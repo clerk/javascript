@@ -1,10 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
+import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { ChevronDown } from '../../../icons/glyphs/chevron-down';
-import { InformationCircle } from '../../../icons/glyphs/information-circle';
 import { RotateAntiClockwise } from '../../../icons/glyphs/rotate-anti-clockwise';
 import { useMessages } from '../../../localization';
 import { Collapsible } from '../../../primitives/collapsible';
@@ -16,7 +17,10 @@ import type { AccessConnectionStepProps } from './access-connection.controller';
 import { ConnectionInput, GoogleDirectoryCredentials, SsoConnectValues } from './access-connection-fields.view';
 import { AccessCopyField, AccessProviderIcon, AccessSelect, StepTitle } from './access-fields.view';
 
-export function ProviderStep({ controller }: AccessConnectionStepProps) {
+export function ProviderStep({
+  controller,
+  firstProvider,
+}: AccessConnectionStepProps & { firstProvider?: Ref<HTMLButtonElement> }) {
   const m = useMessages('organizationProfile').access;
   const groups: AccessProvider[][] =
     controller.kind === 'directory'
@@ -38,6 +42,7 @@ export function ProviderStep({ controller }: AccessConnectionStepProps) {
               {group.map(provider => (
                 <Button
                   key={provider}
+                  ref={provider === groups[0]?.[0] ? firstProvider : undefined}
                   variant='outline'
                   color='neutral'
                   aria-pressed={controller.form.values.provider === provider}
@@ -164,7 +169,9 @@ function SsoConfiguration({ controller, data }: AccessConnectionStepProps) {
             disabled={controller.pending || Boolean(controller.configured)}
           />
         ) : (
-          <Section.Note>{m.ssoRequiresVerifiedDomain}</Section.Note>
+          <Banner.Root color='warning'>
+            <Banner.Label>{m.ssoRequiresVerifiedDomain}</Banner.Label>
+          </Banner.Root>
         )
       ) : (
         <SsoConnectValues
@@ -199,7 +206,11 @@ function DirectoryConfiguration({ controller, data }: AccessConnectionStepProps)
           disabled={controller.pending || Boolean(controller.configured)}
         />
       ) : null}
-      {!controller.matchingSsoConnections.length ? <Section.Note>{m.missingSso}</Section.Note> : null}
+      {!controller.matchingSsoConnections.length ? (
+        <Banner.Root color='warning'>
+          <Banner.Label>{m.missingSso}</Banner.Label>
+        </Banner.Root>
+      ) : null}
       {controller.form.values.provider === 'google' ? (
         <GoogleDirectoryCredentials controller={controller} />
       ) : (
@@ -229,10 +240,9 @@ function DirectoryConfiguration({ controller, data }: AccessConnectionStepProps)
               {m.generateToken}
             </Button>
           </div>
-          <div {...stylex.props(styles.row)}>
-            <Icon glyph={InformationCircle} />
-            <Section.Description>{m.tokenNotice}</Section.Description>
-          </div>
+          <Banner.Root>
+            <Banner.Label>{m.tokenNotice}</Banner.Label>
+          </Banner.Root>
         </>
       )}
     </>

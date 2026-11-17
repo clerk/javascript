@@ -1,5 +1,6 @@
+import type { Ref } from 'react';
+
 import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
 import { EmptyState } from '../../../components/empty-state';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import { ShieldCheck } from '../../../icons/glyphs/shield-check';
@@ -67,16 +68,7 @@ export function AccessConnectionFooter({ controller }: { controller: AccessConne
   );
 }
 
-export function AccessConnectionHeader() {
-  const m = useMessages('organizationProfile').access;
-  return (
-    <Card.Header xstyle={styles.dialogHeader}>
-      <Card.Title xstyle={styles.dialogTitle}>{m.ssoTitle}</Card.Title>
-    </Card.Header>
-  );
-}
-
-export function AccessConnectionSteps(props: AccessConnectionStepProps) {
+export function AccessConnectionSteps(props: AccessConnectionStepProps & { firstProvider?: Ref<HTMLButtonElement> }) {
   const controller = props.controller;
   return (
     <Flow.Root

@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../../tokens.stylex';
+import { colorVars, durationVars, radiusVars, space, typeScaleVars } from '../../../tokens.stylex';
 
 export const styles = stylex.create({
   pageFlow: { transitionProperty: 'none', height: 'auto' },
@@ -31,12 +31,6 @@ export const styles = stylex.create({
     textWrap: 'pretty',
   },
   statusRow: { minHeight: 0 },
-  noticeText: {
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-  },
-  noticeIcon: { color: colorVars['--cl-color-foreground-disabled'] },
   connectionAction: { color: colorVars['--cl-color-foreground-secondary'] },
   dnsRecords: { borderWidth: 0, paddingInline: 0, backgroundColor: 'transparent' },
   dnsRecord: { gap: space['2.5'], paddingBlock: space['1.5'], justifyContent: 'start' },
@@ -68,32 +62,16 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   verified: { color: colorVars['--cl-color-positive'] },
-  notice: {
-    gap: space['2'],
-    paddingBlock: space['2'],
-    paddingInline: space['4'],
-    alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-surface-subtle'],
-    color: colorVars['--cl-color-foreground-secondary'],
-    display: 'flex',
-  },
   footer: {
     gap: space['2'],
     flexDirection: 'row',
     justifyContent: 'end',
-  },
-  dialogHeader: {
-    borderBlockEndColor: colorVars['--cl-color-border'],
-    borderBlockEndStyle: 'solid',
-    borderBlockEndWidth: 1,
-    paddingBlockEnd: space['4'],
   },
   connectionStep: { gap: space['4'] },
   metadataInput: { maxWidth: '100%', width: '25.375rem' },
   headingGroup: { gap: space['1'], display: 'flex', flexDirection: 'column' },
   stepContent: { gap: space['4'], display: 'grid' },
   dialogCard: { width: '38.75rem' },
-  dialogTitle: { fontSize: typeScaleVars['--cl-text-lg-size'], lineHeight: 1.25 },
   providerGroupStack: { gap: space['2'], display: 'flex', flexDirection: 'column' },
   connectionControl: { maxWidth: '100%', width: '18.75rem' },
   selectedProvider: {

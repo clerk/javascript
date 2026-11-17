@@ -1,4 +1,6 @@
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
 import { Field } from '../../../components/field';
@@ -19,6 +21,7 @@ export function ConnectionInput({
   label,
   type = 'text',
   readOnly,
+  inputRef,
 }: {
   controller: ConnectionFieldsController;
   name:
@@ -33,10 +36,13 @@ export function ConnectionInput({
     | 'userInfoUrl'
     | 'subjectEmail';
   readOnly?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
   label: string;
   type?: 'text' | 'password' | 'url' | 'email';
 }) {
   const m = useMessages('organizationProfile').access;
+  const { ref, ...field } = controller.form.register(name);
+  const mergedRef = useMergeRefs([ref, inputRef]);
   return (
     <Field.Root
       disabled={controller.pending}
@@ -47,7 +53,8 @@ export function ConnectionInput({
         readOnly={readOnly}
         type={type}
         placeholder={name === 'metadataUrl' ? m.pasteUrl : undefined}
-        {...controller.form.register(name)}
+        ref={mergedRef}
+        {...field}
       />
     </Field.Root>
   );

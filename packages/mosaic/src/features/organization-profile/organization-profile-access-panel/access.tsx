@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
+import type { RenderProfilePage } from '../../profile-pages/profile-pages.view';
 import { useAccessController } from './access.controller';
 import { useAccessPanelModel } from './access.model';
 import type { AccessData } from './access.types';
-import { OrganizationProfileAccessPanelView } from './access.view';
+import { accessProfilePage } from './access.view';
 
-export function OrganizationProfileAccessPanel() {
+export function OrganizationProfileAccessPanel({ render }: { render: RenderProfilePage }) {
   const [policyId, setPolicyId] = useState<string | null>(null);
   const [directoryParentId, setDirectoryParentId] = useState<string | null>(null);
   const model = useAccessPanelModel(policyId, setPolicyId, directoryParentId, setDirectoryParentId);
@@ -16,27 +17,27 @@ export function OrganizationProfileAccessPanel() {
 
   switch (model.status) {
     case 'hidden':
-      return null;
+      return render(null);
     case 'loading':
-      return <Section.Description role='status'>{m.loadingPolicies}</Section.Description>;
+      return render(<Section.Description role='status'>{m.loadingPolicies}</Section.Description>);
     case 'error':
-      return (
+      return render(
         <div>
           <Section.Error>{m.loadPoliciesError}</Section.Error>
           <Button onClick={() => void model.retry()}>{m.retry}</Button>
-        </div>
+        </div>,
       );
     case 'ready':
-      return <AccessPanelContent data={model.data} />;
+      return (
+        <AccessPanelContent
+          data={model.data}
+          render={render}
+        />
+      );
   }
 }
 
-function AccessPanelContent({ data }: { data: AccessData }) {
-  const controller = useAccessController(data);
-  return (
-    <OrganizationProfileAccessPanelView
-      controller={controller}
-      showEditorControls
-    />
-  );
+function AccessPanelContent({ data, render }: { data: AccessData; render: RenderProfilePage }) {
+  const { page, layout } = accessProfilePage(useAccessController(data));
+  return render(page, layout);
 }

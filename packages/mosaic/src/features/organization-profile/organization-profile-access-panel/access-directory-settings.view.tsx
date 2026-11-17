@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Badge } from '../../../components/badge';
+import { Banner } from '../../../components/banner';
 import { SubmitButton } from '../../../components/button';
 import { Field } from '../../../components/field';
 import { Section } from '../../../components/section';
@@ -49,7 +50,11 @@ export function DirectorySettings({ controller, serviceProvider }: ManageProps) 
               {m.generateNewToken}
             </SubmitButton>
           </div>
-          {controller.token ? <Section.Description>{m.tokenNotice}</Section.Description> : null}
+          {controller.token ? (
+            <Banner.Root role='status'>
+              <Banner.Label>{m.tokenNotice}</Banner.Label>
+            </Banner.Root>
+          ) : null}
         </div>
       ) : null}
       {controller.form.values.enabled !== undefined ? (

@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
 
+import type { ProfilePageContent } from '../profile-pages/profile-pages.view';
+
 export type OrganizationProfilePageId = 'general' | 'members' | 'security' | 'access' | 'billing' | 'apiKeys';
 
 export interface OrganizationProfilePages {
   general: ReactNode;
   members?: ReactNode;
   security?: ReactNode;
-  access?: ReactNode;
+  access?: ProfilePageContent;
   billing?: ReactNode;
   apiKeys?: ReactNode;
 }

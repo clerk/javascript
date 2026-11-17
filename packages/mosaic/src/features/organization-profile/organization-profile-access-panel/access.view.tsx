@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
@@ -11,14 +13,14 @@ import { themeProps } from '../../../props';
 import { rtl } from '../../../styles/rtl.styles';
 import type { AccessController } from './access.controller';
 import { styles } from './access.styles';
-import { AccessConnectionFooter, AccessConnectionHeader, AccessConnectionSteps } from './access-connection.view';
+import { AccessConnectionFooter, AccessConnectionSteps } from './access-connection.view';
 import { AccessDomainsView } from './access-domains.view';
 import { AccessManageConnectionView } from './access-manage-connection.view';
 import { AccessOverview } from './access-overview.view';
 import { AccessPolicyView } from './access-policy.view';
 import { AccessPolicySsoEditDialog } from './access-policy-sso-edit.dialog';
 
-export function AccessBackAction({ controller }: { controller: AccessController }) {
+function AccessBackAction({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
   const manageBackLabel =
     controller.step === 'editor' ? (controller.form.values.id ? m.managePolicy : m.addPolicy) : m.connections;
@@ -46,7 +48,7 @@ export function AccessBackAction({ controller }: { controller: AccessController 
   );
 }
 
-export function AccessFooter({ controller }: { controller: AccessController }) {
+function AccessFooter({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
   if (controller.manageKind) {
     const { form, pending } = controller.manager;
@@ -85,24 +87,24 @@ export function AccessFooter({ controller }: { controller: AccessController }) {
   );
 }
 
-export function OrganizationProfileAccessPanelView({
-  controller,
-  title,
-  showEditorControls = false,
-}: {
-  controller: AccessController;
-  title?: string;
-  showEditorControls?: boolean;
-}) {
+export function accessProfilePage(controller: AccessController) {
+  const editing = controller.pageStep !== 'list';
+  return {
+    page: <OrganizationProfileAccessPanelView controller={controller} />,
+    layout: {
+      contentTitle: controller.pageTitle,
+      contentBackAction: editing ? <AccessBackAction controller={controller} /> : undefined,
+      contentFooter: editing ? <AccessFooter controller={controller} /> : undefined,
+    },
+  };
+}
+
+function OrganizationProfileAccessPanelView({ controller }: { controller: AccessController }) {
+  const firstProvider = useRef<HTMLButtonElement>(null);
+  const m = useMessages('organizationProfile').access;
   return (
     <Panel.Root render={<div {...themeProps('organization-profile-access-panel')} />}>
-      <Panel.Title>{title ?? controller.pageTitle}</Panel.Title>
-      {showEditorControls && controller.pageStep !== 'list' ? <AccessBackAction controller={controller} /> : null}
-      {showEditorControls && controller.pageStep !== 'list' ? (
-        <Section.Header>
-          <Section.Title>{controller.pageTitle}</Section.Title>
-        </Section.Header>
-      ) : null}
+      <Panel.Title>{controller.pageTitle}</Panel.Title>
       <Flow.Root
         xstyle={styles.pageFlow}
         value={controller.pageStep}
@@ -150,27 +152,33 @@ export function OrganizationProfileAccessPanelView({
           </>
         )}
       </Flow.Root>
-      {showEditorControls && controller.pageStep !== 'list' ? (
-        <Section.Actions>
-          <AccessFooter controller={controller} />
-        </Section.Actions>
-      ) : null}
       <AccessDomainsView controller={controller} />
       <AccessPolicySsoEditDialog controller={controller} />
       <Dialog.Root
         open={controller.request?.kind === 'sso'}
         onOpenChange={controller.wizard.onOpenChange}
       >
-        <Dialog.Popup compactPlacement='center'>
+        <Dialog.Popup
+          compactPlacement='center'
+          initialFocus={firstProvider}
+        >
           <Card.Root
             size='lg'
             xstyle={styles.dialogCard}
             renderBranding={false}
           >
-            <AccessConnectionHeader />
-            <Card.Banner color='negative'>{controller.wizard.form.error}</Card.Banner>
+            <Card.Header>
+              <Card.Title>{m.ssoTitle}</Card.Title>
+            </Card.Header>
+            <Card.Banner
+              role='alert'
+              color='negative'
+            >
+              {controller.wizard.form.error}
+            </Card.Banner>
             <Card.Content>
               <AccessConnectionSteps
+                firstProvider={firstProvider}
                 controller={controller.wizard}
                 data={controller.data}
               />

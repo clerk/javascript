@@ -1,10 +1,6 @@
 import { useAccessController } from '@clerk/mosaic/features/organization-profile/organization-profile-access-panel/access.controller';
 import type { AccessData } from '@clerk/mosaic/features/organization-profile/organization-profile-access-panel/access.types';
-import {
-  AccessBackAction,
-  AccessFooter,
-  OrganizationProfileAccessPanelView,
-} from '@clerk/mosaic/features/organization-profile/organization-profile-access-panel/access.view';
+import { accessProfilePage } from '@clerk/mosaic/features/organization-profile/organization-profile-access-panel/access.view';
 import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
@@ -136,20 +132,5 @@ export function useOrganizationProfileAccessFixture({
       return ownershipResponse(name, !failVerification).ownership_verified;
     },
   };
-  const controller = useAccessController(data);
-  const contentTitle = controller.pageTitle;
-  const hasSubpage = controller.pageStep !== 'list';
-  return {
-    page: (
-      <OrganizationProfileAccessPanelView
-        controller={controller}
-        title={contentTitle}
-      />
-    ),
-    layout: {
-      contentTitle,
-      contentBackAction: hasSubpage ? <AccessBackAction controller={controller} /> : undefined,
-      contentFooter: hasSubpage ? <AccessFooter controller={controller} /> : undefined,
-    },
-  };
+  return accessProfilePage(useAccessController(data));
 }

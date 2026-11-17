@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
@@ -13,6 +15,7 @@ import { AccessStepIndicator } from './access-step-indicator.view';
 
 export function AccessPolicySsoEditDialog({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
+  const nameInput = useRef<HTMLInputElement>(null);
   const manager = controller.manager;
   const settingsFormId = `${manager.form.id}-settings`;
   const settings = manager.policyStep === 'settings';
@@ -25,16 +28,24 @@ export function AccessPolicySsoEditDialog({ controller }: { controller: AccessCo
         }
       }}
     >
-      <Dialog.Popup compactPlacement='center'>
+      <Dialog.Popup
+        compactPlacement='center'
+        initialFocus={nameInput}
+      >
         <Card.Root
           size='lg'
           xstyle={styles.dialogCard}
           renderBranding={false}
         >
-          <Card.Header xstyle={styles.dialogHeader}>
-            <Card.Title xstyle={styles.dialogTitle}>{m.editSso}</Card.Title>
+          <Card.Header>
+            <Card.Title>{m.editSso}</Card.Title>
           </Card.Header>
-          <Card.Banner color='negative'>{manager.form.error}</Card.Banner>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {manager.form.error}
+          </Card.Banner>
           <Flow.Root
             value={manager.policyStep}
             direction={settings ? -1 : 1}
@@ -52,6 +63,7 @@ export function AccessPolicySsoEditDialog({ controller }: { controller: AccessCo
                     }
                   >
                     <ConnectionInput
+                      inputRef={nameInput}
                       controller={current.manager}
                       name='name'
                       label={m.name}

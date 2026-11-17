@@ -124,7 +124,14 @@ export function organizationProfilePanels(
   return {
     general: <OrganizationProfileGeneralPanel />,
     members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
-    access: available.includes('access') ? <OrganizationProfileAccessPanel key={organizationId} /> : undefined,
+    access: available.includes('access')
+      ? render => (
+          <OrganizationProfileAccessPanel
+            key={organizationId}
+            render={render}
+          />
+        )
+      : undefined,
     apiKeys:
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };

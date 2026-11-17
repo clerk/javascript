@@ -168,8 +168,12 @@ describe('OrganizationProfile', () => {
     await user.click(within(row).getByRole('button', { name: 'Actions' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Manage' }));
     await user.click(await screen.findByRole('radio', { name: 'Request access' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(screen.getByRole('heading', { name: 'Manage policy' }).closest('.cl-profile-page-header')).toBeTruthy();
+    const save = screen.getByRole('button', { name: 'Save changes' });
+    expect(save.closest('.cl-profile-content-footer')).toBeTruthy();
+    await user.click(save);
     expect(await screen.findByRole('row', { name: /acme.example.*Request access/ })).toBeVisible();
+    expect(document.querySelector('.cl-profile-content-footer')).toBeNull();
   });
 
   it('lists and manages a directory linked to a live SSO connection', async () => {

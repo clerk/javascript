@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { ActionMenu } from '../../../components/action-menu';
+import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -10,7 +11,6 @@ import { Section } from '../../../components/section';
 import { Separator } from '../../../components/separator';
 import { Switch } from '../../../components/switch';
 import { CheckmarkCircle } from '../../../icons/glyphs/checkmark-circle';
-import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
 import { Plus } from '../../../icons/glyphs/plus';
 import { Trash } from '../../../icons/glyphs/trash';
 import { XCircle } from '../../../icons/glyphs/x-circle';
@@ -132,12 +132,11 @@ export function AccessPolicyView({ controller }: { controller: AccessController 
                     </Section.Item>
                   </Section.Row>
                   {usesSso && !domain.verified && controller.canVerifyDomain ? (
-                    <div {...mergeStyleProps(themeProps('access-domain-notice'), stylex.props(styles.notice))}>
-                      <Icon
-                        glyph={ExclamationCircle}
-                        xstyle={styles.noticeIcon}
-                      />
-                      <Section.Description xstyle={styles.noticeText}>{m.verifyNotice}</Section.Description>
+                    <Banner.Root
+                      color='warning'
+                      {...themeProps('access-domain-notice')}
+                    >
+                      <Banner.Label>{m.verifyNotice}</Banner.Label>
                       <Button
                         variant='outline'
                         color='neutral'
@@ -148,7 +147,7 @@ export function AccessPolicyView({ controller }: { controller: AccessController 
                       >
                         {m.verify}
                       </Button>
-                    </div>
+                    </Banner.Root>
                   ) : null}
                 </div>
               ))

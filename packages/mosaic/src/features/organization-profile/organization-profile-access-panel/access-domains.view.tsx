@@ -1,3 +1,6 @@
+import { useMergeRefs } from '@floating-ui/react';
+import { useRef } from 'react';
+
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -14,19 +17,28 @@ import { AccessCopyField } from './access-fields.view';
 export function AccessDomainsView({ controller: c }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
   const form = c.domainForm;
+  const domainInput = useRef<HTMLInputElement>(null);
+  const verificationTitle = useRef<HTMLHeadingElement>(null);
+  const { ref, ...nameField } = form.register('name');
+  const mergedRef = useMergeRefs([ref, domainInput]);
   return (
     <>
       <Dialog.Root
         open={c.addingDomain}
         onOpenChange={c.onDomainOpenChange}
       >
-        <Dialog.Popup>
+        <Dialog.Popup initialFocus={domainInput}>
           <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>{m.addDomainTitle}</Card.Title>
               <Card.Description>{m.addDomainDescription}</Card.Description>
             </Card.Header>
-            <Card.Banner color='negative'>{form.error}</Card.Banner>
+            <Card.Banner
+              role='alert'
+              color='negative'
+            >
+              {form.error}
+            </Card.Banner>
             <Card.Content
               render={
                 <Form
@@ -41,7 +53,8 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
               >
                 <Field.Label>{m.domain}</Field.Label>
                 <Input
-                  {...form.register('name')}
+                  ref={mergedRef}
+                  {...nameField}
                   placeholder={m.domainPlaceholder}
                 />
                 <Field.Feedback feedback={form.fields.name.feedback} />
@@ -71,15 +84,22 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
         open={c.verifyingDomain !== null}
         onOpenChange={c.onVerifyOpenChange}
       >
-        <Dialog.Popup>
+        <Dialog.Popup initialFocus={verificationTitle}>
           <Card.Root renderBranding={false}>
             <Card.Header>
-              <Card.Title xstyle={styles.connectionName}>
+              <Card.Title
+                ref={verificationTitle}
+                tabIndex={-1}
+                xstyle={styles.connectionName}
+              >
                 {c.verifyingDomain}
                 <Badge color='warning'>{m.domainUnverified}</Badge>
               </Card.Title>
             </Card.Header>
-            <Card.Banner color='negative'>
+            <Card.Banner
+              role='alert'
+              color='negative'
+            >
               {c.verification.error ?? (c.verificationMissing ? m.notVerified : undefined)}
             </Card.Banner>
             <Card.Content>

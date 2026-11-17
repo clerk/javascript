@@ -1,14 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Badge } from '../../../components/badge';
+import { Banner } from '../../../components/banner';
 import { CopyButton } from '../../../components/copy-button';
 import { Field } from '../../../components/field';
-import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Section } from '../../../components/section';
 import { Switch } from '../../../components/switch';
 import { Table } from '../../../components/table';
-import { InformationCircle } from '../../../icons/glyphs/information-circle';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../../props';
@@ -94,12 +93,9 @@ export function AssignmentStep({ controller }: AccessConnectionStepProps) {
           <li>{okta ? m.oktaAssignStepOne : m.assignStepOne}</li>
           <li>{okta ? m.oktaAssignStepTwo : m.assignStepTwo}</li>
         </ol>
-        <div {...stylex.props(styles.row)}>
-          <Icon glyph={InformationCircle} />
-          <Section.Description xstyle={styles.stepDescription}>
-            {okta ? m.oktaAssignmentTip : m.assignmentTip}
-          </Section.Description>
-        </div>
+        <Banner.Root>
+          <Banner.Label>{okta ? m.oktaAssignmentTip : m.assignmentTip}</Banner.Label>
+        </Banner.Root>
       </div>
     </>
   );

@@ -85,7 +85,7 @@ if (process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS === '1') {
       await expect(row).toContainText(secondDomain);
     });
 
-    test('keeps incomplete SSO policies from activating or persisting on reload', async ({ page, keycloak }) => {
+    test('verifies domain ownership before saving an SSO policy', async ({ page, keycloak }) => {
       await openAccess(page);
       await button(page, 'Add policy').click();
       await addPolicyDomain(page, keycloak.domain);
@@ -94,6 +94,14 @@ if (process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS === '1') {
       await page.getByRole('radio', { name: 'Single sign-on', exact: true }).click();
       await expect(page.getByText('Ownership unverified', { exact: true })).toBeVisible();
       await expect(button(page, 'Add connection')).toBeVisible();
+      await expect(button(page, 'Activate policy')).toBeDisabled();
+
+      await button(page, 'Verify').click();
+      const verification = page.getByRole('dialog', { name: new RegExp(keycloak.domain) });
+      await expect(verification.getByText('TXT', { exact: true })).toBeVisible();
+      await expect(verification.getByRole('textbox', { name: 'Value', exact: true })).not.toHaveValue('');
+      await button(verification, 'Check verification').click();
+      await expect(page.getByText('Ownership verified', { exact: true })).toBeVisible();
       await expect(button(page, 'Activate policy')).toBeDisabled();
 
       await page.reload();
