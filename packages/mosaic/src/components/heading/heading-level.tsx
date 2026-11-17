@@ -19,3 +19,7 @@ export function HeadingLevelProvider({ level, children }: HeadingLevelProviderPr
 export function useHeadingLevel(): HeadingLevel {
   return React.useContext(HeadingLevelContext);
 }
+
+export declare namespace HeadingLevelProvider {
+  type Props = HeadingLevelProviderProps;
+}

@@ -12,7 +12,7 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { useOptionalFieldContext, useRegisterFieldPartId } from '../field/field.context';
 import * as slots from './item.styles';
 
-export type ItemProps = MosaicComponentProps<'div'>;
+export type ItemRootProps = MosaicComponentProps<'div'>;
 
 /**
  * Root row. Renders a `<div>`, or a custom element (link, button, or
@@ -25,7 +25,7 @@ export type ItemProps = MosaicComponentProps<'div'>;
  *   <Item.Content><Item.Label>Clerk</Item.Label></Item.Content>
  * </Item.Root>
  */
-const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem({ render, xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLDivElement, ItemRootProps>(function MosaicItem({ render, xstyle, ...rest }, ref) {
   // A custom render (link, button, or radio card row) opts into hover + cursor affordances.
   const interactive = Boolean(render);
   return useRender({
@@ -42,8 +42,10 @@ const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem({ r
   });
 });
 
+export type ItemMediaProps = MosaicComponentProps<'div'>;
+
 /** Square column that centers its media (icon, image, avatar, or spinner). */
-const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
+const Media = React.forwardRef<HTMLDivElement, ItemMediaProps>(function MosaicItemMedia(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -57,8 +59,10 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
+export type ItemContentProps = MosaicComponentProps<'div'>;
+
 /** Vertical stack (label + description) that grows to fill the row between media and actions. */
-const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemContent(
+const Content = React.forwardRef<HTMLDivElement, ItemContentProps>(function MosaicItemContent(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -114,8 +118,10 @@ const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicIt
   });
 });
 
+export type ItemDescriptionProps = MosaicComponentProps<'div'>;
+
 /** Secondary text beneath the label. Truncates to a single line. Describes the radio of a `Radio.Card` row. */
-const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemDescription(
+const Description = React.forwardRef<HTMLDivElement, ItemDescriptionProps>(function MosaicItemDescription(
   { render, xstyle, id: idProp, ...rest },
   ref,
 ) {
@@ -138,8 +144,10 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
   });
 });
 
+export type ItemActionsProps = MosaicComponentProps<'div'>;
+
 /** Trailing controls (buttons, badges). */
-const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemActions(
+const Actions = React.forwardRef<HTMLDivElement, ItemActionsProps>(function MosaicItemActions(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -153,8 +161,10 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
+export type ItemGroupProps = MosaicComponentProps<'div'>;
+
 /** Vertical stack of rows, spaced apart. Layout only; the rows carry their own semantics. */
-const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
+const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicItemGroup(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -167,6 +177,34 @@ const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
     },
   });
 });
+
+declare namespace Root {
+  type Props = ItemRootProps;
+}
+
+declare namespace Media {
+  type Props = ItemMediaProps;
+}
+
+declare namespace Content {
+  type Props = ItemContentProps;
+}
+
+declare namespace Label {
+  type Props = ItemLabelProps;
+}
+
+declare namespace Description {
+  type Props = ItemDescriptionProps;
+}
+
+declare namespace Actions {
+  type Props = ItemActionsProps;
+}
+
+declare namespace Group {
+  type Props = ItemGroupProps;
+}
 
 export {
   Root as ItemRoot,

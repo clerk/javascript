@@ -9,4 +9,4 @@
  * with the label it belongs to.
  */
 export * as DataList from './data-list.parts';
-export type { DataListProps } from './data-list';
+export type { DataListItemProps, DataListLabelProps, DataListRootProps, DataListValueProps } from './data-list';

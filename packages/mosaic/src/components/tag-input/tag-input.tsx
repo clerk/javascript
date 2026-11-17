@@ -177,3 +177,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
     </Primitive.Root>
   );
 });
+
+export declare namespace TagInput {
+  type Props = TagInputProps;
+}

@@ -122,3 +122,7 @@ function stateOf(value: number, current: number): SegmentState {
 function atLeastOne(value: number): number {
   return Number.isFinite(value) && value > 1 ? Math.floor(value) : 1;
 }
+
+export declare namespace Stepper {
+  type Props = StepperProps;
+}

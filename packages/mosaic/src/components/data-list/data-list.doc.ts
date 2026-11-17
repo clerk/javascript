@@ -1,6 +1,6 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { MosaicComponentProps } from '../../props';
-import type { DataListProps } from './data-list';
+import type { DataListRootProps } from './data-list';
 
 export default {
   name: 'DataList',
@@ -41,7 +41,7 @@ export default {
     },
   ],
 } satisfies ComponentDoc<{
-  'DataList.Root': DataListProps;
+  'DataList.Root': DataListRootProps;
   'DataList.Item': MosaicComponentProps<'div'>;
   'DataList.Label': MosaicComponentProps<'dt'>;
   'DataList.Value': MosaicComponentProps<'dd'>;

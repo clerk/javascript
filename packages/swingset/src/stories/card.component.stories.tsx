@@ -1,6 +1,6 @@
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Button } from '@clerk/mosaic/components/button';
-import type { CardProps } from '@clerk/mosaic/components/card';
+import type { CardRootProps } from '@clerk/mosaic/components/card';
 import { Card } from '@clerk/mosaic/components/card';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
@@ -68,7 +68,7 @@ export const meta: StoryMeta = {
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
-  return props as unknown as CardProps;
+  return props as unknown as CardRootProps;
 }
 
 export function Default(props: Record<string, unknown>) {

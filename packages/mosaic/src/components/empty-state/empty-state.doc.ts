@@ -4,7 +4,7 @@ import type {
   EmptyStateDescriptionProps,
   EmptyStateIconProps,
   EmptyStateLabelProps,
-  EmptyStateProps,
+  EmptyStateRootProps,
 } from './empty-state';
 
 export default {
@@ -45,7 +45,7 @@ export default {
   ],
   related: ['Skeleton', 'Table'],
 } satisfies ComponentDoc<{
-  'EmptyState.Root': EmptyStateProps;
+  'EmptyState.Root': EmptyStateRootProps;
   'EmptyState.Icon': EmptyStateIconProps;
   'EmptyState.Label': EmptyStateLabelProps;
   'EmptyState.Description': EmptyStateDescriptionProps;

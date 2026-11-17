@@ -7,4 +7,12 @@
  * takes a `render` prop and forwards a ref.
  */
 export * as Item from './item.parts';
-export type { ItemProps } from './item';
+export type {
+  ItemActionsProps,
+  ItemContentProps,
+  ItemDescriptionProps,
+  ItemGroupProps,
+  ItemLabelProps,
+  ItemMediaProps,
+  ItemRootProps,
+} from './item';

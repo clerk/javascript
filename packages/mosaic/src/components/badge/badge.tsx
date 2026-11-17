@@ -51,3 +51,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Mosa
     },
   });
 });
+
+export declare namespace Badge {
+  type Props = BadgeProps;
+}

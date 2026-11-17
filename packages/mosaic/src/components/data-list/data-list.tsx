@@ -10,7 +10,7 @@ import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import * as slots from './data-list.styles';
 
-export type DataListProps = MosaicComponentProps<'dl'> & {
+export type DataListRootProps = MosaicComponentProps<'dl'> & {
   /**
    * Rules between the items, for a list read row by row. Turn it off where the pairs are few
    * enough to scan as a block.
@@ -33,7 +33,7 @@ const DataListContext = React.createContext(true);
  *   </DataList.Item>
  * </DataList.Root>
  */
-const Root = React.forwardRef<HTMLDListElement, DataListProps>(function MosaicDataList(
+const Root = React.forwardRef<HTMLDListElement, DataListRootProps>(function MosaicDataList(
   { divided = true, render, xstyle, ...rest },
   ref,
 ) {
@@ -49,7 +49,9 @@ const Root = React.forwardRef<HTMLDListElement, DataListProps>(function MosaicDa
   return <DataListContext.Provider value={divided}>{element}</DataListContext.Provider>;
 });
 
-const Item = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicDataListItem(
+export type DataListItemProps = MosaicComponentProps<'div'>;
+
+const Item = React.forwardRef<HTMLDivElement, DataListItemProps>(function MosaicDataListItem(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -68,7 +70,9 @@ const Item = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(funct
   });
 });
 
-const Label = React.forwardRef<HTMLElement, MosaicComponentProps<'dt'>>(function MosaicDataListLabel(
+export type DataListLabelProps = MosaicComponentProps<'dt'>;
+
+const Label = React.forwardRef<HTMLElement, DataListLabelProps>(function MosaicDataListLabel(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -82,7 +86,9 @@ const Label = React.forwardRef<HTMLElement, MosaicComponentProps<'dt'>>(function
   });
 });
 
-const Value = React.forwardRef<HTMLElement, MosaicComponentProps<'dd'>>(function MosaicDataListValue(
+export type DataListValueProps = MosaicComponentProps<'dd'>;
+
+const Value = React.forwardRef<HTMLElement, DataListValueProps>(function MosaicDataListValue(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -99,5 +105,21 @@ const Value = React.forwardRef<HTMLElement, MosaicComponentProps<'dd'>>(function
     },
   });
 });
+
+declare namespace Root {
+  type Props = DataListRootProps;
+}
+
+declare namespace Item {
+  type Props = DataListItemProps;
+}
+
+declare namespace Label {
+  type Props = DataListLabelProps;
+}
+
+declare namespace Value {
+  type Props = DataListValueProps;
+}
 
 export { Root as DataListRoot, Item as DataListItem, Label as DataListLabel, Value as DataListValue };

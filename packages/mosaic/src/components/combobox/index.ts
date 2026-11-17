@@ -17,6 +17,7 @@ export {
 } from './combobox';
 export type {
   ComboboxClearProps,
+  ComboboxCollectionProps,
   ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputGroupProps,
@@ -24,8 +25,8 @@ export type {
   ComboboxLabelProps,
   ComboboxListProps,
   ComboboxMediaProps,
-  ComboboxOptionProps,
   ComboboxOptionIndicatorProps,
+  ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
   ComboboxSize,

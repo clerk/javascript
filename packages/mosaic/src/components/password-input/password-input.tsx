@@ -82,3 +82,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     </InputGroup.Root>
   );
 });
+
+export declare namespace PasswordInput {
+  type Props = PasswordInputProps;
+}

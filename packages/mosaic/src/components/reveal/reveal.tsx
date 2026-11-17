@@ -40,3 +40,7 @@ export const Reveal = React.forwardRef<HTMLDivElement, RevealProps>(function Mos
     },
   });
 });
+
+export declare namespace Reveal {
+  type Props = RevealProps;
+}

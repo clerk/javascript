@@ -126,3 +126,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
     );
   },
 );
+
+export declare namespace CopyButton {
+  type Props = CopyButtonProps;
+}

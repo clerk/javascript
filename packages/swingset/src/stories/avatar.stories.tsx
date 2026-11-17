@@ -1,4 +1,4 @@
-import type { AvatarProps } from '@clerk/mosaic/components/avatar';
+import type { AvatarRootProps } from '@clerk/mosaic/components/avatar';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Pen } from '@clerk/mosaic/icons/glyphs/pen';
@@ -10,7 +10,7 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './avatar.stories?raw';
 
 // StyleX has no runtime recipe to derive knobs from, so the variant surface is described
-// here to drive the playground + prop table. Keys mirror `AvatarProps`.
+// here to drive the playground + prop table. Keys mirror `AvatarRootProps`.
 export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
@@ -30,10 +30,10 @@ export const meta: StoryMeta = {
   },
 };
 
-// Story functions accept Record<string,unknown> (knob values) and cast to AvatarProps.
+// Story functions accept Record<string,unknown> (knob values) and cast to AvatarRootProps.
 // The cast is unavoidable: knobs are dynamically typed; Avatar has a strict prop interface.
 function knobsAsProps(props: Record<string, unknown>) {
-  return props as unknown as AvatarProps;
+  return props as unknown as AvatarRootProps;
 }
 
 const IMAGE_SRC = 'https://github.com/clerk.png';

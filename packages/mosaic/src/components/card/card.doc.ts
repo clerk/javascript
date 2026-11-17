@@ -1,6 +1,6 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { MosaicComponentProps } from '../../props';
-import type { CardBannerProps, CardProps } from './card';
+import type { CardBannerProps, CardRootProps } from './card';
 
 export default {
   name: 'Card',
@@ -97,7 +97,7 @@ export default {
   ],
   related: ['Dialog', 'Banner', 'Flow', 'Branding'],
 } satisfies ComponentDoc<{
-  'Card.Root': CardProps;
+  'Card.Root': CardRootProps;
   'Card.Header': MosaicComponentProps<'div'>;
   'Card.Media': MosaicComponentProps<'div'>;
   'Card.Title': MosaicComponentProps<'h2'>;

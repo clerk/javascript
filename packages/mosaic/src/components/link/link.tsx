@@ -55,3 +55,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Mosa
     },
   });
 });
+
+export declare namespace Link {
+  type Props = LinkProps;
+}

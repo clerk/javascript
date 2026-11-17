@@ -11,9 +11,9 @@ import { reset } from '../../styles/reset.styles';
 import { Icon, IconFrame } from '../icon';
 import { styles } from './empty-state.styles';
 
-export type EmptyStateProps = MosaicComponentProps<'div'>;
+export type EmptyStateRootProps = MosaicComponentProps<'div'>;
 
-const Root = React.forwardRef<HTMLDivElement, EmptyStateProps>(function MosaicEmptyState(
+const Root = React.forwardRef<HTMLDivElement, EmptyStateRootProps>(function MosaicEmptyState(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -92,6 +92,26 @@ const Actions = React.forwardRef<HTMLDivElement, EmptyStateActionsProps>(functio
     props: mergeStyleProps(themeProps('empty-state-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
   });
 });
+
+declare namespace Root {
+  type Props = EmptyStateRootProps;
+}
+
+declare namespace EmptyStateIcon {
+  type Props = EmptyStateIconProps;
+}
+
+declare namespace Label {
+  type Props = EmptyStateLabelProps;
+}
+
+declare namespace Description {
+  type Props = EmptyStateDescriptionProps;
+}
+
+declare namespace Actions {
+  type Props = EmptyStateActionsProps;
+}
 
 export {
   Root as EmptyStateRoot,

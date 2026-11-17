@@ -114,3 +114,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
     </span>
   );
 });
+
+export declare namespace Checkbox {
+  type Props = CheckboxProps;
+}

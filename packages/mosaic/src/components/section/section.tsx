@@ -349,6 +349,66 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
   });
 });
 
+declare namespace Root {
+  type Props = SectionRootProps;
+}
+
+declare namespace Group {
+  type Props = SectionGroupProps;
+}
+
+declare namespace Header {
+  type Props = SectionHeaderProps;
+}
+
+declare namespace Title {
+  type Props = SectionTitleProps;
+}
+
+declare namespace Body {
+  type Props = SectionBodyProps;
+}
+
+declare namespace Row {
+  type Props = SectionRowProps;
+}
+
+declare namespace Items {
+  type Props = SectionItemsProps;
+}
+
+declare namespace Item {
+  type Props = SectionItemProps;
+}
+
+declare namespace Media {
+  type Props = SectionMediaProps;
+}
+
+declare namespace Content {
+  type Props = SectionContentProps;
+}
+
+declare namespace Label {
+  type Props = SectionLabelProps;
+}
+
+declare namespace Description {
+  type Props = SectionDescriptionProps;
+}
+
+declare namespace Actions {
+  type Props = SectionActionsProps;
+}
+
+declare namespace Note {
+  type Props = SectionNoteProps;
+}
+
+declare namespace SectionError {
+  type Props = SectionErrorProps;
+}
+
 export {
   Root as SectionRoot,
   Group as SectionGroup,

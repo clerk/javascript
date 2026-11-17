@@ -139,3 +139,7 @@ export const SwitcherTrigger = React.forwardRef<HTMLButtonElement, SwitcherTrigg
     </button>
   );
 });
+
+export declare namespace SwitcherTrigger {
+  type Props = SwitcherTriggerProps;
+}

@@ -1,5 +1,5 @@
 import type { ComponentDoc } from '../../docs-schema';
-import type { AvatarFallbackProps, AvatarIconProps, AvatarImageProps, AvatarProps } from './avatar';
+import type { AvatarFallbackProps, AvatarIconProps, AvatarImageProps, AvatarRootProps } from './avatar';
 
 export default {
   name: 'Avatar',
@@ -43,7 +43,7 @@ export default {
     },
   },
 } satisfies ComponentDoc<{
-  'Avatar.Root': AvatarProps;
+  'Avatar.Root': AvatarRootProps;
   'Avatar.Image': AvatarImageProps;
   'Avatar.Fallback': AvatarFallbackProps;
   'Avatar.Icon': AvatarIconProps;

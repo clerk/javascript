@@ -5,6 +5,6 @@ export type {
   EmptyStateActionsProps,
   EmptyStateDescriptionProps,
   EmptyStateIconProps,
-  EmptyStateProps,
+  EmptyStateRootProps,
   EmptyStateLabelProps,
 } from './empty-state';

@@ -242,3 +242,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     </nav>
   );
 });
+
+export declare namespace Pagination {
+  type Props = PaginationProps;
+}

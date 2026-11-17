@@ -85,3 +85,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(function M
     </span>
   );
 });
+
+export declare namespace Switch {
+  type Props = SwitchProps;
+}

@@ -63,3 +63,7 @@ export const Skeleton = React.forwardRef<HTMLSpanElement, SkeletonProps>(functio
     </span>
   );
 });
+
+export declare namespace Skeleton {
+  type Props = SkeletonProps;
+}

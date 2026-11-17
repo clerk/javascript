@@ -1,6 +1,6 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { MosaicComponentProps } from '../../props';
-import type { ItemLabelProps, ItemProps } from './item';
+import type { ItemLabelProps, ItemRootProps } from './item';
 
 export default {
   name: 'Item',
@@ -74,7 +74,7 @@ export default {
   ],
   related: ['Radio', 'Avatar'],
 } satisfies ComponentDoc<{
-  'Item.Root': ItemProps;
+  'Item.Root': ItemRootProps;
   'Item.Media': MosaicComponentProps<'div'>;
   'Item.Content': MosaicComponentProps<'div'>;
   'Item.Label': ItemLabelProps;

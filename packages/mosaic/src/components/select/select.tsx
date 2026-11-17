@@ -47,7 +47,7 @@ interface SelectItemsProps<Value> {
   items: SelectItem<Value>[];
 }
 
-export type SelectProps<Value = string> =
+export type SelectRootProps<Value = string> =
   | (Omit<PrimitiveSelectSingleProps<Value>, 'items'> & SelectItemsProps<Value>)
   | (Omit<PrimitiveSelectMultipleProps<Value>, 'items'> & SelectItemsProps<Value>);
 
@@ -59,7 +59,7 @@ export function SelectRoot<Value = string>({
   alignItemWithTrigger,
   children,
   ...rest
-}: SelectProps<Value>): React.ReactElement {
+}: SelectRootProps<Value>): React.ReactElement {
   const described = items.some(item => item.description !== undefined);
 
   return (
@@ -383,3 +383,35 @@ export const SelectDescription = React.forwardRef<HTMLSpanElement, SelectDescrip
     });
   },
 );
+
+export declare namespace SelectRoot {
+  type Props<Value = string> = SelectRootProps<Value>;
+}
+
+export declare namespace SelectTrigger {
+  type Props = SelectTriggerProps;
+}
+
+export declare namespace SelectPopup {
+  type Props = SelectPopupProps;
+}
+
+export declare namespace SelectOption {
+  type Props = SelectOptionProps;
+}
+
+export declare namespace SelectMedia {
+  type Props = SelectMediaProps;
+}
+
+export declare namespace SelectContent {
+  type Props = SelectContentProps;
+}
+
+export declare namespace SelectLabel {
+  type Props = SelectLabelProps;
+}
+
+export declare namespace SelectDescription {
+  type Props = SelectDescriptionProps;
+}

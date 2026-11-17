@@ -23,7 +23,7 @@ import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import * as slots from './menu.styles';
 
-export type { MenuProps };
+export type MenuRootProps = MenuProps;
 
 export type MenuTriggerProps = MosaicComponentProps<'button'> & {
   /**
@@ -249,4 +249,36 @@ export const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps
 // Renders no element of its own; re-exported unchanged so the state provider sits
 // alongside the styled parts.
 const MenuRoot = Primitive.Root;
+declare namespace MenuRoot {
+  type Props = MenuRootProps;
+}
+
 export { MenuRoot };
+
+export declare namespace MenuTrigger {
+  type Props = MenuTriggerProps;
+}
+
+export declare namespace MenuPopup {
+  type Props = MenuPopupProps;
+}
+
+export declare namespace MenuItem {
+  type Props = MenuItemProps;
+}
+
+export declare namespace MenuMedia {
+  type Props = MenuMediaProps;
+}
+
+export declare namespace MenuLabel {
+  type Props = MenuLabelProps;
+}
+
+export declare namespace MenuIndicator {
+  type Props = MenuIndicatorProps;
+}
+
+export declare namespace MenuSeparator {
+  type Props = MenuSeparatorProps;
+}

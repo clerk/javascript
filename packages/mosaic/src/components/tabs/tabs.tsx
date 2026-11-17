@@ -114,6 +114,30 @@ const Panels = React.forwardRef<HTMLDivElement, TabsPanelsProps>(function Mosaic
   });
 });
 
+declare namespace Root {
+  type Props = TabsRootProps;
+}
+
+declare namespace List {
+  type Props = TabsListProps;
+}
+
+declare namespace Tab {
+  type Props = TabsTabProps;
+}
+
+declare namespace Trigger {
+  type Props = TabsTriggerProps;
+}
+
+declare namespace Panels {
+  type Props = TabsPanelsProps;
+}
+
+declare namespace Panel {
+  type Props = TabsPanelProps;
+}
+
 export {
   Root as TabsRoot,
   List as TabsList,

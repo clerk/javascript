@@ -63,4 +63,12 @@ const Item = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(func
   );
 });
 
+declare namespace Root {
+  type Props<Value = string> = SegmentedControlRootProps<Value>;
+}
+
+declare namespace Item {
+  type Props = SegmentedControlItemProps;
+}
+
 export { Root as SegmentedControlRoot, Item as SegmentedControlItem };

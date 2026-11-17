@@ -10,6 +10,7 @@ import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
 import { ButtonContext } from '../button/button.context';
 import { useOptionalFieldContext } from '../field/field.context';
+import type { InputProps } from '../input';
 import { Input } from '../input';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
@@ -76,6 +77,12 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
 
 export type InputGroupAddonProps = MosaicComponentProps<'span'>;
 
+export type InputGroupStartProps = InputGroupAddonProps;
+
+export type InputGroupEndProps = InputGroupAddonProps;
+
+export type InputGroupInputProps = InputProps;
+
 const addonButtonSizes = { sm: 'xs', md: 'sm', lg: 'md' } as const;
 
 function useAddon(
@@ -116,12 +123,24 @@ function useAddon(
   return <ButtonContext.Provider value={defaults}>{element}</ButtonContext.Provider>;
 }
 
-const Start = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function MosaicInputGroupStart(props, ref) {
+const Start = React.forwardRef<HTMLSpanElement, InputGroupStartProps>(function MosaicInputGroupStart(props, ref) {
   return useAddon('start', props, ref);
 });
 
-const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function MosaicInputGroupEnd(props, ref) {
+const End = React.forwardRef<HTMLSpanElement, InputGroupEndProps>(function MosaicInputGroupEnd(props, ref) {
   return useAddon('end', props, ref);
 });
+
+declare namespace Root {
+  type Props = InputGroupRootProps;
+}
+
+declare namespace Start {
+  type Props = InputGroupStartProps;
+}
+
+declare namespace End {
+  type Props = InputGroupEndProps;
+}
 
 export { Root as InputGroupRoot, Input as InputGroupInput, Start as InputGroupStart, End as InputGroupEnd };

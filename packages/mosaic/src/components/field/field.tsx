@@ -340,6 +340,46 @@ const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function M
   );
 });
 
+declare namespace Root {
+  type Props = FieldRootProps;
+}
+
+declare namespace Header {
+  type Props = FieldHeaderProps;
+}
+
+declare namespace Label {
+  type Props = FieldLabelProps;
+}
+
+declare namespace Content {
+  type Props = FieldContentProps;
+}
+
+declare namespace Description {
+  type Props = FieldDescriptionProps;
+}
+
+declare namespace Message {
+  type Props = FieldMessageProps;
+}
+
+declare namespace Feedback {
+  type Props = FieldFeedbackProps;
+}
+
+declare namespace FieldError {
+  type Props = FieldErrorProps;
+}
+
+declare namespace FieldSuccess {
+  type Props = FieldSuccessProps;
+}
+
+declare namespace FieldHint {
+  type Props = FieldHintProps;
+}
+
 export {
   Root as FieldRoot,
   Header as FieldHeader,

@@ -179,6 +179,7 @@ export default defineConfig({
         'typescript/no-explicit-any': 'error',
         'typescript/no-floating-promises': 'error',
         'typescript/no-misused-promises': 'error',
+        'typescript/no-namespace': ['error', { allowDeclarations: true }],
         'typescript/no-unsafe-argument': 'error',
         'typescript/no-unsafe-assignment': 'error',
         'typescript/no-unsafe-call': 'error',

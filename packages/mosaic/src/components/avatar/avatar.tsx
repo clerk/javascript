@@ -31,13 +31,13 @@ function useAvatarContext(part: string): AvatarContextValue {
   return context;
 }
 
-export interface AvatarProps extends MosaicComponentProps<'span'> {
+export interface AvatarRootProps extends MosaicComponentProps<'span'> {
   bordered?: boolean;
   shape?: 'circle' | 'square';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'fit';
 }
 
-const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
+const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarRootProps>(function MosaicAvatarRoot(
   { bordered = true, shape = 'circle', size = 'md', render, xstyle, ...rest },
   ref,
 ) {
@@ -194,5 +194,21 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
     />
   );
 });
+
+declare namespace AvatarRoot {
+  type Props = AvatarRootProps;
+}
+
+declare namespace AvatarImage {
+  type Props = AvatarImageProps;
+}
+
+declare namespace AvatarFallback {
+  type Props = AvatarFallbackProps;
+}
+
+declare namespace AvatarIcon {
+  type Props = AvatarIconProps;
+}
 
 export { AvatarRoot, AvatarImage, AvatarFallback, AvatarIcon };

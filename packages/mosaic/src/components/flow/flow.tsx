@@ -68,6 +68,14 @@ const Step = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(
   );
 });
 
+declare namespace Root {
+  type Props<State> = FlowRootProps<State>;
+}
+
+declare namespace Step {
+  type Props = FlowStepProps;
+}
+
 export { Root as FlowRoot, Step as FlowStep };
 
 export type { FlowDirection };

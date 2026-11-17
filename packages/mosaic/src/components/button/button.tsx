@@ -114,3 +114,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     </HeadlessButton>
   );
 });
+
+export declare namespace Button {
+  type Props = ButtonProps;
+}

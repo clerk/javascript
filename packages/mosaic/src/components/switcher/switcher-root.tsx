@@ -22,3 +22,7 @@ export function SwitcherRoot({ placement = 'bottom-start', children, ...rest }: 
     </Popover.Root>
   );
 }
+
+export declare namespace SwitcherRoot {
+  type Props = SwitcherRootProps;
+}

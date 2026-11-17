@@ -32,3 +32,7 @@ export const VisuallyHidden = React.forwardRef<HTMLSpanElement, VisuallyHiddenPr
     },
   });
 });
+
+export declare namespace VisuallyHidden {
+  type Props = VisuallyHiddenProps;
+}

@@ -12,6 +12,7 @@ export type {
   SectionBodyProps,
   SectionContentProps,
   SectionDescriptionProps,
+  SectionErrorProps,
   SectionGroupProps,
   SectionHeaderProps,
   SectionItemProps,

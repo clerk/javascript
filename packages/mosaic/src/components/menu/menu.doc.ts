@@ -1,11 +1,11 @@
 import type { ComponentDoc } from '../../docs-schema';
-import type { MenuProps } from '../../primitives/menu/menu-root';
 import type {
   MenuIndicatorProps,
   MenuItemProps,
   MenuLabelProps,
   MenuMediaProps,
   MenuPopupProps,
+  MenuRootProps,
   MenuSeparatorProps,
   MenuTriggerProps,
 } from './menu';
@@ -140,7 +140,7 @@ export default {
   ],
   related: ['ActionMenu', 'Select', 'Popover'],
 } satisfies ComponentDoc<{
-  'Menu.Root': MenuProps;
+  'Menu.Root': MenuRootProps;
   'Menu.Trigger': MenuTriggerProps;
   'Menu.Popup': MenuPopupProps;
   'Menu.Item': MenuItemProps;

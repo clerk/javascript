@@ -98,3 +98,7 @@ export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicO
     </Primitive.Root>
   );
 });
+
+export declare namespace Otp {
+  type Props = OtpProps;
+}

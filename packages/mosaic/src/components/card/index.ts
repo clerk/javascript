@@ -13,4 +13,15 @@
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
 export * as Card from './card.parts';
-export type { CardAlign, CardBannerProps, CardProps, CardSize } from './card';
+export type {
+  CardAlign,
+  CardBannerProps,
+  CardContentProps,
+  CardDescriptionProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardMediaProps,
+  CardRootProps,
+  CardSize,
+  CardTitleProps,
+} from './card';

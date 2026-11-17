@@ -345,6 +345,26 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
   );
 });
 
+declare namespace Root {
+  type Props = ActionBarRootProps;
+}
+
+declare namespace Action {
+  type Props = ActionBarActionProps;
+}
+
+declare namespace Count {
+  type Props = ActionBarCountProps;
+}
+
+declare namespace Separator {
+  type Props = ActionBarSeparatorProps;
+}
+
+declare namespace Dismiss {
+  type Props = ActionBarDismissProps;
+}
+
 export {
   Root as ActionBarRoot,
   Action as ActionBarAction,

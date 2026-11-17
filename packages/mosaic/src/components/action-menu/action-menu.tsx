@@ -91,3 +91,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
     </Menu.Root>
   );
 }
+
+export declare namespace ActionMenu {
+  type Props = ActionMenuProps;
+}

@@ -4,7 +4,7 @@
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 export { Avatar } from '../components/avatar';
-export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
+export type { AvatarRootProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Banner } from '../components/banner';
@@ -18,7 +18,7 @@ export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';
-export type { CardProps } from '../components/card';
+export type { CardRootProps } from '../components/card';
 export { Drawer } from '../components/drawer';
 export type {
   DrawerCloseProps,
@@ -33,7 +33,7 @@ export type {
   EmptyStateActionsProps,
   EmptyStateDescriptionProps,
   EmptyStateIconProps,
-  EmptyStateProps,
+  EmptyStateRootProps,
   EmptyStateLabelProps,
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
@@ -50,7 +50,7 @@ export type {
   ComboboxSize,
 } from '../components/combobox';
 export { DataList } from '../components/data-list';
-export type { DataListProps } from '../components/data-list';
+export type { DataListRootProps } from '../components/data-list';
 export { Dialog } from '../components/dialog';
 export type {
   DialogCloseButtonProps,
@@ -81,7 +81,7 @@ export type { PasswordInputProps } from '../components/password-input';
 export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
-export type { ItemProps } from '../components/item';
+export type { ItemRootProps } from '../components/item';
 export { Link } from '../components/link';
 export type { LinkProps } from '../components/link';
 export { Menu } from '../components/menu';
@@ -95,7 +95,7 @@ export type {
   MenuMediaProps,
   MenuMediaSize,
   MenuPopupProps,
-  MenuProps,
+  MenuRootProps,
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
@@ -110,7 +110,7 @@ export type {
   SelectItem,
   SelectOptionProps,
   SelectPopupProps,
-  SelectProps,
+  SelectRootProps,
   SelectTriggerProps,
   SelectTriggerVariant,
 } from '../components/select';

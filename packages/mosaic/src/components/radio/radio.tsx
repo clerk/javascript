@@ -10,6 +10,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { visuallyHidden } from '../../styles/visually-hidden.styles';
 import { FieldProvider, useOptionalFieldContext, useOptionalFieldControlProps } from '../field/field.context';
+import type { ItemContentProps, ItemDescriptionProps, ItemLabelProps, ItemMediaProps } from '../item';
 import { Item } from '../item';
 import { Text } from '../text';
 import { radioInputMarker } from './radio.markers.stylex';
@@ -264,8 +265,48 @@ const RadioCard = React.forwardRef<HTMLLabelElement, RadioCardProps>(function Mo
   );
 });
 
+export type RadioMediaProps = ItemMediaProps;
+
+export type RadioContentProps = ItemContentProps;
+
+export type RadioLabelProps = ItemLabelProps;
+
+export type RadioDescriptionProps = ItemDescriptionProps;
+
 const RadioMedia = Item.Media;
 const RadioContent = Item.Content;
 const RadioLabel = Item.Label;
 const RadioDescription = Item.Description;
+declare namespace RadioGroup {
+  type Props<Value = string> = RadioGroupProps<Value>;
+}
+
+declare namespace RadioItem {
+  type Props = RadioItemProps;
+}
+
+declare namespace RadioSection {
+  type Props = RadioSectionProps;
+}
+
+declare namespace RadioCard {
+  type Props = RadioCardProps;
+}
+
+declare namespace RadioMedia {
+  type Props = RadioMediaProps;
+}
+
+declare namespace RadioContent {
+  type Props = RadioContentProps;
+}
+
+declare namespace RadioLabel {
+  type Props = RadioLabelProps;
+}
+
+declare namespace RadioDescription {
+  type Props = RadioDescriptionProps;
+}
+
 export { RadioGroup, RadioItem, RadioSection, RadioCard, RadioMedia, RadioContent, RadioLabel, RadioDescription };

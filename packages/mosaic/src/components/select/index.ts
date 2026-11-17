@@ -17,7 +17,7 @@ export type {
   SelectMediaProps,
   SelectOptionProps,
   SelectPopupProps,
-  SelectProps,
+  SelectRootProps,
   SelectTriggerProps,
   SelectTriggerVariant,
 } from './select';

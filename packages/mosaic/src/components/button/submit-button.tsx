@@ -104,3 +104,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
     </Button>
   );
 });
+
+export declare namespace SubmitButton {
+  type Props = SubmitButtonProps;
+}

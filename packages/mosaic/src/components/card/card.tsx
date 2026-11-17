@@ -46,7 +46,7 @@ function CardBranding() {
   );
 }
 
-export interface CardProps extends MosaicComponentProps<'div'> {
+export interface CardRootProps extends MosaicComponentProps<'div'> {
   /** Surface treatment applied to the card. @default 'card' */
   elevation?: CardElevation;
   /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
@@ -62,7 +62,7 @@ export interface CardProps extends MosaicComponentProps<'div'> {
   renderBranding?: boolean;
 }
 
-const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
+const Root = React.forwardRef<HTMLDivElement, CardRootProps>(function CardRoot(
   {
     elevation = DEFAULT_ELEVATION,
     size = 'md',
@@ -132,7 +132,9 @@ function HeaderCloseButton() {
   );
 }
 
-const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
+export type CardHeaderProps = MosaicComponentProps<'div'>;
+
+const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
   { render, xstyle, children, ...rest },
   ref,
 ) {
@@ -173,10 +175,9 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   });
 });
 
-const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardMedia(
-  { render, xstyle, ...rest },
-  ref,
-) {
+export type CardMediaProps = MosaicComponentProps<'div'>;
+
+const Media = React.forwardRef<HTMLDivElement, CardMediaProps>(function CardMedia({ render, xstyle, ...rest }, ref) {
   const align = React.useContext(CardContext)?.align ?? 'start';
   return useRender({
     defaultTagName: 'div',
@@ -192,11 +193,13 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
+export type CardTitleProps = MosaicComponentProps<'h2'>;
+
 /**
  * Names the card. Renders an `<h2>`, and inside a dialog takes the id the popup points
  * `aria-labelledby` at, so the card names the dialog without knowing it is in one.
  */
-const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(function CardTitle(
+const Title = React.forwardRef<HTMLHeadingElement, CardTitleProps>(function CardTitle(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -215,8 +218,10 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
   });
 });
 
+export type CardDescriptionProps = MosaicComponentProps<'p'>;
+
 /** Describes the card. The `aria-describedby` counterpart to {@link Title}. */
-const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function CardDescription(
+const Description = React.forwardRef<HTMLParagraphElement, CardDescriptionProps>(function CardDescription(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -279,7 +284,9 @@ const CardBanner = React.forwardRef<HTMLDivElement, CardBannerProps>(function Ca
   });
 });
 
-const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardContent(
+export type CardContentProps = MosaicComponentProps<'div'>;
+
+const Content = React.forwardRef<HTMLDivElement, CardContentProps>(function CardContent(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -297,10 +304,9 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
-const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardFooter(
-  { render, xstyle, ...rest },
-  ref,
-) {
+export type CardFooterProps = MosaicComponentProps<'div'>;
+
+const Footer = React.forwardRef<HTMLDivElement, CardFooterProps>(function CardFooter({ render, xstyle, ...rest }, ref) {
   const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
   const parentButtonDefaults = React.useContext(ButtonContext);
   const buttonDefaults = React.useMemo(() => ({ ...parentButtonDefaults, fullWidth: true }), [parentButtonDefaults]);
@@ -319,6 +325,38 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
 
   return <ButtonContext.Provider value={buttonDefaults}>{element}</ButtonContext.Provider>;
 });
+
+declare namespace Root {
+  type Props = CardRootProps;
+}
+
+declare namespace Header {
+  type Props = CardHeaderProps;
+}
+
+declare namespace Media {
+  type Props = CardMediaProps;
+}
+
+declare namespace Title {
+  type Props = CardTitleProps;
+}
+
+declare namespace Description {
+  type Props = CardDescriptionProps;
+}
+
+declare namespace CardBanner {
+  type Props = CardBannerProps;
+}
+
+declare namespace Content {
+  type Props = CardContentProps;
+}
+
+declare namespace Footer {
+  type Props = CardFooterProps;
+}
 
 export {
   Root as CardRoot,

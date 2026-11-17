@@ -43,3 +43,7 @@ export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(functi
 function hasLabel(children: React.ReactNode): boolean {
   return children != null && children !== false && children !== '';
 }
+
+export declare namespace Separator {
+  type Props = SeparatorProps;
+}

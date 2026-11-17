@@ -85,3 +85,7 @@ function themeFromColorScheme(colorScheme: string): CaptchaProps['theme'] {
   }
   return schemes.includes('light') ? 'auto' : 'dark';
 }
+
+export declare namespace Captcha {
+  type Props = CaptchaProps;
+}

@@ -118,3 +118,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
     </Button>
   );
 });
+
+export declare namespace ProviderButton {
+  type Props = ProviderButtonProps;
+}

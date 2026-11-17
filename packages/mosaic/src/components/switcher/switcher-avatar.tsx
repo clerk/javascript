@@ -5,7 +5,7 @@ import type { ReactElement } from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import type { AvatarProps } from '../avatar';
+import type { AvatarRootProps } from '../avatar';
 import { Avatar } from '../avatar';
 import { useSlot } from './switcher.context';
 import { sizes, styles } from './switcher-avatar.styles';
@@ -19,8 +19,8 @@ export interface SwitcherAvatarProps {
   name: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
-  size: AvatarProps['size'];
-  xstyle?: AvatarProps['xstyle'];
+  size: AvatarRootProps['size'];
+  xstyle?: AvatarRootProps['xstyle'];
 }
 
 export function RowAvatar({ name, imageUrl, shape, size, xstyle }: SwitcherAvatarProps): ReactElement {
@@ -76,4 +76,12 @@ export function BadgedAvatar({ name, imageUrl, badge, size }: SwitcherBadgedAvat
       </span>
     </span>
   );
+}
+
+export declare namespace RowAvatar {
+  type Props = SwitcherAvatarProps;
+}
+
+export declare namespace BadgedAvatar {
+  type Props = SwitcherBadgedAvatarProps;
 }

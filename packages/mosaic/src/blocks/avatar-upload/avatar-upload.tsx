@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from 'react';
 
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
-import type { AvatarProps } from '../../components/avatar';
+import type { AvatarRootProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -40,7 +40,7 @@ export interface AvatarUploadRootProps extends Omit<
 
 export type AvatarUploadDropzoneProps = MosaicComponentProps<'div'>;
 
-export type AvatarUploadImageProps = Omit<AvatarProps, 'children'>;
+export type AvatarUploadImageProps = Omit<AvatarRootProps, 'children'>;
 
 export interface AvatarUploadActionsLabels {
   upload: string;

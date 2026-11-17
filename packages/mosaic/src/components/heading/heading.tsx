@@ -60,3 +60,7 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(functi
     />
   );
 });
+
+export declare namespace Heading {
+  type Props = HeadingProps;
+}

@@ -120,6 +120,30 @@ const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProp
   );
 });
 
+declare namespace Root {
+  type Props = DrawerRootProps;
+}
+
+declare namespace Popup {
+  type Props = DrawerPopupProps;
+}
+
+declare namespace Trigger {
+  type Props = DrawerTriggerProps;
+}
+
+declare namespace Title {
+  type Props = DrawerTitleProps;
+}
+
+declare namespace Description {
+  type Props = DrawerDescriptionProps;
+}
+
+declare namespace Close {
+  type Props = DrawerCloseProps;
+}
+
 export {
   Root as DrawerRoot,
   Popup as DrawerPopup,

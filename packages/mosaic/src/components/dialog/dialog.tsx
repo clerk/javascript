@@ -489,6 +489,26 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 
 /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
 const createDialogHandle = Primitive.createHandle;
+declare namespace Root {
+  type Props<Payload = unknown> = DialogRootProps<Payload>;
+}
+
+declare namespace Trigger {
+  type Props<Payload = unknown> = DialogTriggerProps<Payload>;
+}
+
+declare namespace Popup {
+  type Props = DialogPopupProps;
+}
+
+declare namespace Close {
+  type Props = DialogCloseProps;
+}
+
+declare namespace CloseButton {
+  type Props = DialogCloseButtonProps;
+}
+
 export {
   Root as DialogRoot,
   Trigger as DialogTrigger,

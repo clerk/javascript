@@ -117,6 +117,30 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
 });
 
 const PopoverRoot = Primitive.Root;
+declare namespace PopoverRoot {
+  type Props = PopoverRootProps;
+}
+
+declare namespace Trigger {
+  type Props = PopoverTriggerProps;
+}
+
+declare namespace Popup {
+  type Props = PopoverPopupProps;
+}
+
+declare namespace Title {
+  type Props = PopoverTitleProps;
+}
+
+declare namespace Description {
+  type Props = PopoverDescriptionProps;
+}
+
+declare namespace Close {
+  type Props = PopoverCloseProps;
+}
+
 export {
   PopoverRoot,
   Trigger as PopoverTrigger,

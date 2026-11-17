@@ -45,3 +45,7 @@ export const Branding = React.forwardRef<HTMLSpanElement, BrandingProps>(functio
     },
   });
 });
+
+export declare namespace Branding {
+  type Props = BrandingProps;
+}

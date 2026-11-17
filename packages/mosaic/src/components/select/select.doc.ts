@@ -6,7 +6,7 @@ import type {
   SelectMediaProps,
   SelectOptionProps,
   SelectPopupProps,
-  SelectProps,
+  SelectRootProps,
   SelectTriggerProps,
 } from './select';
 
@@ -151,7 +151,7 @@ export default {
   ],
   related: ['Field', 'Combobox'],
 } satisfies ComponentDoc<{
-  'Select.Root': SelectProps;
+  'Select.Root': SelectRootProps;
   'Select.Trigger': SelectTriggerProps;
   'Select.Popup': SelectPopupProps;
   'Select.Option': SelectOptionProps;

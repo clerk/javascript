@@ -106,4 +106,16 @@ const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProp
   });
 });
 
+declare namespace Root {
+  type Props = BannerRootProps;
+}
+
+declare namespace Label {
+  type Props = BannerLabelProps;
+}
+
+declare namespace Description {
+  type Props = BannerDescriptionProps;
+}
+
 export { Root as BannerRoot, Label as BannerLabel, Description as BannerDescription };

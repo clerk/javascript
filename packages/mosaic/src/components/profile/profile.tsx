@@ -670,6 +670,34 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   );
 });
 
+declare namespace Root {
+  type Props = ProfileRootProps;
+}
+
+declare namespace Title {
+  type Props = ProfileTitleProps;
+}
+
+declare namespace Nav {
+  type Props = ProfileNavProps;
+}
+
+declare namespace NavGroup {
+  type Props = ProfileNavGroupProps;
+}
+
+declare namespace NavItem {
+  type Props = ProfileNavItemProps;
+}
+
+declare namespace Content {
+  type Props = ProfileContentProps;
+}
+
+declare namespace ContentPanel {
+  type Props = ProfileContentPanelProps;
+}
+
 export {
   Root as ProfileRoot,
   Title as ProfileTitle,

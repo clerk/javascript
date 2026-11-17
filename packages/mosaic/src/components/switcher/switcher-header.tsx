@@ -43,3 +43,7 @@ export function SwitcherHeader({ avatar, title, description }: SwitcherHeaderPro
     </div>
   );
 }
+
+export declare namespace SwitcherHeader {
+  type Props = SwitcherHeaderProps;
+}

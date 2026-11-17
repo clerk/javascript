@@ -37,3 +37,7 @@ export const SwitcherPopup = React.forwardRef<HTMLDivElement, SwitcherPopupProps
     </Popover.Popup>
   );
 });
+
+export declare namespace SwitcherPopup {
+  type Props = SwitcherPopupProps;
+}

@@ -11,10 +11,9 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import * as slots from './entity.styles';
 
-const Root = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicEntity(
-  { render, xstyle, ...rest },
-  ref,
-) {
+export type EntityRootProps = MosaicComponentProps<'div'>;
+
+const Root = React.forwardRef<HTMLDivElement, EntityRootProps>(function MosaicEntity({ render, xstyle, ...rest }, ref) {
   return useRender({
     defaultTagName: 'div',
     render,
@@ -25,7 +24,9 @@ const Root = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(funct
   });
 });
 
-const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicEntityMedia(
+export type EntityMediaProps = MosaicComponentProps<'div'>;
+
+const Media = React.forwardRef<HTMLDivElement, EntityMediaProps>(function MosaicEntityMedia(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -39,7 +40,9 @@ const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
-const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicEntityContent(
+export type EntityContentProps = MosaicComponentProps<'div'>;
+
+const Content = React.forwardRef<HTMLDivElement, EntityContentProps>(function MosaicEntityContent(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -53,7 +56,9 @@ const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
-const Label = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicEntityLabel(
+export type EntityLabelProps = MosaicComponentProps<'div'>;
+
+const Label = React.forwardRef<HTMLDivElement, EntityLabelProps>(function MosaicEntityLabel(
   { children, render, xstyle, ...rest },
   ref,
 ) {
@@ -68,7 +73,9 @@ const Label = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
-const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicEntityDescription(
+export type EntityDescriptionProps = MosaicComponentProps<'div'>;
+
+const Description = React.forwardRef<HTMLDivElement, EntityDescriptionProps>(function MosaicEntityDescription(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -85,6 +92,26 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
     },
   });
 });
+
+declare namespace Root {
+  type Props = EntityRootProps;
+}
+
+declare namespace Media {
+  type Props = EntityMediaProps;
+}
+
+declare namespace Content {
+  type Props = EntityContentProps;
+}
+
+declare namespace Label {
+  type Props = EntityLabelProps;
+}
+
+declare namespace Description {
+  type Props = EntityDescriptionProps;
+}
 
 export {
   Root as EntityRoot,

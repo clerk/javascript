@@ -49,3 +49,7 @@ export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function M
     />
   );
 });
+
+export declare namespace Text {
+  type Props = TextProps;
+}

@@ -79,3 +79,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     },
   });
 });
+
+export declare namespace Input {
+  type Props = InputProps;
+}

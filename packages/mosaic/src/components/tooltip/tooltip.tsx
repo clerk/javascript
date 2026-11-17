@@ -3,7 +3,10 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { TooltipProps as HeadlessTooltipProps } from '../../primitives/tooltip';
+import type {
+  TooltipGroupProps as HeadlessTooltipGroupProps,
+  TooltipProps as HeadlessTooltipProps,
+} from '../../primitives/tooltip';
 import { Tooltip as Primitive } from '../../primitives/tooltip';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -12,6 +15,8 @@ import { tooltipSurface } from '../../styles/tooltip-surface.styles';
 import { styles } from './tooltip.styles';
 
 export type TooltipRootProps = HeadlessTooltipProps;
+
+export type TooltipGroupProps = HeadlessTooltipGroupProps;
 
 export type TooltipTriggerProps = MosaicComponentProps<'button'>;
 
@@ -46,4 +51,20 @@ const Popup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function Toolt
 
 const TooltipRoot = Primitive.Root;
 const TooltipGroup = Primitive.Group;
+declare namespace TooltipRoot {
+  type Props = TooltipRootProps;
+}
+
+declare namespace TooltipGroup {
+  type Props = TooltipGroupProps;
+}
+
+declare namespace Trigger {
+  type Props = TooltipTriggerProps;
+}
+
+declare namespace Popup {
+  type Props = TooltipPopupProps;
+}
+
 export { TooltipRoot, TooltipGroup, Trigger as TooltipTrigger, Popup as TooltipPopup };

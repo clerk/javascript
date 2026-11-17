@@ -376,3 +376,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     </>
   );
 });
+
+export declare namespace PhoneInput {
+  type Props = PhoneInputProps;
+}

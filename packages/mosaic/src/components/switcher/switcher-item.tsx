@@ -117,3 +117,35 @@ export function SwitcherSeparator({ xstyle, ...rest }: SwitcherSeparatorProps) {
     <hr {...mergeStyleProps(themeProps(slot('separator')), stylex.props(reset.base, styles.separator, xstyle), rest)} />
   );
 }
+
+export declare namespace SwitcherItem {
+  type Props = SwitcherItemProps;
+}
+
+export declare namespace SwitcherItemMedia {
+  type Props = SwitcherItemMediaProps;
+}
+
+export declare namespace SwitcherItemContent {
+  type Props = SwitcherItemContentProps;
+}
+
+export declare namespace SwitcherItemLabel {
+  type Props = SwitcherItemLabelProps;
+}
+
+export declare namespace SwitcherItemDescription {
+  type Props = SwitcherItemDescriptionProps;
+}
+
+export declare namespace SwitcherItemTrailing {
+  type Props = SwitcherItemTrailingProps;
+}
+
+export declare namespace SwitcherGroup {
+  type Props = SwitcherGroupProps;
+}
+
+export declare namespace SwitcherSeparator {
+  type Props = SwitcherSeparatorProps;
+}

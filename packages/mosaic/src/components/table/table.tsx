@@ -362,6 +362,50 @@ const ExpandButton = React.forwardRef<HTMLButtonElement, TableExpandButtonProps>
   );
 });
 
+declare namespace Root {
+  type Props = TableRootProps;
+}
+
+declare namespace Toolbar {
+  type Props = TableToolbarProps;
+}
+
+declare namespace Search {
+  type Props = TableSearchProps;
+}
+
+declare namespace Header {
+  type Props = TableHeaderProps;
+}
+
+declare namespace Column {
+  type Props = TableColumnProps;
+}
+
+declare namespace Body {
+  type Props<Item> = TableBodyProps<Item>;
+}
+
+declare namespace Row {
+  type Props = TableRowProps;
+}
+
+declare namespace Cell {
+  type Props = TableCellProps;
+}
+
+declare namespace SelectionColumn {
+  type Props = TableSelectionColumnProps;
+}
+
+declare namespace SelectionCell {
+  type Props = TableSelectionCellProps;
+}
+
+declare namespace ExpandButton {
+  type Props = TableExpandButtonProps;
+}
+
 export {
   Root as TableRoot,
   Toolbar as TableToolbar,

@@ -35,3 +35,7 @@ export const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(function 
     />
   );
 });
+
+export declare namespace Spinner {
+  type Props = SpinnerProps;
+}

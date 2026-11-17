@@ -6,7 +6,7 @@ import React from 'react';
 import { Checkmark } from '../../icons/glyphs/checkmark';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { X } from '../../icons/glyphs/x';
-import type { ComboboxProps } from '../../primitives/combobox';
+import type { ComboboxCollectionProps, ComboboxProps } from '../../primitives/combobox';
 import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -25,6 +25,7 @@ export type ComboboxRootProps<Item = unknown> = ComboboxProps<Item>;
 export type ComboboxSize = 'sm' | 'md' | 'lg';
 export type ComboboxTriggerProps = MosaicComponentProps<'button'>;
 export type ComboboxClearProps = MosaicComponentProps<'button'>;
+export type { ComboboxCollectionProps };
 export const ComboboxCollection = HeadlessCombobox.Collection;
 
 export function ComboboxRoot<Item>({ sideOffset = 8, openOnInputClick = true, ...props }: ComboboxRootProps<Item>) {
@@ -300,3 +301,59 @@ export const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps
     />
   );
 });
+
+export declare namespace ComboboxRoot {
+  type Props<Item = unknown> = ComboboxRootProps<Item>;
+}
+
+export declare namespace ComboboxCollection {
+  type Props<Item> = ComboboxCollectionProps<Item>;
+}
+
+export declare namespace ComboboxInputGroup {
+  type Props = ComboboxInputGroupProps;
+}
+
+export declare namespace ComboboxInput {
+  type Props = ComboboxInputProps;
+}
+
+export declare namespace ComboboxTrigger {
+  type Props = ComboboxTriggerProps;
+}
+
+export declare namespace ComboboxClear {
+  type Props = ComboboxClearProps;
+}
+
+export declare namespace ComboboxPopup {
+  type Props = ComboboxPopupProps;
+}
+
+export declare namespace ComboboxList {
+  type Props = ComboboxListProps;
+}
+
+export declare namespace ComboboxOption {
+  type Props = ComboboxOptionProps;
+}
+
+export declare namespace ComboboxMedia {
+  type Props = ComboboxMediaProps;
+}
+
+export declare namespace ComboboxLabel {
+  type Props = ComboboxLabelProps;
+}
+
+export declare namespace ComboboxDetail {
+  type Props = ComboboxDetailProps;
+}
+
+export declare namespace ComboboxOptionIndicator {
+  type Props = ComboboxOptionIndicatorProps;
+}
+
+export declare namespace ComboboxEmpty {
+  type Props = ComboboxEmptyProps;
+}

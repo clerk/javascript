@@ -57,3 +57,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     />
   );
 });
+
+export declare namespace Icon {
+  type Props = IconProps;
+}

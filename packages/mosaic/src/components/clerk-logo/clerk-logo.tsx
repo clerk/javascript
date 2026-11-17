@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-export function ClerkLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export type ClerkLogoProps = React.ComponentPropsWithoutRef<'svg'>;
+
+export function ClerkLogo(props: ClerkLogoProps) {
   return (
     <svg
       viewBox='0 0 441 128'
@@ -30,4 +32,8 @@ export function ClerkLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
       />
     </svg>
   );
+}
+
+export declare namespace ClerkLogo {
+  type Props = ClerkLogoProps;
 }

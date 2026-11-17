@@ -38,3 +38,7 @@ export const IconFrame = React.forwardRef<HTMLSpanElement, IconFrameProps>(funct
     },
   });
 });
+
+export declare namespace IconFrame {
+  type Props = IconFrameProps;
+}

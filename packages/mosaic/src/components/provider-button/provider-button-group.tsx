@@ -69,3 +69,7 @@ export const ProviderButtonGroup = React.forwardRef<HTMLDivElement, ProviderButt
     );
   },
 );
+
+export declare namespace ProviderButtonGroup {
+  type Props = ProviderButtonGroupProps;
+}

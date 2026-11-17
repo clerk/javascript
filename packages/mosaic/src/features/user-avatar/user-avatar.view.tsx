@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import type { AvatarProps } from '../../components/avatar';
+import type { AvatarRootProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { themeProps } from '../../props';
 import type { UserAvatarData } from './user-avatar.types';
@@ -11,13 +11,13 @@ export interface UserAvatarAppearanceProps {
    *
    * @default 'circle'
    */
-  shape?: AvatarProps['shape'];
+  shape?: AvatarRootProps['shape'];
   /**
    * The size of the avatar. `fit` fills the element it sits in.
    *
    * @default 'sm'
    */
-  size?: AvatarProps['size'];
+  size?: AvatarRootProps['size'];
 }
 
 export interface UserAvatarViewProps extends UserAvatarData, UserAvatarAppearanceProps {}

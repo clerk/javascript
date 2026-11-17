@@ -82,4 +82,16 @@ const Sections = React.forwardRef<HTMLDivElement, PanelSectionsProps>(function P
   return <HeadingLevelProvider>{element}</HeadingLevelProvider>;
 });
 
+declare namespace Root {
+  type Props = PanelRootProps;
+}
+
+declare namespace Title {
+  type Props = PanelTitleProps;
+}
+
+declare namespace Sections {
+  type Props = PanelSectionsProps;
+}
+
 export { Root as PanelRoot, Title as PanelTitle, Sections as PanelSections };
