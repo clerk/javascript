@@ -65,6 +65,10 @@ function choiceCopy(
     : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
 }
 
+function signUpSignIn(step: Extract<SignInStep, { kind: 'sign-up' }>, onSignIn: () => void) {
+  return step.purpose === 'continue' ? undefined : onSignIn;
+}
+
 export function SignInView({
   step,
   direction,
@@ -284,6 +288,7 @@ export function SignInView({
                     onEditIdentifier={onEditIdentifier}
                     onForgotPassword={onForgotPassword}
                     onCancel={onCancel}
+                    onJoinWaitlist={onJoinWaitlist}
                   />
                 ) : null}
               </Flow.Step>
@@ -307,6 +312,7 @@ export function SignInView({
                   <SignUpDetailsStep
                     focusRef={focusRef}
                     step={current}
+                    logo={logo}
                     onSwitchField={onSwitchField}
                     socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
@@ -317,7 +323,7 @@ export function SignInView({
                     isPending={isPending}
                     onSubmit={onSubmit}
                     passwordFeedback={newPasswordFeedback}
-                    onSignIn={onEditIdentifier}
+                    onSignIn={signUpSignIn(current, onEditIdentifier)}
                   />
                 ) : null}
               </Flow.Step>

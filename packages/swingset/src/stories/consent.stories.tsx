@@ -1,23 +1,23 @@
 import { Card } from '@clerk/mosaic/components/card';
 import { Flow } from '@clerk/mosaic/components/flow';
 import { SegmentedControl } from '@clerk/mosaic/components/segmented-control';
-import { OAuthConsentSkeleton } from '@clerk/mosaic/features/oauth-consent/oauth-consent.skeleton';
-import type { OAuthConsentOrganizationAccess } from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
-import { OAuthConsentError, OAuthConsentView } from '@clerk/mosaic/features/oauth-consent/oauth-consent.view';
+import { ConsentSkeleton } from '@clerk/mosaic/features/consent/consent.skeleton';
+import type { ConsentOrganizationAccess } from '@clerk/mosaic/features/consent/consent.types';
+import { ConsentError, ConsentView } from '@clerk/mosaic/features/consent/consent.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { manyScopes, useOAuthConsentFixture, useOAuthConsentScopeSelectionFixture } from './fixtures/oauth-consent';
+import { manyScopes, useConsentFixture, useConsentScopeSelectionFixture } from './fixtures/consent';
 
-export { default as __source } from './oauth-consent.stories?raw';
+export { default as __source } from './consent.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Misc',
   status: 'wip',
-  title: 'OAuthConsent',
-  label: 'OAuth consent',
-  source: 'packages/mosaic/src/features/oauth-consent/oauth-consent.tsx',
+  title: 'Consent',
+  label: 'Consent',
+  source: 'packages/mosaic/src/features/consent/consent.tsx',
 };
 
 const statuses = ['loading', 'ready', 'error'] as const;
@@ -28,7 +28,7 @@ function isStatus(value: unknown): value is Status {
 }
 
 export function Default() {
-  const props = useOAuthConsentScopeSelectionFixture({
+  const props = useConsentScopeSelectionFixture({
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
@@ -51,7 +51,10 @@ export function Default() {
         <SegmentedControl.Item value='ready'>Consent</SegmentedControl.Item>
         <SegmentedControl.Item value='error'>Error</SegmentedControl.Item>
       </SegmentedControl.Root>
-      <Card.Root align='center'>
+      <Card.Root
+        align='center'
+        renderBranding
+      >
         <Flow.Root
           value={status}
           state={props}
@@ -59,26 +62,13 @@ export function Default() {
           {state => (
             <>
               <Flow.Step ids={['loading']}>
-                <OAuthConsentSkeleton
-                  known={{
-                    applicationName: state.applicationName,
-                    identifier: state.identifier,
-                    redirectUrl: state.redirectUrl,
-                    redirectDomain: state.redirectDomain,
-                    actionUrl: state.actionUrl,
-                    forwardedParams: state.forwardedParams,
-                    renderBranding: false,
-                    organizations: state.organizations,
-                    defaultOrganizationId: state.organizationId,
-                  }}
-                  messages={state.messages}
-                />
+                <ConsentSkeleton messages={state.messages} />
               </Flow.Step>
               <Flow.Step ids={['ready']}>
-                <OAuthConsentView {...state} />
+                <ConsentView {...state} />
               </Flow.Step>
               <Flow.Step ids={['error']}>
-                <OAuthConsentError message='Could not load consent information.' />
+                <ConsentError message='Could not load consent information.' />
               </Flow.Step>
             </>
           )}
@@ -89,36 +79,36 @@ export function Default() {
 }
 
 export function ScopeList() {
-  const props = useOAuthConsentFixture();
+  const props = useConsentFixture();
   return (
     <Card.Root align='center'>
-      <OAuthConsentView {...props} />
+      <ConsentView {...props} />
     </Card.Root>
   );
 }
 
 export function ManyScopes() {
-  const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
+  const props = useConsentScopeSelectionFixture({}, manyScopes);
   return (
     <Card.Root align='center'>
-      <OAuthConsentView {...props} />
+      <ConsentView {...props} />
     </Card.Root>
   );
 }
 
 export function MultipleOrganizations() {
-  const props = useOAuthConsentScopeSelectionFixture({
+  const props = useConsentScopeSelectionFixture({
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
       { value: 'org_3', label: 'Initech' },
     ],
   });
-  const [access, setAccess] = useState<OAuthConsentOrganizationAccess>('all');
+  const [access, setAccess] = useState<ConsentOrganizationAccess>('all');
   const [selected, setSelected] = useState<string[]>(['org_1']);
   return (
     <Card.Root align='center'>
-      <OAuthConsentView
+      <ConsentView
         {...props}
         organizationSelection={{ access, onAccessChange: setAccess, selected, onSelectedChange: setSelected }}
       />
@@ -127,10 +117,10 @@ export function MultipleOrganizations() {
 }
 
 export function OfflineAccess() {
-  const props = useOAuthConsentScopeSelectionFixture({ hasOfflineAccess: true });
+  const props = useConsentScopeSelectionFixture({ hasOfflineAccess: true });
   return (
     <Card.Root align='center'>
-      <OAuthConsentView {...props} />
+      <ConsentView {...props} />
     </Card.Root>
   );
 }

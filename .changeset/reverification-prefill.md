@@ -5,6 +5,8 @@
 
 `useReverification()` accepts a `prefill` option. When a user resets a breached or compromised password to reverify, the modal saves the new password from `prefill` instead of asking for it again, so a password change form doesn't make the user type it twice. It's called with the request's arguments when reverification is needed, and custom `onNeedsReverification` handlers receive its values as `prefill`.
 
+With `passReverificationResult: true`, the fetcher's `reverification` argument is now inferred, and the option is a type error on a fetcher that doesn't take the result first. The option's type moved from `UseReverificationOptions` to `UseReverificationWithResultOptions`, so code that passes `UseReverificationOptions` through to the hook keeps compiling.
+
 ```tsx
 const updatePassword = useReverification(
   (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>

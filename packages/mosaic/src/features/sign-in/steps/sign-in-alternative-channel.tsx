@@ -1,6 +1,6 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -27,6 +27,7 @@ interface SignInAlternativeChannelProps {
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
   copy?: { title: string; description: string; label: string };
+  children?: ReactNode;
 }
 
 export function SignInAlternativeChannel({
@@ -42,6 +43,7 @@ export function SignInAlternativeChannel({
   onCancel,
   focusRef,
   copy: copyProp,
+  children,
 }: SignInAlternativeChannelProps) {
   const m = useMessages('signIn');
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
@@ -76,26 +78,29 @@ export function SignInAlternativeChannel({
           id={form.id}
           onSubmit={onSubmit}
         >
-          <Field.Root
-            required
-            invalid={feedback?.type === 'error'}
-            disabled={isDisabled}
-            focusableWhenDisabled
-          >
-            <Field.Label>{fill(copy.label, { provider })}</Field.Label>
-            <PhoneInput
-              ref={phoneRef}
-              autoComplete='tel'
-              placeholder={m.start.phonePlaceholder}
-              countryTriggerLabel={m.start.selectedCountry}
-              countryPopupLabel={m.start.chooseCountry}
-              countrySearchLabel={m.start.searchCountries}
-              countrySearchPlaceholder={m.start.countrySearchPlaceholder}
-              noResultsMessage={m.start.noCountries}
-              {...phone}
-            />
-            <Field.Feedback feedback={feedback} />
-          </Field.Root>
+          <div {...stylex.props(styles.fieldStack)}>
+            <Field.Root
+              required
+              invalid={feedback?.type === 'error'}
+              disabled={isDisabled}
+              focusableWhenDisabled
+            >
+              <Field.Label>{fill(copy.label, { provider })}</Field.Label>
+              <PhoneInput
+                ref={phoneRef}
+                autoComplete='tel'
+                placeholder={m.start.phonePlaceholder}
+                countryTriggerLabel={m.start.selectedCountry}
+                countryPopupLabel={m.start.chooseCountry}
+                countrySearchLabel={m.start.searchCountries}
+                countrySearchPlaceholder={m.start.countrySearchPlaceholder}
+                noResultsMessage={m.start.noCountries}
+                {...phone}
+              />
+              <Field.Feedback feedback={feedback} />
+            </Field.Root>
+            {children}
+          </div>
         </Form>
         <SignInCaptcha />
       </Card.Content>

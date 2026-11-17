@@ -12,7 +12,7 @@ import { Input } from '../../components/input';
 import { Radio } from '../../components/radio';
 import { Reveal } from '../../components/reveal';
 import { scrollAreaViewport } from '../../components/scroll-area';
-import { Select, type SelectItem } from '../../components/select';
+import { Select } from '../../components/select';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -22,15 +22,16 @@ import { Form } from '../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { RowAvatar } from '../switcher/switcher-avatar.view';
-import { styles } from './oauth-consent.styles';
+import { styles } from './consent.styles';
 import type {
-  OAuthConsentOrganizationSelection,
-  OAuthConsentScopeItem,
-  OAuthConsentScopeSelection,
-  OAuthConsentViewProps,
-} from './oauth-consent.types';
+  ConsentOrganization,
+  ConsentOrganizationSelection,
+  ConsentScopeItem,
+  ConsentScopeSelection,
+  ConsentViewProps,
+} from './consent.types';
 
-export function OAuthConsentView(props: OAuthConsentViewProps) {
+export function ConsentView(props: ConsentViewProps) {
   const { messages: m, oauthApplicationName, organizationId } = props;
   const scopeListTitleId = useId();
   const postedOrganizationIds = props.organizations.length === 0 ? [] : organizationIdsToPost(props);
@@ -50,7 +51,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
         <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
         <Card.Description>
           {rich(m.subtitle, {
-            values: { oauthApplicationName, domain: props.redirectDomain },
+            values: { oauthApplicationName, domain },
             components: { nowrap: renderNowrap },
           })}
         </Card.Description>
@@ -86,7 +87,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           </Field.Root>
         ) : null}
         {props.scopes.length > 0 ? (
-          <div {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}>
+          <div {...mergeStyleProps(themeProps('consent-scopes'), stylex.props(styles.scopes))}>
             <Text
               id={scopeListTitleId}
               size='sm'
@@ -199,7 +200,7 @@ function RedirectUrlDialog({
   open,
   onOpenChange,
 }: {
-  messages: OAuthConsentViewProps['messages'];
+  messages: ConsentViewProps['messages'];
   oauthApplicationName: string;
   redirectUrl: string;
   open: boolean;
@@ -226,7 +227,7 @@ function RedirectUrlDialog({
               readOnly
               value={redirectUrl}
               aria-label={m.redirectUrlTitle}
-              {...themeProps('oauth-consent-redirect-url')}
+              {...themeProps('consent-redirect-url')}
             />
           </Card.Content>
         </Card.Root>
@@ -235,7 +236,7 @@ function RedirectUrlDialog({
   );
 }
 
-function organizationIdsToPost({ organizations, organizationId, organizationSelection }: OAuthConsentViewProps) {
+function organizationIdsToPost({ organizations, organizationId, organizationSelection }: ConsentViewProps) {
   if (!organizationSelection) {
     return organizationId === null ? [] : [organizationId];
   }
@@ -250,9 +251,9 @@ function OrganizationAccess({
   selection,
   disabled,
 }: {
-  messages: OAuthConsentViewProps['messages'];
-  organizations: SelectItem[];
-  selection: OAuthConsentOrganizationSelection;
+  messages: ConsentViewProps['messages'];
+  organizations: ConsentOrganization[];
+  selection: ConsentOrganizationSelection;
   disabled: boolean;
 }) {
   const labelId = useId();
@@ -322,7 +323,7 @@ function OrganizationAccess({
   );
 }
 
-function OrganizationPopup({ organizations }: { organizations: SelectItem[] }) {
+function OrganizationPopup({ organizations }: { organizations: ConsentOrganization[] }) {
   return (
     <Select.Popup>
       {organizations.map(organization => (
@@ -334,6 +335,7 @@ function OrganizationPopup({ organizations }: { organizations: SelectItem[] }) {
           <Select.Media>
             <RowAvatar
               name={organization.label}
+              imageUrl={organization.imageUrl}
               shape='square'
               size='fit'
             />
@@ -353,8 +355,8 @@ function ScopeOption({
   requiredLabel,
   disabled,
 }: {
-  item: OAuthConsentScopeItem;
-  selection: OAuthConsentScopeSelection;
+  item: ConsentScopeItem;
+  selection: ConsentScopeSelection;
   requiredLabel: string;
   disabled: boolean;
 }) {
@@ -378,7 +380,7 @@ function ScopeOption({
   );
 }
 
-function ScopeText({ item, requiredLabel }: { item: OAuthConsentScopeItem; requiredLabel: string }) {
+function ScopeText({ item, requiredLabel }: { item: ConsentScopeItem; requiredLabel: string }) {
   return (
     <div {...stylex.props(styles.scopeText)}>
       <div {...stylex.props(styles.scopeLabel)}>
@@ -421,7 +423,7 @@ function RedirectDomainButton({ domain, label, onClick }: { domain: string; labe
   );
 }
 
-export function OAuthConsentError({ message }: { message: string }) {
+export function ConsentError({ message }: { message: string }) {
   return (
     <Card.Content>
       <EmptyState.Root role='alert'>

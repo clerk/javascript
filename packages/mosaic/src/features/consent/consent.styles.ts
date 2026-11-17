@@ -4,6 +4,7 @@ import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.style
 
 export const styles = stylex.create({
   skeletonCentered: { marginInline: 'auto' },
+  skeletonFill: { width: '100%' },
   organizationAccess: { gap: space['3'], display: 'flex', flexDirection: 'column' },
   organizationPicker: { marginBlockStart: `calc(${space['3']} * -1)` },
   organizationPickerTrigger: { inlineSize: '100%', marginBlockStart: space['3'] },

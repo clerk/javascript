@@ -27,7 +27,7 @@ export const signUpMessages = {
     useEmail: 'Use email instead',
     usePhone: 'Use phone instead',
     passwordLabel: 'Password',
-    passwordPlaceholder: 'Enter your password',
+    passwordPlaceholder: 'Create a password',
   },
   legalConsent: {
     title: 'Legal consent',
@@ -44,6 +44,7 @@ export const signUpMessages = {
   wallets: {
     title: 'Sign up with Solana',
     description: 'Select a wallet below to sign up',
+    continueWith: 'Continue with {wallet}',
   },
   restricted: {
     title: 'Access restricted',

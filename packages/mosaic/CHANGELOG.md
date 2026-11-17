@@ -1,5 +1,20 @@
 # @clerk/mosaic
 
+## 0.6.0
+
+### Minor Changes
+
+- Export the `<Consent />` component. ([#10848](https://github.com/clerk/javascript/pull/10848)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Export `Avatar`, `Badge`, `Banner`, `Button`, `DataList`, `EmptyState`, `Entity`, `Heading`, `Icon`, `Input`, `Item`, `Skeleton`, `Table` and `Text` from `@clerk/mosaic/components/<name>`, and the `External` glyph from `@clerk/mosaic/icons/glyphs/external`, the import paths Swingset documents. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Export `ActionMenu`, `Panel`, `Profile`, `Radio`, `Section` and `SegmentedControl` from `@clerk/mosaic/components/<name>`, and the `ArrowUpRight`, `Code`, `Plus`, `ShieldCheck` and `UserCircle` glyphs from `@clerk/mosaic/icons/glyphs/<name>`. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
 ## 0.5.0
 
 ### Minor Changes
