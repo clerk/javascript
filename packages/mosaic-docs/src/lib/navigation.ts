@@ -1,3 +1,5 @@
+import { docHref, docKinds, docsOfKind } from '@/lib/docs';
+
 export interface NavItem {
   title: string;
   href: string;
@@ -19,4 +21,8 @@ export const navigation: NavGroup[] = [
     title: 'Get started',
     items: [{ title: 'Introduction', href: '/docs' }],
   },
+  ...docKinds.map(({ kind, title }) => ({
+    title,
+    items: docsOfKind(kind).map(entry => ({ title: entry.doc.name, href: docHref(entry) })),
+  })),
 ];

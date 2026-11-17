@@ -4,14 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
-    "dev": "next dev --port 6021",
+    "build": "pnpm generate && next build",
+    "dev": "pnpm generate && next dev --port 6021",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint": "oxlint -c ../../oxlint.config.mjs src",
-    "typecheck": "next typegen && tsc --noEmit"
+    "generate": "node scripts/generate-docs.mjs",
+    "lint": "oxlint -c ../../oxlint.config.mjs src scripts",
+    "test": "node --test scripts/*.test.mjs",
+    "typecheck": "pnpm generate && next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/mosaic": "workspace:*",
     "next": "^16.4.3",
     "react": "catalog:react",
     "react-dom": "catalog:react"

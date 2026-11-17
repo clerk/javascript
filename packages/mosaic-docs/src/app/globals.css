@@ -125,3 +125,17 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
 }
+
+.prose :where(code)::before,
+.prose :where(code)::after {
+  content: none;
+}
+
+.prose :where(:not(pre) > code) {
+  border: 1px solid var(--docs-border);
+  border-radius: 0.375rem;
+  background: var(--docs-muted);
+  font-size: 0.85em;
+  font-weight: 400;
+  padding: 0.1em 0.3em;
+}

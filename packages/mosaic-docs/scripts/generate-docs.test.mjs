@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+
+import { renderModule, toEntries } from './generate-docs.mjs';
+
+test('maps doc paths to a kind and slug', () => {
+  assert.deepEqual(
+    toEntries([
+      'src/primitives/accordion/accordion.doc.ts',
+      'src/hooks/use-pending-action.doc.ts',
+      'src/components/button/button.doc.ts',
+    ]),
+    [
+      { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },
+      { kind: 'hooks', slug: 'use-pending-action', path: 'src/hooks/use-pending-action.doc' },
+      { kind: 'primitives', slug: 'accordion', path: 'src/primitives/accordion/accordion.doc' },
+    ],
+  );
+});
+
+test('rejects a doc outside the documented locations', () => {
+  assert.throws(
+    () => toEntries(['src/components/button/parts/icon.doc.ts']),
+    /src\/components\/button\/parts\/icon\.doc\.ts/,
+  );
+  assert.throws(() => toEntries(['src/blocks/sign-in/sign-in.doc.ts']), /sign-in\.doc\.ts/);
+});
+
+test('rejects two docs with the same kind and slug', () => {
+  assert.throws(() => toEntries(['src/hooks/use-form.doc.ts', 'src/hooks/use-form.doc.ts']), /hooks\/use-form/);
+});
+
+test('renders one typed import per doc', () => {
+  const source = renderModule('../../../mosaic', [
+    { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },
+    { kind: 'hooks', slug: 'use-form', path: 'src/hooks/use-form.doc' },
+  ]);
+  assert.match(source, /import type \{ ComponentDoc, HookDoc \} from '\.\.\/\.\.\/\.\.\/mosaic\/src\/docs-schema';/);
+  assert.match(source, /import doc0 from '\.\.\/\.\.\/\.\.\/mosaic\/src\/components\/button\/button\.doc';/);
+  assert.match(source, /import doc1 from '\.\.\/\.\.\/\.\.\/mosaic\/src\/hooks\/use-form\.doc';/);
+  assert.match(source, /\{ kind: 'components', slug: 'button', doc: doc0 \}/);
+  assert.match(source, /\{ kind: 'hooks', slug: 'use-form', doc: doc1 \}/);
+});
