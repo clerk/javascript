@@ -34,6 +34,7 @@ import {
 } from './fake-fapi/organization-security';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
 import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
+import { createSignUpState, type FakeSignUpSeed, type FakeSignUpState, signUpHandlers } from './fake-fapi/sign-up';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -90,6 +91,7 @@ export interface FakeFapiState {
   enterpriseLinking: FakeEnterpriseLinking;
   ssoBypass: FakeSSOBypassState;
   mfa: FakeMfaState;
+  signUp: FakeSignUpState;
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
   organizationCreationDefaults?: OrganizationCreationDefaultsJSON;
@@ -105,7 +107,8 @@ export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
   tokenIssuedAt?: number;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking' | 'ssoBypass'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking' | 'ssoBypass' | 'signUp'>> & {
+  signUp?: FakeSignUpSeed;
   verification?: FakeVerificationSeed;
   enterpriseLinking?: Partial<FakeEnterpriseLinking>;
   ssoBypass?: Partial<FakeSSOBypassState>;
@@ -317,7 +320,7 @@ export function verifyEmailOutOfBand(state: FakeFapiState, id: string): void {
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, enterpriseLinking, passkeys, ssoBypass, ...rest } = seed;
+  const { verification, enterpriseLinking, passkeys, ssoBypass, signUp, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -338,6 +341,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     ...rest,
     verification: createVerificationState(verification),
     ssoBypass: createSSOBypassState(ssoBypass),
+    signUp: createSignUpState(signUp),
     enterpriseLinking: {
       enabled: false,
       preparations: {},
@@ -355,6 +359,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     ...organizationSecurityHandlers(state, fapiUrl),
     ...passkeyHandlers(state, fapiUrl, passkeys),
     ...mfaHandlers(state, fapiUrl),
+    ...signUpHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () =>
       HttpResponse.json(state.environment, state.country ? { headers: { 'x-country': state.country } } : undefined),
     ),
