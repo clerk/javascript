@@ -1,37 +1,10 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 import type { Doc, PropDocs } from '@/core/doc';
-import type { TocHeading } from '@/core/toc';
+import { type DocSection, docSections } from '@/core/doc-sections';
 
 import { CodeBlock } from './code-block';
-
-export function docHeadings(doc: Doc): TocHeading[] {
-  const headings: TocHeading[] = [{ depth: 2, slug: 'use-for', text: 'Use for' }];
-  if (doc.practices?.length) {
-    headings.push({ depth: 2, slug: 'practices', text: 'Practices' });
-  }
-  if ('parts' in doc) {
-    headings.push({ depth: 2, slug: 'api', text: 'API reference' });
-    for (const name of Object.keys(doc.parts)) {
-      headings.push({ depth: 3, slug: partSlug(name), text: name });
-    }
-  } else {
-    if (doc.options && Object.keys(doc.options).length > 0) {
-      headings.push({ depth: 2, slug: 'options', text: 'Options' });
-    }
-    if (Object.keys(doc.returns).length > 0) {
-      headings.push({ depth: 2, slug: 'returns', text: 'Returns' });
-    }
-  }
-  if (doc.examples?.length) {
-    headings.push({ depth: 2, slug: 'examples', text: 'Examples' });
-  }
-  if (doc.related?.length) {
-    headings.push({ depth: 2, slug: 'related', text: 'Related' });
-  }
-  return headings;
-}
 
 export function DocContent({
   doc,
@@ -49,115 +22,102 @@ export function DocContent({
         <InlineCode text={doc.description} />
       </p>
       {preview}
-
-      <h2 id='use-for'>Use for</h2>
-      <ul>
-        {doc.useFor.map(item => (
-          <li key={item}>
-            <InlineCode text={item} />
-          </li>
-        ))}
-      </ul>
-
-      {doc.practices?.length ? (
-        <>
-          <h2 id='practices'>Practices</h2>
-          <div className='table-scroll'>
-            <table>
-              <thead>
-                <tr>
-                  <th>Guidance</th>
-                  <th>Practice</th>
-                </tr>
-              </thead>
-              <tbody>
-                {doc.practices.map(practice => (
-                  <tr key={practice.text}>
-                    <td>
-                      <span
-                        className={`${practice.do ? 'bg-positive' : 'bg-negative'} inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium leading-4 text-white`}
-                      >
-                        {practice.do ? 'Do' : 'Don’t'}
-                      </span>
-                    </td>
-                    <td>
-                      <InlineCode text={practice.text} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      ) : null}
-
-      {'parts' in doc ? (
-        <>
-          <h2 id='api'>API reference</h2>
-          {Object.entries(doc.parts).map(([name, part]) => (
-            <section key={name}>
-              <h3 id={partSlug(name)}>{name}</h3>
-              <p>
-                <InlineCode text={part.description} />
-              </p>
-              {part.slot ? (
-                <p className='text-muted-foreground text-sm'>
-                  Slot: <code>{part.slot}</code>
-                </p>
-              ) : null}
-              {part.props ? <PropTable props={part.props} /> : null}
-            </section>
-          ))}
-        </>
-      ) : (
-        <>
-          {doc.options && Object.keys(doc.options).length > 0 ? (
-            <>
-              <h2 id='options'>Options</h2>
-              <PropTable props={doc.options} />
-            </>
-          ) : null}
-          {Object.keys(doc.returns).length > 0 ? (
-            <>
-              <h2 id='returns'>Returns</h2>
-              <PropTable props={doc.returns} />
-            </>
-          ) : null}
-        </>
-      )}
-
-      {doc.examples?.length ? (
-        <>
-          <h2 id='examples'>Examples</h2>
-          {doc.examples.map(example => (
-            <section key={example.title}>
-              <h3>{example.title}</h3>
-              <CodeBlock
-                code={example.code.trim()}
-                lang='tsx'
-              />
-            </section>
-          ))}
-        </>
-      ) : null}
-
-      {doc.related?.length ? (
-        <>
-          <h2 id='related'>Related</h2>
-          <ul>
-            {doc.related.map(name => (
-              <li key={name}>
-                <RelatedLink
-                  name={name}
-                  href={hrefFor(name)}
-                />
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : null}
+      {docSections(doc).map(section => (
+        <Fragment key={section.id}>
+          <h2 id={section.id}>{section.title}</h2>
+          <SectionBody
+            section={section}
+            hrefFor={hrefFor}
+          />
+        </Fragment>
+      ))}
     </>
   );
+}
+
+function SectionBody({ section, hrefFor }: { section: DocSection; hrefFor: (name: string) => string | undefined }) {
+  switch (section.id) {
+    case 'use-for':
+      return (
+        <ul>
+          {section.items.map(item => (
+            <li key={item}>
+              <InlineCode text={item} />
+            </li>
+          ))}
+        </ul>
+      );
+    case 'practices':
+      return (
+        <div className='table-scroll'>
+          <table>
+            <thead>
+              <tr>
+                <th>Guidance</th>
+                <th>Practice</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section.practices.map(practice => (
+                <tr key={practice.text}>
+                  <td>
+                    <span
+                      className={`${practice.do ? 'bg-positive' : 'bg-negative'} inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium leading-4 text-white`}
+                    >
+                      {practice.do ? 'Do' : 'Don’t'}
+                    </span>
+                  </td>
+                  <td>
+                    <InlineCode text={practice.text} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    case 'api':
+      return section.parts.map(part => (
+        <section key={part.name}>
+          <h3 id={part.slug}>{part.name}</h3>
+          <p>
+            <InlineCode text={part.description} />
+          </p>
+          {part.slot ? (
+            <p className='text-muted-foreground text-sm'>
+              Slot: <code>{part.slot}</code>
+            </p>
+          ) : null}
+          {part.props ? <PropTable props={part.props} /> : null}
+        </section>
+      ));
+    case 'options':
+    case 'returns':
+      return <PropTable props={section.props} />;
+    case 'examples':
+      return section.examples.map(example => (
+        <section key={example.title}>
+          <h3>{example.title}</h3>
+          <CodeBlock
+            code={example.code.trim()}
+            lang='tsx'
+          />
+        </section>
+      ));
+    case 'related':
+      return (
+        <ul>
+          {section.names.map(name => (
+            <li key={name}>
+              <RelatedLink
+                name={name}
+                href={hrefFor(name)}
+              />
+            </li>
+          ))}
+        </ul>
+      );
+  }
 }
 
 function PropTable({ props }: { props: PropDocs }) {
@@ -208,8 +168,4 @@ function InlineCode({ text }: { text: string }) {
     offset += segment.length + 1;
     return index % 2 === 1 ? <code key={key}>{segment}</code> : segment;
   });
-}
-
-function partSlug(name: string): string {
-  return `part-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 }

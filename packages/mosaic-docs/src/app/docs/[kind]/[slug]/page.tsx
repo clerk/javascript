@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { Preview } from '@/components/preview';
+import { docHeadings } from '@/core/doc-sections';
 import { docEntries, docHref, findDoc, relatedHref } from '@/lib/docs';
 import { CopyPageButton } from '@/ui/copy-page-button';
-import { DocContent, docHeadings } from '@/ui/doc-content';
+import { DocContent } from '@/ui/doc-content';
 import { DocsArticle, DocsAside } from '@/ui/docs-page';
 import { PageOutline } from '@/ui/page-outline';
 import { TableOfContents } from '@/ui/table-of-contents';

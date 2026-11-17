@@ -12,12 +12,22 @@ export interface PartDoc {
   props?: PropDocs;
 }
 
+export interface Practice {
+  do: boolean;
+  text: string;
+}
+
+export interface Example {
+  title: string;
+  code: string;
+}
+
 interface BaseDoc {
   name: string;
   description: string;
   useFor: string[];
-  practices?: { do: boolean; text: string }[];
-  examples?: { title: string; code: string }[];
+  practices?: Practice[];
+  examples?: Example[];
   related?: string[];
 }
 

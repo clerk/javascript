@@ -1,55 +1,43 @@
 import type { Doc, PropDocs } from './doc.ts';
+import { type DocSection, docSections } from './doc-sections.ts';
 
 export function docToMarkdown(doc: Doc, hrefFor: (name: string) => string | undefined): string {
-  const blocks = [`# ${doc.name}`, doc.description, '## Use for', list(doc.useFor)];
-
-  if (doc.practices?.length) {
-    blocks.push(
-      '## Practices',
-      list(doc.practices.map(practice => `${practice.do ? 'Do' : "Don't"}: ${practice.text}`)),
-    );
-  }
-
-  if ('parts' in doc) {
-    blocks.push('## API reference');
-    for (const [name, part] of Object.entries(doc.parts)) {
-      blocks.push(`### ${name}`, part.description);
-      if (part.slot) {
-        blocks.push(`Slot: ${codeSpan(part.slot)}`);
-      }
-      if (part.props) {
-        blocks.push(propTable(part.props));
-      }
-    }
-  } else {
-    if (doc.options && Object.keys(doc.options).length > 0) {
-      blocks.push('## Options', propTable(doc.options));
-    }
-    if (Object.keys(doc.returns).length > 0) {
-      blocks.push('## Returns', propTable(doc.returns));
-    }
-  }
-
-  if (doc.examples?.length) {
-    blocks.push('## Examples');
-    for (const example of doc.examples) {
-      blocks.push(`### ${example.title}`, codeFence(example.code.trim(), 'tsx'));
-    }
-  }
-
-  if (doc.related?.length) {
-    blocks.push(
-      '## Related',
-      list(
-        doc.related.map(name => {
-          const href = hrefFor(name);
-          return href ? `[${name}](${href}.md)` : codeSpan(name);
-        }),
-      ),
-    );
-  }
-
+  const blocks = [
+    `# ${doc.name}`,
+    doc.description,
+    ...docSections(doc).flatMap(section => [`## ${section.title}`, ...sectionBlocks(section, hrefFor)]),
+  ];
   return `${blocks.join('\n\n')}\n`;
+}
+
+function sectionBlocks(section: DocSection, hrefFor: (name: string) => string | undefined): string[] {
+  switch (section.id) {
+    case 'use-for':
+      return [list(section.items)];
+    case 'practices':
+      return [list(section.practices.map(practice => `${practice.do ? 'Do' : "Don't"}: ${practice.text}`))];
+    case 'api':
+      return section.parts.flatMap(part => [
+        `### ${part.name}`,
+        part.description,
+        ...(part.slot ? [`Slot: ${codeSpan(part.slot)}`] : []),
+        ...(part.props ? [propTable(part.props)] : []),
+      ]);
+    case 'options':
+    case 'returns':
+      return [propTable(section.props)];
+    case 'examples':
+      return section.examples.flatMap(example => [`### ${example.title}`, codeFence(example.code.trim(), 'tsx')]);
+    case 'related':
+      return [
+        list(
+          section.names.map(name => {
+            const href = hrefFor(name);
+            return href ? `[${name}](${href}.md)` : codeSpan(name);
+          }),
+        ),
+      ];
+  }
 }
 
 function list(items: string[]): string {
