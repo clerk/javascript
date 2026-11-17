@@ -13,7 +13,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserButton } from '../user-button';
+import { Switcher } from '../switcher';
 
 const GAP = 4;
 
@@ -27,9 +27,9 @@ const alice = fapiUser({
   organization_memberships: memberships,
 });
 
-describe('UserButton badged avatar customization', () => {
+describe('Switcher badged avatar customization', () => {
   it('keeps the gap around a resized badge in the trigger', async () => {
-    customize(`.cl-user-button-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
+    customize(`.cl-switcher-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
     await renderSignedIn();
 
     await expectGapAroundBadge(await triggerAvatar());
@@ -37,7 +37,7 @@ describe('UserButton badged avatar customization', () => {
 
   it('keeps the gap when the trigger avatar is resized', async () => {
     customize(
-      `.cl-user-button-avatar { width: 64px !important; height: 64px !important; --cl-avatar-badge-gap: ${GAP}px; }`,
+      `.cl-switcher-avatar { width: 64px !important; height: 64px !important; --cl-avatar-badge-gap: ${GAP}px; }`,
     );
     await renderSignedIn();
 
@@ -45,7 +45,7 @@ describe('UserButton badged avatar customization', () => {
   });
 
   it('keeps the gap around a resized badge in the header', async () => {
-    customize(`.cl-user-button-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
+    customize(`.cl-switcher-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
     await renderSignedIn();
     await userEvent.setup().click(screen.getByRole('button', { name: /Open account menu/ }));
 
@@ -53,7 +53,7 @@ describe('UserButton badged avatar customization', () => {
   });
 
   it('keeps the gap around a resized badge in right-to-left layouts', async () => {
-    customize(`.cl-user-button-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
+    customize(`.cl-switcher-avatar { --cl-avatar-badge-size: 24px; --cl-avatar-badge-gap: ${GAP}px; }`);
     document.documentElement.dir = 'rtl';
     onTestFinished(() => document.documentElement.removeAttribute('dir'));
     await renderSignedIn();
@@ -64,7 +64,7 @@ describe('UserButton badged avatar customization', () => {
 
 function customize(css: string) {
   const sheet = document.createElement('style');
-  sheet.textContent = `.cl-user-button-avatar { --cl-color-neutral-alpha-200: #000; } ${css}`;
+  sheet.textContent = `.cl-switcher-avatar { --cl-color-neutral-alpha-200: #000; } ${css}`;
   document.head.append(sheet);
   onTestFinished(() => sheet.remove());
 }
@@ -74,7 +74,7 @@ async function renderSignedIn() {
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: acme.id })]),
     memberships,
   });
-  await renderWithClerk(<UserButton />);
+  await renderWithClerk(<Switcher />);
 }
 
 async function triggerAvatar(): Promise<HTMLElement> {
@@ -84,7 +84,7 @@ async function triggerAvatar(): Promise<HTMLElement> {
 
 async function headerAvatar(): Promise<HTMLElement> {
   const dialog = await screen.findByRole('dialog');
-  const header = dialog.querySelector<HTMLElement>('.cl-user-button-header');
+  const header = dialog.querySelector<HTMLElement>('.cl-switcher-header');
   if (!header) {
     throw new Error('No header in the popup');
   }
@@ -92,7 +92,7 @@ async function headerAvatar(): Promise<HTMLElement> {
 }
 
 function requiredAvatar(container: HTMLElement): HTMLElement {
-  const avatar = container.querySelector<HTMLElement>('.cl-user-button-avatar');
+  const avatar = container.querySelector<HTMLElement>('.cl-switcher-avatar');
   if (!avatar) {
     throw new Error('No badged avatar');
   }
@@ -100,7 +100,7 @@ function requiredAvatar(container: HTMLElement): HTMLElement {
 }
 
 async function expectGapAroundBadge(avatar: HTMLElement) {
-  const badge = avatar.querySelector<HTMLElement>('.cl-user-button-avatar-badge');
+  const badge = avatar.querySelector<HTMLElement>('.cl-switcher-avatar-badge');
   if (!badge) {
     throw new Error('No badge');
   }

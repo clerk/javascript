@@ -23,6 +23,7 @@ import { OrganizationSwitcher } from '../../organization-switcher/organization-s
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { UserButton } from '../../user-button/user-button';
 import { UserProfile } from '../../user-profile/user-profile';
+import { Switcher } from '../switcher';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const memberships = [fapiMembership(acme, { permissions: ['org:sys_memberships:manage'] })];
@@ -114,7 +115,7 @@ describe('the profile the switchers open', () => {
     { name: 'combined when asked', profile: { combined: true }, expected: allTabs },
     { name: 'separate when opted out', profile: separate, expected: accountTabs },
   ])('a user-only button opens the account pages first: $name', async ({ profile, expected }) => {
-    await renderWithProfile(<UserButton combined={false} />, profile);
+    await renderWithProfile(<UserButton />, profile);
 
     await clickSettings(buttonTrigger);
 
@@ -123,7 +124,7 @@ describe('the profile the switchers open', () => {
   });
 
   it('a combined button opens one profile straight from Settings', async () => {
-    await renderWithProfile(<UserButton />);
+    await renderWithProfile(<Switcher />);
 
     await clickSettings(buttonTrigger);
 
@@ -132,7 +133,7 @@ describe('the profile the switchers open', () => {
   });
 
   it('a combined button offers two targets over separate profiles', async () => {
-    await renderWithProfile(<UserButton />, separate);
+    await renderWithProfile(<Switcher />, separate);
 
     await chooseSetting(buttonTrigger, 'Manage organization');
 
@@ -159,8 +160,8 @@ describe('the profile the switchers open', () => {
   });
 
   it.each([
-    { name: 'a user-only button', button: <UserButton combined={false} /> },
-    { name: 'a combined button', button: <UserButton /> },
+    { name: 'a user-only button', button: <UserButton /> },
+    { name: 'a combined button', button: <Switcher /> },
   ])('a switcher beside $name keeps its Settings row', async ({ button }) => {
     await renderWithProfile(
       <>
@@ -176,7 +177,7 @@ describe('the profile the switchers open', () => {
   });
 
   it('leaves the organization pages out of the combined profile on a personal account', async () => {
-    await renderWithProfile(<UserButton combined={false} />, undefined, inPersonalAccount);
+    await renderWithProfile(<UserButton />, undefined, inPersonalAccount);
 
     await clickSettings(buttonTrigger);
 
@@ -227,7 +228,7 @@ describe('the profile the switchers open', () => {
   });
 
   it('routes the one profile with a URL, and opens the other as a modal', async () => {
-    const { navigate } = await renderWithProfile(<UserButton />, { userProfileUrl: '/account' });
+    const { navigate } = await renderWithProfile(<Switcher />, { userProfileUrl: '/account' });
 
     await chooseSetting(buttonTrigger, 'Manage profile');
     expect(navigate).toHaveBeenCalledWith('/account');
@@ -257,7 +258,7 @@ describe('the profile the switchers open', () => {
   });
 
   it.each([
-    { name: 'the button', ui: <UserButton combined={false} />, trigger: buttonTrigger },
+    { name: 'the button', ui: <UserButton />, trigger: buttonTrigger },
     { name: 'the switcher', ui: <OrganizationSwitcher />, trigger: switcherTrigger },
   ])('applies the custom pages and order set on the provider when $name opens it', async ({ ui, trigger }) => {
     await renderWithProfile(ui, {
@@ -272,7 +273,7 @@ describe('the profile the switchers open', () => {
 
   it("hands the provider's custom pages to Clerk's modals without newProfiles", async () => {
     const { clerk } = await renderWithProfile(
-      <UserButton combined={false} />,
+      <UserButton />,
       { userProfileProps: { customPages: [terms] } },
       inOrganization,
       {},

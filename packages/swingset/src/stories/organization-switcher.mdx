@@ -5,12 +5,13 @@ import * as OrganizationSwitcherStories from './organization-switcher.stories';
 The organization switcher on its own. The active organization heads the surface. The account's
 organizations sit under it: every one it belongs to, plus **suggested** and **invited** ones it can
 Join, with **Add organization** at their foot. **Settings** and **Invite members** follow them. There are no account rows;
-for those, use `UserButton`.
+for those, use `UserButton` or `Switcher`. It is `<Switcher mode='organization' />`, and
+takes the same props minus the account options and `triggerVariant`.
 
 It renders nothing while Clerk loads, when nobody is signed in, and when the instance has organizations
 turned off.
 
-It shares its view with `UserButton`, so the parts, loading state, and behavior are the same. Only the
+It shares its view with [`Switcher`](/switcher/switcher), so the parts, loading state, and behavior are the same. Only the
 surface differs: its own `.cl-organization-switcher-*` classes and its own `organizationSwitcher`
 localization namespace.
 
@@ -35,7 +36,7 @@ The avatar and name of the active organization. Where none is active, the accoun
 
 `showTriggerLabel={false}` leaves the avatar alone.
 
-`triggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. See the [UserButton trigger example](./user-button#trigger).
+`triggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. See the [Switcher trigger example](/switcher/switcher#trigger).
 
 <Story
   name='IconTrigger'
@@ -65,7 +66,7 @@ organization, or the app does it itself. With no org active either, trigger and 
 
 ## Menu items
 
-`customMenuItems` and `menuItemOrder` work as they do on `UserButton`: the app's own rows join
+`customMenuItems` and `menuItemOrder` work as they do on `Switcher`: the app's own rows join
 **Settings** and **Invite members**, in the order given.
 
 ## Styling
