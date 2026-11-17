@@ -98,13 +98,12 @@ void test('renders a hook doc with options and returns', () => {
   assert.doesNotMatch(markdown, /## Practices|## Examples|## Related/);
 });
 
-void test('leaves out empty hook options', () => {
+void test('leaves out empty hook options and returns', () => {
   const markdown = docToMarkdown(
     { name: 'useToastManager', description: 'Toasts.', useFor: ['a toast'], options: {}, returns: {} },
     noLinks,
   );
-  assert.doesNotMatch(markdown, /## Options/);
-  assert.match(markdown, /## Returns/);
+  assert.doesNotMatch(markdown, /## Options|## Returns/);
 });
 
 void test('fences an example with more backticks than it contains', () => {

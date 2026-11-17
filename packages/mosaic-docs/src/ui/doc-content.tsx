@@ -20,7 +20,9 @@ export function docHeadings(doc: Doc): TocHeading[] {
     if (doc.options && Object.keys(doc.options).length > 0) {
       headings.push({ depth: 2, slug: 'options', text: 'Options' });
     }
-    headings.push({ depth: 2, slug: 'returns', text: 'Returns' });
+    if (Object.keys(doc.returns).length > 0) {
+      headings.push({ depth: 2, slug: 'returns', text: 'Returns' });
+    }
   }
   if (doc.examples?.length) {
     headings.push({ depth: 2, slug: 'examples', text: 'Examples' });
@@ -96,8 +98,12 @@ export function DocContent({
               <PropTable props={doc.options} />
             </>
           ) : null}
-          <h2 id='returns'>Returns</h2>
-          <PropTable props={doc.returns} />
+          {Object.keys(doc.returns).length > 0 ? (
+            <>
+              <h2 id='returns'>Returns</h2>
+              <PropTable props={doc.returns} />
+            </>
+          ) : null}
         </>
       )}
 

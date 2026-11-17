@@ -25,7 +25,9 @@ export function docToMarkdown(doc: Doc, hrefFor: (name: string) => string | unde
     if (doc.options && Object.keys(doc.options).length > 0) {
       blocks.push('## Options', propTable(doc.options));
     }
-    blocks.push('## Returns', propTable(doc.returns));
+    if (Object.keys(doc.returns).length > 0) {
+      blocks.push('## Returns', propTable(doc.returns));
+    }
   }
 
   if (doc.examples?.length) {
