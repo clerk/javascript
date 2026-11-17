@@ -12,7 +12,7 @@ pnpm add @clerk/mosaic
 
 ## Import the stylesheet
 
-Mosaic components carry no runtime style injection. The stylesheet holds every component rule, so nothing renders correctly without it. Import it once, at your app’s CSS entry point:
+Mosaic components carry no runtime style injection. The stylesheet holds every component rule, so nothing renders correctly without it. At your app’s CSS entry point, import it once:
 
 ```css
 @import '@clerk/mosaic/styles.css';
@@ -20,7 +20,7 @@ Mosaic components carry no runtime style injection. The stylesheet holds every c
 
 ## Isolate your app root
 
-Popups, like the UserButton menu, portal to `document.body` and set no `z-index` of their own. A page element with a high `z-index`, like a sticky header, can paint over them.
+Popups, like `Menu` and `Popover`, portal to `document.body` and set no `z-index` of their own. A page element with a high `z-index`, like a sticky header, can paint over them.
 
 Give the element that wraps your page content its own stacking context:
 
