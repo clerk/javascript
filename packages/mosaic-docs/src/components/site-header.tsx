@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { ClerkLogo } from '@/components/clerk-logo';
 import { GitHubLink } from '@/components/github-link';
 import { site } from '@/lib/site';
 import type { NavGroup } from '@/ui/docs-nav';
@@ -25,8 +26,13 @@ export function SiteHeader({ navigation }: { navigation: NavGroup[] }) {
         />
         <Link
           href='/'
-          className='text-foreground inline-flex min-w-0 items-center gap-2 text-base font-semibold'
+          className='text-foreground inline-flex min-w-0 items-center gap-2.5 text-base font-semibold'
         >
+          <ClerkLogo className='-mt-1 h-5 w-auto shrink-0' />
+          <span
+            aria-hidden
+            className='bg-border h-4 w-px shrink-0'
+          />
           <span className='truncate'>{site.name}</span>
         </Link>
       </div>
