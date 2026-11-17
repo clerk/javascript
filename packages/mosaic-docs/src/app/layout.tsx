@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className='bg-background text-foreground flex min-h-dvh flex-col font-sans antialiased'>
         <a
           href='#content'
-          className='bg-accent text-accent-foreground absolute -start-[999px] top-0 z-[100] px-4 py-2 focus:start-0'
+          className='bg-accent text-accent-foreground -inset-s-249.75 z-100 focus:inset-s-0 absolute top-0 px-4 py-2'
         >
           Skip to content
         </a>

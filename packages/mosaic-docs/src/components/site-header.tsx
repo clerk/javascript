@@ -47,7 +47,7 @@ export function SiteHeader({ navigation }: { navigation: NavGroup[] }) {
       </nav>
       <div className='flex-1 lg:hidden' />
       <div className='flex shrink-0 items-center gap-1 lg:col-start-3 lg:justify-self-end'>
-        <GitHubLink iconClassName='size-[18px]' />
+        <GitHubLink iconClassName='size-4.5' />
       </div>
     </header>
   );

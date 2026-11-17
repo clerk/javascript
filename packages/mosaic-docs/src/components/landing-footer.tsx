@@ -26,7 +26,7 @@ export function LandingFooterLinks() {
   return (
     <nav
       aria-label='Footer'
-      className='mx-auto grid w-full max-w-[1400px] grid-cols-2 gap-x-8 gap-y-10 px-6 py-16 sm:grid-cols-3 sm:py-20 lg:grid-cols-7'
+      className='max-w-350 mx-auto grid w-full grid-cols-2 gap-x-8 gap-y-10 px-6 py-16 sm:grid-cols-3 sm:py-20 lg:grid-cols-7'
     >
       {groups.map(group => (
         <div key={group.title}>
@@ -51,7 +51,7 @@ export function LandingFooterLinks() {
 
 export function LandingFooter() {
   return (
-    <footer className='mx-auto w-full max-w-[1400px] px-6 pb-16 sm:pb-20'>
+    <footer className='max-w-350 mx-auto w-full px-6 pb-16 sm:pb-20'>
       <div className='border-border flex flex-col items-center gap-4 border-t pt-8 sm:grid sm:grid-cols-3 sm:items-center'>
         <Link
           href='/'
@@ -60,7 +60,7 @@ export function LandingFooter() {
           {site.name}
         </Link>
         <p className='text-muted-foreground text-center text-xs'>{site.copyright}</p>
-        <div className='-my-[9px] flex items-center gap-1 sm:-me-[9px] sm:justify-self-end'>
+        <div className='-my-2.25 sm:-me-2.25 flex items-center gap-1 sm:justify-self-end'>
           <GitHubLink iconClassName='size-4' />
         </div>
       </div>

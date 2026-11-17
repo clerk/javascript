@@ -49,7 +49,7 @@ export function CopyButton({ text }: { text: string }) {
       type='button'
       aria-label={copied ? 'Copied' : 'Copy code'}
       onClick={() => void navigator.clipboard.writeText(text).then(() => flash(true))}
-      className={`text-muted-foreground bg-background relative inline-flex size-[1.875rem] shrink-0 select-none items-center justify-center rounded-md transition-colors ${copied ? '' : 'hover:bg-muted hover:text-foreground'}`}
+      className={`text-muted-foreground bg-background size-7.5 relative inline-flex shrink-0 select-none items-center justify-center rounded-md transition-colors ${copied ? '' : 'hover:bg-muted hover:text-foreground'}`}
     >
       <svg
         aria-hidden

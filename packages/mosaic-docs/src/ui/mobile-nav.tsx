@@ -44,7 +44,7 @@ export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[
           strokeWidth={2}
           strokeLinecap='round'
           strokeLinejoin='round'
-          className='size-[18px]'
+          className='size-4.5'
         >
           <path d='M4 6h16M4 12h16M4 18h16' />
         </svg>
@@ -70,7 +70,7 @@ export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[
                 strokeWidth={2}
                 strokeLinecap='round'
                 strokeLinejoin='round'
-                className='size-[18px]'
+                className='size-4.5'
               >
                 <path d='M18 6 6 18M6 6l12 12' />
               </svg>
