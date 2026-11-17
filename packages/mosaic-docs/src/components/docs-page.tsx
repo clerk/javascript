@@ -1,9 +1,18 @@
 import type { ReactNode } from 'react';
 
+import { CopyPageButton } from '@/components/copy-page-button';
 import { TableOfContents } from '@/components/table-of-contents';
 import type { TocHeading } from '@/lib/navigation';
 
-export function DocsPage({ headings, children }: { headings: TocHeading[]; children: ReactNode }) {
+export function DocsPage({
+  headings,
+  markdownHref,
+  children,
+}: {
+  headings: TocHeading[];
+  markdownHref: string;
+  children: ReactNode;
+}) {
   return (
     <>
       <main
@@ -17,6 +26,9 @@ export function DocsPage({ headings, children }: { headings: TocHeading[]; child
         className='sticky top-16 hidden max-h-[calc(100dvh-4rem)] overflow-y-auto px-4 pb-10 pt-6 text-sm xl:block'
       >
         {headings.length > 0 && <TableOfContents headings={headings} />}
+        <div className={headings.length > 0 ? 'border-border mt-8 border-t pt-4' : undefined}>
+          <CopyPageButton href={markdownHref} />
+        </div>
       </aside>
     </>
   );

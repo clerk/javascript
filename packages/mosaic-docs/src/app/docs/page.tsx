@@ -17,7 +17,10 @@ const headings: TocHeading[] = [
 
 export default function IntroductionPage() {
   return (
-    <DocsPage headings={headings}>
+    <DocsPage
+      headings={headings}
+      markdownHref='/docs.md'
+    >
       <h1>Introduction</h1>
       <p className='lead'>{site.description}</p>
       <h2 id='components'>Components</h2>

@@ -31,7 +31,10 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
   }
 
   return (
-    <DocsPage headings={docHeadings(entry.doc)}>
+    <DocsPage
+      headings={docHeadings(entry.doc)}
+      markdownHref={`${docHref(entry)}.md`}
+    >
       <DocContent doc={entry.doc} />
     </DocsPage>
   );
