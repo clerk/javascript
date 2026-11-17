@@ -15,6 +15,7 @@
       }
     ],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "incremental": true,
     "paths": {

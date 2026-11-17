@@ -10,7 +10,7 @@
     "format:check": "node ../../scripts/format-package.mjs --check",
     "generate": "node scripts/generate-docs.mjs",
     "lint": "oxlint -c ../../oxlint.config.mjs src scripts",
-    "test": "node --test scripts/*.test.mjs",
+    "test": "node --test 'scripts/*.test.mjs' 'src/**/*.test.ts'",
     "typecheck": "pnpm generate && next typegen && tsc --noEmit"
   },
   "dependencies": {

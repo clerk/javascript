@@ -6,6 +6,7 @@ import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Introduction',
+  alternates: { types: { 'text/markdown': '/docs.md' } },
 };
 
 const headings: TocHeading[] = [
