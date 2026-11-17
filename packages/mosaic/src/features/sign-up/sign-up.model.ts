@@ -214,6 +214,9 @@ export function useSignUpModel({
     continueFieldsFor: identifier => {
       const fields = activeFields(identifier);
       minimizeFieldsForExistingSignup(fields, signUp);
+      if (signUp.hasPassword) {
+        delete fields.password;
+      }
       return toViewFields(fields, isShown);
     },
     prefill: {
