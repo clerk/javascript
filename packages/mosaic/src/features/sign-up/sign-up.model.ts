@@ -4,6 +4,7 @@ import { getSignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import type { ActiveIdentifier } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import {
   determineActiveFields,
+  emailOrPhone,
   getInitialActiveIdentifier,
   minimizeFieldsForExistingSignup,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
@@ -30,6 +31,7 @@ export interface SignUpData {
   step: SignUpNextStep;
   mode: 'public' | 'restricted' | 'waitlist';
   initialIdentifier: SignUpIdentifier;
+  canSwitchIdentifier: boolean;
   startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
   continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
   emailAddress: string | null;
@@ -119,6 +121,7 @@ export function useSignUpModel(): SignUpModel {
     step: getSignUpNextStep(signUp),
     mode: userSettings.signUp.mode,
     initialIdentifier: getInitialActiveIdentifier(attributes, isProgressiveSignUp) ?? null,
+    canSwitchIdentifier: emailOrPhone(attributes, isProgressiveSignUp),
     startFieldsFor: identifier => toViewFields(activeFields(identifier)),
     continueFieldsFor: identifier => {
       const fields = activeFields(identifier);
