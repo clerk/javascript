@@ -60,7 +60,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
+    consent: dynamic(() => import('../stories/consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
     'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),
@@ -71,6 +71,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   authentication: {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
+    'sign-up': dynamic(() => import('../stories/sign-up.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),

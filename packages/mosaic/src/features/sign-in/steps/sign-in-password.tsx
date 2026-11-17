@@ -1,6 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
+import { AuthIdentityPreview } from '../../../blocks/auth';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -10,7 +11,6 @@ import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
-import { SignInIdentityPreview } from './sign-in-identity-preview';
 
 interface SignInPasswordProps {
   identifier: string;
@@ -22,6 +22,7 @@ interface SignInPasswordProps {
   onSubmit: (event: SignInSubmitEvent) => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  onShowHelp?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -35,6 +36,7 @@ export function SignInPassword({
   onSubmit,
   onForgotPassword,
   onCancel,
+  onShowHelp,
   focusRef,
 }: SignInPasswordProps) {
   const m = useMessages('signIn');
@@ -47,7 +49,7 @@ export function SignInPassword({
       <Card.Header>
         <Card.Title>{m.password.title}</Card.Title>
         <Card.Description>{m.password.description}</Card.Description>
-        <SignInIdentityPreview
+        <AuthIdentityPreview
           identifier={identifier}
           editLabel={m.editIdentifier}
           disabled={isPending}
@@ -98,16 +100,16 @@ export function SignInPassword({
         </Form>
       </Card.Content>
       <Card.Footer>
-        {onCancel ? (
+        {onCancel || onShowHelp ? (
           <Button
             type='button'
             variant='outline'
             color='neutral'
             fullWidth
             disabled={isPending}
-            onClick={onCancel}
+            onClick={onCancel ?? onShowHelp}
           >
-            {m.useAnotherMethod}
+            {onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink}
           </Button>
         ) : null}
         <SubmitButton

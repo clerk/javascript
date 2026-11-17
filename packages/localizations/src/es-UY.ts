@@ -1642,6 +1642,14 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá tu contraseña para continuar',
       title: 'Verificación requerida',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -1653,6 +1661,22 @@ export const esUY: LocalizationResource = {
       resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'Ingresá el código enviado a tu teléfono para continuar',
       title: 'Verificación requerida',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',
@@ -2177,6 +2201,7 @@ export const esUY: LocalizationResource = {
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ya has iniciado sesión',
     signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
