@@ -86,6 +86,31 @@ describe('SignUp', () => {
     expect(screen.getByRole('textbox', { name: 'Username' })).toBeInTheDocument();
   });
 
+  it('sends a prefilled value for an optional field it does not show', async () => {
+    const { fapi, user } = await renderSignUp({}, { initialValues: { firstName: 'Alice' } });
+
+    await submitStart(user);
+    await codeSent();
+
+    expect(screen.queryByRole('textbox', { name: 'First name' })).toBeNull();
+    expect(fapi.signUp.creations[0].get('first_name')).toBe('Alice');
+  });
+
+  it('sends a code for the new sign-up when the address is edited while the first code is sending', async () => {
+    const { fapi, user } = await renderSignUp();
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'Edit email address' }));
+    await user.click(await screen.findByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(hold.requests).toHaveLength(2));
+    hold.release();
+
+    await codeSent();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.preparations).toEqual(['email_code']);
+  });
+
   it('prefills the form and sends the metadata and a trimmed username', async () => {
     const { fapi, user } = await renderSignUp(
       { environment: environment({ attributes: { username: { required: true } } }) },

@@ -58,6 +58,7 @@ export interface SignUpData {
   canSwitchIdentifier: boolean;
   startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
   continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
+  startHiddenValuesFor: (identifier: SignUpIdentifier) => Partial<SignUpPrefill>;
   prefill: SignUpPrefill;
   emailAddress: string | null;
   phoneNumber: string | null;
@@ -97,6 +98,8 @@ const FIELD_NAMES: readonly SignUpFieldName[] = [
 ];
 
 const DETAILS_FIELDS = [...FIELD_NAMES, 'legalAccepted'] as const;
+
+const PREFILL_NAMES = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName'] as const;
 
 const ABSOLUTE_URL = /^https?:\/\//;
 
@@ -201,6 +204,14 @@ export function useSignUpModel({
     max_length: userSettings.usernameSettings.max_length,
   };
 
+  const prefill: SignUpPrefill = {
+    emailAddress: signUp.emailAddress || initialValues.emailAddress || '',
+    phoneNumber: signUp.phoneNumber || initialValues.phoneNumber || '',
+    username: signUp.username || initialValues.username || '',
+    firstName: signUp.firstName || initialValues.firstName || '',
+    lastName: signUp.lastName || initialValues.lastName || '',
+  };
+
   const legalConsent = legalConsentRequired
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
@@ -224,13 +235,18 @@ export function useSignUpModel({
       }
       return toViewFields(fields, isShown);
     },
-    prefill: {
-      emailAddress: signUp.emailAddress || initialValues.emailAddress || '',
-      phoneNumber: signUp.phoneNumber || initialValues.phoneNumber || '',
-      username: signUp.username || initialValues.username || '',
-      firstName: signUp.firstName || initialValues.firstName || '',
-      lastName: signUp.lastName || initialValues.lastName || '',
+    startHiddenValuesFor: identifier => {
+      const fields = activeFields(identifier);
+      const hidden: Partial<SignUpPrefill> = {};
+      for (const name of PREFILL_NAMES) {
+        const field = fields[name];
+        if (field && !isShown(name, field.required) && prefill[name]) {
+          hidden[name] = prefill[name];
+        }
+      }
+      return hidden;
     },
+    prefill,
     emailAddress: signUp.emailAddress,
     phoneNumber: signUp.phoneNumber,
     legalConsent,

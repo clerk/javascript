@@ -65,7 +65,7 @@ const codeMachine = code.createMachine({
       },
     },
     sending: {
-      on: { LEAVE: { actions: code.assign(() => ({ channel: undefined })) } },
+      on: { LEAVE: { target: 'idle', actions: code.assign(() => ({ channel: undefined })) } },
       invoke: code.fromPromise(context => (context.channel ? context.sendCode(context.channel) : Promise.resolve()), {
         onDone: {
           target: 'sent',
@@ -239,7 +239,9 @@ export function useSignUpController(model: SignUpReadyModel, options: MosaicLoca
     initialValues: { ...emptyValues, ...model.prefill },
     onSubmit: values => {
       const details = detailsValues(values, fields);
-      return screen === 'continue' ? model.update(details) : model.create(details);
+      return screen === 'continue'
+        ? model.update(details)
+        : model.create({ ...details, ...model.startHiddenValuesFor(identifier) });
     },
     onSuccess: step => {
       if (step) {
