@@ -1,6 +1,9 @@
-import { docEntries, type DocEntry } from '@/generated/docs';
+import { placeDoc } from '@/core/doc-place';
+import { docEntries as generatedEntries, type DocEntry } from '@/generated/docs';
 
 export type { DocEntry };
+
+export const docEntries: DocEntry[] = generatedEntries.map(entry => ({ ...entry, ...placeDoc(entry, entry.doc) }));
 
 export const docKinds = [
   { kind: 'components', title: 'Components' },
@@ -28,5 +31,3 @@ export function relatedHref(name: string): string | undefined {
 export function docsOfKind(kind: DocEntry['kind']): DocEntry[] {
   return docEntries.filter(entry => entry.kind === kind).sort((a, b) => a.doc.name.localeCompare(b.doc.name));
 }
-
-export { docEntries };
