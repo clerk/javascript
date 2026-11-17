@@ -35,13 +35,12 @@ export default function HomePage() {
     <>
       <main className='flex-1'>
         <section className='pb-16 pt-16 sm:pb-20 sm:pt-24'>
-          <div className='mx-auto max-w-[1400px] px-6'>
-            <p className='text-muted-foreground inline-flex items-center py-1 text-xs'>Clerk design system</p>
+          <div className='max-w-350 mx-auto px-6'>
             <h1 className='mt-6 max-w-3xl text-balance text-4xl font-medium sm:text-5xl lg:text-6xl'>
               <span className='block'>Mosaic</span>
               <span className='text-muted-foreground block'>Clerk&apos;s component library</span>
             </h1>
-            <p className='text-muted-foreground mt-8 max-w-xl text-pretty text-lg'>{site.description}</p>
+            <p className='text-muted-foreground mt-8 max-w-xl text-balance text-lg'>{site.description}</p>
             <div className='mt-8 flex flex-wrap items-center gap-x-6 gap-y-4'>
               <div className='rounded-docs border-border flex w-full max-w-xs items-center gap-2 border py-1.5 pl-3 pr-1.5 font-mono text-sm'>
                 <span
