@@ -1,5 +1,4 @@
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
@@ -8,6 +7,7 @@ import { Numbers } from '../../../icons/glyphs/numbers';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {

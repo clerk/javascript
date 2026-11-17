@@ -4,12 +4,12 @@ import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Text } from '../../../components/text';
 import type { IconComponent } from '../../../icons/glyph';
 import { fill, useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 

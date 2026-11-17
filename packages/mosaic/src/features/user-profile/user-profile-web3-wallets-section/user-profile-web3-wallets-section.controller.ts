@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
-import { usePanelTitle } from '../../../components/panel';
+import { usePanelTitle } from '../../../components/panel/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';

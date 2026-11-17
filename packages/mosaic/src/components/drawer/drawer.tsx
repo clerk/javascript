@@ -8,7 +8,7 @@ import { Drawer as Primitive, registerDrawerCssVars } from '../../primitives/dra
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { DialogContext, isInDialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
 import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;

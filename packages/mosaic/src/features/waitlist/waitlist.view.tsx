@@ -1,12 +1,13 @@
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
-import { Flow, useFlowAutoFocus } from '../../components/flow';
+import { Flow } from '../../components/flow';
 import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { useMessages } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow';
 import { Form } from '../../primitives/form';
 import { styles } from './waitlist.styles';
 import type { WaitlistStep, WaitlistValues } from './waitlist.types';

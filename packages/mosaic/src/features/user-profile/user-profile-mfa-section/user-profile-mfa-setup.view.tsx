@@ -1,7 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import { Flow } from '../../../components/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
