@@ -36,6 +36,49 @@ describe('ClientClerkProvider __internal_onBeforeSetActive', () => {
 
   afterEach(() => {
     cleanup();
+    delete (window as { next?: unknown }).next;
+  });
+
+  it('waits for the cache invalidation before it resolves', async () => {
+    let finishInvalidation!: () => void;
+    invalidateCacheAction.mockReturnValue(new Promise<void>(resolve => (finishInvalidation = resolve)));
+
+    let settled = false;
+    const hook = Promise.resolve(window.__internal_onBeforeSetActive()).then(() => (settled = true));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    expect(settled).toBe(false);
+
+    finishInvalidation();
+    await hook;
+    expect(settled).toBe(true);
+  });
+
+  it.each(['15.5.9', '16.2.6'])('skips the cache invalidation on sign-out with Next.js %s', async version => {
+    (window as { next?: unknown }).next = { version };
+
+    await expect(window.__internal_onBeforeSetActive('sign-out')).resolves.toBeUndefined();
+    expect(invalidateCacheAction).not.toHaveBeenCalled();
+  });
+
+  it('invalidates the cache on Next.js 16 when no intent is passed', async () => {
+    (window as { next?: unknown }).next = { version: '16.2.6' };
+    invalidateCacheAction.mockResolvedValue(undefined);
+
+    await expect(window.__internal_onBeforeSetActive()).resolves.toBeUndefined();
+    expect(invalidateCacheAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not leave an unhandled rejection when the cache invalidation action rejects', async () => {
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+    invalidateCacheAction.mockRejectedValue(new Error('Server Action was not found on the server'));
+
+    await expect(window.__internal_onBeforeSetActive()).resolves.toBeUndefined();
+    await new Promise(resolve => setTimeout(resolve, 10));
+    process.off('unhandledRejection', onUnhandled);
+
+    expect(unhandled).toEqual([]);
   });
 
   it('resolves after the cache is invalidated', async () => {
