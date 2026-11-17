@@ -58,7 +58,7 @@ describe('getAuthDataFromRequest', () => {
     vi.clearAllMocks();
   });
 
-  it('redacts the secret key from debug data of a machine auth object', () => {
+  it('redacts debug data of a machine auth object', () => {
     const req = mockRequest({
       url: '/api/protected',
       headers: new Headers({ [constants.Headers.Authorization]: 'Bearer ak_xxx' }),

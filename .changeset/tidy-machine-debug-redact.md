@@ -3,4 +3,4 @@
 '@clerk/backend': patch
 ---
 
-Fix `auth().debug()` in route handlers returning the full secret key for requests authenticated with an M2M token, OAuth token or API key. The secret key is now cut to its first 7 characters, the same as for session tokens.
+Fix `auth().debug()` in route handlers not redacting its data for requests authenticated with an M2M token, OAuth token or API key. Debug data is now redacted the same way as for session tokens.
