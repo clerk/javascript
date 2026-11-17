@@ -32,11 +32,11 @@ const agents = [
   },
   {
     name: 'Cursor',
-    background: '#000',
+    background: 'light-dark(#000, #fff)',
     logo: (
       <path
         d='M29.475 7.57421L16.6646 0.178165C16.2532 -0.0593884 15.7456 -0.0593884 15.3343 0.178165L2.52439 7.57421C2.17859 7.77387 1.96509 8.14313 1.96509 8.54307V23.4572C1.96509 23.8572 2.17859 24.2264 2.52439 24.4261L15.3349 31.8221C15.7462 32.0597 16.2538 32.0597 16.6652 31.8221L29.4756 24.4261C29.8214 24.2264 30.0349 23.8572 30.0349 23.4572V8.54307C30.0349 8.14313 29.8214 7.77387 29.4756 7.57421H29.475ZM28.6703 9.14086L16.3037 30.5604C16.2201 30.7047 15.9994 30.6458 15.9994 30.4786V16.4533C15.9994 16.1731 15.8497 15.9138 15.6067 15.7731L3.46077 8.76077C3.31644 8.67718 3.37538 8.45646 3.54257 8.45646H28.2758C28.627 8.45646 28.8466 8.83715 28.6709 9.14146H28.6703V9.14086Z'
-        fill='#F7F7F8'
+        style={{ fill: 'light-dark(#F7F7F8, #000)' }}
       />
     ),
   },
@@ -59,7 +59,7 @@ export function AgentPrompt() {
         {agents.map((agent, index) => (
           <span
             key={agent.name}
-            className='inset-ring inset-ring-logo-ring grid size-7 place-items-center rounded-full'
+            className='grid size-7 place-items-center rounded-full'
             style={{ background: agent.background, mask: index === 0 ? undefined : cutout }}
           >
             <svg

@@ -10,7 +10,6 @@
   --docs-code-background: var(--docs-background);
   --docs-positive: #15803d;
   --docs-negative: #dc2626;
-  --docs-logo-ring: light-dark(oklch(0 0 0 / 0.025), oklch(1 0 0 / 0.2));
   --shiki-background: var(--docs-code-background);
   --shiki-foreground: light-dark(#131316, #ffffff);
   --shiki-token-keyword: light-dark(#6504ff, #bab1ff);
@@ -39,7 +38,6 @@
   --color-code: var(--docs-code-background);
   --color-positive: var(--docs-positive);
   --color-negative: var(--docs-negative);
-  --color-logo-ring: var(--docs-logo-ring);
   --radius-docs: var(--docs-radius);
   --container-content: var(--docs-content-width);
   --font-sans: var(--docs-font-body);
