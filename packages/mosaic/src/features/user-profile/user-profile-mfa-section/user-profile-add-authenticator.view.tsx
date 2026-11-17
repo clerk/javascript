@@ -5,7 +5,7 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { Otp } from '../../../components/otp';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { styles } from './user-profile-add-authenticator.styles';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';

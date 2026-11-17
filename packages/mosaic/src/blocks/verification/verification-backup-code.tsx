@@ -6,7 +6,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 
 export interface VerificationBackupCodeMessages {

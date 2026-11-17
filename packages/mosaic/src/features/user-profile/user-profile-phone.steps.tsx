@@ -12,7 +12,7 @@ import { Otp } from '../../components/otp';
 import type { CountryIso } from '../../components/phone-input';
 import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { CODE_LENGTH } from '../../utils/verification';

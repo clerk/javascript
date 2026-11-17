@@ -7,7 +7,7 @@ import { Input } from '../../components/input';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { useMessages } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { styles } from './waitlist.styles';
 import type { WaitlistStep, WaitlistValues } from './waitlist.types';

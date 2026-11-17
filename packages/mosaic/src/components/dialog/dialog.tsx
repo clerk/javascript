@@ -12,7 +12,8 @@ import type {
   DialogProps as HeadlessDialogProps,
   DialogRole,
 } from '../../primitives/dialog';
-import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import { Dialog as Primitive } from '../../primitives/dialog';
+import { useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog/dialog-context';
 import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';

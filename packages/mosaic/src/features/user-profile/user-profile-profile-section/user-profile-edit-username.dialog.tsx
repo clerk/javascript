@@ -11,7 +11,7 @@ import { Flow } from '../../../components/flow';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';

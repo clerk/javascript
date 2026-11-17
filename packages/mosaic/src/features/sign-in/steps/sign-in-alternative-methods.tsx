@@ -9,7 +9,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Text } from '../../../components/text';
 import type { IconComponent } from '../../../icons/glyph';
 import { fill, useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { styles } from '../sign-in.styles';
 import type { SignInProvider } from '../sign-in.types';
 

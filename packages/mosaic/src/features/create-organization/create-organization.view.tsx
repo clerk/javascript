@@ -12,7 +12,7 @@ import { Input } from '../../components/input';
 import type { LocalizableError } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { FileUpload } from '../../primitives/file-upload';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { AVATAR_REJECTION_ERRORS } from '../../utils/avatar-upload';
 import type { InviteMembersForm } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';

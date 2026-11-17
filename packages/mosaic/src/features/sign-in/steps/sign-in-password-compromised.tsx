@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 
 interface SignInPasswordCompromisedProps {
   globalErrorMessage?: string;

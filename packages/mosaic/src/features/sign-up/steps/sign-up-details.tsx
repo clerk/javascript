@@ -17,7 +17,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-up.styles';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';

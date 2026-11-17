@@ -14,7 +14,7 @@ import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { fill } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';

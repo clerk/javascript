@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import type { VerificationCodeResend } from '../verification';
 import { AuthIdentityPreview } from './auth-identity-preview';
 

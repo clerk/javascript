@@ -8,7 +8,7 @@ import { Field } from '../../../components/field';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
 

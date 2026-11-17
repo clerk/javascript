@@ -16,7 +16,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';

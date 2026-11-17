@@ -7,7 +7,7 @@ import { Numbers } from '../../../icons/glyphs/numbers';
 import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {

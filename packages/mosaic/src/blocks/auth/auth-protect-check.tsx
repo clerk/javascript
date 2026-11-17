@@ -5,7 +5,7 @@ import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Spinner } from '../../components/spinner';
 import { useSpinDelay } from '../../hooks/use-spin-delay';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 
 export interface AuthProtectCheckMessages {

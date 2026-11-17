@@ -8,7 +8,7 @@ import { Field } from '../../components/field';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import { PhoneInput } from '../../components/phone-input';
 import { fill } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { styles } from './auth.styles';
 import type { AuthProvider } from './auth.types';

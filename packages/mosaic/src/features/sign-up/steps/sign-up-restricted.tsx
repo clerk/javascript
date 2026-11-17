@@ -6,7 +6,7 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { styles } from '../sign-up.styles';
 
 interface SignUpRestrictedProps {

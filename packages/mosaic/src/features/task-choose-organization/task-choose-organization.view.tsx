@@ -7,7 +7,7 @@ import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import type { OrganizationListRowsProps } from '../organization-list/organization-list.view';
 import { OrganizationListRows } from '../organization-list/organization-list.view';
 import { styles } from './task-choose-organization.styles';

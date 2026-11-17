@@ -1,6 +1,6 @@
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 
 export interface VerificationHelpMessages {
   title: string;

@@ -16,7 +16,7 @@ import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';

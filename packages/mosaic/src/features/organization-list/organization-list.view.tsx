@@ -11,7 +11,7 @@ import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import type {
   OrganizationListData,
   OrganizationListInvitation,

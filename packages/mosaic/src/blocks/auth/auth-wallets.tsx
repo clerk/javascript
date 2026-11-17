@@ -9,7 +9,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../components/provider-b
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { fill, rich } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 import type { AuthProvider } from './auth.types';
 

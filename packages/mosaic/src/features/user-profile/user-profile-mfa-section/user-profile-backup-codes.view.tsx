@@ -8,7 +8,7 @@ import { Text } from '../../../components/text';
 import { Clipboard } from '../../../icons/glyphs/clipboard';
 import { Download } from '../../../icons/glyphs/download';
 import { useMessages } from '../../../localization';
-import { useFlowAutoFocus } from '../../../primitives/flow';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';

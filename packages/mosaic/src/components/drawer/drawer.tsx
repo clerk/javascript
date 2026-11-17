@@ -4,7 +4,8 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '../../primitives/drawer';
-import { Drawer as Primitive, registerDrawerCssVars } from '../../primitives/drawer';
+import { Drawer as Primitive } from '../../primitives/drawer';
+import { registerDrawerCssVars } from '../../primitives/drawer/css-vars';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';

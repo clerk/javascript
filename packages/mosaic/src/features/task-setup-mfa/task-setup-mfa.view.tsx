@@ -14,7 +14,7 @@ import { Download } from '../../icons/glyphs/download';
 import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
 import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import { fill, useMessages } from '../../localization';
-import { useFlowAutoFocus } from '../../primitives/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import type { ReverificationController } from '../reverification';
