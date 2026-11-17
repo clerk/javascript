@@ -657,4 +657,69 @@ describe('OAuthConsent', () => {
       expect(icon).toHaveAttribute('aria-label', 'Claude');
     });
   });
+
+  describe('client identity notice', () => {
+    const renderWithConsentInfo = async (consentInfo: Record<string, unknown>) => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['jane@example.com'] });
+      });
+      props.setProps({ componentName: 'OAuthConsent' } as any);
+      mockOAuthApplication(fixtures.clerk, {
+        getConsentInfo: vi.fn().mockResolvedValue({ ...fakeConsentInfo, ...consentInfo }),
+      });
+      return render(<OAuthConsent />, { wrapper });
+    };
+
+    it('warns that a dynamically registered client named itself', async () => {
+      const { getByText } = await renderWithConsentInfo({
+        clientRegistration: 'dynamic',
+        clientMetadataHost: null,
+      });
+
+      await waitFor(() => {
+        expect(getByText('Unverified app: it registered itself, so its name and logo are not verified.')).toBeVisible();
+      });
+    });
+
+    it('shows the host that publishes a client ID metadata document', async () => {
+      const { getByText } = await renderWithConsentInfo({
+        clientRegistration: 'metadata_document',
+        clientMetadataHost: 'claude.ai',
+      });
+
+      await waitFor(() => {
+        expect(getByText('App details published by claude.ai')).toBeVisible();
+      });
+    });
+
+    it('shows no notice for a pre-registered client', async () => {
+      const { getByText, queryByText } = await renderWithConsentInfo({
+        clientRegistration: 'preregistered',
+        clientMetadataHost: null,
+      });
+
+      await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
+      expect(queryByText(/Unverified app/)).toBeNull();
+      expect(queryByText(/App details published by/)).toBeNull();
+    });
+
+    it('shows no notice and still renders for an unknown registration type', async () => {
+      const { getByText, queryByText } = await renderWithConsentInfo({
+        clientRegistration: 'something_new',
+        clientMetadataHost: null,
+      });
+
+      await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
+      expect(queryByText(/Unverified app/)).toBeNull();
+      expect(queryByText(/App details published by/)).toBeNull();
+    });
+
+    it('shows no notice when the backend does not send the registration type', async () => {
+      const { getByText, queryByText } = await renderWithConsentInfo({});
+
+      await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
+      expect(queryByText(/Unverified app/)).toBeNull();
+      expect(queryByText(/App details published by/)).toBeNull();
+    });
+  });
 });

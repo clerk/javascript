@@ -194,6 +194,8 @@ export type ElementsConfig = {
   listGroupItem: WithOptions;
   listGroupItemLabel: WithOptions;
 
+  oauthConsentClientIdentity: WithOptions;
+
   header: WithOptions;
   headerTitle: WithOptions;
   headerSubtitle: WithOptions;
