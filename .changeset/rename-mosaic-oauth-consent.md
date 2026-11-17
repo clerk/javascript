@@ -13,4 +13,4 @@
 | `consent_missing_redirect_uri` error code    | `oauth_consent_missing_redirect_uri`               |
 | `.cl-consent-scopes` / `.cl-consent-redirect-url` | `.cl-oauth-consent-scopes` / `.cl-oauth-consent-redirect-url` |
 
-Find usages with `git grep -nE "\bConsent(Props)?\b|consent[._-](missing|scopes|redirect)|'consent\."`.
+Find usages with `git grep -nE "(^|[^[:alnum:]_])(Consent(Props)?([^[:alnum:]_]|$)|consent[\"']?[[:space:]]*(\.[[:alpha:]]|:)|consent_missing_)|cl-consent-"`.
