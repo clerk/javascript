@@ -4,12 +4,11 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
 import { isRouteName } from '@clerk/mosaic/routing/routes';
 import { useRouterScope } from '@clerk/mosaic/routing/use-router';
-import Link from 'next/link';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
+import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
 import { ModeNav, useModeParam } from '@/components/routing-demo/mode-nav';
 import { RoutedTabs } from '@/components/routing-demo/routed-tabs';
-import { buttonVariants } from '@/components/ui/button';
 import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
 const pagePath = '/routing/single-tabs';
@@ -40,6 +39,8 @@ function Tabs({ mode }: { mode: Mode }) {
 
 export default function SingleTabsPage() {
   const mode = useModeParam(modes);
+  const link = (parts: string) =>
+    hostUrl({ mode, pagePath, entries: [{ base: mode === 'path' ? pagePath : '/tabs', parts }] });
 
   return (
     <MosaicProvider
@@ -47,7 +48,7 @@ export default function SingleTabsPage() {
       routing={routing}
     >
       <DemoPage
-        title='A single set of tabs'
+        title='Tabs'
         intro={
           <p>
             One set of tabs on the page, shown first in path mode, owning the pathname under{' '}
@@ -55,8 +56,8 @@ export default function SingleTabsPage() {
             lives at the base itself, and the others are{' '}
             <code className='font-mono text-xs'>{pagePath}/invitations</code> and{' '}
             <code className='font-mono text-xs'>{pagePath}/settings</code>. Back moves between tabs, a reload keeps the
-            tab, and a link from the host opens one directly. The other modes are here to compare the URL shapes;
-            several sets of tabs on one page is the next case.
+            tab, and a link from the host opens one directly in every URL mode. The other modes are here to compare the
+            URL shapes; multiple tabs on one page are the next case.
           </p>
         }
       >
@@ -66,23 +67,12 @@ export default function SingleTabsPage() {
           mode={mode}
           href={option => `${pagePath}?mode=${option}`}
         />
-        {mode === 'path' ? (
-          <div className='flex flex-wrap items-center gap-2'>
-            <span className='text-muted-foreground text-sm'>Links from the host:</span>
-            <Link
-              href={`${pagePath}/settings?mode=path`}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              <code className='font-mono text-xs'>{pagePath}/settings</code>
-            </Link>
-            <Link
-              href={`${pagePath}/bogus?mode=path`}
-              className={buttonVariants({ variant: 'outline', size: 'sm' })}
-            >
-              <code className='font-mono text-xs'>{pagePath}/bogus</code>
-            </Link>
-          </div>
-        ) : null}
+        <HostLinks
+          links={[
+            { label: 'The settings tab', href: link('settings') },
+            { label: 'A tab the table does not know', href: link('bogus') },
+          ]}
+        />
         <Tabs
           key={mode}
           mode={mode}

@@ -44,33 +44,36 @@ export function TabsInLocation({ routing }: { routing: MosaicRoutingMode }) {
   );
 }
 
-const itemRoutes = { list: '', item: 'items/:item/:tab?' } as const;
-const itemTabRoutes = {
-  overview: 'items/:item',
-  activity: 'items/:item/activity',
-  settings: 'items/:item/settings',
+const projectRoutes = { list: '', project: 'projects/:project/:tab?' } as const;
+const projectTabRoutes = {
+  overview: 'projects/:project',
+  activity: 'projects/:project/activity',
+  settings: 'projects/:project/settings',
 } as const;
+const projects: Record<string, string> = { website: 'Website', mobile: 'Mobile app' };
+const projectName = (id: string) => projects[id] ?? id;
 
-function ItemView({ item, back }: { item: string; back: () => void }) {
-  const { route, go } = useRouter(itemTabRoutes);
+function ProjectView({ project, back }: { project: string; back: () => void }) {
+  const { route, go } = useRouter(projectTabRoutes);
+  const name = projectName(project);
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex items-center justify-between gap-2'>
-        <p className='text-sm'>Item {item}</p>
+        <p className='text-sm'>{name}</p>
         <Button
           variant='outline'
           onClick={back}
         >
-          Back to the list
+          Back to the projects
         </Button>
       </div>
       <RoutedTabs
         value={route ?? 'overview'}
-        onValueChange={value => isRouteName(itemTabRoutes, value) && go(value, { item })}
+        onValueChange={value => isRouteName(projectTabRoutes, value) && go(value, { project })}
         tabs={[
-          { value: 'overview', label: 'Overview', content: `What item ${item} is.` },
-          { value: 'activity', label: 'Activity', content: `What happened to item ${item}.` },
-          { value: 'settings', label: 'Settings', content: `How item ${item} behaves.` },
+          { value: 'overview', label: 'Overview', content: `What the ${name} project is for.` },
+          { value: 'activity', label: 'Activity', content: `Recent deployments of ${name}.` },
+          { value: 'settings', label: 'Settings', content: `How ${name} is configured.` },
         ]}
       />
     </div>
@@ -79,21 +82,27 @@ function ItemView({ item, back }: { item: string; back: () => void }) {
 
 /** Tabs inside one step of a flow: the tab is the trailing part of the owner's segment, read by a nested router. */
 export function TabsInStep({ routing }: { routing: MosaicRoutingMode }) {
-  const { route, params, go, scope } = useRouterScope(itemRoutes, { routing, path: '/item', root: 'list' });
+  const { route, params, go, scope } = useRouterScope(projectRoutes, { routing, path: '/project', root: 'list' });
   return (
     <Case
       title='Tabs inside a step'
-      note='The owner routes items/:item/:tab? and shows the item view for it. Inside, a nested useRouter reads the same segment against its own table, items/:item/activity and so on, so the tab is the last part of the step and goes along with the item in a link.'
+      note='The owner routes projects/:project/:tab? and shows the project for it. Inside, a nested useRouter reads the same segment against its own table, projects/:project/activity and so on, so the tab is the last part of the step and goes along with the project in a link.'
     >
       <MosaicRoutingScope scope={scope}>
         {route === 'list' ? (
           <div className='flex flex-wrap gap-2'>
-            <Button onClick={() => go('item', { item: 'a' })}>Open item A</Button>
-            <Button onClick={() => go('item', { item: 'b' })}>Open item B</Button>
+            {Object.entries(projects).map(([id, name]) => (
+              <Button
+                key={id}
+                onClick={() => go('project', { project: id })}
+              >
+                {name}
+              </Button>
+            ))}
           </div>
         ) : (
-          <ItemView
-            item={params.item ?? ''}
+          <ProjectView
+            project={params.project ?? ''}
             back={() => go('list')}
           />
         )}

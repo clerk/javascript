@@ -4,34 +4,17 @@ import { Button } from '@clerk/mosaic/components/button';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
-import Link from 'next/link';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
+import type { HostEntry } from '@/components/routing-demo/host-links';
+import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
 import { ModeNav, useModeParam } from '@/components/routing-demo/mode-nav';
 import { TabsArrivingLater, TabsInLocation, TabsInStep } from '@/components/routing-demo/tabs-cases';
 import { tabsModal } from '@/components/routing-demo/tabs-modal';
-import { buttonVariants } from '@/components/ui/button';
 import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
 const pagePath = '/routing/multiple-tabs';
 const modes = ['virtual', 'hash', 'query'] as const;
-type Mode = (typeof modes)[number];
-
-// Links a host could render, one per case, in the shape the mode gives them.
-const links: Record<Exclude<Mode, 'virtual'>, { label: string; href: string }[]> = {
-  hash: [
-    { label: 'A tab the table does not know', href: `${pagePath}?mode=hash#tabs=bogus` },
-    { label: 'Item B on its activity tab', href: `${pagePath}?mode=hash#item=items/b/activity` },
-    { label: 'The billing tab, before the tabs are known', href: `${pagePath}?mode=hash#later=billing` },
-    { label: 'The modal on its settings tab', href: `${pagePath}?mode=hash#modal.tabs=settings` },
-  ],
-  query: [
-    { label: 'A tab the table does not know', href: `${pagePath}?mode=query&p.tabs=bogus` },
-    { label: 'Item B on its activity tab', href: `${pagePath}?mode=query&p.item=items/b/activity` },
-    { label: 'The billing tab, before the tabs are known', href: `${pagePath}?mode=query&p.later=billing` },
-    { label: 'The modal on its settings tab', href: `${pagePath}?mode=query&p.modal.tabs=settings` },
-  ],
-};
 
 function TabsModalButtons() {
   const modal = useModal(tabsModal);
@@ -45,7 +28,7 @@ function TabsModalButtons() {
         </p>
       </div>
       <div className='flex flex-wrap gap-2'>
-        <Button onClick={() => modal.open()}>Open the modal</Button>
+        <Button onClick={() => modal.open()}>Organization settings</Button>
         <Button
           variant='outline'
           onClick={() => modal.open({ tab: 'invitations' })}
@@ -59,6 +42,7 @@ function TabsModalButtons() {
 
 export default function MultipleTabsPage() {
   const mode = useModeParam(modes);
+  const link = (entries: HostEntry[]) => hostUrl({ mode, pagePath, entries });
   const routing: MosaicRouting = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
 
   return (
@@ -68,7 +52,7 @@ export default function MultipleTabsPage() {
     >
       <tabsModal.Host>
         <DemoPage
-          title='Several sets of tabs'
+          title='Multiple tabs'
           intro={
             <p>
               Tabs are the simplest routed thing: the active tab is a route name, picking one is{' '}
@@ -84,26 +68,26 @@ export default function MultipleTabsPage() {
             mode={mode}
             href={option => `${pagePath}?mode=${option}`}
           />
-          {mode === 'virtual' ? null : (
-            <div className='flex flex-wrap items-center gap-2'>
-              <span className='text-muted-foreground text-sm'>Links from the host:</span>
-              {links[mode].map(({ label, href }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={buttonVariants({ variant: 'outline', size: 'sm' })}
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          )}
+          <HostLinks
+            links={[
+              { label: 'A tab the table does not know', href: link([{ base: '/tabs', parts: 'bogus' }]) },
+              {
+                label: 'The mobile app on its activity tab',
+                href: link([{ base: '/project', parts: 'projects/mobile/activity' }]),
+              },
+              {
+                label: 'The billing tab, before the tabs are known',
+                href: link([{ base: '/later', parts: 'billing' }]),
+              },
+              { label: 'The modal on its settings tab', href: link([{ base: '/modal/tabs', parts: 'settings' }]) },
+            ]}
+          />
           <TabsInLocation
             key={`tabs:${mode}`}
             routing={mode}
           />
           <TabsInStep
-            key={`item:${mode}`}
+            key={`project:${mode}`}
             routing={mode}
           />
           <TabsArrivingLater
