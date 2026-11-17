@@ -127,8 +127,11 @@ describe('Switcher with experimental.newProfiles', () => {
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('opens the profile as a modal, so an OAuth connection returns to it', async () => {
-    await renderWithNewProfiles({}, withConnectedAccounts([]));
+  it.each([
+    { name: 'combined', props: {}, expected: 'profile/account' },
+    { name: 'user-only', props: { mode: 'user' as const }, expected: 'user-profile/account' },
+  ])('opens the $name profile as a modal, so an OAuth connection returns to it', async ({ props, expected }) => {
+    await renderWithNewProfiles(props, withConnectedAccounts([]));
     const request = holdRequests('post', '/v1/me/external_accounts');
     const user = await open();
 
@@ -138,7 +141,7 @@ describe('Switcher with experimental.newProfiles', () => {
 
     const body = new URLSearchParams(await request.requests[0]?.text());
     const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
+    expect(params.get('__clerk_mosaic_modal')).toBe(expected);
     expect(params.has('__clerk_modal_state')).toBe(false);
     request.fail();
   });

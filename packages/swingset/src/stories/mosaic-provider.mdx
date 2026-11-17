@@ -54,15 +54,17 @@ themselves.
 </MosaicProvider>
 ```
 
-`combined` on `MosaicProvider` decides what the profile shows, and the button you pick (`Switcher`,
-`UserButton` or `OrganizationSwitcher`) decides what its menu lists.
+The button you pick (`Switcher`, `UserButton` or `OrganizationSwitcher`) decides what its menu lists and
+which profile it opens. `combined` on `MosaicProvider` decides whether a combined `Switcher` opens one
+profile or two, and what a `<Profile />` without a `mode` shows.
 
-`profile.combined` takes effect only with `experimental.newProfiles`. Without it, `Switcher`, `UserButton` and
-`OrganizationSwitcher` open Clerk's modals.
+For `Switcher`, `UserButton` and `OrganizationSwitcher`, `profile.combined` takes effect only with
+`experimental.newProfiles`. Without it, they open Clerk's modals. A `<Profile />` without a `mode` follows
+`profile.combined` either way.
 
 | Option                     | Type                       | Default | Description                                                                       |
 | -------------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------- |
-| `combined`                 | `boolean`                  | `true`  | Whether one profile carries the account's pages and the active organization's.    |
+| `combined`                 | `boolean`                  | `true`  | Whether a combined menu, or a `<Profile />` without a `mode`, shows both groups.  |
 | `userProfileUrl`           | `string`                   | —       | Your own user profile page. Setting it routes there instead of opening the modal. |
 | `organizationProfileUrl`   | `string`                   | —       | Your own organization profile page. Setting it routes there instead of the modal. |
 | `userProfileProps`         | `ProfileUserProps`         | —       | Options for the user profile.                                                     |

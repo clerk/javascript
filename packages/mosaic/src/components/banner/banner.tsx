@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -104,18 +106,4 @@ const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProp
   });
 });
 
-/**
- * A tinted strip that annotates the surface it sits on with a status message. Composed through
- * `Banner.Root`, `Banner.Label`, and `Banner.Description`; every part accepts the Mosaic `render`
- * prop and forwards its ref. `Banner.Root` renders the icon for its `color` itself.
- *
- * `Banner.Root` sets no ARIA role. A banner that appears in response to something the user did
- * should be given `role='status'` (or `role='alert'` for an error) so it is announced.
- *
- * @example
- * <Banner.Root color='negative'>
- *   <Banner.Label>Error banner</Banner.Label>
- *   <Banner.Description>Renew now to avoid service interruption.</Banner.Description>
- * </Banner.Root>
- */
-export const Banner = { Root, Label, Description };
+export { Root as BannerRoot, Label as BannerLabel, Description as BannerDescription };

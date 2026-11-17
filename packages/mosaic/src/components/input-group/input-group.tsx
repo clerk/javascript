@@ -124,4 +124,4 @@ const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function Mos
   return useAddon('end', props, ref);
 });
 
-export const InputGroup = { Root, Input, Start, End };
+export { Root as InputGroupRoot, Input as InputGroupInput, Start as InputGroupStart, End as InputGroupEnd };
