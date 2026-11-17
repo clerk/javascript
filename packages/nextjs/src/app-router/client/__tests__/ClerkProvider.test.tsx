@@ -55,6 +55,6 @@ describe('ClientClerkProvider __internal_onBeforeSetActive', () => {
     ]);
 
     expect(outcome).toBe('settled');
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).not.toHaveBeenCalled();
   });
 });

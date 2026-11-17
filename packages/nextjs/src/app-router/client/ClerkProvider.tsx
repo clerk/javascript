@@ -58,10 +58,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
         } else {
           void invalidateCacheAction().then(
             () => resolve(),
-            () => {
-              router.refresh();
-              resolve();
-            },
+            () => resolve(),
           );
         }
       });
