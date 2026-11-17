@@ -33,7 +33,7 @@ function sectionBlocks(section: DocSection, hrefFor: (name: string) => string | 
         list(
           section.names.map(name => {
             const href = hrefFor(name);
-            return href ? `[${name}](${href}.md)` : codeSpan(name);
+            return href ? `[${name}](${href})` : codeSpan(name);
           }),
         ),
       ];

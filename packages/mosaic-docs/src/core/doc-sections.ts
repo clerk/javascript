@@ -56,6 +56,6 @@ function hasProps(props: PropDocs): boolean {
   return Object.keys(props).length > 0;
 }
 
-function partSlug(name: string): string {
+export function partSlug(name: string): string {
   return `part-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 }

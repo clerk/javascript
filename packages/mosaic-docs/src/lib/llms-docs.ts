@@ -4,7 +4,7 @@ import path from 'node:path';
 import { docToMarkdown } from '@/core/doc-markdown';
 import { llmsFull, llmsIndex } from '@/core/llms';
 import { mdxToMarkdown } from '@/core/mdx-markdown';
-import { type DocEntry, docHref, docKinds, docsOfKind, relatedHref } from '@/lib/docs';
+import { type DocEntry, docHref, docKinds, docsOfKind, relatedMarkdownHref } from '@/lib/docs';
 import { site } from '@/lib/site';
 
 export function docsIndexMarkdown(): string {
@@ -35,5 +35,5 @@ export function setupMarkdown(): string {
 }
 
 export function docMarkdown(entry: DocEntry): string {
-  return docToMarkdown(entry.doc, relatedHref);
+  return docToMarkdown(entry.doc, relatedMarkdownHref);
 }

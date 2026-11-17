@@ -28,7 +28,7 @@ void test('renders a component doc with parts, practices, examples and related l
       examples: [{ title: 'An action', code: '\n<Button onClick={onCancel}>Cancel</Button>\n' }],
       related: ['ProviderButton', 'useConfirmController'],
     },
-    name => (name === 'ProviderButton' ? '/docs/components/provider-button' : undefined),
+    name => (name === 'ProviderButton' ? '/docs/components/provider-button.md' : undefined),
   );
 
   assert.equal(
