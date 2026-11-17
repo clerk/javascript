@@ -16,10 +16,10 @@ import type { SwitcherTriggerProps } from './switcher-trigger';
 export default {
   name: 'Switcher',
   description:
-    "The account and organization switcher's look as parts: the trigger, the popover's header, and its rows. For showing a switcher on static data. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` are the working components, built from these parts.",
+    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state.",
   useFor: [
-    'a static picture of the user button or organization switcher',
-    'a marketing figure or docs illustration of the account switcher',
+    'a custom account or organization switcher composed from its parts',
+    'switcher rows or a switcher trigger rendered with your own data',
   ],
   keywords: ['switcher', 'user button', 'organization switcher', 'account switcher', 'menu rows'],
   practices: [

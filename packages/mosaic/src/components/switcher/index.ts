@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * The account and organization switcher's look, as parts to compose on static data, such as a
- * marketing figure or a docs illustration. The working components are `UserButton`,
- * `OrganizationSwitcher` and `Switcher`, which build their trigger and popover from these parts.
+ * The account and organization switcher's parts: its trigger, the popover's header, and its rows.
+ * `UserButton`, `OrganizationSwitcher` and `Switcher` compose them with Clerk's session and
+ * organization state.
  *
  * ```tsx
  * <Switcher.Header avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='md' />} title='Acme' />
