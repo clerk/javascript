@@ -188,6 +188,51 @@ describe('Tabs', () => {
       expect(screen.getByText('Settings content')).toBeVisible();
     });
 
+    it('selects a tab that kept focus while the controlled value moved away', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      function Controlled() {
+        const [value, setValue] = useState('tab1');
+        return (
+          <>
+            <button
+              type='button'
+              onClick={() => setValue('tab1')}
+            >
+              Back to account
+            </button>
+            <Tabs.Root
+              value={value}
+              onValueChange={next => {
+                onValueChange(next);
+                setValue(next);
+              }}
+            >
+              <Tabs.List>
+                <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+                <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+              <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+            </Tabs.Root>
+          </>
+        );
+      }
+      render(<Controlled />);
+
+      await user.click(screen.getByText('Settings'));
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+
+      act(() => screen.getByText('Back to account').click());
+      expect(screen.getByText('Account')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Settings')).toHaveFocus();
+
+      await user.click(screen.getByText('Settings'));
+      expect(onValueChange).toHaveBeenLastCalledWith('tab2');
+      expect(onValueChange).toHaveBeenCalledTimes(2);
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+    });
+
     it('marks selected tab with data-selected', () => {
       renderTabs();
       expect(screen.getByText('Account')).toHaveAttribute('data-selected', '');

@@ -45,6 +45,14 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         setValue(tabValue);
       }
     };
+    // Back button can change the active tab but leave focus on an inactive one. In that
+    // case the focus event wont work to make the tab active again, since it's already
+    // focused, so this handler sets the value only in those scenarios.
+    defaultProps.onMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (!disabled && event.button === 0 && event.currentTarget === document.activeElement) {
+        setValue(tabValue);
+      }
+    };
   } else {
     defaultProps.onClick = () => {
       if (!disabled) {
