@@ -935,7 +935,7 @@ describe('a modal surface in query mode', () => {
     await flush();
     expect(ref.handle?.isOpen).toBe(true);
     expect(screen.getByTestId('route').textContent).toBe('security');
-    expect(window.location.search).toBe('?q=1&p.modal.stub=security');
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
     expect(window.history.length).toBe(length + 1);
 
     act(() => ref.handle?.close());
@@ -950,16 +950,16 @@ describe('a modal surface in query mode', () => {
 
     act(() => ref.handle?.open());
     await flush();
-    expect(window.location.search).toBe('?q=1&p.modal.stub=');
+    expect(window.location.search).toBe('?q=1&.modal.stub=');
     expect(screen.getByTestId('route').textContent).toBe('account');
 
     act(() => screen.getByRole('button', { name: 'Go to security' }).click());
-    expect(window.location.search).toBe('?q=1&p.modal.stub=security');
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
     expect(screen.getByTestId('route').textContent).toBe('security');
   });
 
   it('opens from the URL and closes when the browser goes back', async () => {
-    window.history.replaceState(null, '', '/page?q=1&p.modal.stub=security');
+    window.history.replaceState(null, '', '/page?q=1&.modal.stub=security');
     const { ref } = renderCaller(querySurface());
     await flush();
     expect(ref.handle?.isOpen).toBe(true);

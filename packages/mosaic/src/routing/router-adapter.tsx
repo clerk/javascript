@@ -45,10 +45,10 @@ export interface MosaicRouting {
   adapter?: RouterAdapter;
   /**
    * What the names of the params Mosaic keeps in the query string or the hash start with. A
-   * component's param is this prefix and its base with dots for slashes, `p.user` for `/user` in the
-   * query string.
+   * component's param is this prefix and its base with dots for slashes, `.user` for `/user` and
+   * `.modal.user` for the profile modal, so a leading dot keeps them apart from the host's params.
    *
-   * @default { query: 'p.', hash: '' }
+   * @default { query: '', hash: '' }
    */
   keyPrefix?: { query?: string; hash?: string };
   /**
@@ -77,7 +77,7 @@ const defaultConfig: RoutingConfig = {
   reads: {},
   push: undefined,
   replace: undefined,
-  queryPrefix: 'p.',
+  queryPrefix: '',
   hashPrefix: '',
   modals: undefined,
 };

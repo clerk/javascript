@@ -337,7 +337,7 @@ describe('UserProfile routed in the URL', () => {
 
   it('opens on the page in its query param and writes each page change there', async () => {
     serve();
-    startAt('/app?keep=1&p.user=security');
+    startAt('/app?keep=1&.user=security');
     await renderWithClerk(<UserProfile routing='query' />);
     const user = userEvent.setup();
     expectSelected('Security');
@@ -345,24 +345,24 @@ describe('UserProfile routed in the URL', () => {
     await user.click(screen.getByRole('tab', { name: 'Account' }));
     expectSelected('Account');
     expect(window.location.pathname).toBe('/app');
-    expect(window.location.search).toBe('?keep=1&p.user=');
+    expect(window.location.search).toBe('?keep=1&.user=');
 
     await user.click(screen.getByRole('tab', { name: 'Security' }));
     expectSelected('Security');
-    expect(window.location.search).toBe('?keep=1&p.user=security');
+    expect(window.location.search).toBe('?keep=1&.user=security');
   });
 
   it('replaces a page it does not have with its first page', async () => {
     serve();
-    startAt('/app?p.user=nowhere');
+    startAt('/app?.user=nowhere');
     await renderWithClerk(<UserProfile routing='query' />);
     expectSelected('Account');
-    await waitFor(() => expect(window.location.search).toBe('?p.user='));
+    await waitFor(() => expect(window.location.search).toBe('?.user='));
   });
 
   it('starts over from the URL when its mode changes', async () => {
     serve();
-    startAt('/app?p.user=security');
+    startAt('/app?.user=security');
     const { rerender } = await renderWithClerk(<UserProfile />);
     const user = userEvent.setup();
     expectSelected('Account');
@@ -377,7 +377,7 @@ describe('UserProfile routed in the URL', () => {
 
   it('takes the mode from MosaicProvider', async () => {
     serve();
-    startAt('/app?p.account=security');
+    startAt('/app?.account=security');
     await renderWithClerk(<UserProfile />, undefined, undefined, undefined, {
       userProfileProps: { routing: 'query', path: '/account' },
     });
