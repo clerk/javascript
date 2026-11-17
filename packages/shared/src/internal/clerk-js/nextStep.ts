@@ -108,9 +108,6 @@ export function getSignUpNextStep(signUp: SignUpNextStepInput): SignUpNextStep {
   if (signUp.missingFields.includes('enterprise_sso')) {
     return { type: 'enterprise_sso' };
   }
-  if (signUp.missingFields.length > 0) {
-    return { type: 'fields', fields: signUp.missingFields };
-  }
   if (signUp.unverifiedFields.includes('email_address')) {
     return {
       type: 'verify_email',
@@ -124,6 +121,9 @@ export function getSignUpNextStep(signUp: SignUpNextStepInput): SignUpNextStep {
       target: signUp.phoneNumber,
       sent: signUp.verifications.phoneNumber.nextAction === 'needs_attempt',
     };
+  }
+  if (signUp.missingFields.length > 0) {
+    return { type: 'fields', fields: signUp.missingFields };
   }
   return { type: 'unknown' };
 }

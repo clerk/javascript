@@ -64,9 +64,9 @@ Sign-up:
 - `start` → `start`
 - `protect` → `protectCheck`
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
-- `fields` (`fields`) → `continue`
 - `verify_email` (`target`, `sent`) → `verifyEmail`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`
+- `fields` (`fields`) → `continue`
 
 `identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
 
