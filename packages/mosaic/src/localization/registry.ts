@@ -1,10 +1,10 @@
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
-import { consentMessages } from '../features/consent/consent.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
 import { logsTableMessages } from '../features/logs/logs-table.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -93,7 +93,7 @@ export const mosaicMessages = {
   form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
-  consent: consentMessages,
+  oauthConsent: oauthConsentMessages,
   waitlist: waitlistMessages,
   signIn: signInMessages,
   taskSetupMfa: taskSetupMfaMessages,

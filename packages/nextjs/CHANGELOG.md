@@ -1,5 +1,20 @@
 # Change Log
 
+## 7.10.2
+
+### Patch Changes
+
+- Fix `setActive()` and `signOut()` hanging forever in App Router apps when the cache invalidation server action fails, for example after a redeploy or on a network error. ([#10852](https://github.com/clerk/javascript/pull/10852)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 7.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`11b652a`](https://github.com/clerk/javascript/commit/11b652abc96e2947b2313a315fe19d9be4629930), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/backend@3.30.0
+  - @clerk/shared@4.46.0
+  - @clerk/react@6.18.9
+
 ## 7.10.0
 
 ### Minor Changes

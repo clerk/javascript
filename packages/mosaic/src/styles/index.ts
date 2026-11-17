@@ -61,6 +61,7 @@ export type {
   DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
+export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Flow, useFlowAutoFocus } from '../components/flow';
@@ -189,6 +190,7 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { OAuthConsent } from '../features/oauth-consent/oauth-consent';
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';

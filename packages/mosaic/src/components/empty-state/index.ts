@@ -1,3 +1,5 @@
+'use client';
+
 export { EmptyState } from './empty-state';
 export type {
   EmptyStateActionsProps,

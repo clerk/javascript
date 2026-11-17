@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -15,6 +15,7 @@ interface VerificationPasskeyMessages {
 
 interface VerificationPasskeyProps {
   messages: VerificationPasskeyMessages;
+  identity?: ReactNode;
   errorMessage?: string;
   isPending?: boolean;
   onSubmit: () => void;
@@ -24,6 +25,7 @@ interface VerificationPasskeyProps {
 
 export function VerificationPasskey({
   messages,
+  identity,
   errorMessage,
   isPending = false,
   onSubmit,
@@ -35,6 +37,7 @@ export function VerificationPasskey({
       <Card.Header>
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
+        {identity}
       </Card.Header>
       <Card.Banner
         role='alert'

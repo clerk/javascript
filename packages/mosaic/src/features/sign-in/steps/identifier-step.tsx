@@ -3,6 +3,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React, { type Ref } from 'react';
 
+import { AuthAlternativeChannel, AuthCaptcha } from '../../../blocks/auth';
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -13,9 +14,11 @@ import { Input } from '../../../components/input';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
+import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
   SignInIdentifierField,
@@ -25,8 +28,6 @@ import type {
   SignInValues,
 } from '../sign-in.types';
 import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign-in.utils';
-import { SignInAlternativeChannel } from './sign-in-alternative-channel';
-import { SignInCaptcha } from './sign-in-captcha';
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
@@ -36,9 +37,26 @@ interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'next
 }
 
 export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps) {
+  const m = useMessages('signIn');
+  const signUp = useMessages('signUp');
   if ('channel' in step) {
+    const copy = step.flow === 'sign-up' ? signUp.alternativePhone : m.alternativeChannel;
     return (
-      <SignInAlternativeChannel
+      <AuthAlternativeChannel
+        messages={{
+          title: copy.title,
+          description: copy.description,
+          fieldLabel: copy.label,
+          phonePlaceholder: m.start.phonePlaceholder,
+          selectedCountry: m.start.selectedCountry,
+          chooseCountry: m.start.chooseCountry,
+          searchCountries: m.start.searchCountries,
+          countrySearchPlaceholder: m.start.countrySearchPlaceholder,
+          noCountries: m.start.noCountries,
+          secondaryActionLabel: m.useAnotherMethod,
+          primaryActionLabel: m.continue,
+          pendingLabel: m.verifying,
+        }}
         channel={step.channel}
         applicationName={props.applicationName}
         logo={props.logo}
@@ -50,7 +68,15 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
         onSubmit={props.onSubmit}
         onCancel={onCancel}
         focusRef={props.focusRef}
-      />
+      >
+        {step.legalConsent ? (
+          <SignUpLegalConsentField
+            form={props.form}
+            consent={step.legalConsent}
+            disabled={props.isDisabled}
+          />
+        ) : null}
+      </AuthAlternativeChannel>
     );
   }
   return (
@@ -168,7 +194,7 @@ function IdentifierStart({
             />
           ) : null}
         </div>
-        <SignInCaptcha onInteractiveChange={setIsChallengeShown} />
+        <AuthCaptcha onInteractiveChange={setIsChallengeShown} />
         {onPasskey ? (
           <Button
             type='button'
@@ -433,21 +459,7 @@ function SignInProviders({
       >
         {otherProviders.map(provider => providerButton(provider))}
       </ProviderButtonGroup>
-      {showDivider ? (
-        <div
-          role='separator'
-          {...stylex.props(styles.divider)}
-        >
-          <span {...stylex.props(styles.dividerLine)} />
-          <Text
-            size='sm'
-            color='foreground-secondary'
-          >
-            {m.start.divider}
-          </Text>
-          <span {...stylex.props(styles.dividerLine)} />
-        </div>
-      ) : null}
+      {showDivider ? <Separator>{m.start.divider}</Separator> : null}
     </>
   );
 }

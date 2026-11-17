@@ -1,5 +1,14 @@
 # @clerk/expo-passkeys
 
+## 2.2.2
+
+### Patch Changes
+
+- Fix passkey sign-in failing with `passkey_authentication_failure` on iOS when the passkey is in a credential manager like 1Password. The iOS module now passes the `userVerification` requirement to the system, so the provider asks for Face ID or a passcode before it signs. Passkey creation on iOS now always requires user verification, as it already does on Android. ([#10850](https://github.com/clerk/javascript/pull/10850)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
 ## 2.2.1
 
 ### Patch Changes

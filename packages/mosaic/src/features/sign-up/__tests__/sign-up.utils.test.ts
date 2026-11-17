@@ -5,7 +5,9 @@ import type { SignUpDetails, SignUpStep } from '../sign-up.types';
 import type { SignUpStepKey } from '../sign-up.utils';
 import {
   legalConsentLabel,
-  signUpCodeStep,
+  signUpCodeCopy,
+  signUpCodeIdentity,
+  signUpCodeSecondaryAction,
   signUpDetailsHeading,
   signUpFieldNames,
   signUpStepIds,
@@ -91,11 +93,33 @@ describe('legalConsentLabel', () => {
   });
 });
 
-describe('signUpCodeStep', () => {
-  it('sends an email code for the email and a phone code, with its provider, for the phone', () => {
-    expect(signUpCodeStep({ kind: 'code', purpose: 'verify-email', identifier: 'new@acme.com' }).channel).toBe('email');
-    expect(
-      signUpCodeStep({ kind: 'code', purpose: 'verify-phone', identifier: '+15555550123', provider: 'WhatsApp' }),
-    ).toMatchObject({ channel: 'phone', provider: 'WhatsApp' });
+describe('code step copy', () => {
+  const m = signUpMessages;
+  const onCancel = () => undefined;
+  const email = { kind: 'code', purpose: 'verify-email', identifier: 'new@acme.com' } as const;
+  const phone = { kind: 'code', purpose: 'verify-phone', identifier: '+15555550123' } as const;
+  const whatsApp = { ...phone, provider: 'WhatsApp' } as const;
+
+  it('asks for the email code and lets the address be edited or another method be used', () => {
+    expect(signUpCodeCopy(email, m).title).toBe('Verify your email');
+    expect(signUpCodeIdentity(email, m)).toEqual({ identifier: 'new@acme.com', editLabel: 'Edit email address' });
+    expect(signUpCodeSecondaryAction(email, m, onCancel)).toEqual({ label: 'Use another method', onClick: onCancel });
+  });
+
+  it('formats a phone being verified and offers no other method', () => {
+    expect(signUpCodeCopy(phone, m).title).toBe('Verify your phone');
+    expect(signUpCodeIdentity(phone, m)).toEqual({ identifier: '+1 (555) 555-0123', editLabel: 'Edit phone number' });
+    expect(signUpCodeSecondaryAction(phone, m, onCancel).onClick).toBeUndefined();
+  });
+
+  it('names the alternative phone channel and offers SMS instead', () => {
+    expect(signUpCodeCopy(whatsApp, m)).toMatchObject({
+      title: 'Verify your WhatsApp',
+      description: 'Enter the verification code sent to your WhatsApp',
+    });
+    expect(signUpCodeSecondaryAction(whatsApp, m, onCancel)).toEqual({
+      label: 'Send code via SMS instead',
+      onClick: onCancel,
+    });
   });
 });

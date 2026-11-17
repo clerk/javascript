@@ -1,39 +1,33 @@
 import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { ReactNode, Ref } from 'react';
+import type { Ref } from 'react';
 import { useCallback, useRef, useState } from 'react';
 
+import type { AuthProvider } from '../../../blocks/auth';
+import { AuthCaptcha } from '../../../blocks/auth';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { Checkbox } from '../../../components/checkbox';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
-import { Link } from '../../../components/link';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
+import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
-import { fill, rich, useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
-import type { SignInProvider } from '../../sign-in';
-import { styles } from '../../sign-in/sign-in.styles';
-import { SignInCaptcha } from '../../sign-in/steps/sign-in-captcha';
-import type {
-  SignUpDetails,
-  SignUpFieldName,
-  SignUpLegalConsent,
-  SignUpSubmitEvent,
-  SignUpValues,
-} from '../sign-up.types';
-import { legalConsentLabel, signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
+import { styles } from '../sign-up.styles';
+import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
+import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
+import { SignUpLegalConsentField } from './sign-up-legal-consent';
 
 interface SignUpDetailsProps {
   step: SignUpDetails;
   onSwitchField?: () => void;
-  socialProviders: readonly SignInProvider[];
+  socialProviders: readonly AuthProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   isDisabled: boolean;
@@ -45,7 +39,6 @@ interface SignUpDetailsProps {
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
   logo?: { src: string; alt: string };
-  captcha?: boolean;
 }
 
 export function SignUpDetailsStep({
@@ -63,15 +56,14 @@ export function SignUpDetailsStep({
   onSignIn,
   focusRef,
   logo,
-  captcha = false,
 }: SignUpDetailsProps) {
   const m = useMessages('signUp');
-  const shared = useMessages('signIn');
   const { fields, legalConsent } = step;
   const heading = signUpDetailsHeading(step, m);
   const [first] = signUpFieldNames(fields);
   const onlyLegalConsent = Boolean(legalConsent) && !first;
-  const hasForm = Boolean(first) || Boolean(legalConsent);
+  const hasFields = Boolean(first) || Boolean(legalConsent);
+  const hasForm = hasFields || step.purpose === 'continue';
   const [isChallengeShown, setIsChallengeShown] = useState(false);
   return (
     <>
@@ -101,7 +93,7 @@ export function SignUpDetailsStep({
         >
           <SignUpProviders
             providers={onlyLegalConsent ? [] : socialProviders}
-            showDivider={hasForm}
+            showDivider={hasFields}
             pendingProviderId={pendingProviderId}
             isDisabled={isDisabled}
             onSelectProvider={onSelectProvider}
@@ -118,7 +110,7 @@ export function SignUpDetailsStep({
             />
           ) : null}
         </div>
-        {captcha ? <SignInCaptcha onInteractiveChange={setIsChallengeShown} /> : null}
+        {step.purpose === 'continue' ? null : <AuthCaptcha onInteractiveChange={setIsChallengeShown} />}
         {onSignIn ? (
           <Text
             size='sm'
@@ -145,9 +137,9 @@ export function SignUpDetailsStep({
             fullWidth
             disabled={Boolean(pendingProviderId)}
             isPending={isPending}
-            pendingLabel={shared.verifying}
+            pendingLabel={m.verifying}
           >
-            {shared.continue}
+            {m.submit}
           </SubmitButton>
         </Card.Footer>
       ) : null}
@@ -239,7 +231,7 @@ function SignUpFields({
           />
         ) : null}
         {legalConsent ? (
-          <LegalConsentField
+          <SignUpLegalConsentField
             form={form}
             consent={legalConsent}
             disabled={isDisabled}
@@ -257,13 +249,13 @@ function SignUpProviders({
   onSelectProvider,
   showDivider,
 }: {
-  providers: readonly SignInProvider[];
+  providers: readonly AuthProvider[];
   showDivider: boolean;
   pendingProviderId?: string;
   isDisabled: boolean;
   onSelectProvider: (id: string) => void;
 }) {
-  const shared = useMessages('signIn');
+  const m = useMessages('signUp');
   if (providers.length === 0) {
     return null;
   }
@@ -281,74 +273,16 @@ function SignUpProviders({
                 {...stylex.props(styles.providerIcon)}
               />
             }
-            longLabel={fill(shared.start.socialButton, { provider: provider.name })}
+            longLabel={fill(m.form.socialButton, { provider: provider.name })}
             shortLabel={provider.name}
             isPending={pendingProviderId === provider.id}
-            pendingLabel={shared.verifying}
+            pendingLabel={m.verifying}
             onClick={() => onSelectProvider(provider.id)}
           />
         ))}
       </ProviderButtonGroup>
-      {showDivider ? (
-        <div
-          role='separator'
-          {...stylex.props(styles.divider)}
-        >
-          <span {...stylex.props(styles.dividerLine)} />
-          <Text
-            size='sm'
-            color='foreground-secondary'
-          >
-            {shared.start.divider}
-          </Text>
-          <span {...stylex.props(styles.dividerLine)} />
-        </div>
-      ) : null}
+      {showDivider ? <Separator>{m.form.divider}</Separator> : null}
     </>
-  );
-}
-
-function LegalConsentField({
-  form,
-  consent,
-  disabled,
-}: {
-  form: UseFormResult<SignUpValues>;
-  consent: SignUpLegalConsent;
-  disabled: boolean;
-}) {
-  const m = useMessages('signUp');
-  const { feedback } = form.fields.legalAccepted;
-  const link = (href: string | undefined) => (children: ReactNode) =>
-    href ? (
-      <Link
-        href={href}
-        target='_blank'
-        rel='noopener noreferrer'
-      >
-        {children}
-      </Link>
-    ) : (
-      children
-    );
-
-  return (
-    <Field.Root
-      orientation='horizontal'
-      required
-      invalid={feedback?.type === 'error'}
-      disabled={disabled}
-    >
-      <Checkbox
-        checked={form.values.legalAccepted}
-        onChange={event => form.setValue('legalAccepted', event.target.checked)}
-      />
-      <Field.Label>
-        {rich(legalConsentLabel(consent, m), {
-          components: { terms: link(consent.termsUrl), privacy: link(consent.privacyPolicyUrl) },
-        })}
-      </Field.Label>
-    </Field.Root>
   );
 }
 
@@ -495,7 +429,6 @@ function PasswordField({
   advisoryFeedback,
 }: FieldProps & { advisoryFeedback?: FieldFeedback }) {
   const m = useMessages('signUp');
-  const shared = useMessages('signIn');
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields.password;
   const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
@@ -525,8 +458,8 @@ function PasswordField({
           setFocused(false);
           control.onBlur();
         }}
-        showPasswordLabel={shared.showPassword}
-        hidePasswordLabel={shared.hidePassword}
+        showPasswordLabel={m.form.showPassword}
+        hidePasswordLabel={m.form.hidePassword}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>

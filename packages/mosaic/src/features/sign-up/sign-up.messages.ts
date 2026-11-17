@@ -8,6 +8,8 @@ export const signUpMessages = {
     description: 'Please fill in the remaining details to continue.',
   },
   form: {
+    socialButton: 'Continue with {provider}',
+    divider: 'or',
     firstNameLabel: 'First name',
     firstNamePlaceholder: 'First name',
     lastNameLabel: 'Last name',
@@ -27,7 +29,9 @@ export const signUpMessages = {
     useEmail: 'Use email instead',
     usePhone: 'Use phone instead',
     passwordLabel: 'Password',
-    passwordPlaceholder: 'Enter your password',
+    passwordPlaceholder: 'Create a password',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
   legalConsent: {
     title: 'Legal consent',
@@ -44,6 +48,71 @@ export const signUpMessages = {
   wallets: {
     title: 'Sign up with Solana',
     description: 'Select a wallet below to sign up',
+    continueWith: 'Continue with {wallet}',
+    noneAvailable: 'No Solana Web3 wallets detected. Please install a Web3 supported {#link}wallet extension{/link}.',
+  },
+  enterpriseConnections: {
+    title: 'Choose an account',
+    description: 'Select an enterprise account to continue.',
+    pending: 'Redirecting to SSO',
+  },
+  verifyEmail: {
+    title: 'Verify your email',
+    description: 'Enter the verification code sent to your email',
+    label: 'Verification code',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  verifyPhone: {
+    title: 'Verify your phone',
+    titleProvider: 'Verify your {provider}',
+    description: 'Enter the verification code sent to your phone',
+    descriptionProvider: 'Enter the verification code sent to your {provider}',
+    label: 'Verification code',
+    useSms: 'Send code via SMS instead',
+    resendText: 'Didn’t receive a code?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  verifyEmailLink: {
+    title: 'Verify your email',
+    description: 'Use the verification link sent to your email address',
+    resendText: 'Didn’t receive a link?',
+    resend: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+  },
+  emailLinkStatus: {
+    loading: {
+      title: 'Signing up...',
+      description: 'You will be redirected soon',
+    },
+    signedIn: {
+      title: 'Successfully signed up',
+      description: 'Return to original tab to continue',
+    },
+    signedInOtherTab: {
+      title: 'Successfully verified email',
+      description: 'Return to previous tab to continue',
+    },
+    transferable: {
+      title: 'Email verified',
+      description: 'Return to original tab to continue',
+    },
+    expired: {
+      title: 'This verification link has expired',
+      description: 'Return to the original tab to continue.',
+    },
+    failed: {
+      title: 'This verification link is invalid',
+      description: 'Return to the original tab to continue.',
+    },
+    clientMismatch: {
+      title: 'Verification link is invalid for this device',
+      description:
+        'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+    },
+    closeTab: 'You may close this tab',
   },
   restricted: {
     title: 'Access restricted',
@@ -55,6 +124,25 @@ export const signUpMessages = {
     description: 'Sign ups are currently disabled. To be the first to know when we launch, join the waitlist.',
     joinWaitlist: 'Join waitlist',
   },
+  loading: 'Loading…',
+  protectCheck: {
+    title: 'Verifying your request',
+    description: 'Please wait while we verify your request.',
+    retry: 'Try again',
+  },
+  actionBlocked: {
+    title: 'We couldn’t complete this request',
+    description: 'For your security, this request could not be completed.',
+    traceIdLabel: 'Reference',
+    copyTraceId: 'Copy reference',
+    traceIdCopied: 'Copied',
+  },
   signInPrompt: 'Already have an account?',
   signInLink: 'Sign in',
+  editIdentifier: 'Edit email address',
+  editPhoneNumber: 'Edit phone number',
+  submit: 'Continue',
+  verifying: 'Verifying',
+  back: 'Back',
+  useAnotherMethod: 'Use another method',
 } as const;
