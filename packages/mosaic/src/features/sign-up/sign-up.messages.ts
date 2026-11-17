@@ -130,6 +130,11 @@ export const signUpMessages = {
     description: 'Please wait while we verify your request.',
     retry: 'Try again',
   },
+  startOver: {
+    title: 'Something went wrong',
+    description: 'We couldn’t continue signing you up. Start over to try again.',
+    action: 'Start over',
+  },
   actionBlocked: {
     title: 'We couldn’t complete this request',
     description: 'For your security, this request could not be completed.',

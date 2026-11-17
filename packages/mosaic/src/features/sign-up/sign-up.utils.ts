@@ -16,6 +16,7 @@ export const signUpStepIds = {
     'notice:restricted',
     'notice:waitlist',
     'notice:loading',
+    'notice:start-over',
     'notice:protect-check',
     'notice:action-blocked',
   ],
