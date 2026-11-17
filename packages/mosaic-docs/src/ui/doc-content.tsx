@@ -62,13 +62,32 @@ export function DocContent({
       {doc.practices?.length ? (
         <>
           <h2 id='practices'>Practices</h2>
-          <ul>
-            {doc.practices.map(practice => (
-              <li key={practice.text}>
-                <strong>{practice.do ? 'Do' : 'Don’t'}:</strong> <InlineCode text={practice.text} />
-              </li>
-            ))}
-          </ul>
+          <div className='table-scroll'>
+            <table>
+              <thead>
+                <tr>
+                  <th>Guidance</th>
+                  <th>Practice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {doc.practices.map(practice => (
+                  <tr key={practice.text}>
+                    <td>
+                      <span
+                        className={`${practice.do ? 'bg-positive' : 'bg-negative'} inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium leading-4 text-white`}
+                      >
+                        {practice.do ? 'Do' : 'Don’t'}
+                      </span>
+                    </td>
+                    <td>
+                      <InlineCode text={practice.text} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       ) : null}
 

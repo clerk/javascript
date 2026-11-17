@@ -8,6 +8,8 @@
   --docs-accent: light-dark(oklch(0.145 0 0), #f6f6f7);
   --docs-accent-foreground: light-dark(oklch(1 0 0), #1b1b1f);
   --docs-code-background: var(--docs-background);
+  --docs-positive: #15803d;
+  --docs-negative: #dc2626;
   --shiki-background: var(--docs-code-background);
   --shiki-foreground: light-dark(#131316, #ffffff);
   --shiki-token-keyword: light-dark(#6504ff, #bab1ff);
@@ -34,6 +36,8 @@
   --color-accent: var(--docs-accent);
   --color-accent-foreground: var(--docs-accent-foreground);
   --color-code: var(--docs-code-background);
+  --color-positive: var(--docs-positive);
+  --color-negative: var(--docs-negative);
   --radius-docs: var(--docs-radius);
   --container-content: var(--docs-content-width);
   --font-sans: var(--docs-font-body);
