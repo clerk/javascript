@@ -168,7 +168,10 @@ async function run() {
       reject: false,
       env: {
         INTEGRATION_TEST_RUN_KEY: runKey,
-        E2E_APP_ID: 'react.vite.withSelfServeSso',
+        E2E_APP_ID:
+          process.env.E2E_MOSAIC_ACCESS === '1'
+            ? 'next.appRouterMosaic.withAccessAndOnboarding'
+            : 'react.vite.withSelfServeSso',
         E2E_KEYCLOAK_URL: baseUrl,
         E2E_KEYCLOAK_ADMIN_PASSWORD: adminPassword,
       },

@@ -173,7 +173,12 @@ export function useAccessConnectionController(
     },
     canSubmit: values => {
       if (state.value === 'configure') {
-        return kind === 'directory' ? isDirectoryConfigured(values) : Boolean(values.name.trim());
+        if (test.isPending) {
+          return false;
+        }
+        return kind === 'directory'
+          ? isDirectoryConfigured(values) && (!data.live || values.provider === 'google' || Boolean(configured))
+          : Boolean(values.name.trim()) && (!data.live || Boolean(values.domains?.length));
       }
       if (state.value === 'metadata') {
         return isConnectionConfigured(values);
@@ -187,28 +192,20 @@ export function useAccessConnectionController(
   const matchingSsoConnections = data.connections.filter(
     connection =>
       connection.kind === 'sso' &&
-      connection.configuration.provider === form.values.provider &&
+      (connection.configuration.provider === form.values.provider ||
+        (form.values.provider === 'saml' && connection.configuration.provider === 'oidc')) &&
       (!data.live ||
         connection.id === configured?.configuration.ssoConnectionId ||
         !data.connections.some(
           item => item.kind === 'directory' && item.configuration.ssoConnectionId === connection.id,
         )),
   );
-  const validSsoDomains =
-    !data.live || kind !== 'sso' || state.value !== 'configure' || Boolean(form.values.domains?.length);
   const startTest = data.onStartSsoTest;
   const pending = form.isSubmitting || test.isPending;
   const canContinue =
     !pending &&
     (!data.live || kind !== 'directory' || state.value !== 'provider' || matchingSsoConnections.length > 0) &&
-    validSsoDomains &&
-    (state.value !== 'configure' ||
-      (kind === 'directory'
-        ? isDirectoryConfigured(form.values) &&
-          !form.fields.serviceAccountFile.isValidating &&
-          form.fields.serviceAccountFile.feedback?.type !== 'error'
-        : Boolean(form.values.name.trim()))) &&
-    (state.value !== 'metadata' || isConnectionConfigured(form.values)) &&
+    ((state.value !== 'configure' && state.value !== 'metadata') || form.canSubmit) &&
     (state.value !== 'test' || result?.success === true);
   return {
     form,
@@ -221,7 +218,7 @@ export function useAccessConnectionController(
     configured,
     testUrl,
     onStartTest:
-      configured && startTest
+      kind === 'sso' && configured && startTest
         ? () => {
             void test.run('start', async () => {
               const url = await startTest(configured.id);
@@ -236,7 +233,7 @@ export function useAccessConnectionController(
       data.live && kind === 'directory'
         ? () => {
             const configure = data.onConfigureDirectory;
-            if (configure && isDirectoryConfigured(form.values)) {
+            if (!configured && configure && isDirectoryConfigured(form.values)) {
               void test.run('directory', async () => {
                 const connection = await configure(form.values);
                 send({ type: 'DIRECTORY_CREATED', connection });
@@ -245,6 +242,7 @@ export function useAccessConnectionController(
           }
         : undefined,
     test,
+    directoryError: test.errorKey === 'directory' ? test.error : undefined,
     pending,
     canContinue,
     canSave,
@@ -262,18 +260,18 @@ export function useAccessConnectionController(
       form.reset({
         ...newConnection(),
         provider,
-        name: m.providers[provider],
+        name: kind === 'directory' && provider === 'saml' ? m.customDirectory : m.providers[provider],
         domains: data.eligibleSsoDomains?.slice(0, 1),
       });
-      form.setValue('name', m.providers[provider]);
     },
     onModeChange: (value: string) => {
       if (value === 'metadata' || value === 'file' || value === 'manual') {
         form.setValue('mode', value);
       }
     },
+    canChangeProvider: !configured,
     onBack: () => {
-      if (!form.isSubmitting && !test.isPending) {
+      if (!pending && !(configured && state.value === 'configure')) {
         send({ type: 'BACK' });
       }
     },
@@ -293,7 +291,7 @@ export function useAccessConnectionController(
       }
     },
     onOpenChange: (open: boolean) => {
-      if (!open && !form.isSubmitting && !test.isPending) {
+      if (!open && !pending) {
         onClose();
       }
     },
@@ -308,3 +306,5 @@ export function useAccessConnectionController(
   };
 }
 export type AccessConnectionController = ReturnType<typeof useAccessConnectionController>;
+
+export type AccessConnectionStepProps = { controller: AccessConnectionController; data: AccessData };

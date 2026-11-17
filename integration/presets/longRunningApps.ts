@@ -46,6 +46,9 @@ export const createLongRunningApps = () => {
     /**
      * NextJS apps - Mosaic
      */
+    ...(process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS === '1'
+      ? [{ id: 'next.appRouterMosaic.withAccessAndOnboarding', config: next.appRouterMosaic, env: envs.withAccessAndOnboarding }] as const
+      : []),
     { id: 'next.appRouterMosaic.withEmailCodes', config: next.appRouterMosaic, env: envs.withEmailCodes },
 
     /**
@@ -71,7 +74,7 @@ export const createLongRunningApps = () => {
     { id: 'react.vite.withEmailCodes_persist_client', config: react.vite, env: envs.withEmailCodes_destroy_client },
     { id: 'react.vite.withEmailLinks', config: react.vite, env: envs.withEmailLinks },
     { id: 'react.vite.withLegalConsent', config: react.vite, env: envs.withLegalConsent },
-    ...(process.env.E2E_KEYCLOAK_URL
+    ...(process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS !== '1'
       ? [{ id: 'react.vite.withSelfServeSso', config: react.vite, env: envs.withSelfServeSso }] as const
       : []),
     { id: 'vue.vite', config: vue.vite, env: envs.withCustomRoles },

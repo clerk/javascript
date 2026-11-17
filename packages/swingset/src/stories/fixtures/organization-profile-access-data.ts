@@ -8,7 +8,12 @@ import {
   newConnection,
   newPolicy,
 } from '@clerk/mosaic/features/organization-profile/organization-profile-access-panel/access.utils';
-import type { EnterpriseConnectionJSON, EnterpriseSamlConnectionNestedJSON } from '@clerk/shared/types';
+import type {
+  EnterpriseConnectionJSON,
+  EnterpriseSamlConnectionNestedJSON,
+  OrganizationAccessDomainOwnershipJSON as DomainOwnershipJSON,
+  OrganizationAccessPolicyJSON as AccessPolicyJSON,
+} from '@clerk/shared/types';
 
 const organizationId = 'org_access_preview';
 const createdAt = Date.UTC(2026, 10, 1);
@@ -19,24 +24,6 @@ const providerKeys = {
   saml: 'saml_custom',
   oidc: 'oidc_custom',
 } satisfies Record<AccessProvider, string>;
-
-type AccessPolicyJSON = {
-  object: 'organization_access_policy';
-  id: string;
-  organization_id: string;
-  default: boolean;
-  domains: { name: string; affiliation_verified: boolean; ownership_verified: boolean }[];
-  enrollment_mode: 'invitation_only' | 'invite_automatically' | 'request_access' | 'sso';
-  status: 'active' | 'draft' | null;
-  authentication: {
-    connections: { id: string; name: string; active: boolean }[];
-    directories: { id: string; name: string }[];
-    provisioning: 'jit' | 'directory';
-    connection_required: boolean;
-  } | null;
-  created_at: number;
-  updated_at: number;
-};
 
 type SamlSettingsJSON = Pick<
   EnterpriseSamlConnectionNestedJSON,
@@ -79,14 +66,6 @@ type DirectoryJSON = {
   api_key?: string;
   created_at: number;
   updated_at: number;
-};
-
-type DomainOwnershipJSON = {
-  object: 'organization_access_domain_ownership';
-  domain: string;
-  ownership_verified: boolean;
-  txt_record_name: string | null;
-  txt_record_value: string | null;
 };
 
 type TestRunJSON = {
@@ -288,8 +267,10 @@ export function toAccessPolicy(policy: AccessPolicyJSON, preview?: Partial<Polic
   const enrollment = {
     invitation_only: 'invitation',
     invite_automatically: 'automatic',
+    join_automatically: 'automatic',
     request_access: 'request',
     sso: auth?.provisioning === 'directory' ? 'directory' : 'automatic',
+    blocked: 'blocked',
   } as const;
   return {
     ...newPolicy(),
@@ -443,6 +424,7 @@ export function savePolicyResponse(
     automatic: 'invite_automatically',
     request: 'request_access',
     directory: 'invitation_only',
+    blocked: 'blocked',
   } as const;
   const sso = policy.authentication === 'sso';
   return {

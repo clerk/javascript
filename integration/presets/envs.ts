@@ -209,9 +209,15 @@ const base = environmentConfig()
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
   .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
-const withSelfServeSso = process.env.E2E_KEYCLOAK_URL
-  ? await withInstanceKeys('with-self-serve-sso', base.clone().setId('withSelfServeSso'))
-  : base.clone().setId('withSelfServeSso');
+const withSelfServeSso =
+  process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS !== '1'
+    ? await withInstanceKeys('with-self-serve-sso', base.clone().setId('withSelfServeSso'))
+    : base.clone().setId('withSelfServeSso');
+
+const withAccessAndOnboarding =
+  process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS === '1'
+    ? await withInstanceKeys('with-access-and-onboarding', base.clone().setId('withAccessAndOnboarding'))
+    : base.clone().setId('withAccessAndOnboarding');
 
 const withKeyless = base
   .clone()
@@ -397,6 +403,7 @@ const withPasskeys = await withInstanceKeys('with-passkeys', base.clone().setId(
 export const envs = {
   base,
   withSelfServeSso,
+  withAccessAndOnboarding,
   oauthProvider,
   sessionsDev1,
   sessionsDev2,

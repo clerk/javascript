@@ -92,6 +92,7 @@ export function useAccessModel({ policyId, enabled = true }: { policyId?: string
     status: 'ready' as const,
     canManageDomains,
     canReadDetail,
+    selectedPolicy: selectedPolicy && toPolicyData(selectedPolicy),
     canManageSso: canManageSso && organization.selfServeSSOEnabled,
     policies: policies.data.filter(item => !item.isDefault).map(toPolicyData),
     defaultPolicy: defaultPolicy && toPolicyData(defaultPolicy),
@@ -284,7 +285,8 @@ export function useAccessPanelModel(
     ),
     defaultPolicy: model.defaultPolicy && toEditorPolicy(model.defaultPolicy, canManageDomains, canManageSso),
     ...connections,
-    canCreatePolicy: canManageDomains && Boolean(model.createPolicy),
+    canCreatePolicy: (canManageDomains || canManageSso) && Boolean(model.createPolicy),
+    newPolicyAuthentication: canManageDomains ? 'default' : 'sso',
     onSelectPolicy,
     loadPolicy: loadPolicy && (async id => toEditorPolicy(await loadPolicy(id), canManageDomains, canManageSso)),
     policyListError: Boolean(model.policyListError),
@@ -318,33 +320,35 @@ async function saveEditorPolicy(
   values: AccessPolicy,
   model: Extract<ReturnType<typeof useAccessModel>, { status: 'ready' }>,
 ) {
-  const params = editorPolicyParams(values, model.canManageDomains, model.canManageSso);
+  const previous = model.selectedPolicy;
   const write = values.id ? model.updatePolicy : model.createPolicy;
-  if (!write || !params) {
+  const params = editorPolicyParams(values, model.canManageDomains, model.canManageSso, previous?.authentication);
+  if (!write || !params || (values.id && previous?.id !== values.id)) {
     throw new ClerkRuntimeError('This access policy cannot be saved.', { code: 'access_policy_save_unavailable' });
   }
   await write(params);
 }
 
-function editorPolicyParams(
+export function editorPolicyParams(
   values: AccessPolicy,
   canManageDomains: boolean,
   canManageSso: boolean,
+  previous?: OrganizationAccessPolicyResource['authentication'],
 ): CreateOrganizationAccessPolicyParams | undefined {
   const domains = values.domains.map(domain => domain.name);
   if (values.authentication === 'sso') {
     if (!canManageSso) {
       return undefined;
     }
+    const provisioning = values.enrollment === 'directory' ? 'directory' : 'jit';
     return {
       domains,
       enrollmentMode: 'sso',
       status: values.status === 'active' ? 'active' : 'draft',
       authentication: {
         connectionIds: values.ssoConnectionIds,
-        directoryIds:
-          values.enrollment === 'directory' && values.directoryConnectionId ? [values.directoryConnectionId] : [],
-        provisioning: values.enrollment === 'directory' ? 'directory' : 'jit',
+        directoryIds: getPolicyDirectoryIds(values, previous),
+        provisioning,
       },
     };
   }
@@ -352,4 +356,16 @@ function editorPolicyParams(
     return { domains, enrollmentMode: writableEnrollmentModes[values.enrollment] };
   }
   return undefined;
+}
+
+function getPolicyDirectoryIds(policy: AccessPolicy, previous?: OrganizationAccessPolicyResource['authentication']) {
+  if (policy.enrollment !== 'directory') {
+    return previous?.provisioning === 'jit' ? undefined : [];
+  }
+  const [first, ...others] = previous?.directories ?? [];
+  const selected = policy.directoryConnectionId;
+  if (previous?.provisioning === 'directory' && selected === (first?.id ?? null)) {
+    return undefined;
+  }
+  return selected ? [...new Set([selected, ...others.map(directory => directory.id)])] : [];
 }

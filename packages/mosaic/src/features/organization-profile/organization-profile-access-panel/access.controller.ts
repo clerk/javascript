@@ -167,7 +167,7 @@ export function useAccessController(data: AccessData) {
     }
     policyLoad.reset();
     data.onSelectPolicy?.(null);
-    openEditor(policy ?? newPolicy());
+    openEditor(policy ?? { ...newPolicy(), authentication: data.newPolicyAuthentication ?? 'default' });
   };
   const onSetup = (kind: ConnectionKind) => {
     if ((kind === 'sso' ? data.canCreateSso : data.canCreateDirectory) === false) {
@@ -195,23 +195,21 @@ export function useAccessController(data: AccessData) {
   const wizard = useAccessConnectionController(data, onComplete, () => send({ type: 'CLOSE_SETUP' }));
   const managedConnection = state.context.managedConnection;
   const manager = useAccessManageConnectionController(data, managedConnection, () => send({ type: 'CLOSE_SETUP' }));
-  const manageKind = managedConnection?.kind;
+  const editingPolicySso = managedConnection?.kind === 'sso' && state.value === 'editor';
+  const manageKind = editingPolicySso ? undefined : managedConnection?.kind;
   const pageStep = manageKind ? 'manage' : request?.kind === 'directory' ? 'directory' : state.value;
-  const pageTitle = manageKind
-    ? manageKind === 'sso'
-      ? m.manageSso
-      : m.manageDirectory
-    : pageStep === 'directory'
-      ? m.directoryTitle
-      : pageStep === 'editor'
-        ? form.values.id
-          ? m.managePolicy
-          : m.addPolicy
-        : m.title;
+  const pageTitles = {
+    manage: manageKind === 'sso' ? m.manageSso : m.manageDirectory,
+    directory: m.directoryTitle,
+    editor: form.values.id ? m.managePolicy : m.addPolicy,
+    list: m.title,
+  };
+  const pageTitle = pageTitles[pageStep];
   return {
     wizard,
     manager,
     manageKind,
+    editingPolicySso,
     manageServiceProvider: getManageServiceProvider(data, managedConnection),
     pageStep,
     pageTitle,
@@ -254,6 +252,9 @@ export function useAccessController(data: AccessData) {
     onAuthenticationChange: (value: string) => {
       if (value === 'default' || value === 'sso') {
         form.setValue('authentication', value);
+        if (data.live && value === 'default' && form.values.enrollment === 'directory') {
+          form.setValue('enrollment', 'invitation');
+        }
       }
     },
     onMfaChange: (value: string) => {

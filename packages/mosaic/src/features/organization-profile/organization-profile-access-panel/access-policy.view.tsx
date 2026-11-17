@@ -5,14 +5,12 @@ import { Button } from '../../../components/button';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
-import { Menu } from '../../../components/menu';
 import { Radio } from '../../../components/radio';
 import { Section } from '../../../components/section';
 import { Separator } from '../../../components/separator';
 import { Switch } from '../../../components/switch';
 import { CheckmarkCircle } from '../../../icons/glyphs/checkmark-circle';
-import { Cog6Teeth } from '../../../icons/glyphs/cog-6-teeth';
-import { InformationCircle } from '../../../icons/glyphs/information-circle';
+import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
 import { Plus } from '../../../icons/glyphs/plus';
 import { Trash } from '../../../icons/glyphs/trash';
 import { XCircle } from '../../../icons/glyphs/x-circle';
@@ -22,13 +20,14 @@ import { mergeStyleProps, themeProps } from '../../../props';
 import type { AccessController } from './access.controller';
 import { styles } from './access.styles';
 import { AccessRadio, AccessSelect } from './access-fields.view';
+import { PolicyDirectory, PolicySsoConnections } from './access-policy-connections.view';
 
-export function AccessPolicyView({ controller: c }: { controller: AccessController }) {
+export function AccessPolicyView({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
   const focus = useFlowAutoFocus<HTMLHeadingElement>();
-  const { form, data, registerAddDomain } = c;
-  const p = form.values;
-  const usesSso = p.authentication === 'sso';
+  const { form, data, registerAddDomain } = controller;
+  const policy = form.values;
+  const usesSso = policy.authentication === 'sso';
   return (
     <Form
       id={form.id}
@@ -36,23 +35,23 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
       {...mergeStyleProps(themeProps('access-policy'), stylex.props(styles.stack))}
     >
       <Section.Error>{form.error}</Section.Error>
-      {p.id && (!data.live || usesSso) ? (
+      {policy.id && (!data.live || usesSso) ? (
         <Section.Root>
           <Section.Group>
             <Section.Header>
               <Section.Title>{m.status}</Section.Title>
             </Section.Header>
             <Section.Body>
-              <Section.Row>
+              <Section.Row xstyle={styles.statusRow}>
                 <Field.Root
                   orientation='horizontal'
                   disabled={form.isSubmitting}
                 >
                   <Switch
-                    checked={p.status === 'active'}
+                    checked={policy.status === 'active'}
                     onChange={event => form.setValue('status', event.target.checked ? 'active' : 'inactive')}
                   />
-                  <Field.Label>{p.status === 'active' ? m.active : m.inactive}</Field.Label>
+                  <Field.Label>{policy.status === 'active' ? m.active : m.inactive}</Field.Label>
                 </Field.Root>
               </Section.Row>
             </Section.Body>
@@ -66,14 +65,14 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
               ref={focus}
               tabIndex={-1}
             >
-              {m.domains}
+              {policy.domains.length ? m.domains : m.target}
             </Section.Title>
             <Section.Actions xstyle={styles.headerActions}>
               <Button
                 ref={registerAddDomain}
                 variant='outline'
                 color='neutral'
-                onClick={c.onAddDomain}
+                onClick={controller.onAddDomain}
                 disabled={form.isSubmitting}
               >
                 <Icon glyph={Plus} />
@@ -82,12 +81,12 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
             </Section.Actions>
           </Section.Header>
           <Section.Body xstyle={styles.domainBody}>
-            {!p.domains.length ? (
+            {!policy.domains.length ? (
               <Section.Row xstyle={styles.domainRow}>
                 <Section.Description>{m.noDomains}</Section.Description>
               </Section.Row>
             ) : (
-              p.domains.map(domain => (
+              policy.domains.map(domain => (
                 <div key={domain.name}>
                   <Section.Row xstyle={styles.domainRow}>
                     <Section.Item xstyle={styles.domainItem}>
@@ -111,20 +110,20 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
                         ) : null}
                         <ActionMenu
                           label={m.actions}
-                          triggerRef={c.domainRemoval.registerTrigger(domain.name)}
+                          triggerRef={controller.domainRemoval.registerTrigger(domain.name)}
                           disabled={form.isSubmitting}
                           actions={[
-                            ...(usesSso && !domain.verified && c.canVerifyDomain
-                              ? [{ label: m.verify, onClick: () => c.onVerifyDomain(domain.name) }]
+                            ...(usesSso && !domain.verified && controller.canVerifyDomain
+                              ? [{ label: m.verify, onClick: () => controller.onVerifyDomain(domain.name) }]
                               : []),
                             {
                               label: m.remove,
                               icon: Trash,
                               color: 'negative',
                               onClick: () => {
-                                void c.domainRemoval
+                                void controller.domainRemoval
                                   .remove(domain.name)
-                                  .then(() => c.domainRemoval.finalFocus()?.focus());
+                                  .then(() => controller.domainRemoval.finalFocus()?.focus());
                               },
                             },
                           ]}
@@ -132,16 +131,20 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
                       </Section.Actions>
                     </Section.Item>
                   </Section.Row>
-                  {usesSso && !domain.verified && c.canVerifyDomain ? (
+                  {usesSso && !domain.verified && controller.canVerifyDomain ? (
                     <div {...mergeStyleProps(themeProps('access-domain-notice'), stylex.props(styles.notice))}>
-                      <Icon glyph={InformationCircle} />
-                      <Section.Description>{m.verifyNotice}</Section.Description>
+                      <Icon
+                        glyph={ExclamationCircle}
+                        xstyle={styles.noticeIcon}
+                      />
+                      <Section.Description xstyle={styles.noticeText}>{m.verifyNotice}</Section.Description>
                       <Button
                         variant='outline'
                         color='neutral'
+                        size='sm'
                         xstyle={styles.headerActions}
                         disabled={form.isSubmitting}
-                        onClick={() => c.onVerifyDomain(domain.name)}
+                        onClick={() => controller.onVerifyDomain(domain.name)}
                       >
                         {m.verify}
                       </Button>
@@ -153,17 +156,17 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      <PolicyAuthentication controller={c} />
-      <PolicyEnrollment controller={c} />
+      <PolicyAuthentication controller={controller} />
+      <PolicyEnrollment controller={controller} />
     </Form>
   );
 }
 
-function PolicyAuthentication({ controller: c }: { controller: AccessController }) {
+function PolicyAuthentication({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
-  const { form, data } = c;
-  const p = form.values;
-  const usesSso = p.authentication === 'sso';
+  const { form, data } = controller;
+  const policy = form.values;
+  const usesSso = policy.authentication === 'sso';
   return (
     <Section.Root>
       <Section.Group>
@@ -173,50 +176,44 @@ function PolicyAuthentication({ controller: c }: { controller: AccessController 
         <Section.Body>
           <div {...mergeStyleProps(themeProps('access-authentication'), stylex.props(styles.fields))}>
             {data.live && !data.canEditPolicyAuthentication ? (
-              <>
-                <Section.Label>{usesSso ? m.sso : m.defaultAuthentication}</Section.Label>
-                {p.ssoConnectionIds.map(id => (
-                  <Section.Description key={id}>{p.connectionNames?.[id] ?? id}</Section.Description>
-                ))}
-              </>
+              <Section.Label>{usesSso ? m.sso : m.defaultAuthentication}</Section.Label>
             ) : (
-              <>
-                <Radio.Group
-                  aria-label={m.authentication}
-                  value={p.authentication}
-                  disabled={form.isSubmitting}
-                  onValueChange={c.onAuthenticationChange}
-                >
-                  <AccessRadio
-                    value='default'
-                    label={m.defaultAuthentication}
-                    description={m.defaultDescription}
-                  />
-                  <AccessRadio
-                    value='sso'
-                    label={m.sso}
-                    description={m.ssoDescription}
-                  />
-                </Radio.Group>
-                {usesSso ? <PolicySsoConnections controller={c} /> : !data.live ? <PolicyMfa controller={c} /> : null}
-                {!data.live ? (
-                  <>
-                    <Separator />
-                    <AccessSelect
-                      label={m.reverification}
-                      value={p.reverification}
-                      items={[
-                        { value: '1', label: m.hour },
-                        { value: '12', label: m.twelveHours },
-                        { value: '24', label: m.hours },
-                      ]}
-                      onChange={value => form.setValue('reverification', value)}
-                      disabled={form.isSubmitting}
-                    />
-                  </>
-                ) : null}
-              </>
+              <Radio.Group
+                aria-label={m.authentication}
+                value={policy.authentication}
+                disabled={form.isSubmitting}
+                onValueChange={controller.onAuthenticationChange}
+              >
+                <AccessRadio
+                  value='default'
+                  label={m.defaultAuthentication}
+                  description={m.defaultDescription}
+                />
+                <AccessRadio
+                  value='sso'
+                  label={m.sso}
+                  description={m.ssoDescription}
+                />
+              </Radio.Group>
             )}
+            {usesSso ? <PolicySsoConnections controller={controller} /> : null}
+            {!data.live ? <PolicyMfa controller={controller} /> : null}
+            {!data.live ? (
+              <>
+                <Separator />
+                <AccessSelect
+                  label={m.reverification}
+                  value={policy.reverification}
+                  items={[
+                    { value: '1', label: m.hour },
+                    { value: '12', label: m.twelveHours },
+                    { value: '24', label: m.hours },
+                  ]}
+                  onChange={value => form.setValue('reverification', value)}
+                  disabled={form.isSubmitting}
+                />
+              </>
+            ) : null}
           </div>
         </Section.Body>
       </Section.Group>
@@ -224,11 +221,11 @@ function PolicyAuthentication({ controller: c }: { controller: AccessController 
   );
 }
 
-function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
+function PolicyEnrollment({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
-  const { form, data } = c;
-  const p = form.values;
-  const usesSso = p.authentication === 'sso';
+  const { form, data } = controller;
+  const policy = form.values;
+  const usesSso = policy.authentication === 'sso';
   return (
     <Section.Root>
       <Section.Group>
@@ -241,20 +238,22 @@ function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
               <>
                 <AccessSelect
                   label={m.enrollment}
-                  value={p.enrollment === 'directory' ? 'directory' : 'automatic'}
+                  value={policy.enrollment === 'directory' ? 'directory' : 'automatic'}
                   items={[
                     { value: 'automatic', label: m.automatic },
-                    ...(data.connections.some(item => item.kind === 'directory')
+                    ...(policy.enrollment === 'directory' ||
+                    data.canCreateDirectory ||
+                    data.connections.some(item => item.kind === 'directory')
                       ? [{ value: 'directory', label: m.directory }]
                       : []),
                   ]}
-                  onChange={c.onEnrollmentChange}
+                  onChange={controller.onEnrollmentChange}
                   disabled={form.isSubmitting}
                 />
-                {p.enrollment === 'directory' ? (
+                {policy.enrollment === 'directory' ? (
                   <Section.Description>
-                    {p.directoryConnectionId
-                      ? (p.connectionNames?.[p.directoryConnectionId] ?? p.directoryConnectionId)
+                    {policy.directoryConnectionId
+                      ? (policy.connectionNames?.[policy.directoryConnectionId] ?? policy.directoryConnectionId)
                       : null}
                   </Section.Description>
                 ) : null}
@@ -262,8 +261,8 @@ function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
             ) : (
               <Radio.Group
                 aria-label={m.enrollment}
-                value={p.enrollment}
-                onValueChange={c.onEnrollmentChange}
+                value={policy.enrollment}
+                onValueChange={controller.onEnrollmentChange}
                 disabled={form.isSubmitting}
               >
                 <AccessRadio
@@ -290,7 +289,9 @@ function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
                 ) : null}
               </Radio.Group>
             )}
-            {p.enrollment === 'directory' && (!data.live || usesSso) ? <PolicyDirectory controller={c} /> : null}
+            {policy.enrollment === 'directory' && (!data.live || usesSso) ? (
+              <PolicyDirectory controller={controller} />
+            ) : null}
           </div>
         </Section.Body>
       </Section.Group>
@@ -298,160 +299,10 @@ function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
   );
 }
 
-function PolicySsoConnections({ controller: c }: { controller: AccessController }) {
+function PolicyMfa({ controller }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
-  const { form, data, registerAddSso } = c;
-  const p = form.values;
-  return (
-    <div {...stylex.props(styles.inset)}>
-      {p.ssoConnectionIds.map(id => (
-        <div
-          key={id}
-          {...stylex.props(styles.connectionRow)}
-        >
-          <div {...stylex.props(styles.connectionControl)}>
-            <AccessSelect
-              label={m.connections}
-              hideLabel={id !== p.ssoConnectionIds[0]}
-              provider={data.connections.find(item => item.id === id)?.configuration.provider}
-              value={id}
-              items={data.connections
-                .filter(item => item.kind === 'sso' && (item.id === id || !p.ssoConnectionIds.includes(item.id)))
-                .map(item => ({ value: item.id, label: item.configuration.name }))}
-              onChange={next =>
-                form.setValue(
-                  'ssoConnectionIds',
-                  p.ssoConnectionIds.map(value => (value === id ? next : value)),
-                )
-              }
-              disabled={form.isSubmitting}
-            />
-          </div>
-          <Button
-            variant='outline'
-            color='neutral'
-            shape='square'
-            aria-label={m.manage}
-            onClick={() => c.onManage(id)}
-            disabled={form.isSubmitting}
-          >
-            <Icon glyph={Cog6Teeth} />
-          </Button>
-          <Button
-            ref={c.ssoRemoval.registerTrigger(id)}
-            shape='square'
-            aria-label={m.remove}
-            variant='outline'
-            color='neutral'
-            disabled={form.isSubmitting}
-            onClick={() => {
-              void c.ssoRemoval.remove(id).then(() => c.ssoRemoval.finalFocus()?.focus());
-            }}
-          >
-            <Icon glyph={Trash} />
-          </Button>
-        </div>
-      ))}
-      {c.availableSsoConnections.length ? (
-        <Menu.Root>
-          <Menu.Trigger
-            ref={registerAddSso}
-            render={
-              <Button
-                variant='outline'
-                color='neutral'
-                xstyle={styles.fit}
-              />
-            }
-            disabled={form.isSubmitting}
-          >
-            <Icon glyph={Plus} />
-            {m.addConnection}
-          </Menu.Trigger>
-          <Menu.Popup>
-            {c.availableSsoConnections.map(connection => (
-              <Menu.Item
-                key={connection.id}
-                label={connection.configuration.name}
-                onClick={() => c.onAttachSso(connection.id)}
-              >
-                <Menu.Label>{connection.configuration.name}</Menu.Label>
-              </Menu.Item>
-            ))}
-            <Menu.Item
-              label={m.ssoTitle}
-              onClick={() => c.onSetup('sso')}
-            >
-              <Menu.Label>{m.ssoTitle}</Menu.Label>
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Root>
-      ) : (
-        <Button
-          xstyle={styles.fit}
-          ref={registerAddSso}
-          variant='outline'
-          color='neutral'
-          onClick={() => c.onSetup('sso')}
-          disabled={form.isSubmitting}
-        >
-          <Icon glyph={Plus} />
-          {m.addConnection}
-        </Button>
-      )}
-    </div>
-  );
-}
-
-function PolicyDirectory({ controller: c }: { controller: AccessController }) {
-  const m = useMessages('organizationProfile').access;
-  const { form, data } = c;
-  const p = form.values;
-  return (
-    <div {...stylex.props(styles.inset)}>
-      {p.directoryConnectionId || data.live ? (
-        <div {...stylex.props(styles.connectionRow)}>
-          <AccessSelect
-            label={m.directory}
-            value={p.directoryConnectionId}
-            provider={data.connections.find(item => item.id === p.directoryConnectionId)?.configuration.provider}
-            items={data.connections
-              .filter(item => item.kind === 'directory')
-              .map(item => ({ value: item.id, label: item.configuration.name }))}
-            onChange={id => form.setValue('directoryConnectionId', id)}
-            disabled={form.isSubmitting}
-          />
-          <Button
-            variant='outline'
-            color='neutral'
-            shape='square'
-            aria-label={m.manage}
-            disabled={form.isSubmitting || !p.directoryConnectionId}
-            onClick={() => c.onManage(p.directoryConnectionId ?? '')}
-          >
-            <Icon glyph={Cog6Teeth} />
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant='outline'
-          color='neutral'
-          xstyle={styles.fit}
-          onClick={() => c.onSetup('directory')}
-          disabled={form.isSubmitting}
-        >
-          <Icon glyph={Plus} />
-          {m.addDirectory}
-        </Button>
-      )}
-    </div>
-  );
-}
-
-function PolicyMfa({ controller: c }: { controller: AccessController }) {
-  const m = useMessages('organizationProfile').access;
-  const { form } = c;
-  const p = form.values;
+  const { form } = controller;
+  const policy = form.values;
   return (
     <>
       <Separator />
@@ -463,16 +314,16 @@ function PolicyMfa({ controller: c }: { controller: AccessController }) {
           <Field.Label>{m.mfa}</Field.Label>
         </Field.Content>
         <Switch
-          checked={p.mfaEnabled}
+          checked={policy.mfaEnabled}
           onChange={event => form.setValue('mfaEnabled', event.target.checked)}
         />
-        <span>{p.mfaEnabled ? m.enabled : m.disabled}</span>
+        <span>{policy.mfaEnabled ? m.enabled : m.disabled}</span>
       </Field.Root>
-      {p.mfaEnabled ? (
+      {policy.mfaEnabled ? (
         <Radio.Group
           aria-label={m.mfa}
-          value={p.mfa}
-          onValueChange={c.onMfaChange}
+          value={policy.mfa}
+          onValueChange={controller.onMfaChange}
           disabled={form.isSubmitting}
         >
           <AccessRadio

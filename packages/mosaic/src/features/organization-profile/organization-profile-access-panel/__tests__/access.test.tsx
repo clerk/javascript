@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { deferred } from '../../../../__tests__/async';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { useAccessController } from '../access.controller';
+import { editorPolicyParams } from '../access.model';
 import type { AccessConnection, AccessData } from '../access.types';
 import { canActivatePolicy, newConnection, newPolicy } from '../access.utils';
 
@@ -164,5 +165,39 @@ describe('Access drafts and connection setup', () => {
     expect(canActivatePolicy(policy, [])).toBe(false);
     expect(canActivatePolicy(policy, [connection])).toBe(true);
     expect(canActivatePolicy({ ...policy, enrollment: 'directory' }, [connection])).toBe(false);
+  });
+});
+
+describe('SSO policy updates', () => {
+  const previous = {
+    connections: [],
+    directories: [
+      { id: 'directory_one', name: 'First' },
+      { id: 'directory_two', name: 'Second' },
+    ],
+    connectionRequired: true,
+    provisioning: 'directory' as const,
+  };
+  const policy = {
+    ...newPolicy(),
+    authentication: 'sso' as const,
+    enrollment: 'directory' as const,
+    directoryConnectionId: 'directory_one',
+  };
+
+  it('leaves directory links untouched when another policy field changes', () => {
+    const params = editorPolicyParams({ ...policy, status: 'active' }, true, true, previous);
+    expect(params?.authentication?.provisioning).toBe('directory');
+    expect(params?.authentication?.directoryIds).toBeUndefined();
+  });
+
+  it('keeps the other directory links when the visible directory changes', () => {
+    const params = editorPolicyParams({ ...policy, directoryConnectionId: 'directory_three' }, true, true, previous);
+    expect(params?.authentication?.directoryIds).toEqual(['directory_three', 'directory_two']);
+  });
+
+  it('clears directory links when switching to just-in-time provisioning', () => {
+    const params = editorPolicyParams({ ...policy, enrollment: 'automatic' }, true, true, previous);
+    expect(params?.authentication?.directoryIds).toEqual([]);
   });
 });

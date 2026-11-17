@@ -58,6 +58,7 @@ export interface ConnectionTestResult {
   id?: string;
   createdAt?: number;
   success: boolean;
+  failureMessage?: string;
   email?: string;
   firstName?: string;
   lastName?: string;
@@ -84,6 +85,7 @@ export interface AccessData {
   onConfigureDirectory?: (values: ConnectionConfiguration, id?: string) => Promise<AccessConnection>;
   onEnableSso?: (id: string) => Promise<AccessConnection>;
   canCreatePolicy?: boolean;
+  newPolicyAuthentication?: AccessPolicy['authentication'];
   onSelectPolicy?: (id: string | null) => void;
   loadPolicy?: (id: string) => Promise<AccessPolicy>;
   policyListError?: boolean;

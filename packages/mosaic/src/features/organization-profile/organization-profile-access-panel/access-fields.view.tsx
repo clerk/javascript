@@ -4,11 +4,12 @@ import type { ReactNode } from 'react';
 
 import { CopyButton } from '../../../components/copy-button';
 import { Field } from '../../../components/field';
+import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Radio } from '../../../components/radio';
+import { Section } from '../../../components/section';
 import { Select } from '../../../components/select';
-import { VisuallyHidden } from '../../../components/visually-hidden';
 import { Key } from '../../../icons/glyphs/key';
 import { useMessages } from '../../../localization';
 import { styles } from './access.styles';
@@ -36,13 +37,7 @@ export function AccessSelect({
       disabled={disabled}
       xstyle={styles.control}
     >
-      {hideLabel ? (
-        <VisuallyHidden>
-          <Field.Label>{label}</Field.Label>
-        </VisuallyHidden>
-      ) : (
-        <Field.Label>{label}</Field.Label>
-      )}
+      <Field.Label visuallyHidden={hideLabel}>{label}</Field.Label>
       <Select.Root
         value={value ?? ''}
         items={items}
@@ -65,11 +60,20 @@ export function AccessSelect({
     </Field.Root>
   );
 }
-export function AccessCopyField({ label, value }: { label: string; value: string }) {
+
+export function AccessCopyField({
+  label,
+  value,
+  hideLabel = false,
+}: {
+  label: string;
+  value: string;
+  hideLabel?: boolean;
+}) {
   const m = useMessages('organizationProfile').access;
   return (
     <Field.Root>
-      <Field.Label>{label}</Field.Label>
+      <Field.Label visuallyHidden={hideLabel}>{label}</Field.Label>
       <InputGroup.Root>
         <InputGroup.Input
           readOnly
@@ -86,6 +90,7 @@ export function AccessCopyField({ label, value }: { label: string; value: string
     </Field.Root>
   );
 }
+
 export function AccessRadio({ value, label, description }: { value: string; label: string; description: ReactNode }) {
   return (
     <Field.Root orientation='horizontal'>
@@ -108,5 +113,20 @@ export function AccessProviderIcon({ provider }: { provider: AccessProvider }) {
       alt=''
       {...stylex.props(styles.providerIcon)}
     />
+  );
+}
+
+export function StepTitle({ children, description }: { children: string; description?: string }) {
+  const focus = useFlowAutoFocus<HTMLHeadingElement>();
+  return (
+    <div {...stylex.props(styles.stepHeading)}>
+      <Section.Title
+        ref={focus}
+        tabIndex={-1}
+      >
+        {children}
+      </Section.Title>
+      {description ? <Section.Description xstyle={styles.stepDescription}>{description}</Section.Description> : null}
+    </div>
   );
 }

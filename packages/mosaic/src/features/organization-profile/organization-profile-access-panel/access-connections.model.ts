@@ -90,6 +90,24 @@ function toDirectory(directory: DirectorySyncResource): AccessConnection {
 
 async function connectionParams(values: ConnectionConfiguration, previous?: EnterpriseConnectionResource) {
   const { name, provider, mode } = values;
+  if (previous) {
+    const original = toSso(previous, true).configuration;
+    const settings = [
+      'mode',
+      'metadataUrl',
+      'metadataFile',
+      'signOnUrl',
+      'issuer',
+      'certificate',
+      'clientId',
+      'clientSecret',
+      'tokenUrl',
+      'userInfoUrl',
+    ] as const;
+    if (settings.every(key => values[key] === original[key])) {
+      return { name };
+    }
+  }
   if (provider === 'oidc') {
     return {
       name,
@@ -145,6 +163,7 @@ async function testSso(organization: OrganizationResource, id: string): Promise<
     id: run.id,
     createdAt: run.createdAt?.getTime(),
     success: run.status === 'success',
+    failureMessage: run.logs[0]?.message ?? run.logs[0]?.shortMessage,
     email: run.parsedUserInfo?.emailAddress,
     firstName: run.parsedUserInfo?.firstName,
     lastName: run.parsedUserInfo?.lastName,
@@ -235,15 +254,19 @@ export function useAccessConnectionsModel(
     canCreateDirectory:
       canManageDirectories &&
       typeof organization?.createDirectorySync === 'function' &&
-      source.some(
-        item =>
-          providerNames.some(provider => provider !== 'oidc' && providers[provider] === item.provider) &&
-          !directories.data?.some(directory => directory.configuration.ssoConnectionId === item.id),
-      ),
+      Boolean(directories.data) &&
+      source.some(item => !directories.data?.some(directory => directory.configuration.ssoConnectionId === item.id)),
     eligibleSsoDomains,
     isLoadingConnections: sso.isLoading || directories.isLoading || domains.isLoading,
     connectionLoadError: Boolean(sso.error || directories.error || domains.error),
     ...connectionActions(organization, source, sso, queryKey, canManageSso, canManageDirectories),
+    retryConnections: async () => {
+      await Promise.allSettled([
+        sso.revalidate(),
+        domains.revalidate(),
+        getClerkQueryClient()?.invalidateQueries({ queryKey }),
+      ]);
+    },
     onManageDirectory,
     onRotateDirectoryToken: canManageDirectories
       ? async id => {
@@ -281,12 +304,8 @@ function connectionActions(
     return directory;
   };
   const saveSso = async (values: ConnectionConfiguration, id?: string) => {
-    const params = id
-      ? await connectionParams(
-          values,
-          source.find(item => item.id === id),
-        )
-      : { name: values.name };
+    const previous = source.find(connection => connection.id === id);
+    const params = id ? await connectionParams(values, previous) : { name: values.name };
     const saved = id
       ? await sso.updateEnterpriseConnection(id, params)
       : await sso.createEnterpriseConnection({
@@ -317,9 +336,6 @@ function connectionActions(
     return { ...toDirectory(configured), token: token ?? undefined };
   };
   return {
-    retryConnections: async () => {
-      await Promise.allSettled([sso.revalidate(), refreshDirectories()]);
-    },
     onConfigureDirectory: canManageDirectories ? configureDirectory : undefined,
     onSaveConnection: async (kind: 'sso' | 'directory', values: ConnectionConfiguration, id?: string) => {
       if (kind === 'sso' && canManageSso) {
@@ -333,26 +349,7 @@ function connectionActions(
             subjectEmail: values.subjectEmail,
           });
         }
-        const mappings = Object.entries(values.groupRoles)
-          .filter(([, role]) => role !== 'none')
-          .map(([directoryGroupId, role]) => ({
-            directoryGroupId,
-            role: role.startsWith('org:') ? role : `org:${role}`,
-          }));
-        if (Object.keys(values.groupRoles).length > 0) {
-          const { data: existing } = await directory.getGroupRoleMappings();
-          const replacements = new Map(mappings.map(mapping => [mapping.directoryGroupId, mapping]));
-          const updatedMappings = existing.flatMap(mapping => {
-            const id = mapping.directoryGroupId;
-            const replacement = replacements.get(id);
-            replacements.delete(id);
-            if (Object.hasOwn(values.groupRoles, id)) {
-              return replacement ? [replacement] : [];
-            }
-            return mapping.role ? [{ directoryGroupId: id, role: mapping.role.key }] : [];
-          });
-          await directory.replaceGroupRoleMappings({ mappings: [...updatedMappings, ...replacements.values()] });
-        }
+        await updateDirectoryRoles(directory, values.groupRoles);
         const updated = await directory.update({
           enabled: values.enabled,
           attributeMapping: values.directoryAttributeMapping,
@@ -387,6 +384,30 @@ function connectionActions(
       throw unavailable();
     },
   };
+}
+
+async function updateDirectoryRoles(directory: DirectorySyncResource, edits: Record<string, string>) {
+  if (!Object.keys(edits).length) {
+    return;
+  }
+
+  const { data } = await directory.getGroupRoleMappings();
+  const roles = new Map<string, string>();
+  for (const mapping of data) {
+    if (mapping.role) {
+      roles.set(mapping.directoryGroupId, mapping.role.key);
+    }
+  }
+  for (const [id, role] of Object.entries(edits)) {
+    if (role === 'none') {
+      roles.delete(id);
+    } else {
+      roles.set(id, role.startsWith('org:') ? role : `org:${role}`);
+    }
+  }
+  await directory.replaceGroupRoleMappings({
+    mappings: Array.from(roles, ([directoryGroupId, role]) => ({ directoryGroupId, role })),
+  });
 }
 
 async function testDirectory(directory: DirectorySyncResource): Promise<ConnectionTestResult> {

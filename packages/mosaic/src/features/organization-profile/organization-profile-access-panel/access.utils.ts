@@ -1,4 +1,10 @@
-import type { AccessConnection, AccessPolicy, ConnectionConfiguration } from './access.types';
+import type {
+  AccessConnection,
+  AccessPolicy,
+  AccessProvider,
+  ConnectionConfiguration,
+  ConnectionKind,
+} from './access.types';
 
 export function newPolicy(): AccessPolicy {
   return {
@@ -105,4 +111,30 @@ export async function isServiceAccountFile(file: File) {
   } catch {
     return false;
   }
+}
+
+export function connectionAttributes(kind: ConnectionKind, provider: AccessProvider) {
+  const protocol = kind === 'directory' ? 'scim' : provider === 'oidc' ? 'oidc' : 'saml';
+  const attributes = [
+    { field: 'email', scim: 'userName', oidc: 'email', saml: 'mail', expression: 'user.profile.email' },
+    {
+      field: 'firstName',
+      scim: 'name.givenName',
+      oidc: 'given_name',
+      saml: 'firstName',
+      expression: 'user.profile.firstName',
+    },
+    {
+      field: 'lastName',
+      scim: 'name.familyName',
+      oidc: 'family_name',
+      saml: 'lastName',
+      expression: 'user.profile.lastName',
+    },
+  ] as const;
+  return attributes.map(attribute => ({
+    field: attribute.field,
+    name: attribute[protocol],
+    expression: attribute.expression,
+  }));
 }

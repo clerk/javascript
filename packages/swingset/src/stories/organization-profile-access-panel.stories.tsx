@@ -41,7 +41,6 @@ export function Errors() {
 export const meta: StoryMeta = {
   group: 'Organization Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'OrganizationProfileAccessPanel',
   label: 'Access panel',
   navigation: { category: 'Panels' },

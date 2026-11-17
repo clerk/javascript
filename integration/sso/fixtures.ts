@@ -48,6 +48,9 @@ export const test = base.extend<{
   },
   organization: async ({ app, keycloak }, provide) => {
     const u = await createTestUtils({ app });
+    if (process.env.E2E_MOSAIC_ACCESS === '1') {
+      await u.services.clerk.instance.updateOrganizationSettings({ domainsEnabled: true });
+    }
     const fakeAdmin = {
       ...u.services.users.createFakeUser(test, { withPassword: false }),
       email: `admin+clerk_test@admin-${keycloak.realm}.clerk.test`,
@@ -59,7 +62,10 @@ export const test = base.extend<{
         name: 'Keycloak Test Organization',
         createdBy: admin.id,
       });
-      await u.services.clerk.organizations.updateOrganization(organization.id, { selfServeSsoEnabled: true });
+      await u.services.clerk.organizations.updateOrganization(organization.id, {
+        selfServeSsoEnabled: true,
+        ...(process.env.E2E_MOSAIC_ACCESS === '1' ? { selfServeDirectorySyncEnabled: true } : {}),
+      });
       await provide(organization);
     } finally {
       try {
@@ -137,7 +143,7 @@ export const test = base.extend<{
 });
 
 export function ssoSuite(title: string, define: (args: { app: Application }) => void) {
-  if (process.env.E2E_KEYCLOAK_URL) {
+  if (process.env.E2E_KEYCLOAK_URL && process.env.E2E_MOSAIC_ACCESS !== '1') {
     testAgainstRunningApps({ withEnv: [appConfigs.envs.withSelfServeSso] })(`${title} @sso`, ({ app }) => {
       test.use({ app });
       test.setTimeout(120_000);

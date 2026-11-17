@@ -24,6 +24,7 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
           <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>{m.addDomainTitle}</Card.Title>
+              <Card.Description>{m.addDomainDescription}</Card.Description>
             </Card.Header>
             <Card.Banner color='negative'>{form.error}</Card.Banner>
             <Card.Content
@@ -83,15 +84,18 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
             </Card.Banner>
             <Card.Content>
               <Field.Description>{m.verifyDescription}</Field.Description>
-              <DataList.Root divided={false}>
-                <DataList.Item>
-                  <DataList.Label>{m.recordType}</DataList.Label>
+              <DataList.Root
+                divided={false}
+                xstyle={styles.dnsRecords}
+              >
+                <DataList.Item xstyle={styles.dnsRecord}>
+                  <DataList.Label xstyle={styles.dnsLabel}>{m.recordType}</DataList.Label>
                   <DataList.Value>
                     <Badge color='neutral'>TXT</Badge>
                   </DataList.Value>
                 </DataList.Item>
-                <DataList.Item>
-                  <DataList.Label>{m.host}</DataList.Label>
+                <DataList.Item xstyle={styles.dnsRecord}>
+                  <DataList.Label xstyle={styles.dnsLabel}>{m.host}</DataList.Label>
                   <DataList.Value>
                     <Badge color='neutral'>{c.dnsRecord?.name ?? c.verifyingDomain}</Badge>
                   </DataList.Value>
@@ -99,6 +103,7 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
               </DataList.Root>
               <AccessCopyField
                 label={m.value}
+                hideLabel
                 value={c.dnsRecord?.value ?? c.data.serviceProvider?.dnsValue ?? ''}
               />
             </Card.Content>
