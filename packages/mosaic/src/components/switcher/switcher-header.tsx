@@ -1,11 +1,13 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
+import { useSlot } from './switcher.context';
 import { styles } from './switcher-header.styles';
-import { useSlot } from './switcher-surface';
 
 export interface SwitcherHeaderProps {
   avatar: ReactNode;

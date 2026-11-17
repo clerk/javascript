@@ -1,10 +1,8 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
-import { Badge } from '../../components/badge';
 import { SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
@@ -12,10 +10,23 @@ import { Menu } from '../../components/menu';
 import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
+import { SwitcherSurfaceProvider, useSlot } from '../../components/switcher/switcher.context';
+import { BadgedAvatar, RowAvatar } from '../../components/switcher/switcher-avatar';
+import { SwitcherHeader } from '../../components/switcher/switcher-header';
+import {
+  SwitcherGroup,
+  SwitcherItem,
+  SwitcherItemContent,
+  SwitcherItemDescription,
+  SwitcherItemLabel,
+  SwitcherItemMedia,
+  SwitcherItemTrailing,
+  SwitcherSeparator,
+} from '../../components/switcher/switcher-item';
+import { SwitcherTriggerContent, triggerStyles } from '../../components/switcher/switcher-trigger';
 import type { IconComponent } from '../../icons/glyph';
 import { Building } from '../../icons/glyphs/building';
 import { Checkmark } from '../../icons/glyphs/checkmark';
-import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { Cog6Teeth } from '../../icons/glyphs/cog-6-teeth';
 import { Plus } from '../../icons/glyphs/plus';
@@ -26,12 +37,8 @@ import { UsersAddRight } from '../../icons/glyphs/users-add-right';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import type { MosaicElementProps } from '../../props';
-import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../styles/focus-outline.styles';
+import { themeProps } from '../../props';
 import { rtl } from '../../styles/rtl.styles';
-import { reset } from '../../styles/reset.styles';
-import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
 import type { SwitcherLayout } from './switcher.layout';
 import { resolveSwitcherLayout } from './switcher.layout';
@@ -49,20 +56,8 @@ import type {
   SwitcherTriggerBadge,
 } from './switcher.types';
 import { switcherBusyKeys } from './switcher.types';
-import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
-import { SwitcherHeader } from './switcher-header.view';
-import {
-  SwitcherGroup,
-  SwitcherItem,
-  SwitcherItemContent,
-  SwitcherItemDescription,
-  SwitcherItemLabel,
-  SwitcherItemMedia,
-  SwitcherItemTrailing,
-  SwitcherSeparator,
-} from './switcher-item.view';
 import type { SwitcherMessages } from './switcher-surface';
-import { surfaceForMode, SwitcherSurfaceProvider, useSlot, useSwitcherMessages } from './switcher-surface';
+import { surfaceForMode, useSwitcherMessages } from './switcher-surface';
 import { useSwitcherTriggerController } from './switcher-trigger.controller';
 
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
@@ -1078,97 +1073,6 @@ export function SwitcherTrigger({
         badgeId={badge?.id}
       />
     </Popover.Trigger>
-  );
-}
-
-function triggerStyles(showLabel: boolean, shape: 'circle' | 'square') {
-  return [
-    focusOutline.visible,
-    styles.trigger,
-    showLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-    !showLabel && shape === 'circle' ? styles.triggerRound : null,
-  ];
-}
-
-function SwitcherTriggerContent({
-  avatar,
-  name,
-  badge,
-  badgeId,
-}: {
-  avatar: ReactNode;
-  name?: string;
-  badge?: string;
-  badgeId?: string;
-}): ReactElement {
-  const slot = useSlot();
-  return (
-    <>
-      {avatar}
-      {name ? (
-        <>
-          <span
-            {...mergeStyleProps(
-              themeProps(slot('trigger-label')),
-              stylex.props(styles.triggerName, truncationStyles.singleLine),
-            )}
-          >
-            {name}
-          </span>
-          {badge ? (
-            <Badge
-              color='neutral'
-              data-badge-id={badgeId}
-            >
-              {badge}
-            </Badge>
-          ) : null}
-          <Icon
-            glyph={ChevronDown}
-            size='md'
-            xstyle={styles.triggerCaret}
-          />
-        </>
-      ) : null}
-    </>
-  );
-}
-
-export interface SwitcherTriggerButtonProps extends Omit<MosaicElementProps<'button'>, 'children'> {
-  /** The lead's mark, such as a `BadgedAvatar`. */
-  avatar: ReactNode;
-  /** The lead's name. Leave it out for the avatar-only trigger. */
-  name?: string;
-  /** A plan or status label beside the name. */
-  badge?: string;
-  shape?: 'circle' | 'square';
-}
-
-/** The trigger's look on a plain button, without the popover it opens: for showing the trigger on its own. */
-export function SwitcherTriggerButton({
-  avatar,
-  name,
-  badge,
-  shape = 'square',
-  xstyle,
-  ...rest
-}: SwitcherTriggerButtonProps): ReactElement {
-  const slot = useSlot();
-  return (
-    <button
-      type='button'
-      {...mergeStyleProps(
-        themeProps(slot('trigger'), { variant: 'full' }),
-        stylex.props(reset.base, ...triggerStyles(Boolean(name), shape), xstyle),
-        rest,
-      )}
-    >
-      <SwitcherTriggerContent
-        avatar={avatar}
-        name={name}
-        badge={badge}
-      />
-    </button>
   );
 }
 

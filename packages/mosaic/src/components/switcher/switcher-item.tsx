@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -7,10 +9,18 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
+import { useSlot } from './switcher.context';
 import { styles } from './switcher-item.styles';
-import { useSlot } from './switcher-surface';
 
-export const SwitcherItem = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function SwitcherItem(
+export type SwitcherItemProps = MosaicComponentProps<'div'>;
+export type SwitcherItemMediaProps = MosaicElementProps<'div'>;
+export type SwitcherItemContentProps = MosaicElementProps<'div'>;
+export type SwitcherItemDescriptionProps = MosaicElementProps<'div'>;
+export type SwitcherItemTrailingProps = MosaicElementProps<'div'>;
+export type SwitcherGroupProps = MosaicElementProps<'div'>;
+export type SwitcherSeparatorProps = MosaicElementProps<'hr'>;
+
+export const SwitcherItem = React.forwardRef<HTMLDivElement, SwitcherItemProps>(function SwitcherItem(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -28,14 +38,14 @@ export const SwitcherItem = React.forwardRef<HTMLDivElement, MosaicComponentProp
   });
 });
 
-export function SwitcherItemMedia({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export function SwitcherItemMedia({ xstyle, ...rest }: SwitcherItemMediaProps) {
   const slot = useSlot();
   return (
     <div {...mergeStyleProps(themeProps(slot('item-media')), stylex.props(reset.base, styles.media, xstyle), rest)} />
   );
 }
 
-export function SwitcherItemContent({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export function SwitcherItemContent({ xstyle, ...rest }: SwitcherItemContentProps) {
   const slot = useSlot();
   return (
     <div
@@ -74,7 +84,7 @@ export function SwitcherItemLabel({ variant = 'default', xstyle, ...rest }: Swit
   );
 }
 
-export function SwitcherItemDescription({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export function SwitcherItemDescription({ xstyle, ...rest }: SwitcherItemDescriptionProps) {
   const slot = useSlot();
   return (
     <div
@@ -87,7 +97,7 @@ export function SwitcherItemDescription({ xstyle, ...rest }: MosaicElementProps<
   );
 }
 
-export function SwitcherItemTrailing({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export function SwitcherItemTrailing({ xstyle, ...rest }: SwitcherItemTrailingProps) {
   const slot = useSlot();
   return (
     <div
@@ -96,12 +106,12 @@ export function SwitcherItemTrailing({ xstyle, ...rest }: MosaicElementProps<'di
   );
 }
 
-export function SwitcherGroup({ xstyle, ...rest }: MosaicElementProps<'div'>) {
+export function SwitcherGroup({ xstyle, ...rest }: SwitcherGroupProps) {
   const slot = useSlot();
   return <div {...mergeStyleProps(themeProps(slot('group')), stylex.props(reset.base, styles.group, xstyle), rest)} />;
 }
 
-export function SwitcherSeparator({ xstyle, ...rest }: MosaicElementProps<'hr'>) {
+export function SwitcherSeparator({ xstyle, ...rest }: SwitcherSeparatorProps) {
   const slot = useSlot();
   return (
     <hr {...mergeStyleProps(themeProps(slot('separator')), stylex.props(reset.base, styles.separator, xstyle), rest)} />
