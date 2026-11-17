@@ -21,19 +21,20 @@ Read the split as _where the data comes from_ (model) → _what the user is doin
 
 A feature lives in `src/features/<feature>/`, one file per role, each prefixed with the feature name. Use `.ts` unless the file renders JSX.
 
-| File                         | Holds                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------- |
-| `<feature>.model.ts(x)`      | The Clerk adapter                                                           |
-| `<feature>.controller.ts(x)` | Local state, a machine if it has one, and action wrapping                   |
-| `<feature>.view.tsx`         | Rendering only                                                              |
-| `<feature>.tsx`              | The composition wrapper and the public props type                           |
-| `<feature>.types.ts`         | The data contract the model and view share                                  |
-| `<feature>.messages.ts`      | Every string the feature renders ([Views](views.md#where-the-strings-live)) |
-| `<feature>.layout.ts`        | Pure derivation, such as which affordance goes in which slot                |
-| `<feature>.utils.ts`         | Pure helpers                                                                |
-| `<feature>.styles.ts`        | `stylex.create` atoms ([StyleX](stylex.md))                                 |
-| `<feature>.skeleton.tsx`     | The loading placeholder ([Skeletons](skeletons.md))                         |
-| `<name>.dialog.tsx`          | A dialog the view opens, when it would crowd the view file                  |
+| File                         | Holds                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `<feature>.model.ts(x)`      | The Clerk adapter                                                                                |
+| `<feature>.controller.ts(x)` | Local state, a machine if it has one, and action wrapping                                        |
+| `<feature>.view.tsx`         | Rendering only                                                                                   |
+| `<feature>.tsx`              | The composition wrapper and the public props type                                                |
+| `<feature>.types.ts`         | The data contract the model and view share                                                       |
+| `<feature>.messages.ts`      | Every string the feature renders ([Views](views.md#where-the-strings-live))                      |
+| `<feature>.layout.ts`        | Pure derivation, such as which affordance goes in which slot                                     |
+| `<feature>.routes.ts`        | The route table of a flow that owns its routes, and the pure rules over it (`sign-up.routes.ts`) |
+| `<feature>.utils.ts`         | Pure helpers                                                                                     |
+| `<feature>.styles.ts`        | `stylex.create` atoms ([StyleX](stylex.md))                                                      |
+| `<feature>.skeleton.tsx`     | The loading placeholder ([Skeletons](skeletons.md))                                              |
+| `<name>.dialog.tsx`          | A dialog the view opens, when it would crowd the view file                                       |
 
 `*.types.ts` holds the contract so that neither the model nor the view owns it, and the two cannot drift.
 

@@ -1,8 +1,8 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { describe, expect, it } from 'vitest';
 
-import type { SignUpRoute } from '../sign-up.layout';
-import { allowedRoute, routeFor } from '../sign-up.layout';
+import type { SignUpRoute } from '../sign-up.routes';
+import { allowedRoute, routeFor } from '../sign-up.routes';
 
 const verifyEmail: SignUpNextStep = { type: 'verify_email', target: 'ada@example.com', sent: true };
 const verifyPhone: SignUpNextStep = { type: 'verify_phone', target: '+15555550142', sent: true };

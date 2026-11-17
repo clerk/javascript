@@ -13,9 +13,9 @@ import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
-import type { SignUpRoute } from './sign-up.layout';
-import { allowedRoute, routeFor, signUpRoutes } from './sign-up.layout';
 import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpModel } from './sign-up.model';
+import type { SignUpRoute } from './sign-up.routes';
+import { allowedRoute, routeFor, signUpRoutes } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpStep, SignUpValues, SignUpViewProps } from './sign-up.types';
 
 export type SignUpScreen = SignUpRoute | 'startOver';
