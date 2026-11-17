@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Media`, `Card.Title`,
  * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic
