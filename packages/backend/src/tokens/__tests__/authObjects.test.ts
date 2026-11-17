@@ -531,6 +531,30 @@ describe('getAuthObjectForAcceptedToken', () => {
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).tokenType).toBe('m2m_token');
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).id).toBeNull();
   });
+
+  it('keeps redacted debug data when a single machine token type does not match', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'm2m_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
+  });
+
+  it('keeps redacted debug data when a machine token is not accepted as a session token', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'session_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
+  });
 });
 
 describe('getToken with expiresInSeconds support', () => {
