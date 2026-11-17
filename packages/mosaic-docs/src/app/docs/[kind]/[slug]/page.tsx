@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { DocContent, docHeadings } from '@/components/doc-content';
 import { DocsPage } from '@/components/docs-page';
+import { Preview } from '@/components/preview';
 import { docEntries, docHref, findDoc } from '@/lib/docs';
 
 export const dynamicParams = false;
@@ -35,7 +36,10 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
       headings={docHeadings(entry.doc)}
       markdownHref={`${docHref(entry)}.md`}
     >
-      <DocContent doc={entry.doc} />
+      <DocContent
+        doc={entry.doc}
+        preview={<Preview path={`${kind}/${slug}`} />}
+      />
     </DocsPage>
   );
 }

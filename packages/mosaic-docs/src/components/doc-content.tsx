@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 import { CodeBlock } from '@/components/code-block';
 import { type DocEntry, docHref, findDocByName } from '@/lib/docs';
@@ -32,13 +33,14 @@ export function docHeadings(doc: Doc): TocHeading[] {
   return headings;
 }
 
-export function DocContent({ doc }: { doc: Doc }) {
+export function DocContent({ doc, preview }: { doc: Doc; preview?: ReactNode }) {
   return (
     <>
       <h1>{doc.name}</h1>
       <p className='lead'>
         <InlineCode text={doc.description} />
       </p>
+      {preview}
 
       <h2 id='use-for'>Use for</h2>
       <ul>
