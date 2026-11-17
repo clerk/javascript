@@ -26,9 +26,11 @@ import { UsersAddRight } from '../../icons/glyphs/users-add-right';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
+import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
+import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
 import type { SwitcherLayout } from './switcher.layout';
@@ -1062,18 +1064,48 @@ export function SwitcherTrigger({
     <Popover.Trigger
       {...themeProps(slot('trigger'), { variant: triggerVariant })}
       aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
-      xstyle={[
-        focusOutline.visible,
-        styles.trigger,
-        showTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-        !showTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
-      ]}
+      xstyle={triggerStyles(showTriggerLabel, shape)}
     >
-      <TriggerAvatar
-        lead={lead}
-        variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
+      <SwitcherTriggerContent
+        avatar={
+          <TriggerAvatar
+            lead={lead}
+            variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
+          />
+        }
+        name={showTriggerLabel ? name : undefined}
+        badge={typeof planLabel === 'string' ? planLabel : undefined}
+        badgeId={badge?.id}
       />
-      {showTriggerLabel ? (
+    </Popover.Trigger>
+  );
+}
+
+function triggerStyles(showLabel: boolean, shape: 'circle' | 'square') {
+  return [
+    focusOutline.visible,
+    styles.trigger,
+    showLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
+    !showLabel && shape === 'circle' ? styles.triggerRound : null,
+  ];
+}
+
+function SwitcherTriggerContent({
+  avatar,
+  name,
+  badge,
+  badgeId,
+}: {
+  avatar: ReactNode;
+  name?: string;
+  badge?: string;
+  badgeId?: string;
+}): ReactElement {
+  const slot = useSlot();
+  return (
+    <>
+      {avatar}
+      {name ? (
         <>
           <span
             {...mergeStyleProps(
@@ -1083,12 +1115,12 @@ export function SwitcherTrigger({
           >
             {name}
           </span>
-          {typeof planLabel === 'string' ? (
+          {badge ? (
             <Badge
               color='neutral'
-              data-badge-id={badge?.id}
+              data-badge-id={badgeId}
             >
-              {planLabel}
+              {badge}
             </Badge>
           ) : null}
           <Icon
@@ -1098,7 +1130,45 @@ export function SwitcherTrigger({
           />
         </>
       ) : null}
-    </Popover.Trigger>
+    </>
+  );
+}
+
+export interface SwitcherTriggerButtonProps extends Omit<MosaicElementProps<'button'>, 'children'> {
+  /** The lead's mark, such as a `BadgedAvatar`. */
+  avatar: ReactNode;
+  /** The lead's name. Leave it out for the avatar-only trigger. */
+  name?: string;
+  /** A plan or status label beside the name. */
+  badge?: string;
+  shape?: 'circle' | 'square';
+}
+
+/** The trigger's look on a plain button, without the popover it opens: for showing the trigger on its own. */
+export function SwitcherTriggerButton({
+  avatar,
+  name,
+  badge,
+  shape = 'square',
+  xstyle,
+  ...rest
+}: SwitcherTriggerButtonProps): ReactElement {
+  const slot = useSlot();
+  return (
+    <button
+      type='button'
+      {...mergeStyleProps(
+        themeProps(slot('trigger'), { variant: 'full' }),
+        stylex.props(reset.base, ...triggerStyles(Boolean(name), shape), xstyle),
+        rest,
+      )}
+    >
+      <SwitcherTriggerContent
+        avatar={avatar}
+        name={name}
+        badge={badge}
+      />
+    </button>
   );
 }
 

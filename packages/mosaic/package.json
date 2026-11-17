@@ -56,6 +56,11 @@
       "import": "./dist/components/button.js",
       "default": "./dist/components/button.js"
     },
+    "./components/card": {
+      "types": "./dist/components/card.d.ts",
+      "import": "./dist/components/card.js",
+      "default": "./dist/components/card.js"
+    },
     "./components/data-list": {
       "types": "./dist/components/data-list.d.ts",
       "import": "./dist/components/data-list.js",
@@ -70,6 +75,11 @@
       "types": "./dist/components/entity.d.ts",
       "import": "./dist/components/entity.js",
       "default": "./dist/components/entity.js"
+    },
+    "./components/field": {
+      "types": "./dist/components/field.d.ts",
+      "import": "./dist/components/field.js",
+      "default": "./dist/components/field.js"
     },
     "./components/heading": {
       "types": "./dist/components/heading.d.ts",
@@ -121,6 +131,11 @@
       "import": "./dist/components/skeleton.js",
       "default": "./dist/components/skeleton.js"
     },
+    "./components/switcher": {
+      "types": "./dist/components/switcher.d.ts",
+      "import": "./dist/components/switcher.js",
+      "default": "./dist/components/switcher.js"
+    },
     "./components/table": {
       "types": "./dist/components/table.d.ts",
       "import": "./dist/components/table.js",
@@ -136,30 +151,90 @@
       "import": "./dist/icons/glyphs/arrow-up-right.js",
       "default": "./dist/icons/glyphs/arrow-up-right.js"
     },
+    "./icons/glyphs/building": {
+      "types": "./dist/icons/glyphs/building.d.ts",
+      "import": "./dist/icons/glyphs/building.js",
+      "default": "./dist/icons/glyphs/building.js"
+    },
+    "./icons/glyphs/checkmark": {
+      "types": "./dist/icons/glyphs/checkmark.d.ts",
+      "import": "./dist/icons/glyphs/checkmark.js",
+      "default": "./dist/icons/glyphs/checkmark.js"
+    },
+    "./icons/glyphs/chevron-down": {
+      "types": "./dist/icons/glyphs/chevron-down.d.ts",
+      "import": "./dist/icons/glyphs/chevron-down.js",
+      "default": "./dist/icons/glyphs/chevron-down.js"
+    },
+    "./icons/glyphs/chevron-right": {
+      "types": "./dist/icons/glyphs/chevron-right.d.ts",
+      "import": "./dist/icons/glyphs/chevron-right.js",
+      "default": "./dist/icons/glyphs/chevron-right.js"
+    },
     "./icons/glyphs/code": {
       "types": "./dist/icons/glyphs/code.d.ts",
       "import": "./dist/icons/glyphs/code.js",
       "default": "./dist/icons/glyphs/code.js"
+    },
+    "./icons/glyphs/cog-6-teeth": {
+      "types": "./dist/icons/glyphs/cog-6-teeth.d.ts",
+      "import": "./dist/icons/glyphs/cog-6-teeth.js",
+      "default": "./dist/icons/glyphs/cog-6-teeth.js"
+    },
+    "./icons/glyphs/ellipsis-horizontal": {
+      "types": "./dist/icons/glyphs/ellipsis-horizontal.d.ts",
+      "import": "./dist/icons/glyphs/ellipsis-horizontal.js",
+      "default": "./dist/icons/glyphs/ellipsis-horizontal.js"
     },
     "./icons/glyphs/external": {
       "types": "./dist/icons/glyphs/external.d.ts",
       "import": "./dist/icons/glyphs/external.js",
       "default": "./dist/icons/glyphs/external.js"
     },
+    "./icons/glyphs/key": {
+      "types": "./dist/icons/glyphs/key.d.ts",
+      "import": "./dist/icons/glyphs/key.js",
+      "default": "./dist/icons/glyphs/key.js"
+    },
     "./icons/glyphs/plus": {
       "types": "./dist/icons/glyphs/plus.d.ts",
       "import": "./dist/icons/glyphs/plus.js",
       "default": "./dist/icons/glyphs/plus.js"
+    },
+    "./icons/glyphs/security-lock-square": {
+      "types": "./dist/icons/glyphs/security-lock-square.d.ts",
+      "import": "./dist/icons/glyphs/security-lock-square.js",
+      "default": "./dist/icons/glyphs/security-lock-square.js"
+    },
+    "./icons/glyphs/security-phone": {
+      "types": "./dist/icons/glyphs/security-phone.d.ts",
+      "import": "./dist/icons/glyphs/security-phone.js",
+      "default": "./dist/icons/glyphs/security-phone.js"
     },
     "./icons/glyphs/shield-check": {
       "types": "./dist/icons/glyphs/shield-check.d.ts",
       "import": "./dist/icons/glyphs/shield-check.js",
       "default": "./dist/icons/glyphs/shield-check.js"
     },
+    "./icons/glyphs/sign-out": {
+      "types": "./dist/icons/glyphs/sign-out.d.ts",
+      "import": "./dist/icons/glyphs/sign-out.js",
+      "default": "./dist/icons/glyphs/sign-out.js"
+    },
+    "./icons/glyphs/switch-account": {
+      "types": "./dist/icons/glyphs/switch-account.d.ts",
+      "import": "./dist/icons/glyphs/switch-account.js",
+      "default": "./dist/icons/glyphs/switch-account.js"
+    },
     "./icons/glyphs/user-circle": {
       "types": "./dist/icons/glyphs/user-circle.d.ts",
       "import": "./dist/icons/glyphs/user-circle.js",
       "default": "./dist/icons/glyphs/user-circle.js"
+    },
+    "./icons/glyphs/users-add-right": {
+      "types": "./dist/icons/glyphs/users-add-right.d.ts",
+      "import": "./dist/icons/glyphs/users-add-right.js",
+      "default": "./dist/icons/glyphs/users-add-right.js"
     },
     "./styles.css": {
       "types": "./styles.css.d.ts",
