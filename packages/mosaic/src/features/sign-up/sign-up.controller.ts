@@ -210,12 +210,12 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     go(nextRoute);
   };
 
-  const next = (step: SignUpNextStep) => {
+  const next = async (step: SignUpNextStep) => {
     if (!ready) {
       return;
     }
     if (step.type === 'complete') {
-      void actions.run('finalize', model.finalize);
+      await model.finalize();
       return;
     }
     const nextRoute = routeFor(step);
@@ -240,7 +240,7 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     },
     onSuccess: step => {
       if (step) {
-        next(step);
+        void actions.run('finalize', () => next(step));
       }
     },
   });
@@ -259,7 +259,14 @@ export function useSignUpController(model: SignUpModel, options: MosaicLocationO
     socialProviders: [],
     onSelectProvider: () => undefined,
     form,
-    onSubmit: event => form.handleSubmit(event ?? { preventDefault: () => undefined }),
+    onSubmit: event => {
+      if (resendChannel) {
+        event?.preventDefault();
+        void actions.run('code', async () => next(await verify(form.values.code)));
+        return;
+      }
+      form.handleSubmit(event ?? { preventDefault: () => undefined });
+    },
     onCodeComplete: code => void actions.run('code', async () => next(await verify(code))),
     isPending: form.isSubmitting || actions.isPending,
     isDisabled: form.isSubmitting || actions.isPending,
