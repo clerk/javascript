@@ -1,6 +1,6 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { FieldFeedback } from '../../components/form';
 import { useForm } from '../../components/form';
@@ -206,11 +206,19 @@ export function useSignUpController(model: SignUpReadyModel, options: MosaicLoca
   const resendSeconds = useResendSeconds(codeSnapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
   const identifier = chosenIdentifier ?? model.initialIdentifier;
-  // TODO: When the URL routing modes land (#10780), replace the stored route with `screen` when they differ,
-  // so the address bar never keeps a route the step doesn't allow. In virtual mode the stale route is never seen.
   const screen = signUpScreen(route, model.step);
   const fields = detailsFieldsFor(screen, model, identifier);
 
+  // A route the step does not allow is replaced with the screen that is shown, so the stored route, and the
+  // address bar once the URL routing modes land (#10780), never keeps it. Replacing leaves no history entry.
+  useEffect(() => {
+    if (screen !== 'startOver' && screen !== route) {
+      go(screen, {}, { replace: true });
+    }
+  }, [screen, route, go]);
+
+  // TODO: With a URL routing mode (#10780) a reload can mount on a verify screen. Send the code here when the step
+  // says none is out, and finalize a sign-up that is already complete, each once per mount.
   const goTo = (nextRoute: SignUpRoute) => {
     sendCodeEvent({ type: 'LEAVE' });
     go(nextRoute);

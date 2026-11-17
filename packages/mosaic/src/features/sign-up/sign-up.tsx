@@ -3,13 +3,13 @@
 import type { SignUpInitialValues } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
+import type { MosaicLocationOptions, RoutingProps } from '../../routing/use-mosaic-location';
 import { useSignUpController } from './sign-up.controller';
 import type { SignUpReadyModel } from './sign-up.model';
 import { useSignUpModel } from './sign-up.model';
 import { SignUpView } from './sign-up.view';
 
-export interface SignUpProps {
-  path?: string;
+export interface SignUpProps extends RoutingProps {
   fallback?: ReactNode;
   initialValues?: SignUpInitialValues;
   unsafeMetadata?: SignUpUnsafeMetadata;
@@ -23,6 +23,7 @@ export interface SignUpProps {
 }
 
 export function SignUp({
+  routing = 'virtual',
   path = '/sign-up',
   fallback = null,
   initialValues,
@@ -38,13 +39,20 @@ export function SignUp({
   return (
     <SignUpFlow
       model={model}
+      routing={routing}
       path={path}
     />
   );
 }
 
-function SignUpFlow({ model, path }: { model: SignUpReadyModel; path: string }): ReactElement {
-  const { screen: _screen, ...viewProps } = useSignUpController(model, { routing: 'virtual', path });
+// TODO: The combined sign-in and sign-up flow holds these routes under `create/`. That needs the nested scopes
+// from the routing work (#10780) before it can be built.
+function SignUpFlow({
+  model,
+  routing,
+  path,
+}: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement {
+  const { screen: _screen, ...viewProps } = useSignUpController(model, { routing, path });
 
   return (
     <SignUpView
