@@ -4,10 +4,10 @@ import type { EnterpriseAccountResource, EnterpriseConnectionResource, UserResou
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useReturnUrl } from '../../../routing/use-router';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
-import { withUserProfileModalReturn } from '../user-profile.modal-return';
-import { useUserProfileOptions } from '../user-profile.provider';
+import { USER_PROFILE_ROUTES } from '../user-profile.layout';
 import { isMonochromeProvider, providerId } from '../user-profile-provider.utils';
 import type {
   EnterpriseAccountActionResult,
@@ -83,7 +83,7 @@ export type UserProfileEnterpriseAccountsModel =
     };
 
 export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAccountsModel {
-  const { mode, combined } = useUserProfileOptions();
+  const returnUrl = useReturnUrl(USER_PROFILE_ROUTES);
   const clerk = useClerk();
   const router = useMosaicRouter();
   const [createAccount, connectReverification] = useReverificationFlow(
@@ -137,7 +137,7 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
       if (!projection.connections.some(connection => connection.id === connectionId)) {
         throw unavailable();
       }
-      const redirectUrl = withUserProfileModalReturn(window.location.href, { mode, combined });
+      const redirectUrl = returnUrl('account');
       const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;

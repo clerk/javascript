@@ -14,11 +14,11 @@ const NO_PAGE = '';
 // there when it is.
 export function useProfilePagesController(pageIds: readonly string[] | undefined, options: ProfilePagesOptions) {
   const ids = pageIds ?? [];
-  const { route, go } = useRouterScope(Object.fromEntries(ids.map(id => [id, pageSegment(id)])), {
+  const { route, go, scope } = useRouterScope(Object.fromEntries(ids.map(id => [id, pageSegment(id)])), {
     ...options,
     root: ids[0] ?? NO_PAGE,
     ready: pageIds !== undefined,
   });
 
-  return { activePage: route, onPageChange: go };
+  return { activePage: route, onPageChange: go, scope };
 }

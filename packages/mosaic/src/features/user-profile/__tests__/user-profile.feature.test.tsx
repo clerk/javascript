@@ -362,16 +362,16 @@ describe('UserProfile routed in the URL', () => {
 
   it('starts over from the URL when its mode changes', async () => {
     serve();
-    startAt('/app?.user=security');
+    startAt('/app#.user=security');
     const { rerender } = await renderWithClerk(<UserProfile />);
     const user = userEvent.setup();
     expectSelected('Account');
 
     await user.click(screen.getByRole('tab', { name: 'Security' }));
-    rerender(<UserProfile routing='hash' />);
+    rerender(<UserProfile routing='query' />);
     expectSelected('Account');
 
-    rerender(<UserProfile routing='query' />);
+    rerender(<UserProfile routing='hash' />);
     expectSelected('Security');
   });
 

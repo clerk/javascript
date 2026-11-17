@@ -32,7 +32,7 @@ const MODE_READS: Record<UrlRoutingMode, keyof AdapterReads> = {
 
 const LEADING: Record<keyof HostUrl, string> = { pathname: '', search: '?', hash: '#' };
 
-function useAdapterRead(useRead: AdapterRead, leading: string): string | undefined {
+export function useAdapterRead(useRead: AdapterRead, leading: string): string | undefined {
   const value = useRead() ?? undefined;
   const text = typeof value === 'object' ? value.toString() : value;
   return text?.startsWith(leading) ? text.slice(leading.length) : text;

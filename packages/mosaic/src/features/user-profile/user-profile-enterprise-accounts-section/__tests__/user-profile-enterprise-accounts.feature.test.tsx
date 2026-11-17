@@ -21,8 +21,8 @@ import {
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { InRoutingScope } from '../../../../__tests__/feature/routing';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
 import { useUserProfileEnterpriseAccountsModel } from '../user-profile-enterprise-accounts-section.model';
 import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
@@ -185,12 +185,12 @@ describe('enterprise accounts', () => {
     );
   });
 
-  it('returns to the profile modal after connecting', async () => {
+  it('returns to the account page of the profile it is in', async () => {
     serveFapi(signedIn());
     await renderWithClerk(
-      <UserProfileProvider mode='modal'>
+      <InRoutingScope path='/modal/user'>
         <UserProfileEnterpriseAccountsSection />
-      </UserProfileProvider>,
+      </InRoutingScope>,
     );
     const request = holdRequests('post', '/v1/me/external_accounts');
 
@@ -198,26 +198,7 @@ describe('enterprise accounts', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
     const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
-    expect(params.has('__clerk_modal_state')).toBe(false);
-    request.fail();
-  });
-
-  it('returns to the page without modal state when connecting from a mounted profile', async () => {
-    serveFapi(signedIn());
-    await renderWithClerk(
-      <UserProfileProvider mode='mounted'>
-        <UserProfileEnterpriseAccountsSection />
-      </UserProfileProvider>,
-    );
-    const request = holdRequests('post', '/v1/me/external_accounts');
-
-    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    const body = new URLSearchParams(await request.requests[0]?.text());
-    const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.has('__clerk_mosaic_modal')).toBe(false);
-    expect(params.has('__clerk_modal_state')).toBe(false);
+    expect(params.get('.modal.user')).toBe('account');
     request.fail();
   });
 

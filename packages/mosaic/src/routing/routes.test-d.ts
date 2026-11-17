@@ -3,6 +3,7 @@ import { describe, expectTypeOf, test } from 'vitest';
 import type { MosaicLocation } from './location';
 import { createRouter } from './router';
 import type { RouteParams } from './routes';
+import type { ReturnUrl } from './use-router';
 
 describe('RouteParams', () => {
   test('infers required and optional params from the pattern', () => {
@@ -34,5 +35,20 @@ describe('Router', () => {
 
   test('narrows the route name', () => {
     expectTypeOf(router.parse([])?.name).toEqualTypeOf<'index' | 'security' | 'statement' | undefined>();
+  });
+});
+
+describe('ReturnUrl', () => {
+  const returnUrl: ReturnUrl<{ security: 'security'; statement: 'billing/statement/:statementId' }> = () => '';
+
+  test('takes the params a pattern declares and returns a URL', () => {
+    expectTypeOf(returnUrl('security')).toEqualTypeOf<string>();
+    returnUrl('statement', { statementId: 'st_1' });
+    // @ts-expect-error statementId is required
+    returnUrl('statement');
+    // @ts-expect-error unknown route
+    returnUrl('billing');
+    // @ts-expect-error a return URL takes no write options
+    returnUrl('security', {}, { replace: true });
   });
 });
