@@ -1,3 +1,5 @@
+'use client';
+
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -48,7 +50,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: pageTitleRef ? null : titleRef,
+    ref: [ref, panelTitleRef],
     enabled: !inProfilePage,
     props: {
       ...mergeStyleProps(themeProps('panel-title'), stylex.props(reset.base, styles.title, xstyle), {
@@ -80,16 +82,4 @@ const Sections = React.forwardRef<HTMLDivElement, PanelSectionsProps>(function P
   return <HeadingLevelProvider>{element}</HeadingLevelProvider>;
 });
 
-/**
- * A page of content. `Panel.Sections` sit one heading level below `Panel.Title`.
- *
- * ```tsx
- * <Panel.Root>
- *   <Panel.Title>Account</Panel.Title>
- *   <Panel.Sections>
- *     <Section.Root>…</Section.Root>
- *   </Panel.Sections>
- * </Panel.Root>
- * ```
- */
-export const Panel = { Root, Title, Sections };
+export { Root as PanelRoot, Title as PanelTitle, Sections as PanelSections };

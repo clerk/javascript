@@ -8,7 +8,7 @@ import { Button, SubmitButton } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
-import { Card } from './card';
+import { Card } from '.';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
