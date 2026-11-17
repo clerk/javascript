@@ -3,8 +3,9 @@ export type Rotation = 0 | 90 | 180 | 270;
 
 /**
  * Where the image sits in the square frame. `x` and `y` move the image centre from the frame
- * centre, as a fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame,
- * and below 1 the whole image fits inside it, down to `minZoom`.
+ * centre, as a fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame.
+ * Below 1 the frame shows empty space along the image's short side, and the whole image fits only
+ * at `minZoom`.
  */
 export interface Crop {
   x: number;

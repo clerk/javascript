@@ -58,11 +58,13 @@ function SaveButton() {
 ### Promise
 
 ```tsx
-manager.promise(saveProfile(), {
-  loading: 'Saving…',
-  success: 'Profile saved',
-  error: error => (error instanceof Error ? error.message : 'Could not save'),
-});
+manager
+  .promise(saveProfile(), {
+    loading: 'Saving…',
+    success: 'Profile saved',
+    error: error => (error instanceof Error ? error.message : 'Could not save'),
+  })
+  .catch(() => {});
 ```
 
 The toast starts as `type: 'loading'` with no timeout, then updates to `type: 'success'` or `type: 'error'` with the provider timeout. The promise is re-thrown on rejection.
