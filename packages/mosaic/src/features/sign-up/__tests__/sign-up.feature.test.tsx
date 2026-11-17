@@ -237,6 +237,7 @@ describe('SignUp', () => {
     await user.click(screen.getByRole('button', { name: 'Start over' }));
 
     expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(emailField()).toHaveValue('');
   });
 
   it('replaces the form with the blocked notice when the request is blocked', async () => {

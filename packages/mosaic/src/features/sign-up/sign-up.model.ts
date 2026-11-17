@@ -196,6 +196,11 @@ export function useSignUpModel({
     unsafeMetadata,
   });
 
+  const usernameBounds = {
+    min_length: userSettings.usernameSettings.min_length,
+    max_length: userSettings.usernameSettings.max_length,
+  };
+
   const legalConsent = legalConsentRequired
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
@@ -243,11 +248,15 @@ export function useSignUpModel({
     applicationName: displayConfig.applicationName,
     applicationLogoUrl: displayConfig.logoImageUrl || undefined,
     create: async values => {
-      await save(() => run(() => signUp.create({ ...details(values), password: values.password })), DETAILS_FIELDS);
+      await save(
+        () => run(() => signUp.create({ ...details(values), password: values.password })),
+        DETAILS_FIELDS,
+        usernameBounds,
+      );
       return next(signUp);
     },
     update: async values => {
-      await save(() => run(() => signUp.update(details(values))), DETAILS_FIELDS);
+      await save(() => run(() => signUp.update(details(values))), DETAILS_FIELDS, usernameBounds);
       return next(signUp);
     },
     sendEmailCode: () => run(() => signUp.verifications.sendEmailCode()),
