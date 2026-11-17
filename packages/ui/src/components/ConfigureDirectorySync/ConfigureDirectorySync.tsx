@@ -36,7 +36,7 @@ const AuthenticatedContent = withCoreUserGuard(() => {
     >
       <DirectorySyncNavbar contentRef={contentRef}>
         <ConfigureSSOProtect>
-          <ConfigureDirectorySyncWizard />
+          <ConfigureDirectorySyncWizard contentRef={contentRef} />
         </ConfigureSSOProtect>
       </DirectorySyncNavbar>
     </ProfileCard.Root>

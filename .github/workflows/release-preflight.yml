@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 100
@@ -31,7 +31,7 @@ jobs:
         run: git fetch origin main:refs/remotes/origin/main --depth=100
 
       - name: Setup
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: true
           turbo-enabled: false
@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload preflight artifacts
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: release-preflight-artifacts
           path: .release-artifacts/

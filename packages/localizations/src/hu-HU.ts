@@ -309,9 +309,45 @@ export const huHU: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1604,10 +1640,23 @@ export const huHU: LocalizationResource = {
         'A passkey használata megerősíti a személyazonosságodat. Az eszközöd kérheti az ujjlenyomatodat, arcodat vagy a képernyőzáradat.',
       title: 'Passkey használata',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Másik módszer használata',
       subtitle: 'Add meg a jelenlegi jelszavadat a folytatáshoz',
       title: 'Ellenőrzés szükséges',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
@@ -1620,6 +1669,22 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be a telefonodra küldött kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Visszaigazoló kód',
@@ -1755,6 +1820,10 @@ export const huHU: LocalizationResource = {
       subtitle:
         'A Passkey-d használata megerősíti, hogy te vagy az. Az eszközöd kérheti az ujjlenyomatod, arcod vagy a képernyőzárad.',
       title: 'Használd a passkeydet',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Másik mód használata',
@@ -2067,6 +2136,7 @@ export const huHU: LocalizationResource = {
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:
       'Bot érvényesítése miatt, a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Az ideiglenes e-mail szolgáltatások nem támogatottak. Kérlek, használd a szokásos e-mail címedet a fiók létrehozásához.',
@@ -2146,9 +2216,12 @@ export const huHU: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Már be vagy jelentkezve.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nem található Web3 tárca bővítmény. Kérlek telepíts egyet a folytatáshoz.',
     web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',

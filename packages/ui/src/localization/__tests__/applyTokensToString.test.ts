@@ -129,6 +129,33 @@ describe('applyTokensToString', function () {
           expect(applyTokensToString(input, tokens as any)).toEqual(expected);
         });
       });
+
+      describe('with quoted params', () => {
+        const linkTokens = { url: 'https://example.com', date: new Date('2021-12-31T22:00:00.000Z') };
+        const cases = [
+          [`{{ url | link("Conditions d'utilisation") }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ url | link("Members'") }}`, `[Members'](https://example.com)`],
+          [`{{ url | link('Say "hi"') }}`, `[Say "hi"](https://example.com)`],
+          [`{{ url | link("Terms, Conditions") }}`, `[Terms, Conditions](https://example.com)`],
+          [`{{ url | link("Terms (EU)") }}`, `[Terms (EU)](https://example.com)`],
+          [`{{ url | link( "Terms, Conditions" ) }}`, `[Terms, Conditions](https://example.com)`],
+          [`{{ url | link( "Conditions d'utilisation" ) }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ date | weekday('en-US','long') }}`, 'Friday'],
+          [`{{ date | weekday ( "en-US" , "short" ) }}`, 'Fri'],
+          [`{{ date | weekday('en-US",) }}`, 'Friday'],
+          [`{{ url | link(Conditions d'utilisation) }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ url | link("Terms) }}`, `[Terms](https://example.com)`],
+          [`{{ date | weekday(en-US, narrow) }}`, 'F'],
+          [`{{ date | weekday('', 'short') }}`, 'Fri'],
+          [`{{ url || link("Terms") }}`, `[Terms](https://example.com)`],
+          [`{{ url | link('Conditions d'utilisation') }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ date | weekday('en-US", 'short') }}`, 'Fri'],
+        ];
+
+        it.each(cases)('.applyTokensToString(%s, tokens) => %s', (input, expected) => {
+          expect(applyTokensToString(input, linkTokens as any)).toEqual(expected);
+        });
+      });
     });
   });
 });

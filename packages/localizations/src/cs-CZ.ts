@@ -306,9 +306,45 @@ export const csCZ: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1599,10 +1635,23 @@ export const csCZ: LocalizationResource = {
         'Použití vašeho přístupového klíče potvrzuje vaši identitu. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použít jinou metodu',
       subtitle: 'Zadejte své aktuální heslo pro pokračování',
       title: 'Vyžadováno ověření',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -1615,6 +1664,22 @@ export const csCZ: LocalizationResource = {
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
       subtitle: 'Zadejte kód odeslaný na váš telefon pro pokračování',
       title: 'Vyžadováno ověření',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Ověřovací kód',
@@ -1750,6 +1815,10 @@ export const csCZ: LocalizationResource = {
       subtitle:
         'Použití vašeho přístupového klíče potvrzuje, že jste to vy. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Použít jinou metodu',
@@ -2055,6 +2124,7 @@ export const csCZ: LocalizationResource = {
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Kód je nesprávný.',
     form_email_address_blocked:
       'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
@@ -2128,9 +2198,12 @@ export const csCZ: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste již přihlášen.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',

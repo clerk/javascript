@@ -1,42 +1,46 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import React from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import type { SelectItem } from './select-context';
 import { useSelectContext } from './select-context';
 
 function resolveLabel(
-  value: string | undefined,
-  items: SelectItem[] | undefined,
-  valueToLabelRef: React.MutableRefObject<Map<string, string>>,
-): string | null {
-  if (value === undefined) {
-    return null;
-  }
-  if (items) {
-    const item = items.find(i => i.value === value);
-    if (item) {
-      return item.label;
-    }
-  }
-  const label = valueToLabelRef.current.get(value);
-  if (label) {
-    return label;
-  }
-  return value;
+  value: unknown,
+  items: SelectItem<unknown>[] | undefined,
+  cachedLabels: ReadonlyMap<unknown, string> | null,
+  valueToLabelRef: React.MutableRefObject<Map<unknown, string>>,
+): string {
+  return (
+    cachedLabels?.get(value) ??
+    items?.find(i => Object.is(i.value, value))?.label ??
+    valueToLabelRef.current.get(value) ??
+    String(value)
+  );
 }
 
-export interface SelectValueProps extends ComponentProps<'span'> {
+export interface SelectValueProps extends Omit<ComponentProps<'span'>, 'children'> {
   placeholder?: ReactNode;
+  /** Replaces the selected labels. A function receives the selected values in the order they were picked. */
+  children?: ReactNode | ((value: unknown[]) => ReactNode);
 }
 
-export function SelectValue(props: SelectValueProps) {
-  const { render, placeholder, ...otherProps } = props;
-  const { selectedValue, selectedLabel, items, valueToLabelRef } = useSelectContext();
+export const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(function SelectValue(props, ref) {
+  const { render, placeholder, children, ...otherProps } = props;
+  const { selectedValues, cachedLabels, items, valueToLabelRef } = useSelectContext();
 
-  const displayText =
-    selectedValue !== undefined ? (selectedLabel ?? resolveLabel(selectedValue, items, valueToLabelRef)) : placeholder;
+  let displayText: ReactNode;
+  if (children != null && typeof children !== 'function') {
+    displayText = children;
+  } else if (selectedValues.length === 0 && placeholder != null) {
+    displayText = placeholder;
+  } else if (typeof children === 'function') {
+    displayText = children(selectedValues);
+  } else {
+    displayText = selectedValues.map(value => resolveLabel(value, items, cachedLabels, valueToLabelRef)).join(', ');
+  }
 
   const defaultProps = {
     children: displayText,
@@ -44,7 +48,8 @@ export function SelectValue(props: SelectValueProps) {
 
   return useRender({
     defaultTagName: 'span',
+    ref,
     render,
     props: mergeProps<'span'>(defaultProps, otherProps),
   });
-}
+});

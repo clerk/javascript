@@ -1,6 +1,6 @@
-import type { Wallet } from '@wallet-standard/core';
+import type { Wallet, WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { act } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -8,30 +8,32 @@ import { render, screen } from '@/test/utils';
 import { withCardStateProvider } from '../contexts';
 import { Web3SolanaWalletButtons } from '../Web3SolanaWalletButtons';
 
-const registry = vi.hoisted(() => ({
-  wallets: [] as Wallet[],
-  listeners: { register: new Set<() => void>(), unregister: new Set<() => void>() },
-}));
+let installedWallets: Wallet[] = [];
+const unregister: Array<() => void> = [];
 
-vi.mock('@wallet-standard/core', () => ({
-  getWallets: () => ({
-    get: () => registry.wallets,
-    on: (event: 'register' | 'unregister', listener: () => void) => {
-      registry.listeners[event].add(listener);
-      return () => registry.listeners[event].delete(listener);
-    },
-  }),
-}));
+function register(api: WindowAppReadyEventAPI) {
+  unregister.push(api.register(...installedWallets));
+}
 
-const makeWallet = (name: string, chains: string[], features: string[]): Wallet =>
-  ({
-    name,
-    icon: 'data:image/svg+xml;base64,',
-    version: '1.0.0',
-    chains,
-    accounts: [],
-    features: Object.fromEntries(features.map(feature => [feature, {}])),
-  }) as unknown as Wallet;
+function onAppReady(event: Event & { detail?: WindowAppReadyEventAPI }) {
+  if (event.detail) {
+    register(event.detail);
+  }
+}
+
+function installWallets(wallets: Wallet[]) {
+  installedWallets = wallets;
+  window.dispatchEvent(new CustomEvent('wallet-standard:register-wallet', { detail: register }));
+}
+
+const makeWallet = (name: string, chains: Wallet['chains'], features: string[]): Wallet => ({
+  name,
+  icon: 'data:image/svg+xml;base64,',
+  version: '1.0.0',
+  chains,
+  accounts: [],
+  features: Object.fromEntries(features.map(feature => [feature, {}])),
+});
 
 const SIGN_IN_FEATURES = ['standard:connect', 'solana:signMessage'];
 
@@ -41,18 +43,22 @@ const Buttons = withCardStateProvider(Web3SolanaWalletButtons);
 
 describe('Web3SolanaWalletButtons', () => {
   beforeEach(() => {
-    registry.wallets = [];
-    registry.listeners.register.clear();
-    registry.listeners.unregister.clear();
+    installedWallets = [];
+    window.addEventListener('wallet-standard:app-ready', onAppReady);
+  });
+
+  afterEach(() => {
+    window.removeEventListener('wallet-standard:app-ready', onAppReady);
+    unregister.splice(0).forEach(off => off());
   });
 
   it('lists only Solana wallets that can connect and sign messages', async () => {
-    registry.wallets = [
+    installWallets([
       makeWallet('Phantom', ['solana:mainnet'], SIGN_IN_FEATURES),
       makeWallet('Solana Viewer', ['solana:mainnet'], ['standard:connect']),
       makeWallet('Solana Signer', ['solana:mainnet'], ['solana:signMessage']),
       makeWallet('MetaMask', ['eip155:1'], SIGN_IN_FEATURES),
-    ];
+    ]);
     const { wrapper } = await createFixtures();
 
     render(<Buttons web3AuthCallback={vi.fn()} />, { wrapper });
@@ -71,15 +77,20 @@ describe('Web3SolanaWalletButtons', () => {
     expect(await screen.findByText(/No Solana Web3 wallets detected/)).toBeInTheDocument();
 
     act(() => {
-      registry.wallets = [makeWallet('Backpack', ['solana:mainnet'], SIGN_IN_FEATURES)];
-      registry.listeners.register.forEach(listener => listener());
+      installWallets([makeWallet('Backpack', ['solana:mainnet'], SIGN_IN_FEATURES)]);
     });
 
     expect(await screen.findByText('Continue with Backpack')).toBeInTheDocument();
+
+    act(() => {
+      installedWallets = [];
+      unregister.splice(0).forEach(off => off());
+    });
+    expect(await screen.findByText(/No Solana Web3 wallets detected/)).toBeInTheDocument();
   });
 
   it('passes the chosen wallet name to the auth callback', async () => {
-    registry.wallets = [makeWallet('Phantom', ['solana:mainnet'], SIGN_IN_FEATURES)];
+    installWallets([makeWallet('Phantom', ['solana:mainnet'], SIGN_IN_FEATURES)]);
     const web3AuthCallback = vi.fn().mockResolvedValue(undefined);
     const { wrapper } = await createFixtures();
 

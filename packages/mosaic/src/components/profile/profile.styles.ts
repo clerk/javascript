@@ -60,7 +60,7 @@ export const styles = stylex.create({
 
   // A fixed height so switching pages never resizes the surface.
   layout: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: {
       [compact]: 0,
       default: radiusVars['--cl-radius-xl'],
@@ -72,7 +72,7 @@ export const styles = stylex.create({
     },
     // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-page'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
@@ -104,7 +104,6 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
-    borderWidth: '0px',
     blockSize: 'auto',
     boxShadow: {
       [compact]: 'none',
@@ -114,9 +113,23 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
+  rootFullscreen: {
+    inlineSize: '100cqi',
+  },
+
+  layoutFullscreen: {
+    borderRadius: 0,
+    borderWidth: '0px',
+    boxShadow: 'none',
+  },
+
+  backItem: {
+    marginBlockEnd: space['4'],
+  },
+
   nav: {
     padding: space['4'],
-    borderInlineEndColor: colorVars['--cl-color-border'],
+    borderInlineEndColor: colorVars['--cl-color-border-subtle'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
     // Hidden in CSS too, so the column never shows on a phone before measuring.
@@ -176,23 +189,39 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
+  navGroup: {
+    gap: NAV_GAP,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBlockStart: { default: null, ':not(:first-child)': space['4'] },
+  },
+
+  navGroupLabel: {
+    paddingBlock: space['1'],
+    paddingInline: space['2.5'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '0px',
     gap: space['2'],
-    paddingBlock: space['2'],
     paddingInline: space['2.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':focus-visible': colorVars['--cl-color-border-subtle'],
-      ':where([data-selected])': colorVars['--cl-color-border-subtle'],
-      ':active': colorVars['--cl-color-border-subtle'],
+      ':focus-visible': colorVars['--cl-color-neutral-alpha-100'],
+      ':where([data-selected])': colorVars['--cl-color-neutral-alpha-200'],
+      ':active': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-subtle'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not(:active):not([data-selected])':
+          colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
@@ -210,6 +239,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
     // Above the neighbors, so the selected item's fill cannot cover the ring.
     zIndex: { default: null, ':focus-visible': 1 },
+    height: space['8'],
     minHeight: {
       default: null,
       '@media (pointer: coarse)': targetVars['--cl-target-coarse'],

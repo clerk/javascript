@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const UserCirclePlus = glyph(
+  'user-circle-plus',
   <g transform='translate(1.5 1)'>
     <path
       d='M6.41666 11.6667H3.93749C3.29316 11.6667 2.75741 11.1388 2.88707 10.5076C3.28337 8.57856 4.68668 7 6.99999 7'

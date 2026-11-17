@@ -1,7 +1,7 @@
 'use client';
 
 import { inertProps } from '@clerk/shared/inert';
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -17,9 +17,12 @@ function focusIsWithin(root: HTMLElement): boolean {
   return active === null || active === root.ownerDocument.body || root.contains(active);
 }
 
-function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
+function firstFocusableInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
   let first: HTMLElement | null = null;
   for (const element of elements) {
+    if (element.closest('[inert]')) {
+      continue;
+    }
     if (!first || first.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING) {
       first = element;
     }
@@ -29,26 +32,19 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
-  const {
-    value,
-    direction,
-    rootRef,
-    registerActiveStep,
-    unregisterActiveStep,
-    registerExitingStep,
-    unregisterExitingStep,
-  } = useFlowContext();
+  const parentStep = useContext(FlowStepContext);
+  const parentActive = parentStep?.active ?? true;
+  const registerWithParent = parentStep?.registerFocusTarget;
+  const unregisterWithParent = parentStep?.unregisterFocusTarget;
+  const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
-  const activeChildrenRef = useRef(children);
-  const hasBeenClosed = useRef(false);
+  const [activeChildren, setActiveChildren] = useState(() => children);
   const focusTargetsRef = useRef(new Set<HTMLElement>());
   const wasOpenRef = useRef(open);
 
-  if (open) {
-    activeChildrenRef.current = children;
-  } else {
-    hasBeenClosed.current = true;
+  if (open && !Object.is(activeChildren, children)) {
+    setActiveChildren(() => children);
   }
 
   const { mounted, transitionProps } = useTransition({ open, ref: stepRef });
@@ -63,56 +59,50 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     return () => unregisterActiveStep(element);
   }, [open, registerActiveStep, unregisterActiveStep]);
 
-  const exiting = mounted && !open;
-
+  // A layout effect, so focus moves in the commit that makes the leaving step inert: field to field,
+  // which iOS does without dropping the keyboard. A passive effect would leave a frame with none.
   useLayoutEffect(() => {
-    const element = stepRef.current;
-    if (!exiting || !element) {
-      return;
-    }
-
-    registerExitingStep(element);
-    return () => unregisterExitingStep(element);
-  }, [exiting, registerExitingStep, unregisterExitingStep]);
-
-  useEffect(() => {
     const entering = open && !wasOpenRef.current;
     wasOpenRef.current = open;
     if (!entering) {
       return;
     }
 
-    const target = firstInDocumentOrder(focusTargetsRef.current);
+    const target = firstFocusableInDocumentOrder(focusTargetsRef.current);
     const root = rootRef.current;
     if (target && root && root.contains(target) && focusIsWithin(root)) {
       target.focus({ preventScroll: true });
     }
   }, [open, rootRef]);
 
-  const registerFocusTarget = useCallback((element: HTMLElement) => {
-    focusTargetsRef.current.add(element);
-  }, []);
-  const unregisterFocusTarget = useCallback((element: HTMLElement) => {
-    focusTargetsRef.current.delete(element);
-  }, []);
+  const registerFocusTarget = useCallback(
+    (element: HTMLElement) => {
+      focusTargetsRef.current.add(element);
+      registerWithParent?.(element);
+    },
+    [registerWithParent],
+  );
+  const unregisterFocusTarget = useCallback(
+    (element: HTMLElement) => {
+      focusTargetsRef.current.delete(element);
+      unregisterWithParent?.(element);
+    },
+    [unregisterWithParent],
+  );
   const stepContext = useMemo<FlowStepContextValue>(
-    () => ({ registerFocusTarget, unregisterFocusTarget }),
-    [registerFocusTarget, unregisterFocusTarget],
+    () => ({ active: open && parentActive, registerFocusTarget, unregisterFocusTarget }),
+    [open, parentActive, registerFocusTarget, unregisterFocusTarget],
   );
 
-  const effectiveTransitionProps = !hasBeenClosed.current
-    ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
-    : transitionProps;
-
   const defaultProps = {
-    ...effectiveTransitionProps,
+    ...transitionProps,
     ...inertProps(!open),
     'aria-hidden': !open ? true : undefined,
     style: {
-      ...effectiveTransitionProps.style,
-      ['--cl-flow-transition-direction' as string]: String(direction),
+      ...transitionProps.style,
+      '--cl-flow-transition-direction': String(direction),
     },
-    children: open ? children : activeChildrenRef.current,
+    children: open ? children : activeChildren,
   };
 
   const element = useRender({

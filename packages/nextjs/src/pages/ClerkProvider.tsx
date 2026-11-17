@@ -18,11 +18,11 @@ import { ClerkScripts } from './ClerkScripts';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJSLoadingErrorPackageName(PACKAGE_NAME);
+ReactClerkProvider.displayName = 'ReactClerkProvider';
 
 export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextClerkProviderProps<TUi>): JSX.Element {
   const { __internal_invokeMiddlewareOnAuthStateChange = true } = props;
   const { push, replace } = useRouter();
-  ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   useSafeLayoutEffect(() => {
     window.__internal_onBeforeSetActive = invalidateNextRouterCache;

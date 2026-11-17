@@ -53,7 +53,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -65,7 +65,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
   test.describe('loading resiliency', () => {
     test('signed in users can get a fresh session token when Client fails to load', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -114,7 +114,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -158,7 +158,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       // Simulate "Needs new dev browser, when dev browser exists but does not match the instance".
       const response = makeDevBrowserUnauthenticatedResponse();
 
-      const u = createTestUtils({ app, page, context, useTestingToken: false });
+      const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
       await page.route('**/v1/client?**', route => {
         return route.fulfill(response);
@@ -200,7 +200,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
     test.describe('Clerk.status', () => {
       test('normal flow shows correct states and transitions', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.page.goToRelative('/clerk-status');
 
         // Initial state checks
@@ -226,7 +226,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       });
 
       test('clerk-js hotloading failed', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
 
         await page.route('**/clerk.browser.js', route => route.abort());
 
@@ -253,7 +253,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       });
 
       test('clerk-js client fails and status degraded', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
 
         await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
 
@@ -282,7 +282,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       });
 
       test('clerk-js environment fails and status degraded', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
 
         await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
 
@@ -313,7 +313,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
   test.describe('429 rate limit resiliency', () => {
     test('setActive surfaces 429 error to the developer instead of silently swallowing', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -348,7 +348,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('429 on /tokens does not cause recursive handleUnauthenticated calls', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -380,7 +380,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
   test.describe('clerk-js script loading', () => {
     test('recovers from transient network failure on clerk-js script load', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       let requestCount = 0;
       await page.route('**/clerk.browser.js', route => {
@@ -411,7 +411,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('recovers from HTTP 500 error on clerk-js script load', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       let requestCount = 0;
       await page.route('**/clerk.browser.js', route => {
@@ -443,7 +443,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('recovers from HTTP 503 service unavailable with retry', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       let requestCount = 0;
       await page.route('**/clerk.browser.js', route => {
@@ -472,7 +472,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('fails with error status after exhausting all retries', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Block all clerk.browser.js requests permanently
       await page.route('**/clerk.browser.js', route => route.abort('failed'));
@@ -493,7 +493,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('handles slow network with eventual success', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       let requestCount = 0;
       await page.route('**/clerk.browser.js', async route => {
@@ -521,7 +521,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
 
   test.describe('token refresh with previous token in body', () => {
     test('token refresh includes previous token in POST body and succeeds', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in
       await u.po.signIn.goTo();
@@ -567,7 +567,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     test('token refresh without skipCache does not send force_origin', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in
       await u.po.signIn.goTo();

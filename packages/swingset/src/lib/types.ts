@@ -39,6 +39,7 @@ export type StoryStatus = 'stable' | 'wip' | 'todo';
 export type WipSubstatus =
   /** View renders against mock/static data; not yet connected to its model/controller. */
   | 'needs wire-up'
+  | 'needs reverification'
   /** Awaiting final visual design or a design review. */
   | 'needs design'
   /** Accessibility pass outstanding. */

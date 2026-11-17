@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { EmptyState } from './empty-state';
 
 const atoms = stylex.create({
@@ -13,7 +14,7 @@ describe('Mosaic EmptyState', () => {
   it('renders each part with its slot class', () => {
     render(
       <EmptyState.Root>
-        <EmptyState.Icon name='magnifying-glass' />
+        <EmptyState.Icon glyph={MagnifyingGlass} />
         <EmptyState.Label>No API keys</EmptyState.Label>
         <EmptyState.Description>Create a key to get started.</EmptyState.Description>
         <EmptyState.Actions>
@@ -31,7 +32,7 @@ describe('Mosaic EmptyState', () => {
   it('frames the icon in a filled icon frame', () => {
     const { container } = render(
       <EmptyState.Root>
-        <EmptyState.Icon name='magnifying-glass' />
+        <EmptyState.Icon glyph={MagnifyingGlass} />
         <EmptyState.Label>No results</EmptyState.Label>
       </EmptyState.Root>,
     );

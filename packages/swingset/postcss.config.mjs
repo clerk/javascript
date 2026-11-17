@@ -1,29 +1,22 @@
 import { createRequire } from 'module';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { resolve } from 'path';
 
 const require = createRequire(import.meta.url);
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = process.cwd();
 
 const mosaicRoot = resolve(__dirname, '../mosaic');
 const isDev = process.env.NODE_ENV !== 'production';
 
-// StyleX CSS. `@stylexjs/postcss-plugin` scans the Mosaic source, runs the StyleX babel
-// transform, and replaces the `@stylex;` directive in `globals.css` with the generated CSS:
-// the token `:root { --cl-* }` defaults *and* the atoms. This runs in BOTH dev and prod
-// because it is the only thing that emits the `:root` token defaults — StyleX's `defineVars`
-// is compile-time-only (its runtime export throws), so `runtimeInjection` alone leaves every
-// `var(--cl-*)` unresolved (unstyled). Its babel `dev`/`rootDir` must match the unplugin in
-// `next.config.mjs` so atom hashes line up.
-//
-// In dev this sheet goes stale on `.styles.ts` edits (Next won't re-run the `globals.css`
-// PostCSS pass for files outside the CSS import graph), but that's fine: the unplugin's
-// `runtimeInjection` (see `next.config.mjs`) injects the *fresh* atom at runtime under a new
-// content hash, which HMR tracks. The stale extracted atom is dead CSS; the `:root` token
-// defaults never change mid-session, so they stay correct.
+// Extract token defaults and atoms from the Mosaic and Swingset sources
+// Keep the Babel options aligned with next.config.mjs so class names match
+// Watch the token module directly so edits rebuild the generated defaults
 const stylexExtraction = {
   '@stylexjs/postcss-plugin': {
-    include: [resolve(__dirname, 'src/**/*.{ts,tsx}'), resolve(mosaicRoot, 'src/**/*.{ts,tsx}')],
+    include: [
+      resolve(__dirname, 'src/**/*.{ts,tsx}'),
+      resolve(mosaicRoot, 'src/**/*.{ts,tsx}'),
+      resolve(mosaicRoot, 'src/tokens.stylex.ts'),
+    ],
     useCSSLayers: true,
     babelConfig: {
       babelrc: false,

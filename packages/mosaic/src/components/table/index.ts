@@ -1,16 +1,21 @@
+'use client';
+
 export { Table } from './table';
 export type {
   TableAlign,
   TableBodyProps,
   TableCellProps,
-  TableEmptyProps,
-  TableHeaderCellProps,
+  TableColumnProps,
+  TableExpandButtonProps,
   TableHeaderProps,
-  TableProps,
+  TableLayout,
+  TableRootProps,
   TableRowProps,
   TableSearchProps,
-  TableSelectAllCellProps,
-  TableSelectCellProps,
+  TableSelectionCellProps,
+  TableSelectionColumnProps,
+  TableSelectionMode,
   TableSort,
+  TableSticky,
   TableToolbarProps,
 } from './table';

@@ -1,8 +1,11 @@
 import { Button } from '@clerk/mosaic/components/button';
+import { CopyButton } from '@clerk/mosaic/components/copy-button';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/mosaic/components/input-group';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { Eye } from '@clerk/mosaic/icons/glyphs/eye';
+import { EyeSlash } from '@clerk/mosaic/icons/glyphs/eye-slash';
 import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
@@ -63,7 +66,7 @@ export function Default(props: Record<string, unknown>) {
             aria-label={visible ? 'Hide password' : 'Show password'}
             onClick={() => setVisible(value => !value)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
@@ -119,6 +122,26 @@ export function Disabled(props: Record<string, unknown>) {
   );
 }
 
+export function ReadOnly(props: Record<string, unknown>) {
+  return (
+    <Field.Root xstyle={styles.fieldWidth}>
+      <Field.Label>Reference</Field.Label>
+      <InputGroup.Root {...knobsAsProps(props)}>
+        <InputGroup.Input
+          value='trc_2x7Hq9LmP4'
+          readOnly
+        />
+        <InputGroup.End>
+          <CopyButton
+            value='trc_2x7Hq9LmP4'
+            label='Copy reference'
+          />
+        </InputGroup.End>
+      </InputGroup.Root>
+    </Field.Root>
+  );
+}
+
 export function Invalid(props: Record<string, unknown>) {
   const [visible, setVisible] = useState(false);
   const groupProps = knobsAsProps(props);
@@ -141,7 +164,7 @@ export function Invalid(props: Record<string, unknown>) {
             aria-label={visible ? 'Hide password' : 'Show password'}
             onClick={() => setVisible(value => !value)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>

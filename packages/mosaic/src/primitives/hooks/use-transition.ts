@@ -8,6 +8,7 @@ import { type TransitionStatus, useTransitionStatus } from './use-transition-sta
 export interface UseTransitionOptions {
   open: boolean;
   ref: RefObject<HTMLElement | null>;
+  animateOnMount?: boolean;
 }
 
 export interface TransitionProps {
@@ -32,14 +33,15 @@ export interface UseTransitionReturn {
  * - `transitionProps`: spread onto the element. Exposes
  *   `data-open` / `data-closed` / `data-starting-style` /
  *   `data-ending-style` data attributes and an inline `transition: none` on
- *   the first mount frame.
+ *   the first frame of an entrance. Initially open content only enters when
+ *   `animateOnMount` is true.
  *
  * Consumers drive all animation via CSS — no durations in JS. Works with CSS
  * transitions (via `[data-starting-style]` / `[data-ending-style]`) and
  * CSS keyframe animations (via `[data-open]` / `[data-closed]`).
  */
-export function useTransition({ open, ref }: UseTransitionOptions): UseTransitionReturn {
-  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+export function useTransition({ open, ref, animateOnMount }: UseTransitionOptions): UseTransitionReturn {
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus({ open, animateOnMount });
   const runOnAnimationsFinished = useAnimationsFinished(ref, open);
 
   useEffect(() => {

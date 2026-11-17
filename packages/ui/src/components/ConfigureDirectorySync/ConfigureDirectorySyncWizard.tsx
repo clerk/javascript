@@ -10,10 +10,12 @@ import { Wizard, type WizardStepConfig } from '../ConfigureSSO/elements/Wizard';
 import { ConfigureDirectorySyncProvider, useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
 import { AttributeMappingStep } from './steps/AttributeMappingStep';
 import { ConfigureStep } from './steps/ConfigureStep';
+import { RoleMappingStep } from './steps/RoleMappingStep';
 import { TestSyncStep } from './steps/TestSyncStep';
 
 export type ConfigureDirectorySyncWizardProps = {
   title?: React.ReactNode;
+  contentRef?: React.RefObject<HTMLDivElement>;
   onExit?: () => void;
 };
 
@@ -23,7 +25,10 @@ export type ConfigureDirectorySyncWizardProps = {
  * organization enterprise connection and its SCIM directory.
  */
 export const ConfigureDirectorySyncWizard = (props: ConfigureDirectorySyncWizardProps): JSX.Element => (
-  <ConfigureDirectorySyncProvider onExit={props.onExit}>
+  <ConfigureDirectorySyncProvider
+    contentRef={props.contentRef}
+    onExit={props.onExit}
+  >
     <WizardInternal {...props} />
   </ConfigureDirectorySyncProvider>
 );
@@ -48,6 +53,11 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
       {
         id: 'test',
         label: localizationKeys('configureDirectorySync.stepper.test'),
+        isReachable: () => hasSsoConnection && hasDirectory,
+      },
+      {
+        id: 'roles',
+        label: localizationKeys('configureDirectorySync.stepper.roles'),
         isReachable: () => hasSsoConnection && hasDirectory,
       },
     ],
@@ -85,6 +95,14 @@ const WizardInternal = ({ title }: ConfigureDirectorySyncWizardProps): JSX.Eleme
         <CardStateProvider>
           <Step>
             <TestSyncStep />
+          </Step>
+        </CardStateProvider>
+      </Wizard.Match>
+
+      <Wizard.Match id='roles'>
+        <CardStateProvider>
+          <Step>
+            <RoleMappingStep />
           </Step>
         </CardStateProvider>
       </Wizard.Match>

@@ -1,15 +1,14 @@
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import type { OrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
 import { useOrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section.view';
 
 export type OrganizationProfileDangerSectionProps = {
-  afterLeaveOrganizationUrl?: string;
   fallback?: React.ReactNode;
 };
 
 export function OrganizationProfileDangerSection(props: OrganizationProfileDangerSectionProps) {
-  const model = useOrganizationProfileDangerSectionModel(props);
+  const model = useOrganizationProfileDangerSectionModel();
 
   if (model.status === 'loading') {
     return props.fallback ?? null;
@@ -32,8 +31,8 @@ function OrganizationDangerZone({
 }: {
   model: Extract<OrganizationProfileDangerSectionModel, { status: 'ready' }>;
 }) {
-  const leave = useDestructiveController({ onDelete: model.leaveOrganization });
-  const destroy = useDestructiveController({ onDelete: async () => model.deleteOrganization?.() });
+  const leave = useConfirmController({ onConfirm: model.leaveOrganization });
+  const destroy = useConfirmController({ onConfirm: async () => model.deleteOrganization?.() });
 
   return (
     <OrganizationProfileDangerSectionView

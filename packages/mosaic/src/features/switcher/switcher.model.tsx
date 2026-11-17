@@ -1,0 +1,408 @@
+import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
+import type {
+  CustomPage,
+  OrganizationResource,
+  OrganizationSwitcherProps,
+  UserButtonProps as ClerkUserButtonProps,
+  UserResource,
+} from '@clerk/shared/types';
+import { populateParamFromObject } from '@clerk/shared/url';
+
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicExperimental } from '../../hooks/use-mosaic-experimental';
+import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useModal } from '../../modals/use-modal';
+import { useGetPortalContainer } from '../../primitives/portal';
+import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
+import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
+import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
+import { userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { ORGANIZATION_PAGE_PREFIX } from '../user-profile/user-profile.layout';
+import { userProfileModal } from '../user-profile/user-profile.modal';
+import type {
+  SwitcherBrandingProps,
+  SwitcherCallbacks,
+  SwitcherData,
+  SwitcherInvitation,
+  SwitcherMembership,
+  SwitcherMode,
+  SwitcherSession,
+  SwitcherSuggestion,
+} from './switcher.types';
+import { useOrganizationListInView } from './use-organization-list-in-view';
+
+// Promise-returning so the controller can drive busy state. Navigation callbacks stay fire-and-forget.
+interface SwitcherAsyncCallbacks {
+  onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
+  onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
+  onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
+  onSignOutAll?: () => void | Promise<unknown>;
+  onAcceptSuggestion?: (suggestionId: string) => void | Promise<unknown>;
+  onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
+}
+
+export type SwitcherModel =
+  | { status: 'loading' }
+  | { status: 'hidden' }
+  | (SwitcherData &
+      Omit<SwitcherCallbacks, keyof SwitcherAsyncCallbacks> &
+      SwitcherAsyncCallbacks &
+      SwitcherBrandingProps & {
+        status: 'ready';
+        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode and hides an organization switcher. */
+        organizationsEnabled: boolean;
+      });
+
+type CreateOrganizationMode =
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl: string;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl?: never;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'modal';
+    };
+
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
+  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+
+export type OrganizationSwitcherModelOptions = CreateOrganizationMode &
+  Pick<
+    OrganizationSwitcherProps,
+    | 'afterSelectOrganizationUrl'
+    | 'afterSelectPersonalUrl'
+    | 'afterCreateOrganizationUrl'
+    | 'skipInvitationScreen'
+    | 'hidePersonal'
+  >;
+
+/** What the profiles this button opens are built from. */
+export interface SwitcherProfileContext {
+  profile: MosaicProfile;
+  /** Custom pages in the form Clerk's modals take, already bridged, since only the wrapper can render the portals behind them. */
+  bridgedCustomPages: {
+    userProfile: CustomPage[] | undefined;
+    organizationProfile: CustomPage[] | undefined;
+  };
+  /** Which switchers the opening menu carries. Only a menu with both has one Settings row for two targets. */
+  menuMode: SwitcherMode;
+}
+
+export function resolveAfterUrl<T extends object>(
+  config: ((entity: T) => string) | string | undefined,
+  entity: T,
+): string | undefined {
+  if (typeof config === 'function') {
+    return config(entity);
+  }
+  if (config) {
+    return populateParamFromObject({ urlWithParam: config, entity });
+  }
+  return undefined;
+}
+
+/** Opens the modal unless a URL routes instead. An explicit mode wins; a URL on its own means navigation. */
+function openOrNavigate({
+  url,
+  mode,
+  openModal,
+  buildUrl,
+  navigate,
+}: {
+  url: string | undefined;
+  mode?: 'navigation' | 'modal';
+  openModal: () => void;
+  buildUrl: () => string;
+  navigate: (to: string) => unknown;
+}): () => void {
+  const opensModal = (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
+  return opensModal ? () => openModal() : () => void navigate(url ?? buildUrl());
+}
+
+function displayName(user: UserResource): string {
+  return getFullName(user) || getIdentifier(user);
+}
+
+function toMembership(organization: OrganizationResource): SwitcherMembership {
+  return {
+    kind: 'membership',
+    organizationId: organization.id,
+    name: organization.name,
+    imageUrl: organization.imageUrl || undefined,
+    membersCount: organization.membersCount,
+    // TODO: set `planLabel` once the organization resource carries its billing plan; the view and
+    // types already render it, so today the badge only appears with Swingset's mock data.
+  };
+}
+
+function toSession(sessionId: string, user: UserResource): SwitcherSession {
+  return {
+    sessionId,
+    userId: user.id,
+    name: displayName(user),
+    identifier: getIdentifier(user),
+    imageUrl: user.imageUrl,
+  };
+}
+
+/**
+ * @param context - The provider's profile and what the wrapper bridged from it. With
+ *   `experimental.newProfiles`, a combined user profile also carries the organization's pages, so
+ *   managing the organization opens it on them.
+ */
+export function useSwitcherModel(
+  options: SwitcherModelOptions,
+  { profile, bridgedCustomPages, menuMode }: SwitcherProfileContext,
+): SwitcherModel {
+  const { isLoaded: isUserLoaded, user } = useUser();
+  const { isLoaded: isSessionLoaded, session } = useSession();
+  // The active org names the trigger. That is not a request to turn Organizations on.
+  const { isLoaded: isOrgLoaded, organization } = useOrganization({
+    __internal_skipAttemptToEnableOrganizations: true,
+  });
+  const clerk = useClerk();
+  const router = useMosaicRouter();
+  const userProfile = useModal(userProfileModal);
+  const organizationProfile = useModal(organizationProfileModal);
+  const { newProfiles } = useMosaicExperimental();
+  const {
+    combined = true,
+    userProfileProps,
+    organizationProfileProps,
+    userProfileUrl,
+    organizationProfileUrl,
+  } = profile;
+  // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
+  const getContainer = useGetPortalContainer();
+  const environment = useMosaicEnvironment();
+  const signInUrl = () => options.signInUrl ?? clerk.buildSignInUrl();
+  // Don't fetch orgsLists until we know orgs are enabled.
+  // This wont delay rendering of the trigger, or even the popup shell, since the "ready" status
+  // does not depend on this.
+  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView({
+    enabled: Boolean(environment?.organizationSettings.enabled),
+  });
+
+  const mosaicUserProfile = userProfileModalOptions(profile);
+
+  const manageAccount = openOrNavigate({
+    url: userProfileUrl,
+    openModal: () =>
+      newProfiles
+        ? userProfile.open(mosaicUserProfile, getContainer?.())
+        : clerk.openUserProfile({
+            getContainer,
+            customPages: bridgedCustomPages.userProfile,
+            additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
+            apiKeysProps: userProfileProps?.apiKeysProps,
+          }),
+    buildUrl: () => clerk.buildUserProfileUrl(),
+    navigate: router.navigate,
+  });
+
+  const manageOrganization = openOrNavigate({
+    url: organizationProfileUrl,
+    openModal: () => {
+      if (!newProfiles) {
+        clerk.openOrganizationProfile({
+          getContainer,
+          customPages: bridgedCustomPages.organizationProfile,
+          afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
+          apiKeysProps: organizationProfileProps?.apiKeysProps,
+        });
+      } else if (combined) {
+        userProfile.open(
+          {
+            ...mosaicUserProfile,
+            page: `${ORGANIZATION_PAGE_PREFIX}${organizationProfileProps?.pageOrder?.[0] ?? 'general'}`,
+          },
+          getContainer?.(),
+        );
+      } else {
+        organizationProfile.open(organizationProfileProps, getContainer?.());
+      }
+    },
+    buildUrl: () => clerk.buildOrganizationProfileUrl(),
+    navigate: router.navigate,
+  });
+
+  const managesBothInOneProfile =
+    newProfiles && menuMode === 'combined' && combined && !userProfileUrl && !organizationProfileUrl;
+
+  const createOrganization = openOrNavigate({
+    url: options.createOrganizationUrl,
+    mode: options.createOrganizationMode,
+    openModal: () =>
+      clerk.openCreateOrganization({
+        getContainer,
+        afterCreateOrganizationUrl: options.afterCreateOrganizationUrl,
+        skipInvitationScreen: options.skipInvitationScreen,
+      }),
+    buildUrl: () => clerk.buildCreateOrganizationUrl(),
+    navigate: router.navigate,
+  });
+
+  // These all affect layout, so wait for every one and avoid a reshuffle.
+  if (!isUserLoaded || !isSessionLoaded || !isOrgLoaded || !environment) {
+    return { status: 'loading' };
+  }
+
+  if (!user || !session) {
+    return { status: 'hidden' };
+  }
+
+  const { displayConfig, authConfig, organizationSettings } = environment;
+  // clerk-js refuses `setActive({ organization: null })` when selection is forced, so there is no way back.
+  const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
+  const { singleSessionMode } = authConfig;
+
+  const canInviteMembers =
+    session.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
+  const membershipData = userMemberships.data ?? [];
+  const suggestionData = userSuggestions.data ?? [];
+  const invitationData = userInvitations.data ?? [];
+
+  const memberships: SwitcherMembership[] = membershipData.map(m => toMembership(m.organization));
+
+  const suggestions: SwitcherSuggestion[] = suggestionData.map(s => ({
+    kind: 'suggestion',
+    id: s.id,
+    organizationId: s.publicOrganizationData.id,
+    name: s.publicOrganizationData.name,
+    imageUrl: s.publicOrganizationData.imageUrl || undefined,
+    status: s.status,
+  }));
+
+  // Accepting is all a row offers, so a revoked or expired invitation has nothing to show.
+  const invitations: SwitcherInvitation[] = invitationData.flatMap(i =>
+    i.status === 'pending' || i.status === 'accepted'
+      ? [
+          {
+            kind: 'invitation',
+            id: i.id,
+            status: i.status,
+            organizationId: i.publicOrganizationData.id,
+            organizationName: i.publicOrganizationData.name,
+            imageUrl: i.publicOrganizationData.imageUrl || undefined,
+          },
+        ]
+      : [],
+  );
+
+  // Organization requests are scoped to the active session, so another account's organizations are unknowable.
+  const additionalSessions: SwitcherSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
+    const sessionUser = s.user;
+    if (!sessionUser || s.id === session.id) {
+      return [];
+    }
+    return [toSession(s.id, sessionUser)];
+  });
+
+  const afterSelectUrl = async (organizationId: string | null): Promise<string | undefined> => {
+    if (!organizationId) {
+      return resolveAfterUrl(options.afterSelectPersonalUrl, user);
+    }
+    if (!options.afterSelectOrganizationUrl) {
+      return undefined;
+    }
+    const selected =
+      membershipData.find(m => m.organization.id === organizationId)?.organization ??
+      (await clerk.getOrganization(organizationId));
+    return resolveAfterUrl(options.afterSelectOrganizationUrl, selected);
+  };
+
+  return {
+    status: 'ready',
+    organizationsEnabled,
+    renderBranding: displayConfig.branded,
+    activeSession: toSession(session.id, user),
+    activeOrganization: organization ? toMembership(organization) : null,
+    // The user resource settles this before the paginated list answers; the count covers a stale resource.
+    hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
+    hidePersonal: forceOrganizationSelection || (options.hidePersonal ?? false),
+    // Only true before the first page lands, which is the one window where empty and pending look alike.
+    organizationsLoading: userMemberships.isLoading || userInvitations.isLoading || userSuggestions.isLoading,
+    memberships,
+    suggestions,
+    invitations,
+    additionalSessions,
+    paging: {
+      ref,
+      hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
+    },
+    onSelectOrganization: async organizationId =>
+      clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) }),
+    // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
+    // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
+    onSwitchSession: sessionId =>
+      clerk.setActive({
+        session: sessionId,
+        navigate: async ({ session, decorateUrl }) => {
+          const task = session.currentTask;
+          if (task) {
+            await router.navigate(buildTaskUrl(task, { base: signInUrl() }));
+            return;
+          }
+          const afterSwitchSessionUrl = options.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
+          if (!afterSwitchSessionUrl) {
+            return;
+          }
+          // `redirectUrl` decorated for us; taking the callback takes the Safari ITP refresh with it.
+          await router.navigate(decorateUrl(afterSwitchSessionUrl));
+        },
+      }),
+    onSignOutSession: sessionId =>
+      clerk.signOut({
+        sessionId,
+        // Other accounts stay signed in, so this is a single sign out rather than a full one.
+        redirectUrl:
+          additionalSessions.length > 0 ? clerk.buildAfterMultiSessionSingleSignOutUrl() : clerk.buildAfterSignOutUrl(),
+      }),
+    // Single-session apps cannot hold a second account, so both actions are meaningless there.
+    onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
+    onManageAccount: manageAccount,
+    onManageOrganization: managesBothInOneProfile ? undefined : manageOrganization,
+    // Invite has no page of its own to route to, so it opens its modal even when management is routed.
+    onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
+    // Covers both restricted instances and users at their creation limit.
+    onCreateOrganization: user.createOrganizationEnabled ? createOrganization : undefined,
+    onAddAccount: singleSessionMode ? undefined : () => void router.navigate(signInUrl()),
+    onAcceptSuggestion: async suggestionId => {
+      const suggestion = suggestionData.find(s => s.id === suggestionId);
+      try {
+        const accepted = await suggestion?.accept();
+        if (accepted) {
+          await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
+        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+        await Promise.allSettled([userSuggestions.revalidate?.()]);
+        throw error;
+      }
+    },
+    onAcceptInvitation: async invitationId => {
+      const invitation = invitationData.find(i => i.id === invitationId);
+      try {
+        const accepted = await invitation?.accept();
+        if (accepted) {
+          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
+        await Promise.allSettled([userInvitations.revalidate?.()]);
+        throw error;
+      } finally {
+        // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
+        await Promise.allSettled([userMemberships.revalidate?.()]);
+      }
+    },
+  };
+}

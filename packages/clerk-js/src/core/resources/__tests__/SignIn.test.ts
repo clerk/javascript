@@ -3,11 +3,15 @@ import { camelToSnake } from '@clerk/shared/underscore';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { Clerk } from '../../clerk';
 import { eventBus } from '../../events';
+import { createFapiClient } from '../../fapiClient';
 import { ProtectCheckGate } from '../../protectCheckGate';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
-import { BaseResource } from '../internal';
+import { BaseResource, Client, Environment } from '../internal';
 import { SignIn } from '../SignIn';
+
+const resourceFetch = BaseResource._fetch;
 
 // Mock the authenticateWithPopup module
 vi.mock('../../../utils/authenticateWithPopup', async () => {
@@ -32,6 +36,9 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
     };
   }),
 }));
+
+const toFormFields = (body: Record<string, unknown>) =>
+  Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
 
 describe('SignIn', () => {
   beforeEach(() => {
@@ -329,6 +336,49 @@ describe('SignIn', () => {
 
       expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
       expect(handleResourceCallback).toHaveBeenCalledWith(signIn, { signInUrl: '/sign-in' });
+    });
+  });
+
+  describe('authenticateWithRedirect with oidcPrompt', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: vi.fn(),
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://accounts.google.example/auth',
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      await new SignIn().authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        oidcPrompt: 'select_account',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
+      expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
+        strategy: 'oauth_google',
+        oidc_prompt: 'select_account',
+      });
     });
   });
 
@@ -763,14 +813,307 @@ describe('SignIn', () => {
     });
   });
 
+  describe('authenticateWithPasskey', () => {
+    const mockPublicKeyCredential = {
+      id: 'credential_123',
+      rawId: new ArrayBuffer(32),
+      response: {
+        authenticatorData: new ArrayBuffer(37),
+        clientDataJSON: new ArrayBuffer(121),
+        signature: new ArrayBuffer(64),
+        userHandle: null,
+      },
+      type: 'public-key',
+    };
+
+    const originalFetch = BaseResource._fetch;
+    const originalClerk = SignIn.clerk;
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+      BaseResource._fetch = originalFetch;
+      SignIn.clerk = originalClerk;
+    });
+
+    it('prepares and attempts the second factor when the sign-in needs a second factor', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_123',
+            status: 'needs_second_factor',
+            supported_second_factors: [{ strategy: 'passkey' }],
+            second_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        status: 'needs_second_factor',
+        supported_second_factors: [{ strategy: 'passkey' }, { strategy: 'totp' }],
+      } as any);
+      await signIn.authenticateWithPasskey();
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/prepare_second_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins/signin_123/attempt_second_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it.each(['autofill', 'discoverable'] as const)(
+      'creates a new sign-in for the %s flow even when the sign-in needs a passkey second factor',
+      async flow => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+        const mockIsWebAuthnAutofillSupported = vi.fn().mockResolvedValue(true);
+        const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+          publicKeyCredential: mockPublicKeyCredential,
+          error: null,
+        });
+
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+          __internal_isWebAuthnAutofillSupported: mockIsWebAuthnAutofillSupported,
+          __internal_getPublicCredentials: mockWebAuthnGetCredential,
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_456',
+              status: 'needs_first_factor',
+              first_factor_verification: {
+                nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_456', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          supported_second_factors: [{ strategy: 'passkey' }],
+        } as any);
+        await signIn.authenticateWithPasskey({ flow });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins',
+            body: expect.objectContaining({ strategy: 'passkey' }),
+          }),
+        );
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({
+            path: '/client/sign_ins/signin_456/attempt_first_factor',
+          }),
+        );
+        expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+          expect.objectContaining({ conditionalUI: flow === 'autofill' }),
+        );
+      },
+    );
+
+    it('falls through to the first-factor flow when the sign-in needs a second factor but does not offer passkey', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_456',
+            status: 'needs_first_factor',
+            first_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_456', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      // A stale in-progress sign-in parked at needs_second_factor: e.g. the
+      // backend didn't advertise passkey (instance toggle off, no registered
+      // passkey, or an older-client version gate) while the start page still
+      // offers browser-side passkey discovery.
+      const signIn = new SignIn({
+        id: 'signin_123',
+        status: 'needs_second_factor',
+        supported_second_factors: [{ strategy: 'totp' }],
+      } as any);
+      await signIn.authenticateWithPasskey({ flow: 'discoverable' });
+
+      // The in-progress sign-in is discarded: a fresh sign-in is created and
+      // the passkey verifies its first factor, as on clients that predate
+      // passkey second factors.
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sign_ins/signin_456/attempt_first_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('forwards preferImmediatelyAvailableCredentials to the credential request in the discoverable flow', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_456',
+            status: 'needs_first_factor',
+            first_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_456', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithPasskey({ flow: 'discoverable', preferImmediatelyAvailableCredentials: true });
+
+      expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+        expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+      );
+    });
+
+    it('forwards preferImmediatelyAvailableCredentials to the credential request for a passkey second factor', async () => {
+      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: mockPublicKeyCredential,
+        error: null,
+      });
+
+      SignIn.clerk = {
+        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        __internal_getPublicCredentials: mockWebAuthnGetCredential,
+      } as any;
+
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_123',
+            status: 'needs_second_factor',
+            supported_second_factors: [{ strategy: 'passkey' }],
+            second_factor_verification: {
+              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          client: null,
+          response: { id: 'signin_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        status: 'needs_second_factor',
+        supported_second_factors: [{ strategy: 'passkey' }, { strategy: 'totp' }],
+      } as any);
+      await signIn.authenticateWithPasskey({ preferImmediatelyAvailableCredentials: true });
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          path: '/client/sign_ins/signin_123/prepare_second_factor',
+        }),
+      );
+      expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+        expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+      );
+    });
+  });
+
   describe('trusted_device strategy', () => {
     afterEach(() => {
       vi.clearAllMocks();
       vi.unstubAllGlobals();
     });
-
-    const toFormFields = (body: Record<string, unknown>) =>
-      Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
 
     it('creates a sign-in with a trusted device id', async () => {
       vi.stubGlobal('navigator', { language: '' });
@@ -2337,6 +2680,58 @@ describe('SignIn', () => {
         expect(mockWebAuthnGetCredential).toHaveBeenCalled();
       });
 
+      it('forwards preferImmediatelyAvailableCredentials to the credential request', async () => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+        const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+          publicKeyCredential: {
+            id: 'credential_123',
+            rawId: new ArrayBuffer(32),
+            response: {
+              authenticatorData: new ArrayBuffer(37),
+              clientDataJSON: new ArrayBuffer(121),
+              signature: new ArrayBuffer(64),
+              userHandle: null,
+            },
+            type: 'public-key',
+          },
+          error: null,
+        });
+
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+          __internal_getPublicCredentials: mockWebAuthnGetCredential,
+          __internal_environment: {
+            displayConfig: {
+              captchaOauthBypass: [],
+            },
+          },
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              first_factor_verification: {
+                nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn();
+        await signIn.__internal_future.passkey({ flow: 'discoverable', preferImmediatelyAvailableCredentials: true });
+
+        expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+          expect.objectContaining({ preferImmediatelyAvailableCredentials: true }),
+        );
+      });
+
       it('throws error when WebAuthn is not supported', async () => {
         const mockIsWebAuthnSupported = vi.fn().mockReturnValue(false);
 
@@ -2459,6 +2854,106 @@ describe('SignIn', () => {
             }),
           }),
         );
+      });
+    });
+
+    describe('mfa.passkey', () => {
+      const originalFetch = BaseResource._fetch;
+      const originalClerk = SignIn.clerk;
+
+      afterEach(() => {
+        vi.clearAllMocks();
+        vi.unstubAllGlobals();
+        BaseResource._fetch = originalFetch;
+        SignIn.clerk = originalClerk;
+      });
+
+      it('prepares and attempts the passkey second factor', async () => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+        const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+          publicKeyCredential: {
+            id: 'credential_123',
+            rawId: new ArrayBuffer(32),
+            response: {
+              authenticatorData: new ArrayBuffer(37),
+              clientDataJSON: new ArrayBuffer(121),
+              signature: new ArrayBuffer(64),
+              userHandle: null,
+            },
+            type: 'public-key',
+          },
+          error: null,
+        });
+
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+          __internal_getPublicCredentials: mockWebAuthnGetCredential,
+        } as any;
+
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_123',
+              status: 'needs_second_factor',
+              supported_second_factors: [{ strategy: 'passkey' }],
+              second_factor_verification: {
+                nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_123', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          supported_second_factors: [{ strategy: 'passkey' }],
+        } as any);
+        await signIn.__internal_future.mfa.passkey();
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins/signin_123/prepare_second_factor',
+            body: { strategy: 'passkey' },
+          }),
+        );
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins/signin_123/attempt_second_factor',
+            body: expect.objectContaining({
+              strategy: 'passkey',
+              publicKeyCredential: expect.any(String),
+            }),
+          }),
+        );
+      });
+
+      it('returns error when passkey second factor is not available', async () => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+        } as any;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          supported_second_factors: [{ strategy: 'totp' }],
+        } as any);
+
+        const result = await signIn.__internal_future.mfa.passkey();
+
+        expect(result.error).toBeTruthy();
+        expect(result.error?.code).toBe('factor_not_found');
       });
     });
 
@@ -2806,6 +3301,41 @@ describe('SignIn', () => {
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+      });
+
+      it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_windowNavigate: vi.fn(),
+          __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+        } as any;
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signin_123',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://accounts.google.example/auth',
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const { error } = await new SignIn().__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/dashboard',
+          redirectCallbackUrl: '/sso-callback',
+          oidcPrompt: 'select_account',
+        });
+
+        expect(error).toBeNull();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
+        expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
+          strategy: 'oauth_google',
+          oidc_prompt: 'select_account',
+        });
       });
 
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {
@@ -3944,5 +4474,460 @@ describe('SignIn protect_check gate', () => {
         vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
       );
     });
+  });
+});
+
+describe('SignIn Slack workspace hint requests', () => {
+  const fetchMock = vi.fn();
+  const response = {
+    ...new SignIn().__internal_toSnapshot(),
+    id: 'signin_slack',
+    status: 'needs_first_factor' as const,
+    first_factor_verification: {
+      ...new SignIn().__internal_toSnapshot().first_factor_verification,
+      status: 'unverified' as const,
+      external_verification_redirect_url: 'https://slack.com/openid/connect/authorize',
+    },
+  };
+  const jsonResponse = (payload: unknown, status = 200) => ({
+    ok: status === 200,
+    status,
+    headers: new Headers(),
+    json: () => Promise.resolve(payload),
+  });
+  const workspaceResponse = (team: string) => ({
+    ...response,
+    first_factor_verification: {
+      ...response.first_factor_verification,
+      status: 'unverified' as const,
+      external_verification_redirect_url: `https://slack.com/openid/connect/authorize?team=${team}`,
+    },
+  });
+  const challengedResponse = {
+    ...workspaceResponse('TOLD'),
+    status: 'needs_protect_check',
+    protect_check: { status: 'pending', token: 'challenge', sdk_url: 'https://protect.example/sdk.js' },
+  };
+  let previousFetch: typeof BaseResource._fetch;
+  let previousBaseClerk: typeof BaseResource.clerk;
+  let previousClerk: typeof SignIn.clerk;
+  const fields = (index = 0) => new URLSearchParams(fetchMock.mock.calls[index][1].body);
+
+  beforeEach(() => {
+    previousFetch = BaseResource._fetch;
+    previousBaseClerk = BaseResource.clerk;
+    previousClerk = SignIn.clerk;
+    BaseResource._fetch = resourceFetch;
+    fetchMock.mockReset().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ client: null, response }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const fapiClient = createFapiClient({
+      frontendApi: 'clerk.example.com',
+      instanceType: 'production',
+      getSessionId: () => undefined,
+    });
+    const clerk = new Clerk('pk_live_Y2xlcmsuZXhhbXBsZS5jb20k');
+    clerk.getFapiClient = () => fapiClient;
+    clerk.__internal_setCountry = vi.fn();
+    clerk.buildUrlWithAuth = url => url;
+    clerk.__internal_windowNavigate = vi.fn();
+    clerk.client = Client.getOrCreateInstance();
+    const environment = new Environment();
+    vi.spyOn(clerk, '__internal_environment', 'get').mockReturnValue(environment);
+    BaseResource.clerk = SignIn.clerk = clerk;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    BaseResource._fetch = previousFetch;
+    BaseResource.clerk = previousBaseClerk;
+    SignIn.clerk = previousClerk;
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it.each(['T123ABC', '', undefined])('serializes a low-level create hint of %s', async slackTeamIdHint => {
+    await new SignIn().create({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/callback',
+      slackTeamIdHint,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id_hint')).toBe(slackTeamIdHint ?? null);
+    expect(fields().has('slackTeamIdHint')).toBe(false);
+  });
+
+  it('serializes a unified low-level create hint', async () => {
+    const { error } = await new SignIn().__internal_future.create({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
+  });
+
+  it.each(['redirect', 'popup'] as const)('forwards a hint through legacy %s authentication', async mode => {
+    const signIn = new SignIn();
+    const params = {
+      strategy: 'oauth_slack' as const,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamIdHint: 'T123ABC',
+    };
+    if (mode === 'popup') {
+      await signIn.authenticateWithPopup({ ...params, popup: { location: { href: '' } } as Window });
+    } else {
+      await signIn.authenticateWithRedirect(params);
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
+  });
+
+  it.each(['redirect', 'popup'] as const)('refreshes the workspace on legacy %s continuation', async mode => {
+    const signIn = new SignIn();
+    const popup = { location: { href: '' } } as Window;
+    const params = {
+      strategy: 'oauth_slack' as const,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+    };
+    const authenticate = (slackTeamIdHint: string, continueSignIn = false) =>
+      mode === 'popup'
+        ? signIn.authenticateWithPopup({ ...params, slackTeamIdHint, continueSignIn, popup })
+        : signIn.authenticateWithRedirect({ ...params, slackTeamIdHint, continueSignIn });
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T123ABC') }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    await authenticate('T123ABC');
+    await authenticate('T456DEF', true);
+
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect([fields(0).get('slack_team_id_hint'), fields(1).get('slack_team_id_hint')]).toEqual(['T123ABC', 'T456DEF']);
+    if (mode === 'popup') {
+      expect(popup.location.href).toBe('https://slack.com/openid/connect/authorize?team=T456DEF');
+    } else {
+      expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenLastCalledWith(
+        new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+      );
+    }
+  });
+
+  it.each([
+    { strategy: 'oauth_slack' as const, slackTeamIdHint: '' },
+    { strategy: 'oauth_google' as const, slackTeamIdHint: 'T123ABC' },
+  ])('forwards a rejected legacy continuation hint for $strategy with "$slackTeamIdHint"', async params => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ errors: [{ code: 'form_param_value_invalid' }] }, 422));
+    const signIn = new SignIn(workspaceResponse('TOLD'));
+
+    await expect(
+      signIn.authenticateWithRedirect({
+        ...params,
+        continueSignIn: true,
+        redirectUrl: 'https://example.com/callback',
+        redirectUrlComplete: 'https://example.com/dashboard',
+      }),
+    ).rejects.toMatchObject({ errors: [{ code: 'form_param_value_invalid' }] });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('strategy')).toBe(params.strategy);
+    expect(fields().get('slack_team_id_hint')).toBe(params.slackTeamIdHint);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('reuses the legacy redirect without a request when continuation omits the hint', async () => {
+    const signIn = new SignIn(workspaceResponse('T123ABC'));
+    await signIn.authenticateWithRedirect({
+      strategy: 'oauth_slack',
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T123ABC'),
+    );
+  });
+
+  it('continues the same legacy attempt after Protect without following its stale redirect', async () => {
+    const signIn = new SignIn(workspaceResponse('TOLD'));
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: challengedResponse }))
+      .mockResolvedValueOnce(jsonResponse({ response: { id: 'signin_slack', status: 'needs_first_factor' } }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    const params = {
+      strategy: 'oauth_slack' as const,
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamIdHint: 'T456DEF',
+    };
+
+    await expect(signIn.authenticateWithRedirect(params)).rejects.toMatchObject({ code: 'protect_check_required' });
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+    await signIn.submitProtectCheck({ proofToken: 'proof' });
+    await signIn.authenticateWithRedirect(params);
+
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      '/v1/client/sign_ins/signin_slack/protect_check',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect(fields(0).get('slack_team_id_hint')).toBe('T456DEF');
+    expect(fields(2).get('slack_team_id_hint')).toBe('T456DEF');
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledExactlyOnceWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+    );
+  });
+
+  it.each(['redirect', 'popup'] as const)('prepares a workspace on an existing unified %s attempt', async mode => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const popup = mode === 'popup' ? ({ location: { href: '' } } as Window) : undefined;
+    vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+      params.popup.location.href = params.externalVerificationRedirectURL.toString();
+      return Promise.resolve();
+    });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T456DEF',
+      popup,
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('slack_team_id_hint')).toBe('T456DEF');
+    if (popup) {
+      expect(popup.location.href).toBe('https://slack.com/openid/connect/authorize?team=T456DEF');
+    } else {
+      expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledWith(
+        new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+      );
+    }
+  });
+
+  it.each([
+    { strategy: 'oauth_slack' as const, slackTeamIdHint: '' },
+    { strategy: 'oauth_google' as const, slackTeamIdHint: 'T123ABC' },
+  ])('forwards a rejected existing unified hint for $strategy with "$slackTeamIdHint"', async params => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ errors: [{ code: 'form_param_value_invalid' }] }, 422));
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const { error } = await signIn.__internal_future.sso({
+      ...params,
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+    });
+
+    expect(error).toMatchObject({ errors: [{ code: 'form_param_value_invalid' }] });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('strategy')).toBe(params.strategy);
+    expect(fields().get('slack_team_id_hint')).toBe(params.slackTeamIdHint);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('keeps existing unified reuse without a request when the hint is omitted', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('retries unified workspace preparation on the same attempt after Protect', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: challengedResponse }))
+      .mockResolvedValueOnce(jsonResponse({ response: { id: 'signin_slack', status: 'needs_first_factor' } }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async () => {
+      expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+      if (signIn.protectCheck) {
+        await signIn.submitProtectCheck({ proofToken: 'proof' });
+      }
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T456DEF',
+      oidcPrompt: 'consent',
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      '/v1/client/sign_ins/signin_slack/protect_check',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect(fields(0).get('slack_team_id_hint')).toBe('T456DEF');
+    expect(fields(2)).toEqual(fields(0));
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledExactlyOnceWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+    );
+  });
+
+  it('does not follow a stale unified redirect when Protect resolution fails', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ response: challengedResponse }));
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockRejectedValueOnce(new Error('challenge failed'));
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T456DEF',
+    });
+
+    expect(error).toMatchObject({ message: 'challenge failed' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('forwards incompatible legacy enterprise hints to first-factor preparation', async () => {
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    await signIn.authenticateWithRedirect({
+      strategy: 'enterprise_sso',
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamIdHint: 'T123ABC',
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_existing/prepare_first_factor');
+    expect(fields().get('strategy')).toBe('enterprise_sso');
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
+  });
+
+  it('preserves unsupported legacy social first-factor preparation', () => {
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    expect(() =>
+      signIn.prepareFirstFactor({
+        strategy: 'oauth_slack',
+        redirectUrl: 'https://example.com/callback',
+        actionCompleteRedirectUrl: 'https://example.com/dashboard',
+      }),
+    ).toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('creates fresh unified attempts for changed workspaces and then omits an absent hint', async () => {
+    const signIn = new SignIn();
+    for (const slackTeamIdHint of ['T123ABC', 'T456DEF', undefined]) {
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_slack',
+        redirectUrl: 'https://example.com/dashboard',
+        redirectCallbackUrl: 'https://example.com/callback',
+        slackTeamIdHint,
+      });
+      expect(error).toBeNull();
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual(Array(3).fill('/v1/client/sign_ins'));
+    expect([0, 1, 2].map(index => fields(index).get('slack_team_id_hint'))).toEqual(['T123ABC', 'T456DEF', null]);
+  });
+
+  it('forwards a unified popup hint to the create request', async () => {
+    const popup = { location: { href: '' } } as Window;
+    vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+    const { error } = await new SignIn().__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T123ABC',
+      popup,
+    });
+    expect(error).toBeNull();
+    expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
+    expect(_futureAuthenticateWithPopup).toHaveBeenCalledWith(SignIn.clerk, expect.objectContaining({ popup }));
+  });
+
+  it.each(['oauth_google', 'enterprise_sso'] as const)('forwards incompatible unified %s hints', async strategy => {
+    const { error } = await new SignIn().__internal_future.sso({
+      strategy,
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(strategy === 'enterprise_sso' ? 2 : 1);
+    for (let index = 0; index < fetchMock.mock.calls.length; index++) {
+      expect(fields(index).get('strategy')).toBe(strategy);
+      expect(fields(index).get('slack_team_id_hint')).toBe('T123ABC');
+    }
+  });
+
+  it('preserves the hint when unified enterprise preparation retries after a challenge', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () =>
+        Promise.resolve({
+          response: {
+            id: 'signin_existing',
+            status: 'needs_protect_check',
+            protect_check: { status: 'pending', token: 'challenge', sdk_url: 'https://protect.example/sdk.js' },
+          },
+        }),
+    });
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(() => {
+      signIn.protectCheck = null;
+      return Promise.resolve();
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'enterprise_sso',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamIdHint: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fields(0).get('slack_team_id_hint')).toBe('T123ABC');
+    expect(fields(1).get('slack_team_id_hint')).toBe('T123ABC');
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual(
+      Array(2).fill('/v1/client/sign_ins/signin_existing/prepare_first_factor'),
+    );
   });
 });

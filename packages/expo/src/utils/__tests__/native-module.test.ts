@@ -10,9 +10,10 @@ const makeNativeModule = ({ includeEventMethods = true } = {}) => ({
         addListener: vi.fn(),
       }
     : {}),
-  configure: vi.fn(),
-  getClientToken: vi.fn(),
-  syncClientStateFromJs: vi.fn(),
+  configureNative: vi.fn(),
+  getDeviceToken: vi.fn(),
+  setDeviceToken: vi.fn(),
+  refreshClient: vi.fn(),
 });
 
 vi.mock('react-native', () => ({
@@ -54,7 +55,7 @@ describe('native module loader', () => {
 
   test('returns null when no native module satisfies the bootstrap contract', async () => {
     mocks.nativeModule = {
-      configure: vi.fn(),
+      configureNative: vi.fn(),
     };
 
     const { ClerkExpoModule } = await importNativeModule();

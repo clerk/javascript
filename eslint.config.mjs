@@ -10,7 +10,6 @@ import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
 import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
-import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
@@ -324,6 +323,7 @@ export default tseslint.config([
       '**/build/*',
       '**/coverage/*',
       '**/dist/*',
+      '**/integration/expo-native/**/*',
       '**/integration/templates/**/*',
       '**/node_modules/**',
       '*.snap',
@@ -334,6 +334,8 @@ export default tseslint.config([
       'eslint.config.mjs',
       'typedoc.config.mjs',
       'vitest.workspace.mjs',
+      'packages/mosaic/**',
+      'packages/swingset/**',
       // package specific ignores
       'packages/astro/src/astro-components/**/*.ts',
       'packages/backend/src/runtime/**/*',
@@ -579,6 +581,13 @@ export default tseslint.config([
       'react-hooks/rules-of-hooks': 'warn',
     },
   },
+  {
+    name: 'repo/react-hooks/test',
+    files: TEST_FILES,
+    rules: {
+      'react-hooks/globals': 'off',
+    },
+  },
   ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
   {
     name: 'packages/clerk-js',
@@ -597,97 +606,6 @@ export default tseslint.config([
       'custom-rules/no-physical-css-properties': 'error',
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
-    },
-  },
-  {
-    name: 'packages/mosaic',
-    files: ['packages/mosaic/src/**/*'],
-    // Tests assert on style values they receive; they are not authoring styles.
-    ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
-    plugins: {
-      '@stylexjs': pluginStylex,
-    },
-    rules: {
-      '@stylexjs/enforce-extension': 'error',
-      '@stylexjs/no-legacy-contextual-styles': 'error',
-      '@stylexjs/no-lookahead-selectors': 'error',
-      '@stylexjs/no-nonstandard-styles': 'error',
-      '@stylexjs/no-conflicting-props': 'error',
-      '@stylexjs/no-unused': 'error',
-      '@stylexjs/sort-keys': 'error',
-      '@stylexjs/valid-shorthands': 'error',
-      '@stylexjs/valid-styles': 'error',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "Property > Literal.key[value='&:hover']",
-          message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
-        },
-        {
-          selector: "Property > Literal.key[value='@media (hover: hover)']",
-          message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
-        },
-        {
-          selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
-          message:
-            "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
-        },
-        // A Mosaic part takes `xstyle`, not `className`/`style`; its prop types already reject the pair,
-        // this names the replacement. Native elements (lowercase) are unaffected.
-        {
-          selector:
-            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
-          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
-        },
-        {
-          selector:
-            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
-          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
-        },
-        // `{...stylex.props(x)}` is the same pair by another route; the types miss it because a
-        // spread's optional keys skip excess-property checks.
-        {
-          selector:
-            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
-          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
-        },
-        {
-          selector:
-            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
-          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
-        },
-      ],
-    },
-  },
-  {
-    name: 'packages/mosaic/jsx-a11y',
-    files: ['packages/mosaic/src/**/*'],
-    rules: {
-      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
-      // the outer component. Both rules only see the empty inner element and always report.
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
-    },
-  },
-  {
-    // StyleX `create()` files author conditions raw (`@media (hover: hover)`, `:hover`) — StyleX
-    // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
-    // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
-    // `@stylexjs/*` rules from the mosaic block still cover these files.
-    name: 'packages/mosaic - stylex styles',
-    files: ['packages/mosaic/src/**/*.styles.ts'],
-    rules: {
-      'no-restricted-syntax': 'off',
-    },
-  },
-  {
-    // Primitives are unstyled and take `className`/`style` like any other headless component; the
-    // `xstyle`-only rule targets styled Mosaic parts and otherwise false-positives on things like
-    // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
-    name: 'packages/mosaic - primitives',
-    files: ['packages/mosaic/src/primitives/**/*'],
-    rules: {
-      'no-restricted-syntax': 'off',
     },
   },
   {
@@ -762,18 +680,6 @@ export default tseslint.config([
         'error',
         {
           allowList: ['_NEXT_ROUTER_BASEPATH'],
-        },
-      ],
-    },
-  },
-  {
-    name: 'packages/swingset',
-    files: ['packages/swingset/src/**/*'],
-    rules: {
-      'turbo/no-undeclared-env-vars': [
-        'error',
-        {
-          allowList: ['SWINGSET_DASHBOARD_URL'],
         },
       ],
     },

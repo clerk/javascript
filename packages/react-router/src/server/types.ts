@@ -1,4 +1,4 @@
-import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
+import type { VerifyTokenOptions } from '@clerk/backend';
 import type {
   OrganizationSyncOptions,
   RequestState,
@@ -48,20 +48,10 @@ export type ClerkMiddlewareOptions = {
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl;
 
-export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadUser?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadSession?: boolean;
-  /**
-   * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
-   */
-  loadOrganization?: boolean;
-};
+/**
+ * @deprecated Use `ClerkMiddlewareOptions` instead. `rootAuthLoader()` no longer accepts options.
+ */
+export type RootAuthLoaderOptions = ClerkMiddlewareOptions;
 
 export interface KeylessUrls {
   __keylessClaimUrl?: string;
@@ -84,7 +74,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignUpFallbackRedirectUrl &
   KeylessUrls;
 
-export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
+export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions = any> = (
   args: LoaderFunctionArgsWithAuth<Options>,
 ) => RootAuthLoaderCallbackReturn;
 
@@ -109,8 +99,6 @@ export type LoaderFunctionArgsWithAuth<Options extends RootAuthLoaderOptions = a
   request: RequestWithAuth<Options>;
 };
 
-export type RequestWithAuth<Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
+export type RequestWithAuth<_Options extends RootAuthLoaderOptions = any> = LoaderFunctionArgs['request'] & {
   auth: Omit<SignedInAuthObject | SignedOutAuthObject, 'session' | 'user' | 'organization'>;
-} & (Options extends { loadSession: true } ? { session: Session | null } : object) &
-  (Options extends { loadUser: true } ? { user: User | null } : object) &
-  (Options extends { loadOrganization: true } ? { organization: Organization | null } : object);
+};

@@ -1,8 +1,8 @@
 'use client';
 
-import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode } from 'react';
 
+import { Portal } from '../portal';
 import { useDialogContext } from './dialog-context';
 
 export interface DialogPortalProps {
@@ -17,5 +17,5 @@ export function DialogPortal(props: DialogPortalProps) {
     return null;
   }
 
-  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
+  return <Portal root={props.root}>{props.children}</Portal>;
 }

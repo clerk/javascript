@@ -3,11 +3,31 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
-import { startWorker, takeUnhandledRequests, takeUnsettledHolds, worker } from './src/__tests__/feature/fake-fapi';
+import {
+  startWorker,
+  takeUnhandledRequests,
+  takeUnsettledHolds,
+  switchFapiHost,
+  worker,
+} from './src/__tests__/feature/fake-fapi';
 
 expect.extend(matchers);
 
 configure({ asyncUtilTimeout: 3000 });
+
+const disableMotion = document.createElement('style');
+disableMotion.textContent = `
+  *, *::before, *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  [data-starting-style] {
+    opacity: 1 !important;
+  }
+`;
+document.head.append(disableMotion);
 
 const NativeBroadcastChannel = window.BroadcastChannel;
 const channelNamespace = crypto.randomUUID();
@@ -40,8 +60,17 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  switchFapiHost();
   window.focus();
 });
+
+function clearCookies() {
+  for (const cookie of document.cookie.split('; ').filter(Boolean)) {
+    document.cookie = `${cookie.split('=')[0]}=; max-age=0; path=/`;
+  }
+}
+
+window.addEventListener('pagehide', clearCookies);
 
 afterEach(() => {
   cleanup();
@@ -49,9 +78,7 @@ afterEach(() => {
   for (const channel of [...openChannels]) {
     channel.close();
   }
-  for (const cookie of document.cookie.split('; ').filter(Boolean)) {
-    document.cookie = `${cookie.split('=')[0]}=; max-age=0; path=/`;
-  }
+  clearCookies();
   localStorage.clear();
   sessionStorage.clear();
   worker.resetHandlers();

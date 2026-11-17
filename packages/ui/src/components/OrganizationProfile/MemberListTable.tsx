@@ -147,9 +147,10 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr> & { isDisabled?:
 };
 
 export const RoleSelect = (props: {
-  roles: { label: string; value: string }[] | undefined;
+  roles: { label: string; value: string; description?: string }[] | undefined;
   value: string;
   fallbackLabel?: string;
+  showDescriptions?: boolean;
   onChange: (params: string) => unknown;
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
@@ -166,6 +167,7 @@ export const RoleSelect = (props: {
     triggerSx,
     optionListSx,
     prefixLocalizationKey,
+    showDescriptions,
     formatLabel = label => label,
   } = props;
 
@@ -181,8 +183,9 @@ export const RoleSelect = (props: {
       fetchedRoles.map(role => ({
         value: role.value,
         label: formatLabel(localizeCustomRole(role.value) || role.label, role),
+        description: showDescriptions ? role.description : undefined,
       })),
-    [fetchedRoles, localizeCustomRole, formatLabel],
+    [fetchedRoles, localizeCustomRole, formatLabel, showDescriptions],
   );
 
   return (
@@ -254,6 +257,7 @@ type RolesListItemProps = PropsOfComponent<typeof Flex> & {
   option?: {
     label: string;
     value: string;
+    description?: string;
   };
 };
 
@@ -277,7 +281,17 @@ const RolesListItem = memo((props: RolesListItemProps) => {
       ]}
       {...rest}
     >
-      <Text variant='subtitle'>{option?.label}</Text>
+      <Col>
+        <Text variant='subtitle'>{option?.label}</Text>
+        {option?.description && (
+          <Text
+            colorScheme='secondary'
+            sx={t => ({ fontSize: t.fontSizes.$sm })}
+          >
+            {option.description}
+          </Text>
+        )}
+      </Col>
     </Flex>
   );
 });

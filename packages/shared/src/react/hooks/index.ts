@@ -60,6 +60,12 @@ export type {
   UseOrganizationDirectorySyncUsersReturn,
 } from './useOrganizationDirectorySyncUsers';
 export { __internal_useOrganizationDirectorySyncStatus } from './useOrganizationDirectorySyncStatus';
+export { __internal_useOrganizationDirectorySyncGroupRoleMappings } from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  DirectorySyncGroupRoleMappingsData,
+  UseOrganizationDirectorySyncGroupRoleMappingsParams,
+  UseOrganizationDirectorySyncGroupRoleMappingsReturn,
+} from './useOrganizationDirectorySyncGroupRoleMappings';
 export type {
   UseOrganizationDirectorySyncStatusParams,
   UseOrganizationDirectorySyncStatusReturn,
@@ -75,6 +81,10 @@ export type {
   UseOrganizationSSOBypassAllowlistParams,
   UseOrganizationSSOBypassAllowlistReturn,
 } from './useOrganizationSSOBypassAllowlist';
+
+export { createCacheKeys as __internal_createCacheKeys } from './createCacheKeys';
+export { useClearQueriesOnSignOut as __internal_useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
+export { useClerkQuery as __internal_useClerkQuery } from '../query/useQuery';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

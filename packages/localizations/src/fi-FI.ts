@@ -308,9 +308,45 @@ export const fiFI: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1603,10 +1639,23 @@ export const fiFI: LocalizationResource = {
         'Pääsyavaimen käyttö vahvistaa henkilöllisyytesi. Laitteesi saattaa pyytää sormenjälkeä, kasvoja tai näytön lukitusta.',
       title: 'Käytä pääsyavaintasi',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Käytä toista menetelmää',
       subtitle: 'Syötä nykyinen salasanasi jatkaaksesi',
       title: 'Vahvistus vaaditaan',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -1619,6 +1668,22 @@ export const fiFI: LocalizationResource = {
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Syötä puhelimeesi lähetetty koodi jatkaaksesi',
       title: 'Vahvistus vaaditaan',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Vahvistuskoodi',
@@ -1753,6 +1818,10 @@ export const fiFI: LocalizationResource = {
       subtitle:
         'Käyttämällä pääsyavaintasi vahvistat, että olet se joka väität olevasi. Laite voi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta.',
       title: 'Käytä pääsyavaintasi',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Käytä toista tapaa',
@@ -2065,6 +2134,7 @@ export const fiFI: LocalizationResource = {
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
@@ -2145,9 +2215,12 @@ export const fiFI: LocalizationResource = {
     protect_check_unsupported_environment:
       'Tarkistusta ei tueta tässä ympäristössä. Jatka tavallisella selaimella tai ota yhteyttä tukeen.',
     session_exists: 'Olet jo kirjautunut sisään.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',
     web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',

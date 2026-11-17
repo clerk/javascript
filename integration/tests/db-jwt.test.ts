@@ -20,7 +20,7 @@ test.describe('Dev browser test', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test);
+        fakeUser = (await createTestUtils({ app })).services.users.createFakeUser(test);
       });
 
       test.afterAll(async () => {
@@ -29,7 +29,7 @@ test.describe('Dev browser test', () => {
       });
 
       test('sign up through accounts portal', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.page.pause();
         await u.page.goToRelative('/protected');
         await u.page.waitForURL(/accounts/);
@@ -41,7 +41,7 @@ test.describe('Dev browser test', () => {
       });
 
       test('sign in through accounts portal', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.page.pause();
         await u.page.goToRelative('/protected');
         await u.page.waitForURL(/accounts/);

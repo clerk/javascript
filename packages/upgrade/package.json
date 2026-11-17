@@ -1,6 +1,6 @@
 {
   "name": "@clerk/upgrade",
-  "version": "2.0.8",
+  "version": "2.0.11",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm clean && NODE_ENV=production babel --keep-file-extension --out-dir=dist src --copy-files",
+    "build": "pnpm clean && NODE_ENV=production babel --keep-file-extension --out-dir=dist src --copy-files && rimraf --glob 'dist/**/__tests__'",
     "clean": "rm -rf dist/*",
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
     "format": "node ../../scripts/format-package.mjs",

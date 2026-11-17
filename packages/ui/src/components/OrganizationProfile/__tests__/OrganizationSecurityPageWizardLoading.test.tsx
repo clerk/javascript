@@ -114,7 +114,9 @@ const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures
   f.withOrganizations();
   f.withUser({
     email_addresses: ['test@clerk.com'],
-    organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+    organization_memberships: [
+      { name: 'Org1', self_serve_sso_enabled: true, permissions: ['org:sys_entconns:manage'] },
+    ],
   });
 };
 

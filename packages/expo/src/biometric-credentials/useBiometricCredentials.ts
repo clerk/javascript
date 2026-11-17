@@ -19,6 +19,7 @@ const biometricCredentials: UseBiometricCredentialsReturn = Object.freeze({
   list: rejectUnsupported,
   enroll: rejectUnsupported,
   revoke: rejectUnsupported,
+  revokeCurrentDeviceCredential: rejectUnsupported,
   signIn: rejectUnsupported,
   reverify: rejectUnsupported,
 });

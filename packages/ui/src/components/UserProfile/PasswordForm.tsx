@@ -1,5 +1,5 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
-import type { UserResource } from '@clerk/shared/types';
+import { useClerk, useReverification, useSession, useUser } from '@clerk/shared/react';
+import type { ReverificationResult, UserResource } from '@clerk/shared/types';
 import { useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -16,6 +16,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import { useConfirmPassword } from '../../hooks';
+import type { UserVerificationResetPassword } from '../UserVerification/utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
   const localizedTexts = [];
@@ -38,8 +39,29 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   const { t, locale } = useLocalizations();
   const { onSuccess, onReset } = props;
   const { user } = useUser();
+  const clerk = useClerk();
+  // The new password the form is about to set. If reverification asks the user
+  // to reset a breached password, the modal uses it instead of asking again.
+  const pendingPasswordRef = useRef<UserVerificationResetPassword>();
   const updatePasswordWithReverification = useReverification(
-    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
+    (
+      reverification: ReverificationResult | undefined,
+      user: UserResource,
+      opts: Parameters<UserResource['updatePassword']>,
+    ) =>
+      // The modal already saved the password it reset; sending the form's would overwrite it.
+      reverification?.passwordReset ? user.reload().catch(() => user) : user.updatePassword(...opts),
+    {
+      passReverificationResult: true,
+      onNeedsReverification: ({ level, complete, cancel }) => {
+        clerk.__internal_openReverification({
+          level,
+          resetPassword: pendingPasswordRef.current,
+          afterVerification: complete,
+          afterVerificationCancelled: cancel,
+        });
+      },
+    },
   );
 
   if (!user) {
@@ -125,6 +147,10 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         signOutOfOtherSessions: sessionsField.checked,
         currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
       } satisfies Parameters<typeof user.updatePassword>[0];
+      pendingPasswordRef.current = {
+        password: opts.newPassword,
+        signOutOfOtherSessions: !!opts.signOutOfOtherSessions,
+      };
 
       await updatePasswordWithReverification(user, [opts]);
       onSuccess();

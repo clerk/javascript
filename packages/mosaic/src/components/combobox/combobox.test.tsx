@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Icon } from '../icon';
@@ -12,7 +14,7 @@ import { Combobox } from './combobox';
 function FloatingCombobox(props?: { onValueChange?: (value: string | null) => void; anchor?: HTMLElement }) {
   return (
     <Combobox.Root onValueChange={props?.onValueChange}>
-      <InputGroup.Root data-testid='fruit-group'>
+      <Combobox.InputGroup data-testid='fruit-group'>
         <Combobox.Input
           aria-label='Fruit'
           placeholder='Search fruit'
@@ -23,12 +25,12 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
             render={<Button />}
           >
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               size='sm'
             />
           </Combobox.Trigger>
         </InputGroup.End>
-      </InputGroup.Root>
+      </Combobox.InputGroup>
       <Combobox.Popup anchor={props?.anchor}>
         <Combobox.Option
           value='apple'
@@ -116,6 +118,18 @@ describe('Mosaic Combobox', () => {
 
     await waitFor(() => expect(measureGroup).toHaveBeenCalled());
     expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
+  it('stays open when the input group padding is pressed', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+    const input = screen.getByRole('combobox', { name: 'Fruit' });
+    await user.click(screen.getByRole('button', { name: 'Toggle fruit options' }));
+
+    await user.click(screen.getByTestId('fruit-group'));
+
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveFocus();
   });
 
   it('opens its options from a composed trigger', async () => {
@@ -210,6 +224,15 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('option', { name: 'Apple' }).closest('.cl-combobox-viewport')).toBe(viewport);
   });
 
+  it('opens its options when the input is clicked', async () => {
+    const user = userEvent.setup();
+    render(<FloatingCombobox />);
+
+    await user.click(screen.getByRole('combobox', { name: 'Fruit' }));
+
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+  });
+
   it('selects an option and restores its label to the input', async () => {
     const onValueChange = vi.fn();
     const user = userEvent.setup();
@@ -253,16 +276,16 @@ describe('Mosaic Combobox', () => {
   it('keeps the selected label while reopening the unfiltered collection', async () => {
     const user = userEvent.setup();
     render(
-      <Combobox.Root>
+      <Combobox.Root
+        items={['Apple', 'Banana']}
+        itemToStringLabel={item => item}
+      >
         <Combobox.Input aria-label='Fruit' />
         <Combobox.Trigger aria-label='Show fruits' />
         <Combobox.Popup>
-          <Combobox.Collection
-            items={['Apple', 'Banana']}
-            itemToStringLabel={item => item}
-            empty={<Combobox.Empty>No matches</Combobox.Empty>}
-          >
-            {item => (
+          <Combobox.Empty>No matches</Combobox.Empty>
+          <Combobox.Collection>
+            {(item: string) => (
               <Combobox.Option
                 key={item}
                 value={item}
@@ -319,7 +342,7 @@ describe('Mosaic Combobox', () => {
       <Combobox.Root open>
         <InputGroup.Root size='lg'>
           <InputGroup.Start>
-            <Icon name='magnifying-glass' />
+            <Icon glyph={MagnifyingGlass} />
           </InputGroup.Start>
           <Combobox.Input
             aria-label='Search countries'
@@ -339,9 +362,116 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('option', { name: 'United States' })).toHaveClass('cl-combobox-option');
   });
 
-  it('renders a reusable empty state', () => {
-    render(<Combobox.Empty>No matches</Combobox.Empty>);
+  it('composes an option from media, label and detail parts', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.Input aria-label='Country' />
+        <Combobox.Popup>
+          <Combobox.Option
+            value='dz'
+            label='Algeria'
+          >
+            <Combobox.Media data-testid='flag'>🇩🇿</Combobox.Media>
+            <Combobox.Label>Algeria</Combobox.Label>
+            <Combobox.Detail>+213</Combobox.Detail>
+          </Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>,
+    );
 
-    expect(screen.getByText('No matches')).toHaveClass('cl-combobox-empty');
+    await user.click(screen.getByRole('combobox', { name: 'Country' }));
+
+    const option = screen.getByRole('option', { name: /Algeria/ });
+    expect(screen.getByTestId('flag')).toHaveClass('cl-combobox-option-media');
+    expect(option).toContainElement(screen.getByText('Algeria', { selector: '.cl-combobox-option-label' }));
+    expect(option).toContainElement(screen.getByText('+213', { selector: '.cl-combobox-option-detail' }));
+  });
+
+  it('renders the empty state as a styled status region', () => {
+    render(
+      <Combobox.Root
+        inline
+        open
+        items={[]}
+        itemToStringLabel={item => item}
+      >
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Empty>No matches</Combobox.Empty>
+      </Combobox.Root>,
+    );
+
+    expect(screen.getByRole('status')).toHaveClass('cl-combobox-empty');
+    expect(screen.getByRole('status')).toHaveTextContent('No matches');
+  });
+
+  function ClearableCombobox(props?: { onValueChange?: (value: string | null) => void }) {
+    return (
+      <Combobox.Root
+        defaultValue='apple'
+        defaultInputValue='Apple'
+        onValueChange={props?.onValueChange}
+      >
+        <Combobox.InputGroup>
+          <Combobox.Input aria-label='Fruit' />
+          <InputGroup.End>
+            <Combobox.Clear />
+            <Combobox.Trigger aria-label='Toggle fruit options' />
+          </InputGroup.End>
+        </Combobox.InputGroup>
+        <Combobox.Popup>
+          <Combobox.Option
+            value='apple'
+            label='Apple'
+          >
+            Apple
+          </Combobox.Option>
+        </Combobox.Popup>
+      </Combobox.Root>
+    );
+  }
+
+  it('clears the input and selection from the Clear button and keeps focus on the input', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<ClearableCombobox onValueChange={onValueChange} />);
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(null);
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveValue('');
+    expect(screen.getByRole('combobox', { name: 'Fruit' })).toHaveFocus();
+  });
+
+  it('renders Clear only while there is an input value or a selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.InputGroup>
+          <Combobox.Input aria-label='Fruit' />
+          <InputGroup.End>
+            <Combobox.Clear />
+          </InputGroup.End>
+        </Combobox.InputGroup>
+      </Combobox.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+  });
+
+  it('keeps the trigger toggling the list with its own name while there is text', async () => {
+    const user = userEvent.setup();
+    render(<ClearableCombobox />);
+
+    const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });

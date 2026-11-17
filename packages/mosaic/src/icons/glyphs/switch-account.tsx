@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const SwitchAccount = glyph(
+  'switch-account',
   <>
     <path
       d='M11.5 2L13.1465 3.64645C13.3417 3.84171 13.3417 4.15829 13.1465 4.35355L11.5 6'

@@ -1,8 +1,8 @@
 'use client';
 
-import { Composite } from '@floating-ui/react';
-import React, { type ReactNode, useCallback, useId, useMemo } from 'react';
+import React, { type ReactNode, useCallback, useId, useMemo, useState } from 'react';
 
+import { CompositeItemsProvider, useComposite, useCompositeItems } from '../hooks/use-composite';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { AccordionContext, type AccordionContextValue } from './accordion-context';
@@ -21,7 +21,7 @@ export interface AccordionProps extends ComponentProps<'div'> {
   children: ReactNode;
 }
 
-export function AccordionRoot(props: AccordionProps) {
+export const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionProps>(function AccordionRoot(props, ref) {
   const { render, type = 'multiple', disabled = false, children, ...otherProps } = props;
 
   const [value, setValue] = useControllableState(props.value, props.defaultValue ?? [], props.onValueChange);
@@ -47,58 +47,24 @@ export function AccordionRoot(props: AccordionProps) {
     [value, toggle, disabled, accordionId],
   );
 
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+
+  const items = useCompositeItems();
+  const composite = useComposite(element, {
+    getItems: items.getItems,
+    orientation: 'vertical',
+  });
+
   return (
     <AccordionContext.Provider value={contextValue}>
-      <Composite
-        orientation='vertical'
-        render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-          // aria-orientation is injected by Composite but is not valid on a
-          // generic <div> (no widget role). Strip it to avoid an axe violation.
-          const { 'aria-orientation': _ao, ...restCompositeProps } = compositeProps;
-
-          const defaultProps: Record<string, unknown> = {
-            onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
-              if (event.key !== 'Home' && event.key !== 'End') {
-                return;
-              }
-              event.preventDefault();
-              const items = Array.from(
-                event.currentTarget.querySelectorAll<HTMLElement>('[aria-expanded]:not([disabled])'),
-              );
-              if (items.length === 0) {
-                return;
-              }
-              const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-              target.focus();
-            },
-          };
-
-          const merged = mergeProps<'div'>(
-            defaultProps,
-            mergeProps<'div'>(otherProps, restCompositeProps as Record<string, unknown>),
-          );
-
-          // Composite may inject a ref via compositeProps; hand it to useRender's ref
-          // param (which owns ref-merging) instead of leaving it in props, where
-          // useRender's merged ref would overwrite it.
-          const { ref: compositeRef, ...mergedProps } = merged;
-
-          // floating-ui's Composite invokes this render callback synchronously and
-          // unconditionally during its own render (see renderJsx), so useRender runs in a
-          // stable hook position on the Composite fiber. The rule can't see that.
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          return useRender({
-            defaultTagName: 'div',
-            render,
-            // SAFETY: mergeProps returns Record<string, unknown>; a ref Composite injected
-            // is a valid React ref at runtime.
-            ref: compositeRef as React.Ref<unknown>,
-            props: mergedProps,
-          });
-        }}
-      >
-        {children}
-      </Composite>
+      <CompositeItemsProvider value={items}>
+        {useRender({
+          defaultTagName: 'div',
+          render,
+          ref: [setElement, ref],
+          props: mergeProps<'div'>({ onKeyDown: composite.handleKeyDown, children }, otherProps),
+        })}
+      </CompositeItemsProvider>
     </AccordionContext.Provider>
   );
-}
+});

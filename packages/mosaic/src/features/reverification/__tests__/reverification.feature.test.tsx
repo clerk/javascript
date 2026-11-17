@@ -9,9 +9,10 @@ import type {
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import type { FakeVerificationSeed } from '../../../__tests__/feature/fake-fapi/verification';
 import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
@@ -20,6 +21,7 @@ import { Card } from '../../../components/card';
 import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { Reverification, useReverificationFlow } from '../reverification';
+import { errorCode, Host } from './reverification-test-host';
 
 const alice = fapiUser({
   id: 'user_1',
@@ -29,10 +31,19 @@ const alice = fapiUser({
 });
 
 const aliceSession = fapiSession({ id: 'sess_1', user: alice });
+const bobSession = fapiSession({
+  id: 'sess_2',
+  user: fapiUser({
+    id: 'user_2',
+    first_name: 'Bob',
+    email_addresses: [fapiEmailAddress({ id: 'idn_bob', email_address: 'bob@example.com' })],
+  }),
+});
 
 const VERIFY = '/v1/client/sessions/sess_1/verify';
 const PREPARE_FIRST = `${VERIFY}/prepare_first_factor`;
 const ATTEMPT_FIRST = `${VERIFY}/attempt_first_factor`;
+const ATTEMPT_SECOND = `${VERIFY}/attempt_second_factor`;
 const TOUCH = '/v1/client/sessions/sess_1/touch';
 
 const PASSWORD = 'hunter2';
@@ -72,6 +83,7 @@ const secondPhoneFactor: SignInSecondFactorJSON = {
   phone_number_id: 'idn_phone',
   safe_identifier: '+1 555 0100',
 };
+const secondPasskeyFactor: SignInSecondFactorJSON = { strategy: 'passkey' };
 
 const TITLE = 'Verification required';
 const NO_FACTORS_TITLE = 'Cannot verify your account';
@@ -101,62 +113,6 @@ function guardedAction(config?: ReverificationConfig) {
   return vi.fn().mockResolvedValueOnce(reverificationError(config)).mockResolvedValue({ done: true });
 }
 
-function errorCode(error: unknown) {
-  if (error instanceof Error) {
-    return 'code' in error && typeof error.code === 'string' ? error.code : error.message;
-  }
-  return 'unknown';
-}
-
-function Host({ action }: { action: () => Promise<unknown> }) {
-  const [run, reverification] = useReverificationFlow(action);
-  const [outcome, setOutcome] = useState('');
-  const [running, setRunning] = useState(false);
-  const inFlight = useRef(false);
-
-  return (
-    <>
-      <button
-        type='button'
-        onClick={() => {
-          const owner = !inFlight.current;
-          if (owner) {
-            inFlight.current = true;
-            setRunning(true);
-          }
-          void run()
-            .then(
-              () => setOutcome('resolved'),
-              (error: unknown) => setOutcome(`rejected: ${errorCode(error)}`),
-            )
-            .finally(() => {
-              if (owner) {
-                inFlight.current = false;
-                setRunning(false);
-              }
-            });
-        }}
-      >
-        Run action
-      </button>
-      <output aria-label='Outcome'>{outcome}</output>
-      {running ? (
-        <Card.Root renderBranding={false}>
-          <Reverification {...reverification} />
-          {reverification.onCancel ? (
-            <button
-              type='button'
-              onClick={reverification.onCancel}
-            >
-              Dismiss
-            </button>
-          ) : null}
-        </Card.Root>
-      ) : null}
-    </>
-  );
-}
-
 function HoldingHost({ action }: { action: () => Promise<unknown> }) {
   const [run, reverification] = useReverificationFlow(action);
   const [outcome, setOutcome] = useState('');
@@ -174,16 +130,10 @@ function HoldingHost({ action }: { action: () => Promise<unknown> }) {
       >
         Run action
       </button>
-      <button
-        type='button'
-        onClick={reverification.reset}
-      >
-        Reset
-      </button>
       <output aria-label='Outcome'>{outcome}</output>
       <output aria-label='Visible'>{String(reverification.visible)}</output>
       <Card.Root renderBranding={false}>
-        <Reverification {...reverification} />
+        <Reverification controller={reverification} />
         {reverification.onCancel ? (
           <button
             type='button'
@@ -201,11 +151,13 @@ function renderReverification(
   action = guardedAction(),
   seed: FakeFapiSeed = signedIn(),
   localization?: MosaicLocalization,
+  options?: Parameters<typeof renderWithClerk>[1],
 ) {
   const fapi = serveFapi(seed);
   const host = <Host action={action} />;
   return renderWithClerk(
     localization ? <MosaicProvider localization={localization}>{host}</MosaicProvider> : host,
+    options,
   ).then(view => ({ ...view, fapi, action }));
 }
 
@@ -367,40 +319,50 @@ describe('Reverification', () => {
         ),
       );
 
-      const user = await startVerification();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        const user = await startVerification();
 
-      // The error card stays on screen without the server's message
-      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
-      expect(screen.getByText('Please try again.')).toBeVisible();
-      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
-      expect(screen.queryByText('Nope')).toBeNull();
-      await settle();
-      expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
-      expect(outcome()).toBe('');
+        // The error card stays on screen without the server's message
+        expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
+        expect(screen.getByText('Please try again.')).toBeVisible();
+        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+        expect(screen.queryByText('Nope')).toBeNull();
+        await act(() => vi.advanceTimersByTimeAsync(60_000));
+        expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
+        expect(outcome()).toBe('');
 
-      // Closing it rejects the action as cancelled
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      await untilClosed();
-      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+        // Closing it rejects the action as cancelled
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+        expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('keeps showing the no factors card until it is dismissed when none of the factors are supported', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [enterpriseSsoFactor] }));
 
-      const user = await startVerification();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        const user = await startVerification();
 
-      expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
-      expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
-      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
-      await settle();
-      expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
-      expect(outcome()).toBe('');
+        expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
+        expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
+        expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+        await act(() => vi.advanceTimersByTimeAsync(60_000));
+        expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
+        expect(outcome()).toBe('');
 
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      await untilClosed();
-      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+        await user.click(screen.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+        expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -477,14 +439,41 @@ describe('Reverification', () => {
       expect(await screen.findByText(STEP.backupCode)).toBeVisible();
     });
 
-    // This is a future behavior we will need to account for, here's the PR that builds it for the existing reverification: https://github.com/clerk/javascript/pull/9127
-    it.todo('offer a passkey listed as a second factor', () => {
-      // The passkey is not offered on the second factor step
+    it('starts a supported second factor with passkey before code factors', async () => {
+      await renderReverification(
+        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+        verificationSeed({ secondFactors: [totpFactor, secondPasskeyFactor, secondPhoneFactor] }),
+      );
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+        await useAnotherMethod(user);
+        expect(await screen.findByRole('button', { name: 'Use your authenticator app' })).toBeVisible();
+        expect(screen.getByRole('button', { name: 'Send SMS code to +1 555 0100' })).toBeVisible();
+      } finally {
+        restore();
+      }
     });
   });
 
   describe('password', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
+    it('shows unrelated attempt errors globally without marking the password invalid', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      await user.type(passwordField(), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      attempt.fail('unrelated_parameter', 'This session cannot be verified.', 'session_id');
+
+      expect(await screen.findByText('This session cannot be verified.')).toBeVisible();
+      expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
+      expect(screen.getByRole('alert')).toHaveTextContent('This session cannot be verified.');
+    });
+
     it('recovers from a wrong password and completes the challenge', async () => {
       const { action } = await renderReverification(
         guardedAction(),
@@ -496,7 +485,7 @@ describe('Reverification', () => {
       const user = await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
 
-      // A wrong password shows the server message and stays on the step
+      // A wrong password shows an error and stays on the step
       // Pressing Enter submits the password
       await user.type(passwordField(), 'wrong{Enter}');
       expect(await screen.findByText(/Password is incorrect/)).toBeInTheDocument();
@@ -514,13 +503,15 @@ describe('Reverification', () => {
       const touch = holdRequests('post', TOUCH);
       await user.click(screen.getByRole('button', { name: 'Continue' }));
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       attempt.release();
 
       // The last step stays visible and pending while the session is being activated
       await waitFor(() => expect(touch.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       expect(action).toHaveBeenCalledTimes(1);
       touch.release();
@@ -532,10 +523,38 @@ describe('Reverification', () => {
       // The card closes once the retried action has settled
       await untilClosed();
     });
+
+    it('reveals and hides the password on request', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(passwordField()).toHaveAttribute('type', 'password');
+
+      await user.click(screen.getByRole('button', { name: 'Show password' }));
+      expect(passwordField()).toHaveAttribute('type', 'text');
+      await user.click(screen.getByRole('button', { name: 'Hide password' }));
+      expect(passwordField()).toHaveAttribute('type', 'password');
+    });
+
+    it('keeps Continue disabled until a password is typed', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.type(passwordField(), '{Enter}');
+
+      await user.type(passwordField(), PASSWORD);
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('password')).toBe(PASSWORD);
+      attempt.release();
+    });
   });
 
   describe('email code', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
     it('sends a code and completes the challenge with the correct code', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
       const prepare = holdRequests('post', PREPARE_FIRST);
@@ -554,11 +573,11 @@ describe('Reverification', () => {
       expect(prepare.requests).toHaveLength(1);
 
       // A wrong code submits automatically on the last digit and shows the server error
-      // The field is disabled and shows the verifying label while the attempt is in flight
+      // The field is read-only and shows the verifying label while the attempt is in flight
       const attempt = holdRequests('post', ATTEMPT_FIRST);
       await user.keyboard(WRONG_CODE.slice(3));
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
-      expect(slots().every(slot => slot.disabled)).toBe(true);
+      expect(slots().every(slot => slot.readOnly && slot.getAttribute('aria-disabled') === 'true')).toBe(true);
       expect(verifying()).toBeInTheDocument();
       attempt.release();
       expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
@@ -588,6 +607,22 @@ describe('Reverification', () => {
       expect(verifying()).toBeInTheDocument();
       attempt.release();
       expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
+    });
+
+    it('keeps Continue disabled until the code is complete', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      await pasteCode(user, CODE.slice(0, 3));
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.keyboard('{Enter}');
+
+      await user.keyboard(CODE.slice(3));
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('code')).toBe(CODE);
+      attempt.release();
     });
 
     it('holds a submit made while a code is being sent', async () => {
@@ -630,14 +665,178 @@ describe('Reverification', () => {
       expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
     });
 
+    describe('when the user leaves the step while the code is being sent', () => {
+      async function startSendingCode(
+        firstFactors: SignInFirstFactorJSON[] = [emailFactor, passwordFactor],
+        action = guardedAction(),
+      ) {
+        await renderReverification(action, verificationSeed({ firstFactors }, { environment: preferring('otp') }));
+        const prepare = holdRequests('post', PREPARE_FIRST);
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+        return { prepare, user };
+      }
+
+      const back = (user: User) => user.click(screen.getByRole('button', { name: 'Back' }));
+
+      it.each(['picker', 'help'] as const)(
+        'shows a failure that arrives on the %s step once the user returns',
+        async step => {
+          const { prepare, user } = await startSendingCode();
+          await useAnotherMethod(user);
+          if (step === 'help') {
+            await user.click(await screen.findByRole('button', { name: 'Get help' }));
+            expect(await screen.findByText(/If you have trouble verifying your account/)).toBeVisible();
+          }
+
+          prepare.fail('preparation_failed', 'Could not send your code');
+          await settle();
+          if (step === 'help') {
+            expect(screen.getByText(/If you have trouble verifying your account/)).toBeVisible();
+            await back(user);
+          }
+          expect(await screen.findByRole('button', { name: 'Continue with your password' })).toBeVisible();
+          await back(user);
+
+          // The step shows the failure and the user can resend immediately
+          expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+          expect(await screen.findByText('Could not send your code')).toBeVisible();
+          expect(prepare.requests).toHaveLength(1);
+          const retry = holdRequests('post', PREPARE_FIRST);
+          await user.click(screen.getByRole('button', { name: /Resend/ }));
+          await waitFor(() => expect(retry.requests).toHaveLength(1));
+          expect(screen.queryByText('Could not send your code')).toBeNull();
+          expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+          retry.release();
+        },
+      );
+
+      it('keeps the cooldown of a code sent while the picker is open', async () => {
+        const { prepare, user } = await startSendingCode();
+        await useAnotherMethod(user);
+
+        prepare.release();
+        await settle();
+        expect(screen.getByRole('button', { name: 'Continue with your password' })).toBeVisible();
+        await back(user);
+
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+        expect(prepare.requests).toHaveLength(1);
+      });
+
+      it.each(['sent', 'not sent'] as const)(
+        'holds a submit made after returning from the picker until the code is %s',
+        async result => {
+          const { prepare, user } = await startSendingCode();
+          const attempt = holdRequests('post', ATTEMPT_FIRST);
+          await useAnotherMethod(user);
+          await back(user);
+          expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+
+          await pasteCode(user, CODE);
+          await settle();
+          expect(attempt.requests).toHaveLength(0);
+
+          if (result === 'sent') {
+            prepare.release();
+            await waitFor(() => expect(attempt.requests).toHaveLength(1));
+            attempt.release();
+            await untilResolved();
+          } else {
+            prepare.fail('preparation_failed', 'Could not send your code');
+            expect(await screen.findByText('Could not send your code')).toBeVisible();
+            expect(attempt.requests).toHaveLength(0);
+            expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
+            attempt.release();
+          }
+          expect(prepare.requests).toHaveLength(1);
+        },
+      );
+
+      it('drops a held submit when the user opens the picker', async () => {
+        const { prepare, user } = await startSendingCode();
+        const attempt = holdRequests('post', ATTEMPT_FIRST);
+        await pasteCode(user, CODE);
+        await useAnotherMethod(user);
+
+        prepare.release();
+        await settle();
+        expect(screen.getByRole('button', { name: 'Continue with your password' })).toBeVisible();
+        expect(attempt.requests).toHaveLength(0);
+
+        // The typed code is still there on return
+        await back(user);
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        expect(slotValues()).toEqual(CODE.split(''));
+        expect(attempt.requests).toHaveLength(0);
+        expect(prepare.requests).toHaveLength(1);
+        attempt.release();
+      });
+
+      it('ignores a late failure after the user picks the password', async () => {
+        const { prepare, user } = await startSendingCode();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByText(STEP.password)).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+      });
+
+      it('ignores a late failure after the user picks another email address', async () => {
+        const { prepare, user } = await startSendingCode([emailFactor, workEmailFactor]);
+        await useAnotherMethod(user);
+        const second = holdRequests('post', PREPARE_FIRST);
+        await user.click(await screen.findByRole('button', { name: 'Email code to alice@work.example' }));
+        await waitFor(() => expect(second.requests).toHaveLength(1));
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByRole('button', { name: 'Email code to alice@work.example' })).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+        expect(prepare.requests).toHaveLength(1);
+        expect(second.requests).toHaveLength(1);
+        second.release();
+      });
+
+      it('ignores a late failure after the challenge is dismissed from the picker and run again', async () => {
+        const action = vi
+          .fn()
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValueOnce(reverificationError());
+        const { prepare, user } = await startSendingCode(undefined, action);
+        await useAnotherMethod(user);
+        await dismiss(user);
+        await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+        await untilClosed();
+
+        const next = holdRequests('post', PREPARE_FIRST);
+        await user.click(screen.getByRole('button', { name: 'Run action' }));
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(next.requests).toHaveLength(1));
+
+        prepare.fail('preparation_failed', 'Could not send your code');
+        await settle();
+        expect(screen.getByText(STEP.emailCode)).toBeVisible();
+        expect(screen.queryByText('Could not send your code')).toBeNull();
+        expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+        expect(prepare.requests).toHaveLength(1);
+        next.release();
+      });
+    });
+
     it('resends a code once the cooldown has passed', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
-      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
 
       try {
         const user = await startVerification();
         expect(await screen.findByText(STEP.emailCode)).toBeVisible();
-        await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+        await vi.waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
 
         // Resend is disabled and shows the countdown while the cooldown runs
         const resend = await screen.findByRole('button', { name: /Resend \(\d+\)/ });
@@ -645,7 +844,8 @@ describe('Reverification', () => {
 
         // Resend is enabled again after the cooldown
         vi.setSystemTime(Date.now() + 30_000);
-        await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 3000 });
+        await act(() => vi.advanceTimersByTimeAsync(1000));
+        expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
         expect(screen.getByRole('button', { name: /Resend/ }).textContent).not.toMatch(/\(\d+\)/);
 
         // Resending sends a new code and clears the typed value
@@ -654,7 +854,7 @@ describe('Reverification', () => {
         expect(slotValues()).toEqual(['1', '2', '3', '', '', '']);
         const prepare = holdRequests('post', PREPARE_FIRST);
         await user.click(screen.getByRole('button', { name: /Resend/ }));
-        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+        await vi.waitFor(() => expect(prepare.requests).toHaveLength(1));
         expect(slotValues()).toEqual(['', '', '', '', '', '']);
         expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
 
@@ -664,7 +864,7 @@ describe('Reverification', () => {
         await settle();
         expect(attempt.requests).toHaveLength(0);
         prepare.release();
-        await waitFor(() => expect(attempt.requests).toHaveLength(1));
+        await vi.waitFor(() => expect(attempt.requests).toHaveLength(1));
         attempt.release();
         await untilResolved();
       } finally {
@@ -723,10 +923,33 @@ describe('Reverification', () => {
       await pasteCode(user, CODE);
       await untilResolved();
     });
+
+    it('offers an advertised passkey after the first factor of a multi-factor request', async () => {
+      const { action, clerk } = await renderReverification(
+        guardedAction({ level: 'multi_factor', afterMinutes: 10 }),
+        verificationSeed({ firstFactors: [passwordFactor], secondFactors: [totpFactor, secondPasskeyFactor] }),
+      );
+      clerk.__internal_getPublicCredentials = vi.fn().mockResolvedValue({
+        publicKeyCredential: fakeAssertion(),
+        error: null,
+      });
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await user.type(passwordField(), `${PASSWORD}{Enter}`);
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await untilResolved();
+        expect(action).toHaveBeenCalledTimes(2);
+      } finally {
+        restore();
+      }
+    });
   });
 
   describe('second factor alternatives', () => {
-    // Currently wrong: the error shown is the server's English text, not a localized message. See the errors group.
     it('switches from the authenticator app to a backup code', async () => {
       await renderReverification(
         guardedAction({ level: 'second_factor', afterMinutes: 10 }),
@@ -751,21 +974,64 @@ describe('Reverification', () => {
       await user.type(screen.getByLabelText('Backup code'), `${BACKUP_CODE}{Enter}`);
       await untilResolved();
     });
+
+    it('keeps Continue disabled until a backup code is typed', async () => {
+      await renderReverification(
+        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+        verificationSeed({ secondFactors: [backupCodeFactor] }),
+      );
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.backupCode)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_SECOND);
+
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.type(screen.getByLabelText('Backup code'), '{Enter}');
+
+      await user.type(screen.getByLabelText('Backup code'), BACKUP_CODE);
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(new URLSearchParams(await attempt.requests[0]?.text()).get('code')).toBe(BACKUP_CODE);
+      attempt.release();
+    });
   });
 
-  describe('passkey', () => {
-    // Currently wrong: the banner shows the browser or clerk-js error message as is, which is not localized.
+  describe.each([
+    {
+      stage: 'first factor',
+      action: () => guardedAction(),
+      seed: { firstFactors: [passwordFactor, passkeyFactor] },
+      verifiedOn: 'firstFactorVerification' as const,
+      skippedOn: 'secondFactorVerification' as const,
+      otherMethod: { name: 'Continue with your password', step: STEP.password },
+      withoutWebAuthn: {
+        seed: { firstFactors: [passwordFactor, passkeyFactor, emailFactor] },
+        step: STEP.password,
+        alternative: 'Email code to alice@example.com',
+      },
+    },
+    {
+      stage: 'second factor',
+      action: () => guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+      seed: { secondFactors: [totpFactor, secondPasskeyFactor] },
+      verifiedOn: 'secondFactorVerification' as const,
+      skippedOn: 'firstFactorVerification' as const,
+      otherMethod: { name: 'Use your authenticator app', step: STEP.totp },
+      withoutWebAuthn: {
+        seed: { secondFactors: [totpFactor, secondPasskeyFactor, backupCodeFactor] },
+        step: STEP.totp,
+        alternative: 'Use a backup code',
+      },
+    },
+  ])('passkey as the $stage', ({ action, seed, verifiedOn, skippedOn, otherMethod, withoutWebAuthn }) => {
     it('completes the challenge with the passkey', async () => {
-      const { clerk } = await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
-      );
+      const { clerk, fapi } = await renderReverification(action(), verificationSeed(seed));
       let acceptCredential: () => void = () => {};
       const getCredential = vi
         .fn()
         .mockResolvedValueOnce({
           publicKeyCredential: null,
-          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_failed' }),
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
         })
         .mockImplementationOnce(
           () =>
@@ -781,9 +1047,12 @@ describe('Reverification', () => {
         const user = await startVerification();
         expect(await screen.findByText(STEP.passkey)).toBeVisible();
 
-        // A refused credential shows an error banner and stays on the step
+        // A refused credential shows a localized error banner and stays on the step
         await user.click(screen.getByRole('button', { name: 'Continue' }));
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The operation was refused'));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+        expect(screen.getByRole('alert')).not.toHaveTextContent('The operation was refused');
         expect(screen.getByText(STEP.passkey)).toBeVisible();
 
         // The button is disabled and shows the verifying label while the credential is being verified
@@ -795,21 +1064,84 @@ describe('Reverification', () => {
         await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
         acceptCredential();
         await untilResolved();
+        expect(fapi.verification[verifiedOn]?.strategy).toBe('passkey');
+        expect(fapi.verification[skippedOn]).toBeNull();
+      } finally {
+        restore();
+      }
+    });
+
+    it('shows no error when the passkey prompt is aborted', async () => {
+      const { clerk } = await renderReverification(action(), verificationSeed(seed));
+      const getCredential = vi.fn().mockResolvedValue({
+        publicKeyCredential: null,
+        error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
+      });
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(1));
+        await settle();
+
+        // The step stays open and ready for another attempt, without an error
+        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+        expect(screen.getByText(STEP.passkey)).toBeVisible();
+        expect(screen.getByRole('alert').textContent).toBe('');
+      } finally {
+        restore();
+      }
+    });
+
+    it('clears an earlier passkey error when the next prompt is aborted', async () => {
+      const { clerk } = await renderReverification(action(), verificationSeed(seed));
+      const getCredential = vi
+        .fn()
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_cancelled' }),
+        })
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was aborted', { code: 'passkey_operation_aborted' }),
+        });
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Passkey verification was cancelled or timed out.'),
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
+        await settle();
+
+        expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+        expect(screen.getByRole('alert').textContent).toBe('');
       } finally {
         restore();
       }
     });
 
     it('offers the passkey from the picker when another method is showing', async () => {
-      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }));
+      await renderReverification(action(), verificationSeed(seed));
       const restore = pretendToBeARealBrowser();
 
       try {
         const user = await startVerification();
         expect(await screen.findByText(STEP.passkey)).toBeVisible();
         await useAnotherMethod(user);
-        await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
-        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await user.click(await screen.findByRole('button', { name: otherMethod.name }));
+        expect(await screen.findByText(otherMethod.step)).toBeVisible();
 
         // The passkey is listed once the user is on another method
         await useAnotherMethod(user);
@@ -821,20 +1153,17 @@ describe('Reverification', () => {
     });
 
     it('does not offer a passkey when the browser does not support WebAuthn', async () => {
-      await renderReverification(
-        guardedAction(),
-        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor, emailFactor] }),
-      );
+      await renderReverification(action(), verificationSeed(withoutWebAuthn.seed));
       const restore = pretendWebAuthnIsUnsupported();
 
       try {
         // The passkey is not the starting method
         const user = await startVerification();
-        expect(await screen.findByText(STEP.password)).toBeVisible();
+        expect(await screen.findByText(withoutWebAuthn.step)).toBeVisible();
 
         // The passkey is not listed in the picker
         await useAnotherMethod(user);
-        expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
+        expect(await screen.findByRole('button', { name: withoutWebAuthn.alternative })).toBeVisible();
         expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
       } finally {
         restore();
@@ -931,7 +1260,8 @@ describe('Reverification', () => {
       secondPrepare.release();
 
       // The code step opens with an empty field and no error once the code is sent
-      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await screen.findByRole('group', { name: 'Verification code' });
+      expect(screen.getByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(slotValues()).toEqual(['', '', '', '', '', '']));
       expect(screen.queryByText('Incorrect code')).toBeNull();
 
@@ -1001,7 +1331,32 @@ describe('Reverification', () => {
         // Email support opens a mail to support@ the Frontend API host
         await user.click(await screen.findByRole('button', { name: 'Email support' }));
         await waitFor(() => expect(navigations.urls).toHaveLength(1));
-        expect(navigations.urls[0]).toMatch(/^mailto:support@/);
+        expect(navigations.urls[0]).toMatch(/^mailto:support@run\d+\.12345\.prod\.lclclerk\.com$/);
+      } finally {
+        navigations.stop();
+      }
+    });
+
+    it('emails the support address from the supportEmail option over the environment', async () => {
+      await renderReverification(
+        guardedAction(),
+        verificationSeed(
+          { firstFactors: [passwordFactor, emailFactor] },
+          { environment: fapiEnvironment({ display_config: { support_email: 'help@acme.test' } }) },
+        ),
+        undefined,
+        { supportEmail: 'option@acme.test' },
+      );
+      const navigations = captureNavigations();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Get help' }));
+
+        await user.click(await screen.findByRole('button', { name: 'Email support' }));
+        await waitFor(() => expect(navigations.urls).toEqual(['mailto:option@acme.test']));
       } finally {
         navigations.stop();
       }
@@ -1020,7 +1375,8 @@ describe('Reverification', () => {
 
       // The last step stays visible and pending while the session is being activated
       await waitFor(() => expect(touch.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       touch.fail();
 
@@ -1057,7 +1413,8 @@ describe('Reverification', () => {
 
       // The last step stays visible and pending while the action is being retried
       await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
 
       // Dismissing is not available
@@ -1066,7 +1423,9 @@ describe('Reverification', () => {
       // A second call rejects with request_already_in_progress
       await user.click(screen.getByRole('button', { name: 'Run action' }));
       await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
-      expect(passwordField()).toBeDisabled();
+      expect(action).toHaveBeenCalledTimes(2);
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
 
       // An error thrown by the retried action rejects the action and closes the card
       rejectRetry(new Error('retry failed'));
@@ -1087,8 +1446,8 @@ describe('Reverification', () => {
       return renderWithClerk(<HoldingHost action={action} />);
     };
 
-    it('keeps the last card on screen, inert, after a dismissal until it is reset', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen, inert, after a dismissal, until the next challenge replaces it', async () => {
+      await renderHolding(vi.fn().mockResolvedValue(reverificationError()));
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), 'half-typed');
 
@@ -1097,26 +1456,39 @@ describe('Reverification', () => {
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
 
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
-      expect(screen.queryByText(STEP.password)).toBeNull();
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('keeps the last card on screen after the action completes until the next run', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen after the action completes, until the next challenge replaces it', async () => {
+      await renderHolding(
+        vi
+          .fn()
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValueOnce({ done: true })
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValue({ done: true }),
+      );
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await untilResolved();
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.queryByText(STEP.password)).toBeNull());
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('is visible once there is a card of its own to show, until it is reset', async () => {
+    it('is visible once there is a card of its own to show, until the run ends', async () => {
       await renderHolding(guardedAction());
       const start = holdRequests('post', VERIFY);
       const visible = () => screen.getByLabelText('Visible').textContent;
@@ -1133,10 +1505,8 @@ describe('Reverification', () => {
 
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      expect(visible()).toBe('true');
-
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
       expect(visible()).toBe('false');
+      expect(screen.getByText(STEP.password)).toBeVisible();
     });
 
     it('does not keep anything on screen when no reverification was needed', async () => {
@@ -1296,8 +1666,26 @@ describe('Reverification', () => {
   });
 
   describe('action lifecycle', () => {
+    it('rejects a second call while the first request is in flight', async () => {
+      const response = deferred<{ done: true }>();
+      const action = vi.fn(() => response.promise);
+      await renderReverification(action);
+      const user = await startVerification();
+
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+
+      await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
+      expect(action).toHaveBeenCalledOnce();
+
+      response.resolve({ done: true });
+      await untilResolved();
+    });
+
     it('rejects a second call while a challenge is open', async () => {
-      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const { action } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), 'typed');
 
@@ -1307,6 +1695,7 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
 
       // The open challenge is unaffected
+      expect(action).toHaveBeenCalledOnce();
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('typed');
     });
@@ -1328,6 +1717,134 @@ describe('Reverification', () => {
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
     });
 
+    it('cancels the challenge when the active session changes', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }, { client: fapiClient([aliceSession, bobSession]) }),
+      );
+      await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      await act(() => clerk.setActive({ session: 'sess_2' }));
+
+      await untilClosed();
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+    });
+
+    it('keeps the challenge open while the session is briefly unset during a navigation', async () => {
+      const { clerk, navigate } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
+      const navigation = deferred<undefined>();
+      navigate.mockImplementationOnce(() => navigation.promise);
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      let switching: Promise<void> = Promise.resolve();
+      act(() => {
+        switching = clerk.setActive({ session: 'sess_1', redirectUrl: '/elsewhere' });
+      });
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/elsewhere'));
+      expect(clerk.session).toBeUndefined();
+      navigation.resolve(undefined);
+      await act(() => switching);
+
+      expect(clerk.session?.id).toBe('sess_1');
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      expect(outcome()).toBe('');
+
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+    });
+
+    it('lets a retry finish when the session changes or signs out', async () => {
+      const retry = deferred<{ done: true }>();
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementationOnce(() => retry.promise);
+      const { clerk } = await renderReverification(
+        action,
+        verificationSeed({ firstFactors: [passwordFactor] }, { client: fapiClient([aliceSession, bobSession]) }),
+      );
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+
+      await act(() => clerk.setActive({ session: 'sess_2' }));
+      await act(() => clerk.signOut());
+      await settle();
+      expect(outcome()).toBe('');
+
+      retry.resolve({ done: true });
+      await untilResolved();
+    });
+
+    it('cancels the challenge when its owner unmounts', async () => {
+      serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={guardedAction()}
+          onOutcome={onOutcome}
+        />,
+      );
+      await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      rerender(<p>Gone</p>);
+
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+    });
+
+    it('cancels the challenge when its owner unmounts before the action asks for reverification', async () => {
+      serveFapi(signedIn());
+      const response = deferred<unknown>();
+      const action = vi.fn(() => response.promise);
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={action}
+          onOutcome={onOutcome}
+        />,
+      );
+      await startVerification();
+      await waitFor(() => expect(action).toHaveBeenCalledOnce());
+
+      rerender(<p>Gone</p>);
+      response.resolve(reverificationError());
+
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('rejected: reverification_cancelled'));
+      expect(action).toHaveBeenCalledOnce();
+    });
+
+    it('lets a retry finish when its owner unmounts', async () => {
+      serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
+      const retry = deferred<{ done: true }>();
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementationOnce(() => retry.promise);
+      const onOutcome = vi.fn();
+      const { rerender } = await renderWithClerk(
+        <Host
+          action={action}
+          onOutcome={onOutcome}
+        />,
+      );
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+
+      rerender(<p>Gone</p>);
+      await settle();
+      expect(onOutcome).not.toHaveBeenCalled();
+
+      retry.resolve({ done: true });
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith('resolved'));
+    });
+
     it('passes through an error that is unrelated to reverification', async () => {
       const action = vi.fn().mockRejectedValue(new Error('unrelated failure'));
       await renderReverification(action);
@@ -1343,14 +1860,30 @@ describe('Reverification', () => {
   });
 
   describe('errors', () => {
-    // Currently wrong: the controller keeps only the server's longMessage or message (errorDetail drops the error code), so nothing downstream can localize it. Known codes such as form_password_incorrect, form_code_incorrect and verification_not_sent should map to localized messages the way the old UI does.
-    // Blocked: Mosaic has no message keys for error codes yet, so there is nothing a test can override.
-    it.todo('shows a localized message for a wrong password', () => {
-      // The message for form_password_incorrect follows the configured locale
+    it('shows a localized message for a wrong password', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }), {
+        messages: { 'errors.form_password_incorrect': 'Mot de passe incorrect.' },
+      });
+      const user = await startVerification();
+
+      await user.type(await screen.findByLabelText('Password'), 'wrong{Enter}');
+
+      expect(await screen.findByText('Mot de passe incorrect.')).toBeInTheDocument();
+      expect(screen.queryByText(/Password is incorrect/)).toBeNull();
     });
 
-    it.todo('shows a localized message for a wrong code', () => {
-      // The message for form_code_incorrect follows the configured locale
+    it('shows a localized message for a wrong code', async () => {
+      const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }), {
+        messages: { 'errors.form_code_incorrect': 'Code incorrect.' },
+      });
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+
+      await pasteCode(user, WRONG_CODE);
+
+      expect(await screen.findByText('Code incorrect.')).toBeInTheDocument();
+      expect(screen.queryByText('Incorrect code')).toBeNull();
     });
 
     it('shows the long message from the server for a Clerk error code without a localized message', async () => {
@@ -1390,7 +1923,7 @@ describe('Reverification', () => {
         guardedAction(),
         verificationSeed({ firstFactors: [passwordFactor] }),
         {
-          messages: { 'reverification.unstable__errors__generic': 'Something custom went wrong' },
+          messages: { 'reverification.attemptFailed': 'Something custom went wrong' },
         },
       );
       const user = await startVerification();
@@ -1412,7 +1945,10 @@ describe('Reverification', () => {
 
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
 
-        await waitFor(() => expect(passwordField()).toBeInvalid());
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        );
+        expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
         expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument();
         expect(document.body).not.toHaveTextContent(/https?:\/\//);
       } finally {
@@ -1430,7 +1966,10 @@ describe('Reverification', () => {
 
         // The step stays open with an error
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
-        await waitFor(() => expect(passwordField()).toBeInvalid());
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        );
+        expect(passwordField()).not.toHaveAttribute('aria-invalid', 'true');
         expect(screen.getByText(STEP.password)).toBeVisible();
         expect(passwordField()).toBeEnabled();
         expect(passwordField()).toHaveValue(PASSWORD);

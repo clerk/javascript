@@ -1,7 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { CheckmarkCircle } from '../../icons/glyphs/checkmark-circle';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import type { ToastObject } from '../../primitives/toast';
 import { Toast as Primitive } from '../../primitives/toast';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -20,19 +23,19 @@ function toToastType(type: string | undefined): ToastType | undefined {
 }
 
 type Indicator = {
-  icons: Record<Exclude<ToastType, 'loading'>, IconName>;
+  icons: Record<Exclude<ToastType, 'loading'>, IconComponent>;
   iconSize: 'sm' | 'md';
   spinnerSize: 'sm' | 'md';
 };
 
 const DEFAULT_INDICATOR: Indicator = {
-  icons: { success: 'checkmark-circle', error: 'exclamation-circle' },
+  icons: { success: CheckmarkCircle, error: ExclamationCircle },
   iconSize: 'md',
   spinnerSize: 'md',
 };
 
 const ANCHORED_INDICATOR: Indicator = {
-  icons: { success: 'checkmark', error: 'exclamation-circle' },
+  icons: { success: Checkmark, error: ExclamationCircle },
   iconSize: 'sm',
   spinnerSize: 'sm',
 };
@@ -43,7 +46,7 @@ function ToastIndicator(props: { type: ToastType; indicator: Indicator }) {
     <Spinner size={indicator.spinnerSize} />
   ) : (
     <Icon
-      name={indicator.icons[type]}
+      glyph={indicator.icons[type]}
       size={indicator.iconSize}
     />
   );
@@ -59,7 +62,7 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
       {...mergeStyleProps(themeProps('toast-root'), stylex.props(reset.base, styles.root, styles.stackOrder(zIndex)))}
     >
       <Primitive.Content {...mergeStyleProps(themeProps('toast-item'), stylex.props(reset.base, styles.item))}>
-        {type && (
+        {type ? (
           <span
             aria-hidden='true'
             {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.icon, iconColors[type]))}
@@ -69,7 +72,7 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
               indicator={DEFAULT_INDICATOR}
             />
           </span>
-        )}
+        ) : null}
         <div {...mergeStyleProps(themeProps('toast-content'), stylex.props(reset.base, styles.content))}>
           <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base, styles.label))} />
           <Primitive.Description
@@ -100,7 +103,7 @@ function AnchoredToast(props: { toast: ToastObject }) {
       >
         <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base))} />
         <Primitive.Description {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base))} />
-        {type && (
+        {type ? (
           <span
             aria-hidden='true'
             {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.anchoredIcon))}
@@ -110,7 +113,7 @@ function AnchoredToast(props: { toast: ToastObject }) {
               indicator={ANCHORED_INDICATOR}
             />
           </span>
-        )}
+        ) : null}
       </Primitive.Root>
     </Primitive.Positioner>
   );

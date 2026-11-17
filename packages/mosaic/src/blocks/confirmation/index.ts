@@ -1,8 +1,2 @@
 export { Confirmation } from './confirmation';
-export type {
-  ConfirmationColor,
-  ConfirmationControlledProps,
-  ConfirmationHandle,
-  ConfirmationHandleProps,
-  ConfirmationProps,
-} from './confirmation';
+export type { ConfirmationColor, ConfirmationProps } from './confirmation';

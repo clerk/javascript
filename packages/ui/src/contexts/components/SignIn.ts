@@ -23,6 +23,7 @@ export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRe
   signInUrl: string;
   signUpContinueUrl: string;
   signUpProtectCheckUrl: string;
+  signUpEnterpriseConnectionsUrl: string;
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
@@ -152,6 +153,10 @@ export const useSignInContext = (): SignInContextType => {
   // Built off `signUpUrl`, which is `<signInUrl>#/create` in the combined flow. That hash form only reaches
   // the embedded route on a fresh page load; navigation inside the mounted component uses relative `create/*` paths.
   const signUpProtectCheckUrl = buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+  const signUpEnterpriseConnectionsUrl = buildURL(
+    { base: signUpUrl, hashPath: '/enterprise-connections' },
+    { stringify: true },
+  );
 
   const navigateOnSetActive = async ({
     session,
@@ -213,6 +218,7 @@ export const useSignInContext = (): SignInContextType => {
     navigateAfterSignIn,
     signUpContinueUrl,
     signUpProtectCheckUrl,
+    signUpEnterpriseConnectionsUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
     authQueryString,

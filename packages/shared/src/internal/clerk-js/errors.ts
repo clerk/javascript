@@ -105,6 +105,15 @@ export function clerkInvalidStrategy(functionaName: string, strategy: string): n
 /**
  *
  */
+export function clerkInvalidVerificationLevel(functionName: string, level: string): never {
+  throw new Error(
+    `${errorPrefix} "${level}" is not a valid verification level for ${functionName}. Use 'first_factor' or 'second_factor'.`,
+  );
+}
+
+/**
+ *
+ */
 export function clerkVerifyWeb3WalletCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
   throw new Error(
     `${errorPrefix} You need to start a ${type} flow by calling ${type}.create({ identifier: 'your web3 wallet address' }) first`,

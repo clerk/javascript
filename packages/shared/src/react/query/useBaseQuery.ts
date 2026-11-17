@@ -30,6 +30,7 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
     : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>);
 
   // Make sure results are optimistically set in fetching state before subscribing or updating options
+  // eslint-disable-next-line react-hooks/immutability -- kept in sync with TanStack Query's useBaseQuery, which sets this on the defaulted options
   defaultedOptions._optimisticResults = 'optimistic';
 
   const observer = React.useMemo(() => {

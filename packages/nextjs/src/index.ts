@@ -25,6 +25,7 @@ export {
   APIKeys,
   CreateOrganization,
   GoogleOneTap,
+  HandleSSOCallback,
   InviteMembersButton,
   OAuthConsent,
   OAuthDeviceVerification,

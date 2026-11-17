@@ -1,5 +1,6 @@
 import type { IconFrameProps } from '@clerk/mosaic/components/icon';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
 import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
@@ -35,12 +36,12 @@ export const meta: StoryMeta = {
     _variants: {
       bordered: { true: {}, false: {} },
       filled: { true: {}, false: {} },
-      size: { sm: {}, md: {}, lg: {}, xl: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
       bordered: true,
       filled: false,
-      size: 'xl',
+      size: 'md',
     },
   },
 };
@@ -52,7 +53,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 export function Default(props: Record<string, unknown>) {
   return (
     <IconFrame {...knobsAsProps(props)}>
-      <Icon name='checkmark' />
+      <Icon glyph={Checkmark} />
     </IconFrame>
   );
 }
@@ -60,27 +61,27 @@ export function Default(props: Record<string, unknown>) {
 export function Sizes() {
   return (
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
+      <IconFrame size='xs'>
+        <Icon
+          glyph={Checkmark}
+          size='sm'
+        />
+      </IconFrame>
       <IconFrame size='sm'>
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           size='sm'
         />
       </IconFrame>
       <IconFrame size='md'>
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           size='md'
         />
       </IconFrame>
       <IconFrame size='lg'>
         <Icon
-          name='checkmark'
-          size='md'
-        />
-      </IconFrame>
-      <IconFrame size='xl'>
-        <Icon
-          name='checkmark'
+          glyph={Checkmark}
           size='lg'
         />
       </IconFrame>
@@ -95,23 +96,23 @@ export function Treatments() {
         aria-label='Unframed'
         bordered={false}
       >
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>
       <IconFrame aria-label='Bordered'>
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>
       <IconFrame
         aria-label='Filled'
         bordered={false}
         filled
       >
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>
       <IconFrame
         aria-label='Bordered and filled'
         filled
       >
-        <Icon name='checkmark' />
+        <Icon glyph={Checkmark} />
       </IconFrame>
     </div>
   );
@@ -121,7 +122,7 @@ export function CustomSurface() {
   return (
     <IconFrame xstyle={styles.customSurface}>
       <Icon
-        name='checkmark'
+        glyph={Checkmark}
         size='lg'
       />
     </IconFrame>

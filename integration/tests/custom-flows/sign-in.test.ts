@@ -17,7 +17,7 @@ test.describe('Custom Flows Sign In @custom', () => {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
@@ -33,7 +33,7 @@ test.describe('Custom Flows Sign In @custom', () => {
   });
 
   test('can sign in with email code', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
 
@@ -47,7 +47,7 @@ test.describe('Custom Flows Sign In @custom', () => {
   });
 
   test('renders error with invalid email code', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
 
@@ -60,7 +60,7 @@ test.describe('Custom Flows Sign In @custom', () => {
   });
 
   test('can sign in with phone code', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
 
@@ -74,7 +74,7 @@ test.describe('Custom Flows Sign In @custom', () => {
   });
 
   test('can sign in with password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
 

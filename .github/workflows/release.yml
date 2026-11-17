@@ -41,14 +41,14 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.event_name == 'workflow_dispatch' && format('snapshot-{0}-{1}', inputs.pr_number, inputs.requester) || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' || contains(github.event.head_commit.message, 'Version packages') }}
 
 jobs:
   release:
     name: Release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       actions: read
@@ -67,7 +67,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           fetch-depth: 0
           show-progress: false
@@ -79,7 +79,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Release uses --force, so turbo cache is not needed
@@ -98,7 +98,7 @@ jobs:
 
       - name: Download electron-passkeys native binaries
         if: ${{ steps.detect-native.outputs.should-build == 'true' }}
-        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
+        uses: dawidd6/action-download-artifact@v21
         with:
           github_token: ${{ github.token }}
           workflow: electron-passkeys.yml
@@ -116,7 +116,7 @@ jobs:
 
       - name: Create Release PR
         id: changesets
-        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
+        uses: changesets/action@v1.8.0
         with:
           commit: "ci(repo): Version packages"
           title: "ci(repo): Version packages"
@@ -126,11 +126,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           HUSKY: "0"
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -171,14 +171,14 @@ jobs:
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
             }
 
-      # Recovery: if the changesets action published to npm but then failed
-      # (e.g. git push --follow-tags error), the `published` output is never
+      # Recovery: if the changesets action published to npm but then failed,
+      # the `published` output is never
       # set and downstream repos are not notified. This step detects that
       # scenario by checking npm for the local package version and dispatches
       # if the packages are already live.
       - name: Recover downstream notifications
         if: always() && steps.changesets.conclusion == 'failure'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -276,16 +276,59 @@ jobs:
       - name: Send commit log to Slack
         id: slack
         if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Generate Expo release payload
+        id: expo-release
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_pr="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.head.ref == "changeset-release/main")][0].html_url // ""')" || release_pr=""
+          payload="$(jq -c --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --arg release_pr "$release_pr" '
+            first(.[] | select(.name == "@clerk/expo"))
+            | "Clerk Expo SDK \(.version) has been released" as $title
+            | "\(.name)@\(.version)" as $tag
+            | "<\($repo)/releases/tag/\($tag | @uri | gsub("%2F"; "/"))|View the GitHub release>" as $release_link
+            | {
+                text: $title,
+                blocks: [
+                  { type: "section", text: { type: "mrkdwn", text: "*\($title)*" } },
+                  { type: "context", elements: [ { type: "mrkdwn", text: (if $release_pr == "" then $release_link else "\($release_link) · <\($release_pr)|View the changeset release PR>" end) } ] }
+                ]
+              }
+          ' <<<"$PUBLISHED_PACKAGES")"
+          if [ -z "$payload" ]; then
+            echo "@clerk/expo was not published in this release."
+            exit 0
+          fi
+          echo "$payload"
+          {
+            echo 'payload<<__NOTIFY_EOF__'
+            echo "$payload"
+            echo '__NOTIFY_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send Expo release to Slack
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.expo-release.outputs.payload != '' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v1.27.1
+        with:
+          payload: ${{ steps.expo-release.outputs.payload }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {
@@ -307,13 +350,13 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -322,7 +365,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
@@ -345,12 +388,12 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:canary
         env:
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
         continue-on-error: true
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -385,7 +428,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {
@@ -416,7 +459,7 @@ jobs:
 
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -437,7 +480,7 @@ jobs:
 
       - name: Extract snapshot name
         id: extract-snapshot-name
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           script: |
             const match = context.payload.comment.body.match(/!snapshot (.*)/)
@@ -449,7 +492,7 @@ jobs:
             core.setOutput('name', name);
 
       - name: Validate PR and dispatch snapshot release
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ steps.extract-snapshot-name.outputs.name }}
         with:
@@ -499,7 +542,7 @@ jobs:
             }
 
       - name: Acknowledge request
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
@@ -508,7 +551,7 @@ jobs:
     name: Snapshot release
     if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       contents: read
@@ -517,7 +560,7 @@ jobs:
 
     steps:
       - name: Validate dispatch inputs
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
           HEAD_SHA: ${{ inputs.head_sha }}
@@ -532,7 +575,7 @@ jobs:
             }
 
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -541,7 +584,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
@@ -565,12 +608,12 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:snapshot
         env:
-          NPM_CONFIG_PROVENANCE: true
+          PNPM_CONFIG_PROVENANCE: true
 
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
         id: package-info
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
         with:
@@ -599,14 +642,14 @@ jobs:
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           comment-id: ${{ inputs.comment_id }}
           reactions: heart
 
       - name: Minimize previous snapshot comments
         if: steps.version-packages.outputs.success == '1'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
         with:
@@ -637,7 +680,7 @@ jobs:
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           issue-number: ${{ inputs.pr_number }}
           body: |
@@ -666,7 +709,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -675,7 +718,7 @@ jobs:
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: true
           node-version: ${{ matrix.version }}

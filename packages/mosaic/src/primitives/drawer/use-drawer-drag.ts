@@ -2,6 +2,8 @@
 
 import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 
+import { canScrollToward, isElement } from '../utils/dom';
+import { isIOS } from '../utils/platform';
 import {
   CLOSE_THRESHOLD,
   MIN_SAMPLE_MS,
@@ -11,7 +13,7 @@ import {
   VELOCITY_THRESHOLD,
 } from './constants';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
-import { clamp, dampen, isIOS, safeCapture } from './helpers';
+import { clamp, dampen, safeCapture } from './helpers';
 import type { SnapController } from './use-snap-points';
 
 export interface UseDrawerDragOptions {
@@ -46,11 +48,6 @@ export interface UseDrawerDragReturn {
   isDragging: boolean;
 }
 
-function scrolls(el: HTMLElement): boolean {
-  const { overflowY } = getComputedStyle(el);
-  return overflowY === 'auto' || overflowY === 'scroll';
-}
-
 /**
  * Pointer/transform drag engine for a bottom sheet (Y axis only). Down-to-dismiss
  * with velocity and distance thresholds, an inner-scroll-aware gate, and snap-point
@@ -83,6 +80,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
 
   // Latest options, read at event time so the handlers can stay referentially stable.
   const cfg = useRef(opts);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   cfg.current = opts;
 
   // Record when the drawer opened so the grace window can suppress drag while the
@@ -118,10 +116,15 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     // scroll, so a stale value would drag the sheet where a list should have scrolled.
     cfg.current.setSwipe(0);
     cfg.current.setVar(DrawerCssVars.swipeProgress, '0');
+    // eslint-disable-next-line react/set-state-in-effect -- Clear dragging state when the drawer closes.
     setIsDragging(false);
   }, [open]);
 
-  const shouldDrag = useCallback((target: HTMLElement, down: boolean): boolean => {
+  // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
+  const shouldDrag = useCallback((target: EventTarget | null, down: boolean): boolean => {
+    if (!isElement(target)) {
+      return false;
+    }
     const { now: clock, curSwipe, snap } = cfg.current;
     // Total displacement from fully-open = resting snap offset + live drag delta.
     // Summed from our own authored values, never parsed from getComputedStyle.
@@ -178,17 +181,14 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     // moves — rubber-banding upward at rest, so the drag is never simply swallowed. The walk ends
     // at the sheet: nothing above it is inner content, and its box may well be taller than the
     // screen, while the page behind must never veto a drag.
-    for (let el: HTMLElement | null = target; el; el = el.parentElement) {
+    for (let el: Element | null = target; el; el = el.parentElement) {
       // Only a box that can scroll is inner content: a clipped or overflowing one has the same
       // geometry and none of the behaviour, and would swallow every upward drag at rest.
-      if (el.scrollHeight > el.clientHeight && scrolls(el)) {
-        const room = down ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
-        if (room) {
-          if (down) {
-            lastScrollAt.current = clock();
-          }
-          return false;
+      if (canScrollToward(el, 0, down ? 1 : -1)) {
+        if (down) {
+          lastScrollAt.current = clock();
         }
+        return false;
       }
       if (el === sheet) {
         break;
@@ -281,10 +281,11 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
         return; // nothing a drag could accomplish
       }
       const popup = popupRef.current;
-      if (!popup || !popup.contains(e.target as Node)) {
+      const target = e.target;
+      if (!popup || !isElement(target) || !popup.contains(target)) {
         return;
       }
-      if (handleOnly && !(e.target as HTMLElement).closest(`[${DrawerAttrs.handle}]`)) {
+      if (handleOnly && !target.closest(`[${DrawerAttrs.handle}]`)) {
         return;
       }
 
@@ -301,7 +302,6 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
 
       // Capture the actual target (not the popup) so a click on an inner control
       // still lands on it; the popup handler keeps receiving bubbled moves. (vaul)
-      const target = e.target as Element;
       captured.current = target;
       safeCapture(target, e.pointerId, 'setPointerCapture');
 
@@ -348,7 +348,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       const dist = e.clientY - startY.current; // positive is downward
       const down = dist > 0;
 
-      if (!allowed.current && !shouldDrag(e.target as HTMLElement, down)) {
+      if (!allowed.current && !shouldDrag(e.target, down)) {
         return;
       }
       if (!allowed.current) {

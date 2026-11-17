@@ -1,9 +1,6 @@
 import {
   autoUpdate,
-  Composite,
-  CompositeItem,
   FloatingFocusManager,
-  FloatingPortal,
   getOverflowAncestors,
   hide,
   limitShift,
@@ -16,13 +13,23 @@ import { activeElement, contains, getDocument, getTarget, useLatestRef } from '@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
-import { mergeProps, useRender } from '../../primitives/utils';
+import { X } from '../../icons/glyphs/x';
+import {
+  CompositeItemsProvider,
+  useAnimationsFinished,
+  useComposite,
+  useCompositeItem,
+  useCompositeItems,
+  useTransitionStatus,
+} from '../../primitives/hooks';
+import { Portal } from '../../primitives/portal';
+import { isElement, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { useHeldMessage } from '../../utils/feedback';
 import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { Icon } from '../icon';
@@ -75,12 +82,16 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   ref,
 ) {
   const barRef = React.useRef<HTMLDivElement | null>(null);
+  const [bar, setBar] = React.useState<HTMLDivElement | null>(null);
+  const items = useCompositeItems();
+  const composite = useComposite(bar, {
+    getItems: items.getItems,
+    orientation: 'horizontal',
+    homeEnd: false,
+  });
   const countId = React.useId();
   const context = React.useMemo(() => ({ countId }), [countId]);
-  const openChildrenRef = React.useRef(children);
-  if (open) {
-    openChildrenRef.current = children;
-  }
+  const heldChildren = useHeldMessage(children, open);
 
   const wasOpenRef = React.useRef(false);
   const [status, setStatus] = React.useState('');
@@ -88,6 +99,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- The live region must commit empty before its text arrives, or a bar mounted open is never announced.
       setStatus('');
     } else if (!wasOpen) {
       setStatus(openAnnouncement ?? announcement ?? '');
@@ -113,7 +125,9 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
           shift({
             mainAxis: false,
             crossAxis: true,
-            boundary: scrollingAncestors(state.elements.reference as Element),
+            boundary: isElement(state.elements.reference)
+              ? scrollingAncestors(state.elements.reference)
+              : 'clippingAncestors',
             padding: EDGE_GAP,
             limiter: limitShift({ mainAxis: false, crossAxis: true }),
           }).fn(state),
@@ -126,7 +140,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     refs.setReference(anchor.current);
   });
 
-  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus({ open });
   const runOnAnimationsFinished = useAnimationsFinished(barRef, open);
 
   const focusWithinRef = React.useRef(false);
@@ -154,7 +168,8 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
   const guardPortalledKeys = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
-    if (!bar || !contains(bar, getTarget(event.nativeEvent) as Element)) {
+    const target = getTarget(event.nativeEvent);
+    if (!bar || !isElement(target) || !contains(bar, target)) {
       event.stopPropagation();
     }
   };
@@ -171,7 +186,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
         {status}
       </VisuallyHidden>
       {mounted ? (
-        <FloatingPortal root={portalRoot}>
+        <Portal root={portalRoot}>
           <FloatingFocusManager
             context={floatingContext}
             modal={false}
@@ -190,60 +205,65 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
                 stylex.props(reset.base, styles.positioner, positionerXstyle),
               )}
             >
-              <Composite
-                orientation='horizontal'
-                loop
-                render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-                  const { ref: compositeRef, ...merged } = mergeProps<'div'>(
-                    {
-                      'aria-describedby': countId,
-                      ...mergeStyleProps(
-                        themeProps('action-bar', { open }),
-                        stylex.props(reset.base, styles.bar, xstyle),
-                        rest,
-                      ),
-                    },
-                    compositeProps as Record<string, unknown>,
-                  );
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
-                  return useRender({
-                    defaultTagName: 'div',
-                    render,
-                    ref: [barRef, compositeRef as React.Ref<unknown>],
-                    props: {
-                      ...merged,
-                      ...(transitionStatus === 'starting'
-                        ? { 'data-starting-style': '', style: { transition: 'none' } }
-                        : null),
-                      ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
-                      'data-open': open,
-                      role: 'toolbar',
-                      onFocus: () => {
-                        focusWithinRef.current = true;
-                      },
-                      onBlur: () => {
-                        focusWithinRef.current = false;
-                      },
-                      children: (
-                        <div
-                          role='presentation'
-                          onKeyDown={guardPortalledKeys}
-                          {...stylex.props(styles.items)}
-                        >
-                          {open ? children : openChildrenRef.current}
-                        </div>
-                      ),
-                    },
-                  });
+              <Bar
+                render={render}
+                barRefs={[barRef, setBar]}
+                onCompositeKeyDown={composite.handleKeyDown}
+                transitionStatus={transitionStatus}
+                open={open}
+                onFocusWithinChange={within => {
+                  focusWithinRef.current = within;
                 }}
-              />
+                {...mergeStyleProps(
+                  themeProps('action-bar', { open }),
+                  stylex.props(reset.base, styles.bar, xstyle),
+                  rest,
+                )}
+                aria-describedby={countId}
+              >
+                <div
+                  role='presentation'
+                  onKeyDown={guardPortalledKeys}
+                  {...stylex.props(styles.items)}
+                >
+                  <CompositeItemsProvider value={items}>{heldChildren}</CompositeItemsProvider>
+                </div>
+              </Bar>
             </div>
           </FloatingFocusManager>
-        </FloatingPortal>
+        </Portal>
       ) : null}
     </ActionBarContext.Provider>
   );
 });
+
+interface BarProps extends MosaicComponentProps<'div'> {
+  barRefs: React.Ref<HTMLDivElement>[];
+  onCompositeKeyDown: React.KeyboardEventHandler<HTMLDivElement>;
+  open: boolean;
+  transitionStatus: ReturnType<typeof useTransitionStatus>['transitionStatus'];
+  onFocusWithinChange: (within: boolean) => void;
+}
+
+function Bar({ render, barRefs, onCompositeKeyDown, open, transitionStatus, onFocusWithinChange, ...props }: BarProps) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref: barRefs,
+    props: {
+      ...mergeProps<'div'>(props, {
+        onKeyDown: onCompositeKeyDown,
+        onFocus: () => onFocusWithinChange(true),
+        onBlur: () => onFocusWithinChange(false),
+      }),
+      ...(transitionStatus === 'starting' ? { 'data-starting-style': '', style: { transition: 'none' } } : null),
+      ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
+      'data-open': open,
+      role: 'toolbar',
+      'aria-orientation': 'horizontal',
+    },
+  });
+}
 
 export type ActionBarActionProps = ButtonProps;
 
@@ -251,25 +271,16 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
   { color, xstyle, ...rest },
   ref,
 ) {
+  const compositeItem = useCompositeItem();
+  const mergedRef = useMergeRefs([compositeItem, ref]);
   return (
-    <CompositeItem
-      render={(itemProps: React.HTMLAttributes<HTMLElement>) => {
-        const { ref: itemRef, ...merged } = mergeProps<'button'>(
-          rest as Record<string, unknown>,
-          itemProps as Record<string, unknown>,
-        );
-        return (
-          <Button
-            variant='ghost'
-            size='md'
-            color={color}
-            {...merged}
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            ref={useMergeRefs([ref, itemRef as React.Ref<HTMLButtonElement>])}
-            xstyle={[color === 'negative' && styles.destructive, xstyle]}
-          />
-        );
-      }}
+    <Button
+      variant='ghost'
+      size='md'
+      {...rest}
+      color={color}
+      ref={mergedRef}
+      xstyle={[color === 'negative' && styles.destructive, xstyle]}
     />
   );
 });
@@ -327,7 +338,7 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
       aria-label={ariaLabel ?? 'Clear selection'}
       {...mergeStyleProps(themeProps('action-bar-dismiss'), rest)}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Action>
   );
 });

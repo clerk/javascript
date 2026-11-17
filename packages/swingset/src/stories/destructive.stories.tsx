@@ -1,5 +1,6 @@
+import type { ConfirmControllerOptions } from '@clerk/mosaic/blocks/confirm';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
 import { Menu } from '@clerk/mosaic/components/menu';
 import React from 'react';
@@ -18,7 +19,7 @@ export const meta: StoryMeta = {
 };
 
 // A real delete is a network round trip. Without one the action never renders its pending
-// state, so both stories wait before they settle.
+// state, so the stories wait before they settle.
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 const copy = {
@@ -37,45 +38,54 @@ const copy = {
   actionLabel: 'Delete account',
 };
 
-function Example({ onDelete }: { onDelete: () => Promise<void> }) {
-  const controller = useDestructiveController({ onDelete });
+function Example(options: ConfirmControllerOptions) {
+  const deleteAccount = useConfirmController(options);
   return (
     <Destructive
       {...copy}
-      {...controller}
+      controller={deleteAccount}
     />
   );
 }
 
 export function Default() {
-  return (
-    <Example
-      onDelete={async () => {
-        await settleAfter(2000);
-      }}
-    />
-  );
+  return <Example onConfirm={() => settleAfter(2000)} />;
 }
 
 export function WithError() {
   return (
     <Example
-      onDelete={async () => {
+      onConfirm={async () => {
         await settleAfter(2000);
-        throw new Error('Your subscription is still active. Cancel it before you delete your account.');
+        throw new Error('internal');
       }}
+      errorFallback='Your subscription is still active. Cancel it before you delete your account.'
     />
   );
 }
 
-export function WithHandle() {
-  const [projects, setProjects] = React.useState([
+interface Project {
+  id: string;
+  name: string;
+}
+
+export function WithPayload() {
+  const [projects, setProjects] = React.useState<Project[]>([
     { id: 'project_1', name: 'Production' },
     { id: 'project_2', name: 'Staging' },
     { id: 'project_3', name: 'Development' },
   ]);
-  const deleteProject = React.useMemo(() => Destructive.createHandle<{ id: string; name: string }>(), []);
   const listRef = React.useRef<HTMLUListElement>(null);
+  const deleteProject = useConfirmController<Project>({
+    onConfirm: async project => {
+      await settleAfter(2000);
+      if (project.name === 'Production') {
+        throw new Error('internal');
+      }
+      setProjects(current => current.filter(item => item.id !== project.id));
+    },
+    errorFallback: 'Production still has active deployments. Remove them before deleting the project.',
+  });
 
   return (
     <>
@@ -116,20 +126,13 @@ export function WithHandle() {
         ))}
       </ul>
       <Destructive
-        handle={deleteProject}
+        controller={deleteProject}
         finalFocus={listRef}
         title={project => `Delete ${project.name}?`}
         description={project => `${project.name} and all of its data will be permanently deleted.`}
         fieldLabel={project => `Type “${project.name}” below to continue`}
         confirmationValue={project => project.name}
         actionLabel='Delete project'
-        onDelete={async project => {
-          await settleAfter(2000);
-          if (project.name === 'Production') {
-            throw new Error('Production still has active deployments. Remove them before deleting the project.');
-          }
-          setProjects(current => current.filter(item => item.id !== project.id));
-        }}
       />
     </>
   );

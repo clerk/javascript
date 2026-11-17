@@ -1,16 +1,16 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
-import { useOrganizationProfileEditFieldController } from './organization-profile-edit-field.controller';
-import { OrganizationProfileEditFieldDialog } from './organization-profile-edit-field.dialog';
+import { useOrganizationProfileEditNameController } from './organization-profile-edit-name.controller';
+import { OrganizationProfileEditNameDialog } from './organization-profile-edit-name.dialog';
 
-export interface OrganizationProfileNameRowViewProps {
+interface OrganizationProfileNameRowViewProps {
   name: string;
   onSubmit?: (name: string) => Promise<void>;
 }
 
 export function OrganizationProfileNameRowView({ name, onSubmit }: OrganizationProfileNameRowViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   return (
     <Section.Row>
       <Section.Item>
@@ -32,17 +32,14 @@ export function OrganizationProfileNameRowView({ name, onSubmit }: OrganizationP
 }
 
 function EditName({ name, onSubmit }: { name: string; onSubmit: (name: string) => Promise<void> }) {
-  const m = useMessages('organizationProfileProfileSection');
-  const controller = useOrganizationProfileEditFieldController({ value: name, onSubmit });
+  const m = useMessages('organizationProfile').profile;
+  const controller = useOrganizationProfileEditNameController({ name, onSubmit });
 
   return (
-    <OrganizationProfileEditFieldDialog
-      {...controller}
+    <OrganizationProfileEditNameDialog
+      form={controller.form}
       open={controller.isOpen}
-      title={m.name.dialogTitle}
-      fieldLabel={m.name.fieldLabel}
-      cancelLabel={m.name.cancel}
-      saveLabel={m.name.save}
+      onOpenChange={controller.onOpenChange}
       trigger={
         <Button
           color='neutral'

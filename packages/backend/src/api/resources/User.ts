@@ -28,7 +28,7 @@ export class User {
     readonly twoFactorEnabled: boolean,
     /** Whether the user is banned or not. */
     readonly banned: boolean,
-    /** Whether the user is [locked](https://clerk.com/docs/guides/secure/user-lockout) or not. */
+    /** Whether the user is [locked](https://clerk.com/docs/guides/protect/user-lockout) or not. */
     readonly locked: boolean,
     /** The Unix timestamp when the user was first created. */
     readonly createdAt: number,
@@ -85,6 +85,8 @@ export class User {
     readonly locale: string | null,
     /** The timezone of the user. */
     readonly timezone: string | null = null,
+    /** Whether the user has been [deprovisioned through Directory Sync](https://clerk.com/docs/guides/configure/auth-strategies/enterprise-connections/directory-sync) and is restricted from signing in. Unlike `banned`, it's set and cleared by Directory Sync, not through the Backend API. */
+    readonly deprovisioned: boolean = false,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -123,6 +125,7 @@ export class User {
       data.legal_accepted_at,
       data.locale,
       data.timezone,
+      data.deprovisioned,
     );
     res._raw = data;
     return res;

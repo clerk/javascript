@@ -24,10 +24,6 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   const profileContext = useUserProfileContext();
   const { startEnterpriseSSOLinkFlow } = useEnterpriseSSOLink(email);
 
-  React.useEffect(() => {
-    startVerification();
-  }, []);
-
   function startVerification() {
     const { mode, componentName } = profileContext;
 
@@ -42,6 +38,10 @@ export const VerifyWithEnterpriseConnection = (props: VerifyWithEnterpriseConnec
   async function handleClick() {
     await navigate(email.verification.externalVerificationRedirectURL?.href || '');
   }
+
+  React.useEffect(() => {
+    startVerification();
+  }, []);
 
   return (
     <>

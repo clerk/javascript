@@ -41,7 +41,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
         },
       });
 
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -52,9 +52,8 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
     });
 
     test('sign-in flow', async ({ context, page }) => {
-      const u = createTestUtils({ app, context, page });
+      const u = await createTestUtils({ app, context, page });
 
-      await u.po.testingToken.setup();
       await u.page.goto(`http://${APP_HOST}`, { timeout: 50000 });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);

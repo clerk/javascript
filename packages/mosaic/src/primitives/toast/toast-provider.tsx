@@ -31,6 +31,7 @@ export function ToastProvider(props: ToastProviderProps) {
 
   const ownManagerRef = useRef<ExternalToastManager | null>(null);
   ownManagerRef.current ??= createToastManager();
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   const manager = toastManager ?? ownManagerRef.current;
 
   const storedToasts = useSyncExternalStore(manager.subscribe, manager.getSnapshot, manager.getSnapshot);
@@ -49,6 +50,7 @@ export function ToastProvider(props: ToastProviderProps) {
     const onBlur = () => setWindowFocused(false);
     const onFocus = () => setWindowFocused(true);
     const onVisibilityChange = () => setDocumentVisible(document.visibilityState !== 'hidden');
+    // eslint-disable-next-line react/set-state-in-effect -- Synchronize focus state with the browser window.
     setWindowFocused(document.hasFocus());
     onVisibilityChange();
     window.addEventListener('blur', onBlur);

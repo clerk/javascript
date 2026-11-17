@@ -20,7 +20,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -33,7 +33,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
   // Skip: Intercepting client responses breaks JWT signature validation
   // The decorateUrl functionality is tested in the tests below
   test.skip('navigates through touch endpoint when cookie is close to expiration', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Intercept client responses and modify cookie_expires_at to be within 8 days
     // This makes isEligibleForTouch() return true
@@ -87,7 +87,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
   // Skip: Intercepting client responses breaks JWT signature validation
   // The decorateUrl functionality is tested in the tests below
   test.skip('does not use touch endpoint when cookie is not close to expiration', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Intercept client responses and set cookie_expires_at to be far in the future
     // This makes isEligibleForTouch() return false
@@ -135,7 +135,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
   });
 
   test('decorateUrl returns touch URL when client is eligible for touch', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Sign in first without mocking to get a valid session
     await u.po.signIn.goTo();
@@ -183,7 +183,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
   });
 
   test('decorateUrl returns original URL when client is not eligible for touch', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Sign in first
     await u.po.signIn.goTo();

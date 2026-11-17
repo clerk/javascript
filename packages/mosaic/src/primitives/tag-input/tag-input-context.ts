@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react';
 
+import type { CompositeKeyEvent } from '../hooks/use-composite';
+
 export interface TagInputTag {
   value: string;
   present: boolean;
@@ -11,8 +13,11 @@ export type FocusAfterRemove = 'input' | 'previous' | 'next';
 export interface TagInputContextValue {
   value: string[];
   tags: TagInputTag[];
+  inputValue: string;
+  setInputValue: (inputValue: string) => void;
   delimiters: string[];
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   add: (values: string[]) => void;
   remove: (value: string, focusAfter: FocusAfterRemove) => void;
   focusInput: () => void;
@@ -20,6 +25,7 @@ export interface TagInputContextValue {
   registerInput: (element: HTMLInputElement | null) => void;
   registerTag: (value: string, element: HTMLElement | null) => void;
   onTagExited: (value: string) => void;
+  navigateFromTag: (event: CompositeKeyEvent) => void;
 }
 
 export const TagInputContext = createContext<TagInputContextValue | null>(null);

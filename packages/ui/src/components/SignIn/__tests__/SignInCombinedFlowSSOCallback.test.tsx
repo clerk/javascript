@@ -1,4 +1,4 @@
-import type { HandleOAuthCallbackParams, SignInResource } from '@clerk/shared/types';
+import type { HandleOAuthCallbackParams, SignInResource, SignUpResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -23,12 +23,16 @@ const signInProtectCheckFallbackUrl = `${window.location.origin}/sign-in#/protec
 
 type Fixtures = Awaited<ReturnType<typeof createFixtures>>['fixtures'];
 
-const setup = async (opts: { pendingOAuthTransfer?: boolean } = {}) => {
+const setup = async (opts: { pendingOAuthTransfer?: boolean; gatedSignUp?: boolean } = {}) => {
   const { wrapper, fixtures, props } = await createFixtures(f => {
     f.withEmailAddress();
     f.withSocialProvider({ provider: 'google' });
     f.withPasskey();
     f.withPasskeySettings({ allow_autofill: true, show_sign_in_button: false });
+    if (opts.gatedSignUp) {
+      f.startSignUpWithProtectCheck();
+      return;
+    }
     f.startSignInWithProtectCheck(
       opts.pendingOAuthTransfer ? { pendingOAuthTransfer: true, status: 'needs_identifier' } : undefined,
     );
@@ -138,6 +142,45 @@ describe('SignIn combined-flow SSO callback gated by a Protect check', () => {
       );
     });
     expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-abc' });
+    expectNoReplacementSignIn(fixtures);
+  });
+
+  it('resumes an existing-account transfer after the embedded sign-up challenge', async () => {
+    const { wrapper, fixtures } = await setup({ gatedSignUp: true });
+    vi.mocked(fixtures.clerk.handleRedirectCallback).mockImplementation(
+      async (params: HandleOAuthCallbackParams, navigate?: (to: string) => Promise<unknown>) =>
+        navigate!(params.signUpProtectCheckUrl!),
+    );
+    fixtures.signUp.submitProtectCheck.mockResolvedValue({
+      status: 'missing_requirements',
+      missingFields: ['email_address', 'password'],
+      unverifiedFields: [],
+      protectCheck: null,
+      createdSessionId: null,
+      verifications: {
+        externalAccount: {
+          status: 'transferable',
+          strategy: 'oauth_google',
+          error: { code: 'external_account_exists' },
+        },
+      },
+    } as unknown as SignUpResource);
+
+    renderAtCallback(wrapper);
+
+    await waitFor(() => {
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+        expect.objectContaining({
+          firstFactorUrl: '../../factor-one',
+          secondFactorUrl: '../../factor-two',
+          resetPasswordUrl: '../../reset-password',
+          signInProtectCheckUrl: '../../protect-check',
+        }),
+        expect.any(Function),
+      );
+    });
+    expect(window.location.pathname).toBe('/sign-in/create/protect-check');
+    expect(fixtures.signUp.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-abc' });
     expectNoReplacementSignIn(fixtures);
   });
 });

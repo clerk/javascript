@@ -6,7 +6,7 @@ export { default as __source } from './organization-profile-api-keys-panel.stori
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'OrganizationProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },

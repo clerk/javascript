@@ -276,7 +276,6 @@ describe('Button', () => {
       render(
         <Button
           nativeButton={false}
-          // eslint-disable-next-line jsx-a11y/anchor-has-content -- the render element is a template; Button supplies the children
           render={<a href='#target' />}
           onClick={onClick}
         >
@@ -314,7 +313,6 @@ describe('Button', () => {
         <div>
           <Button
             nativeButton={false}
-            // eslint-disable-next-line jsx-a11y/anchor-has-content -- the render element is a template; Button supplies the children
             render={<a href='#target' />}
             disabled
           >
@@ -335,7 +333,6 @@ describe('Button', () => {
         <Button
           nativeButton={false}
           ref={ref}
-          // eslint-disable-next-line jsx-a11y/anchor-has-content -- the render element is a template; Button supplies the children
           render={<a href='#target' />}
         >
           Save

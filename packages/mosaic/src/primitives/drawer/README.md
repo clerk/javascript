@@ -97,18 +97,18 @@ sheet resists overshooting.
 
 ## Parts
 
-| Part                 | Default Element | Description                                                      |
-| -------------------- | --------------- | ---------------------------------------------------------------- |
-| `Drawer.Root`        | —               | Root context provider; owns open/drag/snap/nesting state         |
-| `Drawer.Trigger`     | `<button>`      | Opens the drawer (in-tree, or via a detached `handle`)           |
-| `Drawer.Portal`      | —               | Portals children (defaults to `document.body`)                   |
-| `Drawer.Backdrop`    | `<div>`         | Semi-transparent overlay surface                                 |
-| `Drawer.Viewport`    | `<div>`         | Fixed full-viewport container; owns scroll lock                  |
-| `Drawer.Popup`       | `<div>`         | The sheet (`role="dialog"`); hosts the drag gesture + focus trap |
-| `Drawer.Handle`      | `<div>`         | Visual drag grip; the hit-test target when `handleOnly`          |
-| `Drawer.Title`       | `<h2>`          | Heading, wired to `aria-labelledby`                              |
-| `Drawer.Description` | `<p>`           | Description, wired to `aria-describedby`                         |
-| `Drawer.Close`       | `<button>`      | Closes the drawer on click                                       |
+| Part                 | Default Element | Description                                                                         |
+| -------------------- | --------------- | ----------------------------------------------------------------------------------- |
+| `Drawer.Root`        | —               | Root context provider; owns open/drag/snap/nesting state                            |
+| `Drawer.Trigger`     | `<button>`      | Opens the drawer (in-tree, or via a detached `handle`)                              |
+| `Drawer.Portal`      | —               | Portals children (defaults to the `PortalProvider` container, else `document.body`) |
+| `Drawer.Backdrop`    | `<div>`         | Semi-transparent overlay surface                                                    |
+| `Drawer.Viewport`    | `<div>`         | Fixed full-viewport container; owns scroll lock                                     |
+| `Drawer.Popup`       | `<div>`         | The sheet (`role="dialog"`); hosts the drag gesture + focus trap                    |
+| `Drawer.Handle`      | `<div>`         | Visual drag grip; the hit-test target when `handleOnly`                             |
+| `Drawer.Title`       | `<h2>`          | Heading, wired to `aria-labelledby`                                                 |
+| `Drawer.Description` | `<p>`           | Description, wired to `aria-describedby`                                            |
+| `Drawer.Close`       | `<button>`      | Closes the drawer on click                                                          |
 
 ## Props
 

@@ -274,7 +274,7 @@ describe('Mosaic Menu', () => {
 
     const media = screen.getByTestId('add-icon').parentElement;
     expect(media?.tagName).toBe('SPAN');
-    expect(media).toHaveClass('cl-menu-media');
+    expect(media).toHaveClass('cl-menu-item-media');
     expect(media?.parentElement).toHaveClass('cl-menu-item');
   });
 
@@ -292,7 +292,7 @@ describe('Mosaic Menu', () => {
     );
 
     // The empty slot must not name the item, or every unillustrated row would read differently.
-    expect(screen.getByRole('menuitem', { name: 'Sign out' }).querySelector('.cl-menu-media')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Sign out' }).querySelector('.cl-menu-item-media')).toBeInTheDocument();
   });
 
   it('forwards the media ref and swaps its element via render', () => {
@@ -313,7 +313,7 @@ describe('Mosaic Menu', () => {
     );
 
     expect(ref.current?.tagName).toBe('I');
-    expect(ref.current).toHaveClass('cl-menu-media');
+    expect(ref.current).toHaveClass('cl-menu-item-media');
   });
 
   it('renders the label as a span inside the item, and names it', () => {
@@ -329,7 +329,7 @@ describe('Mosaic Menu', () => {
       </Menu.Root>,
     );
 
-    const label = screen.getByRole('menuitem', { name: 'colin@clerk.dev' }).querySelector('.cl-menu-label');
+    const label = screen.getByRole('menuitem', { name: 'colin@clerk.dev' }).querySelector('.cl-menu-item-label');
     expect(label?.tagName).toBe('SPAN');
     expect(label).toHaveTextContent('colin@clerk.dev');
   });
@@ -351,7 +351,7 @@ describe('Mosaic Menu', () => {
       </Menu.Root>,
     );
 
-    const mediaOf = (name: string) => screen.getByRole('menuitem', { name }).querySelector('.cl-menu-media');
+    const mediaOf = (name: string) => screen.getByRole('menuitem', { name }).querySelector('.cl-menu-item-media');
 
     expect(mediaOf('Sign out')).toHaveAttribute('data-size', 'sm');
     expect(mediaOf('colin@clerk.dev')).toHaveAttribute('data-size', 'xs');
@@ -370,5 +370,20 @@ describe('Mosaic Menu', () => {
       </Menu.Root>,
     );
     expect(ref.current).toBe(screen.getByRole('button'));
+  });
+
+  it('forwards a ref to the separator', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Popup>
+          <Menu.Item>Cut</Menu.Item>
+          <Menu.Separator ref={ref} />
+          <Menu.Item>Copy</Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('separator'));
   });
 });

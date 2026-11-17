@@ -3,16 +3,16 @@ import Foundation
 
 final class ClerkBiometricsException: Exception {
   private let errorCode: String
-  private let message: String
+  private let errorMessage: String
 
   init(_ error: BiometricsError) {
     errorCode = error.code.rawValue
-    message = error.message
+    errorMessage = error.message
     super.init()
   }
 
   override var code: String { errorCode }
-  override var reason: String { message }
+  override var reason: String { errorMessage }
 }
 
 struct BiometricAvailabilityResult: Record {

@@ -13,6 +13,7 @@ import { useOptionalFieldContext } from '../field/field.context';
 import { Input } from '../input';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
+import { inputGroupScope } from './input-group.markers.stylex';
 import { sizes, styles, textSizes } from './input-group.styles';
 
 export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
@@ -28,23 +29,27 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
   const field = useOptionalFieldContext();
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
-  const [groupElement, setGroupElement] = React.useState<HTMLDivElement | null>(null);
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);
   const inputRef = React.useCallback((node: HTMLInputElement | null) => {
     inputElementRef.current = node;
   }, []);
-  const context = React.useMemo(
-    () => ({ element: groupElement, disabled, invalid, inputRef, size }),
-    [groupElement, disabled, invalid, inputRef, size],
-  );
+  const context = React.useMemo(() => ({ disabled, invalid, inputRef, size }), [disabled, invalid, inputRef, size]);
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, setGroupElement],
+    ref,
     props: {
       ...mergeStyleProps(
         themeProps('input-group', { size, disabled, invalid }),
-        stylex.props(reset.base, inputStyles.group, styles.root, sizes[size], disabled && inputStyles.disabled, xstyle),
+        stylex.props(
+          reset.base,
+          inputGroupScope,
+          inputStyles.group,
+          styles.root,
+          sizes[size],
+          disabled && inputStyles.disabled,
+          xstyle,
+        ),
         otherProps,
       ),
       onClick: (event: React.MouseEvent<HTMLDivElement>) => {

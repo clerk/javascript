@@ -10,9 +10,10 @@ import type {
   OrganizationInvitation,
   OrganizationMembership,
   PhoneNumber,
-  User,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { UserMergedJSON } from '../resources/JSON';
+import { User } from '../resources/User';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
 
@@ -38,6 +39,11 @@ export type UserCountParams = {
 
 /** @generateWithEmptyComment */
 export type UserListParams = ClerkPaginationRequest<{
+  /**
+   * The ID of the last user on the previous page. Only valid when `orderBy` is omitted, `created_at`, `+created_at`,
+   * or `-created_at`, and `offset` is omitted or `0`.
+   */
+  startingAfter?: string;
   /** Filters users with the specified email addresses. Accepts up to 100 email addresses. */
   emailAddress?: string[];
   /** Filters users with the specified phone numbers. Accepts up to 100 phone numbers. */
@@ -101,15 +107,21 @@ export type PasswordHasher =
   | 'argon2id'
   | 'awscognito'
   | 'bcrypt'
+  | 'bcrypt_peppered'
   | 'bcrypt_sha256_django'
   | 'md5'
+  | 'md5_salted'
   | 'pbkdf2_sha256'
   | 'pbkdf2_sha256_django'
   | 'pbkdf2_sha1'
+  | 'pbkdf2_sha512'
+  | 'pbkdf2_sha512_hex'
   | 'phpass'
   | 'scrypt_firebase'
   | 'scrypt_werkzeug'
   | 'sha256'
+  | 'sha256_salted'
+  | 'sha512_symfony'
   | 'md5_phpass'
   | 'ldap_ssha';
 
@@ -145,9 +157,9 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  <li> [`md5_salted` (insecure)](https://en.wikipedia.org/wiki/MD5) </li>
    *   <ul>
-   *    <li> When set, `password_digest` must be in the format of `salt$hash`. </li>
-   *    <li> _salt:_ The salt used to generate the above hash. </li>
+   *    <li> When set, `password_digest` must be in the format of `hash$salt`. </li>
    *    <li> _hash:_ A 32-length hex string. </li>
+   *    <li> _salt:_ The salt used to generate the above hash. </li>
    *   </ul>
    *  <li> [`pbkdf2_sha1`](https://en.wikipedia.org/wiki/PBKDF2) </li>
    *   <ul>
@@ -205,9 +217,9 @@ export type UserPasswordHashingParams = {
    *   </ul>
    *  <li> [`sha256_salted` (insecure)](https://en.wikipedia.org/wiki/SHA-2) </li>
    *   <ul>
-   *    <li> When set, `password_digest` must be in the format of `salt$hash`. </li>
-   *    <li> _salt:_ The salt used to generate the above hash. </li>
+   *    <li> When set, `password_digest` must be in the format of `hash$salt`. </li>
    *    <li> _hash:_ A 64-length hex string. </li>
+   *    <li> _salt:_ The salt used to generate the above hash. </li>
    *   </ul>
    *  <li> [`argon2`](https://argon2.online/) variants: `argon2i` and `argon2id`. </li>
    *   <ul>
@@ -276,7 +288,7 @@ export type CreateUserParams = {
   createdAt?: Date;
   /** When set to `true`, the user is created already banned and cannot sign in. */
   banned?: boolean;
-  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/secure/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
+  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/protect/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
   locked?: boolean;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -414,6 +426,22 @@ export type SetPasswordCompromisedParams = {
   revokeAllSessions?: boolean;
 };
 
+/** @generateWithEmptyComment */
+export type MergeUserParams = {
+  /** The ID of the user to merge into the other user. This user is deleted. */
+  fromUserId: string;
+  /** Whether to return the result of the merge without changing anything. Defaults to `false`. */
+  dryRun?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type UserMergeResult = {
+  /** The user that remains, as it is after the merge. */
+  user: User;
+  /** The merged user as it was before it was deleted. */
+  deletedUser: User;
+};
+
 type ReplaceUserEmailAddressParams = {
   /** The new email address. Must adhere to the RFC 5322 specification for email address format. */
   emailAddress: string;
@@ -435,7 +463,7 @@ export class UserAPI extends AbstractAPI {
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
   public async getUserList(params: UserListParams = {}) {
-    const { limit, offset, orderBy, ...userCountParams } = params;
+    const { limit, offset, orderBy, startingAfter, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
     // In some edge cases the data.length != totalCount due to a creation of a user between the 2 api responses
@@ -789,7 +817,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured in the application's [**System**](https://dashboard.clerk.com/~/protect/rules) settings under **Protect** > **Rules**. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Protections**](https://dashboard.clerk.com/~/protect/protections) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {
@@ -800,7 +828,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to unlock.
    */
   public async unlockUser(userId: string) {
@@ -918,5 +946,23 @@ export class UserAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
+  }
+
+  /**
+   * Merges the `fromUserId` user into the given user: moves its identifications, connected accounts, second factors, organization memberships, and metadata onto the given user, then deletes the `fromUserId` user. Where both users have a value, the given user keeps its own.
+   *
+   * A merge cannot be undone. Use `dryRun` to preview one.
+   * @param userId - The ID of the user that remains after the merge.
+   * @param params - The parameters for the merge.
+   * @returns The remaining [`User`](https://clerk.com/docs/reference/backend/types/backend-user) after the merge, and the deleted user as it was before the merge.
+   */
+  public async mergeUser(userId: string, params: MergeUserParams): Promise<UserMergeResult> {
+    this.requireId(userId);
+    const result = await this.request<UserMergedJSON>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'merge'),
+      bodyParams: params,
+    });
+    return { user: User.fromJSON(result.user), deletedUser: User.fromJSON(result.deleted_user) };
   }
 }

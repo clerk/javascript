@@ -52,8 +52,9 @@ export const disabledSelfServeSSOFeature: ComponentGuard = (clerk, environment) 
 
 export const disabledSelfServeDirectorySyncFeature: ComponentGuard = (clerk, environment) => {
   return (
-    disabledSelfServeSSOFeature(clerk, environment) ||
-    !environment?.userSettings.enterpriseSSO.self_serve_directory_sync
+    !environment?.userSettings.enterpriseSSO.self_serve_sso ||
+    !environment?.userSettings.enterpriseSSO.self_serve_directory_sync ||
+    !clerk.organization?.selfServeDirectorySyncEnabled
   );
 };
 

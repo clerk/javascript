@@ -1,15 +1,18 @@
-import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
+import { useClerk } from '@clerk/shared/react';
+import type { HandleOAuthCallbackParams, SignUpProps, SignUpResource } from '@clerk/shared/types';
 import { type ComponentType, useEffect, useRef, useState } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
 import { ActionBlockedCard, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp } from '../../contexts';
+import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
+import { useRouter } from '../../router';
 import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
 import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
+import { isSignUpPendingOAuthTransfer } from './util';
 
 /**
  * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
@@ -23,6 +26,7 @@ type SignUpProtectCheckProps = Partial<SignUpProps> & {
   verifyPhonePath?: string;
   continuePath?: string;
   protectCheckPath?: string;
+  oauthCallbackParams?: HandleOAuthCallbackParams;
 };
 
 function SignUpProtectCheckInternal({
@@ -30,9 +34,13 @@ function SignUpProtectCheckInternal({
   verifyPhonePath = '../verify-phone-number',
   continuePath = '../continue',
   protectCheckPath = '.',
+  oauthCallbackParams,
 }: SignUpProtectCheckProps = {}): JSX.Element | null {
   const card = useCardState();
   const signUp = useCoreSignUp();
+  const { navigate } = useRouter();
+  const { __internal_resumeAfterProtectCheck } = useClerk();
+  const { navigateOnSetActive } = useSignUpContext();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const completeSignUpFlow = useCompleteSignUpFlow();
   // Latches that a protect check existed at some point, so the resolution race
@@ -41,6 +49,7 @@ function SignUpProtectCheckInternal({
   // write, which React disallows in the render body.
   const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signUp.protectCheck);
   const didStartNoCheckFallbackRef = useRef(false);
+  const didResumeOAuthCallbackRef = useRef(false);
 
   if (signUp.protectCheck && !everSawProtectCheck) {
     setEverSawProtectCheck(true);
@@ -64,6 +73,18 @@ function SignUpProtectCheckInternal({
     // land correctly.
     onResolved: async (updatedSignUp, isCancelled) => {
       if (isCancelled()) {
+        return;
+      }
+      if (
+        oauthCallbackParams &&
+        typeof __internal_resumeAfterProtectCheck === 'function' &&
+        (didResumeOAuthCallbackRef.current || isSignUpPendingOAuthTransfer(updatedSignUp))
+      ) {
+        didResumeOAuthCallbackRef.current = true;
+        await __internal_resumeAfterProtectCheck(
+          { ...oauthCallbackParams, __internal_navigateOnSetActive: navigateOnSetActive },
+          navigate,
+        );
         return;
       }
       await completeSignUpFlow({

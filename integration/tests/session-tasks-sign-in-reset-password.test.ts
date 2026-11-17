@@ -14,7 +14,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
     });
 
     test('resolve both reset password and organization selection tasks after sign-in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const user = u.services.users.createFakeUser(test);
       const createdUser = await u.services.users.createBapiUser(user);
@@ -62,7 +62,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
     });
 
     test('sign-in with email and resolve the reset password task', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const user = u.services.users.createFakeUser(test);
       const createdUser = await u.services.users.createBapiUser(user);
 

@@ -357,19 +357,60 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.replayInterceptedInvocations(clerk);
     };
 
+    const onLoadFailed = (err: unknown) => {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+      this.emitLoaded();
+    };
+
     if (!clerk.loaded) {
       clerk
         .load(this.options)
-        .then(() => onLoaded())
-        .catch(err => {
-          if (__DEV__) {
-            console.error('Clerk: Failed to load:', err);
-          }
-          this.#eventBus.emit(clerkEvents.Status, 'error');
-          this.emitLoaded();
-        });
+        .then(onLoaded, err => {
+          onLoadFailed(err);
+          this.replayWhenLoadIsFinished(clerk);
+        })
+        .catch(onLoadFailed);
     } else {
       onLoaded();
+    }
+  }
+
+  /**
+   * clerk-js can finish a failed load on the same instance, such as when `@clerk/expo` reloads its initial resources
+   * once Clerk stops rejecting the app's version.
+   */
+  private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    if (typeof clerk.on !== 'function') {
+      return;
+    }
+    let finished = false;
+    const onStatus = (status: ClerkStatus) => {
+      if (finished || (status !== 'ready' && status !== 'degraded')) {
+        return;
+      }
+      finished = true;
+      // Unsubscribing while the event bus dispatches would skip the next listener.
+      queueMicrotask(() => {
+        clerk.off('status', onStatus);
+        this.replayFinishedLoad(clerk);
+      });
+    };
+    clerk.on('status', onStatus, { notify: true });
+  }
+
+  // Nothing awaits this replay, so a queued call or listener that throws is handled here, as it is when the first load
+  // succeeds.
+  private replayFinishedLoad(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    try {
+      this.replayInterceptedInvocations(clerk);
+    } catch (err) {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
     }
   }
 
@@ -1633,17 +1674,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  // TODO: This function should likely return its promise and accept onCustomNavigate like the clerk-js version,
+  //       but because that might change behavior of existing callers we need to be careful, might be a major
   handleRedirectCallback = async (params: HandleOAuthCallbackParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleRedirectCallback(params);
     if (this.clerkjs && this.loaded) {
       void callback()?.catch(() => {
-        // This error is caused when the host app is using React18
-        // and strictMode is enabled. This useEffects runs twice because
-        // the clerk-react ui components mounts, unmounts and mounts again
-        // so the clerk-js component loses its state because of the custom
-        // unmount callback we're using.
-        // This needs to be solved by tweaking the logic in uiComponents.tsx
-        // or by making handleRedirectCallback idempotent
+        // This catch was added to silence the error from a second call when a React 18
+        // host app remounted in strict mode. Swallowing the error to "fix" strict mode
+        // hid a real error and clerk-js now joins calls that overlap to fix it.
+        // This catch still hides every other callback failure from callers and should
+        // be removed, but that now changes the public API/behavior of this function
+        // if we happen to have other errors, so it's only safe to do in a major.
       });
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);

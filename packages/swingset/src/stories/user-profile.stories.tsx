@@ -53,3 +53,19 @@ export function Overlay() {
     </Dialog.Root>
   );
 }
+
+export function Fullscreen() {
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
+      <Dialog.Popup variant='fullscreen'>
+        <UserProfileView
+          activePage={activePage}
+          pages={pages}
+          onPageChange={setActivePage}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}

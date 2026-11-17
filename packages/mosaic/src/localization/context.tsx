@@ -29,8 +29,9 @@ function merge(base: unknown, overrides: unknown): unknown {
     if (value === undefined) {
       continue;
     }
-    const [head, ...rest] = key.split('.');
-    const nested = rest.length > 0 ? { [rest.join('.')]: value } : value;
+    const dot = key.indexOf('.');
+    const head = dot === -1 ? key : key.slice(0, dot);
+    const nested = dot === -1 ? value : { [key.slice(dot + 1)]: value };
     result = { ...result, [head]: merge(result[head], nested) };
   }
   return result;
@@ -51,6 +52,7 @@ function resolveLocale(locale: string | undefined): string {
 export function resolveLocalization(localization: MosaicLocalization | undefined): MosaicLocalizationValue {
   const layers = [localization?.messages, localization?.overrides];
   return {
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The merge preserves the message catalog shape while applying partial overrides.
     messages: layers.reduce<unknown>(merge, mosaicMessages) as MosaicMessages,
     locale: resolveLocale(localization?.locale),
   };

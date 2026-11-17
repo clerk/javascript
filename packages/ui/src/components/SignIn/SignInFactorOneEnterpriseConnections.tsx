@@ -10,7 +10,7 @@ import type { AvailableComponentProps } from '@/ui/types';
 
 import { useRouter } from '../../router';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
-import { hasMultipleEnterpriseConnections } from './shared';
+import { getEnterpriseConnectionFactors, hasMultipleEnterpriseConnections } from './shared';
 
 /**
  * @experimental
@@ -22,11 +22,11 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    // This should not happen due to the HOC guard, but provides type safety
+    // This should not happen due to the HOC guard
     return null;
   }
 
-  const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
+  const enterpriseConnections = getEnterpriseConnectionFactors(signIn.supportedFirstFactors).map(ff => ({
     id: ff.enterpriseConnectionId,
     name: ff.enterpriseConnectionName,
     logoPublicUrl: ff.enterpriseConnectionLogoPublicUrl,

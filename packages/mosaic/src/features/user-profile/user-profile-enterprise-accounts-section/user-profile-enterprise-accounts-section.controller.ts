@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
-
+import { usePendingAction } from '../../../hooks/use-pending-action';
+import type { ReverificationController } from '../../reverification';
+import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -10,7 +11,8 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
   onConnect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
-  errorMessage: string;
+  connectReverification: ReverificationController;
+  errorFallback: string;
 }
 
 export interface UserProfileEnterpriseAccountsController {
@@ -18,44 +20,30 @@ export interface UserProfileEnterpriseAccountsController {
   connections: UserProfileEnterpriseConnection[];
   pendingId: string | undefined;
   onConnect: (connectionId: string) => void;
+  connectReverification: ReverificationController;
 }
 
 export function useUserProfileEnterpriseAccountsController({
   accounts,
   connections,
   onConnect,
-  errorMessage,
+  connectReverification,
+  errorFallback,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
-  const [pendingId, setPendingId] = useState<string>();
-  const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
-  const connecting = useRef(false);
-
-  const run = async (id: string) => {
-    if (connecting.current) {
-      return;
-    }
-    connecting.current = true;
-    setPendingId(id);
-    setConnectErrors(({ [id]: _cleared, ...rest }) => rest);
-
-    try {
-      if ((await onConnect(id)) === 'redirecting') {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    } catch (error) {
-      setConnectErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : errorMessage }));
-    } finally {
-      connecting.current = false;
-      setPendingId(undefined);
-    }
-  };
+  const actions = usePendingAction({ errorFallback });
 
   return {
     accounts,
     connections: connections.map(connection =>
-      connectErrors[connection.id] ? { ...connection, connectError: connectErrors[connection.id] } : connection,
+      actions.errorKey === connection.id ? { ...connection, connectError: actions.error } : connection,
     ),
-    pendingId,
-    onConnect: id => void run(id),
+    pendingId: actions.pendingKey,
+    onConnect: id =>
+      void actions.run(id, async () => {
+        if ((await onConnect(id)) === 'redirecting') {
+          await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+        }
+      }),
+    connectReverification,
   };
 }

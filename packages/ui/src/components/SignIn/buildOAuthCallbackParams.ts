@@ -9,6 +9,7 @@ export const signUpStepUrls = (prefix: string) => ({
   verifyEmailAddressUrl: `${prefix}verify-email-address`,
   verifyPhoneNumberUrl: `${prefix}verify-phone-number`,
   signUpProtectCheckUrl: `${prefix}protect-check`,
+  enterpriseConnectionsUrl: `${prefix}enterprise-connections`,
 });
 
 export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOAuthCallbackParams {
@@ -24,7 +25,11 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
     signInProtectCheckUrl: '../protect-check',
     ...(ctx.isCombinedFlow
       ? signUpStepUrls('../create/')
-      : { continueSignUpUrl: ctx.signUpContinueUrl, signUpProtectCheckUrl: ctx.signUpProtectCheckUrl }),
+      : {
+          continueSignUpUrl: ctx.signUpContinueUrl,
+          signUpProtectCheckUrl: ctx.signUpProtectCheckUrl,
+          enterpriseConnectionsUrl: ctx.signUpEnterpriseConnectionsUrl,
+        }),
     unsafeMetadata: ctx.unsafeMetadata,
   };
 }
@@ -51,6 +56,7 @@ export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType):
           verifyEmailAddressUrl: signUpStepUrl('verify-email-address'),
           verifyPhoneNumberUrl: signUpStepUrl('verify-phone-number'),
           signUpProtectCheckUrl: signUpStepUrl('protect-check'),
+          enterpriseConnectionsUrl: signUpStepUrl('enterprise-connections'),
         }),
   };
 }

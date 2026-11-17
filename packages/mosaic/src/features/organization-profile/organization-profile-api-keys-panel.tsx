@@ -4,13 +4,19 @@ import type { ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
-import { APIKeysTable, useAPIKeysAccess } from '../api-keys/api-keys-table';
+import type { APIKeysPageProps } from '../api-keys/api-keys-table';
+import { APIKeysTable } from '../api-keys/api-keys-table';
+import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
 
-export interface OrganizationProfileApiKeysPanelProps {
+export interface OrganizationProfileApiKeysPanelProps extends Omit<APIKeysPageProps, 'hide'> {
   fallback?: ReactNode;
 }
 
-export function OrganizationProfileApiKeysPanel({ fallback }: OrganizationProfileApiKeysPanelProps) {
+export function OrganizationProfileApiKeysPanel({
+  perPage,
+  showDescription,
+  fallback,
+}: OrganizationProfileApiKeysPanelProps) {
   const { organization } = useOrganization();
   const { isAvailable } = useAPIKeysAccess(organization?.id);
   const m = useMessages('organizationProfile');
@@ -24,6 +30,8 @@ export function OrganizationProfileApiKeysPanel({ fallback }: OrganizationProfil
       <Panel.Title>{m.pages.apiKeys}</Panel.Title>
       <APIKeysTable
         subject={organization.id}
+        perPage={perPage}
+        showDescription={showDescription}
         fallback={fallback}
       />
     </Panel.Root>

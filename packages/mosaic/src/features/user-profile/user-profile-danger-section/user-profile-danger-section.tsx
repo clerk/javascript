@@ -1,6 +1,6 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import { useReverificationFlow } from '../../reverification';
 import { UserProfileDangerSectionView } from './user-profile-danger-section.view';
 
@@ -36,11 +36,8 @@ export function UserProfileDangerSection(props: UserProfileDangerSectionProps) {
   };
 
   // -- Controllers --
-  const [deleteAccountWithReverification, reverificationState] = useReverificationFlow(deleteAccount);
-  const destructiveController = useDestructiveController({
-    onDelete: deleteAccountWithReverification,
-    reverification: reverificationState,
-  });
+  const [deleteAccountWithReverification, reverification] = useReverificationFlow(deleteAccount);
+  const controller = useConfirmController({ onConfirm: deleteAccountWithReverification, reverification });
 
   // -- View --
   if (!isLoaded) {
@@ -51,5 +48,5 @@ export function UserProfileDangerSection(props: UserProfileDangerSectionProps) {
     return null;
   }
 
-  return <UserProfileDangerSectionView {...destructiveController} />;
+  return <UserProfileDangerSectionView controller={controller} />;
 }

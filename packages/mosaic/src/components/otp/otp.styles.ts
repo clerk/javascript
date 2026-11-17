@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import {
   colorVars,
+  durationVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -39,13 +40,14 @@ export const styles = stylex.create({
       default: colorVars['--cl-color-positive'],
       ':focus-visible': colorVars['--cl-color-positive'],
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-positive'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-positive'],
       },
     },
     boxShadow: {
       default: null,
       ':focus-visible': positiveFocusShadow,
     },
+    transitionDuration: durationVars['--cl-duration-base'],
   },
   touchTarget: {
     minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },

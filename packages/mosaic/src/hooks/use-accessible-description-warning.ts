@@ -37,12 +37,12 @@ export function useAccessibleDescriptionWarning(
       const described = describedBy
         ?.split(/\s+/)
         .filter(Boolean)
-        .some(id => node.ownerDocument.getElementById(id)?.textContent?.trim());
+        .some(id => node.ownerDocument.getElementById(id)?.textContent.trim());
       if (described) {
         return;
       }
       console.warn(
-        `[clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${descriptionPart ?? `${component}.Description`}>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
+        `[Clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${descriptionPart ?? `${component}.Description`}>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
       );
     }, 0);
 

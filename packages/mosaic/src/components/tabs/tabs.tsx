@@ -2,7 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type {
-  TabsIndicatorProps as HeadlessTabsIndicatorProps,
   TabsListProps as HeadlessTabsListProps,
   TabsPanelProps as HeadlessTabsPanelProps,
   TabsProps as HeadlessTabsRootProps,
@@ -31,7 +30,6 @@ export type TabsTriggerProps = StyledProps<HeadlessTabsTriggerProps>;
 export type TabsPanelProps = StyledProps<HeadlessTabsPanelProps>;
 /** Props for the optional wrapper that stacks the panels in one grid cell so they can animate in and out. */
 export type TabsPanelsProps = MosaicComponentProps<'div'>;
-export type TabsIndicatorProps = StyledProps<HeadlessTabsIndicatorProps>;
 
 function Root({ xstyle, children, ...rest }: TabsRootProps) {
   return (
@@ -41,24 +39,35 @@ function Root({ xstyle, children, ...rest }: TabsRootProps) {
   );
 }
 
-function List({ xstyle, ...rest }: TabsListProps) {
+function List({ xstyle, children, ...rest }: TabsListProps) {
   return (
-    <Primitive.List
-      {...mergeStyleProps(themeProps('tabs-list'), stylex.props(reset.base, styles.list, xstyle), rest)}
-    />
+    <Primitive.List {...mergeStyleProps(themeProps('tabs-list'), stylex.props(reset.base, styles.list, xstyle), rest)}>
+      <Primitive.Indicator
+        {...mergeStyleProps(themeProps('tabs-indicator'), stylex.props(reset.base, styles.indicator))}
+      />
+      {children}
+    </Primitive.List>
   );
 }
 
-const Tab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function MosaicTabsTab({ xstyle, ...rest }, ref) {
+const Tab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function MosaicTabsTab(
+  { xstyle, children, ...rest },
+  ref,
+) {
   return (
     <Primitive.Tab
       ref={ref}
       {...mergeStyleProps(
         themeProps('tabs-tab'),
-        stylex.props(reset.base, styles.tab, styles.hitArea, focusOutline.visible, xstyle),
+        stylex.props(reset.base, styles.tab, styles.anchor, styles.hitArea, focusOutline.visible, xstyle),
         rest,
       )}
-    />
+    >
+      <Primitive.Indicator
+        {...mergeStyleProps(themeProps('tabs-indicator'), stylex.props(reset.base, styles.fallbackIndicator))}
+      />
+      {children}
+    </Primitive.Tab>
   );
 });
 
@@ -103,14 +112,6 @@ const Panels = React.forwardRef<HTMLDivElement, TabsPanelsProps>(function Mosaic
   });
 });
 
-function Indicator({ xstyle, ...rest }: TabsIndicatorProps) {
-  return (
-    <Primitive.Indicator
-      {...mergeStyleProps(themeProps('tabs-indicator'), stylex.props(reset.base, styles.indicator, xstyle), rest)}
-    />
-  );
-}
-
 export const Tabs = {
   Root,
   List,
@@ -118,5 +119,4 @@ export const Tabs = {
   Trigger,
   Panels,
   Panel,
-  Indicator,
 };

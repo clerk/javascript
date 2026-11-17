@@ -1,7 +1,10 @@
+'use client';
+
 export { Profile } from './profile';
 export type {
   ProfileContentProps,
   ProfileElevation,
+  ProfileNavGroupProps,
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileContentPanelProps,

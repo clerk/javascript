@@ -1,8 +1,9 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { Otp } from './index';
 
@@ -239,15 +240,15 @@ describe('Otp', () => {
       expect(inputs()[0]).toHaveFocus();
     });
 
-    it('swaps ArrowLeft/ArrowRight under dir="rtl"', async () => {
+    it('swaps ArrowLeft/ArrowRight in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Harness
             length={4}
             defaultValue='1234'
           />
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(inputs()[1]);
@@ -258,15 +259,15 @@ describe('Otp', () => {
       expect(inputs()[1]).toHaveFocus();
     });
 
-    it('swaps Ctrl/Cmd + arrows under dir="rtl"', async () => {
+    it('swaps Ctrl/Cmd + arrows in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Harness
             length={4}
             defaultValue='123'
           />
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(inputs()[1]);
@@ -475,9 +476,8 @@ describe('Otp', () => {
         Otp.useOtp();
         return null;
       }
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<Orphan />)).toThrow(/within <Otp.Root>/);
-      spy.mockRestore();
     });
   });
 
@@ -517,7 +517,7 @@ describe('Otp', () => {
     });
   });
 
-  describe('form integration', () => {
+  describe('form validation', () => {
     it('marks every slot required so a partial code fails validation', () => {
       render(
         <Harness
@@ -630,5 +630,18 @@ describe('Otp', () => {
       );
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards a ref to the root', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Otp.Root
+        length={4}
+        ref={ref}
+      >
+        <Slots />
+      </Otp.Root>,
+    );
+    expect(ref.current).toBe(screen.getByRole('group'));
   });
 });

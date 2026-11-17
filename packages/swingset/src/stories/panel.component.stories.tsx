@@ -10,7 +10,7 @@ export { default as __source } from './panel.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Panel',
   source: 'packages/mosaic/src/components/panel/panel.tsx',
 };
@@ -29,7 +29,9 @@ export function Default() {
           <Section.Root key={section.title}>
             <Section.Group>
               <Section.Header>
-                <Section.Title>{section.title}</Section.Title>
+                <Section.Content>
+                  <Section.Title>{section.title}</Section.Title>
+                </Section.Content>
               </Section.Header>
               <Section.Body>
                 <Section.Row>

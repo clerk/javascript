@@ -17,7 +17,7 @@ test.describe('Next with ClerkJS V5 <-> Account Portal Core 3 @ap-flows', () => 
     await app.setup();
     await app.withEnv(appConfigs.envs.withAPCore3ClerkV5);
     await app.dev();
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });

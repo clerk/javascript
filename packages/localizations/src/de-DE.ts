@@ -308,9 +308,45 @@ export const deDE: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1608,10 +1644,23 @@ export const deDE: LocalizationResource = {
         'Die Verwendung Ihres Passkeys bestätigt Ihre Identität. Ihr Gerät kann nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen.',
       title: 'Verwenden Sie Ihren Passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Passwort zurücksetzen',
       subtitle: 'Geben Sie Ihr Passwort ein, um fortzufahren.',
       title: 'Passwort-Verifizierung',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Geben Sie den Code ein, den wir an Ihre Telefonnummer gesendet haben.',
@@ -1624,6 +1673,22 @@ export const deDE: LocalizationResource = {
       resendButton: 'Code erneut senden',
       subtitle: 'Überprüfen Sie Ihre SMS auf den Verifizierungscode.',
       title: 'SMS-Code (MFA) Verifizierung',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Geben Sie den Code aus Ihrer Authentifikator-App ein.',
@@ -1758,6 +1823,10 @@ export const deDE: LocalizationResource = {
       subtitle:
         'Die Verwendung Ihres Passkeys bestätigt, dass Sie es sind. Ihr Gerät kann nach Ihrem Fingerabdruck, Ihrem Gesicht oder der Bildschirmsperre fragen.',
       title: 'Verwenden Sie Ihren Passkey',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Verwenden Sie eine andere Methode',
@@ -2063,6 +2132,7 @@ export const deDE: LocalizationResource = {
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
     form_email_address_blocked:
       'Temporäre E-Mail-Dienste werden nicht unterstützt. Bitte verwenden Sie Ihre reguläre E-Mail-Adresse, um ein Konto zu erstellen.',
@@ -2146,9 +2216,12 @@ export const deDE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Sie sind bereits angemeldet.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',

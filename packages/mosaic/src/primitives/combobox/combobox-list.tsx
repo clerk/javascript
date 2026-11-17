@@ -18,7 +18,7 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
   }, [setInlineMode]);
 
   const floatingProps = getFloatingProps();
-  const wiredId = floatingProps.id;
+  const wiredId = floatingProps['id'];
 
   const ownProps = {} satisfies DefaultProps<'div'>;
 
@@ -27,7 +27,7 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
   const merged = mergeProps<'div'>(defaultProps, otherProps);
   // The wired id is owned by the primitive: a consumer-supplied id must not
   // override it, or the aria-controls pairing would silently break.
-  if (wiredId != null) {
+  if (typeof wiredId === 'string') {
     merged.id = wiredId;
   }
 
@@ -39,10 +39,7 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
       {useRender({
         defaultTagName: 'div',
         render,
-        // floating-ui types `setFloating` as a method signature, but at runtime it's
-        // a stable callback that doesn't use `this`, so the unbound-method check is a
-        // false positive here.
-        // eslint-disable-next-line @typescript-eslint/unbound-method
+        // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
         ref: [refs.setFloating, ref],
         props: merged,
       })}

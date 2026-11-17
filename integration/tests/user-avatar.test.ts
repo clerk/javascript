@@ -13,7 +13,7 @@ testAgainstRunningApps({
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, {
       withPhoneNumber: true,
       withUsername: true,
@@ -27,13 +27,13 @@ testAgainstRunningApps({
   });
 
   test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.signOut();
     await u.page.context().clearCookies();
   });
 
   test('UserAvatar loads and renders correctly when user is signed in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({

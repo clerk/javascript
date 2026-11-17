@@ -16,7 +16,9 @@ function Account() {
         <Section.Root>
           <Section.Group>
             <Section.Header>
-              <Section.Title>Email addresses</Section.Title>
+              <Section.Content>
+                <Section.Title>Email addresses</Section.Title>
+              </Section.Content>
             </Section.Header>
           </Section.Group>
         </Section.Root>
@@ -71,7 +73,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content>
+          <Profile.Content pageTitle='Account'>
             <Profile.ContentPanel value='account'>
               <Account />
             </Profile.ContentPanel>
@@ -94,7 +96,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content>
+          <Profile.Content pageTitle='Account'>
             <Profile.ContentPanel value='account'>
               <Panel.Root>
                 <Panel.Title ref={titleRef}>Account</Panel.Title>

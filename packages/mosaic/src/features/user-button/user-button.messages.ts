@@ -23,12 +23,10 @@ export const userButtonMessages = {
     signOutAll: 'Sign out of all accounts',
   },
   manage: {
-    invite: 'Invite',
+    invite: 'Invite members',
     settings: 'Settings',
-    organizationSettings: 'Organization settings',
-    profileSettings: 'Profile settings',
-    account: 'Manage account',
+    profile: 'Manage profile',
     organization: 'Manage organization',
-    createOrganization: 'Create organization',
+    createOrganization: 'Add organization',
   },
 } as const;

@@ -6,7 +6,6 @@ import type {
   SignInStrategy,
 } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { isEmail } from '@/ui/utils/emailUtils';
 import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
@@ -19,8 +18,12 @@ const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
-function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
-  if (isWebAuthnSupported()) {
+export function isOfferableSecondFactor(factor: { strategy: SignInStrategy }, webAuthnSupported: boolean): boolean {
+  return factor.strategy !== 'passkey' || webAuthnSupported;
+}
+
+function findPasskeyStrategy(factors: SignInFactor[], webAuthnSupported: boolean): SignInFactor | null {
+  if (webAuthnSupported) {
     // @ts-ignore
     const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
 
@@ -34,8 +37,9 @@ function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
 function determineStrategyWhenPasswordIsPreferred(
   factors: SignInFactor[],
   identifier: string | null,
+  webAuthnSupported: boolean,
 ): SignInFactor | null {
-  const passkeyFactor = findPasskeyStrategy(factors);
+  const passkeyFactor = findPasskeyStrategy(factors, webAuthnSupported);
   if (passkeyFactor) {
     return passkeyFactor;
   }
@@ -46,8 +50,12 @@ function determineStrategyWhenPasswordIsPreferred(
   return factors.find(factorForIdentifier(identifier)) || selected || null;
 }
 
-function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
-  const passkeyFactor = findPasskeyStrategy(factors);
+function determineStrategyWhenOTPIsPreferred(
+  factors: SignInFactor[],
+  identifier: string | null,
+  webAuthnSupported: boolean,
+): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors, webAuthnSupported);
   if (passkeyFactor) {
     return passkeyFactor;
   }
@@ -69,14 +77,15 @@ export function determineStartingSignInFactor(
   firstFactors: SignInFactor[] | null,
   identifier: string | null,
   preferredSignInStrategy: PreferredSignInStrategy,
+  webAuthnSupported: boolean,
 ): SignInFactor | null | undefined {
   if (!firstFactors || firstFactors.length === 0) {
     return null;
   }
 
   return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password
-    ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier)
-    : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
+    ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier, webAuthnSupported)
+    : determineStrategyWhenOTPIsPreferred(firstFactors, identifier, webAuthnSupported);
 }
 
 export function determineSalutation(signIn: Partial<SignInResource>): string {
@@ -96,10 +105,20 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
   return localStrategies.includes(factor.strategy);
 }
 
-// The priority of second factors is: TOTP -> Phone code -> any other factor
-export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[] | null): SignInFactor | null {
+// The priority of second factors is: Passkey -> TOTP -> Phone code -> any other factor.
+// Passkey is only offered where WebAuthn is supported — without it the passkey
+// card is a dead end, so fall through to the enrolled code-based factors instead.
+export function determineStartingSignInSecondFactor(
+  secondFactors: SignInFactor[] | null,
+  webAuthnSupported: boolean,
+): SignInFactor | null {
   if (!secondFactors || secondFactors.length === 0) {
     return null;
+  }
+
+  const passkeyFactor = findPasskeyStrategy(secondFactors, webAuthnSupported);
+  if (passkeyFactor) {
+    return passkeyFactor;
   }
 
   const totpFactor = secondFactors.find(f => f.strategy === 'totp');
@@ -112,12 +131,17 @@ export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[
     return phoneCodeFactor;
   }
 
-  return secondFactors[0];
+  return secondFactors.find(f => f.strategy !== 'passkey') ?? secondFactors[0];
 }
 
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
+
+/** Whether the sign-in's first factor was a verified password reset. */
+export const isResettingPassword = (resource: SignInResource) =>
+  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
+  resource.firstFactorVerification?.status === 'verified';
 
 export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
   if (identifier.type === 'tel') {

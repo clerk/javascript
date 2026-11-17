@@ -7,38 +7,33 @@
  * would make the browser handle it, but iOS Safari does not implement it and the viewport meta
  * belongs to the host app regardless. So the inset is measured here instead.
  *
- * The value is consumed as extra bottom padding on `Dialog.Viewport`, which is why one number
- * serves all three sizes without any per-size branching:
+ * Two places consume it:
  *
- * - `prompt` is `align-self: end`, so it rises to sit exactly on top of the keyboard.
- * - `card` is centered, so it re-centers in the space that is left — it moves up, and its height is
- *   still driven by its content, so nothing is squashed.
- * - `profile` is `align-self: stretch`, so it shrinks — which is right for the one surface that
- *   already composes its own scroll region.
+ * - The track pads its bottom edge by it, so a centered `card` re-centers in the space that is left
+ *   and a `profile`, which stretches, shrinks into its own scroll region.
+ * - A sheet stays flush to the bottom edge and pads its popup by it instead, so the sheet reaches
+ *   down to the keyboard with no gap where iOS floats its address bar, which `visualViewport`
+ *   counts as part of the keyboard.
  *
- * And `place-items: safe center` on the viewport means a card taller than the remaining space
- * aligns to its top rather than having its head cut off.
+ * While the keyboard is up, iOS can also pan the visual viewport down to reveal a field, which
+ * moves the top of the visible band below the top of the overlay. That pan is published as
+ * `--_cl-keyboard-offset`, and the track pads its top edge by it, so the whole dialog stays inside
+ * the band and scrolls within it rather than leaving its top out of reach above the screen.
  */
 
-import type React from 'react';
-
 const PROPERTY = '--_cl-keyboard-inset';
+const OFFSET_PROPERTY = '--_cl-keyboard-offset';
 
-const NON_TEXT_INPUT_TYPES = new Set([
-  'button',
-  'checkbox',
-  'color',
-  'file',
-  'hidden',
-  'image',
-  'radio',
-  'range',
-  'reset',
-  'submit',
-]);
+// Keyboard-sized changes only: browser toolbars collapsing and expanding stay below this.
+const KEYBOARD_THRESHOLD = 60;
 
 let listeners = 0;
 let detach: (() => void) | null = null;
+// A fixed `100svh` box. Chrome on iOS shrinks `svh` to the keyboard before it resizes the layout
+// viewport to match, so a box that already fits the visible band means the browser is moving fixed
+// content itself, and an inset would lift the dialog twice. Safari leaves `svh` alone.
+let smallViewportProbe: HTMLElement | null = null;
+let fixedBoxProbe: HTMLElement | null = null;
 
 /**
  * The gap between the bottom of the layout viewport and the bottom of the visual viewport — which
@@ -47,7 +42,7 @@ let detach: (() => void) | null = null;
  * `offsetTop` is part of it because iOS scrolls the visual viewport to bring a focused field into
  * view, so the visible band moves as well as shrinks.
  */
-function measure(): number {
+export function measureKeyboardInset(): number {
   const viewport = window.visualViewport;
   if (!viewport) {
     return 0;
@@ -57,11 +52,18 @@ function measure(): number {
   if (viewport.scale > 1) {
     return 0;
   }
-  return Math.max(0, Math.round(document.documentElement.clientHeight - (viewport.height + viewport.offsetTop)));
+  if (smallViewportProbe && smallViewportProbe.offsetHeight - viewport.height <= KEYBOARD_THRESHOLD) {
+    return 0;
+  }
+  const layoutHeight = fixedBoxProbe?.offsetHeight ?? document.documentElement.clientHeight;
+  return Math.max(0, Math.round(layoutHeight - (viewport.height + viewport.offsetTop)));
 }
 
 function publish(): void {
-  document.documentElement.style.setProperty(PROPERTY, `${measure()}px`);
+  const inset = measureKeyboardInset();
+  const offset = inset > 0 ? Math.round(Math.max(0, window.visualViewport?.offsetTop ?? 0)) : 0;
+  document.documentElement.style.setProperty(PROPERTY, `${inset}px`);
+  document.documentElement.style.setProperty(OFFSET_PROPERTY, `${offset}px`);
 }
 
 /**
@@ -77,13 +79,25 @@ export function acquireKeyboardInset(): () => void {
   listeners++;
   if (listeners === 1) {
     const viewport = window.visualViewport;
+    smallViewportProbe = document.createElement('div');
+    smallViewportProbe.style.cssText =
+      'position:fixed;top:0;height:100svh;width:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(smallViewportProbe);
+    fixedBoxProbe = document.createElement('div');
+    fixedBoxProbe.style.cssText = 'position:fixed;top:0;bottom:0;width:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(fixedBoxProbe);
     publish();
     viewport.addEventListener('resize', publish);
     viewport.addEventListener('scroll', publish);
     detach = () => {
       viewport.removeEventListener('resize', publish);
       viewport.removeEventListener('scroll', publish);
+      smallViewportProbe?.remove();
+      smallViewportProbe = null;
+      fixedBoxProbe?.remove();
+      fixedBoxProbe = null;
       document.documentElement.style.removeProperty(PROPERTY);
+      document.documentElement.style.removeProperty(OFFSET_PROPERTY);
     };
   }
 
@@ -94,22 +108,4 @@ export function acquireKeyboardInset(): () => void {
       detach = null;
     }
   };
-}
-
-function opensKeyboard(element: EventTarget | null): element is HTMLElement {
-  return (
-    (element instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.has(element.type)) ||
-    element instanceof HTMLTextAreaElement ||
-    (element instanceof HTMLElement && element.isContentEditable)
-  );
-}
-
-// iOS's reveal pan stops at the end of the locked page, leaving the canvas under the keyboard; the inset lifts the dialog instead.
-export function focusWithoutScroll(event: React.TouchEvent): void {
-  const target = event.target;
-  if (!opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
-    return;
-  }
-  event.preventDefault();
-  target.focus({ preventScroll: true });
 }

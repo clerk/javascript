@@ -305,9 +305,45 @@ export const zhTW: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1585,10 +1621,23 @@ export const zhTW: LocalizationResource = {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '使用其他方式',
       subtitle: '請輸入您的密碼以繼續',
       title: '需要驗證您的身分',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: '驗證碼',
@@ -1601,6 +1650,22 @@ export const zhTW: LocalizationResource = {
       resendButton: '沒收到代碼？重新傳送',
       subtitle: '請輸入已寄至您手機的驗證碼以繼續',
       title: '需要驗證您的身分',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',
@@ -1732,6 +1797,10 @@ export const zhTW: LocalizationResource = {
     passkey: {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '使用其他方式',
@@ -2031,6 +2100,7 @@ export const zhTW: LocalizationResource = {
     avatar_file_type_invalid: '不支援的檔案類型。請上傳 JPG、PNG、GIF 或 WEBP 格式的圖片。',
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
@@ -2102,9 +2172,12 @@ export const zhTW: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '您已經登錄。',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: '找不到 Web3 錢包擴充功能。請安裝以繼續。',
     web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',

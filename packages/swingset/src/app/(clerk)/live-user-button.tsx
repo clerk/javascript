@@ -6,7 +6,7 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 export function LiveUserButton() {
   return (
     <MosaicProvider>
-      <UserButton />
+      <UserButton triggerVariant='condensed' />
     </MosaicProvider>
   );
 }

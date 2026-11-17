@@ -468,6 +468,45 @@ describe('SSO bypass allowlist', () => {
     });
   });
 
+  describe('with self-serve turned off for the organization', () => {
+    it('renders the connections read-only and hides Directory Sync for a member who can manage connections', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+        f.withEmailAddress();
+        f.withOrganizations();
+        f.withOrganizationDomains(undefined, 'org:member');
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: false,
+              permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'],
+            },
+          ],
+        });
+      });
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([activeConnection]);
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([]);
+
+      renderPage(wrapper);
+
+      expect(await screen.findByText('SSO bypass')).toBeInTheDocument();
+      expect(screen.getByText('Active')).toBeInTheDocument();
+
+      expect(
+        within(document.querySelector('.cl-profileSection__sso') as HTMLElement).queryByRole('button', {
+          name: /open menu/i,
+        }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Add connection' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
+      expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
+      expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.getEnterpriseConnectionTestRuns).not.toHaveBeenCalled();
+    });
+  });
+
   describe('with the SSO bypass permission alone', () => {
     it('renders the connections read-only next to the SSO bypass section', async () => {
       const { wrapper, fixtures } = await createFixtures(

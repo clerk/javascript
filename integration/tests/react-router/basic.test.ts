@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -27,13 +27,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('can sign in and user button renders', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
@@ -51,7 +51,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/protected');
       await u.page.waitForURL(`${app.serverUrl}/sign-in`);
@@ -59,7 +59,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('renders control components contents', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToAppHome();
       await expect(u.page.getByText('SignedOut')).toBeVisible();
@@ -72,7 +72,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('renders user profile with SSR data', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in');
       await u.po.signIn.waitForMounted();

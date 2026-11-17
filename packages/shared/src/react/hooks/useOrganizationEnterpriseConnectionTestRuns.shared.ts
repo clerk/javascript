@@ -13,6 +13,7 @@ export function useOrganizationEnterpriseConnectionTestRunsCacheKeys(params: {
   args: GetEnterpriseConnectionTestRunsParams;
 }) {
   const { organizationId, enterpriseConnectionId, args } = params;
+  const argsKey = JSON.stringify(args);
   return useMemo(() => {
     return createCacheKeys({
       stablePrefix: INTERNAL_STABLE_KEYS.ORGANIZATION_ENTERPRISE_CONNECTION_TEST_RUNS_KEY,
@@ -27,5 +28,5 @@ export function useOrganizationEnterpriseConnectionTestRunsCacheKeys(params: {
     });
     // The args object is intentionally serialized via the consumer to keep stability.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId, enterpriseConnectionId, JSON.stringify(args)]);
+  }, [organizationId, enterpriseConnectionId, argsKey]);
 }
