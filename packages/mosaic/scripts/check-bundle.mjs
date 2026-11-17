@@ -5,12 +5,11 @@ const distDir = resolve(import.meta.dirname, '../dist');
 const jsFiles = (await readdir(distDir, { recursive: true })).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
 const packageJson = JSON.parse(await readFile(resolve(import.meta.dirname, '../package.json'), 'utf8'));
-const entryFiles = Object.entries(packageJson.exports)
-  .filter(([subpath]) => subpath === '.' || /^\.\/(components|primitives)\//.test(subpath))
-  .map(([, target]) => target)
-  .map(target => (typeof target === 'string' ? target : target.import))
-  .filter(file => file?.endsWith('.js'))
-  .map(file => resolve(import.meta.dirname, '..', file));
+const entryFile = target => resolve(import.meta.dirname, '..', typeof target === 'string' ? target : target.import);
+const unitEntryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => /^\.\/(components|primitives)\//.test(subpath))
+  .map(([, target]) => entryFile(target));
+const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles];
 
 const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
 const importsOf = source =>
@@ -27,7 +26,7 @@ const code = source =>
 const checkNamespaceEntry = async (entryFile, source) => {
   const display = relative(distDir, entryFile);
   const lines = code(source);
-  const namedImport = /^import \{ (\w+) \} from "(\.[^"]+)";$/;
+  const namedImport = /^import \{ (\w+(?:, \w+)*) \} from "(\.[^"]+)";$/;
   const namedExport = /^export \{ (\w+(?: as \w+)?(?:, \w+(?: as \w+)?)*) \};$/;
   if (!lines.every(line => namedImport.test(line) || namedExport.test(line))) {
     throw new Error(
@@ -35,16 +34,19 @@ const checkNamespaceEntry = async (entryFile, source) => {
     );
   }
   for (const line of lines.filter(line => namedImport.test(line))) {
-    const [, binding, specifier] = line.match(namedImport);
+    const [, bindings, specifier] = line.match(namedImport);
     const partsFile = resolve(dirname(entryFile), specifier);
     const parts = await readFile(partsFile, 'utf8');
     if (isClientModule(parts)) {
       continue;
     }
-    if (!new RegExp(`^var ${binding} = /\\* @__PURE__ \\*/ __exportAll\\(`, 'm').test(parts)) {
+    const binding = bindings
+      .split(', ')
+      .find(name => new RegExp(`^var ${name} = /\\* @__PURE__ \\*/ __exportAll\\(`, 'm').test(parts));
+    if (!binding) {
       if (importsReact(parts)) {
         throw new Error(
-          `${display} imports ${binding} from ${relative(distDir, partsFile)}, which imports React but is neither a namespace object nor a 'use client' module.`,
+          `${display} imports ${bindings} from ${relative(distDir, partsFile)}, which imports React but is neither a namespace object nor a 'use client' module.`,
         );
       }
       continue;
@@ -61,10 +63,15 @@ const checkNamespaceEntry = async (entryFile, source) => {
   }
 };
 
-for (const entryFile of entryFiles) {
-  const source = await readFile(entryFile, 'utf8');
+for (const file of entryFiles) {
+  const source = await readFile(file, 'utf8');
+  if (isClientModule(source) && unitEntryFiles.includes(file)) {
+    throw new Error(
+      `Published Mosaic JS entry ${relative(distDir, file)} starts with 'use client'; put the boundary on the modules it re-exports instead.`,
+    );
+  }
   if (!isClientModule(source)) {
-    await checkNamespaceEntry(entryFile, source);
+    await checkNamespaceEntry(file, source);
   }
 }
 

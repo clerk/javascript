@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * The account and organization switcher. `Switcher.Root` holds the open state, `Switcher.Trigger`
  * opens it, and `Switcher.Popup` positions a card holding `Switcher.Header` and `Switcher.Group`s
