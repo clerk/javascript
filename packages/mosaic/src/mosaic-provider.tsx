@@ -5,7 +5,6 @@ import { organizationProfileModal } from './features/organization-profile/organi
 import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
 import { MosaicProfileProvider } from './features/profile-pages/use-mosaic-profile';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
-import { UserProfileModalReturn } from './features/user-profile/user-profile.modal-return';
 import type { MosaicExperimental } from './hooks/use-mosaic-experimental';
 import { MosaicExperimentalProvider } from './hooks/use-mosaic-experimental';
 import { MosaicNowProvider } from './hooks/use-now';
@@ -74,10 +73,7 @@ export function MosaicProvider({
                     modals={routing?.modals}
                   >
                     <VirtualStoreProvider>
-                      <ModalHost surfaces={modalSurfaces}>
-                        <UserProfileModalReturn />
-                        {children}
-                      </ModalHost>
+                      <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
                     </VirtualStoreProvider>
                   </RouterAdapterProvider>
                 </ToastProvider>

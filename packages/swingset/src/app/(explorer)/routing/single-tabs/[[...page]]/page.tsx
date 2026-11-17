@@ -56,8 +56,8 @@ export default function SingleTabsPage() {
             lives at the base itself, and the others are{' '}
             <code className='font-mono text-xs'>{pagePath}/invitations</code> and{' '}
             <code className='font-mono text-xs'>{pagePath}/settings</code>. Back moves between tabs, a reload keeps the
-            tab, and a link from the host opens one directly in every URL mode. The other modes are here to compare the
-            URL shapes; multiple tabs on one page are the next case.
+            tab, and a link from the host opens one directly in every mode. The other modes are here to compare the URL
+            shapes; multiple tabs on one page are the next case.
           </p>
         }
       >

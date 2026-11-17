@@ -47,7 +47,7 @@ A URL location is derived from the host URL and writes to it directly.
 - Back works in every URL mode, a deep link opens the page it names, and the page survives a reload. After a modal is opened and closed the page has two history entries, so the first Back appears to do nothing; cheap to change if it turns out to matter.
 - Two writes in one tick clobber each other; the last one wins.
 - A host that adds trailing slashes redirects each write once. Under a base path, hash and query work with reads alone, since the write then starts from `window`; path mode needs `push` and `replace` that prepend the base path.
-- A write from a passive effect in the hydration commit of a Next.js app runs before Next has patched `history`, so Next does not see it. Nothing in Mosaic writes there today: the profiles wait for Clerk before their first redirect. A write that has to happen then goes through a microtask, as the modal return does.
+- A write from a passive effect in the hydration commit of a Next.js app runs before Next has patched `history`, so Next does not see it. Nothing in Mosaic writes there today: the profiles wait for Clerk before their first redirect. A write that has to happen then goes through a microtask, as consuming a link does ([MEDR-0010](./0010-links.md)).
 - A part cannot contain a slash in hash or query mode, and a custom page path with one works in path and virtual mode only. `/a.b` and `/a/b` share a key. Hash routing with the empty prefix needs a `path` other than `/`, and warns otherwise.
 - Every mode runs the contract suite. The URL modes declare `parks` and `dropsOnMove` as differences, `path` declares `severalBases`, and `hash` and `query` declare `slashInPart`.
 - `ModalSurfaceConfig.routing` puts a surface's entry in the hash or the query string, and the provider's `routing.modals` does it for Mosaic's own modals at once. In the pathname a modal's base is the page it opens from plus its own path, and `clear` writes that page rather than the base, since a pathname at the base would still mean open; the location takes the page as `clearedPath`. They stay virtual by default until a product decision says otherwise.
@@ -63,3 +63,4 @@ A URL location is derived from the host URL and writes to it directly.
 
 - **2026-11-11**: Accepted.
 - **2026-11-12**: Amended after review: the re-serialised query is attributed to the swingset's stack rather than to Next's hydration.
+- **2026-11-17**: Amended: the microtask example is consuming a link.

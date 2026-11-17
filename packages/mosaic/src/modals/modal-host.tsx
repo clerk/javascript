@@ -8,6 +8,7 @@ import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
 import { normalizeBase } from '../routing/base-path';
+import { useConsumeLink } from '../routing/consume-link';
 import { useRoutingConfig } from '../routing/router-adapter';
 import { useMosaicLocation } from '../routing/use-mosaic-location';
 import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from './modal.types';
@@ -75,7 +76,8 @@ export function ModalSurfaceHost<Options>({
   const page = routing === 'path' ? (modals?.path ?? '') : undefined;
   const base = page === undefined ? own : `${normalizeBase(page)}${normalizeBase(own)}`;
   const location = useMosaicLocation({ routing, path: base, clearedPath: page });
-  const isOpen = location.useSegmentParts() !== undefined;
+  const entry = useConsumeLink(location, location.useSegmentParts(), { routing, path: own });
+  const isOpen = entry !== undefined;
   const stack = React.useContext(ModalStackContext);
   const register = stack?.register;
   React.useEffect(() => (isOpen ? register?.(surface.id) : undefined), [isOpen, register, surface.id]);

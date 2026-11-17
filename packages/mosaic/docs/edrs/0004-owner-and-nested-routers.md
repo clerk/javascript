@@ -34,7 +34,7 @@ Two hooks with an opaque scope between them. The owner names its `root`, redirec
 ## Consequences
 
 - `route` can be switched on without a guard. Passing `ready` at all makes it optional in the type, so an owner with an unsettled table has to decide what the loading window shows.
-- Owners of one base that fall back to their root cannot loop each other, but the second keeps snapping the first back to its root on every navigation; a configuration error shows as that, with no warning. Two such owners whose `notFound` send one segment to different routes redirect each other forever, also with no warning.
+- Owners of one base that fall back to their root cannot loop each other, but the second keeps snapping the first back to its root on every navigation; a configuration error shows as that, with no warning. Two such owners whose `notFound` send one segment to different routes redirect each other forever, also with no warning. Owners of one base in different modes, a virtual and a query owner of `/user`, share the query param of [MEDR-0010](./0010-links.md): the query owner reads it as its entry and the virtual owner takes it as a link and removes it.
 - An empty table, as when a profile has no pages yet, routes to a placeholder root and writes nothing.
 - Nesting lands on the scope later: a sub-surface's base is the parent's base plus its segment.
 
@@ -48,3 +48,4 @@ Two hooks with an opaque scope between them. The owner names its `root`, redirec
 - **2026-11-06**: Accepted.
 - **2026-11-06**: Amended after review: `notFound` and the redirect fuse replaced by `root`; `ready` added.
 - **2026-11-12**: Amended: `notFound` as an owner option recorded; a route it names that needs params shows the root with a warning; two owners of one base whose `notFound` disagree can loop.
+- **2026-11-17**: Amended: owners of one base in different modes share a link's param.

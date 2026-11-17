@@ -83,7 +83,7 @@ export default function PageWithModalsPage() {
   const href = (page: MosaicRoutingMode, modal: ModalMode) => `${pagePath}?mode=${page}&modal=${modal}`;
   const query = { modal: modalMode };
   const pageBase = pageMode === 'path' ? pagePath : '/page';
-  const sameMode = pageMode === modalMode && pageMode !== 'virtual' && pageMode !== 'path';
+  const sameMode = pageMode === modalMode && pageMode !== 'path';
 
   return (
     <MosaicProvider

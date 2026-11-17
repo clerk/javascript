@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { MosaicRoutingScope } from '../../routing/routing-scope';
 import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
@@ -150,13 +151,11 @@ export function UserProfile(props: UserProfileProps) {
         apiKeysProps: organizationApiKeysProps,
         afterLeaveOrganizationUrl,
       }}
-      presentation='mounted'
     />
   );
 }
 
 export function UserProfileSurface({
-  presentation,
   combined = true,
   organizationProfileProps,
   customPages,
@@ -166,7 +165,7 @@ export function UserProfileSurface({
   additionalOAuthScopes,
   fallback,
   apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
-}: UserProfileProps & { presentation: NonNullable<UserProfileOptions['mode']> }) {
+}: UserProfileProps) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
 
@@ -192,10 +191,7 @@ export function UserProfileSurface({
   };
 
   return (
-    <UserProfileProvider
-      additionalOAuthScopes={additionalOAuthScopes}
-      mode={presentation}
-    >
+    <UserProfileProvider additionalOAuthScopes={additionalOAuthScopes}>
       {combined ? (
         <CombinedUserProfileView
           key={routing}
@@ -219,7 +215,7 @@ type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'
 };
 
 function AccountUserProfileView({ path, routing, ...viewProps }: AccountViewProps) {
-  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
+  const { activePage, onPageChange, scope } = useProfilePagesController(userProfilePageIds(viewProps), {
     routing,
     path,
   });
@@ -229,11 +225,13 @@ function AccountUserProfileView({ path, routing, ...viewProps }: AccountViewProp
   }
 
   return (
-    <UserProfileView
-      {...viewProps}
-      activePage={activePage}
-      onPageChange={onPageChange}
-    />
+    <MosaicRoutingScope scope={scope}>
+      <UserProfileView
+        {...viewProps}
+        activePage={activePage}
+        onPageChange={onPageChange}
+      />
+    </MosaicRoutingScope>
   );
 }
 
@@ -250,7 +248,7 @@ function CombinedUserProfileView({
       ? { pages: organizationProfilePanels(model.pages, apiKeysProps), customPages, pageOrder }
       : undefined;
   const pageIds = model.status === 'loading' ? undefined : userProfilePageIds({ ...viewProps, organization });
-  const { activePage, onPageChange } = useProfilePagesController(pageIds, {
+  const { activePage, onPageChange, scope } = useProfilePagesController(pageIds, {
     routing,
     path,
     notFound: parts =>
@@ -265,12 +263,14 @@ function CombinedUserProfileView({
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
-      <UserProfileView
-        {...viewProps}
-        activePage={activePage}
-        onPageChange={onPageChange}
-        organization={organization}
-      />
+      <MosaicRoutingScope scope={scope}>
+        <UserProfileView
+          {...viewProps}
+          activePage={activePage}
+          onPageChange={onPageChange}
+          organization={organization}
+        />
+      </MosaicRoutingScope>
     </OrganizationProfileProvider>
   );
 }

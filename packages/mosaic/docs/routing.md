@@ -13,7 +13,7 @@ In virtual mode a segment lives while a mounted component owns it. Navigate away
 ## URL modes
 
 - `path` keeps the segment in the pathname under `path`, `/user/security`, as the legacy components do. `path` is where the component is mounted, so a host with a catch-all route at `/account/[[...page]]` passes `path='/account'`. A component mounted somewhere else shows its first page, and its first navigation writes under `path`, away from where it is. One component per page can use the pathname.
-- `hash` and `query` keep the segment in one param per component, `#.user=security` or `?.user=security`. The param's name is a prefix and the component's base with dots for slashes, so the profile modal at `/modal/user` is `.modal.user`. The leading dot is what keeps them apart from the host's own params, and it survives a host re-serialising the query string, which `~`, `@` and the like do not. A prefix can go in front of it, `routing={{ keyPrefix: { query: 'clerk' } }}` for `clerk.user`; there is none by default. The value is the segment's parts, each percent-encoded, joined with `/`, and is read back the way the host reads any param, decoded, so a part cannot contain a slash in these modes. Other params are left exactly as they are.
+- `hash` and `query` keep the segment in one param per component, `#.user=security` or `?.user=security`. The param's name is a prefix and the component's base with dots for slashes, so the profile modal at `/modal/user` is `.modal.user`. The leading dot is what keeps them apart from the host's own params, and it survives a host re-serialising the query string, which `~`, `@` and the like do not. A prefix can go in front of it, `routing={{ keyPrefix: { query: 'clerk' } }}` for `clerk.user`; there is none by default. The value is the segment's parts, each percent-encoded, joined with `/`, and is read back the way the host reads any param, decoded, so a part cannot contain a slash in these modes. Other params are left exactly as they are. The query form is also how a page links to a component in any mode, see [Links](#links).
 - A navigation pushes a history entry; a redirect to the root and a modal closing replace. Back moves through a component's pages. Reloading or sharing the URL opens the page it names.
 - `routing` is fixed when the component mounts. To change it, remount the component with a `key`; a changed prop warns and is ignored.
 - Without an adapter the URL modes read and write `window.location`. The server renders the component's first page and the client corrects it after hydration.
@@ -82,6 +82,36 @@ export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
 `useModal(userProfileModal).open({ page: 'security' })` is how a host opens a profile on a page. Opening on the first page writes its id, which the profile canonicalises to the base. The modal is open whenever its entry exists, so an entry written from outside opens it too, and its content loads whenever it is open, not only when the handle opened it.
 
 In the hash and query modes opening pushes a history entry and closing replaces it, so Back closes the modal, a URL with the param opens it, and after a close the page has two entries for its own URL. A modal opened from another modal stacks on it, in every mode: an outside press or Escape closes the one on top only. Mosaic's own modals are virtual by default; `routing={{ modals: 'query' }}` on the provider puts them in the query string, `'hash'` in the hash, for every modal at once. In the pathname a modal lives under the page it opens from: `routing={{ modals: { routing: 'path', path: '/account' } }}` opens the user profile modal at `/account/modal/user/security` and closes back to `/account`, so that page's route has to accept the extra parts, and one modal at a time can be open. Changing any of it needs the provider remounted.
+
+## Links
+
+A link to a component's page is the query mode's param, in every mode. `?.user=security` lands the owner of `/user` on Security, and `?.modal.user=account` opens the profile modal on Account, whether they route in memory, the pathname, the hash or the query string. The name is the query prefix and the base with dots for slashes, as in query mode, and the value is the parts, each percent-encoded, joined with `/`. A host links to a page with it, and a redirect returns through it.
+
+- In query mode the param is the component's entry, and it stays.
+- In `virtual`, `path` and `hash` mode the owner of the base reads the param, writes its page to its own place, memory, the pathname or the hash, with a replace, and removes the param, leaving every other param, the hash and the history state as they were. The modal host does it for each modal, so a link opens a modal before its content has mounted. A path-mode modal answers to its own name too, `.modal.user`, not the page's path in front of it.
+- Links are read from the query string only, never from the hash.
+- The owner reads links whenever the URL changes, not only when it mounts, so a host's `<Link href="?.user=security">` on a page that stays mounted works.
+- When the owner mounts with an entry already, the URL wins and the link is removed unused: that is a reload of a page whose URL already names the page. In path mode the base itself counts as no entry. A link that arrives after the owner mounted is followed whatever page it is on, since it is a navigation.
+- Nothing reads a link for a base nothing owns; it stays in the URL until an owner mounts. An inline owner shows its first page until it has read the link, a moment after it mounts.
+- Two owners of one base in different modes, a virtual and a query one of `/user` on the same page, share the one param: the query owner reads it as its entry and the virtual owner takes it as a link and removes it. Give one of them another `path`.
+
+### Returning after a redirect
+
+A flow that leaves the page and comes back, such as an OAuth or enterprise connection or verifying an email through an identity provider, hands Clerk the URL to return to. Build it with `useReturnUrl`, anywhere `useRouter` can be called:
+
+```ts
+const returnUrl = useReturnUrl(routes);
+
+await user.createExternalAccount({ strategy, redirectUrl: returnUrl('account') });
+```
+
+- `returnUrl(name, params)` takes a route name and its params, typed from the table as `go` is, and returns the page's URL as it is when called, absolute, with a link to that route for the scope's owner. It never navigates.
+- In `path` and `hash` mode the route is written where the owner keeps it, `/user/security` or `#.user=security`; in `query` and `virtual` mode it is the link, `?.user=security`. Nothing else in the URL changes.
+- Outside a scope, or for params a carrier cannot hold, it returns the page's URL as it is, the latter with a warning.
+
+What comes back is the route and nothing else. A modal reopened by a link gets the provider's `profile` options, not the options it was opened with. A flow's machine starts over in its first state, and a section reads its resources again, so it shows what the redirect changed.
+
+The profile sections that redirect, connected accounts, enterprise accounts and email verification through an identity provider, return to the profile's account page: a connection made in the profile modal reopens the modal on Account, and one made in an inline profile shows that profile on Account.
 
 ## Seeing it run
 

@@ -10,7 +10,6 @@ export interface UserProfileOptions {
    * @example { google: ['https://www.googleapis.com/auth/calendar.readonly'] }
    */
   additionalOAuthScopes?: AdditionalOAuthScopes;
-  mode?: 'modal' | 'mounted';
 }
 
 export interface UserProfileProviderProps extends UserProfileOptions {
@@ -19,8 +18,8 @@ export interface UserProfileProviderProps extends UserProfileOptions {
 
 const UserProfileContext = createContext<UserProfileOptions>({});
 
-export function UserProfileProvider({ additionalOAuthScopes, mode, children }: UserProfileProviderProps) {
-  return <UserProfileContext.Provider value={{ additionalOAuthScopes, mode }}>{children}</UserProfileContext.Provider>;
+export function UserProfileProvider({ additionalOAuthScopes, children }: UserProfileProviderProps) {
+  return <UserProfileContext.Provider value={{ additionalOAuthScopes }}>{children}</UserProfileContext.Provider>;
 }
 
 export function useUserProfileOptions(): UserProfileOptions {

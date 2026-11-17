@@ -16,6 +16,9 @@ export interface Route<Routes extends RouteTable> {
   params: Record<string, string>;
 }
 
+export type RouteParamsArgs<Pattern extends string> =
+  Record<never, never> extends RouteParams<Pattern> ? [params?: RouteParams<Pattern>] : [params: RouteParams<Pattern>];
+
 type RouteArgs<Pattern extends string, Rest> =
   Record<never, never> extends RouteParams<Pattern>
     ? [params?: RouteParams<Pattern>, rest?: Rest]

@@ -8,11 +8,18 @@ import { UserCircle } from '../../icons/glyphs/user-circle';
 import { applyOrder } from '../../utils/apply-order';
 import { organizationProfilePageIds } from '../organization-profile/organization-profile.layout';
 import type { OrganizationProfilePageListOptions } from '../organization-profile/organization-profile.types';
-import { withRoutablePaths, withUniquePaths } from '../profile-pages/profile-pages.layout';
+import { pageSegment, withRoutablePaths, withUniquePaths } from '../profile-pages/profile-pages.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
 export const USER_PROFILE_PAGE_IDS: readonly UserProfilePageId[] = ['account', 'security', 'billing', 'apiKeys'];
+
+export const USER_PROFILE_ROUTES: Readonly<Record<UserProfilePageId, string>> = {
+  account: pageSegment('account'),
+  security: pageSegment('security'),
+  billing: pageSegment('billing'),
+  apiKeys: pageSegment('apiKeys'),
+};
 
 /** Sets an organization page's id apart from an account page's when the profile shows both. */
 export const ORGANIZATION_PAGE_PREFIX = 'organization/';

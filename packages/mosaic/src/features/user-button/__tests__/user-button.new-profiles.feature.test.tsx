@@ -138,8 +138,7 @@ describe('UserButton with experimental.newProfiles', () => {
 
     const body = new URLSearchParams(await request.requests[0]?.text());
     const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
-    expect(params.has('__clerk_modal_state')).toBe(false);
+    expect(params.get('.modal.user')).toBe('account');
     request.fail();
   });
 

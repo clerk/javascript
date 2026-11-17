@@ -28,7 +28,6 @@ export default function UserProfileModalContent({
   return (
     <UserProfileSurface
       {...props}
-      presentation='modal'
       path={path}
       routing={routing}
     />

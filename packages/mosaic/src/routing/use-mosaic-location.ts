@@ -37,7 +37,7 @@ function readNothing(): undefined {
 
 // An adapter's hook, or nothing when it does not have that one. The provider fixes which hooks the
 // adapter has, so the hooks this calls are fixed too.
-function useAdapterRead(
+export function useAdapterRead(
   read: (() => string | URLSearchParams | null | undefined) | undefined,
   leading: string,
 ): string | undefined {
