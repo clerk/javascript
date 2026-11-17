@@ -14,7 +14,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en'>
-      <body className='bg-white font-sans text-neutral-950 antialiased'>
+      <body className='bg-background text-foreground flex min-h-dvh flex-col font-sans antialiased'>
+        <a
+          href='#content'
+          className='bg-accent text-accent-foreground absolute -start-[999px] top-0 z-[100] px-4 py-2 focus:start-0'
+        >
+          Skip to content
+        </a>
         <SiteHeader />
         {children}
       </body>

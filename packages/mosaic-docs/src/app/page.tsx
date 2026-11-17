@@ -1,31 +1,63 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
+import { LandingFooter } from '@/components/landing-footer';
 import { site } from '@/lib/site';
+
+function TextLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className='text-accent hover:text-foreground inline-flex items-center gap-1 whitespace-nowrap text-sm font-medium'
+    >
+      {children}
+      <svg
+        aria-hidden='true'
+        className='size-3.5 shrink-0'
+        fill='none'
+        stroke='currentColor'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        strokeWidth='2'
+        viewBox='0 0 24 24'
+      >
+        <path d='m9 18 6-6-6-6' />
+      </svg>
+    </Link>
+  );
+}
 
 export default function HomePage() {
   return (
-    <main className='mx-auto max-w-5xl px-4 py-24 sm:px-6'>
-      <p className='text-xs text-neutral-500'>Clerk design system</p>
-      <h1 className='mt-6 text-5xl font-medium tracking-tight sm:text-6xl'>
-        Mosaic
-        <br />
-        <span className='text-neutral-400'>Clerk&apos;s component library</span>
-      </h1>
-      <p className='mt-8 max-w-xl text-lg text-neutral-600'>{site.description}</p>
-      <div className='mt-8 flex flex-wrap items-center gap-6 text-sm font-medium'>
-        <Link
-          href='/docs'
-          className='rounded-md bg-neutral-950 px-4 py-2.5 text-white transition-colors hover:bg-neutral-800'
-        >
-          Get started
-        </Link>
-        <Link
-          href={site.githubUrl}
-          className='text-neutral-600 transition-colors hover:text-neutral-950'
-        >
-          View on GitHub
-        </Link>
-      </div>
-    </main>
+    <>
+      <main className='flex-1'>
+        <section className='pb-16 pt-16 sm:pb-20 sm:pt-24'>
+          <div className='mx-auto max-w-[1400px] px-6'>
+            <p className='text-muted-foreground inline-flex items-center py-1 text-xs'>Clerk design system</p>
+            <h1 className='mt-6 max-w-3xl text-balance text-4xl font-medium sm:text-5xl lg:text-6xl'>
+              <span className='block'>Mosaic</span>
+              <span className='text-muted-foreground block'>Clerk&apos;s component library</span>
+            </h1>
+            <p className='text-muted-foreground mt-8 max-w-xl text-pretty text-lg'>{site.description}</p>
+            <div className='mt-8 flex flex-wrap items-center gap-x-6 gap-y-4'>
+              <div className='rounded-docs border-border flex w-full max-w-xs items-center gap-2 border px-3 py-2.5 font-mono text-sm'>
+                <span
+                  aria-hidden='true'
+                  className='text-muted-foreground'
+                >
+                  $
+                </span>
+                <code>pnpm add @clerk/mosaic</code>
+              </div>
+              <div className='flex items-center gap-6'>
+                <TextLink href='/docs'>Get started</TextLink>
+                <TextLink href={site.githubUrl}>View on GitHub</TextLink>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <LandingFooter />
+    </>
   );
 }

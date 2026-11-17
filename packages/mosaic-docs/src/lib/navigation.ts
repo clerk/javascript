@@ -8,6 +8,12 @@ export interface NavGroup {
   items: NavItem[];
 }
 
+export interface TocHeading {
+  depth: 2 | 3;
+  slug: string;
+  text: string;
+}
+
 export const navigation: NavGroup[] = [
   {
     title: 'Get started',

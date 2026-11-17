@@ -1,20 +1,30 @@
 import type { Metadata } from 'next';
 
+import { DocsPage } from '@/components/docs-page';
+import type { TocHeading } from '@/lib/navigation';
 import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Introduction',
 };
 
+const headings: TocHeading[] = [
+  { depth: 2, slug: 'components', text: 'Components' },
+  { depth: 2, slug: 'primitives', text: 'Primitives' },
+  { depth: 2, slug: 'hooks', text: 'Hooks' },
+];
+
 export default function IntroductionPage() {
   return (
-    <article>
-      <h1 className='text-4xl font-medium tracking-tight'>Introduction</h1>
-      <p className='mt-4 text-lg text-neutral-600'>{site.description}</p>
-      <p className='mt-6 text-neutral-700'>
-        Mosaic is split into components, which are styled and ready to use, primitives, which are headless building
-        blocks, and hooks.
-      </p>
-    </article>
+    <DocsPage headings={headings}>
+      <h1>Introduction</h1>
+      <p className='lead'>{site.description}</p>
+      <h2 id='components'>Components</h2>
+      <p>Styled, ready-to-use building blocks.</p>
+      <h2 id='primitives'>Primitives</h2>
+      <p>Headless building blocks that components are made from.</p>
+      <h2 id='hooks'>Hooks</h2>
+      <p>React hooks for behavior shared across components.</p>
+    </DocsPage>
   );
 }

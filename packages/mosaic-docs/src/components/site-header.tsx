@@ -1,34 +1,47 @@
-import Link from 'next/link';
+'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { GitHubLink } from '@/components/github-link';
 import { site } from '@/lib/site';
 
-const links = [
+const tabs = [
   { title: 'Docs', href: '/docs' },
   { title: 'Changelog', href: site.changelogUrl },
-  { title: 'GitHub', href: site.githubUrl },
 ];
 
 export function SiteHeader() {
+  const pathname = usePathname();
+
   return (
-    <header className='sticky top-0 z-10 border-b border-neutral-100 bg-white/90 backdrop-blur'>
-      <div className='mx-auto grid h-14 max-w-screen-2xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6'>
+    <header className='bg-background/90 sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 px-4 backdrop-blur sm:gap-3 md:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(max-content,1fr)]'>
+      <div className='flex min-w-0 items-center gap-2 sm:gap-3 lg:col-start-1'>
         <Link
           href='/'
-          className='text-sm font-semibold text-neutral-950'
+          className='text-foreground inline-flex min-w-0 items-center gap-2 text-base font-semibold'
         >
-          {site.name}
+          <span className='truncate'>{site.name}</span>
         </Link>
-        <nav className='flex items-center gap-6 text-sm text-neutral-600'>
-          {links.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className='transition-colors hover:text-neutral-950'
-            >
-              {link.title}
-            </Link>
-          ))}
-        </nav>
+      </div>
+      <nav
+        aria-label='Sections'
+        className='hidden shrink-0 gap-1 md:flex lg:col-start-2'
+      >
+        {tabs.map(tab => (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            aria-current={pathname.startsWith(tab.href) ? 'page' : undefined}
+            className='text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:text-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors'
+          >
+            {tab.title}
+          </Link>
+        ))}
+      </nav>
+      <div className='flex-1 lg:hidden' />
+      <div className='flex shrink-0 items-center gap-1 lg:col-start-3 lg:justify-self-end'>
+        <GitHubLink iconClassName='size-[18px]' />
       </div>
     </header>
   );
