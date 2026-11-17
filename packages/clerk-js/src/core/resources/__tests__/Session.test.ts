@@ -1621,6 +1621,27 @@ describe('Session', () => {
         expect.anything(),
       );
     });
+
+    it('asks for the client on the touch request', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+
+      requestSpy.mockResolvedValue({
+        payload: { response: mockSessionData },
+        status: 200,
+      });
+
+      await session.__internal_touch();
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/touch',
+          search: { include_client: 'true' },
+        }),
+        expect.anything(),
+      );
+    });
   });
 
   describe('isAuthorized()', () => {

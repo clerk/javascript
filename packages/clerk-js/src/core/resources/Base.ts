@@ -103,8 +103,15 @@ export abstract class BaseResource {
     let fapiResponse: FapiResponse<J>;
     const { fetchMaxTries } = opts;
 
+    let fapiRequestInit = requestInit;
+    if (requestInit.method === 'GET' && opts.forceUpdateClient) {
+      const search = new URLSearchParams(requestInit.search);
+      search.set('include_client', 'true');
+      fapiRequestInit = { ...requestInit, search };
+    }
+
     try {
-      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
+      fapiResponse = await BaseResource.fapiClient.request<J>(fapiRequestInit, { fetchMaxTries });
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
