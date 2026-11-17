@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import { fapiEnvironment, type FapiEnvironmentOverrides } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useVirtualSegment, useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp, type SignUpProps } from '../sign-up';
 
 const EMAIL = 'alice@example.com';
@@ -26,6 +27,22 @@ async function renderSignUp(
   const view = await renderWithClerk(<SignUp {...props} />, options);
   const user = userEvent.setup();
   return { ...view, fapi, user };
+}
+
+function RouteProbe() {
+  const parts = useVirtualSegment('/sign-up');
+  const write = useVirtualWrite();
+  return (
+    <>
+      <output aria-label='Stored route'>{parts?.join('/') || 'start'}</output>
+      <button
+        type='button'
+        onClick={() => write('/sign-up', ['verify-email-address'])}
+      >
+        Open the verify route
+      </button>
+    </>
+  );
 }
 
 const emailField = () => screen.getByRole('textbox', { name: 'Email address' });
@@ -275,6 +292,23 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
     expect(screen.getByText('Contact support.')).toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
+  });
+
+  it('replaces a route the sign-up is not ready for with the screen it shows', async () => {
+    serveFapi({ environment: environment() });
+    await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+
+    await waitFor(() => expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('start'));
+    expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
   });
 
   it('links to sign-in from the form', async () => {
