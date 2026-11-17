@@ -1,7 +1,7 @@
 'use client';
 
 import { site } from '@/lib/site';
-import { CopyIcon, useFlash } from '@/ui/copy-button';
+import { CopyIcon, copyText, useFlash } from '@/ui/copy-button';
 
 const prompt = `Set up Mosaic for me. Fetch ${site.url}/docs/setup.md and follow it.`;
 
@@ -43,13 +43,19 @@ const agents = [
 ];
 
 export function AgentPrompt() {
-  const [copied, flash] = useFlash<true>();
+  const [status, flash] = useFlash<'copied' | 'failed'>();
+  const copied = status === 'copied';
 
   return (
     <button
       type='button'
       title={prompt}
-      onClick={() => void navigator.clipboard.writeText(prompt).then(() => flash(true))}
+      onClick={() =>
+        void copyText(prompt).then(
+          () => flash('copied'),
+          () => flash('failed'),
+        )
+      }
       className='border-border hover:bg-muted/50 inline-flex cursor-pointer items-center gap-3 rounded-full border py-2 pl-2 pr-4 text-left transition-colors'
     >
       <span
@@ -77,7 +83,7 @@ export function AgentPrompt() {
         className='sr-only'
         aria-live='polite'
       >
-        {copied ? 'Prompt copied' : ''}
+        {copied ? 'Prompt copied' : status === 'failed' ? 'Copy failed' : ''}
       </span>
       <span
         aria-hidden

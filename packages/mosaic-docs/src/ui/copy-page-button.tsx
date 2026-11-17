@@ -22,12 +22,12 @@ export function CopyPageButton({ href }: { href: string }) {
   );
 }
 
-function copyMarkdown(href: string): Promise<void> {
+async function copyMarkdown(href: string): Promise<void> {
   const blob = fetch(href).then(async response => {
     if (!response.ok) {
       throw new Error(`Fetching ${href} failed with ${response.status}`);
     }
     return new Blob([await response.text()], { type: 'text/plain' });
   });
-  return navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
+  await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
 }

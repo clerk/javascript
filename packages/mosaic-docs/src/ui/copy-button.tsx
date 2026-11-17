@@ -41,14 +41,24 @@ export function CopyIcon({ className }: { className: string }) {
   );
 }
 
+export async function copyText(text: string): Promise<void> {
+  await navigator.clipboard.writeText(text);
+}
+
 export function CopyButton({ text }: { text: string }) {
-  const [copied, flash] = useFlash<true>();
+  const [status, flash] = useFlash<'copied' | 'failed'>();
+  const copied = status === 'copied';
 
   return (
     <button
       type='button'
-      aria-label={copied ? 'Copied' : 'Copy code'}
-      onClick={() => void navigator.clipboard.writeText(text).then(() => flash(true))}
+      aria-label={copied ? 'Copied' : status === 'failed' ? 'Copy failed' : 'Copy code'}
+      onClick={() =>
+        void copyText(text).then(
+          () => flash('copied'),
+          () => flash('failed'),
+        )
+      }
       className={`text-muted-foreground bg-background size-7.5 relative inline-flex shrink-0 select-none items-center justify-center rounded-md transition-colors ${copied ? '' : 'hover:bg-muted hover:text-foreground'}`}
     >
       <svg
