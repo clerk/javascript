@@ -71,19 +71,6 @@ export type UseReverificationOptions = {
   /**
    * When `true`, the fetcher's first argument is a `ReverificationResult` (`undefined` on the first call), and the
    * returned function takes the remaining arguments.
-   *
-   * @example
-   * ```tsx
-   * const updatePassword = useReverification(
-   *   (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
-   *     // A password reset during reverification already saved the new password.
-   *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
-   *   { passReverificationResult: true },
-   * );
-   *
-   * // In the submit handler, once `user` is loaded:
-   * await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
-   * ```
    */
   passReverificationResult?: true;
 };
