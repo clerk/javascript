@@ -18,6 +18,12 @@ test('maps doc paths to a kind and slug', () => {
   );
 });
 
+test('leaves out docs the site does not publish', () => {
+  assert.deepEqual(toEntries(['src/components/captcha/captcha.doc.ts', 'src/components/button/button.doc.ts']), [
+    { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },
+  ]);
+});
+
 test('rejects a doc outside the documented locations', () => {
   assert.throws(
     () => toEntries(['src/components/button/parts/icon.doc.ts']),

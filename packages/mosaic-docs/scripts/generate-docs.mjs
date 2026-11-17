@@ -3,6 +3,7 @@ import { dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const DOC_PATH = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
+const EXCLUDED = new Set(['components/captcha']);
 
 export function toEntries(paths) {
   const entries = paths.map(path => {
@@ -24,7 +25,9 @@ export function toEntries(paths) {
     seen.add(key);
   }
 
-  return entries.sort((a, b) => a.kind.localeCompare(b.kind) || a.slug.localeCompare(b.slug));
+  return entries
+    .filter(({ kind, slug }) => !EXCLUDED.has(`${kind}/${slug}`))
+    .sort((a, b) => a.kind.localeCompare(b.kind) || a.slug.localeCompare(b.slug));
 }
 
 export function renderModule(mosaicDir, entries) {
