@@ -11,5 +11,4 @@
  * ```
  */
 export * as Panel from './panel.parts';
-export { usePanelTitle } from './panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from './panel';

@@ -1,1 +1,1 @@
-export { PanelRoot as Root, PanelTitle as Title, PanelSections as Sections } from './panel';
+export { PanelRoot as Root, PanelTitle as Title, PanelSections as Sections, usePanelTitle } from './panel';

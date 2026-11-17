@@ -15,3 +15,4 @@ export {
   SectionNote as Note,
   SectionError as Error,
 } from './section';
+export { sectionCompactStyles as compactStyles } from './section.styles';

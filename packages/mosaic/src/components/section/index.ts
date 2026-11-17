@@ -4,7 +4,6 @@
  * either `Section.Row`s (one setting each) or a `Section.Items` list of values.
  */
 export * as Section from './section.parts';
-export { sectionCompactStyles } from './section.styles';
 export type {
   SectionActionsProps,
   SectionBodyProps,
