@@ -1,5 +1,6 @@
 export const site = {
   name: 'Mosaic',
+  url: 'https://mosaic.clerk.com',
   description: 'Clerk’s next-generation component library: components, primitives and hooks.',
   details:
     'Install with `pnpm add @clerk/mosaic`. Each page below documents one component, primitive or hook: what to use it for, its practices, its API and examples.',

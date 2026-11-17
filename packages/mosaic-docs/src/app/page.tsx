@@ -1,38 +1,8 @@
-import Link from 'next/link';
-import type { ReactNode } from 'react';
-
+import { AgentPrompt } from '@/components/agent-prompt';
 import { LandingFooter, LandingFooterLinks } from '@/components/landing-footer';
-import { highlightTokens } from '@/core/highlight';
 import { site } from '@/lib/site';
-import { CopyButton } from '@/ui/copy-button';
 
-const installCommand = 'pnpm add @clerk/mosaic';
-
-function TextLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className='text-accent hover:text-foreground inline-flex items-center gap-1 whitespace-nowrap text-sm font-medium'
-    >
-      {children}
-      <svg
-        aria-hidden='true'
-        className='size-3.5 shrink-0'
-        fill='none'
-        stroke='currentColor'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2'
-        viewBox='0 0 24 24'
-      >
-        <path d='m9 18 6-6-6-6' />
-      </svg>
-    </Link>
-  );
-}
-
-export default async function HomePage() {
-  const installTokens = await highlightTokens(installCommand, 'sh');
+export default function HomePage() {
   return (
     <>
       <div className='flex min-h-[calc(100dvh-4rem)] flex-col'>
@@ -44,30 +14,8 @@ export default async function HomePage() {
                 <span className='text-muted-foreground block'>Clerk’s component library</span>
               </h1>
               <p className='text-muted-foreground mt-8 max-w-xl text-balance text-lg'>{site.description}</p>
-              <div className='mt-8 flex flex-wrap items-center gap-x-6 gap-y-4'>
-                <div className='rounded-docs border-border flex w-full max-w-xs items-center gap-2 border py-1.5 pl-3 pr-1.5 font-mono text-sm'>
-                  <span
-                    aria-hidden='true'
-                    className='text-muted-foreground'
-                  >
-                    $
-                  </span>
-                  <code className='flex-1'>
-                    {installTokens.map((token, index) => (
-                      <span
-                        key={index}
-                        style={{ color: token.color }}
-                      >
-                        {token.content}
-                      </span>
-                    ))}
-                  </code>
-                  <CopyButton text={installCommand} />
-                </div>
-                <div className='flex items-center gap-6'>
-                  <TextLink href='/docs'>Get started</TextLink>
-                  <TextLink href={site.githubUrl}>View on GitHub</TextLink>
-                </div>
+              <div className='mt-8'>
+                <AgentPrompt />
               </div>
             </div>
           </section>
