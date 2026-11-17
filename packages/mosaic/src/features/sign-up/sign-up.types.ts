@@ -28,7 +28,7 @@ export type SignUpStep =
   | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly AuthProvider[] }
   | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
   | { kind: 'notice'; purpose: 'email-link-status'; status: AuthEmailLinkStatusValue }
-  | { kind: 'notice'; purpose: 'restricted' | 'waitlist' | 'loading' }
+  | { kind: 'notice'; purpose: 'restricted' | 'waitlist' | 'loading' | 'start-over' }
   | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
   | { kind: 'notice'; purpose: 'action-blocked'; details?: AuthActionBlockedDetails };
 
@@ -57,6 +57,7 @@ export interface SignUpViewProps {
   onEditIdentifier: () => void;
   onCancel?: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEmailSupport?: () => void;
   onJoinWaitlist?: () => void;
   onResend?: () => void;

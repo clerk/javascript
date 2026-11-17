@@ -112,6 +112,7 @@ function StepPanel({
       onEditIdentifier={() => undefined}
       onCancel={onCancel}
       onBack={() => undefined}
+      onStartOver={() => undefined}
       onEmailSupport={onEmailSupport}
       onJoinWaitlist={onJoinWaitlist}
       onResend={resend ? () => undefined : undefined}
@@ -355,6 +356,10 @@ export function WalletsSingle() {
 
 export function Loading() {
   return <StepPanel step={{ kind: 'notice', purpose: 'loading' }} />;
+}
+
+export function StartOver() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
 }
 
 export function ProtectCheck() {

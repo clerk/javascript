@@ -9,6 +9,7 @@ import {
   AuthIdentityPreview,
   AuthLoading,
   AuthProtectCheck,
+  AuthStartOver,
   AuthWallets,
 } from '../../blocks/auth';
 import type { VerificationResendMessages } from '../../blocks/verification';
@@ -49,6 +50,7 @@ export function SignUpView({
   onEditIdentifier,
   onCancel,
   onBack,
+  onStartOver,
   onEmailSupport,
   onJoinWaitlist,
   onResend,
@@ -121,6 +123,13 @@ export function SignUpView({
             isPending={isPending}
             containerRef={protectCheckRef}
             onRetry={onRetry}
+          />
+        );
+      case 'start-over':
+        return (
+          <AuthStartOver
+            messages={m.startOver}
+            onStartOver={onStartOver}
           />
         );
       case 'action-blocked':

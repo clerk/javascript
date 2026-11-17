@@ -29,6 +29,7 @@ const stepsByKey: Record<SignUpStepKey, SignUpStep> = {
   'notice:restricted': { kind: 'notice', purpose: 'restricted' },
   'notice:waitlist': { kind: 'notice', purpose: 'waitlist' },
   'notice:loading': { kind: 'notice', purpose: 'loading' },
+  'notice:start-over': { kind: 'notice', purpose: 'start-over' },
   'notice:protect-check': { kind: 'notice', purpose: 'protect-check', challenge: false },
   'notice:action-blocked': { kind: 'notice', purpose: 'action-blocked' },
 };
