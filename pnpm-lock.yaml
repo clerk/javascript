@@ -1068,12 +1068,18 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.3.0
+        version: 4.3.0
       '@types/react':
         specifier: catalog:react
         version: 18.3.28
       '@types/react-dom':
         specifier: catalog:react
         version: 18.3.7(@types/react@18.3.28)
+      tailwindcss:
+        specifier: ^4.3.0
+        version: 4.3.0
       typescript:
         specifier: catalog:repo
         version: 6.0.3

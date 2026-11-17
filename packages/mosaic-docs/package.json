@@ -17,8 +17,10 @@
     "react-dom": "catalog:react"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.0",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "tailwindcss": "^4.3.0",
     "typescript": "catalog:repo"
   }
 }
