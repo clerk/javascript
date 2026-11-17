@@ -125,6 +125,8 @@ export function getSignUpNextStep(signUp: SignUpNextStepInput): SignUpNextStep {
   if (signUp.missingFields.length > 0) {
     return { type: 'fields', fields: signUp.missingFields };
   }
+  // TODO: FAPI computes `MissingRequirements` in `checkStatus` but does not serialize it, so a sign-up blocked only
+  // by an unmet identifier requirement lands here. Return `fields` from `missing_requirements` once FAPI sends it.
   return { type: 'unknown' };
 }
 
