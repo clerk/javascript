@@ -3750,8 +3750,8 @@ export class Clerk implements ClerkInterface {
       }
     }
 
-    this.updateClient(client);
     this.updateEnvironment(environment);
+    this.updateClient(client);
     // TODO: Add an auth service also for non standard browsers that will poll for the __session JWT but won't use cookies
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
@@ -3785,8 +3785,8 @@ export class Clerk implements ClerkInterface {
   __internal_reloadInitialResources = async (): Promise<void> => {
     const [environment, client] = await this.#fetchInitialResources({ fetchMaxTries: 1, timeLimited: true });
 
-    this.updateClient(client);
     this.updateEnvironment(environment);
+    this.updateClient(client);
 
     // A load that is still running finishes with these resources if it fails. An overlapping reload may have finished
     // loading first.
