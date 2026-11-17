@@ -1,8 +1,26 @@
 import Link from 'next/link';
 
 import { GitHubLink } from '@/components/github-link';
-import { navigation } from '@/lib/navigation';
+import { docKinds } from '@/lib/docs';
 import { site } from '@/lib/site';
+
+const groups = [
+  {
+    title: 'Docs',
+    items: [
+      { title: 'Introduction', href: '/docs' },
+      ...docKinds.map(({ kind, title }) => ({ title, href: `/docs#${kind}` })),
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { title: 'Changelog', href: site.changelogUrl },
+      { title: 'GitHub', href: site.githubUrl },
+      { title: 'llms.txt', href: '/llms.txt' },
+    ],
+  },
+];
 
 export function LandingFooter() {
   return (
@@ -12,18 +30,15 @@ export function LandingFooter() {
           aria-label='Footer'
           className='grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-7'
         >
-          {navigation.map(group => (
-            <div
-              key={group.title}
-              className='min-w-0'
-            >
+          {groups.map(group => (
+            <div key={group.title}>
               <p className='text-foreground text-sm font-medium'>{group.title}</p>
               <ul className='mt-4 space-y-3'>
                 {group.items.map(item => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className='text-muted-foreground hover:text-foreground wrap-anywhere text-sm transition-colors'
+                      className='text-muted-foreground hover:text-foreground text-sm transition-colors'
                     >
                       {item.title}
                     </Link>
