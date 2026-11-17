@@ -20,9 +20,9 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import { useVirtualEntries, useVirtualWrite } from '../../../routing/virtual-store';
 import { OrganizationProfile } from '../../organization-profile/organization-profile';
 import { OrganizationSwitcher } from '../../organization-switcher/organization-switcher';
+import { Profile } from '../../profile/profile';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import { UserButton } from '../../user-button/user-button';
-import { UserProfile } from '../../user-profile/user-profile';
 import { Switcher } from '../switcher';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
@@ -111,16 +111,16 @@ beforeEach(async () => {
 
 describe('the profile the switchers open', () => {
   it.each([
-    { name: 'combined by default', profile: undefined, expected: allTabs },
-    { name: 'combined when asked', profile: { combined: true }, expected: allTabs },
-    { name: 'separate when opted out', profile: separate, expected: accountTabs },
-  ])('a user-only button opens the account pages first: $name', async ({ profile, expected }) => {
+    { name: 'by default', profile: undefined },
+    { name: 'with a combined provider', profile: { combined: true } },
+    { name: 'with separate profiles', profile: separate },
+  ])('a user-only button opens only the account pages: $name', async ({ profile }) => {
     await renderWithProfile(<UserButton />, profile);
 
     await clickSettings(buttonTrigger);
 
     expect(await selectedTab('Account')).toBeInTheDocument();
-    expect(tabs()).toEqual(expected);
+    expect(tabs()).toEqual(accountTabs);
   });
 
   it('a combined button opens one profile straight from Settings', async () => {
@@ -141,17 +141,11 @@ describe('the profile the switchers open', () => {
     expect(tabs()).toEqual(organizationTabs);
   });
 
-  it('a lone switcher lands on the organization pages of the combined profile', async () => {
-    await renderWithProfile(<OrganizationSwitcher />);
-
-    await clickSettings(switcherTrigger);
-
-    expect(await selectedTab('General')).toBeInTheDocument();
-    expect(tabs()).toEqual(allTabs);
-  });
-
-  it('a lone switcher opens the standalone organization profile when opted out', async () => {
-    await renderWithProfile(<OrganizationSwitcher />, separate);
+  it.each([
+    { name: 'by default', profile: undefined },
+    { name: 'with separate profiles', profile: separate },
+  ])('a lone switcher opens only the organization pages: $name', async ({ profile }) => {
+    await renderWithProfile(<OrganizationSwitcher />, profile);
 
     await clickSettings(switcherTrigger);
 
@@ -173,7 +167,7 @@ describe('the profile the switchers open', () => {
     await clickSettings(switcherTrigger);
 
     expect(await selectedTab('General')).toBeInTheDocument();
-    expect(tabs()).toEqual(allTabs);
+    expect(tabs()).toEqual(organizationTabs);
   });
 
   it('leaves the organization pages out of the combined profile on a personal account', async () => {
@@ -196,20 +190,17 @@ describe('the profile the switchers open', () => {
     expect(navigate).toHaveBeenCalledWith('/org');
   });
 
-  it.each([
-    { name: 'separate', combined: false, expected: ['General'] },
-    { name: 'combined', combined: true, expected: ['Account', 'Security', 'General'] },
-  ])("hides the organization's API keys from the profile a switcher opens: $name", async ({ combined, expected }) => {
+  it("hides the organization's API keys from the profile a switcher opens", async () => {
     await renderWithProfile(
       <OrganizationSwitcher />,
-      { combined, organizationProfileProps: { apiKeysProps: { hide: true } } },
+      { organizationProfileProps: { apiKeysProps: { hide: true } } },
       withOrganizationApiKeys,
     );
 
     await clickSettings(switcherTrigger);
 
     expect(await selectedTab('General')).toBeInTheDocument();
-    expect(tabs()).toEqual(expected);
+    expect(tabs()).toEqual(['General']);
   });
 
   it("hands the provider's organization options to Clerk's modal without newProfiles", async () => {
@@ -238,38 +229,54 @@ describe('the profile the switchers open', () => {
   });
 
   it('opens a combined profile on the first organization page in the configured order', async () => {
-    await renderWithProfile(<OrganizationSwitcher />, {
+    await renderWithProfile(<Switcher />, {
+      userProfileUrl: '/account',
       organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] },
     });
 
-    await clickSettings(switcherTrigger);
+    await chooseSetting(buttonTrigger, 'Manage organization');
 
     expect(await selectedTab('Terms')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Account' })).toBeInTheDocument();
   });
 
   it('skips a page this organization does not have when opening a combined profile', async () => {
-    await renderWithProfile(<OrganizationSwitcher />, {
+    await renderWithProfile(<Switcher />, {
+      userProfileUrl: '/account',
       organizationProfileProps: { pageOrder: ['apiKeys', 'members'] },
     });
 
-    await clickSettings(switcherTrigger);
+    await chooseSetting(buttonTrigger, 'Manage organization');
 
     expect(await selectedTab('Members')).toBeInTheDocument();
   });
 
   it.each([
-    { name: 'the button', ui: <UserButton />, trigger: buttonTrigger },
-    { name: 'the switcher', ui: <OrganizationSwitcher />, trigger: switcherTrigger },
-  ])('applies the custom pages and order set on the provider when $name opens it', async ({ ui, trigger }) => {
-    await renderWithProfile(ui, {
-      userProfileProps: { customPages: [terms], pageOrder: ['account', 'terms'] },
-      organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['audit'] },
-    });
+    {
+      name: 'the button',
+      ui: <UserButton />,
+      trigger: buttonTrigger,
+      expected: ['Account', 'Terms', 'Security'],
+    },
+    {
+      name: 'the switcher',
+      ui: <OrganizationSwitcher />,
+      trigger: switcherTrigger,
+      expected: ['Audit', 'General', 'Members'],
+    },
+  ])(
+    'applies the custom pages and order set on the provider when $name opens it',
+    async ({ ui, trigger, expected }) => {
+      await renderWithProfile(ui, {
+        userProfileProps: { customPages: [terms], pageOrder: ['account', 'terms'] },
+        organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['audit'] },
+      });
 
-    await clickSettings(trigger);
+      await clickSettings(trigger);
 
-    await waitFor(() => expect(tabs()).toEqual(['Account', 'Terms', 'Security', 'Audit', 'General', 'Members']));
-  });
+      await waitFor(() => expect(tabs()).toEqual(expected));
+    },
+  );
 
   it("hands the provider's custom pages to Clerk's modals without newProfiles", async () => {
     const { clerk } = await renderWithProfile(
@@ -335,22 +342,49 @@ function OpenByRouting({ base }: { base: string }) {
   return <button onClick={() => write(base, [])}>Open by routing</button>;
 }
 
-describe('a user profile modal opened by the routing state', () => {
-  it("renders with the provider's options", async () => {
-    await renderWithProfile(<OpenByRouting base='/modal/user' />, { userProfileProps: { customPages: [terms] } });
+describe('a profile modal opened by the routing state', () => {
+  it.each([
+    { name: 'the account pages at /modal/user', base: '/modal/user', expected: [...accountTabs, 'Terms'] },
+    {
+      name: 'both groups at /modal/profile',
+      base: '/modal/profile',
+      expected: [...accountTabs, 'Terms', ...organizationTabs],
+    },
+  ])("renders $name with the provider's options", async ({ base, expected }) => {
+    await renderWithProfile(<OpenByRouting base={base} />, { userProfileProps: { customPages: [terms] } });
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Open by routing' }));
     const dialog = await screen.findByRole('dialog');
 
-    expect(await within(dialog).findByRole('tab', { name: 'Terms' })).toBeInTheDocument();
+    await within(dialog).findByRole('tab', { name: 'Terms' });
+    expect(tabs()).toEqual(expected);
   });
 });
 
-describe('a mounted UserProfile under a provider profile', () => {
+describe('the route of the profile a switcher opens', () => {
+  it.each([
+    { name: 'a user-only button opens the account profile', ui: <UserButton />, base: '/modal/user' },
+    { name: 'a combined button opens the combined profile', ui: <Switcher />, base: '/modal/profile' },
+  ])('$name at $base', async ({ ui, base }) => {
+    await renderWithProfile(
+      <>
+        {ui}
+        <Entry base={base} />
+      </>,
+    );
+
+    await clickSettings(buttonTrigger);
+
+    await selectedTab('Account');
+    expect(JSON.parse(screen.getByTestId('entry').textContent ?? 'null')).toEqual([]);
+  });
+});
+
+describe('a mounted Profile under a provider profile', () => {
   it("routes its pages under the provider's path", async () => {
     await renderWithProfile(
       <>
-        <UserProfile />
+        <Profile />
         <Entry base='/account' />
       </>,
       { userProfileProps: { path: '/account' } },
@@ -361,7 +395,7 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it('fills in what its own organizationProfileProps leave out from the provider', async () => {
-    await renderWithProfile(<UserProfile organizationProfileProps={{ pageOrder: ['members'] }} />, {
+    await renderWithProfile(<Profile organizationProfileProps={{ pageOrder: ['members'] }} />, {
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }], pageOrder: ['general'] },
     });
 
@@ -369,7 +403,7 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it('lands where the provider says after leaving the organization', async () => {
-    const { navigate } = await renderWithProfile(<UserProfile />, {
+    const { navigate } = await renderWithProfile(<Profile />, {
       organizationProfileProps: { afterLeaveOrganizationUrl: '/left' },
     });
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'General', description: 'Organization' }));
@@ -379,18 +413,23 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it.each([
-    { name: 'follows the provider', profile: separate, combined: undefined, expected: accountTabs },
-    { name: 'defaults to combined', profile: undefined, combined: undefined, expected: allTabs },
-    { name: 'wins over the provider when combined', profile: separate, combined: true, expected: allTabs },
-    { name: 'wins over the provider when not', profile: { combined: true }, combined: false, expected: accountTabs },
-  ])('$name', async ({ profile, combined, expected }) => {
-    await renderWithProfile(<UserProfile combined={combined} />, profile);
+    { name: 'follows the provider', profile: separate, mode: undefined, expected: accountTabs },
+    { name: 'defaults to combined', profile: undefined, mode: undefined, expected: allTabs },
+    { name: 'wins over the provider when combined', profile: separate, mode: 'combined' as const, expected: allTabs },
+    {
+      name: 'wins over the provider when user',
+      profile: { combined: true },
+      mode: 'user' as const,
+      expected: accountTabs,
+    },
+  ])('$name', async ({ profile, mode, expected }) => {
+    await renderWithProfile(<Profile mode={mode} />, profile);
 
     await waitFor(() => expect(tabs()).toEqual(expected));
   });
 
   it("uses the provider's profile props", async () => {
-    await renderWithProfile(<UserProfile />, {
+    await renderWithProfile(<Profile />, {
       userProfileProps: { customPages: [terms] },
       organizationProfileProps: { customPages: [{ ...terms, label: 'Audit', path: 'audit' }] },
     });
@@ -399,7 +438,7 @@ describe('a mounted UserProfile under a provider profile', () => {
   });
 
   it('lets its own props win over the provider', async () => {
-    await renderWithProfile(<UserProfile customPages={[{ ...terms, label: 'Own', path: 'own' }]} />, {
+    await renderWithProfile(<Profile customPages={[{ ...terms, label: 'Own', path: 'own' }]} />, {
       userProfileProps: { customPages: [terms] },
     });
 

@@ -12,6 +12,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   switcher: {
     switcher: dynamic(() => import('../stories/switcher.mdx')),
   },
+  profile: {
+    profile: dynamic(() => import('../stories/profile.mdx')),
+  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),

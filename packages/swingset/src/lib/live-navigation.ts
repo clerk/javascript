@@ -15,6 +15,7 @@ type LiveSidebarGroup = {
 };
 
 const livePages = new Set([
+  '/profile/profile',
   '/user-profile/user-profile',
   '/user-profile/user-profile-profile-panel',
   '/user-profile/user-profile-security-panel',
