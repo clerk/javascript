@@ -1,4 +1,4 @@
-export const consentMessages = {
+export const oauthConsentMessages = {
   title: '{oauthApplicationName} would like to access your {applicationName} account',
   subtitle: 'Only continue if you trust {oauthApplicationName} {#nowrap}({domain}){/nowrap}.',
   scopeListTitle: 'This will allow {applicationName} access to:',

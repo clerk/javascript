@@ -1,23 +1,23 @@
 import { Card } from '@clerk/mosaic/components/card';
 import { Flow } from '@clerk/mosaic/components/flow';
 import { SegmentedControl } from '@clerk/mosaic/components/segmented-control';
-import { ConsentSkeleton } from '@clerk/mosaic/features/consent/consent.skeleton';
-import type { ConsentOrganizationAccess } from '@clerk/mosaic/features/consent/consent.types';
-import { ConsentError, ConsentView } from '@clerk/mosaic/features/consent/consent.view';
+import { OAuthConsentSkeleton } from '@clerk/mosaic/features/oauth-consent/oauth-consent.skeleton';
+import type { OAuthConsentOrganizationAccess } from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
+import { OAuthConsentError, OAuthConsentView } from '@clerk/mosaic/features/oauth-consent/oauth-consent.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { manyScopes, useConsentFixture, useConsentScopeSelectionFixture } from './fixtures/consent';
+import { manyScopes, useOAuthConsentFixture, useOAuthConsentScopeSelectionFixture } from './fixtures/oauth-consent';
 
-export { default as __source } from './consent.stories?raw';
+export { default as __source } from './oauth-consent.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Misc',
   status: 'wip',
-  title: 'Consent',
-  label: 'Consent',
-  source: 'packages/mosaic/src/features/consent/consent.tsx',
+  title: 'OAuthConsent',
+  label: 'OAuth consent',
+  source: 'packages/mosaic/src/features/oauth-consent/oauth-consent.tsx',
 };
 
 const statuses = ['loading', 'ready', 'error'] as const;
@@ -28,7 +28,7 @@ function isStatus(value: unknown): value is Status {
 }
 
 export function Default() {
-  const props = useConsentScopeSelectionFixture({
+  const props = useOAuthConsentScopeSelectionFixture({
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
@@ -62,13 +62,13 @@ export function Default() {
           {state => (
             <>
               <Flow.Step ids={['loading']}>
-                <ConsentSkeleton messages={state.messages} />
+                <OAuthConsentSkeleton messages={state.messages} />
               </Flow.Step>
               <Flow.Step ids={['ready']}>
-                <ConsentView {...state} />
+                <OAuthConsentView {...state} />
               </Flow.Step>
               <Flow.Step ids={['error']}>
-                <ConsentError message='Could not load consent information.' />
+                <OAuthConsentError message='Could not load consent information.' />
               </Flow.Step>
             </>
           )}
@@ -79,36 +79,36 @@ export function Default() {
 }
 
 export function ScopeList() {
-  const props = useConsentFixture();
+  const props = useOAuthConsentFixture();
   return (
     <Card.Root align='center'>
-      <ConsentView {...props} />
+      <OAuthConsentView {...props} />
     </Card.Root>
   );
 }
 
 export function ManyScopes() {
-  const props = useConsentScopeSelectionFixture({}, manyScopes);
+  const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
   return (
     <Card.Root align='center'>
-      <ConsentView {...props} />
+      <OAuthConsentView {...props} />
     </Card.Root>
   );
 }
 
 export function MultipleOrganizations() {
-  const props = useConsentScopeSelectionFixture({
+  const props = useOAuthConsentScopeSelectionFixture({
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
       { value: 'org_3', label: 'Initech' },
     ],
   });
-  const [access, setAccess] = useState<ConsentOrganizationAccess>('all');
+  const [access, setAccess] = useState<OAuthConsentOrganizationAccess>('all');
   const [selected, setSelected] = useState<string[]>(['org_1']);
   return (
     <Card.Root align='center'>
-      <ConsentView
+      <OAuthConsentView
         {...props}
         organizationSelection={{ access, onAccessChange: setAccess, selected, onSelectedChange: setSelected }}
       />
@@ -117,10 +117,10 @@ export function MultipleOrganizations() {
 }
 
 export function OfflineAccess() {
-  const props = useConsentScopeSelectionFixture({ hasOfflineAccess: true });
+  const props = useOAuthConsentScopeSelectionFixture({ hasOfflineAccess: true });
   return (
     <Card.Root align='center'>
-      <ConsentView {...props} />
+      <OAuthConsentView {...props} />
     </Card.Root>
   );
 }

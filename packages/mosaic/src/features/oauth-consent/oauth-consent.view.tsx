@@ -22,16 +22,16 @@ import { Form } from '../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { RowAvatar } from '../switcher/switcher-avatar.view';
-import { styles } from './consent.styles';
+import { styles } from './oauth-consent.styles';
 import type {
-  ConsentOrganization,
-  ConsentOrganizationSelection,
-  ConsentScopeItem,
-  ConsentScopeSelection,
-  ConsentViewProps,
-} from './consent.types';
+  OAuthConsentOrganization,
+  OAuthConsentOrganizationSelection,
+  OAuthConsentScopeItem,
+  OAuthConsentScopeSelection,
+  OAuthConsentViewProps,
+} from './oauth-consent.types';
 
-export function ConsentView(props: ConsentViewProps) {
+export function OAuthConsentView(props: OAuthConsentViewProps) {
   const { messages: m, oauthApplicationName, organizationId } = props;
   const scopeListTitleId = useId();
   const postedOrganizationIds = props.organizations.length === 0 ? [] : organizationIdsToPost(props);
@@ -87,7 +87,7 @@ export function ConsentView(props: ConsentViewProps) {
           </Field.Root>
         ) : null}
         {props.scopes.length > 0 ? (
-          <div {...mergeStyleProps(themeProps('consent-scopes'), stylex.props(styles.scopes))}>
+          <div {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}>
             <Text
               id={scopeListTitleId}
               size='sm'
@@ -200,7 +200,7 @@ function RedirectUrlDialog({
   open,
   onOpenChange,
 }: {
-  messages: ConsentViewProps['messages'];
+  messages: OAuthConsentViewProps['messages'];
   oauthApplicationName: string;
   redirectUrl: string;
   open: boolean;
@@ -227,7 +227,7 @@ function RedirectUrlDialog({
               readOnly
               value={redirectUrl}
               aria-label={m.redirectUrlTitle}
-              {...themeProps('consent-redirect-url')}
+              {...themeProps('oauth-consent-redirect-url')}
             />
           </Card.Content>
         </Card.Root>
@@ -236,7 +236,7 @@ function RedirectUrlDialog({
   );
 }
 
-function organizationIdsToPost({ organizations, organizationId, organizationSelection }: ConsentViewProps) {
+function organizationIdsToPost({ organizations, organizationId, organizationSelection }: OAuthConsentViewProps) {
   if (!organizationSelection) {
     return organizationId === null ? [] : [organizationId];
   }
@@ -251,9 +251,9 @@ function OrganizationAccess({
   selection,
   disabled,
 }: {
-  messages: ConsentViewProps['messages'];
-  organizations: ConsentOrganization[];
-  selection: ConsentOrganizationSelection;
+  messages: OAuthConsentViewProps['messages'];
+  organizations: OAuthConsentOrganization[];
+  selection: OAuthConsentOrganizationSelection;
   disabled: boolean;
 }) {
   const labelId = useId();
@@ -323,7 +323,7 @@ function OrganizationAccess({
   );
 }
 
-function OrganizationPopup({ organizations }: { organizations: ConsentOrganization[] }) {
+function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrganization[] }) {
   return (
     <Select.Popup>
       {organizations.map(organization => (
@@ -355,8 +355,8 @@ function ScopeOption({
   requiredLabel,
   disabled,
 }: {
-  item: ConsentScopeItem;
-  selection: ConsentScopeSelection;
+  item: OAuthConsentScopeItem;
+  selection: OAuthConsentScopeSelection;
   requiredLabel: string;
   disabled: boolean;
 }) {
@@ -380,7 +380,7 @@ function ScopeOption({
   );
 }
 
-function ScopeText({ item, requiredLabel }: { item: ConsentScopeItem; requiredLabel: string }) {
+function ScopeText({ item, requiredLabel }: { item: OAuthConsentScopeItem; requiredLabel: string }) {
   return (
     <div {...stylex.props(styles.scopeText)}>
       <div {...stylex.props(styles.scopeLabel)}>
@@ -423,7 +423,7 @@ function RedirectDomainButton({ domain, label, onClick }: { domain: string; labe
   );
 }
 
-export function ConsentError({ message }: { message: string }) {
+export function OAuthConsentError({ message }: { message: string }) {
   return (
     <Card.Content>
       <EmptyState.Root role='alert'>

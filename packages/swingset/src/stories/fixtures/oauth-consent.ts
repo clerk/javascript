@@ -1,15 +1,15 @@
-import { useConsentController } from '@clerk/mosaic/features/consent/consent.controller';
+import { useOAuthConsentController } from '@clerk/mosaic/features/oauth-consent/oauth-consent.controller';
 import type {
-  ConsentReadyModel,
-  ConsentScopeItem,
-  ConsentViewProps,
-} from '@clerk/mosaic/features/consent/consent.types';
+  OAuthConsentReadyModel,
+  OAuthConsentScopeItem,
+  OAuthConsentViewProps,
+} from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
 import { useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useState } from 'react';
 
 const redirectUrl = 'https://app.linear.example.com/oauth/callback';
 
-const baseModel: ConsentReadyModel = {
+const baseModel: OAuthConsentReadyModel = {
   status: 'ready',
   applicationName: 'Acme',
   oauthApplicationName: 'Linear',
@@ -32,13 +32,13 @@ const baseModel: ConsentReadyModel = {
   renderBranding: true,
 };
 
-const selectableScopes: ConsentScopeItem[] = [
+const selectableScopes: OAuthConsentScopeItem[] = [
   { scope: 'email', label: 'View your email address', description: 'alice@example.com', required: true },
   { scope: 'projects', label: 'Read your projects', description: 'Read the projects in your account.' },
   { scope: 'phone', label: 'View your phone number', description: 'Allow Linear to view your phone number' },
 ];
 
-export const manyScopes: ConsentScopeItem[] = [
+export const manyScopes: OAuthConsentScopeItem[] = [
   ...selectableScopes,
   { scope: 'issues', label: 'Read your issues', description: 'Read the issues assigned to you.' },
   { scope: 'comments', label: 'Write comments', description: 'Comment on issues on your behalf.' },
@@ -72,17 +72,17 @@ function useMockSubmit() {
   };
 }
 
-export function useConsentFixture(overrides: Partial<ConsentReadyModel> = {}): ConsentViewProps {
-  const messages = useMessages('consent');
-  const props = useConsentController({ ...baseModel, ...overrides }, messages);
+export function useOAuthConsentFixture(overrides: Partial<OAuthConsentReadyModel> = {}): OAuthConsentViewProps {
+  const messages = useMessages('oauthConsent');
+  const props = useOAuthConsentController({ ...baseModel, ...overrides }, messages);
   return { ...props, ...useMockSubmit() };
 }
 
-export function useConsentScopeSelectionFixture(
-  overrides: Partial<ConsentReadyModel> = {},
-  scopes: ConsentScopeItem[] = selectableScopes,
-): ConsentViewProps {
-  const props = useConsentFixture(overrides);
+export function useOAuthConsentScopeSelectionFixture(
+  overrides: Partial<OAuthConsentReadyModel> = {},
+  scopes: OAuthConsentScopeItem[] = selectableScopes,
+): OAuthConsentViewProps {
+  const props = useOAuthConsentFixture(overrides);
   const [checked, setChecked] = useState<readonly string[]>(() => scopes.map(item => item.scope));
   return {
     ...props,

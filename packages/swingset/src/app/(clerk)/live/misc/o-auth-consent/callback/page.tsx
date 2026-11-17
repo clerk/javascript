@@ -26,10 +26,10 @@ function CallbackParams() {
   );
 }
 
-export default function ConsentCallbackPage() {
+export default function OAuthConsentCallbackPage() {
   return (
     <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
-      <LivePageHeader title='Consent callback'>
+      <LivePageHeader title='OAuthConsent callback'>
         What Clerk sent to the redirect URI after the consent screen. Approving returns a <code>code</code>; denying
         returns an <code>error</code>.
       </LivePageHeader>
@@ -37,7 +37,7 @@ export default function ConsentCallbackPage() {
         <CallbackParams />
       </Suspense>
       <Link
-        href='/live/misc/consent'
+        href='/live/misc/o-auth-consent'
         className='text-sm underline underline-offset-4'
       >
         Back to consent

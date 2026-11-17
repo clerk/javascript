@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import { fill } from '../../localization';
-import type { ConsentMessages, ConsentReadyModel, ConsentViewProps } from './consent.types';
+import type { OAuthConsentMessages, OAuthConsentReadyModel, OAuthConsentViewProps } from './oauth-consent.types';
 
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 
-export function useConsentController(
-  { status: _status, scopes, defaultOrganizationId, ...model }: ConsentReadyModel,
-  messages: ConsentMessages,
-): ConsentViewProps {
+export function useOAuthConsentController(
+  { status: _status, scopes, defaultOrganizationId, ...model }: OAuthConsentReadyModel,
+  messages: OAuthConsentMessages,
+): OAuthConsentViewProps {
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
   const [isRedirectUrlOpen, setIsRedirectUrlOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'allow' | 'deny'>();

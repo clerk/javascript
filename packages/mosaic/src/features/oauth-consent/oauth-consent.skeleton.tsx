@@ -9,8 +9,8 @@ import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { styles } from './consent.styles';
-import type { ConsentMessages } from './consent.types';
+import { styles } from './oauth-consent.styles';
+import type { OAuthConsentMessages } from './oauth-consent.types';
 
 const PLACEHOLDER_TITLE = ['Application would like to access', 'your Application account'];
 const PLACEHOLDER_SUBTITLE = 'Only continue if you trust Application (example.com).';
@@ -28,7 +28,7 @@ const PLACEHOLDER_NOTICE = [
 ];
 const PLACEHOLDER_FOOTER = 'Signed in as name@example.com';
 
-export function ConsentSkeleton({ messages: m }: { messages: ConsentMessages }) {
+export function OAuthConsentSkeleton({ messages: m }: { messages: OAuthConsentMessages }) {
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
@@ -66,7 +66,7 @@ export function ConsentSkeleton({ messages: m }: { messages: ConsentMessages }) 
         </Field.Root>
         <div
           aria-hidden
-          {...mergeStyleProps(themeProps('consent-scopes'), stylex.props(styles.scopes))}
+          {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}
         >
           <Text
             size='sm'

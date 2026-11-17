@@ -5,15 +5,15 @@ import type { ReactElement, ReactNode } from 'react';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useErrorText, useMessages } from '../../localization';
-import { useConsentController } from './consent.controller';
-import type { ConsentModelOptions } from './consent.model';
-import { useConsentModel } from './consent.model';
-import { ConsentSkeleton } from './consent.skeleton';
-import type { ConsentMessages, ConsentReadyModel } from './consent.types';
-import { ConsentError, ConsentView } from './consent.view';
+import { useOAuthConsentController } from './oauth-consent.controller';
+import type { OAuthConsentModelOptions } from './oauth-consent.model';
+import { useOAuthConsentModel } from './oauth-consent.model';
+import { OAuthConsentSkeleton } from './oauth-consent.skeleton';
+import type { OAuthConsentMessages, OAuthConsentReadyModel } from './oauth-consent.types';
+import { OAuthConsentError, OAuthConsentView } from './oauth-consent.view';
 
-/** Everything `<Consent />` takes: which OAuth request to answer, and what to show while Clerk loads. */
-export type ConsentProps = ConsentModelOptions & {
+/** Everything `<OAuthConsent />` takes: which OAuth request to answer, and what to show while Clerk loads. */
+export type OAuthConsentProps = OAuthConsentModelOptions & {
   /**
    * The element to render while Clerk loads.
    */
@@ -29,24 +29,24 @@ export type ConsentProps = ConsentModelOptions & {
  *
  * @example
  * ```tsx
- * import { Consent } from '@clerk/mosaic';
+ * import { OAuthConsent } from '@clerk/mosaic';
  *
- * <Consent />
+ * <OAuthConsent />
  * ```
  *
  * @example
  * ```tsx
- * <Consent
+ * <OAuthConsent
  *   oauthClientId='client_123'
  *   scope='openid profile email'
  *   redirectUrl='https://app.example.com/oauth/callback'
  * />
  * ```
  */
-export function Consent({ fallback, ...options }: ConsentProps): ReactElement | null {
-  const messages = useMessages('consent');
+export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): ReactElement | null {
+  const messages = useMessages('oauthConsent');
   const errorText = useErrorText();
-  const model = useConsentModel(options);
+  const model = useOAuthConsentModel(options);
 
   if (model.status === 'loading') {
     return <>{fallback}</>;
@@ -66,11 +66,11 @@ export function Consent({ fallback, ...options }: ConsentProps): ReactElement | 
         {current => (
           <>
             <Flow.Step ids={['fetching']}>
-              <ConsentSkeleton messages={messages} />
+              <OAuthConsentSkeleton messages={messages} />
             </Flow.Step>
             <Flow.Step ids={['ready']}>
               {current.status === 'ready' ? (
-                <ReadyConsent
+                <ReadyOAuthConsent
                   model={current}
                   messages={messages}
                 />
@@ -78,7 +78,7 @@ export function Consent({ fallback, ...options }: ConsentProps): ReactElement | 
             </Flow.Step>
             <Flow.Step ids={['error']}>
               {current.status === 'error' ? (
-                <ConsentError message={errorText(current.error, messages.loadError)} />
+                <OAuthConsentError message={errorText(current.error, messages.loadError)} />
               ) : null}
             </Flow.Step>
           </>
@@ -88,6 +88,6 @@ export function Consent({ fallback, ...options }: ConsentProps): ReactElement | 
   );
 }
 
-function ReadyConsent({ model, messages }: { model: ConsentReadyModel; messages: ConsentMessages }) {
-  return <ConsentView {...useConsentController(model, messages)} />;
+function ReadyOAuthConsent({ model, messages }: { model: OAuthConsentReadyModel; messages: OAuthConsentMessages }) {
+  return <OAuthConsentView {...useOAuthConsentController(model, messages)} />;
 }

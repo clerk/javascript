@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@clerk/mosaic/components/button';
-import { Consent } from '@clerk/mosaic/features/consent/consent';
+import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { Suspense, useSyncExternalStore } from 'react';
 
 import { LivePageHeader } from '../../../live-page-header';
 
-const CALLBACK_PATH = '/live/misc/consent/callback';
+const CALLBACK_PATH = '/live/misc/o-auth-consent/callback';
 const DEFAULT_SCOPE = 'openid profile email';
 const PKCE_CHALLENGE = 'AYpKiMUrGK_t4053AFZoQnHhq_53aGQqaAcsqkcrNkM';
 
@@ -91,22 +91,22 @@ function RequestForm() {
   );
 }
 
-function LiveConsent() {
+function LiveOAuthConsent() {
   const search = useSearchParams();
   if (!search.get('client_id')) {
     return null;
   }
-  return <Consent key={search.toString()} />;
+  return <OAuthConsent key={search.toString()} />;
 }
 
-export default function ConsentLivePage() {
+export default function OAuthConsentLivePage() {
   const { isLoaded, isSignedIn } = useUser();
 
   return (
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
         <div className='flex flex-col gap-4'>
-          <LivePageHeader title='Consent'>
+          <LivePageHeader title='OAuthConsent'>
             The connected consent screen. It needs an OAuth application in this Clerk instance whose redirect URIs
             include the redirect URI below. Approving or denying posts to Clerk, which redirects to that URI.
           </LivePageHeader>
@@ -127,7 +127,7 @@ export default function ConsentLivePage() {
         </div>
         <div className='flex justify-center'>
           <Suspense>
-            <LiveConsent />
+            <LiveOAuthConsent />
           </Suspense>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { expect, test } from '@playwright/test';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Consent @mosaic', ({ app }) => {
+testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic OAuthConsent @mosaic', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
@@ -16,12 +16,12 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
   let oauthApp: OAuthApplication;
   const cleanups: Array<() => Promise<unknown>> = [];
 
-  const path = '/consent';
+  const path = '/oauth-consent';
   const state = 'mosaic-consent-state';
   const codeChallenge = createHash('sha256')
     .update('mosaic-consent-code-verifier-0123456789abcdef')
     .digest('base64url');
-  const redirectUri = () => new URL('/consent/callback', app.serverUrl).toString();
+  const redirectUri = () => new URL('/oauth-consent/callback', app.serverUrl).toString();
 
   test.beforeAll(async () => {
     const u = await createTestUtils({ app });
@@ -29,17 +29,17 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
     cleanups.push(() => fakeUser.deleteIfExists());
     const user = await u.services.users.createBapiUser(fakeUser);
     organization = await u.services.clerk.organizations.createOrganization({
-      name: `Mosaic Consent ${Date.now()}`,
+      name: `Mosaic OAuthConsent ${Date.now()}`,
       createdBy: user.id,
     });
     cleanups.push(() => u.services.clerk.organizations.deleteOrganization(organization.id));
     otherOrganization = await u.services.clerk.organizations.createOrganization({
-      name: `Mosaic Consent Other ${Date.now()}`,
+      name: `Mosaic OAuthConsent Other ${Date.now()}`,
       createdBy: user.id,
     });
     cleanups.push(() => u.services.clerk.organizations.deleteOrganization(otherOrganization.id));
     oauthApp = await u.services.clerk.oauthApplications.create({
-      name: `Mosaic Consent ${Date.now()}`,
+      name: `Mosaic OAuthConsent ${Date.now()}`,
       redirectUris: [redirectUri()],
       scopes: 'profile email user:org:read',
     });
@@ -51,7 +51,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
     await app.teardown();
     const failures = results.flatMap(result => (result.status === 'rejected' ? [result.reason] : []));
     if (failures.length > 0) {
-      throw new AggregateError(failures, 'Mosaic Consent cleanup failed');
+      throw new AggregateError(failures, 'Mosaic OAuthConsent cleanup failed');
     }
   });
 
@@ -79,7 +79,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Cons
   }
 
   async function waitForCallback(page: Page) {
-    await page.waitForURL(url => url.pathname === '/consent/callback');
+    await page.waitForURL(url => url.pathname === '/oauth-consent/callback');
     return new URL(page.url()).searchParams;
   }
 
