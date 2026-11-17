@@ -23,7 +23,7 @@ export function DocsPage({
       </main>
       <aside
         aria-label='On this page'
-        className='sticky top-16 hidden max-h-[calc(100dvh-4rem)] overflow-y-auto px-4 pb-10 pt-6 text-sm xl:block'
+        className='scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent sticky top-16 hidden max-h-[calc(100dvh-4rem)] overflow-y-auto px-4 pb-10 pt-6 text-sm xl:block'
       >
         {headings.length > 0 && <TableOfContents headings={headings} />}
         <div className={headings.length > 0 ? 'border-border mt-8 border-t pt-4' : undefined}>

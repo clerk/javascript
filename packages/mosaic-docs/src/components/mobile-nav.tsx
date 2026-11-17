@@ -55,7 +55,7 @@ export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[
         aria-label='Navigation'
         className='drawer bg-background text-foreground border-border m-0 h-dvh max-h-none w-72 max-w-[80vw] border-e p-0'
       >
-        <div className='h-full overflow-y-auto px-5 pb-6 pt-3'>
+        <div className='scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent h-full overflow-y-auto px-5 pb-6 pt-3'>
           <div className='mb-4 flex items-center justify-end'>
             <button
               type='button'
@@ -81,7 +81,7 @@ export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[
             aria-label='Sections'
             className='border-border mb-6 border-b pb-4'
           >
-            <ul className='m-0 list-none space-y-px p-0'>
+            <ul className='m-0 list-none p-0'>
               {tabs.map(tab => (
                 <li key={tab.href}>
                   <Link
