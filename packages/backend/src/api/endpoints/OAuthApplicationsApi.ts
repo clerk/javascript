@@ -42,7 +42,6 @@ export type RevokeOAuthApplicationTokenParams = {
 
 /**
  * A token type identifier as defined in [RFC 8693 section 3](https://www.rfc-editor.org/rfc/rfc8693#section-3).
- * @inline
  */
 export type OAuthTokenTypeIdentifier = Autocomplete<
   | 'urn:ietf:params:oauth:token-type:access_token'
@@ -53,7 +52,6 @@ export type OAuthTokenTypeIdentifier = Autocomplete<
 
 /**
  * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
- * @inline
  */
 export type ExchangeOAuthApplicationTokenParams = {
   /** The publishable key of the instance, used to derive its token endpoint. */
@@ -74,7 +72,6 @@ export type ExchangeOAuthApplicationTokenParams = {
 
 /**
  * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
- * @inline
  */
 export type ExchangeOAuthApplicationTokenResult = {
   /** The issued security token. */
