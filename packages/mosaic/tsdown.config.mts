@@ -67,6 +67,18 @@ export default defineConfig({
   },
   clean: true,
   unbundle: true,
+  outputOptions: options => ({
+    entryFileNames: chunk => {
+      const pattern =
+        typeof options.entryFileNames === 'function'
+          ? options.entryFileNames(chunk)
+          : (options.entryFileNames ?? '[name].js');
+      const vendored = /(?:^|\/)node_modules\/(?:\.pnpm\/[^/]+\/node_modules\/)?((?:@[^/]+\/)?[^/]+)\/(.+)$/.exec(
+        chunk.name,
+      );
+      return vendored ? pattern.replace('[name]', `_vendor/${vendored[1]}/${vendored[2]}`) : pattern;
+    },
+  }),
   target: 'es2022',
   platform: 'browser',
   minify: false,

@@ -68,6 +68,15 @@ for (const entryFile of entryFiles) {
   }
 }
 
+const nodeModulesPaths = (await readdir(distDir, { recursive: true })).filter(file =>
+  file.split(/[\\/]/).includes('node_modules'),
+);
+if (nodeModulesPaths.length > 0) {
+  throw new Error(
+    `Published Mosaic output has files under a node_modules path, which consumers cannot resolve: ${nodeModulesPaths.join(', ')}`,
+  );
+}
+
 const forbidden = [
   { name: '@clerk/ui', pattern: /(?:from|import)\s*['"]@clerk\/ui(?:\/[^'"]*)?['"]/ },
   { name: 'Emotion', pattern: /(?:from|import)\s*['"]@emotion\// },
