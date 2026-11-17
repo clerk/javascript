@@ -29,9 +29,6 @@ import { UserProfileProfilePanel } from '../user-profile/user-profile-profile-pa
 import { UserProfileSecurityPanel } from '../user-profile/user-profile-security-panel';
 import { useUserProfileUserModel } from '../user-profile/user-profile-user.model';
 
-/** Which pages the profile carries: the account's and the active organization's, or one of them alone. */
-export type ProfileMode = 'combined' | 'user' | 'organization';
-
 /** Everything `<Profile />` takes in `combined` mode. */
 export interface CombinedProfileProps extends UserProfileProps {
   /**

@@ -26,8 +26,7 @@ type SwitcherBaseProps = SwitcherTriggerProps &
     fallback?: ReactNode;
   };
 
-/** Everything `<Switcher />` takes in `combined` mode. */
-export type CombinedSwitcherProps = SwitcherBaseProps &
+type CombinedSwitcherProps = SwitcherBaseProps &
   SwitcherModelOptions & {
     /**
      * How much the labelled trigger carries: `full` badges the active organization with the account at a

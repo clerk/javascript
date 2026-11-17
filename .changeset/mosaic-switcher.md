@@ -10,7 +10,7 @@
 | `<UserButton combined={false} />`                                                                               | `<UserButton />` or `<Switcher mode='user' />`           |
 | `<UserButton triggerVariant='condensed' />`                                                                     | `<Switcher triggerVariant='condensed' />`                |
 | Organization props on `UserButton` (`hidePersonal`, `afterSelectOrganizationUrl`, `createOrganizationUrl`, ...) | The same props on `Switcher`                             |
-| `UserButtonProps` (combined menu)                                                                               | `CombinedSwitcherProps`                                  |
+| `UserButtonProps` (combined menu)                                                                               | `SwitcherProps`                                          |
 | `UserButtonProps` (user-only menu)                                                                              | `UserButtonProps`, which now takes account options only  |
 | `.cl-user-button-*` classes on the combined menu                                                                | `.cl-switcher-*`; `UserButton` keeps `.cl-user-button-*` |
 

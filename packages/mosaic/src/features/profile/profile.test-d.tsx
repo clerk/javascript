@@ -2,7 +2,7 @@ import { describe, test } from 'vitest';
 
 import { OrganizationProfile } from '../organization-profile/organization-profile';
 import { UserProfile } from '../user-profile/user-profile';
-import type { ProfileMode, ProfileProps } from './profile';
+import type { ProfileProps } from './profile';
 import { Profile } from './profile';
 
 describe('Profile props', () => {
@@ -85,6 +85,6 @@ describe('UserProfile and OrganizationProfile props', () => {
   });
 });
 
-function pickMode(): ProfileMode {
+function pickMode(): NonNullable<ProfileProps['mode']> {
   return 'user';
 }
