@@ -38,6 +38,23 @@ describe('useWindowUrl', () => {
     expect(result.current?.hash).toBe('p=1');
   });
 
+  it('follows a same-document navigation the Navigation API reports, a microtask later', async () => {
+    const navigation = new EventTarget();
+    Object.defineProperty(window, 'navigation', { value: navigation, configurable: true });
+    try {
+      const { result, unmount } = renderHook(() => useWindowUrl(true));
+      await act(async () => {
+        window.history.pushState({ __NA: true }, '', '/page#tabs=settings');
+        navigation.dispatchEvent(new Event('currententrychange'));
+        await Promise.resolve();
+      });
+      expect(result.current?.hash).toBe('tabs=settings');
+      unmount();
+    } finally {
+      Reflect.deleteProperty(window, 'navigation');
+    }
+  });
+
   it('follows its own writes without an event', () => {
     const { result } = renderHook(() => useWindowUrl(true));
     act(() => writeWindowUrl('/user?p.user=security', false));
