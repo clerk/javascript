@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -24,7 +24,7 @@ async function renderPanel(permissions: string[]) {
 }
 
 function bodyRows() {
-  const [, ...rows] = within(screen.getByRole('table', { name: 'Logs' })).getAllByRole('row');
+  const [, ...rows] = within(screen.getByRole('grid', { name: 'Logs' })).getAllByRole('row');
   return rows;
 }
 
@@ -32,10 +32,10 @@ describe('OrganizationProfileLogsPanel', () => {
   it('lists the latest events with their member, IP address and timestamp', async () => {
     await renderPanel(['org:sys_logs:read']);
 
-    expect(await screen.findByRole('table', { name: 'Logs' })).toBeVisible();
+    expect(await screen.findByRole('grid', { name: 'Logs' })).toBeVisible();
     expect(bodyRows()).toHaveLength(10);
     const [first] = bodyRows();
-    expect(within(first).getByRole('button', { name: 'View details for Signed in' })).toBeVisible();
+    expect(first).toHaveAccessibleName('Signed in session.created');
     expect(within(first).getByText('session.created')).toBeVisible();
     expect(within(first).getByText('Liam Chen')).toBeVisible();
     expect(within(first).getByText('198.51.100.7')).toBeVisible();
@@ -46,7 +46,7 @@ describe('OrganizationProfileLogsPanel', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Next logs page' }));
 
-    expect(await screen.findByRole('button', { name: 'View details for Domain added' })).toBeVisible();
+    expect(await screen.findByRole('row', { name: /^Domain added/ })).toBeVisible();
     expect(within(bodyRows()[0]).getByText('Maria Garcia')).toBeVisible();
   });
 
@@ -69,14 +69,12 @@ describe('OrganizationProfileLogsPanel', () => {
     expect(await screen.findByText('No logs found')).toBeVisible();
   });
 
-  it('opens the details of an event', async () => {
+  it('opens the details of an event from anywhere in its row', async () => {
     const user = await renderPanel(['org:sys_logs:read']);
+    const row = await screen.findByRole('row', { name: /^Member role changed/ });
+    expect(row).toHaveAttribute('data-actionable');
 
-    const dialog = await openDialog(
-      user,
-      await screen.findByRole('button', { name: 'View details for Member role changed' }),
-      { name: 'Member role changed' },
-    );
+    const dialog = await openDialog(user, within(row).getByText('Maria Garcia'), { name: 'Member role changed' });
 
     expect(within(dialog).getByText('organization_membership.updated')).toBeVisible();
     expect(within(dialog).getByText('Maria Garcia (maria@acme.com)')).toBeVisible();
@@ -84,11 +82,25 @@ describe('OrganizationProfileLogsPanel', () => {
     expect(within(dialog).getByText('San Francisco, US')).toBeVisible();
   });
 
+  it('opens the details of an event with Enter and returns focus to its row on close', async () => {
+    const user = await renderPanel(['org:sys_logs:read']);
+    const row = await screen.findByRole('row', { name: /^Member role changed/ });
+
+    act(() => row.focus());
+    await user.keyboard('{Enter}');
+    const dialog = await screen.findByRole('dialog', { name: 'Member role changed' });
+    expect(within(dialog).getByText('organization_membership.updated')).toBeVisible();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(row).toHaveFocus();
+  });
+
   it('tells a member without permission that they cannot view logs', async () => {
     await renderPanel([]);
 
     expect(await screen.findByText('You don’t have access to logs')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Logs' })).toBeVisible();
-    expect(screen.queryByRole('table', { name: 'Logs' })).toBeNull();
+    expect(screen.queryByRole('grid', { name: 'Logs' })).toBeNull();
   });
 });

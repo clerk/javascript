@@ -1,9 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 
 import { Avatar } from '../../components/avatar';
 import { Button } from '../../components/button';
-import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { EmptyState } from '../../components/empty-state';
 import { Entity } from '../../components/entity';
@@ -38,6 +37,12 @@ export function LogsTableView({
   onRetry,
 }: LogsTableViewProps) {
   const details = useMemo(() => Dialog.createHandle<LogEntry>(), []);
+  // The row opens the dialog through its handle, so there is no trigger for focus to return to.
+  const openerRef = useRef<HTMLTableRowElement | null>(null);
+  const openDetails = (log: LogEntry, row: HTMLTableRowElement) => {
+    openerRef.current = row;
+    details.open(log);
+  };
   const showPagination = Math.ceil(totalCount / pageSize) > 1 || (totalCount > 0 && Boolean(onPageSizeChange));
   const query = searchValue.trim();
   const emptyState = query
@@ -63,7 +68,7 @@ export function LogsTableView({
           minWidth='44rem'
         >
           <Table.Header>
-            <Table.Column>{m.event}</Table.Column>
+            <Table.Column rowHeader>{m.event}</Table.Column>
             <Table.Column>{m.member}</Table.Column>
             <Table.Column width='11rem'>{m.ipAddress}</Table.Column>
             <Table.Column width='11rem'>{m.timestamp}</Table.Column>
@@ -101,8 +106,7 @@ export function LogsTableView({
             {log => (
               <LogRow
                 log={log}
-                details={details}
-                messages={m}
+                onOpen={openDetails}
               />
             )}
           </Table.Body>
@@ -132,33 +136,25 @@ export function LogsTableView({
       <LogDetailsDialog
         handle={details}
         messages={m}
+        finalFocus={() => (openerRef.current?.isConnected ? openerRef.current : null)}
       />
     </>
   );
 }
 
-function LogRow({
-  log,
-  details,
-  messages: m,
-}: {
-  log: LogEntry;
-  details: DialogHandle<LogEntry>;
-  messages: LogsTableMessages;
-}) {
+function LogRow({ log, onOpen }: { log: LogEntry; onOpen: (log: LogEntry, row: HTMLTableRowElement) => void }) {
   return (
-    <Table.Row>
+    <Table.Row onClick={event => onOpen(log, event.currentTarget)}>
       <Table.Cell>
         <div {...stylex.props(styles.event)}>
-          <Dialog.Trigger
-            handle={details}
-            payload={log}
-            aria-label={fill(m.viewDetails, { event: log.eventLabel })}
-            render={<Button variant='link' />}
+          <Text
+            render={<span />}
+            xstyle={styles.eventLabel}
           >
             {log.eventLabel}
-          </Dialog.Trigger>
+          </Text>
           <Text
+            render={<span />}
             size='xs'
             color='foreground-secondary'
           >

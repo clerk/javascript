@@ -1,7 +1,7 @@
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { DataList } from '../../components/data-list';
-import type { DialogHandle } from '../../components/dialog';
+import type { DialogFocusTarget, DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { fill } from '../../localization';
 import type { LogEntry, LogsTableMessages } from './logs-table.types';
@@ -9,9 +9,11 @@ import type { LogEntry, LogsTableMessages } from './logs-table.types';
 export interface LogDetailsDialogProps {
   handle: DialogHandle<LogEntry>;
   messages: LogsTableMessages;
+  /** Where focus returns on close. The dialog opens from its handle, so there is no trigger to default to. */
+  finalFocus?: DialogFocusTarget;
 }
 
-export function LogDetailsDialog({ handle, messages: m }: LogDetailsDialogProps) {
+export function LogDetailsDialog({ handle, messages: m, finalFocus }: LogDetailsDialogProps) {
   return (
     <Dialog.Root handle={handle}>
       {({ payload }) =>
@@ -19,6 +21,7 @@ export function LogDetailsDialog({ handle, messages: m }: LogDetailsDialogProps)
           <Dialog.Popup
             variant='card'
             compactPlacement='center'
+            finalFocus={finalFocus}
           >
             <Card.Root
               elevation='overlay'

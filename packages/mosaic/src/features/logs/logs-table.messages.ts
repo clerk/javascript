@@ -20,7 +20,6 @@ export const logsTableMessages = {
   member: 'Member',
   ipAddress: 'IP address',
   timestamp: 'Timestamp',
-  viewDetails: 'View details for {event}',
   events: {
     organizationUpdated: 'Organization updated',
     organizationLogoUpdated: 'Logo updated',
