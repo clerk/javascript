@@ -49,7 +49,9 @@ const revealEnd = stylex.keyframes({
 // own, since the two can never legitimately differ. Where we do NOT paint the scrollbar the
 // layer is zero-wide and contributes nothing. Layers composite with `add` by default, so no
 // `mask-composite` declaration is needed.
-const fadeStops = `transparent 0, #000 calc(${progressStart} * ${fadeSize}), #000 calc(100% - ${progressEnd} * ${fadeSize}), transparent 100%`;
+const fadeStart = `var(--_cl-scroll-area-fade-start, ${fadeSize})`;
+const fadeEnd = `var(--_cl-scroll-area-fade-end, ${fadeSize})`;
+const fadeStops = `transparent 0, #000 calc(${progressStart} * ${fadeStart}), #000 calc(100% - ${progressEnd} * ${fadeEnd}), transparent 100%`;
 const blockMaskImage = `linear-gradient(to bottom, ${fadeStops}), linear-gradient(#000, #000)`;
 const inlineMaskImage = `linear-gradient(to right, ${fadeStops}), linear-gradient(#000, #000)`;
 const inlineMaskImageRtl = `linear-gradient(to left, ${fadeStops}), linear-gradient(#000, #000)`;
@@ -101,7 +103,11 @@ const styles = stylex.create({
         // it. `:focus-within` comes along so a keyboard user arrowing through the content gets the
         // same bar a pointer user does.
         default: scrollbarVars['--cl-scrollbar-thumb-idle'],
-        ':is(:hover, :focus-within)': scrollbarVars['--cl-scrollbar-thumb'],
+        ':focus-within': scrollbarVars['--cl-scrollbar-thumb'],
+        '@media (hover: hover)': {
+          default: null,
+          ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': scrollbarVars['--cl-scrollbar-thumb'],
+        },
       },
     },
     // Longer leaving than arriving, per the duration tokens: reaching the region is direct pointer
@@ -110,7 +116,11 @@ const styles = stylex.create({
       default: null,
       '@media (pointer: fine)': {
         default: durationVars['--cl-duration-base'],
-        ':is(:hover, :focus-within)': durationVars['--cl-duration-fast'],
+        ':focus-within': durationVars['--cl-duration-fast'],
+        '@media (hover: hover)': {
+          default: null,
+          ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-fast'],
+        },
       },
     },
     transitionProperty: { default: null, '@media (pointer: fine)': '--_cl-scrollbar-thumb-color' },
@@ -187,7 +197,7 @@ const styles = stylex.create({
         '@media (pointer: fine)': scrollbarVars['--cl-scrollbar-thumb-active'],
       },
     },
-    // eslint-disable-next-line @stylexjs/valid-styles -- see above.
+    // eslint-disable-next-line @stylexjs/valid-styles, eslint-compat/no-restricted-syntax -- see above; the hover guard can't wrap a combined key, and every value here only applies under (pointer: fine), where touch platforms keep their own scrollbar, and a scrollbar can't be disabled.
     '::-webkit-scrollbar-thumb:hover': {
       '--_cl-scrollbar-thumb-color': {
         default: null,

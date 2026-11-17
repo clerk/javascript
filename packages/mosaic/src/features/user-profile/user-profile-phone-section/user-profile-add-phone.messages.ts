@@ -6,6 +6,11 @@ export const userProfileAddPhoneMessages = {
     label: 'Phone',
     submit: 'Send code',
     pending: 'Sending code',
+    selectedCountry: 'Country, {country}',
+    chooseCountry: 'Choose a country',
+    searchCountries: 'Search countries',
+    countrySearchPlaceholder: 'Search',
+    noCountries: 'No countries found',
   },
   verify: {
     title: 'Verify your phone number',
@@ -14,8 +19,9 @@ export const userProfileAddPhoneMessages = {
     submit: 'Verify',
     pending: 'Verifying',
     cancel: 'Cancel',
-    resend: 'Didn’t receive a code? Resend',
+    resend: 'Resend',
+    resendText: 'Didn’t receive a code?',
     resending: 'Sending a new code…',
-    resendCountdown: 'Didn’t receive a code? Resend ({seconds})',
+    resendCountdown: 'Resend ({seconds})',
   },
 } as const;

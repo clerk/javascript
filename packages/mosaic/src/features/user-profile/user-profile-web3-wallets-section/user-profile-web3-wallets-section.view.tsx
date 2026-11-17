@@ -1,4 +1,5 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
@@ -9,16 +10,21 @@ export function UserProfileWeb3WalletsSectionView({
   wallets,
   sectionRef,
   availableProviders = [],
-  pendingId,
+  isDisabled = false,
+  error,
   onConnect,
+  onVerify,
   onSetPrimary,
   registerTrigger,
   remove,
   finalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
+  createReverification,
+  createFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
-  const m = useMessages('userProfileWeb3Wallets');
-  const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
-  const isBusy = pendingId !== undefined;
+  const m = useMessages('userProfile').web3Wallets;
+  const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect)) || Boolean(error);
 
   return (
     <>
@@ -39,7 +45,8 @@ export function UserProfileWeb3WalletsSectionView({
                   key={wallet.id}
                   wallet={wallet}
                   triggerRef={registerTrigger(wallet.id)}
-                  isDisabled={isBusy}
+                  isDisabled={isDisabled}
+                  onVerify={onVerify}
                   onSetPrimary={onSetPrimary}
                   onRemove={remove ? wallet => remove.open(wallet) : undefined}
                 />
@@ -49,12 +56,13 @@ export function UserProfileWeb3WalletsSectionView({
                     <UserProfileWeb3WalletRowView
                       key={provider.id}
                       wallet={provider}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
+                      triggerRef={registerTrigger(provider.id)}
+                      isDisabled={isDisabled}
                       onConnect={onConnect}
                     />
                   ))
                 : null}
+              <Section.Error>{error}</Section.Error>
             </Section.Body>
           </Section.Group>
         </Section.Root>
@@ -71,6 +79,18 @@ export function UserProfileWeb3WalletsSectionView({
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
+        />
+      ) : null}
+      {setPrimaryReverification ? (
+        <ReverificationDialog
+          controller={setPrimaryReverification}
+          finalFocus={setPrimaryFinalFocus}
+        />
+      ) : null}
+      {createReverification ? (
+        <ReverificationDialog
+          controller={createReverification}
+          finalFocus={createFinalFocus}
         />
       ) : null}
     </>

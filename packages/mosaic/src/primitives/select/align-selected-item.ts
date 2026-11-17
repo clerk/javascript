@@ -130,11 +130,17 @@ export function alignSelectedItem({
       detachScroll?.();
       detachScroll = null;
 
-      const selected = selectedItemRef.current;
-      if (!selected || !openRef.current) {
+      if (!openRef.current) {
         held = null;
         setHeight(floating, maxHeight);
         return { data: { availableHeight: maxHeight } };
+      }
+
+      const selected = selectedItemRef.current;
+      if (!selected) {
+        held = null;
+        onFallback();
+        return {};
       }
 
       // Measured uncapped: the cut below needs the list's natural height, not a previous cap.

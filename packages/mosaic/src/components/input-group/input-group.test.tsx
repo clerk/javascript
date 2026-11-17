@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button } from '../button';
 import { Field } from '../field';
 import { Input } from '../input';
-import { InputGroup } from './input-group';
+import { InputGroup } from '.';
 
 describe('Mosaic InputGroup', () => {
   it('exposes slots rather than a separate action component', () => {
@@ -105,7 +105,6 @@ describe('Mosaic InputGroup', () => {
     const focus = vi.spyOn(input, 'focus');
     fireEvent.click(input);
     expect(focus).not.toHaveBeenCalled();
-    focus.mockRestore();
   });
 
   it.each([
@@ -130,7 +129,7 @@ describe('Mosaic InputGroup', () => {
   });
 
   it.each(['Start', 'End'] as const)('provides button defaults inside %s', side => {
-    const Slot = InputGroup[side];
+    const Slot = { Start: InputGroup.Start, End: InputGroup.End }[side];
     render(
       <InputGroup.Root disabled>
         <Input aria-label='Value' />

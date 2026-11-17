@@ -8,6 +8,7 @@ import type { SwitcherSlot } from './switcher.layout';
 
 export interface SwitcherSession {
   sessionId: string;
+  userId: string;
   name: string;
   /** Whatever the account is addressed by: username, email, phone, or wallet. */
   identifier: string;
@@ -124,6 +125,19 @@ export interface SwitcherBusyState {
   pendingKey?: string | null;
 }
 
+/**
+ * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
+ * container (which sets `pendingKey`) and the view (which matches against it).
+ */
+export const switcherBusyKeys = {
+  selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
+  switchSession: (sessionId: string) => `switch:${sessionId}`,
+  signOutSession: (sessionId: string, from: SwitcherSlot) => `sign-out:${from}:${sessionId}`,
+  signOutAll: () => 'sign-out-all',
+  acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
+  acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
+} as const;
+
 // ─── Menu items ─────────────────────────────────────────────────────────────
 
 /**
@@ -170,3 +184,9 @@ export interface SwitcherMenuProps {
    */
   menuItemOrder?: (SwitcherMenuItemId | (string & {}))[];
 }
+
+export type SwitcherTriggerBadgeOptions = { kind: 'user' | 'organization'; id: string };
+
+export type SwitcherTriggerBadge =
+  | boolean
+  | ((options: SwitcherTriggerBadgeOptions) => Promise<{ id: string; label: string } | null>);

@@ -12,10 +12,15 @@ export function GoogleSignInButton() {
         testID='google-sign-in-button'
         title='Sign in with Google'
         onPress={() => {
-          void startGoogleAuthenticationFlow().catch((error: unknown) => {
-            const message = error instanceof Error ? error.message : String(error);
-            setResult(message.replace(/\s+/g, ' '));
-          });
+          setResult(null);
+          void startGoogleAuthenticationFlow().then(
+            ({ createdSessionId }) =>
+              setResult(createdSessionId ? 'Google sign-in created a session' : 'Google sign-in was cancelled'),
+            (error: unknown) => {
+              const message = error instanceof Error ? error.message : String(error);
+              setResult(`Google sign-in failed: ${message.replace(/\s+/g, ' ')}`);
+            },
+          );
         }}
       />
       {result && <Text testID='google-result'>{result}</Text>}

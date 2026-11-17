@@ -1,7 +1,7 @@
 'use client';
 
-import { useClerk, useUser } from '@clerk/nextjs';
-import type { EnvironmentResource } from '@clerk/shared/types';
+import { useMosaicEnvironment } from '@clerk/mosaic/hooks/use-mosaic-environment';
+import { useUser } from '@clerk/nextjs';
 import { ExternalLinkIcon } from 'lucide-react';
 import Link from 'next/link';
 
@@ -18,11 +18,8 @@ export function LiveOverview({
   dashboardUrl: string | null;
   deployment: { label: string; dashboardUrl: string | null } | null;
 }) {
-  const clerk = useClerk();
   const { isLoaded, isSignedIn, user } = useUser();
-  // The environment resource isn't part of the public Clerk interface; reach through the internal getter.
-  const environment = (clerk as unknown as { __internal_environment?: EnvironmentResource | null })
-    .__internal_environment;
+  const environment = useMosaicEnvironment();
   const applicationName = environment?.displayConfig.applicationName;
 
   return (

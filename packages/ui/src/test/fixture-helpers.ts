@@ -128,8 +128,11 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportEmailCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
+    supportPasskey?: boolean;
     supportResetPasswordEmail?: boolean;
     supportResetPasswordPhone?: boolean;
+    supportEmailLink?: boolean;
+    clientTrustState?: SignInJSON['client_trust_state'];
   };
 
   const startSignInWithEmailAddress = (params?: SignInWithEmailAddressParams) => {
@@ -224,14 +227,18 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       identifier = '+30 691 1111111',
       supportPhoneCode = true,
       supportEmailCode,
+      supportEmailLink,
       supportTotp,
       supportBackupCode,
+      supportPasskey,
       supportResetPasswordEmail,
       supportResetPasswordPhone,
+      clientTrustState,
     } = params || {};
     baseClient.sign_in = {
       status,
       identifier,
+      ...(clientTrustState ? { client_trust_state: clientTrustState } : {}),
       ...(supportResetPasswordEmail
         ? {
             first_factor_verification: {
@@ -252,8 +259,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.com' }] : []),
+        ...(supportEmailLink
+          ? [{ strategy: 'email_link', safe_identifier: 'n*****@clerk.com', email_address_id: 'idn_123' }]
+          : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportPasskey ? [{ strategy: 'passkey' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;

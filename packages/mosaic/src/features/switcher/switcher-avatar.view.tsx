@@ -5,7 +5,7 @@ import type { AvatarProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { styles } from './switcher-avatar.styles';
+import { sizes, styles } from './switcher-avatar.styles';
 import { useSlot } from './switcher-surface';
 
 function initials(name: string): string {
@@ -46,14 +46,15 @@ export interface BadgedAvatarProps {
   name: string;
   imageUrl?: string;
   badge: { name: string; imageUrl?: string };
+  size: 'sm' | 'md';
 }
 
-export function BadgedAvatar({ name, imageUrl, badge }: BadgedAvatarProps): ReactElement {
+export function BadgedAvatar({ name, imageUrl, badge, size }: BadgedAvatarProps): ReactElement {
   const slot = useSlot();
   return (
     <span
       aria-hidden
-      {...mergeStyleProps(themeProps(slot('avatar')), stylex.props(reset.base, styles.root))}
+      {...mergeStyleProps(themeProps(slot('avatar')), stylex.props(reset.base, styles.root, sizes[size]))}
     >
       <RowAvatar
         name={name}

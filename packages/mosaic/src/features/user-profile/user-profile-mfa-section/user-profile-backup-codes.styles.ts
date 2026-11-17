@@ -4,18 +4,18 @@ import { colorVars, radiusVars, space } from '../../../tokens.stylex';
 
 export const styles = stylex.create({
   codes: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     listStyleType: 'none',
   },
   cell: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderStyle: 'solid',
     paddingBlock: space['2'],
     paddingInline: space['3'],

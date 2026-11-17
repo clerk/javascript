@@ -1,8 +1,10 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
@@ -12,6 +14,7 @@ export function UserProfilePhoneSectionView({
   phones,
   defaultPhoneCountry,
   canAdd,
+  isDisabled,
   verification,
   error,
   rowRef,
@@ -19,28 +22,32 @@ export function UserProfilePhoneSectionView({
   remove,
   finalFocus,
   verificationFinalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
-  const m = useMessages('userProfileContact');
+  const messages = useMessages('userProfile');
+  const m = messages.phone;
   const addPhoneAction = canAdd ? (
     <Dialog.Trigger
       handle={verification.handle}
       render={
         <Button
-          aria-label={m.phone.add}
+          aria-label={m.add}
           color='neutral'
           size='sm'
           variant='outline'
+          disabled={isDisabled}
         />
       }
     >
       <Icon
-        name='plus'
+        glyph={Plus}
         placement='inline-start'
-        size='sm'
+        size='md'
       />
-      {m.add}
+      {messages.contact.add}
     </Dialog.Trigger>
   ) : undefined;
 
@@ -51,11 +58,12 @@ export function UserProfilePhoneSectionView({
         triggerRef={registerTrigger}
         items={phones}
         kind='phone'
-        label={m.phone.label}
+        label={m.label}
         addAction={addPhoneAction}
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        isDisabled={isDisabled}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
@@ -64,17 +72,21 @@ export function UserProfilePhoneSectionView({
         defaultCountry={defaultPhoneCountry}
         finalFocus={verificationFinalFocus}
       />
+      <ReverificationDialog
+        controller={setPrimaryReverification}
+        finalFocus={setPrimaryFinalFocus}
+      />
       {remove ? (
         <Confirmation
           controller={remove}
-          title={m.phone.removeDialog.title}
+          title={m.removeDialog.title}
           description={phone =>
-            fill(phone.isVerified ? m.phone.removeDialog.verifiedDescription : m.phone.removeDialog.description, {
+            fill(phone.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
               phoneNumber: phone.value,
             })
           }
-          actionLabel={m.phone.removeDialog.confirm}
-          cancelLabel={m.phone.removeDialog.cancel}
+          actionLabel={m.removeDialog.confirm}
+          cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
         />
       ) : null}

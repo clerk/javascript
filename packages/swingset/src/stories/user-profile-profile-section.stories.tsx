@@ -9,7 +9,7 @@ export { default as __source } from './user-profile-profile-section.stories?raw'
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileProfileSection',
   label: 'Profile',
   navigation: { category: 'Sections' },

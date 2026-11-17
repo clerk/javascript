@@ -14,7 +14,13 @@ type ViewProps = Omit<UserProfileEditNameDialogProps, 'form'> & {
 };
 
 function View({ onSubmit, ...props }: ViewProps) {
-  const { form } = useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit });
+  const { form } = useUserProfileEditNameController({
+    firstName: 'Preston',
+    lastName: 'Booth',
+    firstNameRequired: props.firstNameAttribute?.required,
+    lastNameRequired: props.lastNameAttribute?.required,
+    onSubmit,
+  });
   return (
     <UserProfileEditNameDialog
       {...props}

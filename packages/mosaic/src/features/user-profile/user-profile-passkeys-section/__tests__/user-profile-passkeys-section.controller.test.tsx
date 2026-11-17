@@ -16,6 +16,7 @@ function renderController(onAdd: () => Promise<void>) {
         onRename: async () => {},
         validateName: () => undefined,
         onRemove: async () => {},
+        reverification: { status: 'idle', visible: false },
       }),
     {
       wrapper: ({ children }: { children: ReactNode }) => (

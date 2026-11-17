@@ -7,7 +7,7 @@ import { nestLabsWithClerkApp, personalAccount, usePrototype } from './fixtures/
 export { default as __source } from './organization-switcher.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Organization Switcher',
+  group: 'Misc',
   title: 'OrganizationSwitcher',
   label: 'Organization switcher',
   status: 'stable',
@@ -32,7 +32,7 @@ export function IconTrigger(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='organization'
-      renderTriggerLabel={false}
+      showTriggerLabel={false}
     />
   );
 }

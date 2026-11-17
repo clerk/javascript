@@ -1,24 +1,35 @@
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
-import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
-  OrganizationProfileModalProps,
+  CustomPage,
   OrganizationResource,
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
-  UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicExperimental } from '../../hooks/use-mosaic-experimental';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useModal } from '../../modals/use-modal';
+import { useGetPortalContainer } from '../../primitives/portal';
+import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
+import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
+import { profileModal } from '../profile/profile.modal';
+import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
+import { profileModalOptions, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { ORGANIZATION_PAGE_PREFIX } from '../user-profile/user-profile.layout';
+import { userProfileModal } from '../user-profile/user-profile.modal';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
   SwitcherData,
   SwitcherInvitation,
   SwitcherMembership,
+  SwitcherMode,
   SwitcherSession,
   SwitcherSuggestion,
 } from './switcher.types';
@@ -46,35 +57,6 @@ export type SwitcherModel =
         organizationsEnabled: boolean;
       });
 
-/** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
-type UserProfileMode =
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
-      userProfileUrl: string;
-      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
-      userProfileUrl?: never;
-      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
-      userProfileMode?: 'modal';
-    };
-
-type OrganizationProfileMode =
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
-      organizationProfileUrl: string;
-      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'navigation';
-    }
-  | {
-      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
-      organizationProfileUrl?: never;
-      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
-      organizationProfileMode?: 'modal';
-    };
-
 type CreateOrganizationMode =
   | {
       /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
@@ -89,29 +71,36 @@ type CreateOrganizationMode =
       createOrganizationMode?: 'modal';
     };
 
-export type SwitcherModelOptions = UserProfileMode &
-  OrganizationSwitcherModelOptions &
-  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions & UserSwitcherModelOptions;
 
-export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
-  CreateOrganizationMode &
+export type UserSwitcherModelOptions = Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+
+export type OrganizationSwitcherModelOptions = CreateOrganizationMode &
   Pick<
     OrganizationSwitcherProps,
     | 'afterSelectOrganizationUrl'
     | 'afterSelectPersonalUrl'
     | 'afterCreateOrganizationUrl'
-    | 'afterLeaveOrganizationUrl'
     | 'skipInvitationScreen'
     | 'hidePersonal'
   >;
 
-/** Props forwarded to the profile modals this button opens. */
-export interface SwitcherModalProps {
-  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
-  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+/** What the profiles this button opens are built from. */
+export interface SwitcherProfileContext {
+  profile: MosaicProfile;
+  /** Custom pages in the form Clerk's modals take, already bridged, since only the wrapper can render the portals behind them. */
+  bridgedCustomPages: {
+    userProfile: CustomPage[] | undefined;
+    organizationProfile: CustomPage[] | undefined;
+  };
+  /**
+   * Which switchers the opening menu carries. Only a menu with both has one Settings row for two
+   * targets, and only it can open a combined profile.
+   */
+  menuMode: SwitcherMode;
 }
 
-function resolveAfterUrl<T extends object>(
+export function resolveAfterUrl<T extends object>(
   config: ((entity: T) => string) | string | undefined,
   entity: T,
 ): string | undefined {
@@ -133,16 +122,14 @@ function openOrNavigate({
   navigate,
 }: {
   url: string | undefined;
-  mode: 'navigation' | 'modal' | undefined;
+  mode?: 'navigation' | 'modal';
   openModal: () => void;
   buildUrl: () => string;
   navigate: (to: string) => unknown;
 }): () => void {
-  const resolved = mode ?? (url ? 'navigation' : 'modal');
-  return resolved === 'navigation' ? () => void navigate(url ?? buildUrl()) : () => openModal();
+  const opensModal = (mode ?? (url ? 'navigation' : 'modal')) === 'modal';
+  return opensModal ? () => openModal() : () => void navigate(url ?? buildUrl());
 }
-
-const INVITE_MEMBERS_PERMISSION = 'org:sys_memberships:manage';
 
 function displayName(user: UserResource): string {
   return getFullName(user) || getIdentifier(user);
@@ -160,9 +147,14 @@ function toMembership(organization: OrganizationResource): SwitcherMembership {
   };
 }
 
+function opensCombinedProfile(menuMode: SwitcherMode, { combined = true }: MosaicProfile): boolean {
+  return menuMode === 'combined' && combined;
+}
+
 function toSession(sessionId: string, user: UserResource): SwitcherSession {
   return {
     sessionId,
+    userId: user.id,
     name: displayName(user),
     identifier: getIdentifier(user),
     imageUrl: user.imageUrl,
@@ -170,10 +162,14 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
- *   the wrapper can render the portals behind them.
+ * @param context - The provider's profile and what the wrapper bridged from it. With
+ *   `experimental.newProfiles`, a combined user profile also carries the organization's pages, so
+ *   managing the organization opens it on them.
  */
-export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
+export function useSwitcherModel(
+  options: SwitcherModelOptions,
+  { profile, bridgedCustomPages, menuMode }: SwitcherProfileContext,
+): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
@@ -182,10 +178,15 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
+  const userProfile = useModal(userProfileModal);
+  const combinedProfile = useModal(profileModal);
+  const organizationProfile = useModal(organizationProfileModal);
+  const { newProfiles } = useMosaicExperimental();
+  const { userProfileProps, organizationProfileProps, userProfileUrl, organizationProfileUrl } = profile;
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
-  const getContainer = usePortalRoot();
+  const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
-  const signInUrl = () => options?.signInUrl ?? clerk.buildSignInUrl();
+  const signInUrl = () => options.signInUrl ?? clerk.buildSignInUrl();
   // Don't fetch orgsLists until we know orgs are enabled.
   // This wont delay rendering of the trigger, or even the popup shell, since the "ready" status
   // does not depend on this.
@@ -193,35 +194,61 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
+  const profileCombined = opensCombinedProfile(menuMode, profile);
+
   const manageAccount = openOrNavigate({
-    url: options?.userProfileUrl,
-    mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
+    url: userProfileUrl,
+    openModal: () =>
+      newProfiles
+        ? profileCombined
+          ? combinedProfile.open(profileModalOptions(profile), getContainer?.())
+          : userProfile.open(userProfileModalOptions(profile), getContainer?.())
+        : clerk.openUserProfile({
+            getContainer,
+            customPages: bridgedCustomPages.userProfile,
+            additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
+            apiKeysProps: userProfileProps?.apiKeysProps,
+          }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
 
   const manageOrganization = openOrNavigate({
-    url: options?.organizationProfileUrl,
-    mode: options?.organizationProfileMode,
-    openModal: () =>
-      clerk.openOrganizationProfile({
-        getContainer,
-        ...modals?.organizationProfile,
-        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-      }),
+    url: organizationProfileUrl,
+    openModal: () => {
+      if (!newProfiles) {
+        clerk.openOrganizationProfile({
+          getContainer,
+          customPages: bridgedCustomPages.organizationProfile,
+          afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
+          apiKeysProps: organizationProfileProps?.apiKeysProps,
+        });
+      } else if (profileCombined) {
+        combinedProfile.open(
+          {
+            ...profileModalOptions(profile),
+            page: `${ORGANIZATION_PAGE_PREFIX}${organizationProfileProps?.pageOrder?.[0] ?? 'general'}`,
+          },
+          getContainer?.(),
+        );
+      } else {
+        organizationProfile.open(organizationProfileProps, getContainer?.());
+      }
+    },
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
 
+  const managesBothInOneProfile = newProfiles && profileCombined && !userProfileUrl && !organizationProfileUrl;
+
   const createOrganization = openOrNavigate({
-    url: options?.createOrganizationUrl,
-    mode: options?.createOrganizationMode,
+    url: options.createOrganizationUrl,
+    mode: options.createOrganizationMode,
     openModal: () =>
       clerk.openCreateOrganization({
         getContainer,
-        afterCreateOrganizationUrl: options?.afterCreateOrganizationUrl,
-        skipInvitationScreen: options?.skipInvitationScreen,
+        afterCreateOrganizationUrl: options.afterCreateOrganizationUrl,
+        skipInvitationScreen: options.skipInvitationScreen,
       }),
     buildUrl: () => clerk.buildCreateOrganizationUrl(),
     navigate: router.navigate,
@@ -241,7 +268,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
   const { singleSessionMode } = authConfig;
 
-  const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION }) ?? false;
+  const canInviteMembers =
+    session.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
   const membershipData = userMemberships.data ?? [];
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];
@@ -282,12 +310,17 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     return [toSession(s.id, sessionUser)];
   });
 
-  const afterSelectUrl = (organizationId: string | null): string | undefined => {
+  const afterSelectUrl = async (organizationId: string | null): Promise<string | undefined> => {
     if (!organizationId) {
-      return resolveAfterUrl(options?.afterSelectPersonalUrl, user);
+      return resolveAfterUrl(options.afterSelectPersonalUrl, user);
     }
-    const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
-    return selected ? resolveAfterUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
+    if (!options.afterSelectOrganizationUrl) {
+      return undefined;
+    }
+    const selected =
+      membershipData.find(m => m.organization.id === organizationId)?.organization ??
+      (await clerk.getOrganization(organizationId));
+    return resolveAfterUrl(options.afterSelectOrganizationUrl, selected);
   };
 
   return {
@@ -298,7 +331,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     activeOrganization: organization ? toMembership(organization) : null,
     // The user resource settles this before the paginated list answers; the count covers a stale resource.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
-    hidePersonal: forceOrganizationSelection || (options?.hidePersonal ?? false),
+    hidePersonal: forceOrganizationSelection || (options.hidePersonal ?? false),
     // Only true before the first page lands, which is the one window where empty and pending look alike.
     organizationsLoading: userMemberships.isLoading || userInvitations.isLoading || userSuggestions.isLoading,
     memberships,
@@ -309,8 +342,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
-    onSelectOrganization: organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
+    onSelectOrganization: async organizationId =>
+      clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) }),
     // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
     // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
     onSwitchSession: sessionId =>
@@ -322,7 +355,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
             await router.navigate(buildTaskUrl(task, { base: signInUrl() }));
             return;
           }
-          const afterSwitchSessionUrl = options?.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
+          const afterSwitchSessionUrl = options.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
           if (!afterSwitchSessionUrl) {
             return;
           }
@@ -340,7 +373,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     // Single-session apps cannot hold a second account, so both actions are meaningless there.
     onSignOutAll: singleSessionMode ? undefined : () => clerk.signOut({ redirectUrl: clerk.buildAfterSignOutUrl() }),
     onManageAccount: manageAccount,
-    onManageOrganization: manageOrganization,
+    onManageOrganization: managesBothInOneProfile ? undefined : manageOrganization,
     // Invite has no page of its own to route to, so it opens its modal even when management is routed.
     onInviteMembers: canInviteMembers ? () => clerk.openInviteMembers({ getContainer }) : undefined,
     // Covers both restricted instances and users at their creation limit.
@@ -349,21 +382,31 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     onAcceptSuggestion: async suggestionId => {
       const suggestion = suggestionData.find(s => s.id === suggestionId);
       try {
-        await suggestion?.accept();
-      } finally {
-        // We always revalidate, a failed accept might be because of old state
+        const accepted = await suggestion?.accept();
+        if (accepted) {
+          await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
         // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
         await Promise.allSettled([userSuggestions.revalidate?.()]);
+        throw error;
       }
     },
     onAcceptInvitation: async invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
       try {
-        await invitation?.accept();
+        const accepted = await invitation?.accept();
+        if (accepted) {
+          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
+        await Promise.allSettled([userInvitations.revalidate?.()]);
+        throw error;
       } finally {
-        // We always revalidate, a failed accept might be because of old state
         // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
-        await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+        await Promise.allSettled([userMemberships.revalidate?.()]);
       }
     },
   };

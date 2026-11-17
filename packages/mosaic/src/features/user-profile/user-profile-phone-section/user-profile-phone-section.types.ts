@@ -3,13 +3,15 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { CountryIso } from '../../../components/phone-input';
-import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
+import type { ReverificationController } from '../../reverification';
+import type { UserProfileContactRow, UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneController } from './user-profile-add-phone.controller';
 
 export interface UserProfilePhoneSectionViewProps {
-  phones: UserProfilePhone[];
+  phones: UserProfileContactRow[];
   defaultPhoneCountry?: CountryIso;
   canAdd: boolean;
+  isDisabled: boolean;
   verification: UserProfileAddPhoneController;
   error: string | undefined;
   rowRef: Ref<HTMLDivElement>;
@@ -17,6 +19,8 @@ export interface UserProfilePhoneSectionViewProps {
   remove?: ConfirmController<UserProfilePhone>;
   finalFocus: DialogFocusTarget;
   verificationFinalFocus: DialogFocusTarget;
+  setPrimaryReverification: ReverificationController;
+  setPrimaryFinalFocus: DialogFocusTarget;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
 }
@@ -33,6 +37,9 @@ export type UserProfilePhoneSectionModel =
       getPhoneVerifier: (id: string) => UserProfilePhoneVerifier;
       onSetPrimaryPhone: (id: string) => Promise<void>;
       onRemovePhone?: (id: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyPhoneSectionModel = Extract<UserProfilePhoneSectionModel, { status: 'ready' }>;

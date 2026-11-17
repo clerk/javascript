@@ -15,7 +15,6 @@ import {
 // Literals: StyleX cannot import them. Must match `tabs.styles.ts`.
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
 const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
-const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
 const forcedColors = '@media (forced-colors: active)' as const;
 const activeAnchor = '--_cl-segmented-control-active';
 const forcedTextVar = '--_cl-segmented-control-forced-text';
@@ -32,7 +31,7 @@ const scaleIn = stylex.keyframes({
 
 const surface = {
   borderRadius: radiusVars['--cl-radius-md'],
-  backgroundColor: { default: colorVars['--cl-color-background'], [forcedColors]: 'Highlight' },
+  backgroundColor: { default: colorVars['--cl-color-surface'], [forcedColors]: 'Highlight' },
   boxShadow: shadowVars['--cl-shadow-sm'],
   forcedColorAdjust: 'none',
 } as const;
@@ -44,7 +43,7 @@ export const styles = stylex.create({
     padding: space['0.5'],
     borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['0.5']})`,
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
     display: 'inline-flex',
     isolation: 'isolate',
     position: 'relative',
@@ -65,11 +64,11 @@ export const styles = stylex.create({
     position: 'absolute',
     transitionDuration: {
       default: `${trail}, ${lead}`,
-      [reduceMotion]: {
+      ':where([data-direction="backward"])': `${lead}, ${trail}`,
+      '@media (prefers-reduced-motion: reduce)': {
         default: durationVars['--cl-duration-instant'],
         ':where([data-direction="backward"])': durationVars['--cl-duration-instant'],
       },
-      ':where([data-direction="backward"])': `${lead}, ${trail}`,
     },
     transitionProperty: 'inset-inline-start, inset-inline-end',
     transitionTimingFunction: easingVars['--cl-ease-enter'],
@@ -118,7 +117,7 @@ export const styles = stylex.create({
     ...surface,
     inset: 0,
     animationDuration: durationVars['--cl-duration-base'],
-    animationName: { default: scaleIn, [reduceMotion]: 'none' },
+    animationName: { default: scaleIn, '@media (prefers-reduced-motion: reduce)': 'none' },
     animationTimingFunction: easingVars['--cl-ease-enter'],
     display: {
       default: 'none',

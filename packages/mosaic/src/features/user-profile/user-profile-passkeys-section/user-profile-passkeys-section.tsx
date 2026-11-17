@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { useReverificationFlow } from '../../reverification';
-import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { useUserProfilePasskeysSectionController } from './user-profile-passkeys-section.controller';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 import { useUserProfilePasskeysModel } from './user-profile-passkeys-section.model';
+import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 
 export interface UserProfilePasskeysSectionProps {
   fallback?: ReactNode;
@@ -31,7 +30,6 @@ export function passkeysSectionNode(model: UserProfilePasskeysModel, fallback: R
 }
 
 function PasskeysEditor({ model }: { model: Extract<UserProfilePasskeysModel, { status: 'ready' }> }) {
-  const [remove, reverification] = useReverificationFlow(model.onRemove);
-  const controller = useUserProfilePasskeysSectionController({ ...model, onRemove: remove, reverification });
+  const controller = useUserProfilePasskeysSectionController(model);
   return <UserProfilePasskeysSectionView {...controller} />;
 }

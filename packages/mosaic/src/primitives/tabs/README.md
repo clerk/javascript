@@ -1,6 +1,6 @@
 # Tabs
 
-A tabbed interface with automatic or manual activation, keyboard navigation, and an optional indicator element. Panels are shown/hidden via the HTML `hidden` attribute (not unmounted).
+A tabbed interface with automatic or manual activation, keyboard navigation, and an optional indicator element. Every panel element stays in the DOM; a panel's children render only while it is shown or animating out.
 
 ## When to Use
 
@@ -94,10 +94,10 @@ A standalone tab button for use outside `Tabs.List`. Unlike `Tabs.Tab`, it does 
 
 ### `Tabs.Panel`
 
-| Prop               | Type      | Default      | Description                                                         |
-| ------------------ | --------- | ------------ | ------------------------------------------------------------------- |
-| `value`            | `string`  | **required** | Must match a Tab's `value`                                          |
-| `shouldForceMount` | `boolean` | —            | When true, keeps the panel in layout flow instead of using `hidden` |
+| Prop          | Type      | Default      | Description                                                |
+| ------------- | --------- | ------------ | ---------------------------------------------------------- |
+| `value`       | `string`  | **required** | Must match a Tab's `value`                                 |
+| `keepMounted` | `boolean` | —            | When true, renders the panel's children while it is hidden |
 
 ### `Tabs.List`, `Tabs.Indicator`
 
@@ -115,16 +115,16 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## Data Attributes
 
-| Attribute             | Applies To   | Description                                     |
-| --------------------- | ------------ | ----------------------------------------------- |
-| `data-selected`       | Tab, Trigger | Active tab                                      |
-| `data-direction`      | Indicator    | `forward` or `backward`, see below              |
-| `data-disabled`       | Tab, Trigger | Disabled tab                                    |
-| `data-hidden`         | Panel        | Inactive panel                                  |
-| `data-open`           | Panel        | Selected panel (when `shouldForceMount`)        |
-| `data-closed`         | Panel        | Deselected panel (when `shouldForceMount`)      |
-| `data-starting-style` | Panel        | Enter animation frame (when `shouldForceMount`) |
-| `data-ending-style`   | Panel        | Exit animation frame (when `shouldForceMount`)  |
+| Attribute             | Applies To   | Description                            |
+| --------------------- | ------------ | -------------------------------------- |
+| `data-selected`       | Tab, Trigger | Active tab                             |
+| `data-direction`      | Indicator    | `forward` or `backward`, see below     |
+| `data-disabled`       | Tab, Trigger | Disabled tab                           |
+| `data-hidden`         | Panel        | Hidden panel                           |
+| `data-open`           | Panel        | Selected panel                         |
+| `data-closed`         | Panel        | Deselected panel while it animates out |
+| `data-starting-style` | Panel        | Enter animation frame                  |
+| `data-ending-style`   | Panel        | Exit animation frame                   |
 
 ## Indicator
 
@@ -152,9 +152,9 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ## CSS Variables
 
-### Panel (with `shouldForceMount`)
+### Panel
 
-When `shouldForceMount` is set, panels expose a direction variable for directional animations:
+Panels expose a direction variable for directional animations:
 
 | CSS Variable                    | Description                                                    |
 | ------------------------------- | -------------------------------------------------------------- |
@@ -183,8 +183,9 @@ Use this to drive directional slide animations:
 
 ## Important Notes
 
-- **Panels use the `hidden` attribute** by default — they stay in the DOM but are hidden when inactive. This preserves state in inactive panels.
-- **`shouldForceMount` panels** stay in layout flow with `inert` on inactive panels. This enables CSS enter/exit animations between tabs. The initially-selected panel appears instantly (no enter animation on page load).
+- **Panel children unmount when the panel is hidden.** A deselected panel keeps its children, with `inert` and `data-ending-style`, until its exit animations finish, then gains `hidden` and unmounts them. State inside a panel resets when it is hidden; pass `keepMounted` to keep the children rendered.
+- **Leaving panel content freezes.** While a deselected panel animates out, its children are wrapped in `Freeze` (`../utils`) and hold their last frame instead of re-rendering under the animation.
+- **The initially selected panel appears instantly** (no enter animation on page load).
 - **`Tabs.Trigger` vs `Tabs.Tab`**: Use `Tabs.Tab` inside `Tabs.List` for keyboard-navigable tabs with roving tabindex. Use `Tabs.Trigger` for standalone tab buttons placed anywhere in the tree (e.g., in a sidebar).
 - **Disabled tabs use `aria-disabled`**, not the native `disabled` attribute, keeping them focusable for keyboard users.
 - **Indicator is `aria-hidden`** — it's purely decorative.

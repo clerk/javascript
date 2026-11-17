@@ -1,3 +1,5 @@
+'use client';
+
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -6,6 +8,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
+import { mediaSizes } from '../../styles/media-size.styles';
 import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
 import { shapes, sizes, styles } from './avatar.styles';
@@ -55,6 +58,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
           reset.base,
           styles.base,
           shapes[shape],
+          size !== 'fit' && mediaSizes[size],
           sizes[size],
           interactive && styles.interactive,
           interactive && focusOutline.visible,
@@ -191,15 +195,4 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
   );
 });
 
-/**
- * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
- * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
- * adds an optional corner affordance.
- */
-export const Avatar = {
-  Root: AvatarRoot,
-  Image: AvatarImage,
-  Fallback: AvatarFallback,
-  Icon: AvatarIcon,
-};
+export { AvatarRoot, AvatarImage, AvatarFallback, AvatarIcon };

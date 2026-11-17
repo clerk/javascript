@@ -1,4 +1,3 @@
-import { useReverificationFlow } from '../../reverification';
 import { useUserProfilePhoneSectionController } from './user-profile-phone-section.controller';
 import { useUserProfilePhoneSectionModel } from './user-profile-phone-section.model';
 import type { ReadyPhoneSectionModel } from './user-profile-phone-section.types';
@@ -20,11 +19,6 @@ export function UserProfilePhoneSection() {
 }
 
 function Phones({ model }: { model: ReadyPhoneSectionModel }) {
-  const [removePhone, reverification] = useReverificationFlow((id: string) => model.onRemovePhone?.(id));
-  const controller = useUserProfilePhoneSectionController({
-    ...model,
-    onRemovePhone: model.onRemovePhone ? removePhone : undefined,
-    reverification,
-  });
+  const controller = useUserProfilePhoneSectionController(model);
   return <UserProfilePhoneSectionView {...controller} />;
 }

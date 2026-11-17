@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
@@ -12,11 +12,10 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
-
-afterEach(() => vi.restoreAllMocks());
 
 function serveAccounts(enabled = true) {
   vi.spyOn(navigator, 'webdriver', 'get').mockReturnValue(false);
@@ -57,7 +56,7 @@ describe('Passkey action errors', () => {
     serveAccounts();
     const view = await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Could not add this passkey.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Could not add this passkey.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -72,7 +71,7 @@ describe('Passkey action errors', () => {
     expect(screen.queryByText('Private authenticator details')).toBeNull();
     view.rerender(
       <MosaicProvider
-        localization={{ messages: { userProfilePasskeys: { saveError: 'Impossible de créer cette clé.' } } }}
+        localization={{ messages: { userProfile: { passkeys: { saveError: 'Impossible de créer cette clé.' } } } }}
       >
         <UserProfilePasskeysSection />
       </MosaicProvider>,
@@ -173,7 +172,7 @@ describe('Submitting passkey actions', () => {
     serveAccounts();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.keyboard('{ArrowDown}{Enter}');
     const dialog = await screen.findByRole('dialog');
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
@@ -331,7 +330,7 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
     await act(() => clerk.setActive({ session: 'sess_b' }));
@@ -343,7 +342,7 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
@@ -400,7 +399,7 @@ describe('Replacing instance policy while editing', () => {
         localization={{
           locale: 'fr-FR',
           messages: {
-            userProfilePasskeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' },
+            userProfile: { passkeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' } },
             form: { error: 'Erreur générique du formulaire.' },
           },
         }}
@@ -409,7 +408,7 @@ describe('Replacing instance policy while editing', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);

@@ -276,7 +276,7 @@ describe('UserProfileView', () => {
     });
 
     await waitFor(() => {
-      expect(warn).toHaveBeenCalledWith('Could not open custom user profile page "docs".', error);
+      expect(warn).toHaveBeenCalledWith('Clerk: Could not open custom user profile page "docs".', error);
       expect(mocks.navigateCustomPage).toHaveBeenCalledWith('back');
     });
 

@@ -2,13 +2,13 @@ import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
   InvitationsTableTabViewProps,
   OrganizationProfileInvitation,
-} from '@clerk/mosaic/features/organization-profile/invitations-table-tab.types';
+} from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/invitations-table-tab.types';
 import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosRole, chaosRows } from '@/lib/chaos';
 
 const exampleInvitations = [
   'ada',
@@ -36,7 +36,7 @@ export function useInvitationsTableFixture({ proposed = false, empty = false } =
     chaosRows(items).map((invitation, index) => ({
       ...invitation,
       email: chaosEmail(index),
-      roleLabel: chaosText(invitation.roleLabel),
+      roleLabel: chaosRole(index).label,
     })),
   );
   const [items, setItems] = useState(empty ? [] : invitations);

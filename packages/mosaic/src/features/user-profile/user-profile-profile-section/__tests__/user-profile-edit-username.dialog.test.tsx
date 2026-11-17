@@ -28,6 +28,7 @@ function renderView(overrides: Partial<ViewProps> = {}, localization?: MosaicLoc
   const props: ViewProps = {
     open: true,
     onOpenChange: vi.fn(),
+    step: 'edit',
     onSubmit: vi.fn(() => Promise.resolve()),
     ...overrides,
   };

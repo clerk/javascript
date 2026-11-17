@@ -31,8 +31,8 @@ function useBreadcrumb() {
   const [groupSlug, ...parts] = pathname.split('/').filter(Boolean);
 
   // Prefer the registry's own `meta.title`, which is the only source that round-trips a slug back
-  // to how the entry is actually written — `scroll-area` → `Scroll Area`, `use-data-table` →
-  // `useDataTable`. Fall back to title-casing the slug for any path the registry doesn't cover.
+  // to how the entry is actually written — `scroll-area` → `Scroll Area`, `use-form` →
+  // `useForm`. Fall back to title-casing the slug for any path the registry doesn't cover.
   return parts.map((part, index) => {
     const title = index === 0 ? getModule(groupSlug, part)?.meta.title : undefined;
     return title ?? part.replace(/(^|-)([a-z])/g, (_, sep: string, ch: string) => (sep ? ' ' : '') + ch.toUpperCase());

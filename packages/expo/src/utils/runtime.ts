@@ -26,6 +26,21 @@ export function waitUntilAppIsActive(): Promise<void> {
   });
 }
 
+export function isExpoGo(): boolean {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const constants = (require('expo-constants') as { default?: ExpoGoConstants }).default;
+    return constants?.executionEnvironment === 'storeClient' || constants?.appOwnership === 'expo';
+  } catch {
+    return false;
+  }
+}
+
+type ExpoGoConstants = {
+  appOwnership?: string | null;
+  executionEnvironment?: string;
+};
+
 export function isHermes() {
   //@ts-expect-error HermesInternal is added only added by the Hermes JS Engine
   return !!global.HermesInternal;

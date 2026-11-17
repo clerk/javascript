@@ -1,8 +1,11 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
 import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
+import { X } from '../../icons/glyphs/x';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -15,6 +18,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
+import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
@@ -29,6 +33,7 @@ import {
   viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
+import { guardKeyboardFocus } from './keyboard-focus';
 import { acquireKeyboardInset } from './keyboard-inset';
 import { guardKeyboardTouch } from './keyboard-touch';
 
@@ -198,6 +203,7 @@ function Root<Payload = unknown>({
 }
 
 /** Opens the dialog. Renders a `<button>`; `render` swaps in another element. */
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
 const Trigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger(
   { xstyle, ...rest },
   ref,
@@ -262,6 +268,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         aria-label={ariaLabel}
         render={props => (
           <Button
+            color='neutral'
             variant='ghost'
             shape='circle'
             size='sm'
@@ -270,7 +277,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         )}
         {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
-        <Icon name='x' />
+        <Icon glyph={X} />
       </Primitive.Close>
     </span>
   );
@@ -313,6 +320,7 @@ function Viewport({
   const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
   React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardFocus(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
@@ -471,48 +479,21 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>{holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
+    <Primitive.Portal>
+      <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+        {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+      </ButtonContext.Provider>
+    </Primitive.Portal>
   );
 });
 
-/**
- * Mosaic `Dialog` — a modal surface built on the `primitives/dialog` primitive, composed
- * via dot syntax:
- *
- * ```tsx
- * <Dialog.Root>
- *   <Dialog.Trigger render={<Button />}>Open</Dialog.Trigger>
- *   <Dialog.Popup>
- *     <Card.Root elevation='overlay'>
- *       <Card.Header>
- *         <Card.Title>…</Card.Title>
- *         <Card.Description>…</Card.Description>
- *       </Card.Header>
- *     </Card.Root>
- *   </Dialog.Popup>
- * </Dialog.Root>
- * ```
- *
- * The dialog brings the geometry, the motion and the floating tree; the SURFACE comes from what
- * is rendered inside it — a `Card` for a `card`, a `Profile` for a `profile`. Those surfaces read
- * `DialogContext`, so `Card.Title` names the dialog and `Card.Header` carries its dismiss without
- * either knowing it is in one.
- *
- * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
- * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
- * ask for a decision and waits for one. In the compact band a card is a bottom sheet unless
- * `compactPlacement='center'`.
- *
- * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
- * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus
- * management, scroll lock, and ARIA wiring.
- */
-export const Dialog = {
-  Root,
-  Trigger,
-  Popup,
-  Close,
-  CloseButton,
-  /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
-  createHandle: Primitive.createHandle,
+/** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
+const createDialogHandle = Primitive.createHandle;
+export {
+  Root as DialogRoot,
+  Trigger as DialogTrigger,
+  Popup as DialogPopup,
+  Close as DialogClose,
+  CloseButton as DialogCloseButton,
+  createDialogHandle,
 };

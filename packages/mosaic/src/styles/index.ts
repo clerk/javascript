@@ -13,6 +13,8 @@ export type { BrandingProps } from '../components/branding';
 export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
+export { Captcha } from '../components/captcha';
+export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';
@@ -36,9 +38,12 @@ export type {
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
+  ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
@@ -56,6 +61,7 @@ export type {
   DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
+export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Flow, useFlowAutoFocus } from '../components/flow';
@@ -70,10 +76,14 @@ export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
 export { Pagination } from '../components/pagination';
 export type { PaginationProps } from '../components/pagination';
+export { PasswordInput } from '../components/password-input';
+export type { PasswordInputProps } from '../components/password-input';
 export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
+export { Link } from '../components/link';
+export type { LinkProps } from '../components/link';
 export { Menu } from '../components/menu';
 export { TagInput } from '../components/tag-input';
 export type { TagInputProps } from '../components/tag-input';
@@ -91,6 +101,10 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
+export { ProviderButton, ProviderButtonGroup } from '../components/provider-button';
+export type { ProviderButtonGroupProps, ProviderButtonProps } from '../components/provider-button';
+export { Radio } from '../components/radio';
+export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
 export type {
   SelectItem,
@@ -105,17 +119,19 @@ export type {
   TableAlign,
   TableBodyProps,
   TableCellProps,
-  TableEmptyProps,
-  TableHeaderCellProps,
+  TableColumnProps,
+  TableExpandButtonProps,
   TableHeaderProps,
-  TableProps,
+  TableRootProps,
   TableRowProps,
-  TableSelectAllCellProps,
-  TableSelectCellProps,
+  TableSelectionCellProps,
+  TableSelectionColumnProps,
   TableSort,
 } from '../components/table';
 export { SegmentedControl } from '../components/segmented-control';
 export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
+export { Separator } from '../components/separator';
+export type { SeparatorProps } from '../components/separator';
 export { Tabs } from '../components/tabs';
 export type {
   TabsListProps,
@@ -162,6 +178,8 @@ export type {
 } from '../components/popover';
 export { Panel } from '../components/panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
+export { Reveal } from '../components/reveal';
+export type { RevealProps } from '../components/reveal';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
@@ -172,8 +190,15 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { OAuthConsent } from '../features/oauth-consent/oauth-consent';
+export { CreateOrganization } from '../features/create-organization/create-organization';
+export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { Switcher } from '../features/switcher/switcher';
+export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
+export { TaskSetupMFA } from '../features/task-setup-mfa/task-setup-mfa';
 export { UserButton } from '../features/user-button/user-button';
+export { Waitlist } from '../features/waitlist/waitlist';
 
 import {
   colorVars,
@@ -232,6 +257,6 @@ export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-m
 export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
 export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
-export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
-export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
-export { RequestsTableTabView } from '../features/organization-profile/requests-table-tab.view';
+export { MembersTableTabView } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.view';
+export { RequestsTableTabView } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.view';

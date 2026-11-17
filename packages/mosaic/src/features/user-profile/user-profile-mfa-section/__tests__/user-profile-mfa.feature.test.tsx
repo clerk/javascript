@@ -141,7 +141,7 @@ describe('User profile MFA', () => {
       expect(screen.getByText('You cannot set your last identification as second factor.')).toBeVisible(),
     );
     expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveAccessibleDescription(
-      'You cannot set your last identification as second factor.',
+      'Add a new phone number You cannot set your last identification as second factor.',
     );
     expect(fapi.mfa.phoneUpdates).toHaveLength(0);
     expect(screen.getByRole('button', { name: 'Back' })).toBeVisible();
@@ -178,10 +178,81 @@ describe('User profile MFA', () => {
     const fapi = await renderMfa(fapiUser({ id: 'user_1' }), environment);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(screen.queryByRole('button', { name: /SMS verification/ })).toBeNull();
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.backupCodeCreations).toBe(0);
+  });
+
+  it('offers only the methods the user has not set up yet', async () => {
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    await renderMfa(
+      fapiUser({
+        id: 'user_1',
+        phone_numbers: [reserved],
+        totp_enabled: true,
+        backup_code_enabled: true,
+        two_factor_enabled: true,
+      }),
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /^SMS verification/ })).toBeVisible());
+    expect(screen.queryByRole('button', { name: /^Authenticator app/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Backup codes/ })).toBeNull();
+  });
+
+  it('lists only phones that are not already used for SMS verification', async () => {
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const other = fapiPhoneNumber({ ...phone, id: 'phone_2', phone_number: '+15555550202' });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved, other], two_factor_enabled: true }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /^SMS verification/ }));
+    await user.click(screen.getByRole('combobox', { name: /Phone number/ }));
+    const options = await screen.findAllByRole('option');
+    expect(options.map(option => option.textContent)).toEqual(['+1 (555) 555-0202']);
+  });
+
+  it('lets either factor be removed when a verified SMS phone backs up the authenticator', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.sign_up.mfa = { required: true };
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [reserved], totp_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByRole('button', { name: 'Manage Authenticator app' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).toBeVisible();
+  });
+
+  it('does not count an unverified SMS phone toward required verification', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.sign_up.mfa = { required: true };
+    const unverified = fapiPhoneNumber({
+      ...phone,
+      reserved_for_second_factor: true,
+      verification: { ...phone.verification, status: 'unverified' },
+    });
+    await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [unverified], totp_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByText('Authenticator app')).toBeVisible();
+    expect(screen.queryByText('SMS verification')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage Authenticator app' })).toBeNull();
+  });
+
+  it('hides existing backup codes when the instance turns them off', async () => {
+    const environment = mfaEnvironment();
+    environment.user_settings.attributes.backup_code.used_for_second_factor = false;
+    await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      environment,
+    );
+    expect(screen.getByText('Authenticator app')).toBeVisible();
+    expect(screen.queryByText('Backup codes')).toBeNull();
   });
 
   it('shows a localized incorrect TOTP code and allows a retry with the same secret', async () => {
@@ -221,7 +292,16 @@ describe('User profile MFA', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(screen.getByRole('combobox', { name: /Phone number/ })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+    } finally {
+      held.release();
+    }
     expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
     expect(fapi.mfa.phoneUpdates).toEqual([]);
@@ -297,6 +377,25 @@ describe('User profile MFA', () => {
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
   });
 
+  it('unlocks the SMS resend by the clock when timers were held up', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    try {
+      expect(screen.getByRole('button', { name: /Resend/ })).toBeDisabled();
+      vi.setSystemTime(Date.now() + 60_000);
+      await act(async () => vi.advanceTimersByTimeAsync(1000));
+      expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('disables verification and Back while resending an SMS code', async () => {
     const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
     vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -311,7 +410,7 @@ describe('User profile MFA', () => {
       for (let second = 0; second < 30; second++) {
         await act(async () => vi.advanceTimersByTimeAsync(1000));
       }
-      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
+      await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled());
       await user.click(screen.getByRole('button', { name: /Resend/ }));
       await waitFor(() => expect(held.requests).toHaveLength(1));
       expect(code).toHaveAttribute('aria-disabled', 'true');
@@ -322,7 +421,7 @@ describe('User profile MFA', () => {
       held.release();
       vi.useRealTimers();
     }
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled());
     expect(code).not.toHaveAttribute('aria-disabled');
     expect(code).not.toHaveAttribute('readonly');
   });
@@ -363,6 +462,49 @@ describe('User profile MFA', () => {
     await user.click(screen.getAllByRole('option')[1]);
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     await waitFor(() => expect(fapi.mfa.phonePreparations).toEqual(['phone_1', 'phone_2']));
+  });
+
+  it('creates the entered phone instead of using the selected one', async () => {
+    const fapi = await renderMfa();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.type(await screen.findByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    expect(fapi.mfa.phoneCreations).toHaveLength(1);
+    expect(fapi.mfa.phonePreparations).not.toContain('phone_1');
+  });
+
+  it('enrolls the selected phone after backing out of new phone entry', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.type(await screen.findByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(fapi.mfa.phonePreparations).toEqual(['phone_1']));
+    expect(fapi.mfa.phoneCreations).toHaveLength(0);
+  });
+
+  it('clears a failed selected phone error when adding a new phone', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await screen.findByRole('textbox', { name: 'Phone' });
+    expect(screen.queryByText('Unable to send a code.')).toBeNull();
   });
 
   it('returns to the entered number after backing out of a new phone verification', async () => {

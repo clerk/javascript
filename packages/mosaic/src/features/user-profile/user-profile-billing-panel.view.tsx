@@ -5,12 +5,12 @@ import { themeProps } from '../../props';
 import type {
   UserProfileBillingHistoryItem,
   UserProfileBillingHistoryPagination,
-} from './user-profile-billing-history-section.view';
-import { UserProfileBillingHistorySectionView } from './user-profile-billing-history-section.view';
-import type { UserProfilePaymentMethod } from './user-profile-payment-methods-section.view';
-import { UserProfilePaymentMethodsSectionView } from './user-profile-payment-methods-section.view';
-import type { UserProfileSubscription } from './user-profile-subscription-section.view';
-import { UserProfileSubscriptionSectionView } from './user-profile-subscription-section.view';
+} from './user-profile-billing-history-section/user-profile-billing-history-section.view';
+import { UserProfileBillingHistorySectionView } from './user-profile-billing-history-section/user-profile-billing-history-section.view';
+import type { UserProfilePaymentMethod } from './user-profile-payment-methods-section/user-profile-payment-methods-section.view';
+import { UserProfilePaymentMethodsSectionView } from './user-profile-payment-methods-section/user-profile-payment-methods-section.view';
+import type { UserProfileSubscription } from './user-profile-subscription-section/user-profile-subscription-section.view';
+import { UserProfileSubscriptionSectionView } from './user-profile-subscription-section/user-profile-subscription-section.view';
 
 export type {
   UserProfileBillingHistoryItem,

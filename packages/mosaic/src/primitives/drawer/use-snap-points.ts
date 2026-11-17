@@ -116,6 +116,7 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
   );
 
   const onRelease = useCallback(
+    // eslint-disable-next-line sonarjs/cognitive-complexity -- Keep the related branches together so their execution order stays visible.
     ({ dist, v, dismissible, close }: SnapReleaseArgs): boolean => {
       const pos = offset(activeIndex) + dist;
       // Direction comes from the release velocity (falling back to net distance

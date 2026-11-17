@@ -61,7 +61,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
     variant: variantProp,
     size: sizeProp,
     shape: shapeProp,
-    fullWidth = false,
+    fullWidth: fullWidthProp,
     touchTarget = true,
     disabled: disabledProp,
     focusableWhenDisabled = false,
@@ -76,6 +76,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   const variant = variantProp ?? defaults.variant ?? 'filled';
   const size = sizeProp ?? defaults.size ?? 'md';
   const shape = shapeProp ?? defaults.shape ?? 'default';
+  const fullWidth = fullWidthProp ?? defaults.fullWidth ?? false;
   const disabled = defaults.disabled || disabledProp || false;
   const isIconShape = shape === 'square' || shape === 'circle';
   const hasTouchTarget = touchTarget && variant !== 'link';

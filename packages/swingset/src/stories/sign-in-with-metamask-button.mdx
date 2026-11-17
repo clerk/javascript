@@ -1,0 +1,62 @@
+import * as SignInWithMetamaskButtonStories from './sign-in-with-metamask-button.stories';
+
+# SignInWithMetamaskButton
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SignInWithMetamaskButtonStories}
+/>
+
+## Usage
+
+```tsx
+import { SignInWithMetamaskButton } from '@clerk/mosaic/features/sign-in-with-metamask-button/sign-in-with-metamask-button';
+
+<SignInWithMetamaskButton />;
+```
+
+## Props
+
+| Prop           | Type                   | Default                   | Description                                                                                             |
+| -------------- | ---------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `redirectUrl`  | `string`               | —                         | Where to go after signing in.                                                                           |
+| `render`       | `ReactElement \| func` | —                         | The element to render. The button's props are merged into it.                                           |
+| `children`     | `ReactNode`            | `'Sign in with MetaMask'` | The button's content. The default label is localized as `signInWithMetamaskButton.label`.               |
+| `nativeButton` | `boolean`              | `true`                    | Set to `false` when `render` is not a `<button>`, to apply button semantics.                            |
+| `onClick`      | `MouseEventHandler`    | —                         | Runs alongside starting sign-in.                                                                        |
+| `fallback`     | `ReactNode`            | —                         | Rendered while Clerk loads. Nothing renders once Clerk answers that MetaMask is not a sign-in strategy. |
+
+Other `<button>` attributes pass through to the rendered element.
+
+## Your own element
+
+<Story
+  name='CustomElement'
+  storyModule={SignInWithMetamaskButtonStories}
+/>
+
+## Pending
+
+The button is disabled while the wallet asks for a signature.
+
+<Story
+  name='Pending'
+  storyModule={SignInWithMetamaskButtonStories}
+/>
+
+## Styling
+
+The button emits no class. Style it with your own `className`, or through the element you pass to
+`render`.
+
+| Attribute       | Description                                    |
+| --------------- | ---------------------------------------------- |
+| `data-disabled` | Present while the wallet asks for a signature. |
+
+```css
+.sign-in-with-metamask[data-disabled] {
+  cursor: progress;
+}
+```

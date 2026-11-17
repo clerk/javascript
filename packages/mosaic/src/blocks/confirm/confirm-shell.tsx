@@ -88,7 +88,7 @@ function ConfirmCard<Payload>({
               <Flow.Step ids={['confirm']}>{confirmStep}</Flow.Step>
               <Flow.Step ids={['verify']}>
                 <Reverification
-                  {...reverification}
+                  controller={reverification}
                   onClose={() => controller.onOpenChange(false)}
                 />
               </Flow.Step>

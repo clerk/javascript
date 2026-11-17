@@ -8,13 +8,16 @@ import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
+import type { ReadyActiveDevicesModel } from './user-profile-active-devices-section.model';
 
-export interface UserProfileActiveDevicesControllerOptions {
-  devices: UserProfileDevice[];
+export type UserProfileActiveDevicesControllerOptions = Omit<
+  ReadyActiveDevicesModel,
+  'status' | 'identity' | 'revoke' | 'reverification'
+> & {
   revoke?: (id: string) => Promise<void>;
   revokeAll?: () => Promise<void>;
   reverification?: ReverificationController;
-}
+};
 
 export interface UserProfileActiveDevicesController {
   devices: UserProfileDevice[];
@@ -35,7 +38,7 @@ export function useUserProfileActiveDevicesController({
   revokeAll,
   reverification,
 }: UserProfileActiveDevicesControllerOptions): UserProfileActiveDevicesController {
-  const m = useMessages('userProfileActiveDevices');
+  const m = useMessages('userProfile').activeDevices;
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   const visibleDevices = devices.filter(device => !removedIds.includes(device.id));
   const currentDeviceTriggerRef = useRef<HTMLButtonElement>(null);

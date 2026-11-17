@@ -16,6 +16,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
+import { useSignOutWithRedirect } from '@/ui/hooks/useSignOutWithRedirect';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { withTaskGuard } from '../shared';
@@ -125,11 +126,12 @@ const TaskChooseOrganizationCardFooter = () => {
   const { user } = useUser();
   const { session } = useSession();
   const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const signOutWithRedirect = useSignOutWithRedirect();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return signOutWithRedirect(navigateAfterSignOut, afterSignOutUrl);
     }
 
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });

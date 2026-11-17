@@ -1,7 +1,6 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
-import type { SignInResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -16,7 +15,7 @@ import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
-import { isResetPasswordStrategy } from './utils';
+import { isResettingPassword } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
@@ -36,10 +35,6 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
     isRequired: true,
   });
   const clerk = useClerk();
-
-  const isResettingPassword = (resource: SignInResource) =>
-    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-    resource.firstFactorVerification?.status === 'verified';
 
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();

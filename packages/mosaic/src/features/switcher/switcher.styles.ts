@@ -17,20 +17,27 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
     cursor: 'pointer',
     display: 'inline-flex',
-    transitionDuration: durationVars['--cl-duration-base'],
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      '@media (hover: hover)': {
+        default: null,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': durationVars['--cl-duration-instant'],
+      },
+    },
+    transitionTimingFunction: 'linear',
     maxWidth: '100%',
     minWidth: 0,
   },
 
   triggerLabelled: {
     padding: space['1.5'],
-    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
+    borderRadius: radiusVars['--cl-radius-xl'],
     gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',
       ':is([data-open])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
       },
     },
     transitionProperty: 'background-color',
@@ -41,7 +48,7 @@ export const styles = stylex.create({
       default: 1,
       ':is([data-open])': 0.8,
       '@media (hover: hover)': {
-        ':hover': 0.8,
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': 0.8,
       },
     },
     transitionProperty: 'opacity',

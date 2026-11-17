@@ -7,18 +7,18 @@ export interface CompositionPiece {
   name: string;
   /** Route to the piece's page in swingset (e.g. `/components/button`). */
   href: string;
-  /** Which Mosaic layer the piece lives in (e.g. `User Button`, `Components`, `Primitives`). */
+  /** Which Mosaic layer the piece lives in (e.g. `Switcher`, `Components`, `Primitives`). */
   layer: string;
 }
 
 // Mosaic layers, high → low. Drives the order the composition groups render in.
 // Matches the sidebar group names.
 const LAYER_ORDER = [
-  'User Button',
-  'Organization Switcher',
+  'Switcher',
+  'Profile',
   'User Profile',
   'Organization Profile',
-  'API Keys',
+  'Misc',
   'Blocks',
   'Components',
   'Styles',

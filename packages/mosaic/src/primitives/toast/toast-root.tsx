@@ -30,7 +30,7 @@ const visuallyHidden: CSSProperties = {
   padding: 0,
   margin: -1,
   overflow: 'hidden',
-  clip: 'rect(0, 0, 0, 0)',
+  clipPath: 'inset(50%)',
   whiteSpace: 'nowrap',
   border: 0,
 };
@@ -88,7 +88,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   const [descriptionId, setDescriptionId] = useState<string | undefined>(undefined);
 
   const open = toast.transitionStatus !== 'ending';
-  const { mounted, transitionProps } = useTransition({ open, ref: rootRef });
+  const { mounted, transitionProps } = useTransition({ open, ref: rootRef, animateOnMount: true });
 
   useEffect(() => {
     if (!mounted) {
@@ -110,6 +110,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
     if (repeatCount === 0) {
       return;
     }
+    // eslint-disable-next-line react/set-state-in-effect -- Reset the repeat indicator when the toast changes.
     setRepeated(false);
     const frame = requestAnimationFrame(() => setRepeated(true));
     return () => cancelAnimationFrame(frame);
@@ -150,7 +151,8 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   const index = peers.indexOf(toast);
   const offsetY = peers.slice(0, Math.max(index, 0)).reduce((sum, t) => sum + (t.limited ? 0 : (t.height ?? 0)), 0);
 
-  const behind = frontmost !== undefined && peers.includes(frontmost) && index > peers.indexOf(frontmost);
+  const frontmostIndex = frontmost === undefined ? -1 : peers.indexOf(frontmost);
+  const behind = frontmostIndex !== -1 && index > frontmostIndex;
 
   const contextValue = useMemo<ToastRootContextValue>(
     () => ({ toast, behind, rootId, titleId, descriptionId, setTitleId, setDescriptionId }),

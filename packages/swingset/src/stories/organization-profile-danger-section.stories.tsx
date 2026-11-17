@@ -9,7 +9,7 @@ export { default as __source } from './organization-profile-danger-section.stori
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'OrganizationProfileDangerSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },

@@ -146,6 +146,7 @@ export const CreateAPIKeyForm: React.FC<CreateAPIKeyFormProps> = ({ onCreate }) 
       return t(localizationKeys('apiKeys.formFieldCaption__expiration__never'));
     }
 
+    // eslint-disable-next-line react-hooks/purity -- the caption is memoized on the selected expiration, so it is computed from the time of selection
     const expirationDate = new Date(Date.now() + timeLeftInSeconds * 1000);
     return t(
       localizationKeys('apiKeys.formFieldCaption__expiration__expiresOn', {

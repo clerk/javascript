@@ -2,24 +2,17 @@
 
 import type { ReactElement } from 'react';
 
-import type { SwitcherProps } from '../switcher/switcher';
+import type { OrganizationSwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
-import type { OrganizationSwitcherModelOptions } from '../switcher/switcher.model';
-import type { SwitcherMenuProps } from '../switcher/switcher.types';
-import type { SwitcherTriggerProps } from '../switcher/switcher.view';
 
-/** Everything `<OrganizationSwitcher />` takes: profile routing, trigger content, the app's own menu rows, and the profile it opens. */
-export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
-  SwitcherTriggerProps &
-  SwitcherMenuProps &
-  Pick<SwitcherProps, 'organizationProfileProps' | 'fallback'>;
+export type { OrganizationSwitcherProps };
 
 /**
  * The active organization's avatar, and the menu behind it: switch organization or back to the
  * personal account, join a suggested or invited one, create one, invite members, and open the
  * organization's settings. It reads the active session and organization from Clerk, so it takes no
  * data. It renders `fallback` until Clerk answers, and nothing at all when nobody is signed in or the
- * instance has organizations turned off.
+ * instance has organizations turned off. It is `<Switcher mode='organization' />`.
  *
  * @example
  * ```tsx
@@ -35,11 +28,11 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  * ```
  *
  * @example
- * Passing a URL routes to a page of your own instead of opening Clerk's modal. `afterSelectOrganizationUrl`
- * is where switching organization lands, and takes a `:param` template, a plain path, or a function.
+ * `createOrganizationUrl` routes to a page of your own instead of opening Clerk's modal. `afterSelectOrganizationUrl`
+ * is where switching organization lands, and takes a `:param` template, a plain path, or a function. Set
+ * `organizationProfileUrl` on `MosaicProvider`'s `profile` to route Settings to a page of your own.
  * ```tsx
  * <OrganizationSwitcher
- *   organizationProfileUrl='/settings/organization'
  *   createOrganizationUrl='/orgs/new'
  *   afterSelectOrganizationUrl='/orgs/:slug'
  *   afterSelectPersonalUrl='/dashboard'
@@ -47,14 +40,10 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  * ```
  *
  * @example
- * `customPages` adds your own pages to the organization profile; `customMenuItems` adds your own rows
- * beside Settings, each one either an `onClick` action or an `href` link.
+ * `customMenuItems` adds your own rows beside Settings, each one either an `onClick` action or an
+ * `href` link. The profile's own pages are set on `MosaicProvider`'s `profile`.
  * ```tsx
  * <OrganizationSwitcher
- *   organizationProfileProps={{
- *     customPages: [{ path: 'audit', label: 'Audit log', icon: <ListIcon />, content: <AuditPage /> }],
- *     pageOrder: ['general', 'members', 'audit'],
- *   }}
  *   customMenuItems={[{ id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' }]}
  * />
  * ```

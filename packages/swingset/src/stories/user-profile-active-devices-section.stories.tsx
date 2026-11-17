@@ -12,7 +12,7 @@ export { default as __source } from './user-profile-active-devices-section.stori
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileActiveDevicesSection',
   label: 'Active devices',
   navigation: { category: 'Sections' },

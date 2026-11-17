@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -75,19 +76,84 @@ describe('FileUpload', () => {
       render(<Harness />);
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.dragEnter(dropzone, { dataTransfer: { files: [] } });
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['Files'], files: [] } });
       expect(dropzone).toHaveAttribute('data-dragging', '');
 
-      fireEvent.dragLeave(dropzone, { dataTransfer: { files: [] } });
+      fireEvent.dragLeave(dropzone, { dataTransfer: { types: ['Files'], files: [] } });
       expect(dropzone).not.toHaveAttribute('data-dragging');
+    });
+
+    it.each([
+      { name: 'a type outside accept', types: ['text/plain'], multiple: false, rejected: true },
+      { name: 'a type inside accept', types: ['image/png'], multiple: false, rejected: false },
+      { name: 'a type the browser leaves blank', types: [''], multiple: false, rejected: false },
+      {
+        name: 'a first file outside accept in single mode',
+        types: ['text/plain', 'image/png'],
+        multiple: false,
+        rejected: true,
+      },
+      {
+        name: 'one file inside accept in multiple mode',
+        types: ['text/plain', 'image/png'],
+        multiple: true,
+        rejected: false,
+      },
+    ])('marks the drag rejected for $name: $rejected', ({ types, multiple, rejected }) => {
+      render(
+        <Harness
+          accept='image/*'
+          multiple={multiple}
+        />,
+      );
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+      const items = types.map(type => ({ kind: 'file', type }));
+
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['Files'], items, files: [] } });
+
+      expect(dropzone).toHaveAttribute('data-dragging', '');
+      expect(dropzone.hasAttribute('data-drag-rejected')).toBe(rejected);
+    });
+
+    it('keeps an extension-only accept open until the drop, since names are hidden while dragging', () => {
+      render(<Harness accept='.png' />);
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+
+      fireEvent.dragEnter(dropzone, {
+        dataTransfer: { types: ['Files'], items: [{ kind: 'file', type: 'text/plain' }], files: [] },
+      });
+
+      expect(dropzone).not.toHaveAttribute('data-drag-rejected');
+    });
+
+    it('clears the rejected state when the drag leaves', () => {
+      render(<Harness accept='image/*' />);
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+      const dataTransfer = { types: ['Files'], items: [{ kind: 'file', type: 'text/plain' }], files: [] };
+
+      fireEvent.dragEnter(dropzone, { dataTransfer });
+      fireEvent.dragLeave(dropzone, { dataTransfer });
+
+      expect(dropzone).not.toHaveAttribute('data-drag-rejected');
+    });
+
+    it('ignores drags that carry no files', () => {
+      render(<Harness />);
+      const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
+
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['text/plain'], files: [] } });
+      const dragOver = fireEvent.dragOver(dropzone, { dataTransfer: { types: ['text/plain'], files: [] } });
+
+      expect(dropzone).not.toHaveAttribute('data-dragging');
+      expect(dragOver).toBe(true);
     });
 
     it('adds dropped files and clears the dragging state', () => {
       render(<Harness multiple />);
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.dragEnter(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('a.png', 'image/png')] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('a.png', 'image/png')] } });
 
       expect(screen.getByText('a.png')).toBeInTheDocument();
       expect(dropzone).not.toHaveAttribute('data-dragging');
@@ -105,7 +171,10 @@ describe('FileUpload', () => {
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, {
-        dataTransfer: { files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')] },
+        dataTransfer: {
+          types: ['Files'],
+          files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')],
+        },
       });
 
       expect(onValueChange).toHaveBeenCalledTimes(1);
@@ -131,7 +200,10 @@ describe('FileUpload', () => {
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
       fireEvent.drop(dropzone, {
-        dataTransfer: { files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')] },
+        dataTransfer: {
+          types: ['Files'],
+          files: [makeFile('a.png', 'image/png'), makeFile('doc.pdf', 'application/pdf')],
+        },
       });
 
       expect(onReject).toHaveBeenCalledTimes(1);
@@ -154,7 +226,7 @@ describe('FileUpload', () => {
       const small = makeSizedFile('small.png', 'image/png', 50);
       const big = makeSizedFile('big.png', 'image/png', 500);
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [small, big] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [small, big] } });
 
       expect(onReject).toHaveBeenCalledTimes(1);
       expect(onReject.mock.calls[0][0]).toEqual([{ file: big, reason: 'size' }]);
@@ -175,7 +247,9 @@ describe('FileUpload', () => {
       );
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeSizedFile('ok.png', 'image/png', 100)] } });
+      fireEvent.drop(dropzone, {
+        dataTransfer: { types: ['Files'], files: [makeSizedFile('ok.png', 'image/png', 100)] },
+      });
 
       expect(onReject).not.toHaveBeenCalled();
     });
@@ -194,7 +268,7 @@ describe('FileUpload', () => {
       const first = makeFile('first.png', 'image/png');
       const second = makeFile('second.png', 'image/png');
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [first, second] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [first, second] } });
 
       expect(onValueChange.mock.calls[0][0].map((f: File) => f.name)).toEqual(['first.png']);
       expect(onReject).toHaveBeenCalledTimes(1);
@@ -212,7 +286,9 @@ describe('FileUpload', () => {
       );
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
       // A PDF that is also oversized should be rejected for the type, not the size.
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeSizedFile('big.pdf', 'application/pdf', 500)] } });
+      fireEvent.drop(dropzone, {
+        dataTransfer: { types: ['Files'], files: [makeSizedFile('big.pdf', 'application/pdf', 500)] },
+      });
 
       expect(onReject.mock.calls[0][0]).toEqual([
         { file: expect.objectContaining({ name: 'big.pdf' }), reason: 'accept' },
@@ -225,7 +301,7 @@ describe('FileUpload', () => {
       render(<Harness defaultValue={[makeFile('first.png', 'image/png')]} />);
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('second.png', 'image/png')] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('second.png', 'image/png')] } });
 
       expect(screen.queryByText('first.png')).not.toBeInTheDocument();
       expect(screen.getByText('second.png')).toBeInTheDocument();
@@ -240,7 +316,7 @@ describe('FileUpload', () => {
       );
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('second.png', 'image/png')] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('second.png', 'image/png')] } });
 
       expect(screen.getByText('first.png')).toBeInTheDocument();
       expect(screen.getByText('second.png')).toBeInTheDocument();
@@ -290,7 +366,7 @@ describe('FileUpload', () => {
 
       expect(screen.getByText('locked.png')).toBeInTheDocument();
 
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('new.png', 'image/png')] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('new.png', 'image/png')] } });
 
       // Controlled: the callback fires but the rendered list stays as provided.
       expect(onValueChange).toHaveBeenCalledTimes(1);
@@ -316,8 +392,8 @@ describe('FileUpload', () => {
       );
       const dropzone = document.querySelector('[data-testid="file-upload-dropzone"]') as HTMLElement;
 
-      fireEvent.dragEnter(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
-      fireEvent.drop(dropzone, { dataTransfer: { files: [makeFile('a.png', 'image/png')] } });
+      fireEvent.dragEnter(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('a.png', 'image/png')] } });
+      fireEvent.drop(dropzone, { dataTransfer: { types: ['Files'], files: [makeFile('a.png', 'image/png')] } });
 
       expect(onValueChange).not.toHaveBeenCalled();
       expect(dropzone).not.toHaveAttribute('data-dragging');
@@ -356,9 +432,8 @@ describe('FileUpload', () => {
 
   describe('context guards', () => {
     it('throws when a part is used outside Root', () => {
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<FileUpload.Trigger>x</FileUpload.Trigger>)).toThrow(/must be used within <FileUpload.Root>/);
-      spy.mockRestore();
     });
   });
 
@@ -372,5 +447,42 @@ describe('FileUpload', () => {
       const { container } = render(<Harness defaultValue={[makeFile('a.png', 'image/png')]} />);
       expect(await axe(container)).toHaveNoViolations();
     });
+  });
+
+  it('forwards refs to the root, dropzone, trigger, item and delete button', () => {
+    const file = makeFile('a.png', 'image/png');
+    const refs = {
+      root: createRef<HTMLDivElement>(),
+      dropzone: createRef<HTMLDivElement>(),
+      trigger: createRef<HTMLButtonElement>(),
+      item: createRef<HTMLDivElement>(),
+      remove: createRef<HTMLButtonElement>(),
+    };
+    render(
+      <FileUpload.Root
+        ref={refs.root}
+        defaultValue={[file]}
+        data-testid='file-upload-root'
+      >
+        <FileUpload.Dropzone
+          ref={refs.dropzone}
+          data-testid='file-upload-dropzone'
+        >
+          <FileUpload.Trigger ref={refs.trigger}>Choose files</FileUpload.Trigger>
+        </FileUpload.Dropzone>
+        <FileUpload.Item
+          file={file}
+          ref={refs.item}
+          data-testid='file-upload-item'
+        >
+          <FileUpload.ItemDelete ref={refs.remove}>Remove a.png</FileUpload.ItemDelete>
+        </FileUpload.Item>
+      </FileUpload.Root>,
+    );
+    expect(refs.root.current).toBe(screen.getByTestId('file-upload-root'));
+    expect(refs.dropzone.current).toBe(screen.getByTestId('file-upload-dropzone'));
+    expect(refs.trigger.current).toBe(screen.getByRole('button', { name: 'Choose files' }));
+    expect(refs.item.current).toBe(screen.getByTestId('file-upload-item'));
+    expect(refs.remove.current).toBe(screen.getByRole('button', { name: 'Remove a.png' }));
   });
 });

@@ -1,2 +1,4 @@
-export { Skeleton, SkeletonContext } from './skeleton';
+'use client';
+
+export { Skeleton } from './skeleton';
 export type { SkeletonProps, SkeletonShape } from './skeleton';

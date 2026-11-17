@@ -42,7 +42,7 @@ export const styles = stylex.create({
 export const sizes = stylex.create({
   sm: {
     borderRadius: radiusVars['--cl-radius-md'],
-    paddingInline: space['3'],
+    paddingInline: `calc(${space['3']} - 1px)`,
     fontSize: {
       default: typeScaleVars['--cl-text-xs-size'],
       '@media (pointer: coarse)': `max(1rem, ${typeScaleVars['--cl-text-xs-size']})`,
@@ -52,7 +52,7 @@ export const sizes = stylex.create({
   },
   md: {
     borderRadius: radiusVars['--cl-radius-md'],
-    paddingInline: space['3'],
+    paddingInline: `calc(${space['3']} - 1px)`,
     fontSize: {
       default: typeScaleVars['--cl-text-sm-size'],
       '@media (pointer: coarse)': `max(1rem, ${typeScaleVars['--cl-text-sm-size']})`,
@@ -62,7 +62,7 @@ export const sizes = stylex.create({
   },
   lg: {
     borderRadius: radiusVars['--cl-radius-lg'],
-    paddingInline: space['3'],
+    paddingInline: `calc(${space['3']} - 1px)`,
     fontSize: {
       default: typeScaleVars['--cl-text-base-size'],
       '@media (pointer: coarse)': `max(1rem, ${typeScaleVars['--cl-text-base-size']})`,

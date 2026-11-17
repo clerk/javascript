@@ -1,15 +1,12 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import { clerkApiError } from '../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../mosaic-provider';
 import { usePendingAction } from '../use-pending-action';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function blocked() {
   return clerkApiError('action_blocked', 'Raw server sentence.');
@@ -129,6 +126,37 @@ describe('usePendingAction', () => {
 
     expect(result.current.errorKey).toBe('a');
     expect(result.current.error).toBeDefined();
+  });
+
+  it('remembers the last key after the run ends', async () => {
+    const { result } = renderHook(() => usePendingAction());
+
+    await act(async () => {
+      await result.current.run('a', () => Promise.resolve());
+    });
+
+    expect(result.current.pendingKey).toBeUndefined();
+    expect(result.current.lastKey).toBe('a');
+  });
+
+  it('releases a cancelled reverification without showing an error', async () => {
+    const { result } = renderHook(() => usePendingAction());
+    const cancelled = new ClerkRuntimeError('User cancelled attempted verification', {
+      code: 'reverification_cancelled',
+    });
+
+    let succeeded: boolean | undefined;
+    await act(async () => {
+      succeeded = await result.current.run('a', () => Promise.reject(cancelled));
+    });
+
+    expect(succeeded).toBe(false);
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.errorKey).toBeUndefined();
+    expect(result.current.isPending).toBe(false);
+    await act(async () => {
+      expect(await result.current.run('b', () => Promise.resolve())).toBe(true);
+    });
   });
 
   it.each([

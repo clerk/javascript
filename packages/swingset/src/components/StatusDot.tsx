@@ -8,12 +8,6 @@ const dotColor: Record<StoryStatus, string> = {
   todo: 'bg-neutral-400',
 };
 
-const statusLabel: Record<StoryStatus, string> = {
-  stable: 'Stable',
-  wip: 'Work in progress',
-  todo: 'To do',
-};
-
 // A substatus only ever refines a wip entry; a stable one's is ignored.
 function substatusFor(status: StoryStatus, substatus?: WipSubstatus) {
   return status === 'wip' ? substatus : undefined;
@@ -29,7 +23,7 @@ export function StatusDot({
   className?: string;
 }) {
   const refinement = substatusFor(status, substatus);
-  const label = statusLabel[status] + (refinement ? `: ${refinement}` : '');
+  const label = status + (refinement ? `: ${refinement}` : '');
   return (
     <span
       title={label}

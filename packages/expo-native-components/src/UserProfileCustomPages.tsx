@@ -202,7 +202,7 @@ export function useUserProfileCustomPages(
         openingPaths.current.add(path);
         void Linking.openURL(page.href)
           .catch(error => {
-            console.warn(`Could not open custom user profile page "${path}".`, error);
+            console.warn(`Clerk: Could not open custom user profile page "${path}".`, error);
           })
           .finally(() => {
             openingPaths.current.delete(path);

@@ -1,8 +1,10 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
@@ -11,6 +13,7 @@ import type { UserProfileEmailSectionViewProps } from './user-profile-email-sect
 export function UserProfileEmailSectionView({
   emails,
   canAdd,
+  isDisabled,
   verification,
   error,
   rowRef,
@@ -18,28 +21,32 @@ export function UserProfileEmailSectionView({
   remove,
   finalFocus,
   verificationFinalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
   onVerify,
   onSetPrimary,
 }: UserProfileEmailSectionViewProps) {
-  const m = useMessages('userProfileContact');
+  const messages = useMessages('userProfile');
+  const m = messages.email;
   const addEmailAction = canAdd ? (
     <Dialog.Trigger
       handle={verification.handle}
       render={
         <Button
-          aria-label={m.email.add}
+          aria-label={m.add}
           color='neutral'
           size='sm'
           variant='outline'
+          disabled={isDisabled}
         />
       }
     >
       <Icon
-        name='plus'
+        glyph={Plus}
         placement='inline-start'
-        size='sm'
+        size='md'
       />
-      {m.add}
+      {messages.contact.add}
     </Dialog.Trigger>
   ) : undefined;
 
@@ -50,11 +57,12 @@ export function UserProfileEmailSectionView({
         triggerRef={registerTrigger}
         items={emails}
         kind='email'
-        label={m.email.label}
+        label={m.label}
         addAction={addEmailAction}
         onRemove={remove ? email => remove.open(email) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        isDisabled={isDisabled}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
@@ -62,17 +70,21 @@ export function UserProfileEmailSectionView({
         {...verification}
         finalFocus={verificationFinalFocus}
       />
+      <ReverificationDialog
+        controller={setPrimaryReverification}
+        finalFocus={setPrimaryFinalFocus}
+      />
       {remove ? (
         <Confirmation
           controller={remove}
-          title={m.email.removeDialog.title}
+          title={m.removeDialog.title}
           description={email =>
-            fill(email.isVerified ? m.email.removeDialog.verifiedDescription : m.email.removeDialog.description, {
+            fill(email.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
               emailAddress: email.value,
             })
           }
-          actionLabel={m.email.removeDialog.confirm}
-          cancelLabel={m.email.removeDialog.cancel}
+          actionLabel={m.removeDialog.confirm}
+          cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
         />
       ) : null}

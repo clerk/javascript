@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Clerk Test Extension",
   "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw026nCDX5zl6YTeUsRXECDNDG7R1rjRfKTRPMbGUDGVvbw8cQLAkEohewo9nHrSc41/97sgHVE92SboJYumBDuy9GXSWYMT6Asx0r797YWkk8WBE/Fq7xNfHhEpjsl4SeHXOP41ANXQ8RLda5kP0AwGeLdvOyoFciLMJXwQaclEbuaceWv09CdkWDD48aZzPml7IEaHHaPpnliNCVMfwqaaW+GlS6Tg2hxPnEX0OiitIhbMEfw/W6twzck0jO1+2L2ml3mDuYMNjaXngGIWP+FcOJk/UCWxUKqbfGhkfFNjU9REjmXX9l4Kca9xEiz4osU/i9i3etDQX/XQTQVPILQIDAQAB",
   "action": {
     "default_popup": "popup.html"
   },

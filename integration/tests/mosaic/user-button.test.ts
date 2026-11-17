@@ -33,10 +33,11 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     }
   });
 
+  const path = '/user-button';
   const trigger = (page: Page) => page.getByRole('button', { name: /^Open account menu for / });
   const popup = (page: Page) => page.getByRole('dialog', { name: 'Account' });
 
-  async function signIn({ page, context }: { page: Page; context: BrowserContext }, path = '/') {
+  async function signIn({ page, context }: { page: Page; context: BrowserContext }) {
     const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -46,32 +47,25 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     return u;
   }
 
-  async function openProfileSettings(page: Page) {
-    await popup(page).getByRole('button', { name: 'Settings' }).click();
-    const profileSettings = page.getByRole('menuitem', { name: 'Manage profile' });
-    await profileSettings.or(page.locator('.cl-userProfile-root')).first().waitFor();
-    if (await profileSettings.isVisible()) {
-      await profileSettings.click();
-    }
-  }
-
-  test('switches the active organization and keeps it across a reload', async ({ page, context }) => {
-    const u = await signIn({ page, context });
-    const { id, name } = organization;
-
-    await trigger(page).click();
-    await popup(page).getByRole('button', { name: 'Personal account' }).click();
-    await page.waitForFunction(() => window.Clerk?.organization === null);
-    await page.keyboard.press('Escape');
-    await expect(popup(page)).toBeHidden();
-
-    await trigger(page).click();
-    await popup(page).getByRole('button', { name }).click();
-    await page.waitForFunction(orgId => window.Clerk?.organization?.id === orgId, id);
-
-    await u.page.reload();
+  test('renders nothing when signed out', async ({ page, context }) => {
+    const u = await createTestUtils({ app, page, context });
+    await u.page.goToRelative(path);
     await u.page.waitForClerkJsLoaded();
-    await page.waitForFunction(orgId => window.Clerk?.organization?.id === orgId, id);
+
+    await expect(trigger(page)).toHaveCount(0);
+  });
+
+  test('lists no organizations while one is active', async ({ page, context }) => {
+    await signIn({ page, context });
+    await page.evaluate(orgId => window.Clerk?.setActive({ organization: orgId }), organization.id);
+    await page.waitForFunction(orgId => window.Clerk?.organization?.id === orgId, organization.id);
+
+    await expect(trigger(page)).not.toContainText(organization.name);
+    await trigger(page).click();
+    await expect(popup(page).getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
+    await expect(popup(page).getByText(organization.name)).toHaveCount(0);
+    await expect(popup(page).getByText('Personal account')).toHaveCount(0);
+    await expect(popup(page).getByRole('button', { name: 'Invite members' })).toHaveCount(0);
   });
 
   test('signs out', async ({ page, context }) => {
@@ -94,21 +88,10 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   });
 
   test('follows a custom menu link', async ({ page, context }) => {
-    await signIn({ page, context }, '/custom');
+    await signIn({ page, context });
 
     await trigger(page).click();
     await popup(page).getByRole('link', { name: 'Custom link' }).click();
     await expect(page.getByText('custom-link-target')).toBeVisible();
-  });
-
-  test('renders a custom page inside the UserProfile modal', async ({ page, context }) => {
-    const u = await signIn({ page, context }, '/custom');
-
-    await trigger(page).click();
-    await openProfileSettings(page);
-    await u.po.userProfile.waitForUserProfileModal();
-
-    await page.locator('.cl-userProfile-root').getByText('Custom page').click();
-    await expect(page.getByText('custom-page-content')).toBeVisible();
   });
 });

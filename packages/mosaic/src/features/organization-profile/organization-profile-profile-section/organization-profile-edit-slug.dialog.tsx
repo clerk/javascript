@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 
 export interface OrganizationProfileEditSlugValue {
   slug: string;
@@ -27,7 +28,7 @@ export function OrganizationProfileEditSlugDialog({
   trigger,
   form,
 }: OrganizationProfileEditSlugDialogProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const inputRef = useRef<HTMLInputElement>(null);
   const { feedback } = form.fields.slug;
   const { ref, ...control } = form.register('slug');
@@ -59,7 +60,7 @@ export function OrganizationProfileEditSlugDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={form.id}
                 onSubmit={form.handleSubmit}
               />
@@ -67,6 +68,7 @@ export function OrganizationProfileEditSlugDialog({
           >
             <Field.Root
               disabled={form.isSubmitting}
+              focusableWhenDisabled
               invalid={feedback?.type === 'error'}
             >
               <Field.Label visuallyHidden>{m.slug.fieldLabel}</Field.Label>
@@ -83,7 +85,6 @@ export function OrganizationProfileEditSlugDialog({
                 <Button
                   variant='outline'
                   color='neutral'
-                  fullWidth
                 />
               }
             >
@@ -91,7 +92,6 @@ export function OrganizationProfileEditSlugDialog({
             </Dialog.Close>
             <SubmitButton
               form={form.id}
-              fullWidth
               isPending={form.isSubmitting}
               disabled={!form.canSubmit}
               focusableWhenDisabled

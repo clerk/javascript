@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -7,6 +9,7 @@ import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg' | 'anchor';
@@ -98,25 +101,27 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
         {...(ariaLabelledby == null ? {} : { 'aria-labelledby': ariaLabelledby })}
       >
-        <Primitive.Popup
-          ref={ref}
-          {...mergeStyleProps(
-            themeProps('popover-popup', { size }),
-            stylex.props(reset.base, styles.popup, sizes[size], xstyle),
-            rest,
-          )}
-        />
+        <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+          <Primitive.Popup
+            ref={ref}
+            {...mergeStyleProps(
+              themeProps('popover-popup', { size }),
+              stylex.props(reset.base, styles.popup, sizes[size], xstyle),
+              rest,
+            )}
+          />
+        </ButtonContext.Provider>
       </Positioner>
     </Primitive.Portal>
   );
 });
 
-/** A floating box anchored to a trigger. */
-export const Popover = {
-  Root: Primitive.Root,
-  Trigger,
-  Popup,
-  Title,
-  Description,
-  Close,
+const PopoverRoot = Primitive.Root;
+export {
+  PopoverRoot,
+  Trigger as PopoverTrigger,
+  Popup as PopoverPopup,
+  Title as PopoverTitle,
+  Description as PopoverDescription,
+  Close as PopoverClose,
 };

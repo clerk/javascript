@@ -1636,10 +1636,23 @@ export const ruRU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Используйте другой метод',
       subtitle: 'Введите пароль, связанный с вашей учетной записью',
       title: 'Введите ваш пароль',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -1652,6 +1665,22 @@ export const ruRU: LocalizationResource = {
       resendButton: 'Не получили код? Отправить повторно',
       subtitle: 'Для продолжения, введите верификационный код, отправленный на ваш телефон',
       title: 'Проверьте ваш телефон',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Верификационный код',
@@ -1787,6 +1816,10 @@ export const ruRU: LocalizationResource = {
       subtitle:
         'Использование вашего ключа доступа подтверждает вашу личность. Ваше устройство может запросить ваш отпечаток пальца, лицо или блокировку экрана.',
       title: 'Используйте ваш ключ доступа',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Использовать другой метод',
@@ -2093,6 +2126,7 @@ export const ruRU: LocalizationResource = {
       'Регистрация не удалась из-за неудачных проверок безопасности. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     captcha_unavailable:
       'Регистрация не удалась из-за неудачной проверки бота. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Временные почтовые службы не поддерживаются. Пожалуйста, используйте свой обычный адрес электронной почты для создания аккаунта.',
@@ -2169,9 +2203,12 @@ export const ruRU: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Вы уже вошли в систему.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:

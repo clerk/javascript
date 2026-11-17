@@ -209,4 +209,63 @@ describe('UserAPI', () => {
       await expect(apiClient.users.removePassword('')).rejects.toThrow('A valid resource ID is required.');
     });
   });
+
+  describe('mergeUser', () => {
+    it('calls POST /users/{id}/merge and returns both users', async () => {
+      const postHandler = vi.fn(async ({ request }: { request: Request }) => {
+        expect(await request.json()).toEqual({ from_user_id: 'user_456', dry_run: true });
+        return HttpResponse.json({
+          user: { ...mockUserResponse, first_name: 'Remaining' },
+          deleted_user: { ...mockUserResponse, id: 'user_456', first_name: 'Deleted' },
+        });
+      });
+
+      server.use(http.post('https://api.clerk.test/v1/users/user_123/merge', validateHeaders(postHandler)));
+
+      const response = await apiClient.users.mergeUser('user_123', { fromUserId: 'user_456', dryRun: true });
+
+      expect(postHandler).toHaveBeenCalledTimes(1);
+      expect(response.user.id).toBe('user_123');
+      expect(response.user.firstName).toBe('Remaining');
+      expect(response.deletedUser.id).toBe('user_456');
+      expect(response.deletedUser.firstName).toBe('Deleted');
+    });
+
+    it('requires a user ID', async () => {
+      await expect(apiClient.users.mergeUser('', { fromUserId: 'user_456' })).rejects.toThrow(
+        'A valid resource ID is required.',
+      );
+    });
+  });
+
+  describe('getUserOauthAccessToken', () => {
+    it('exposes the provider error from a failed token retrieval', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/users/user_123/oauth_access_tokens/oauth_apple',
+          validateHeaders(() =>
+            HttpResponse.json(
+              {
+                errors: [
+                  {
+                    code: 'oauth_token_retrieval_error',
+                    message: 'Token retrieval failed',
+                    long_message: 'Failed to retrieve a new access token from the OAuth provider',
+                    meta: { provider_error: 'Apple Key ID is missing from the Apple OAuth settings' },
+                  },
+                ],
+              },
+              { status: 400 },
+            ),
+          ),
+        ),
+      );
+
+      const errResponse = await apiClient.users.getUserOauthAccessToken('user_123', 'apple').catch(err => err);
+
+      expect(errResponse.status).toBe(400);
+      expect(errResponse.errors[0].code).toBe('oauth_token_retrieval_error');
+      expect(errResponse.errors[0].meta.providerError).toBe('Apple Key ID is missing from the Apple OAuth settings');
+    });
+  });
 });

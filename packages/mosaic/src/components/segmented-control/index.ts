@@ -1,2 +1,4 @@
-export { SegmentedControl } from './segmented-control';
+'use client';
+
+export * as SegmentedControl from './segmented-control.parts';
 export type { SegmentedControlItemProps, SegmentedControlRootProps } from './segmented-control';

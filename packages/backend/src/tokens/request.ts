@@ -420,10 +420,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // Reject JWTs of another class (machine tokens, JWT templates) presented where a session
-    // token is expected. They are validly signed by the same instance key and pass
-    // verifyToken(), but a JWT-template token carries no `sid` and outlives revocation of the
-    // session that minted it (SEC-340).
+    // Reject JWTs of another class (machine tokens, JWT templates, uncategorized tokens such as
+    // OIDC id_tokens) presented where a session token is expected. They are validly signed by
+    // the same instance key, but a JWT-template token carries no `sid` and outlives revocation
+    // of the session that minted it (SEC-340), and an id_token is a delegation to a third-party
+    // OAuth client, not a session (AISEC-21).
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (isMachineJwt(tokenInHeader!) || hasNonSessionJwtCategory(tokenInHeader!)) {
       return signedOut({
@@ -633,7 +634,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
-    // Machine JWTs and JWT-template tokens pass verifyToken() but must not be accepted as
+    // Machine JWTs, JWT-template tokens and uncategorized tokens must not be accepted as
     // session tokens (mirrors header path).
     if (
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

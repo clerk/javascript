@@ -62,8 +62,9 @@ run it.
 ## Your first machine
 
 ```ts
-import { createMachine } from '../../machine/create-machine';
-import { assign } from '../../machine/assign';
+import { setup } from '../../machine/setup';
+
+const { createMachine, assign, fromPromise } = setup<LoaderContext, LoaderEvent>();
 
 const loader = createMachine({
   initial: 'idle', // where it starts
@@ -74,8 +75,7 @@ const loader = createMachine({
     },
     loading: {
       // `invoke` runs a promise on entry and branches on the result.
-      invoke: {
-        src: () => fetchThing(),
+      invoke: fromPromise(() => fetchThing(), {
         onDone: {
           target: 'success',
           // copy the resolved value into context
@@ -83,9 +83,9 @@ const loader = createMachine({
         },
         onError: {
           target: 'failure',
-          actions: assign((_ctx, event) => ({ error: String(event.error) })),
+          actions: assign((_ctx, event) => ({ error: toLocalizableError(event.error) })),
         },
-      },
+      }),
     },
     success: {},
     failure: { on: { FETCH: 'loading' } }, // allow a retry
@@ -114,7 +114,7 @@ factory functions that don't require repeating them:
 ```ts
 import { setup } from '../../machine/setup';
 
-const { createMachine, assign } = setup<LoaderContext, LoaderEvent>();
+const { createMachine, assign, fromPromise } = setup<LoaderContext, LoaderEvent>();
 
 const loader = createMachine({
   // no <LoaderContext, LoaderEvent> needed
@@ -130,17 +130,16 @@ const loader = createMachine({
       },
     },
     loading: {
-      invoke: {
-        src: async ctx => fetchData(ctx.query),
+      invoke: fromPromise(ctx => fetchData(ctx.query), {
         onDone: {
           target: 'success',
-          actions: assign((_, e) => ({ data: String(e.output), error: null })), // e: DoneInvokeEvent<unknown>
+          actions: assign((_, e) => ({ data: e.output, error: null })), // e.output: what fetchData resolves to
         },
         onError: {
           target: 'failure',
-          actions: assign((_, e) => ({ error: String(e.error) })), // e: ErrorInvokeEvent
+          actions: assign((_, e) => ({ error: toLocalizableError(e.error) })), // e: ErrorInvokeEvent
         },
-      },
+      }),
     },
     success: {},
     failure: { on: { FETCH: 'loading' } },
@@ -251,7 +250,7 @@ you can't easily click to (a `deleting` state hidden behind a 2-second mutation,
 a guard-gated wizard step), `mockActor` drops you straight in:
 
 ```ts
-const actor = mockActor(loader, { value: 'failure', context: { error: 'Network error' } });
+const actor = mockActor(loader, { value: 'failure', context: { error: { cause: new Error('Network error') } } });
 render(<Loader actor={actor} />); // snapshot a state you'd otherwise have to provoke
 ```
 

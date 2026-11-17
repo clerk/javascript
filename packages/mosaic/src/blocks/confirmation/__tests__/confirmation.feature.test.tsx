@@ -2,13 +2,14 @@ import { reverificationError } from '@clerk/shared/authorization-errors';
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
@@ -23,10 +24,6 @@ type User = ReturnType<typeof userEvent.setup>;
 const session = fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) });
 const VERIFY = '/v1/client/sessions/sess_1/verify';
 const TITLE = 'Remove connected account';
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function Host<Payload>({
   options,
@@ -85,6 +82,7 @@ describe('Confirmation', () => {
     await user.click(confirmButton());
     expect(onConfirm).toHaveBeenCalledOnce();
     expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+    expect(confirmButton()).toHaveFocus();
 
     run.resolve();
     await closed();
@@ -273,16 +271,16 @@ describe('Confirmation shared by rows', () => {
     expect(screen.queryByRole('alertdialog')).toBeNull();
 
     const firstTrigger = screen.getByRole('button', { name: 'Actions for Preston' });
-    await user.click(firstTrigger);
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+    await openMenu(user, firstTrigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Remove Preston?');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     await waitFor(() => expect(firstTrigger).toHaveFocus());
 
     const secondTrigger = screen.getByRole('button', { name: 'Actions for Jane' });
-    await user.click(secondTrigger);
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+    await openMenu(user, secondTrigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     const dialog = await screen.findByRole('alertdialog');
     expect(dialog).toHaveAccessibleName('Remove Jane?');
     expect(dialog).toHaveAccessibleDescription('Jane will be removed from the organization.');
@@ -296,31 +294,21 @@ describe('Confirmation shared by rows', () => {
 
 function ReverifiedHost({
   action,
-  cleanupMs,
-  settleMs,
-  beforeRunMs,
+  cleanup,
+  beforeRun,
 }: {
   action: () => Promise<unknown>;
-  cleanupMs?: number;
-  settleMs?: number;
-  beforeRunMs?: number;
+  cleanup?: () => Promise<unknown>;
+  beforeRun?: () => Promise<unknown>;
 }) {
   const [run, reverification] = useReverificationFlow(action);
   const controller = useConfirmController({
     onConfirm: async () => {
-      if (beforeRunMs !== undefined) {
-        await new Promise(resolve => setTimeout(resolve, beforeRunMs));
-      }
+      await beforeRun?.();
       try {
-        const result = await run();
-        if (settleMs !== undefined) {
-          await new Promise(resolve => setTimeout(resolve, settleMs));
-        }
-        return result;
+        return await run();
       } catch (error) {
-        if (cleanupMs !== undefined) {
-          await new Promise(resolve => setTimeout(resolve, cleanupMs));
-        }
+        await cleanup?.();
         throw error;
       }
     },
@@ -403,7 +391,9 @@ describe('Confirmation with reverification', () => {
 
   it('closes from the error card without going back to the confirm step', async () => {
     serveFapi({ client: fapiClient([session]) });
-    const { user } = await renderReverified({ action: interruptedOnce(), cleanupMs: 400 });
+    const cleanupDone = deferred<void>();
+    const cleanup = vi.fn(() => cleanupDone.promise);
+    const { user } = await renderReverified({ action: interruptedOnce(), cleanup });
     holdRequests('post', VERIFY).fail('some_new_error', 'Nope');
 
     await confirmIntoVerification(user);
@@ -413,38 +403,54 @@ describe('Confirmation with reverification', () => {
     const stopWatching = watchForConfirmStep();
     const buttons = screen.getAllByRole('button', { name: 'Close' });
     await user.click(buttons[buttons.length - 1]);
+    await waitFor(() => expect(cleanup).toHaveBeenCalledOnce());
+    cleanupDone.resolve();
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(stopWatching()).toEqual([]);
     expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
   });
 
-  for (const cleanupMs of [undefined, 400]) {
-    it(`closes from the factor card's corner dismiss without going back to the confirm step (host cleans up after ${cleanupMs ?? 0}ms)`, async () => {
+  for (const cleansUpLater of [false, true]) {
+    it(`closes from the factor card's corner dismiss without going back to the confirm step (host cleans up ${cleansUpLater ? 'later' : 'at once'})`, async () => {
       serveFapi(passwordVerification);
-      const { user } = await renderReverified({ action: interruptedOnce(), cleanupMs });
+      const cleanupDone = deferred<void>();
+      if (!cleansUpLater) {
+        cleanupDone.resolve();
+      }
+      const cleanup = vi.fn(() => cleanupDone.promise);
+      const { user } = await renderReverified({ action: interruptedOnce(), cleanup });
       await confirmIntoVerification(user);
 
       expect(await screen.findByLabelText('Password')).toBeVisible();
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
+      await waitFor(() => expect(cleanup).toHaveBeenCalledOnce());
+      cleanupDone.resolve();
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(stopWatching()).toEqual([]);
       expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
     });
   }
 
-  for (const settleMs of [undefined, 400]) {
-    it(`does not go back to the confirm step after a successful verification (host settles after ${settleMs ?? 0}ms)`, async () => {
+  for (const settlesLater of [false, true]) {
+    it(`does not go back to the confirm step after a successful verification (action settles ${settlesLater ? 'later' : 'at once'})`, async () => {
       serveFapi(passwordVerification);
-      const { user } = await renderReverified({ action: interruptedOnce(), settleMs });
+      const retry = deferred<{ done: true }>();
+      if (!settlesLater) {
+        retry.resolve({ done: true });
+      }
+      const action = vi.fn().mockResolvedValueOnce(reverificationError()).mockReturnValueOnce(retry.promise);
+      const { user } = await renderReverified({ action });
       await confirmIntoVerification(user);
 
       const field = await screen.findByLabelText('Password');
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.type(field, 'hunter2{Enter}');
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull(), { timeout: 3000 });
+      await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+      retry.resolve({ done: true });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(stopWatching()).toEqual([]);
       expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
     });
@@ -477,7 +483,9 @@ describe('Confirmation with reverification', () => {
       .mockResolvedValueOnce(reverificationError())
       .mockResolvedValue({ done: true });
     serveFapi(passwordVerification);
-    const { user } = await renderReverified({ action, beforeRunMs: 400 });
+    const secondRun = deferred<void>();
+    const beforeRun = vi.fn().mockResolvedValueOnce(undefined).mockReturnValueOnce(secondRun.promise);
+    const { user } = await renderReverified({ action, beforeRun });
     await confirmIntoVerification(user);
     expect(await screen.findByLabelText('Password')).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
@@ -486,9 +494,10 @@ describe('Confirmation with reverification', () => {
     await openDialog(user, screen.getByRole('button', { name: 'Remove Google' }), { role: 'alertdialog', name: TITLE });
     const stopWatching = watchForConfirmStep();
     await user.click(confirmButton());
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await waitFor(() => expect(beforeRun).toHaveBeenCalledTimes(2));
     expect(screen.queryByLabelText('Password')).toBeNull();
-    expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
+    secondRun.resolve();
+    expect(await screen.findByLabelText('Password')).toBeVisible();
     expect(stopWatching()).toEqual([]);
   });
 });

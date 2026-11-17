@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const PasskeyAdded = glyph(
+  'passkey-added',
   <g transform='translate(0.1248 0)'>
     <path
       d='M12.083 13.2835V13.306L12 13.3724L11.917 13.306V13.1341L12.083 13.2835ZM11.917 10.7454C11.9445 10.747 11.9721 10.7503 12 10.7503C12.0279 10.7503 12.0555 10.747 12.083 10.7454V11.6898L11.917 11.8558V10.7454Z'

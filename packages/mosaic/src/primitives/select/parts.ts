@@ -11,4 +11,10 @@ export { type SelectPortalProps, SelectPortal as Portal } from './select-portal'
 export { type SelectPositionerProps, SelectPositioner as Positioner } from './select-positioner';
 export { type SelectPopupProps, SelectPopup as Popup } from './select-popup';
 export { type SelectOptionProps, SelectOption as Option } from './select-option';
+export {
+  type SelectGroupLabelProps,
+  type SelectGroupProps,
+  SelectGroup as Group,
+  SelectGroupLabel as GroupLabel,
+} from './select-group';
 export { type SelectArrowProps, SelectArrow as Arrow } from './select-arrow';

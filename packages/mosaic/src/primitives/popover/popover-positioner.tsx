@@ -31,13 +31,15 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       hasDescription,
     } = usePopoverContext();
 
+    const restoreReference = React.useCallback(() => refs.setPositionReference(refs.domReference.current), [refs]);
+
     React.useLayoutEffect(() => {
       if (!anchor) {
         return;
       }
       refs.setPositionReference(anchor);
-      return () => refs.setPositionReference(refs.domReference.current);
-    }, [anchor, refs]);
+      return restoreReference;
+    }, [anchor, refs, restoreReference]);
 
     const side = parsePlacement(placement).side;
 

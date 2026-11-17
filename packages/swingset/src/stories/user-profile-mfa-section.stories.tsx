@@ -8,7 +8,7 @@ export { default as __source } from './user-profile-mfa-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileMfaSection',
   label: '2-step verification',
   navigation: { category: 'Sections' },

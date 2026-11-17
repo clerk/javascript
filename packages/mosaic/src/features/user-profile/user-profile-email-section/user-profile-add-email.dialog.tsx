@@ -14,26 +14,26 @@ import { Input } from '../../../components/input';
 import { Item } from '../../../components/item';
 import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
-import { styles as panelStyles } from '../user-profile-profile-panel.styles';
-
-const styles = stylex.create({
-  ssoConnection: {
-    paddingInline: 0,
-  },
-});
+import { Form } from '../../../primitives/form';
+import { tabularNumbersStyle } from '../../../styles/typography.styles';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
-  step: 'email' | 'verify' | 'link' | 'sso';
+  step: 'email' | 'reverify' | 'verify' | 'link' | 'sso';
+  reverification: ReverificationController;
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   canSubmitEmail?: boolean;
   code: string;
   onCodeChange: (value: string) => void;
+  canSubmitCode?: boolean;
   onSubmit: (code?: string) => void;
   onResend: () => void;
   onConnect: () => void;
@@ -52,6 +52,8 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
+      shouldCloseOnInteractOutside={props.step !== 'reverify'}
+      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification.onCancel)}
     >
       <Dialog.Popup
         variant='card'
@@ -79,6 +81,12 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     errorMessage={current.errorMessage}
                   />
                 </Flow.Step>
+                <Flow.Step ids={['reverify']}>
+                  <Reverification
+                    controller={current.reverification}
+                    onClose={() => current.onOpenChange(false)}
+                  />
+                </Flow.Step>
                 <Flow.Step ids={['link']}>
                   <VerifyLinkStep
                     emailAddress={current.emailAddress}
@@ -101,6 +109,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     emailAddress={current.emailAddress}
                     code={current.code}
                     onCodeChange={current.onCodeChange}
+                    canSubmit={current.canSubmitCode !== false}
                     onSubmit={current.onSubmit}
                     onResend={current.onResend}
                     isPending={current.isPending}
@@ -129,8 +138,9 @@ interface EnterEmailStepProps {
 }
 
 function EnterEmailStep(props: EnterEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const emailFormId = useId();
+  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -145,7 +155,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={emailFormId}
             onSubmit={handleSubmit}
           />
@@ -159,7 +169,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
         >
           <Field.Label>{m.email.label}</Field.Label>
           <Input
-            ref={props.inputRef}
+            ref={inputRef}
             name='emailAddress'
             type='email'
             autoComplete='email'
@@ -174,7 +184,6 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       <Card.Footer>
         <SubmitButton
           form={emailFormId}
-          fullWidth
           disabled={!props.canSubmit}
           isPending={props.isPending}
           pendingLabel={m.email.pending}
@@ -191,6 +200,7 @@ interface VerifyEmailStepProps {
   emailAddress: string;
   code: string;
   onCodeChange: (value: string) => void;
+  canSubmit: boolean;
   onSubmit: (code?: string) => void;
   onResend: () => void;
   isPending?: boolean;
@@ -200,7 +210,7 @@ interface VerifyEmailStepProps {
 }
 
 function VerifyEmailStep(props: VerifyEmailStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const verifyFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
@@ -217,7 +227,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={verifyFormId}
             onSubmit={handleSubmit}
           />
@@ -240,13 +250,16 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <ResendButton
-            labels={m.verify}
-            onResend={props.onResend}
-            disabled={props.isPending}
-            isResending={props.isResending}
-            resendSeconds={props.resendSeconds}
-          />
+          <Field.Description>
+            {m.verify.resendText}{' '}
+            <ResendButton
+              labels={m.verify}
+              onResend={props.onResend}
+              disabled={props.isPending}
+              isResending={props.isResending}
+              resendSeconds={props.resendSeconds}
+            />
+          </Field.Description>
         </Field.Root>
       </Card.Content>
       <Card.Footer>
@@ -255,7 +268,6 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -263,9 +275,8 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         </Dialog.Close>
         <SubmitButton
           form={verifyFormId}
-          fullWidth
           isPending={props.isPending}
-          disabled={props.isResending}
+          disabled={!props.canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
         >
           {m.verify.submit}
@@ -283,7 +294,7 @@ interface VerifyLinkStepProps {
 }
 
 function VerifyLinkStep(props: VerifyLinkStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
 
   return (
     <>
@@ -312,7 +323,6 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -331,7 +341,7 @@ interface VerifySsoStepProps {
 }
 
 function VerifySsoStep(props: VerifySsoStepProps) {
-  const m = useMessages('userProfileAddEmail');
+  const m = useMessages('userProfile').email.addDialog;
   const domain = props.emailAddress.split('@')[1] ?? props.emailAddress;
 
   return (
@@ -358,7 +368,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
           logoPublicUrl }) to the email address — the connections sign-in would offer for it, oldest
           first — which is the data to render once it lands.
         */}
-        <Item.Root xstyle={styles.ssoConnection}>
+        <Item.Root>
           <Item.Content>
             <Item.Label>{domain}</Item.Label>
             <Item.Description>{m.sso.connection}</Item.Description>
@@ -372,9 +382,9 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             >
               {m.sso.connect}
               <Icon
-                name='arrow-up-right'
+                glyph={ArrowUpRight}
                 placement='inline-end'
-                size='sm'
+                size='md'
               />
             </Button>
           </Item.Actions>
@@ -386,7 +396,6 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             <Button
               variant='outline'
               color='neutral'
-              fullWidth
             />
           }
         >
@@ -422,7 +431,7 @@ function ResendButton(props: ResendButtonProps) {
       ) : resendSeconds > 0 ? (
         <span>
           {rich(props.labels.resendCountdown, {
-            values: { seconds: <span {...stylex.props(panelStyles.countdown)}>{resendSeconds}</span> },
+            values: { seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendSeconds}</span> },
           })}
         </span>
       ) : (

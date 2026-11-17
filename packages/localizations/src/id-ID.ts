@@ -1631,10 +1631,23 @@ export const idID: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gunakan metode lain',
       subtitle: 'Masukkan kata sandi Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kode verifikasi',
@@ -1647,6 +1660,22 @@ export const idID: LocalizationResource = {
       resendButton: 'Tidak menerima kode? Kirim ulang',
       subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Kode verifikasi',
@@ -1782,6 +1811,10 @@ export const idID: LocalizationResource = {
       subtitle:
         'Menggunakan passkey mengonfirmasi bahwa ini adalah Anda. Perangkat Anda mungkin meminta sidik jari, wajah, atau kunci layar.',
       title: 'Gunakan passkey Anda',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gunakan metode lain',
@@ -2086,6 +2119,7 @@ export const idID: LocalizationResource = {
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:
       'Pendaftaran gagal karena validasi bot gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Layanan email sementara tidak didukung. Silakan gunakan alamat email reguler Anda untuk membuat akun.',
@@ -2162,9 +2196,12 @@ export const idID: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Anda sudah masuk.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Anda menolak permintaan tanda tangan. Silakan coba lagi untuk melanjutkan.',

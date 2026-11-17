@@ -10,6 +10,7 @@ export const useInView = (params: IntersectionOptions) => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const paramsRef = useRef(params);
 
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   paramsRef.current = params;
 
   const ref = useCallback((element: HTMLElement | null) => {

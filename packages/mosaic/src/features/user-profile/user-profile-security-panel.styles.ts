@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   icon: {
@@ -8,13 +8,6 @@ export const styles = stylex.create({
     display: 'block',
     height: space['4.5'],
     width: space['4.5'],
-  },
-  media: {
-    borderColor: colorVars['--cl-color-border-subtle'],
-    borderRadius: radiusVars['--cl-radius-md'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
   },
   sectionCards: {
     gap: space['3'],

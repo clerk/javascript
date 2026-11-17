@@ -60,7 +60,7 @@ export const styles = stylex.create({
 
   // A fixed height so switching pages never resizes the surface.
   layout: {
-    borderColor: colorVars['--cl-color-border'],
+    borderColor: colorVars['--cl-color-border-subtle'],
     borderRadius: {
       [compact]: 0,
       default: radiusVars['--cl-radius-xl'],
@@ -72,7 +72,7 @@ export const styles = stylex.create({
     },
     // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-page'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
@@ -104,7 +104,6 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
-    borderWidth: '0px',
     blockSize: 'auto',
     boxShadow: {
       [compact]: 'none',
@@ -120,6 +119,7 @@ export const styles = stylex.create({
 
   layoutFullscreen: {
     borderRadius: 0,
+    borderWidth: '0px',
     boxShadow: 'none',
   },
 
@@ -129,7 +129,7 @@ export const styles = stylex.create({
 
   nav: {
     padding: space['4'],
-    borderInlineEndColor: colorVars['--cl-color-border'],
+    borderInlineEndColor: colorVars['--cl-color-border-subtle'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
     // Hidden in CSS too, so the column never shows on a phone before measuring.
@@ -189,6 +189,22 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
+  navGroup: {
+    gap: NAV_GAP,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBlockStart: { default: null, ':not(:first-child)': space['4'] },
+  },
+
+  navGroupLabel: {
+    paddingBlock: space['1'],
+    paddingInline: space['2.5'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],
@@ -204,7 +220,8 @@ export const styles = stylex.create({
       ':active': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
+        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"]):not(:active):not([data-selected])':
+          colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {

@@ -24,7 +24,9 @@ import {
   useTypeahead,
 } from '@floating-ui/react';
 import { type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
+import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
@@ -71,6 +73,7 @@ function MenuInner(props: MenuProps) {
   // has a parent node id too, and treating that as nesting makes it hover-open, side-placed, and
   // unclickable by mouse.
   const isNested = parentId != null && parentContext != null;
+  const direction = useDirection();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
@@ -80,6 +83,7 @@ function MenuInner(props: MenuProps) {
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const pressPointerTypeRef = useRef<string | null>(null);
+  const openFrameRef = useRef<number | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
 
   const resolvedPlacement = placementProp ?? (isNested ? 'right-start' : 'bottom-start');
@@ -102,6 +106,7 @@ function MenuInner(props: MenuProps) {
       })),
       flip({ fallbackPlacements }),
       shift({ padding: 5 }),
+      // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
       arrow({ element: arrowRef }),
       cssVars({ sideOffset: resolvedOffset }),
     ],
@@ -138,7 +143,23 @@ function MenuInner(props: MenuProps) {
           if (isNested || event.button !== 0 || (pointerType !== 'mouse' && pointerType !== 'pen')) {
             return;
           }
-          floatingContext.onOpenChange(!open || isHoverOpen(floatingContext), event.nativeEvent, 'click');
+          if (openFrameRef.current !== null) {
+            cancelAnimationFrame(openFrameRef.current);
+            openFrameRef.current = null;
+            return;
+          }
+          if (open && !isHoverOpen(floatingContext)) {
+            floatingContext.onOpenChange(false, event.nativeEvent, 'click');
+            return;
+          }
+          // Safari blurs an already-focused button on press, moving focus to its nearest focusable
+          // ancestor. Opening now lets that blur reach the open menu and close it, so open on the
+          // next frame, after the press has settled, as Base UI's `useClick` does.
+          const nativeEvent = event.nativeEvent;
+          openFrameRef.current = requestAnimationFrame(() => {
+            openFrameRef.current = null;
+            flushSync(() => floatingContext.onOpenChange(true, nativeEvent, 'click'));
+          });
         },
       },
     }),
@@ -162,6 +183,7 @@ function MenuInner(props: MenuProps) {
     listRef: elementsRef,
     activeIndex,
     nested: isNested,
+    rtl: direction === 'rtl',
     onNavigate: setActiveIndex,
   });
   const typeahead = useTypeahead(floatingContext, {
@@ -179,6 +201,15 @@ function MenuInner(props: MenuProps) {
     listNavigation,
     typeahead,
   ]);
+
+  useEffect(
+    () => () => {
+      if (openFrameRef.current !== null) {
+        cancelAnimationFrame(openFrameRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!tree) {

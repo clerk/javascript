@@ -80,6 +80,7 @@ function DrawerInner(props: DrawerProps) {
   // Stable clock wrapper so the engine's handlers/effects don't churn when a test
   // passes a fresh `_now` each render.
   const nowRef = useRef(defaultNow);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   nowRef.current = props._now ?? defaultNow;
   const now = useCallback(() => nowRef.current(), []);
 
@@ -92,8 +93,10 @@ function DrawerInner(props: DrawerProps) {
   // Read via refs so the handle connection stays stable across renders even when
   // the consumer passes a fresh `onOpenChange` (which re-creates `setOpen`).
   const openRef = useRef(open);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   openRef.current = open;
   const setOpenRef = useRef(setOpen);
+  // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
   setOpenRef.current = setOpen;
   useEffect(() => {
     if (!handle) {

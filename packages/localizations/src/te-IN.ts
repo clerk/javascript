@@ -1640,10 +1640,23 @@ export const teIN: LocalizationResource = {
         'మీ పాస్‌కీని ఉపయోగించడం మీ గుర్తింపును నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.',
       title: 'మీ పాస్‌కీని ఉపయోగించండి',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'మరొక పద్ధతిని ఉపయోగించండి',
       subtitle: 'కొనసాగించడానికి మీ ప్రస్తుత పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -1656,6 +1669,22 @@ export const teIN: LocalizationResource = {
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఫోన్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -1790,6 +1819,10 @@ export const teIN: LocalizationResource = {
       subtitle:
         'మీ పాస్‌కీని ఉపయోగించడం అది మీరని నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.',
       title: 'మీ పాస్‌కీని ఉపయోగించండి',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'మరొక పద్ధతిని ఉపయోగించండి',
@@ -2102,6 +2135,7 @@ export const teIN: LocalizationResource = {
       'భద్రతా ధృవీకరణలు విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     captcha_unavailable:
       'బాట్ ధృవీకరణ విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'తాత్కాలిక ఇమెయిల్ సేవలు మద్దతు లేవు. దయచేసి ఖాతాను సృష్టించడానికి మీ సాధారణ ఇమెయిల్ చిరునామాను ఉపయోగించండి.',
@@ -2182,9 +2216,12 @@ export const teIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
     web3_signature_request_rejected: 'మీరు సంతకం అభ్యర్థనను తిరస్కరించారు. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',

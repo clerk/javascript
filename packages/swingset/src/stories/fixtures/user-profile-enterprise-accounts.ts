@@ -5,7 +5,7 @@ import type {
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosText } from '@/lib/chaos';
+import { chaosCompany, chaosEmail } from '@/lib/chaos';
 
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
@@ -13,6 +13,7 @@ export const accounts: UserProfileEnterpriseAccount[] = [
     name: 'Acme Okta',
     emailAddress: 'alex@acme.com',
     iconUrl: 'https://img.clerk.com/static/okta.svg',
+    monochromeIcon: true,
   },
   { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com' },
 ];
@@ -29,10 +30,14 @@ export function useEnterpriseAccountsFixture({
   initialError?: string;
 } = {}) {
   const seedAccounts = useChaosFixture(initialAccounts, items =>
-    items.map((account, index) => ({ ...account, name: chaosText(account.name), emailAddress: chaosEmail(index) })),
+    items.map((account, index) => ({
+      ...account,
+      name: `${chaosCompany(index)} Okta`,
+      emailAddress: chaosEmail(index),
+    })),
   );
   const seedConnections = useChaosFixture(connections, items =>
-    items.map(connection => ({ ...connection, name: chaosText(connection.name) })),
+    items.map((connection, index) => ({ ...connection, name: `${chaosCompany(index + 2)} SAML` })),
   );
   const [linkedAccounts, setLinkedAccounts] = useState(seedAccounts);
   const [availableConnections, setAvailableConnections] = useState(
@@ -57,7 +62,7 @@ export function useEnterpriseAccountsFixture({
       setTimeout(() => {
         setLinkedAccounts(current => [
           ...current,
-          { id: `account_${id}`, name: connection.name, iconUrl: connection.iconUrl, emailAddress: 'alex@acme.com' },
+          { ...connection, id: `account_${id}`, connectError: undefined, emailAddress: 'alex@acme.com' },
         ]);
         setAvailableConnections(current => current.filter(item => item.id !== id));
         setPendingId(undefined);

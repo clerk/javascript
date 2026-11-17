@@ -79,6 +79,7 @@ export function TabsRoot(props: TabsProps) {
   );
 
   if (valueProp !== undefined && valueProp !== selection.value) {
+    // eslint-disable-next-line react/refs -- This ref holds an imperative resource or the latest callback outside React state.
     update(selection.value, valueProp);
   }
 

@@ -40,8 +40,8 @@ import { Dialog } from '@clerk/mosaic/components/dialog';
         <Card.Description>Are you sure you want to proceed?</Card.Description>
       </Card.Header>
       <Card.Footer>
-        <Dialog.Close render={<Button variant='outline' fullWidth />}>Cancel</Dialog.Close>
-        <Button fullWidth>Proceed</Button>
+        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+        <Button>Proceed</Button>
       </Card.Footer>
     </Card.Root>
   </Dialog.Popup>
@@ -207,8 +207,8 @@ action as its submit.
   <Input value={name} onChange={…} />
 </Card.Content>
 <Card.Footer>
-  <Dialog.Close render={<Button variant='outline' fullWidth />}>Cancel</Dialog.Close>
-  <Button type='submit' form='update-profile' fullWidth>Save</Button>
+  <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+  <Button type='submit' form='update-profile'>Save</Button>
 </Card.Footer>
 ```
 

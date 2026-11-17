@@ -1621,10 +1621,23 @@ export const kkKZ: LocalizationResource = {
         'Құпия кілт арқылы сіздің тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Басқа әдісті қолдану',
       subtitle: 'Жалғастыру үшін құпия сөзді енгізіңіз',
       title: 'Растау қажет',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Растау коды',
@@ -1637,6 +1650,22 @@ export const kkKZ: LocalizationResource = {
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
       subtitle: 'Жалғастыру үшін телефонға жіберілген кодты енгізіңіз',
       title: 'Растау қажет',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Растау коды',
@@ -1770,6 +1799,10 @@ export const kkKZ: LocalizationResource = {
       subtitle:
         'Құпия кілт арқылы тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Басқа әдісті қолдану',
@@ -2069,6 +2102,7 @@ export const kkKZ: LocalizationResource = {
     avatar_file_type_invalid: 'Файл түрі қолдау көрсетілмейді. JPG, PNG, GIF немесе WEBP суретін жүктеңіз.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Уақытша электрондық пошта қызметтері қолдау көрсетілмейді. Есептік жазбаны жасау үшін кәдімгі электрондық пошта мекенжайыңызды пайдаланыңыз.',
@@ -2142,9 +2176,12 @@ export const kkKZ: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
     web3_signature_request_rejected: 'Сіз қолтаңба сұрауын қабылдамадыңыз. Жалғастыру үшін қайтадан көріңіз.',

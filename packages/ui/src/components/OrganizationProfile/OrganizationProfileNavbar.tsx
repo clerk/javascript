@@ -30,6 +30,10 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
+  const allowAPIKeysRoute = useProtect(
+    has => has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' }),
+  );
+
   const { allowed: allowSecurityRoute } = useSecurityRouteAccess();
 
   const routes = pages.routes
@@ -43,7 +47,7 @@ export const OrganizationProfileNavbar = (
         r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
         (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
     )
-    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || !apiKeysProps?.hide)
+    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || (!apiKeysProps?.hide && allowAPIKeysRoute))
     .filter(
       r =>
         r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY ||

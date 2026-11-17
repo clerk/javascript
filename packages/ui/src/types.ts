@@ -166,7 +166,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
-  redirectOnActiveSession?: MutableRefObject<boolean>;
+  redirectOnActiveSessionRef?: MutableRefObject<boolean>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {

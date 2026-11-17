@@ -183,6 +183,9 @@ export class StateProxy implements State {
             },
           });
         },
+        get clientTrustState() {
+          return gateProperty(target, 'clientTrustState', undefined);
+        },
         get identifier() {
           return gateProperty(target, 'identifier', null);
         },
@@ -252,6 +255,7 @@ export class StateProxy implements State {
           'verifyEmailCode',
           'verifyTOTP',
           'verifyBackupCode',
+          'passkey',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
         passkey: this.gateMethod(target, 'passkey'),

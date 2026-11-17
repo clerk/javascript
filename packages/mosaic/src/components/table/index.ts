@@ -1,16 +1,21 @@
-export { Table } from './table';
+'use client';
+
+export * as Table from './table.parts';
 export type {
   TableAlign,
   TableBodyProps,
   TableCellProps,
-  TableEmptyProps,
-  TableHeaderCellProps,
+  TableColumnProps,
+  TableExpandButtonProps,
   TableHeaderProps,
-  TableProps,
+  TableLayout,
+  TableRootProps,
   TableRowProps,
   TableSearchProps,
-  TableSelectAllCellProps,
-  TableSelectCellProps,
+  TableSelectionCellProps,
+  TableSelectionColumnProps,
+  TableSelectionMode,
   TableSort,
+  TableSticky,
   TableToolbarProps,
 } from './table';

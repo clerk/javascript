@@ -1,7 +1,11 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -140,6 +144,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
   });
 });
 
+/** Props for the row that puts a field's label at the start and an action, such as a link, at the end. */
+export type FieldHeaderProps = MosaicComponentProps<'div'>;
+
+const Header = React.forwardRef<HTMLDivElement, FieldHeaderProps>(function MosaicFieldHeader(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-header'), stylex.props(reset.base, styles.header, xstyle), rest),
+  });
+});
+
 /** Props for the container that stacks a horizontal field's label and supporting text. */
 export type FieldContentProps = MosaicComponentProps<'div'>;
 
@@ -221,9 +240,9 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
 
 type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
-  error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
-  success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconComponent; color: stylex.StyleXStyles }> = {
+  error: { slot: 'field-error', icon: ExclamationCircle, color: feedbackStyles.error },
+  success: { slot: 'field-success', icon: Checkmark, color: feedbackStyles.success },
   info: { slot: 'field-info', color: feedbackStyles.info },
 };
 
@@ -321,15 +340,15 @@ const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function M
   );
 });
 
-/** Styled parts for composing an automatically associated single-control field. */
-export const Field = {
-  Root,
-  Label,
-  Content,
-  Description,
-  Message,
-  Feedback,
-  Error: FieldError,
-  Success: FieldSuccess,
-  Hint: FieldHint,
+export {
+  Root as FieldRoot,
+  Header as FieldHeader,
+  Label as FieldLabel,
+  Content as FieldContent,
+  Description as FieldDescription,
+  Message as FieldMessage,
+  Feedback as FieldFeedback,
+  FieldError,
+  FieldSuccess,
+  FieldHint,
 };

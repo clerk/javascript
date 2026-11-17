@@ -37,6 +37,7 @@ export function useOrganizationDirectorySyncUsersCacheKeys(params: {
   args: GetDirectorySyncUsersParams;
 }) {
   const { organizationId, enterpriseConnectionId, directoryId, args } = params;
+  const argsKey = JSON.stringify(args);
   return useMemo(() => {
     return createCacheKeys({
       stablePrefix: INTERNAL_STABLE_KEYS.ORGANIZATION_DIRECTORY_SYNC_USERS_KEY,
@@ -52,7 +53,7 @@ export function useOrganizationDirectorySyncUsersCacheKeys(params: {
     });
     // The args object is intentionally serialized via the consumer to keep stability.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId, enterpriseConnectionId, directoryId, JSON.stringify(args)]);
+  }, [organizationId, enterpriseConnectionId, directoryId, argsKey]);
 }
 
 /**

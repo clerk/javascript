@@ -1,6 +1,7 @@
 import { UserProfileAddMfaDialog } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-add-mfa.dialog';
 import { UserProfileMfaSetupView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 
+import { idleReverification } from './reverification';
 import { useUserProfileMfaFixture } from './user-profile-mfa';
 
 export function useUserProfileMfaExample() {
@@ -19,6 +20,7 @@ export function useUserProfileMfaExample() {
         backupCodes={fixture.backupCodes}
         onBack={fixture.setup.onBack}
         onCancel={() => fixture.setup.onOpenChange(false)}
+        reverification={idleReverification}
       />
     </UserProfileAddMfaDialog>
   );

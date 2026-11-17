@@ -2,13 +2,13 @@ import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
   MembersTableTabViewProps,
   OrganizationProfileMember,
-} from '@clerk/mosaic/features/organization-profile/members-table-tab.types';
+} from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/members-table-tab.types';
 import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
+import { chaosEmail, chaosName, chaosRole, chaosRows } from '@/lib/chaos';
 
 const exampleRoles = [
   { value: 'admin', label: 'Admin' },
@@ -38,7 +38,9 @@ const exampleMembers = [
 
 export function useMembersTableFixture({ proposed = false, empty = false } = {}): MembersTableTabViewProps {
   const locale = useLocale();
-  const roles = useChaosFixture(exampleRoles, items => items.map(role => ({ ...role, label: chaosText(role.label) })));
+  const roles = useChaosFixture(exampleRoles, items =>
+    items.map((role, index) => ({ ...role, label: chaosRole(index).label })),
+  );
   const seed = useChaosFixture(exampleMembers, items =>
     chaosRows(items).map((member, index) => ({
       ...member,

@@ -11,7 +11,7 @@ import { Checkbox } from '../../checkbox';
 import type { FieldFeedback } from '../../form';
 import { Input } from '../../input';
 import { Select } from '../../select';
-import { Field } from '../field';
+import { Field } from '..';
 
 const overrides = stylex.create({
   root: { display: 'grid' },
@@ -239,6 +239,31 @@ describe('Mosaic Field', () => {
     expect(checkbox).toBeChecked();
   });
 
+  it('keeps the label associated when it shares a header row with an action', async () => {
+    const onAction = vi.fn();
+    render(
+      <Field.Root>
+        <Field.Header>
+          <Field.Label>Password</Field.Label>
+          <button
+            type='button'
+            onClick={onAction}
+          >
+            Forgot password?
+          </button>
+        </Field.Header>
+        <Input />
+      </Field.Root>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Password' });
+    await userEvent.click(screen.getByRole('button', { name: 'Forgot password?' }));
+    expect(onAction).toHaveBeenCalledOnce();
+    expect(input).not.toHaveFocus();
+    await userEvent.click(screen.getByText('Password'));
+    expect(input).toHaveFocus();
+  });
+
   it('toggles a checkbox wrapped in its label', async () => {
     render(
       <Field.Root>
@@ -332,7 +357,6 @@ describe('Mosaic Field', () => {
     expect(control).toHaveAttribute('aria-describedby', description?.id);
 
     await act(() => root?.unmount());
-    consoleError.mockRestore();
   });
 
   it('warns when Root contains more than one form control', () => {
@@ -349,7 +373,6 @@ describe('Mosaic Field', () => {
     expect(consoleWarn).toHaveBeenCalledWith(
       '[Clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
     );
-    consoleWarn.mockRestore();
   });
 
   it('updates registered control and message IDs as parts change', () => {
@@ -382,6 +405,7 @@ describe('Mosaic Field', () => {
     const labelRef = React.createRef<HTMLLabelElement>();
     const descriptionRef = React.createRef<HTMLParagraphElement>();
     const contentRef = React.createRef<HTMLDivElement>();
+    const headerRef = React.createRef<HTMLDivElement>();
     const errorRef = React.createRef<HTMLParagraphElement>();
 
     render(
@@ -405,6 +429,10 @@ describe('Mosaic Field', () => {
           ref={contentRef}
           data-content='field'
         />
+        <Field.Header
+          ref={headerRef}
+          data-header='field'
+        />
         <Field.Error
           ref={errorRef}
           role='status'
@@ -418,6 +446,7 @@ describe('Mosaic Field', () => {
     expect(labelRef.current).toHaveAttribute('for', 'name');
     expect(descriptionRef.current).toHaveAttribute('title', 'Help');
     expect(contentRef.current).toHaveAttribute('data-content', 'field');
+    expect(headerRef.current).toHaveAttribute('data-header', 'field');
     expect(errorRef.current).toHaveAttribute('role', 'status');
   });
 
@@ -473,6 +502,7 @@ describe('Mosaic Field', () => {
         <Field.Label render={props => <label {...props} />}>Biography</Field.Label>
         <Field.Description render={props => <div {...props} />}>Description</Field.Description>
         <Field.Content render={props => <section {...props} />}>Content</Field.Content>
+        <Field.Header render={props => <header {...props} />}>Header</Field.Header>
         <Field.Error render={props => <div {...props} />}>Error</Field.Error>
       </Field.Root>,
     );
@@ -480,6 +510,7 @@ describe('Mosaic Field', () => {
     expect(screen.getByText('Biography').closest('section')).not.toBeNull();
     expect(screen.getByText('Description').tagName).toBe('DIV');
     expect(screen.getByText('Content').tagName).toBe('SECTION');
+    expect(screen.getByText('Header').tagName).toBe('HEADER');
     expect(screen.getByText('Error').closest('div')).toHaveClass('cl-field-error');
   });
 
@@ -492,7 +523,7 @@ describe('Mosaic Field', () => {
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('mounts through the headless enter transition and animates the message height', () => {
+  it('animates the registered message height while initially present feedback stays at rest', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
@@ -527,7 +558,7 @@ describe('Mosaic Field', () => {
     expect(atoms(probe.feedback)).toHaveLength(3);
     expect(error).toHaveClass(...atoms(probe.feedback));
     expect(error).toHaveAttribute('data-open');
-    expect(error).toHaveAttribute('data-starting-style');
+    expect(error).not.toHaveAttribute('data-starting-style');
   });
 
   it('renders nothing without a message', () => {
@@ -723,7 +754,6 @@ describe('Mosaic Field', () => {
     expect(trigger).toHaveFocus();
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(consoleWarn).not.toHaveBeenCalled();
-    consoleWarn.mockRestore();
   });
 
   it('keeps a native label for a select when htmlFor is explicit', () => {
@@ -748,7 +778,6 @@ describe('Mosaic Field', () => {
     render(<Field.Label render={<div />}>Email</Field.Label>);
 
     expect(consoleWarn).toHaveBeenCalledWith('[Clerk] <Field.Label> must render a native `<label>` element.');
-    consoleWarn.mockRestore();
   });
 });
 

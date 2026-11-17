@@ -112,7 +112,7 @@ No additional props beyond standard HTML attributes and the `render` prop.
 
 ### `Menu.Arrow`
 
-Accepts all `FloatingArrow` props. `ref` and `context` are injected automatically.
+Accepts all `FloatingArrow` props and forwards `ref`. `context` is injected automatically.
 
 ## Keyboard Navigation
 

@@ -10,9 +10,9 @@ import type { UserProfileDevice } from '../user-profile-active-devices-section/u
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type { UserProfileMfaSectionViewProps } from '../user-profile-mfa-section/user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '../user-profile-mfa-section/user-profile-mfa-section.view';
-import type { UserProfilePasskey } from '../user-profile-passkeys-section.view';
-import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { useUserProfilePasskeysSectionController } from '../user-profile-passkeys-section/user-profile-passkeys-section.controller';
+import type { UserProfilePasskey } from '../user-profile-passkeys-section/user-profile-passkeys-section.view';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 function ActiveDevices({
@@ -268,7 +268,7 @@ describe('UserProfileSecurityPanelView', () => {
     const backupOnlyView = renderView(
       <UserProfileMfaSectionView
         methods={[backupCodes]}
-        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        regenerate={{ onClick: onRegenerateBackupCodes, status: 'idle' }}
         onRemove={onRemove}
       />,
     );
@@ -280,7 +280,7 @@ describe('UserProfileSecurityPanelView', () => {
     renderView(
       <UserProfileMfaSectionView
         methods={[{ id: 'sms_1', type: 'sms' }, backupCodes]}
-        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        regenerate={{ onClick: onRegenerateBackupCodes, status: 'idle' }}
         onRemove={onRemove}
       />,
     );

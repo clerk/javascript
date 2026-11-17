@@ -53,7 +53,6 @@ describe('createLayoutAnimator', () => {
   afterEach(() => {
     dispose();
     container.remove();
-    vi.restoreAllMocks();
   });
 
   it('slides items that move when a sibling is removed', async () => {
@@ -203,16 +202,19 @@ describe('createLayoutAnimator', () => {
   });
 
   it('snaps under reduced motion but still pins an exiting item', async () => {
-    vi.spyOn(window, 'matchMedia').mockImplementation(query => ({
-      matches: query === '(prefers-reduced-motion: reduce)',
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }));
+    vi.spyOn(window, 'matchMedia').mockImplementation(query => {
+      const media = {
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      };
+      return media;
+    });
     const b = item(container, { x: 50, y: 0 });
     const c = item(container, { x: 100, y: 0 });
     dispose = createLayoutAnimator(container);
@@ -250,7 +252,6 @@ describe('createLayoutAnimator', () => {
     await flush();
 
     expect(observed.filter(element => element === a)).toHaveLength(1);
-    vi.unstubAllGlobals();
   });
 
   it('stops watching once disposed', async () => {

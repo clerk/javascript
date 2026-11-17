@@ -59,6 +59,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                   {...formState.firstName.props}
                   isRequired={fields.firstName?.required}
                   isOptional={!fields.firstName?.required}
+                  autoComplete='given-name'
                 />
               )}
               {shouldShow('lastName') && (
@@ -66,6 +67,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                   {...formState.lastName.props}
                   isRequired={fields.lastName?.required}
                   isOptional={!fields.lastName?.required}
+                  autoComplete='family-name'
                 />
               )}
             </Form.ControlRow>
@@ -76,6 +78,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 {...formState.username.props}
                 isRequired={fields.username?.required}
                 isOptional={!fields.username?.required}
+                autoComplete='username'
               />
             </Form.ControlRow>
           )}
@@ -86,6 +89,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 isRequired={fields.emailAddress?.required}
                 isOptional={!fields.emailAddress?.required}
                 isDisabled={fields.emailAddress?.disabled}
+                autoComplete='email'
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_phone') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
               />
@@ -97,6 +101,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
                 {...formState.phoneNumber.props}
                 isRequired={fields.phoneNumber?.required}
                 isOptional={!fields.phoneNumber?.required}
+                autoComplete='tel'
                 actionLabel={canToggleEmailPhone ? localizationKeys('signUp.start.actionLink__use_email') : undefined}
                 onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('emailAddress') : undefined}
               />

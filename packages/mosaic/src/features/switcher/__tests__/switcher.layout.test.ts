@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { resolveSwitcherLayout } from '../switcher.layout';
 import type { SwitcherData, SwitcherMode } from '../switcher.types';
 
-const alice = { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' };
-const bob = { sessionId: 'sess_2', name: 'Bob Jones', identifier: 'bob@example.com' };
+const alice = { sessionId: 'sess_1', userId: 'user_1', name: 'Alice Smith', identifier: 'alice@example.com' };
+const bob = { sessionId: 'sess_2', userId: 'user_2', name: 'Bob Jones', identifier: 'bob@example.com' };
 const foundry = { kind: 'membership', organizationId: 'org_1', name: 'Foundry' } as const;
 
 function resolve(mode: SwitcherMode, data: Partial<SwitcherData> = {}) {

@@ -1,5 +1,6 @@
 import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
+import type { ClientTrustState } from './json';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { ProtectCheckResource } from './signUpCommon';
@@ -35,6 +36,10 @@ export interface SignInFutureCreateParams {
    * The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\(if%20necessary\).) in the generated OAuth redirect URL.
    */
   oidcLoginHint?: string;
+  /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
   /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
@@ -244,6 +249,10 @@ export interface SignInFutureSSOParams {
    */
   oidcPrompt?: string;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+  /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental
    */
@@ -321,6 +330,10 @@ export interface SignInFuturePasskeyParams {
    * </ul>
    */
   flow?: 'autofill' | 'discoverable';
+  /**
+   * Only offer passkeys that are already on the device. When there are none, the request fails without showing the system's "use a passkey from another device" sheet. Supported by `@clerk/expo-passkeys` on iOS 16+ and Android. Browsers ignore it. Defaults to `false`.
+   */
+  preferImmediatelyAvailableCredentials?: boolean;
 }
 
 /** @generateWithEmptyComment */
@@ -362,7 +375,7 @@ export interface SignInFutureResource {
    * <li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Device Trust](https://clerk.com/docs/guides/secure/device-trust). See the [Device Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/device-trust) for more information.</li>
    * <li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>
    * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy), or `'enterprise_sso'`.</li>
-   * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
+   * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, `'email_link'`, or `'passkey'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
    * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. When Clerk's UI is loaded, the sign-in methods resolve the challenge in a modal before they return. Otherwise, run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead. The pre-built components handle this automatically.</li>
    * </ul>
@@ -393,6 +406,17 @@ export interface SignInFutureResource {
    * The state of the verification process for the selected second factor. Initially, this property contains an empty verification object, since there is no second factor selected.
    */
   readonly secondFactorVerification: VerificationResource;
+
+  /**
+   * The [Device Trust](https://clerk.com/docs/guides/protect/device-trust) state of the device the user is signing in from, as of the latest response. With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, so entering an identifier doesn't reveal whether that account has signed in on this device. Without that update, Clerk returns it on every response.
+   * <ul>
+   *  <li>`'new'` - Clerk doesn't trust this device for the user yet, or can't confirm that it does. While `status` is `'needs_client_trust'`, this is `'new'`.</li>
+   *  <li>`'known'` - Clerk trusts this device for the user. Completing a sign-in makes the device trusted in most cases, so a `'complete'` sign-in usually reads `'known'`.</li>
+   *  <li>`'pending'` - Clerk can't tell yet.</li>
+   * </ul>
+   * `undefined` when Device Trust is off. With the Device Trust Status update, it's also `undefined` before the first factor is verified.
+   */
+  readonly clientTrustState?: ClientTrustState;
 
   /**
    * The authentication identifier value for the current sign-in. `null` if the `strategy` is `'oauth_<provider>'` or `'enterprise_sso'`.
@@ -585,6 +609,14 @@ export interface SignInFutureResource {
      * Verifies a backup code to sign in with as a second factor.
      */
     verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
+
+    /**
+     * Uses a passkey to sign in with as a second factor. Only available when
+     * the instance allows passkeys to satisfy the second factor and the user
+     * has a registered passkey (`passkey` appears in
+     * `supportedSecondFactors`).
+     */
+    passkey: () => Promise<{ error: ClerkError | null }>;
   };
 
   /**

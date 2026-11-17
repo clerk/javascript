@@ -4,12 +4,11 @@ import { useOrganizationProfileDangerSectionModel } from './organization-profile
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section.view';
 
 export type OrganizationProfileDangerSectionProps = {
-  afterLeaveOrganizationUrl?: string;
   fallback?: React.ReactNode;
 };
 
 export function OrganizationProfileDangerSection(props: OrganizationProfileDangerSectionProps) {
-  const model = useOrganizationProfileDangerSectionModel(props);
+  const model = useOrganizationProfileDangerSectionModel();
 
   if (model.status === 'loading') {
     return props.fallback ?? null;

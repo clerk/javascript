@@ -64,15 +64,21 @@ beforeEach(() => {
   window.focus();
 });
 
+function clearCookies() {
+  for (const cookie of document.cookie.split('; ').filter(Boolean)) {
+    document.cookie = `${cookie.split('=')[0]}=; max-age=0; path=/`;
+  }
+}
+
+window.addEventListener('pagehide', clearCookies);
+
 afterEach(() => {
   cleanup();
   __resetClerkQueryClientForTest();
   for (const channel of [...openChannels]) {
     channel.close();
   }
-  for (const cookie of document.cookie.split('; ').filter(Boolean)) {
-    document.cookie = `${cookie.split('=')[0]}=; max-age=0; path=/`;
-  }
+  clearCookies();
   localStorage.clear();
   sessionStorage.clear();
   worker.resetHandlers();

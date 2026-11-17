@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SegmentedControl } from './segmented-control';
+import { DirectionProvider } from '../../primitives/direction-provider';
+import { SegmentedControl } from '.';
 
 function BillingPeriod(props: Partial<React.ComponentProps<typeof SegmentedControl.Root>>) {
   return (
@@ -58,9 +59,9 @@ describe('Mosaic SegmentedControl', () => {
 
   it('flips the arrow keys in a right-to-left layout', async () => {
     render(
-      <div dir='rtl'>
+      <DirectionProvider direction='rtl'>
         <BillingPeriod defaultValue='monthly' />
-      </div>,
+      </DirectionProvider>,
     );
 
     await userEvent.tab();

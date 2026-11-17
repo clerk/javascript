@@ -5,6 +5,7 @@ import { fapiClient, fapiSession, fapiUser } from './fapi';
 import { renderWithClerk } from './render';
 
 describe('fake FAPI isolation between tests', () => {
+  // eslint-disable-next-line vitest/expect-expect -- Leaves work running for the next test, which asserts it is isolated.
   it('leaves a request in flight when the test ends', async () => {
     const user = fapiUser({ id: 'user_1' });
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
@@ -20,6 +21,7 @@ describe('fake FAPI isolation between tests', () => {
     memberships.release();
   });
 
+  // eslint-disable-next-line vitest/expect-expect -- Leaves work running for the next test, which asserts it is isolated.
   it('starts a request after the test ends', async () => {
     const user = fapiUser({ id: 'user_1' });
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
@@ -33,5 +35,26 @@ describe('fake FAPI isolation between tests', () => {
     await new Promise(resolve => setTimeout(resolve, 200));
     expect(memberships.requests).toHaveLength(0);
     memberships.release();
+  });
+
+  it('does not let any Clerk write session cookies', async () => {
+    const user = fapiUser({ id: 'user_1' });
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    const { clerk } = await renderWithClerk(<div />);
+    expect(await clerk.session?.getToken()).toEqual(expect.any(String));
+    expect(document.cookie).not.toMatch(/(?:^|; )__session/);
+  });
+
+  it('clears authentication cookies when the test iframe leaves the page', async () => {
+    const user = fapiUser({ id: 'user_1' });
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    await renderWithClerk(<div />, { standardBrowser: true });
+    window.dispatchEvent(new Event('focus'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(document.cookie).toContain('__session=');
+
+    window.dispatchEvent(new PageTransitionEvent('pagehide'));
+
+    expect(document.cookie).toBe('');
   });
 });

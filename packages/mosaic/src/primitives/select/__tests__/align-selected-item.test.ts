@@ -344,17 +344,15 @@ describe('alignSelectedItem', () => {
     expect(scroller.scrollTop).toBe(0);
   });
 
-  it('caps the height but leaves the position alone when nothing is selected', async () => {
-    const { middleware, state, floating, selectedItemRef } = setup({
+  it('falls back to anchored positioning when nothing is selected', async () => {
+    const { middleware, state, selectedItemRef, onFallback } = setup({
       referenceTop: 300,
       floatingHeight: 200,
       selectedOffset: 60,
     });
     selectedItemRef.current = null;
 
-    const result = await middleware.fn(state);
-
-    expect(result).toEqual({ data: { availableHeight: 784 } });
-    expect(floating.style.maxHeight).toBe('784px');
+    expect(await middleware.fn(state)).toEqual({});
+    expect(onFallback).toHaveBeenCalledOnce();
   });
 });

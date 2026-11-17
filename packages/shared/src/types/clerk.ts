@@ -38,7 +38,7 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { SessionResource, SessionTask, SignedInSessionResource } from './session';
-import type { SessionVerificationLevel } from './sessionVerification';
+import type { ReverificationResult, SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
@@ -201,6 +201,8 @@ export type SignOutCallback = () => void | Promise<any>;
  * Configuration options.
  */
 export type SignOutOptions = {
+  /** @internal */
+  __internal_satelliteSignOutRedirectUrl?: string;
   /**
    * Specify a specific session to sign out. Useful for multi-session applications.
    */
@@ -1203,6 +1205,8 @@ export interface Clerk {
   /**
    * Completes a custom OAuth or SAML redirect flow that was started by calling [`SignIn.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-in) or [`SignUp.authenticateWithRedirect(params)`](https://clerk.com/docs/reference/objects/sign-up).
    *
+   * If this is called while a previous call is still running, it returns the promise of the running call, and the `params` and `customNavigate` passed to the later call are ignored.
+   *
    * @param params - Additional props that define where the user will be redirected to at the end of a successful OAuth or SAML flow.
    * @param customNavigate - A function that overrides Clerk's default navigation behavior, allowing custom handling of navigation during sign-up and sign-in flows.
    */
@@ -1972,7 +1976,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
-  afterVerification?: () => void;
+  afterVerification?: (result?: ReverificationResult) => void;
 
   /**
    * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
@@ -1986,6 +1990,15 @@ export type __internal_UserVerificationProps = RoutingOptions & {
    * @default `'secondFactor'`
    */
   level?: SessionVerificationLevel;
+
+  /**
+   * A new password the caller already collected. When the user resets their
+   * password to verify, it's used instead of asking for one.
+   */
+  resetPassword?: {
+    password: string;
+    signOutOfOtherSessions: boolean;
+  };
 
   /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.

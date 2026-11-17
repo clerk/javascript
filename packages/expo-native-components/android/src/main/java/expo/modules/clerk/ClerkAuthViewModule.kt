@@ -64,7 +64,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   private val onHostBack by EventDispatcher()
 
   init {
-    // At cold start, ClerkExpoModule.configure() may run before React's
+    // At cold start, ClerkExpoModule.configureNative() may run before React's
     // host-resume sync, so this view's construction is a reliable second hook.
     activity?.let { Clerk.attachActivity(it) }
   }

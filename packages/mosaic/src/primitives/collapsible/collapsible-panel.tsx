@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { type CSSProperties } from 'react';
 
-import { useAnimationsFinished } from '../hooks/use-animations-finished';
-import { useTransition } from '../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { autoUpdate, getScrollDimensions } from '../utils/dom';
+import { usePanelSize } from '../hooks/use-panel-size';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsiblePanelProps = ComponentProps<'div'>;
@@ -15,87 +13,23 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
     const { render, ...otherProps } = props;
     const { open, triggerId, panelId } = useCollapsibleContext();
 
-    const panelRef = useRef<HTMLElement | null>(null);
-    const [height, setHeight] = useState<number | undefined>(undefined);
-    const [width, setWidth] = useState<number | undefined>(undefined);
-
-    const hasBeenClosed = useRef(false);
-    if (!open) {
-      hasBeenClosed.current = true;
-    }
-
-    const { mounted, transitionStatus, transitionProps } = useTransition({
-      open,
-      ref: panelRef,
-    });
-
-    const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);
-
-    useLayoutEffect(() => {
-      if (!mounted) {
-        return;
-      }
-
-      const panel = panelRef.current;
-      if (!panel) {
-        return;
-      }
-
-      return autoUpdate(panel, () => {
-        const dimensions = getScrollDimensions(panel);
-        setHeight(dimensions.height);
-        setWidth(dimensions.width);
-      });
-    }, [mounted]);
-
-    // Once the open animation settles, drop the measured pixel dimensions so the
-    // panel flows naturally with its content (CSS vars omitted → auto).
-    useLayoutEffect(() => {
-      if (!open || !mounted) {
-        return;
-      }
-      runOnAnimationsFinished(() => {
-        setHeight(undefined);
-        setWidth(undefined);
-      });
-    }, [open, mounted, runOnAnimationsFinished]);
-
-    // Re-pin to measured pixel values when closing starts so the exit
-    // transition animates from concrete dimensions (auto can't interpolate).
-    useLayoutEffect(() => {
-      if (open || transitionStatus !== 'ending') {
-        return;
-      }
-      const panel = panelRef.current;
-      if (!panel) {
-        return;
-      }
-      const dimensions = getScrollDimensions(panel);
-      setHeight(dimensions.height);
-      setWidth(dimensions.width);
-    }, [open, transitionStatus]);
+    const { panelRef, mounted, transitionProps, height, width } = usePanelSize(open);
 
     const state = { open };
 
-    const effectiveTransitionProps = !hasBeenClosed.current
-      ? {
-          ...transitionProps,
-          'data-starting-style': undefined,
-          style: undefined,
-        }
-      : transitionProps;
+    const style: CSSProperties & Record<`--${string}`, string | undefined> = {
+      '--collapsible-panel-height': height != null ? `${height}px` : undefined,
+      '--collapsible-panel-width': width != null ? `${width}px` : undefined,
+      ...transitionProps.style,
+    };
 
-    const defaultProps: Record<string, unknown> = {
+    const defaultProps = {
       id: panelId,
       role: 'region' as const,
       'aria-labelledby': triggerId,
-      ...effectiveTransitionProps,
-      style: {
-        '--collapsible-panel-height': height != null ? `${height}px` : undefined,
-        '--collapsible-panel-width': width != null ? `${width}px` : undefined,
-        ...effectiveTransitionProps.style,
-      },
-    };
+      ...transitionProps,
+      style,
+    } satisfies DefaultProps<'div'>;
 
     const merged = mergeProps<'div'>(defaultProps, otherProps);
     // The wired id is owned by the primitive: a consumer-supplied id must not

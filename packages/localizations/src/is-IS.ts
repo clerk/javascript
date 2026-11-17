@@ -1639,10 +1639,23 @@ export const isIS: LocalizationResource = {
         'Að nota lykilinn þinn staðfestir auðkenni þitt. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.',
       title: 'Nota lykilinn þinn',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Nota aðra aðferð',
       subtitle: 'Sláðu inn núverandi lykilorð til að halda áfram',
       title: 'Staðfesting nauðsynleg',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
@@ -1655,6 +1668,22 @@ export const isIS: LocalizationResource = {
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn kóðann sem sendur var á símann þinn til að halda áfram',
       title: 'Staðfesting nauðsynleg',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Staðfestingarkóði',
@@ -1790,6 +1819,10 @@ export const isIS: LocalizationResource = {
       subtitle:
         'Að nota lykilinn þinn staðfestir að þú ert það. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.',
       title: 'Nota lykilinn þinn',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Nota aðra aðferð',
@@ -2102,6 +2135,7 @@ export const isIS: LocalizationResource = {
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:
       'Skráning mistókst vegna misheppnaðrar vélmenna staðfestingar. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Tímabundin tölvupóstþjónusta er ekki studd. Vinsamlegast notaðu venjulega netfangið þitt til að búa til reikning.',
@@ -2180,9 +2214,12 @@ export const isIS: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Þú ert nú þegar innskráður.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_requests: undefined,
     too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Ekki fannst Web3 veskisviðbót. Vinsamlegast settu upp eina til að halda áfram.',
     web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',

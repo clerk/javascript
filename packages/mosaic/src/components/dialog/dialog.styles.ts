@@ -146,6 +146,7 @@ export const styles = stylex.create({
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    paddingBlockStart: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-offset, 0px))',
     // A grid item's automatic minimum would otherwise hold this to its content and defeat the
     // definite row `viewportVariants.profile` pins.
     minHeight: 0,
@@ -217,7 +218,7 @@ export const styles = stylex.create({
       inset: 0,
       // Follows the popup's own radius.
       borderRadius: 'inherit',
-      backgroundColor: colorVars['--cl-color-background'],
+      backgroundColor: colorVars['--cl-color-surface'],
       content: '""',
       opacity: 'var(--_cl-stack-veil, 0)',
       pointerEvents: 'none',
@@ -464,7 +465,7 @@ export const compactPlacements = stylex.create({
     // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [SHEET]: 'end', default: null },
     // The sheet's surface, so it runs on through the keyboard padding below; the card only fills it.
-    backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
+    backgroundColor: { [SHEET]: colorVars['--cl-color-surface'], default: null },
     // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`. The card inside
     // reads the two variables and drops its own shadow and fixed width.
     boxShadow: { [SHEET]: shadowVars['--cl-shadow-sm'], default: null },

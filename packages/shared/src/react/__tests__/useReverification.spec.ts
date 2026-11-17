@@ -3,6 +3,8 @@ import { expectTypeOf } from 'expect-type';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { reverificationError } from '../../authorization-errors';
+import type { ReverificationResult } from '../../types';
+import type { UseReverificationOptions } from '../hooks/useReverification';
 import { useReverification as useReverificationImp } from '../hooks/useReverification';
 
 vi.mock('../hooks/useClerk', () => {
@@ -53,6 +55,18 @@ describe('useReverification type tests', () => {
     >();
   });
 });
+describe('useReverification passReverificationResult type tests', () => {
+  it('drops the first fetcher parameter, required or optional, from the returned function', () => {
+    type Required = (reverification: ReverificationResult | undefined, key: string) => Promise<{ key: string }>;
+    type Optional = (reverification?: ReverificationResult, key?: string) => Promise<{ key?: string }>;
+    type Returned<F extends Required | Optional> = ReturnType<
+      typeof useReverificationImp<F, { passReverificationResult: true }>
+    >;
+    expectTypeOf<Parameters<Returned<Required>>>().toEqualTypeOf<[key: string]>();
+    expectTypeOf<Parameters<Returned<Optional>>>().toEqualTypeOf<[key?: string]>();
+  });
+});
+
 describe('useReverification', () => {
   const mockFetcherInner = vi.fn().mockResolvedValue({ ok: true });
 
@@ -88,5 +102,41 @@ describe('useReverification', () => {
       await secondHandler();
     });
     expect(fetchSpy).toHaveBeenCalledWith('B');
+  });
+
+  describe('passReverificationResult', () => {
+    const passwordReset = { newPassword: 'new-password-123', signOutOfOtherSessions: true };
+
+    // Calls the hook once: the first fetcher call needs reverification, which completes with `result`.
+    const callWithReverification = async (options: UseReverificationOptions, result?: ReverificationResult) => {
+      const fetchSpy = vi.fn().mockResolvedValueOnce(reverificationError()).mockResolvedValueOnce({ ok: true });
+      const { result: hook } = renderHook(() =>
+        useReverificationImp(fetchSpy, { ...options, onNeedsReverification: ({ complete }) => complete(result) }),
+      );
+      await act(async () => {
+        await hook.current('arg');
+      });
+      return fetchSpy;
+    };
+
+    it('passes undefined first, then the result given to complete, on the retry', async () => {
+      const fetchSpy = await callWithReverification({ passReverificationResult: true }, { passwordReset });
+
+      expect(fetchSpy).toHaveBeenNthCalledWith(1, undefined, 'arg');
+      expect(fetchSpy).toHaveBeenNthCalledWith(2, { passwordReset }, 'arg');
+    });
+
+    it('passes undefined on the retry when complete gets no result', async () => {
+      const fetchSpy = await callWithReverification({ passReverificationResult: true });
+
+      expect(fetchSpy).toHaveBeenNthCalledWith(2, undefined, 'arg');
+    });
+
+    it('calls the fetcher with only its own arguments without the option', async () => {
+      const fetchSpy = await callWithReverification({}, { passwordReset });
+
+      expect(fetchSpy).toHaveBeenNthCalledWith(1, 'arg');
+      expect(fetchSpy).toHaveBeenNthCalledWith(2, 'arg');
+    });
   });
 });
