@@ -11,25 +11,20 @@ import type {
   SwitcherItemTrailingProps,
   SwitcherSeparatorProps,
 } from './switcher-item';
+import type { SwitcherPopupProps } from './switcher-popup';
+import type { SwitcherRootProps } from './switcher-root';
 import type { SwitcherTriggerProps } from './switcher-trigger';
 
 export default {
   name: 'Switcher',
   description:
-    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state. They sit inside a `Popover` and a `Card`: `Popover.Trigger` renders `Switcher.Trigger`, and `Popover.Popup` holds a `Card.Root` with `Switcher.Header`, then `Switcher.Group`s of `Switcher.Item`s split by `Switcher.Separator`s. These parts carry `cl-switcher-*` classes; inside `UserButton` and `OrganizationSwitcher` the same parts carry `cl-user-button-*` and `cl-organization-switcher-*`. `Switcher.Avatar` carries `cl-avatar`.",
-  useFor: [
-    'a custom account or organization switcher composed from its parts',
-    'switcher rows or a switcher trigger rendered with your own data',
-  ],
+    "The account and organization switcher. `Switcher.Root` holds the open state, `Switcher.Trigger` opens it, and `Switcher.Popup` positions a `Card` holding `Switcher.Header`, then `Switcher.Group`s of `Switcher.Item`s split by `Switcher.Separator`s. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose these parts with Clerk's session and organization state. The parts carry `cl-switcher-*` classes; inside `UserButton` and `OrganizationSwitcher` the same parts carry `cl-user-button-*` and `cl-organization-switcher-*`. `Switcher.Avatar` carries `cl-avatar`.",
+  useFor: ['an account or organization switcher composed from its parts'],
   keywords: ['switcher', 'user button', 'organization switcher', 'account switcher', 'menu rows'],
   practices: [
     {
       do: true,
-      text: "Render `Switcher.Trigger` through `Popover.Trigger`'s `render` prop, so the popover owns the open state and the button keeps the trigger's look.",
-    },
-    {
-      do: true,
-      text: 'Put `Switcher.Header` and the row groups in a `Card.Root` inside `Popover.Popup`.',
+      text: 'Put `Switcher.Trigger` and `Switcher.Popup` inside one `Switcher.Root`, and label the popup with `aria-label`.',
     },
     {
       do: true,
@@ -41,18 +36,30 @@ export default {
     },
     {
       do: false,
-      text: 'Expect the parts to read Clerk or hold state. They render the props they are given; `UserButton` and `OrganizationSwitcher` connect them to Clerk.',
+      text: 'Expect the parts to read Clerk. They render the props they are given; `UserButton` and `OrganizationSwitcher` connect them to Clerk.',
     },
   ],
   parts: {
+    'Switcher.Root': {
+      description: 'Holds the open state. Renders no element of its own.',
+      props: {
+        open: { type: 'boolean', doc: 'The controlled open state.' },
+        defaultOpen: { type: 'boolean', doc: 'The initial open state when uncontrolled.', default: 'false' },
+        onOpenChange: { type: '(open: boolean) => void', doc: 'Called when the popup opens or closes.' },
+        placement: { type: 'Placement', doc: 'Where the popup sits against the trigger.', default: "'bottom-start'" },
+        sideOffset: { type: 'number', doc: 'The gap between the trigger and the popup.', default: '4' },
+        alignOffset: { type: 'number', doc: 'Shifts the popup along the trigger edge.', default: '0' },
+      },
+    },
     'Switcher.Trigger': {
       description:
-        "The trigger's look on a plain `button`, without the popover it opens. With a `name` it shows the name, the badge and a caret; without one, the avatar alone.",
+        'Opens the popup. With a `name` it shows the name, the badge and a caret; without one, the avatar alone.',
       slot: 'cl-switcher-trigger',
       props: {
         avatar: { type: 'ReactNode', doc: "The lead's mark, such as a `Switcher.BadgedAvatar`." },
         name: { type: 'string', doc: "The lead's name. Leave it out for the avatar-only trigger." },
         badge: { type: 'string', doc: 'A plan or status label beside the name.' },
+        badgeId: { type: 'string', doc: 'Set as `data-badge-id` on the badge.' },
         shape: {
           type: "'circle' | 'square'",
           doc: 'Rounds the avatar-only trigger to match a circular avatar.',
@@ -63,6 +70,15 @@ export default {
           doc: 'Which mark the trigger carries, set as `data-variant`: `full` for a `Switcher.BadgedAvatar`, `condensed` for a `Switcher.Avatar`.',
           default: "'condensed'",
         },
+      },
+    },
+    'Switcher.Popup': {
+      description:
+        'The floating popup: portals, positions against the trigger, and paints a `Card` holding its children. A dialog named by `aria-label`.',
+      slot: 'cl-switcher-popover',
+      props: {
+        'aria-label': { type: 'string', doc: 'Names the popup.' },
+        renderBranding: { type: 'boolean', doc: 'Shows Clerk branding at the foot of the card.', default: 'true' },
       },
     },
     'Switcher.Header': {
@@ -136,49 +152,45 @@ export default {
   },
   examples: [
     {
-      title: 'A trigger and its popover',
+      title: 'A trigger and its popup',
       code: `
-<Popover.Root placement='bottom-start'>
-  <Popover.Trigger
+<Switcher.Root>
+  <Switcher.Trigger
     aria-label='Open account menu'
-    render={
-      <Switcher.Trigger
-        avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='sm' />}
-        name='Acme'
-        badge='Pro'
-        variant='full'
-      />
-    }
+    avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='sm' />}
+    name='Acme'
+    badge='Pro'
+    variant='full'
   />
-  <Popover.Popup aria-label='Account menu'>
-    <Card.Root>
-      <Switcher.Header
-        avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='md' />}
-        title='Acme'
-        description='alice@example.com'
-      />
-      <Switcher.Separator />
-      <Switcher.Group>
-        <Switcher.Item render={<button type='button' />}>
-          <Switcher.ItemMedia>
-            <Switcher.Avatar name='Globex' shape='square' size='sm' />
-          </Switcher.ItemMedia>
-          <Switcher.ItemContent>
-            <Switcher.ItemLabel>Globex</Switcher.ItemLabel>
-            <Switcher.ItemDescription>Member</Switcher.ItemDescription>
-          </Switcher.ItemContent>
-          <Switcher.ItemTrailing>…</Switcher.ItemTrailing>
-        </Switcher.Item>
-      </Switcher.Group>
-    </Card.Root>
-  </Popover.Popup>
-</Popover.Root>
+  <Switcher.Popup aria-label='Account menu'>
+    <Switcher.Header
+      avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='md' />}
+      title='Acme'
+      description='alice@example.com'
+    />
+    <Switcher.Separator />
+    <Switcher.Group>
+      <Switcher.Item render={<button type='button' />}>
+        <Switcher.ItemMedia>
+          <Switcher.Avatar name='Globex' shape='square' size='sm' />
+        </Switcher.ItemMedia>
+        <Switcher.ItemContent>
+          <Switcher.ItemLabel>Globex</Switcher.ItemLabel>
+          <Switcher.ItemDescription>Member</Switcher.ItemDescription>
+        </Switcher.ItemContent>
+        <Switcher.ItemTrailing>…</Switcher.ItemTrailing>
+      </Switcher.Item>
+    </Switcher.Group>
+  </Switcher.Popup>
+</Switcher.Root>
 `,
     },
   ],
   related: ['Avatar', 'Popover', 'Card'],
 } satisfies ComponentDoc<{
+  'Switcher.Root': SwitcherRootProps;
   'Switcher.Trigger': SwitcherTriggerProps;
+  'Switcher.Popup': SwitcherPopupProps;
   'Switcher.Header': SwitcherHeaderProps;
   'Switcher.Avatar': SwitcherAvatarProps;
   'Switcher.BadgedAvatar': SwitcherBadgedAvatarProps;

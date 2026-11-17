@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
 import { axe } from '../../primitives/test-utils/axe';
 import { Card } from '../card';
-import { Popover } from '../popover';
+import type { SwitcherRootProps } from '.';
 import { Switcher } from '.';
 import { SwitcherSurfaceProvider } from './switcher.context';
 
@@ -214,46 +214,126 @@ describe('Switcher', () => {
     expect(trigger.querySelector('.cl-badge')).not.toBeNull();
   });
 
-  it('composes as the switcher does: a popover trigger rendering Switcher.Trigger, and a card in the popup', async () => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <Popover.Root placement='bottom-start'>
-          <Popover.Trigger
-            aria-label='Open account menu'
-            render={
-              <Switcher.Trigger
-                avatar={
-                  <Switcher.BadgedAvatar
-                    name='Acme'
-                    badge={{ name: 'Alice Smith' }}
-                    size='sm'
-                  />
-                }
-                name='Acme'
-                variant='full'
-              />
-            }
-          />
-          <Popover.Popup aria-label='Account menu'>
-            <Card.Root>
+  describe('Root, Trigger and Popup', () => {
+    function Composed(props: Partial<SwitcherRootProps>) {
+      return (
+        <MosaicProvider>
+          <Switcher.Root {...props}>
+            <Switcher.Trigger
+              aria-label='Open account menu'
+              avatar={
+                <Switcher.BadgedAvatar
+                  name='Acme'
+                  badge={{ name: 'Alice Smith' }}
+                  size='sm'
+                />
+              }
+              name='Acme'
+              badge='Pro'
+              variant='full'
+            />
+            <Switcher.Popup aria-label='Account menu'>
               <PopupContent />
-            </Card.Root>
-          </Popover.Popup>
-        </Popover.Root>
+            </Switcher.Popup>
+          </Switcher.Root>
+        </MosaicProvider>
+      );
+    }
+
+    it('opens the popup from the trigger, and closes it with Escape', async () => {
+      const user = userEvent.setup();
+      render(<Composed />);
+
+      const trigger = screen.getByRole('button', { name: 'Open account menu' });
+      expect(trigger).toHaveClass('cl-popover-trigger', 'cl-switcher-trigger');
+      expect(trigger).toHaveAttribute('data-variant', 'full');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.queryByRole('dialog')).toBeNull();
+
+      await user.click(trigger);
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'true');
+      expect(trigger).toHaveAttribute('data-open');
+      const dialog = await screen.findByRole('dialog', { name: 'Account menu' });
+      expect(trigger).toHaveAttribute('aria-controls', dialog.id);
+      const popup = dialog.querySelector('.cl-switcher-popover');
+      expect(popup).toHaveClass('cl-popover-popup');
+      expect(popup?.querySelector('.cl-card-root')).toContainElement(
+        screen.getByRole('button', { name: 'Globex Member Pro' }),
+      );
+      expect(popup?.querySelector('.cl-switcher-header')).not.toBeNull();
+
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(trigger).toHaveFocus();
+    });
+
+    it('opens from the keyboard and moves focus into the popup', async () => {
+      const user = userEvent.setup();
+      render(<Composed />);
+
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Open account menu' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+
+      await screen.findByRole('dialog', { name: 'Account menu' });
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Globex Member Pro' })).toHaveFocus());
+    });
+
+    it('follows a controlled open state', async () => {
+      const user = userEvent.setup();
+      const onOpenChange = vi.fn();
+      const { rerender } = render(
+        <Composed
+          open
+          onOpenChange={onOpenChange}
+        />,
+      );
+
+      expect(await screen.findByRole('dialog', { name: 'Account menu' })).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Open account menu' }));
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+
+      rerender(
+        <Composed
+          open={false}
+          onOpenChange={onOpenChange}
+        />,
+      );
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+  });
+
+  it('renders open in normal flow from the content parts inside a Card, with the trigger beside it on its own', () => {
+    const { container } = render(
+      <MosaicProvider>
+        <Card.Root>
+          <PopupContent />
+        </Card.Root>
+        <Switcher.Trigger
+          aria-label='Open account menu'
+          avatar={
+            <Switcher.BadgedAvatar
+              name='Acme'
+              badge={{ name: 'Alice Smith' }}
+              size='sm'
+            />
+          }
+          name='Acme'
+          variant='full'
+        />
       </MosaicProvider>,
     );
 
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(container.querySelector('.cl-card-root .cl-switcher-header')).not.toBeNull();
+    expect(container.querySelector('.cl-card-root .cl-switcher-item')).not.toBeNull();
     const trigger = screen.getByRole('button', { name: 'Open account menu' });
-    expect(trigger).toHaveClass('cl-popover-trigger', 'cl-switcher-trigger');
+    expect(trigger).toHaveClass('cl-switcher-trigger');
+    expect(trigger).not.toHaveClass('cl-popover-trigger');
     expect(trigger).toHaveAttribute('data-variant', 'full');
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-
-    await user.click(trigger);
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(await screen.findByRole('dialog', { name: 'Account menu' })).toContainElement(
-      screen.getByRole('button', { name: 'Globex Member Pro' }),
-    );
+    expect(trigger).not.toHaveAttribute('aria-expanded');
   });
 });

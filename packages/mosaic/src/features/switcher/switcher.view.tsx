@@ -4,13 +4,12 @@ import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
 import { SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
-import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
-import { SwitcherSurfaceProvider, useSlot } from '../../components/switcher/switcher.context';
+import { Switcher } from '../../components/switcher';
+import { SwitcherSurfaceProvider } from '../../components/switcher/switcher.context';
 import { BadgedAvatar, RowAvatar } from '../../components/switcher/switcher-avatar';
 import { SwitcherHeader } from '../../components/switcher/switcher-header';
 import {
@@ -24,7 +23,6 @@ import {
   SwitcherSeparator,
 } from '../../components/switcher/switcher-item';
 import type { SwitcherTriggerVariant } from '../../components/switcher/switcher-trigger';
-import { SwitcherTriggerContent, triggerStyles } from '../../components/switcher/switcher-trigger';
 import type { IconComponent } from '../../icons/glyph';
 import { Building } from '../../icons/glyphs/building';
 import { Checkmark } from '../../icons/glyphs/checkmark';
@@ -38,7 +36,6 @@ import { UsersAddRight } from '../../icons/glyphs/users-add-right';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import { themeProps } from '../../props';
 import { rtl } from '../../styles/rtl.styles';
 import { applyOrder } from '../../utils/apply-order';
 import type { SwitcherLayout } from './switcher.layout';
@@ -989,7 +986,7 @@ export interface SwitcherRootProps
 
 /**
  * Owns the account/organization data + callbacks and forwards the popover's open state straight to
- * the headless `Popover.Root` — it does not keep a second controllable-state copy. Leaves consume
+ * `Switcher.Root` — it does not keep a second controllable-state copy. Leaves consume
  * the data through context.
  */
 export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
@@ -999,17 +996,17 @@ export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
   const layout = resolveSwitcherLayout(mode, data);
 
   return (
-    <Popover.Root
+    <Switcher.Root
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      placement={placement ?? 'bottom-start'}
+      placement={placement}
       sideOffset={sideOffset}
     >
       <SwitcherSurfaceProvider value={surfaceForMode(mode)}>
         <SwitcherContext.Provider value={{ ...data, layout }}>{children}</SwitcherContext.Provider>
       </SwitcherSurfaceProvider>
-    </Popover.Root>
+    </Switcher.Root>
   );
 }
 
@@ -1040,7 +1037,6 @@ export function SwitcherTrigger({
   triggerVariant = 'condensed',
 }: SwitcherTriggerOptions & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
-  const slot = useSlot();
   const data = useSwitcherContext();
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
@@ -1056,24 +1052,20 @@ export function SwitcherTrigger({
   const user = leadUser(lead);
 
   return (
-    <Popover.Trigger
-      {...themeProps(slot('trigger'), { variant: triggerVariant })}
+    <Switcher.Trigger
       aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
-      xstyle={triggerStyles(showTriggerLabel, shape)}
-    >
-      <SwitcherTriggerContent
-        avatar={
-          <TriggerAvatar
-            lead={lead}
-            variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
-          />
-        }
-        showLabel={showTriggerLabel}
-        name={name}
-        badge={typeof planLabel === 'string' ? planLabel : undefined}
-        badgeId={badge?.id}
-      />
-    </Popover.Trigger>
+      avatar={
+        <TriggerAvatar
+          lead={lead}
+          variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
+        />
+      }
+      name={showTriggerLabel ? name : undefined}
+      badge={typeof planLabel === 'string' ? planLabel : undefined}
+      badgeId={badge?.id}
+      shape={shape}
+      variant={triggerVariant}
+    />
   );
 }
 
@@ -1109,22 +1101,18 @@ function TriggerAvatar({
 /** The popover surface: header, organizations, what can be done about the lead, and footer. */
 export function SwitcherPopup(): ReactElement {
   const m = useSwitcherMessages();
-  const slot = useSlot();
   const { renderBranding } = useSwitcherContext();
 
   return (
-    <Popover.Popup
-      {...themeProps(slot('popover'))}
+    <Switcher.Popup
       aria-label={m.popup.label}
-      xstyle={styles.popup}
+      renderBranding={renderBranding}
     >
-      <Card.Root renderBranding={renderBranding}>
-        <Header />
-        <OrganizationSection />
-        <ManageSection />
-        <Footer />
-      </Card.Root>
-    </Popover.Popup>
+      <Header />
+      <OrganizationSection />
+      <ManageSection />
+      <Footer />
+    </Switcher.Popup>
   );
 }
 

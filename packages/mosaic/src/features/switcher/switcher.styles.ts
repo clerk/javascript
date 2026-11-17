@@ -16,8 +16,4 @@ export const styles = stylex.create({
   scroll: {
     maxHeight: '18rem',
   },
-
-  popup: {
-    width: 'min(21.875rem, calc(100vw - 2rem))',
-  },
 });

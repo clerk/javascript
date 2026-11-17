@@ -10,4 +10,6 @@ export {
   SwitcherGroup as Group,
   SwitcherSeparator as Separator,
 } from './switcher-item';
-export { SwitcherTriggerButton as Trigger } from './switcher-trigger';
+export { SwitcherPopup as Popup } from './switcher-popup';
+export { SwitcherRoot as Root } from './switcher-root';
+export { SwitcherTrigger as Trigger } from './switcher-trigger';
