@@ -278,9 +278,13 @@ describe('Freeze', () => {
 
     // These two run on React's own scheduler rather than inside `act`, which would flush the
     // transition to completion before the second click. The child renders slowly while it shows
-    // the transition's label, so the transition yields, and the hold's sync commit and then the
-    // click land before the transition commits. The render log shows the transition had rendered,
-    // and so had requested the hold, before the click.
+    // the transition's label, so the transition yields, and the second click usually lands after
+    // the hold's sync commit and before the transition commits, which is the window the tests are
+    // about.
+    // Without mocking the React scheduler, there's no way to enforce that the click lands after
+    // the sync commit, so the test only asserts what it can. That means if this start failing
+    // it might seem flaky, but that's because the re-run that passes is not testing the
+    // correct behavior. Treat flakiness as a real test failure here.
     async function scheduled(run: (renders: string[]) => Promise<void>) {
       const flag = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
       const previous = flag.IS_REACT_ACT_ENVIRONMENT;
@@ -306,14 +310,18 @@ describe('Freeze', () => {
       }
     }
 
-    const settle = () => new Promise(resolve => setTimeout(resolve, 5));
+    // Resolves once the child has rendered the label, so the transition has at least started and
+    // requested the hold before the second click.
+    const rendered = (renders: string[], label: string) =>
+      new Promise<void>(resolve => {
+        const check = () => (renders.includes(label) ? resolve() : setTimeout(check, 1));
+        check();
+      });
 
     it('releases a hold whose transition is thawed before it commits', async () => {
       await scheduled(async renders => {
         screen.getByText('freeze later').click();
-        await settle();
-        expect(renders).toContain('Globex');
-        expect(status()).toBe('live:0');
+        await rendered(renders, 'Globex');
 
         screen.getByText('thaw now').click();
 
@@ -325,9 +333,7 @@ describe('Freeze', () => {
     it('keeps the transition alive through an unrelated sync update while it is pending', async () => {
       await scheduled(async renders => {
         screen.getByText('freeze later').click();
-        await settle();
-        expect(renders).toContain('Globex');
-        expect(status()).toBe('live:0');
+        await rendered(renders, 'Globex');
 
         screen.getByText('tick').click();
 
