@@ -62,7 +62,7 @@ export async function CodeBlock({ code, lang }: { code: string; lang: CodeLangua
   const language = languages[lang];
   return (
     <figure className='code-block'>
-      <figcaption className='not-prose text-muted-foreground border-border flex h-11 items-center gap-2.5 border-b pl-4 pr-3 font-sans text-xs font-medium'>
+      <figcaption className='not-prose text-muted-foreground border-border flex items-center gap-2.5 border-b py-1.5 pl-4 pr-1.5 font-sans text-xs font-medium'>
         {language.icon}
         <span className='flex-1 truncate'>{language.label}</span>
         <CopyButton text={code} />
