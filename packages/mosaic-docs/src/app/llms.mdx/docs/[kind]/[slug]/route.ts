@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
-import { docToMarkdown } from '@/lib/doc-markdown';
-import { docEntries, docHref, findDoc, findDocByName } from '@/lib/docs';
+import { docEntries, findDoc } from '@/lib/docs';
+import { docMarkdown } from '@/lib/llms-docs';
 
 export const dynamicParams = false;
 
@@ -16,9 +16,5 @@ export async function GET(_request: Request, { params }: RouteContext<'/llms.mdx
     notFound();
   }
 
-  const markdown = docToMarkdown(entry.doc, name => {
-    const related = findDocByName(name);
-    return related ? docHref(related) : undefined;
-  });
-  return new Response(markdown, { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
+  return new Response(docMarkdown(entry), { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
 }
