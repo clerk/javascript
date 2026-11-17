@@ -111,6 +111,11 @@
       "import": "./dist/components/profile.js",
       "default": "./dist/components/profile.js"
     },
+    "./components/provider-button": {
+      "types": "./dist/components/provider-button.d.ts",
+      "import": "./dist/components/provider-button.js",
+      "default": "./dist/components/provider-button.js"
+    },
     "./components/radio": {
       "types": "./dist/components/radio.d.ts",
       "import": "./dist/components/radio.js",

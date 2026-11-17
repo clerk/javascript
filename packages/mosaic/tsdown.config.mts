@@ -31,6 +31,7 @@ export default defineConfig({
     'components/item': './src/components/item/index.ts',
     'components/panel': './src/components/panel/index.ts',
     'components/profile': './src/components/profile/index.ts',
+    'components/provider-button': './src/components/provider-button/index.ts',
     'components/radio': './src/components/radio/index.ts',
     'components/section': './src/components/section/index.ts',
     'components/segmented-control': './src/components/segmented-control/index.ts',
