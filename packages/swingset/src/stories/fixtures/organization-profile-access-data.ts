@@ -26,7 +26,7 @@ type AccessPolicyJSON = {
   organization_id: string;
   default: boolean;
   domains: { name: string; affiliation_verified: boolean; ownership_verified: boolean }[];
-  enrollment_mode: 'invitation_only' | 'invite_automatically' | 'request_access' | 'sso';
+  enrollment_mode: 'invitation_only' | 'invite_automatically' | 'request_access' | 'sso' | 'blocked';
   status: 'active' | 'draft' | null;
   authentication: {
     connections: { id: string; name: string; active: boolean }[];
@@ -290,6 +290,7 @@ export function toAccessPolicy(policy: AccessPolicyJSON, preview?: Partial<Polic
     invite_automatically: 'automatic',
     request_access: 'request',
     sso: auth?.provisioning === 'directory' ? 'directory' : 'automatic',
+    blocked: 'blocked',
   } as const;
   return {
     ...newPolicy(),
@@ -443,6 +444,7 @@ export function savePolicyResponse(
     automatic: 'invite_automatically',
     request: 'request_access',
     directory: 'invitation_only',
+    blocked: 'blocked',
   } as const;
   const sso = policy.authentication === 'sso';
   return {
