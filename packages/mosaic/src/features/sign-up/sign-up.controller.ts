@@ -292,6 +292,7 @@ export function useSignUpController(model: SignUpReadyModel, options: MosaicLoca
     onStartOver: () =>
       void actions.run('startOver', async () => {
         await model.reset();
+        form.reset();
         goTo('start');
       }),
     onResend: resendChannel ? () => sendCodeEvent({ type: 'RESEND', channel: resendChannel }) : undefined,
