@@ -54,6 +54,10 @@ export type SwitcherModel =
         status: 'ready';
         /** Whether the instance has organizations turned on at all. False forces the button to `user` mode and hides an organization switcher. */
         organizationsEnabled: boolean;
+        /** Whether a profile this button opened is still loading its code, before it shows. */
+        isOpeningProfile: boolean;
+        /** Tells Clerk's servers which account and organization are active. `setActive` skips this in a tab without focus, so a switch made there reverts on the next load. */
+        onPersistSession: (intent: 'select_org' | 'select_session') => Promise<unknown>;
       });
 
 type CreateOrganizationMode =
@@ -321,6 +325,7 @@ export function useSwitcherModel(
   return {
     status: 'ready',
     organizationsEnabled,
+    isOpeningProfile: userProfile.isLoading || organizationProfile.isLoading,
     renderBranding: displayConfig.branded,
     activeSession: toSession(session.id, user),
     activeOrganization: organization ? toMembership(organization) : null,
@@ -358,6 +363,7 @@ export function useSwitcherModel(
           await router.navigate(decorateUrl(afterSwitchSessionUrl));
         },
       }),
+    onPersistSession: async intent => clerk.session?.touch({ intent }),
     onSignOutSession: sessionId =>
       clerk.signOut({
         sessionId,

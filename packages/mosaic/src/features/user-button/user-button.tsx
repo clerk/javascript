@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import type { SwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
 import type { SwitcherTriggerVariant } from '../switcher/switcher.view';
+import { userButtonAgent } from './user-button.agent';
 
 /** What the menu lists, and how much its trigger carries. */
 export interface UserButtonMenuProps {
@@ -93,6 +94,7 @@ export function UserButton({ combined = true, triggerVariant = 'full', ...props 
       {...props}
       mode={combined ? 'combined' : 'user'}
       triggerVariant={combined ? triggerVariant : 'condensed'}
+      agentSurface={model => userButtonAgent(model, { combined })}
     />
   );
 }

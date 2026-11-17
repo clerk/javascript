@@ -51,6 +51,8 @@ export function ModalSurfaceHost<Options>({
   const base = surface.path ?? `/modal/${surface.id}`;
   const location = useMosaicLocation({ routing: 'virtual', path: base });
   const isOpen = location.useSegmentParts() !== undefined;
+  const [content] = useActor(surface.loader);
+  const isLoading = isOpen && content.value !== 'loaded' && content.value !== 'failed';
   // wasOpen guarantees this only runs once as we are opening the modal
   if (isOpen && !state.wasOpen) {
     setState(previous =>
@@ -100,8 +102,9 @@ export function ModalSurfaceHost<Options>({
       },
       preload,
       isOpen,
+      isLoading,
     };
-  }, [surface, location, isOpen]);
+  }, [surface, location, isOpen, isLoading]);
 
   return (
     <surface.context.Provider value={modal}>

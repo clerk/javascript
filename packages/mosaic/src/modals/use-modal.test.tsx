@@ -194,7 +194,7 @@ describe('useModal', () => {
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
   });
 
-  it('opens nothing until the content has loaded', async () => {
+  it('opens nothing and says it is loading until the content has loaded', async () => {
     let resolveLoad: (module: { default: typeof StubContent }) => void = () => {};
     const surface = stubSurface(
       'slow',
@@ -205,16 +205,19 @@ describe('useModal', () => {
     );
     const { ref } = renderCaller(surface);
     await flush();
+    expect(ref.handle?.isLoading).toBe(false);
 
     act(() => ref.handle?.open());
     await flush();
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(ref.handle?.isLoading).toBe(true);
 
     resolveLoad({ default: StubContent });
     await flush();
 
     expect(screen.getByRole('dialog')).toContainElement(screen.getByText('Stub modal'));
+    expect(ref.handle?.isLoading).toBe(false);
   });
 
   it('forgets the previous options when opened without any', async () => {

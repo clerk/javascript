@@ -19,6 +19,8 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { installWebmcp } from '../../../__tests__/feature/webmcp';
+import { createAgent } from '../../../agent/create-agent';
 import { PortalProvider } from '../../../primitives/portal';
 import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 import type { UserButtonProps } from '../user-button';
@@ -1550,5 +1552,146 @@ describe('UserButton custom trigger badges', () => {
     expect(trigger()).not.toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(triggerBadge).not.toHaveBeenCalled();
+  });
+});
+
+describe('UserButton with an agent', () => {
+  function renderWithAgent(ui = tree(), seed: FakeFapiSeed = signedIn()) {
+    const agent = createAgent();
+    serveFapi(seed);
+    return renderWithClerk(ui, undefined, undefined, { agent }).then(() => agent);
+  }
+
+  const actions = (agent: ReturnType<typeof createAgent>) =>
+    agent.snapshot().map(surface => [surface.ref, surface.actions.map(entry => entry.name)]);
+
+  it('shows the agent its accounts and organizations, and switches organization on the screen', async () => {
+    const agent = await renderWithAgent();
+
+    expect(actions(agent)).toEqual([['userButton', ['switchAccount', 'switchOrganization', 'openProfile', 'signOut']]]);
+    expect(agent.snapshot()[0]).toMatchObject({
+      label: 'Alice Smith',
+      state: {
+        activeAccount: { sessionId: 'sess_1' },
+        otherAccounts: [{ sessionId: 'sess_2' }],
+        activeOrganization: { organizationId: 'org_1' },
+      },
+    });
+    expect(JSON.stringify(agent.snapshot())).not.toContain('imageUrl');
+
+    const result = await agent.act({
+      steps: [{ ref: 'userButton', action: 'switchOrganization', input: { organizationId: 'org_9' } }],
+    });
+
+    expect(result.state.userButton).toMatchObject({ activeOrganization: { organizationId: 'org_9' } });
+    await open();
+    expect(await screen.findByRole('button', { name: 'Acme' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Other' })).toBeNull();
+  });
+
+  describe('in a tab without focus', () => {
+    async function renderUnfocused() {
+      vi.spyOn(document, 'hasFocus').mockReturnValue(false);
+      const agent = createAgent();
+      const server = serveFapi(signedIn());
+      await renderWithClerk(tree(), { standardBrowser: true }, undefined, { agent });
+      return { agent, server };
+    }
+
+    it('keeps the organization it switches to', async () => {
+      const { agent, server } = await renderUnfocused();
+
+      const result = await agent.act({
+        steps: [{ ref: 'userButton', action: 'switchOrganization', input: { organizationId: 'org_9' } }],
+      });
+
+      expect(result.ok).toBe(true);
+      expect(server.client.sessions.find(session => session.id === 'sess_1')?.last_active_organization_id).toBe(
+        'org_9',
+      );
+    });
+
+    it('keeps the account it switches to', async () => {
+      const { agent, server } = await renderUnfocused();
+
+      const result = await agent.act({
+        steps: [{ ref: 'userButton', action: 'switchAccount', input: { sessionId: 'sess_2' } }],
+      });
+
+      expect(result.ok).toBe(true);
+      expect(server.client.last_active_session_id).toBe('sess_2');
+    });
+  });
+
+  it('gives each user button on the page its own ref', async () => {
+    const agent = await renderWithAgent(
+      <div data-testid='host'>
+        <UserButton />
+        <UserButton combined={false} />
+      </div>,
+    );
+
+    expect(actions(agent)).toEqual([
+      ['userButton', ['switchAccount', 'switchOrganization', 'openProfile', 'signOut']],
+      ['userButton-2', ['switchAccount', 'openProfile', 'signOut']],
+    ]);
+    expect(agent.snapshot()[1]?.state).not.toHaveProperty('organizations');
+  });
+
+  it('hands the user button to a browser agent through WebMCP until the provider unmounts', async () => {
+    const webmcp = installWebmcp();
+    serveFapi(signedIn());
+    const { unmount } = await renderWithClerk(tree(), undefined, undefined, { webmcp: true });
+
+    expect(webmcp.call('clerk_snapshot')).toMatchObject([{ ref: 'userButton' }]);
+    expect(await webmcp.call('clerk_act', { steps: [{ ref: 'userButton', action: 'signOut' }] })).toMatchObject({
+      ok: false,
+      error: { step: 0, message: expect.stringContaining('Needs a person') },
+    });
+
+    unmount();
+
+    expect(webmcp.names()).toEqual([]);
+  });
+
+  it('drops the user button from the snapshot once it unmounts', async () => {
+    const agent = createAgent();
+    serveFapi(signedIn());
+    const { rerender } = await renderWithClerk(tree(), undefined, undefined, { agent });
+    expect(actions(agent)).toHaveLength(1);
+
+    rerender(<div />);
+
+    expect(agent.snapshot()).toEqual([]);
+  });
+
+  it('offers only what the account can do now', async () => {
+    const agent = await renderWithAgent(tree(), alone());
+
+    expect(actions(agent)).toEqual([['userButton', ['switchOrganization', 'openProfile', 'signOut']]]);
+  });
+
+  it('leaves signing out to a person', async () => {
+    const agent = await renderWithAgent();
+
+    expect((await agent.act({ steps: [{ ref: 'userButton', action: 'signOut' }] })).error).toEqual({
+      step: 0,
+      message: 'Needs a person: Signs the person out of their account',
+    });
+    expect(trigger()).toBeInTheDocument();
+  });
+
+  it('shows the agent nothing while Clerk loads or when nobody is signed in', async () => {
+    const agent = createAgent();
+    serveFapi(signedIn());
+    const client = holdRequests('get', '/v1/client');
+    const rendering = renderWithClerk(tree(), undefined, undefined, { agent });
+
+    await waitFor(() => expect(client.requests).toHaveLength(1));
+    expect(agent.snapshot()).toEqual([]);
+    client.release();
+    await rendering;
+
+    expect((await renderWithAgent(tree(), signedIn({ client: fapiClient() }))).snapshot()).toEqual([]);
   });
 });
