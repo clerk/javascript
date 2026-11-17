@@ -16,13 +16,21 @@ import type { SwitcherTriggerProps } from './switcher-trigger';
 export default {
   name: 'Switcher',
   description:
-    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state. These parts carry `cl-switcher-*` classes; inside `UserButton` and `OrganizationSwitcher` the same parts carry `cl-user-button-*` and `cl-organization-switcher-*`. `Switcher.Avatar` carries `cl-avatar`.",
+    "The account and organization switcher's parts: the trigger, the popover's header, and its rows. `UserButton`, `OrganizationSwitcher` and `Switcher` from `@clerk/mosaic` compose them with Clerk's session and organization state. They sit inside a `Popover` and a `Card`: `Popover.Trigger` renders `Switcher.Trigger`, and `Popover.Popup` holds a `Card.Root` with `Switcher.Header`, then `Switcher.Group`s of `Switcher.Item`s split by `Switcher.Separator`s. These parts carry `cl-switcher-*` classes; inside `UserButton` and `OrganizationSwitcher` the same parts carry `cl-user-button-*` and `cl-organization-switcher-*`. `Switcher.Avatar` carries `cl-avatar`.",
   useFor: [
     'a custom account or organization switcher composed from its parts',
     'switcher rows or a switcher trigger rendered with your own data',
   ],
   keywords: ['switcher', 'user button', 'organization switcher', 'account switcher', 'menu rows'],
   practices: [
+    {
+      do: true,
+      text: "Render `Switcher.Trigger` through `Popover.Trigger`'s `render` prop, so the popover owns the open state and the button keeps the trigger's look.",
+    },
+    {
+      do: true,
+      text: 'Put `Switcher.Header` and the row groups in a `Card.Root` inside `Popover.Popup`.',
+    },
     {
       do: true,
       text: 'Wrap rows in a `Switcher.Group`, and split groups with a `Switcher.Separator`.',
@@ -33,7 +41,7 @@ export default {
     },
     {
       do: false,
-      text: 'Build a working account menu from these parts. Use `UserButton` or `OrganizationSwitcher`, which read Clerk and open the popover.',
+      text: 'Expect the parts to read Clerk or hold state. They render the props they are given; `UserButton` and `OrganizationSwitcher` connect them to Clerk.',
     },
   ],
   parts: {
@@ -128,25 +136,43 @@ export default {
   },
   examples: [
     {
-      title: 'A header and one organization row',
+      title: 'A trigger and its popover',
       code: `
-<Switcher.Header
-  avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='md' />}
-  title='Acme'
-  description='alice@example.com'
-/>
-<Switcher.Separator />
-<Switcher.Group>
-  <Switcher.Item render={<button type='button' />}>
-    <Switcher.ItemMedia>
-      <Switcher.Avatar name='Globex' shape='square' size='sm' />
-    </Switcher.ItemMedia>
-    <Switcher.ItemContent>
-      <Switcher.ItemLabel>Globex</Switcher.ItemLabel>
-      <Switcher.ItemDescription>Member</Switcher.ItemDescription>
-    </Switcher.ItemContent>
-  </Switcher.Item>
-</Switcher.Group>
+<Popover.Root placement='bottom-start'>
+  <Popover.Trigger
+    aria-label='Open account menu'
+    render={
+      <Switcher.Trigger
+        avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='sm' />}
+        name='Acme'
+        badge='Pro'
+        variant='full'
+      />
+    }
+  />
+  <Popover.Popup aria-label='Account menu'>
+    <Card.Root>
+      <Switcher.Header
+        avatar={<Switcher.BadgedAvatar name='Acme' badge={{ name: 'Alice Smith' }} size='md' />}
+        title='Acme'
+        description='alice@example.com'
+      />
+      <Switcher.Separator />
+      <Switcher.Group>
+        <Switcher.Item render={<button type='button' />}>
+          <Switcher.ItemMedia>
+            <Switcher.Avatar name='Globex' shape='square' size='sm' />
+          </Switcher.ItemMedia>
+          <Switcher.ItemContent>
+            <Switcher.ItemLabel>Globex</Switcher.ItemLabel>
+            <Switcher.ItemDescription>Member</Switcher.ItemDescription>
+          </Switcher.ItemContent>
+          <Switcher.ItemTrailing>…</Switcher.ItemTrailing>
+        </Switcher.Item>
+      </Switcher.Group>
+    </Card.Root>
+  </Popover.Popup>
+</Popover.Root>
 `,
     },
   ],

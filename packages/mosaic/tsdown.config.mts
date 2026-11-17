@@ -30,6 +30,7 @@ export default defineConfig({
     'components/input': './src/components/input/index.ts',
     'components/item': './src/components/item/index.ts',
     'components/panel': './src/components/panel/index.ts',
+    'components/popover': './src/components/popover/index.ts',
     'components/profile': './src/components/profile/index.ts',
     'components/provider-button': './src/components/provider-button/index.ts',
     'components/radio': './src/components/radio/index.ts',

@@ -1,14 +1,17 @@
 import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
 import { axe } from '../../primitives/test-utils/axe';
+import { Card } from '../card';
+import { Popover } from '../popover';
 import { Switcher } from '.';
 import { SwitcherSurfaceProvider } from './switcher.context';
 
-function Popover() {
+function PopupContent() {
   return (
     <>
       <Switcher.Header
@@ -54,7 +57,7 @@ describe('Switcher', () => {
   it('renders the popover parts with their switcher slots', async () => {
     const { container } = render(
       <MosaicProvider>
-        <Popover />
+        <PopupContent />
       </MosaicProvider>,
     );
 
@@ -72,7 +75,7 @@ describe('Switcher', () => {
     const { container } = render(
       <MosaicProvider>
         <SwitcherSurfaceProvider value={surface}>
-          <Popover />
+          <PopupContent />
         </SwitcherSurfaceProvider>
       </MosaicProvider>,
     );
@@ -209,5 +212,48 @@ describe('Switcher', () => {
     const trigger = screen.getByRole('button', { name: 'Open account menu' });
     expect(trigger.querySelector('.cl-switcher-trigger-label')).not.toBeNull();
     expect(trigger.querySelector('.cl-badge')).not.toBeNull();
+  });
+
+  it('composes as the switcher does: a popover trigger rendering Switcher.Trigger, and a card in the popup', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <Popover.Root placement='bottom-start'>
+          <Popover.Trigger
+            aria-label='Open account menu'
+            render={
+              <Switcher.Trigger
+                avatar={
+                  <Switcher.BadgedAvatar
+                    name='Acme'
+                    badge={{ name: 'Alice Smith' }}
+                    size='sm'
+                  />
+                }
+                name='Acme'
+                variant='full'
+              />
+            }
+          />
+          <Popover.Popup aria-label='Account menu'>
+            <Card.Root>
+              <PopupContent />
+            </Card.Root>
+          </Popover.Popup>
+        </Popover.Root>
+      </MosaicProvider>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Open account menu' });
+    expect(trigger).toHaveClass('cl-popover-trigger', 'cl-switcher-trigger');
+    expect(trigger).toHaveAttribute('data-variant', 'full');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(await screen.findByRole('dialog', { name: 'Account menu' })).toContainElement(
+      screen.getByRole('button', { name: 'Globex Member Pro' }),
+    );
   });
 });
