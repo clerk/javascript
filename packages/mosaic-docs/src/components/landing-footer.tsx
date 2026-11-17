@@ -13,14 +13,17 @@ export function LandingFooter() {
           className='grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-7'
         >
           {navigation.map(group => (
-            <div key={group.title}>
+            <div
+              key={group.title}
+              className='min-w-0'
+            >
               <p className='text-foreground text-sm font-medium'>{group.title}</p>
               <ul className='mt-4 space-y-3'>
                 {group.items.map(item => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+                      className='text-muted-foreground hover:text-foreground wrap-anywhere text-sm transition-colors'
                     >
                       {item.title}
                     </Link>
