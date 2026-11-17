@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * A page of content. `Panel.Sections` sit one heading level below `Panel.Title`.
  *

@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * A surface you navigate: a column of destinations beside the page each one opens.
  *

@@ -66,6 +66,7 @@ export default defineConfig({
     tsgo: { path: getTypeScriptExecutablePath() },
   },
   clean: true,
+  unbundle: true,
   target: 'es2022',
   platform: 'browser',
   minify: false,

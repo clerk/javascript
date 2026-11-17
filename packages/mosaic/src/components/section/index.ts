@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * A compound component for a topic of settings. `Section.Root` stacks groups; each `Section.Group`
  * is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding

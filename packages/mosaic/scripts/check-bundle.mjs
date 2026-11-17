@@ -1,17 +1,70 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 
 const distDir = resolve(import.meta.dirname, '../dist');
 const jsFiles = (await readdir(distDir, { recursive: true })).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
-const componentEntries = (await readdir(resolve(distDir, 'components')))
-  .filter(file => file.endsWith('.js'))
-  .map(file => `components/${file}`);
+const packageJson = JSON.parse(await readFile(resolve(import.meta.dirname, '../package.json'), 'utf8'));
+const entryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => subpath === '.' || /^\.\/(components|primitives)\//.test(subpath))
+  .map(([, target]) => target)
+  .map(target => (typeof target === 'string' ? target : target.import))
+  .filter(file => file?.endsWith('.js'))
+  .map(file => resolve(import.meta.dirname, '..', file));
 
-for (const entryFile of ['index.js', ...componentEntries]) {
-  const entry = await readFile(resolve(distDir, entryFile), 'utf8');
-  if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
-    throw new Error(`Published Mosaic JS entry ${entryFile} is missing a top-level 'use client' boundary.`);
+const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
+const importsOf = source =>
+  [...source.matchAll(/^import\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["'];?$/gm)].map(m => m[1]);
+const importsReact = source =>
+  importsOf(source).some(specifier => specifier === 'react' || specifier.startsWith('react/'));
+const code = source =>
+  source
+    .replace(/\/\/.*$/gm, '')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+
+const checkNamespaceEntry = async (entryFile, source) => {
+  const display = relative(distDir, entryFile);
+  const lines = code(source);
+  const namedImport = /^import \{ (\w+) \} from "(\.[^"]+)";$/;
+  const namedExport = /^export \{ (\w+(?: as \w+)?(?:, \w+(?: as \w+)?)*) \};$/;
+  if (!lines.every(line => namedImport.test(line) || namedExport.test(line))) {
+    throw new Error(
+      `Published Mosaic JS entry ${display} must start with 'use client' or contain only re-exports of namespaces, 'use client' modules and React-free modules.`,
+    );
+  }
+  for (const line of lines.filter(line => namedImport.test(line))) {
+    const [, binding, specifier] = line.match(namedImport);
+    const partsFile = resolve(dirname(entryFile), specifier);
+    const parts = await readFile(partsFile, 'utf8');
+    if (isClientModule(parts)) {
+      continue;
+    }
+    if (!new RegExp(`^var ${binding} = /\\* @__PURE__ \\*/ __exportAll\\(`, 'm').test(parts)) {
+      if (importsReact(parts)) {
+        throw new Error(
+          `${display} imports ${binding} from ${relative(distDir, partsFile)}, which imports React but is neither a namespace object nor a 'use client' module.`,
+        );
+      }
+      continue;
+    }
+    for (const leafSpecifier of importsOf(parts).filter(specifier => specifier.startsWith('.'))) {
+      const leafFile = resolve(dirname(partsFile), leafSpecifier);
+      const leaf = await readFile(leafFile, 'utf8');
+      if (importsReact(leaf) && !isClientModule(leaf)) {
+        throw new Error(
+          `${relative(distDir, leafFile)}, re-exported by the namespace ${relative(distDir, partsFile)}, imports React but is missing a top-level 'use client' boundary.`,
+        );
+      }
+    }
+  }
+};
+
+for (const entryFile of entryFiles) {
+  const source = await readFile(entryFile, 'utf8');
+  if (!isClientModule(source)) {
+    await checkNamespaceEntry(entryFile, source);
   }
 }
 
