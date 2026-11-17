@@ -5,7 +5,7 @@ import { site } from '@/lib/site';
 export default function HomePage() {
   return (
     <>
-      <div className='flex min-h-[calc(100dvh-4rem)] flex-col'>
+      <div className='flex min-h-[calc(100dvh-6.25rem)] flex-col'>
         <main
           id='content'
           className='flex-1'

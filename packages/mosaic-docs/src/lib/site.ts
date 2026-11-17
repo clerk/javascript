@@ -6,5 +6,6 @@ export const site = {
     'Install with `pnpm add @clerk/mosaic`. Each page below documents one component, primitive or hook: what to use it for, its practices, its API and examples.',
   githubUrl: 'https://github.com/clerk/javascript/tree/main/packages/mosaic',
   copyright: `© ${new Date().getFullYear()} Clerk. MIT licensed.`,
+  clerkDocsUrl: 'https://clerk.com/docs',
   changelogUrl: 'https://github.com/clerk/javascript/blob/main/packages/mosaic/CHANGELOG.md',
 };

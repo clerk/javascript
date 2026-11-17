@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import type { ReactNode } from 'react';
 
+import { SiteBanner } from '@/components/site-banner';
 import { SiteHeader } from '@/components/site-header';
 import { navigation } from '@/lib/navigation';
 import { site } from '@/lib/site';
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Skip to content
         </a>
+        <SiteBanner />
         <SiteHeader navigation={navigation} />
         {children}
       </body>
