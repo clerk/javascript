@@ -1,3 +1,5 @@
+'use client';
+
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -360,16 +362,16 @@ const ExpandButton = React.forwardRef<HTMLButtonElement, TableExpandButtonProps>
   );
 });
 
-export const Table = {
-  Root,
-  Toolbar,
-  Search,
-  Header,
-  Column,
-  Body,
-  Row,
-  Cell,
-  SelectionColumn,
-  SelectionCell,
-  ExpandButton,
+export {
+  Root as TableRoot,
+  Toolbar as TableToolbar,
+  Search as TableSearch,
+  Header as TableHeader,
+  Column as TableColumn,
+  Body as TableBody,
+  Row as TableRow,
+  Cell as TableCell,
+  SelectionColumn as TableSelectionColumn,
+  SelectionCell as TableSelectionCell,
+  ExpandButton as TableExpandButton,
 };

@@ -162,6 +162,11 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       code: "import type { ClerkAPIError } from '@clerk/shared/types';",
     },
     {
+      name: "a primitive's doc may import the doc schema: import type { ComponentDoc } from '../../docs-schema';",
+      filename: 'src/primitives/accordion/accordion.doc.ts',
+      code: "import type { ComponentDoc } from '../../docs-schema';",
+    },
+    {
       name: "src/primitives/sample.ts may import down or across: import { Form } from './form';",
       filename: 'src/primitives/sample.ts',
       code: "import { Form } from './form';",
@@ -374,6 +379,12 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       filename: 'src/features/reverification/sample.controller.ts',
       code: "import { ReverificationView } from './reverification.view';",
       errors: [/props/],
+    },
+    {
+      name: "src/primitives/sample.ts cannot import the doc schema: import type { ComponentDoc } from '../docs-schema';",
+      filename: 'src/primitives/sample.ts',
+      code: "import type { ComponentDoc } from '../docs-schema';",
+      errors: [/down/],
     },
     {
       name: "src/primitives/sample.ts cannot import up: import { Button } from '../components/button';",

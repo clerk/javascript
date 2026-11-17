@@ -2,13 +2,17 @@ import { createContext, useContext } from 'react';
 
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
+import type { ProfileModalOptions } from '../profile/profile.modal.types';
 import type { UserProfileProps } from '../user-profile/user-profile';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 
 export interface MosaicProfile {
   /**
-   * Whether one profile carries the account's pages and the active organization's. `false` keeps them
-   * in separate profiles. It decides the profile's shape, not what `UserButton`'s menu lists.
+   * Whether a menu that carries both the account and the organization opens one profile with both
+   * groups of pages. `false` opens them as separate profiles. A menu that carries only one of them
+   * always opens that one's profile. It is also the mode of a `<Profile />` without a `mode`:
+   * `false` shows the account's pages alone.
    *
    * @default true
    */
@@ -67,10 +71,14 @@ export function useMosaicProfile(): MosaicProfile {
 }
 
 /** What the user profile modal opens with, whichever path opens it. */
-export function userProfileModalOptions({
-  combined = true,
+export function userProfileModalOptions({ userProfileProps }: MosaicProfile): UserProfileModalOptions {
+  return { ...userProfileProps };
+}
+
+/** What the combined profile modal opens with, whichever path opens it. */
+export function profileModalOptions({
   userProfileProps,
   organizationProfileProps,
-}: MosaicProfile) {
-  return { ...userProfileProps, combined, organizationProfileProps };
+}: MosaicProfile): ProfileModalOptions {
+  return { ...userProfileProps, organizationProfileProps };
 }
