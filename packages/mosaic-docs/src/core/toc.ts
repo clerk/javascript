@@ -23,3 +23,9 @@ function visibleRatio(box: HeadingBox, view: { top: number; bottom: number }): n
   const shown = Math.min(box.bottom, view.bottom) - Math.max(box.top, view.top);
   return Math.max(shown, 0) / height;
 }
+
+export interface TocHeading {
+  depth: 2 | 3;
+  slug: string;
+  text: string;
+}

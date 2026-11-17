@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import type { TocHeading } from '@/lib/navigation';
-import { activeSlugs, type HeadingBox } from '@/lib/toc';
+import { activeSlugs, type HeadingBox, type TocHeading } from '@/core/toc';
 
 const HEADER_HEIGHT = 64;
 
@@ -42,8 +41,12 @@ export function TableOfContents({ headings }: { headings: TocHeading[] }) {
     };
   }, [headings]);
 
+  if (headings.length === 0) {
+    return null;
+  }
+
   return (
-    <>
+    <div>
       <p className='text-foreground mb-3 text-sm font-semibold'>On this page</p>
       <div className='relative'>
         <div
@@ -78,7 +81,7 @@ export function TableOfContents({ headings }: { headings: TocHeading[] }) {
           ))}
         </ul>
       </div>
-    </>
+    </div>
   );
 }
 

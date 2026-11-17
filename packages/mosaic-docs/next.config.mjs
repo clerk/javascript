@@ -15,7 +15,7 @@ const nextConfig = {
 
 const withMDX = createMDX({
   options: {
-    remarkPlugins: [fileURLToPath(new URL('./src/mdx/remark-headings.ts', import.meta.url))],
+    remarkPlugins: [fileURLToPath(new URL('./src/core/remark-headings.ts', import.meta.url))],
   },
 });
 

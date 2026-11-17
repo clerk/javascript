@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import type { NavGroup } from '@/lib/navigation';
+export interface NavItem {
+  title: string;
+  href: string;
+}
+
+export interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
 
 export function DocsNav({ groups }: { groups: NavGroup[] }) {
   const pathname = usePathname();

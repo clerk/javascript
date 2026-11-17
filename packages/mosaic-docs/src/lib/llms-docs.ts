@@ -1,6 +1,6 @@
-import { docToMarkdown } from '@/lib/doc-markdown';
-import { type DocEntry, docHref, docKinds, docsOfKind, findDocByName } from '@/lib/docs';
-import { llmsFull, llmsIndex } from '@/lib/llms';
+import { docToMarkdown } from '@/core/doc-markdown';
+import { llmsFull, llmsIndex } from '@/core/llms';
+import { type DocEntry, docHref, docKinds, docsOfKind, relatedHref } from '@/lib/docs';
 import { site } from '@/lib/site';
 
 export function docsIndexMarkdown(): string {
@@ -27,8 +27,5 @@ export function docsFullMarkdown(): string {
 }
 
 export function docMarkdown(entry: DocEntry): string {
-  return docToMarkdown(entry.doc, name => {
-    const related = findDocByName(name);
-    return related ? docHref(related) : undefined;
-  });
+  return docToMarkdown(entry.doc, relatedHref);
 }

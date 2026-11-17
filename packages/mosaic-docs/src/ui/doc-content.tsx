@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import { CodeBlock } from '@/components/code-block';
-import { type DocEntry, docHref, findDocByName } from '@/lib/docs';
-import type { TocHeading } from '@/lib/navigation';
+import type { Doc, PropDocs } from '@/core/doc';
+import type { TocHeading } from '@/core/toc';
 
-type Doc = DocEntry['doc'];
-type PropDocs = Partial<Record<string, { type: string; doc: string; default?: string }>>;
+import { CodeBlock } from './code-block';
 
 export function docHeadings(doc: Doc): TocHeading[] {
   const headings: TocHeading[] = [{ depth: 2, slug: 'use-for', text: 'Use for' }];
@@ -33,7 +31,15 @@ export function docHeadings(doc: Doc): TocHeading[] {
   return headings;
 }
 
-export function DocContent({ doc, preview }: { doc: Doc; preview?: ReactNode }) {
+export function DocContent({
+  doc,
+  preview,
+  hrefFor,
+}: {
+  doc: Doc;
+  preview?: ReactNode;
+  hrefFor: (name: string) => string | undefined;
+}) {
   return (
     <>
       <h1>{doc.name}</h1>
@@ -116,7 +122,10 @@ export function DocContent({ doc, preview }: { doc: Doc; preview?: ReactNode }) 
           <ul>
             {doc.related.map(name => (
               <li key={name}>
-                <RelatedLink name={name} />
+                <RelatedLink
+                  name={name}
+                  href={hrefFor(name)}
+                />
               </li>
             ))}
           </ul>
@@ -163,9 +172,8 @@ function PropTable({ props }: { props: PropDocs }) {
   );
 }
 
-function RelatedLink({ name }: { name: string }) {
-  const entry = findDocByName(name);
-  return entry ? <Link href={docHref(entry)}>{name}</Link> : <code>{name}</code>;
+function RelatedLink({ name, href }: { name: string; href: string | undefined }) {
+  return href ? <Link href={href}>{name}</Link> : <code>{name}</code>;
 }
 
 function InlineCode({ text }: { text: string }) {

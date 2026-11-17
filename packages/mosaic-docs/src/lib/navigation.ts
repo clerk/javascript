@@ -1,20 +1,5 @@
 import { docHref, docKinds, docsOfKind } from '@/lib/docs';
-
-export interface NavItem {
-  title: string;
-  href: string;
-}
-
-export interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
-
-export interface TocHeading {
-  depth: 2 | 3;
-  slug: string;
-  text: string;
-}
+import type { NavGroup } from '@/ui/docs-nav';
 
 export const navigation: NavGroup[] = [
   {

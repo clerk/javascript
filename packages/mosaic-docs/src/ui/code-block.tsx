@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { highlight } from '@/lib/highlight';
+import { highlight } from '@/core/highlight';
 
 import { CopyButton } from './copy-button';
 

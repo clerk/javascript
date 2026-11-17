@@ -1,10 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { highlight } from '@/core/highlight';
 import { examples } from '@/examples';
-import { highlight } from '@/lib/highlight';
-
-import { PreviewTabs } from './preview-tabs';
+import { PreviewTabs } from '@/ui/preview-tabs';
 
 export async function Preview({ path }: { path: string }) {
   const Example = examples[path];

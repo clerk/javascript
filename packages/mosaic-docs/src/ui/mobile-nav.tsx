@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
-import { DocsNav } from '@/components/docs-nav';
-import type { NavGroup, NavItem } from '@/lib/navigation';
+import { DocsNav, type NavGroup, type NavItem } from './docs-nav';
 
 export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[] }) {
   const dialog = useRef<HTMLDialogElement>(null);

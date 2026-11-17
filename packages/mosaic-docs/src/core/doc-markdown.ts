@@ -1,7 +1,4 @@
-import type { DocEntry } from '@/generated/docs';
-
-type Doc = DocEntry['doc'];
-type PropDocs = Partial<Record<string, { type: string; doc: string; default?: string }>>;
+import type { Doc, PropDocs } from './doc.ts';
 
 export function docToMarkdown(doc: Doc, hrefFor: (name: string) => string | undefined): string {
   const blocks = [`# ${doc.name}`, doc.description, '## Use for', list(doc.useFor)];

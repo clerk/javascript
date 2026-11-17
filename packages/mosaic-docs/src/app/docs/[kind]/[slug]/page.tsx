@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { DocContent, docHeadings } from '@/components/doc-content';
-import { DocsPage } from '@/components/docs-page';
 import { Preview } from '@/components/preview';
-import { docEntries, docHref, findDoc } from '@/lib/docs';
+import { docEntries, docHref, findDoc, relatedHref } from '@/lib/docs';
+import { CopyPageButton } from '@/ui/copy-page-button';
+import { DocContent, docHeadings } from '@/ui/doc-content';
+import { DocsArticle, DocsAside } from '@/ui/docs-page';
+import { TableOfContents } from '@/ui/table-of-contents';
 
 export const dynamicParams = false;
 
@@ -32,14 +34,18 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
   }
 
   return (
-    <DocsPage
-      headings={docHeadings(entry.doc)}
-      markdownHref={`${docHref(entry)}.md`}
-    >
-      <DocContent
-        doc={entry.doc}
-        preview={<Preview path={`${kind}/${slug}`} />}
-      />
-    </DocsPage>
+    <>
+      <DocsArticle>
+        <DocContent
+          doc={entry.doc}
+          preview={<Preview path={`${kind}/${slug}`} />}
+          hrefFor={relatedHref}
+        />
+      </DocsArticle>
+      <DocsAside>
+        <TableOfContents headings={docHeadings(entry.doc)} />
+        <CopyPageButton href={`${docHref(entry)}.md`} />
+      </DocsAside>
+    </>
   );
 }

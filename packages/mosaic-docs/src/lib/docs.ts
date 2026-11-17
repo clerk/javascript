@@ -20,6 +20,11 @@ export function findDocByName(name: string): DocEntry | undefined {
   return docEntries.find(entry => entry.doc.name === name);
 }
 
+export function relatedHref(name: string): string | undefined {
+  const related = findDocByName(name);
+  return related ? docHref(related) : undefined;
+}
+
 export function docsOfKind(kind: DocEntry['kind']): DocEntry[] {
   return docEntries.filter(entry => entry.kind === kind).sort((a, b) => a.doc.name.localeCompare(b.doc.name));
 }

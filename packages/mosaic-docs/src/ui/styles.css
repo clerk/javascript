@@ -1,0 +1,302 @@
+:root {
+  color-scheme: light dark;
+  --docs-background: light-dark(oklch(1 0 0), #1b1b1f);
+  --docs-foreground: light-dark(oklch(0.145 0 0), #f6f6f7);
+  --docs-muted: light-dark(oklch(0.965 0 0), #232328);
+  --docs-muted-foreground: light-dark(oklch(0.53 0 0), #adadb7);
+  --docs-border: light-dark(oklch(0.88 0.006 260 / 0.72), #33333e);
+  --docs-accent: light-dark(oklch(0.145 0 0), #f6f6f7);
+  --docs-accent-foreground: light-dark(oklch(1 0 0), #1b1b1f);
+  --docs-code-background: var(--docs-background);
+  --shiki-background: var(--docs-code-background);
+  --shiki-foreground: light-dark(#2b2b34, #ffffff);
+  --shiki-token-keyword: light-dark(#6c47ff, #bab0ff);
+  --shiki-token-constant: light-dark(#6c47ff, #bab0ff);
+  --shiki-token-string: light-dark(#1c5bb6, #def7fd);
+  --shiki-token-string-expression: var(--shiki-token-string);
+  --shiki-token-link: var(--shiki-token-string);
+  --shiki-token-comment: #90909d;
+  --shiki-token-function: light-dark(#15892b, #aff9bf);
+  --shiki-token-parameter: var(--shiki-foreground);
+  --shiki-token-punctuation: light-dark(#5f5f6f, #ffffff);
+  --docs-radius: 0.75rem;
+  --docs-content-width: 42rem;
+  --docs-font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --docs-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+}
+
+@theme inline {
+  --color-background: var(--docs-background);
+  --color-foreground: var(--docs-foreground);
+  --color-muted: var(--docs-muted);
+  --color-muted-foreground: var(--docs-muted-foreground);
+  --color-border: var(--docs-border);
+  --color-accent: var(--docs-accent);
+  --color-accent-foreground: var(--docs-accent-foreground);
+  --color-code: var(--docs-code-background);
+  --radius-docs: var(--docs-radius);
+  --container-content: var(--docs-content-width);
+  --font-sans: var(--docs-font-body);
+  --font-mono: var(--docs-font-mono);
+}
+
+@layer base {
+  :root {
+    font-feature-settings:
+      'liga' 1,
+      'calt' 1;
+  }
+  * {
+    min-width: 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--docs-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  html {
+    scroll-padding-top: 5rem;
+  }
+}
+
+@utility nav-link {
+  @apply text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground relative block rounded-[0.65rem] px-2.5 py-1.5 text-sm transition-colors after:absolute after:inset-x-0 after:top-full after:h-px aria-[current=page]:font-medium;
+}
+
+@utility nav-heading {
+  @apply text-foreground mb-1 flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium;
+}
+
+.drawer {
+  transition:
+    translate 0.2s ease,
+    display 0.2s allow-discrete,
+    overlay 0.2s allow-discrete;
+  translate: -100% 0;
+}
+
+.drawer[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .drawer[open] {
+    translate: -100% 0;
+  }
+}
+
+.drawer::backdrop {
+  background: oklch(0 0 0 / 0.4);
+}
+
+.prose {
+  --tw-prose-body: var(--docs-foreground);
+  --tw-prose-headings: var(--docs-foreground);
+  --tw-prose-lead: var(--docs-muted-foreground);
+  --tw-prose-links: var(--docs-foreground);
+  --tw-prose-bold: var(--docs-foreground);
+  --tw-prose-counters: var(--docs-muted-foreground);
+  --tw-prose-bullets: var(--docs-muted-foreground);
+  --tw-prose-hr: var(--docs-border);
+  --tw-prose-quotes: var(--docs-muted-foreground);
+  --tw-prose-quote-borders: var(--docs-border);
+  --tw-prose-captions: var(--docs-muted-foreground);
+  --tw-prose-code: var(--docs-foreground);
+  --tw-prose-pre-code: var(--docs-foreground);
+  --tw-prose-pre-bg: var(--docs-code-background);
+  --tw-prose-th-borders: var(--docs-border);
+  --tw-prose-td-borders: var(--docs-border);
+  --tw-prose-kbd: inherit;
+  --tw-prose-kbd-shadows: transparent;
+  color: var(--docs-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+@scope (.prose) to (.not-prose) {
+  :scope :where(h1, h2, h3, h4) {
+    font-weight: 500;
+  }
+
+  :scope :where(h1) {
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+  }
+
+  :scope :where(h2) {
+    font-size: 1.875rem;
+    line-height: 1.2;
+    margin-top: 3rem;
+  }
+
+  :scope :where(h3) {
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+
+  :scope :where(h4) {
+    color: var(--docs-muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  :scope :where(p, ul, ol) {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  :scope :where(strong) {
+    font-weight: 600;
+  }
+
+  :scope :where(a) {
+    color: var(--docs-foreground);
+    font-weight: 500;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  :scope :where(hr) {
+    margin: 2.5rem 0;
+  }
+
+  :scope :where(pre) {
+    background: transparent;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    color: var(--docs-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    padding: 1rem 0;
+    position: relative;
+  }
+
+  :scope :where(pre code) {
+    background: transparent;
+    border-radius: 0;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 400;
+    padding: 0;
+  }
+
+  :scope :where(pre > code) {
+    display: block;
+    max-height: 24rem;
+    overflow: auto;
+    padding: 0 1.25rem 0.375rem;
+    scrollbar-color: var(--docs-border) transparent;
+    scrollbar-width: thin;
+  }
+
+  :scope :where(pre:has(> code)) {
+    padding-bottom: calc(1rem - 0.375rem);
+  }
+
+  :scope :where(.code-block) {
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+
+  :scope :where(.code-block pre) {
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  :scope :where(.code-block pre > code) {
+    counter-reset: line;
+  }
+
+  :scope :where(.code-block .line)::before {
+    color: var(--docs-muted-foreground);
+    content: counter(line);
+    counter-increment: line;
+    display: inline-block;
+    margin-right: 1.25rem;
+    text-align: right;
+    user-select: none;
+    width: 1.25rem;
+  }
+
+  :scope :where(table) {
+    font-size: 0.8125rem;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+    border: 1px solid var(--docs-border);
+    border-radius: var(--docs-radius);
+  }
+
+  .table-scroll > table {
+    margin: 0;
+  }
+
+  .table-scroll :is(th, td) {
+    padding: 0.75rem;
+  }
+
+  .table-scroll th {
+    white-space: nowrap;
+  }
+
+  :scope :where(td, th) > code,
+  :scope :where(td, th) :not(pre) > code {
+    white-space: normal;
+  }
+
+  @media (max-width: 640px) {
+    :scope :where(h1) {
+      font-size: 2.25rem;
+    }
+
+    :scope :where(h2) {
+      font-size: 1.625rem;
+    }
+  }
+
+  :scope :not(pre) > code {
+    background: var(--docs-code-background);
+    padding: 0.15em 0.35em;
+    border-radius: 0.3rem;
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+
+  :scope :not(pre) > code::before,
+  :scope :not(pre) > code::after {
+    content: none;
+  }
+
+  :scope kbd {
+    background: var(--docs-muted);
+    border: 1px solid var(--docs-border);
+    border-radius: 0.25rem;
+    box-shadow: none;
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    font-weight: 500;
+    padding: 0.125rem 0.25rem;
+  }
+}

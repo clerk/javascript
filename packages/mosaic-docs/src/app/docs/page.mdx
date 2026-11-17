@@ -1,5 +1,7 @@
-import { DocsPage } from '@/components/docs-page';
 import { site } from '@/lib/site';
+import { CopyPageButton } from '@/ui/copy-page-button';
+import { DocsArticle, DocsAside } from '@/ui/docs-page';
+import { TableOfContents } from '@/ui/table-of-contents';
 
 export const metadata = {
   title: 'Introduction',
@@ -8,12 +10,13 @@ export const metadata = {
 
 export default function Layout({ children }) {
   return (
-    <DocsPage
-      headings={headings}
-      markdownHref='/docs.md'
-    >
-      {children}
-    </DocsPage>
+    <>
+      <DocsArticle>{children}</DocsArticle>
+      <DocsAside>
+        <TableOfContents headings={headings} />
+        <CopyPageButton href='/docs.md' />
+      </DocsAside>
+    </>
   );
 }
 

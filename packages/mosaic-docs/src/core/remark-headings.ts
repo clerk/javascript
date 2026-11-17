@@ -4,7 +4,7 @@ import type { Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { visit } from 'unist-util-visit';
 
-import type { TocHeading } from '../lib/navigation.ts';
+import type { TocHeading } from './toc.ts';
 
 export default function remarkHeadings() {
   return (tree: Root): void => {

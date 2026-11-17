@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-import { DocsNav } from '@/components/docs-nav';
 import { SiteFooter } from '@/components/site-footer';
 import { navigation } from '@/lib/navigation';
+import { DocsNav } from '@/ui/docs-nav';
 
 export default function DocsLayout({ children }: { children: ReactNode }) {
   return (

@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import { CopyButton } from '@/components/copy-button';
 import { LandingFooter } from '@/components/landing-footer';
 import { site } from '@/lib/site';
+import { CopyButton } from '@/ui/copy-button';
 
 const installCommand = 'pnpm add @clerk/mosaic';
 

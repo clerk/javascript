@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { GitHubLink } from '@/components/github-link';
-import { MobileNav } from '@/components/mobile-nav';
-import type { NavGroup } from '@/lib/navigation';
 import { site } from '@/lib/site';
+import type { NavGroup } from '@/ui/docs-nav';
+import { MobileNav } from '@/ui/mobile-nav';
 
 const tabs = [
   { title: 'Docs', href: '/docs' },
