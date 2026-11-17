@@ -55,7 +55,7 @@
 }
 
 @utility nav-link {
-  @apply text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground block rounded-[0.65rem] px-2.5 py-[calc(0.375rem+0.5px)] text-sm transition-colors aria-[current=page]:font-medium;
+  @apply text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground block rounded-[0.65rem] border-b border-transparent bg-clip-padding px-2.5 py-1.5 text-sm transition-colors aria-[current=page]:font-medium;
 }
 
 @utility nav-heading {
