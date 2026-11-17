@@ -2,7 +2,7 @@
 
 Read this when you write or change a `*.agent.ts` file, change `src/agent/`, or let an agent read or drive a feature. It covers what a feature shows an agent, which actions need a person, and how the surface is wired and tested.
 
-Worked example: `src/features/user-button/user-button.agent.ts`, wired in `src/features/switcher/switcher.tsx` and tested in `src/features/user-button/__tests__/user-button.feature.test.tsx` (`UserButton with an agent`).
+Worked examples: `src/features/user-button/user-button.agent.ts`, wired in `src/features/switcher/switcher.tsx` and tested in `src/features/user-button/__tests__/user-button.feature.test.tsx` (`UserButton with an agent`); and `src/features/user-profile/user-profile.agent.ts`, which the user button's `openProfile` returns in `appeared` along with `src/features/user-profile/user-profile-profile-section/user-profile-profile-section.agent.ts`, whose `updateName` follows the instance's name attributes.
 
 ## Rules
 

@@ -24,6 +24,7 @@ import {
 import { animatedPngFile, imageFile, saveCrop } from '../../../../__tests__/feature/image';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { createAgent } from '../../../../agent/create-agent';
 import { UserProfileProfileSection } from '../user-profile-profile-section';
 
 function signedIn(environment = fapiEnvironment()): FakeFapiSeed {
@@ -656,5 +657,111 @@ describe('username reverification', () => {
 
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.client.sessions.map(session => session.user.username)).toEqual(['alicesmith', 'bob']);
+  });
+});
+
+describe('the user profile profile section with an agent', () => {
+  async function renderWithAgent(seed: FakeFapiSeed = signedIn()) {
+    const agent = createAgent();
+    const fapi = serveFapi(seed);
+    await renderWithClerk(<UserProfileProfileSection />, undefined, undefined, { agent });
+    return { agent, fapi };
+  }
+
+  it('renames the user on the screen, and keeps the half the agent leaves out', async () => {
+    const { agent } = await renderWithAgent();
+
+    expect(agent.snapshot()).toMatchObject([
+      {
+        ref: 'profileSection',
+        state: { firstName: 'Alice', lastName: 'Smith' },
+        actions: [{ name: 'updateName', input: { required: [] } }],
+      },
+    ]);
+
+    const result = await agent.act({
+      steps: [{ ref: 'profileSection', action: 'updateName', input: { firstName: 'Alicia' } }],
+    });
+
+    expect(result).toMatchObject({ ok: true, state: { profileSection: { firstName: 'Alicia', lastName: 'Smith' } } });
+    expect(within(screen.getByRole('group', { name: 'Profile' })).getByText('Alicia Smith')).toBeInTheDocument();
+  });
+
+  it('tells the agent why the server refused a name', async () => {
+    const { agent } = await renderWithAgent();
+    failsWith(
+      '/v1/me',
+      {
+        code: 'form_param_format_invalid',
+        message: 'Invalid',
+        long_message: 'Last name contains invalid characters.',
+        meta: { param_name: 'last_name' },
+      },
+      422,
+    );
+
+    const result = await agent.act({
+      steps: [{ ref: 'profileSection', action: 'updateName', input: { lastName: '!' } }],
+    });
+
+    expect(result.error).toEqual({ step: 0, message: 'Last name contains invalid characters' });
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+  });
+
+  it('offers only the half of the name the instance collects', async () => {
+    const { agent } = await renderWithAgent(
+      signedIn(fapiEnvironment({ attributes: { last_name: { enabled: false } } })),
+    );
+
+    const [section] = agent.snapshot();
+    expect(section?.state).toEqual({ firstName: 'Alice' });
+    expect(Object.keys(section?.actions[0]?.input.properties ?? {})).toEqual(['firstName']);
+  });
+
+  it('asks for a required half of the name, and refuses it empty', async () => {
+    const { agent } = await renderWithAgent(
+      signedIn(fapiEnvironment({ attributes: { first_name: { required: true } } })),
+    );
+
+    expect(agent.snapshot()[0]?.actions[0]?.input.required).toEqual(['firstName']);
+
+    const missing = await agent.act({
+      steps: [{ ref: 'profileSection', action: 'updateName', input: { lastName: 'Jones' } }],
+    });
+    const empty = await agent.act({
+      steps: [{ ref: 'profileSection', action: 'updateName', input: { firstName: '' } }],
+    });
+
+    expect(missing.error).toEqual({ step: 0, message: 'firstName is required' });
+    expect(empty.error).toEqual({ step: 0, message: 'firstName is required' });
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+  });
+
+  it('offers no rename when an enterprise connection manages the name', async () => {
+    const user = fapiUser({
+      id: 'user_1',
+      first_name: 'Alice',
+      last_name: 'Smith',
+      email_addresses: [fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@acme.co' })],
+      enterprise_accounts: [
+        fapiEnterpriseAccount({ id: 'eac_1', email_address: 'alice@acme.co' }, { name: 'Acme Corp' }),
+      ],
+    });
+    const { agent } = await renderWithAgent({
+      environment: fapiEnvironment({
+        user_settings: {
+          enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false },
+        },
+      }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user })]),
+    });
+
+    expect(agent.snapshot()).toMatchObject([
+      {
+        ref: 'profileSection',
+        state: { firstName: 'Alice', lastName: 'Smith', nameManagedBy: 'Acme Corp' },
+        actions: [],
+      },
+    ]);
   });
 });

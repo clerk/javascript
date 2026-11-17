@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { useAgentSurface } from '../../agent/use-agent-surface';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePanels } from '../organization-profile/organization-profile';
@@ -10,6 +11,7 @@ import { OrganizationProfileProvider } from '../organization-profile/organizatio
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
+import { userProfileAgent } from './user-profile.agent';
 import { ORGANIZATION_PAGE_PREFIX, userProfilePageIds } from './user-profile.layout';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
@@ -200,10 +202,14 @@ type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange'
 };
 
 function AccountUserProfileView({ path, ...viewProps }: AccountViewProps) {
-  const { activePage, onPageChange } = useProfilePagesController(userProfilePageIds(viewProps), {
+  const pageIds = userProfilePageIds(viewProps);
+  const { activePage, onPageChange } = useProfilePagesController(pageIds, {
     routing: 'virtual',
     path,
   });
+  useAgentSurface(
+    activePage === undefined ? undefined : userProfileAgent({ pages: pageIds, activePage, onPageChange }),
+  );
 
   if (activePage === undefined) {
     return null;
@@ -238,6 +244,11 @@ function CombinedUserProfileView({
         ? pageIds?.find(id => id.startsWith(ORGANIZATION_PAGE_PREFIX))
         : undefined,
   });
+  useAgentSurface(
+    activePage === undefined || pageIds === undefined
+      ? undefined
+      : userProfileAgent({ pages: pageIds, activePage, onPageChange }),
+  );
 
   if (activePage === undefined) {
     return fallback ?? null;

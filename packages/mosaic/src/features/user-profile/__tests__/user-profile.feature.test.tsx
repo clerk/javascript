@@ -15,6 +15,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { createAgent } from '../../../agent/create-agent';
 import { useModal } from '../../../modals/use-modal';
 import { useVirtualEntries } from '../../../routing/virtual-store';
 import { UserProfile } from '../user-profile';
@@ -477,5 +478,42 @@ describe('UserProfile with an active organization', () => {
       'aria-selected',
       'true',
     );
+  });
+});
+
+describe('UserProfile with an agent', () => {
+  async function renderWithAgent() {
+    const agent = createAgent();
+    serve();
+    await renderWithClerk(<UserProfile />, undefined, undefined, { agent });
+    return agent;
+  }
+
+  it('shows the agent the page it is on, and moves to another on the screen', async () => {
+    const agent = await renderWithAgent();
+
+    expect(agent.snapshot()).toContainEqual(
+      expect.objectContaining({
+        ref: 'userProfile',
+        state: { page: 'account', pages: ['account', 'security'] },
+        actions: [expect.objectContaining({ name: 'showPage' })],
+      }),
+    );
+
+    const result = await agent.act({
+      steps: [{ ref: 'userProfile', action: 'showPage', input: { page: 'security' } }],
+    });
+
+    expect(result.state.userProfile).toMatchObject({ page: 'security' });
+    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('refuses a page the profile does not list', async () => {
+    const agent = await renderWithAgent();
+
+    const result = await agent.act({ steps: [{ ref: 'userProfile', action: 'showPage', input: { page: 'billing' } }] });
+
+    expect(result.error).toEqual({ step: 0, message: 'billing is not one of pages' });
+    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
   });
 });
