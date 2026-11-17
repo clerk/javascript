@@ -73,7 +73,8 @@ const MINT_TIME_LIMIT_MS = 20_000;
  * Creates a one-time URL that signs the active session's user in on `destination`. Every call
  * creates a new transfer. Rejects with a `SessionTransferError`.
  *
- * Use it only to present the URL yourself. `useAuthenticatedWebView` covers WebViews.
+ * Use it only to present the URL yourself. `useAuthenticatedWebView` and
+ * `openInBrowser` cover WebViews and the system browser.
  *
  * > [!WARNING]
  * > Android browsers redeem the URL only when the app sets `android.intent.extra.REFERRER_NAME`
