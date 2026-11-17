@@ -3,12 +3,12 @@ import { useClerk, useOAuthConsent, useSession } from '@clerk/shared/react';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { toLocalizableError } from '../../utils/errors';
-import type { ConsentModel } from './consent.types';
+import type { OAuthConsentModel } from './oauth-consent.types';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 const USER_ORG_READ_SCOPE = 'user:org:read';
 
-export interface ConsentModelOptions {
+export interface OAuthConsentModelOptions {
   /**
    * Override the OAuth client ID. Defaults to the `client_id` query parameter
    * from the current URL.
@@ -30,7 +30,7 @@ function readSearchParams(): URLSearchParams {
   return typeof window === 'undefined' ? new URLSearchParams() : new URLSearchParams(window.location.search);
 }
 
-export function useConsentModel(options: ConsentModelOptions): ConsentModel {
+export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthConsentModel {
   const clerk = useClerk();
   const { isLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
@@ -52,10 +52,10 @@ export function useConsentModel(options: ConsentModelOptions): ConsentModel {
     return { status: 'hidden' };
   }
   if (!oauthClientId) {
-    return { status: 'error', error: { code: 'consent_missing_client_id' } };
+    return { status: 'error', error: { code: 'oauth_consent_missing_client_id' } };
   }
   if (!redirectUrl) {
-    return { status: 'error', error: { code: 'consent_missing_redirect_uri' } };
+    return { status: 'error', error: { code: 'oauth_consent_missing_redirect_uri' } };
   }
   if (error) {
     return { status: 'error', error: toLocalizableError(error) };

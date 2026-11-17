@@ -19,8 +19,8 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { MosaicLocalization } from '../../../localization';
-import type { ConsentProps } from '../consent';
-import { Consent } from '../consent';
+import type { OAuthConsentProps } from '../oauth-consent';
+import { OAuthConsent } from '../oauth-consent';
 
 const PIXEL =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -66,17 +66,17 @@ function visit(params: Record<string, string>) {
   onTestFinished(() => window.history.replaceState(null, '', previous));
 }
 
-function visitConsent(params: Record<string, string> = {}) {
+function visitOAuthConsent(params: Record<string, string> = {}) {
   visit({ client_id: 'client_1', scope: 'profile email', redirect_uri: REDIRECT_URI, state: 'st_1', ...params });
 }
 
-async function renderConsent(
+async function renderOAuthConsent(
   seed: FakeFapiSeed = signedIn(),
-  props: Partial<ConsentProps> = {},
+  props: Partial<OAuthConsentProps> = {},
   localization?: MosaicLocalization,
 ) {
   const fapi = serveFapi(seed);
-  const view = await renderWithClerk(<Consent {...props} />, undefined, localization);
+  const view = await renderWithClerk(<OAuthConsent {...props} />, undefined, localization);
   return { ...view, fapi, user: userEvent.setup() };
 }
 
@@ -111,11 +111,11 @@ function captureSubmits() {
   return submits;
 }
 
-describe('Consent', () => {
+describe('OAuthConsent', () => {
   describe('consent screen', () => {
     it('names the app and who is granting access, and lists the requested scopes', async () => {
-      visitConsent();
-      await renderConsent();
+      visitOAuthConsent();
+      await renderOAuthConsent();
 
       await ready();
       expect(screen.getByText(/Only continue if you trust/)).toHaveTextContent(
@@ -126,8 +126,8 @@ describe('Consent', () => {
     });
 
     it('asks the Frontend API for the client, scope and redirect URI in the URL', async () => {
-      visitConsent();
-      const { fapi } = await renderConsent();
+      visitOAuthConsent();
+      const { fapi } = await renderOAuthConsent();
 
       await ready();
       const [request] = fapi.oauthConsentRequests;
@@ -138,7 +138,7 @@ describe('Consent', () => {
 
     it('prefers props over the URL', async () => {
       visit({ client_id: 'client_from_url', scope: 'email', redirect_uri: 'https://url.example.com/cb' });
-      const { fapi } = await renderConsent(signedIn(), {
+      const { fapi } = await renderOAuthConsent(signedIn(), {
         oauthClientId: 'client_1',
         scope: 'profile',
         redirectUrl: REDIRECT_URI,
@@ -152,29 +152,29 @@ describe('Consent', () => {
     });
 
     it('names the user by phone number when they have no email address', async () => {
-      visitConsent();
+      visitOAuthConsent();
       const bob = fapiUser({
         id: 'user_2',
         phone_numbers: [fapiPhoneNumber({ id: 'idn_phone', phone_number: '+15555550100' })],
         primary_phone_number_id: 'idn_phone',
       });
-      await renderConsent(signedIn({ client: fapiClient([fapiSession({ id: 'sess_1', user: bob })]) }));
+      await renderOAuthConsent(signedIn({ client: fapiClient([fapiSession({ id: 'sess_1', user: bob })]) }));
 
       await ready();
       expect(screen.getByText('Signed in as +15555550100')).toBeVisible();
     });
 
     it('falls back to the scope name when the scope has no description', async () => {
-      visitConsent();
-      await renderConsent(signedIn({ oauthConsent: consent({ scopes: [scope('openid')] }) }));
+      visitOAuthConsent();
+      await renderOAuthConsent(signedIn({ oauthConsent: consent({ scopes: [scope('openid')] }) }));
 
       await ready();
       expect(scopeLabels()).toEqual(['openid']);
     });
 
     it('describes private metadata in its own words', async () => {
-      visitConsent();
-      await renderConsent(
+      visitOAuthConsent();
+      await renderOAuthConsent(
         signedIn({ oauthConsent: consent({ scopes: [scope('private_metadata', 'Server description')] }) }),
       );
 
@@ -183,11 +183,11 @@ describe('Consent', () => {
     });
 
     it('localizes the private metadata description', async () => {
-      visitConsent();
-      await renderConsent(
+      visitOAuthConsent();
+      await renderOAuthConsent(
         signedIn({ oauthConsent: consent({ scopes: [scope('private_metadata')] }) }),
         {},
-        { overrides: { 'consent.privateMetadata': 'Métadonnées privées de {applicationName}' } },
+        { overrides: { 'oauthConsent.privateMetadata': 'Métadonnées privées de {applicationName}' } },
       );
 
       await ready();
@@ -195,8 +195,8 @@ describe('Consent', () => {
     });
 
     it('keeps offline access out of the list and says the user stays signed in', async () => {
-      visitConsent();
-      await renderConsent(
+      visitOAuthConsent();
+      await renderOAuthConsent(
         signedIn({ oauthConsent: consent({ scopes: [scope('profile', 'Your profile'), scope('offline_access')] }) }),
       );
 
@@ -206,16 +206,16 @@ describe('Consent', () => {
     });
 
     it('hides the scope list when offline access is the only scope', async () => {
-      visitConsent();
-      await renderConsent(signedIn({ oauthConsent: consent({ scopes: [scope('offline_access')] }) }));
+      visitOAuthConsent();
+      await renderOAuthConsent(signedIn({ oauthConsent: consent({ scopes: [scope('offline_access')] }) }));
 
       await ready();
       expect(screen.queryByRole('list')).toBeNull();
     });
 
     it('leaves out the offline access notice when it is not requested', async () => {
-      visitConsent();
-      await renderConsent();
+      visitOAuthConsent();
+      await renderOAuthConsent();
 
       await ready();
       expect(screen.queryByText(/You'll stay signed in/)).toBeNull();
@@ -224,8 +224,8 @@ describe('Consent', () => {
 
   describe('redirect domain', () => {
     it('warns about the domain the Frontend API reports, and where the user will land', async () => {
-      visitConsent();
-      await renderConsent(signedIn({ oauthConsent: consent({ redirect_domain: 'linear.app' }) }));
+      visitOAuthConsent();
+      await renderOAuthConsent(signedIn({ oauthConsent: consent({ redirect_domain: 'linear.app' }) }));
 
       await ready();
       expect(screen.getByText(/Only continue if you trust/)).toHaveTextContent(
@@ -237,8 +237,8 @@ describe('Consent', () => {
     });
 
     it('derives the domain from the redirect URI when the Frontend API reports none', async () => {
-      visitConsent();
-      await renderConsent();
+      visitOAuthConsent();
+      await renderOAuthConsent();
 
       await ready();
       expect(screen.getByText(/Only continue if you trust/)).toHaveTextContent('(example.com)');
@@ -249,8 +249,8 @@ describe('Consent', () => {
       ['description', /Only continue if you trust/],
       ['redirect notice', /If you allow access, this app will redirect you to/],
     ])('shows the full redirect URL from the domain in the %s', async (_, text) => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
 
       await ready();
       const domain = within(screen.getByText(text)).getByRole('button', { name: 'example.com' });
@@ -267,8 +267,8 @@ describe('Consent', () => {
 
   describe('submitting', () => {
     it('posts one form to the consent endpoint for the signed-in session', async () => {
-      visitConsent();
-      await renderConsent();
+      visitOAuthConsent();
+      await renderOAuthConsent();
 
       await ready();
       const forms = document.querySelectorAll('form');
@@ -281,8 +281,8 @@ describe('Consent', () => {
     });
 
     it('allows with every URL parameter forwarded', async () => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
       const submits = captureSubmits();
 
       await ready();
@@ -298,8 +298,8 @@ describe('Consent', () => {
     });
 
     it('denies with the same form', async () => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
       const submits = captureSubmits();
 
       await ready();
@@ -311,8 +311,8 @@ describe('Consent', () => {
     });
 
     it('shows the chosen button as pending, locks the other, and submits only once', async () => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
       const submits = captureSubmits();
 
       await ready();
@@ -326,8 +326,8 @@ describe('Consent', () => {
     });
 
     it('unlocks when the browser restores the page from history', async () => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
       captureSubmits();
 
       await ready();
@@ -351,8 +351,8 @@ describe('Consent', () => {
     }
 
     it('asks which organization to share when the app reads organizations', async () => {
-      visitConsent();
-      const { user } = await renderConsent(signedIn(orgScopes));
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes));
 
       await ready();
       expect(scopeLabels()).toEqual(['Your profile', 'user:org:read']);
@@ -362,8 +362,8 @@ describe('Consent', () => {
     });
 
     it('locks the organization once the form submits', async () => {
-      visitConsent();
-      const { user } = await renderConsent(signedIn(orgScopes));
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes));
 
       await ready();
       await submitAllow(user);
@@ -372,8 +372,8 @@ describe('Consent', () => {
     });
 
     it('defaults to the last active organization', async () => {
-      visitConsent();
-      const { user } = await renderConsent(signedIn(orgScopes, globex.id));
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes, globex.id));
 
       await ready();
       expect(screen.getByRole('combobox', { name: /^Grant access for:/ })).toHaveTextContent('Globex');
@@ -381,8 +381,8 @@ describe('Consent', () => {
     });
 
     it('falls back to the first membership when the last active organization is not one', async () => {
-      visitConsent();
-      const { user } = await renderConsent(signedIn(orgScopes, 'org_gone'));
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes, 'org_gone'));
 
       await ready();
       expect(screen.getByRole('combobox', { name: /^Grant access for:/ })).toHaveTextContent('Acme');
@@ -390,8 +390,8 @@ describe('Consent', () => {
     });
 
     it('submits the organization the user picks', async () => {
-      visitConsent();
-      const { user } = await renderConsent(signedIn(orgScopes));
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes));
 
       await ready();
       await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
@@ -401,10 +401,10 @@ describe('Consent', () => {
     });
 
     it('shows each organization logo', async () => {
-      visitConsent();
+      visitOAuthConsent();
       const initech = fapiOrganization({ id: 'org_3', name: 'Initech', image_url: PIXEL, has_image: true });
       const bob = fapiUser({ id: 'user_2', organization_memberships: [fapiMembership(initech)] });
-      const { user } = await renderConsent({
+      const { user } = await renderOAuthConsent({
         ...orgScopes,
         client: fapiClient([fapiSession({ id: 'sess_2', user: bob, last_active_organization_id: null })]),
       });
@@ -417,8 +417,8 @@ describe('Consent', () => {
     });
 
     it('does not ask when the app does not read organizations', async () => {
-      visitConsent();
-      const { user } = await renderConsent();
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
 
       await ready();
       expect(screen.queryByRole('combobox', { name: /^Grant access for:/ })).toBeNull();
@@ -426,8 +426,8 @@ describe('Consent', () => {
     });
 
     it('does not ask when organizations are disabled', async () => {
-      visitConsent();
-      const { user } = await renderConsent(
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(
         signedIn({ ...orgScopes, environment: fapiEnvironment({ organization_settings: { enabled: false } }) }),
       );
 
@@ -437,9 +437,9 @@ describe('Consent', () => {
     });
 
     it('does not ask when the user has no memberships', async () => {
-      visitConsent();
+      visitOAuthConsent();
       const loner = fapiUser({ id: 'user_3', organization_memberships: [] });
-      const { user } = await renderConsent(
+      const { user } = await renderOAuthConsent(
         signedIn({ ...orgScopes, client: fapiClient([fapiSession({ id: 'sess_1', user: loner })]) }),
       );
 
@@ -451,8 +451,8 @@ describe('Consent', () => {
 
   describe('availability', () => {
     it('renders nothing when signed out', async () => {
-      visitConsent();
-      const { fapi } = await renderConsent({ oauthConsent: consent() });
+      visitOAuthConsent();
+      const { fapi } = await renderOAuthConsent({ oauthConsent: consent() });
 
       await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
       expect(screen.queryByRole('heading')).toBeNull();
@@ -460,10 +460,10 @@ describe('Consent', () => {
     });
 
     it('renders the fallback until Clerk loads', async () => {
-      visitConsent();
+      visitOAuthConsent();
       serveFapi(signedIn());
       const held = holdRequests('get', '/v1/environment');
-      const rendering = renderWithClerk(<Consent fallback={<p>Waiting for Clerk</p>} />);
+      const rendering = renderWithClerk(<OAuthConsent fallback={<p>Waiting for Clerk</p>} />);
 
       expect(await screen.findByText('Waiting for Clerk')).toBeVisible();
       expect(screen.queryByRole('status')).toBeNull();
@@ -474,9 +474,9 @@ describe('Consent', () => {
     });
 
     it('shows a skeleton while consent loads', async () => {
-      visitConsent();
+      visitOAuthConsent();
       const held = holdRequests('get', CONSENT_PATH);
-      await renderConsent();
+      await renderOAuthConsent();
 
       expect(await screen.findByRole('status')).toHaveTextContent('Loading consent information');
       expect(screen.getByRole('button', { name: 'Allow' })).toBeDisabled();
@@ -489,9 +489,9 @@ describe('Consent', () => {
       [true, 1],
       [false, 0],
     ])('signs the skeleton only where the instance is branded (%s)', async (branded, signatures) => {
-      visitConsent();
+      visitOAuthConsent();
       const held = holdRequests('get', CONSENT_PATH);
-      await renderConsent(signedIn({ environment: fapiEnvironment({ display_config: { branded } }) }));
+      await renderOAuthConsent(signedIn({ environment: fapiEnvironment({ display_config: { branded } }) }));
 
       await screen.findByRole('status');
       expect(screen.queryAllByText(/Secured by/)).toHaveLength(signatures);
@@ -501,7 +501,7 @@ describe('Consent', () => {
 
     it('explains a missing client ID without asking the Frontend API', async () => {
       visit({ redirect_uri: REDIRECT_URI });
-      const { fapi } = await renderConsent();
+      const { fapi } = await renderOAuthConsent();
 
       expect(await screen.findByRole('alert')).toHaveTextContent('The client ID is missing.');
       expect(fapi.oauthConsentRequests).toEqual([]);
@@ -509,13 +509,13 @@ describe('Consent', () => {
 
     it('explains a missing redirect URI', async () => {
       visit({ client_id: 'client_1' });
-      await renderConsent();
+      await renderOAuthConsent();
 
       expect(await screen.findByRole('alert')).toHaveTextContent('The redirect URI is missing.');
     });
 
     it('shows why consent could not load', { timeout: 20_000 }, async () => {
-      visitConsent();
+      visitOAuthConsent();
       serveFapi(signedIn());
       worker.use(
         http.get(fapiUrl(CONSENT_PATH), () =>
@@ -525,7 +525,7 @@ describe('Consent', () => {
           ),
         ),
       );
-      await renderWithClerk(<Consent />);
+      await renderWithClerk(<OAuthConsent />);
 
       expect(await screen.findByRole('alert', undefined, { timeout: 15_000 })).toHaveTextContent(
         'Consent metadata unavailable',

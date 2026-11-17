@@ -4,13 +4,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Card } from '../../../components/card';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { consentMessages } from '../consent.messages';
-import type { ConsentOrganizationSelection, ConsentViewProps } from '../consent.types';
-import { ConsentView } from '../consent.view';
+import { oauthConsentMessages } from '../oauth-consent.messages';
+import type { OAuthConsentOrganizationSelection, OAuthConsentViewProps } from '../oauth-consent.types';
+import { OAuthConsentView } from '../oauth-consent.view';
 
-function propsFor(overrides: Partial<ConsentViewProps> = {}): ConsentViewProps {
+function propsFor(overrides: Partial<OAuthConsentViewProps> = {}): OAuthConsentViewProps {
   return {
-    messages: consentMessages,
+    messages: oauthConsentMessages,
     oauthApplicationName: 'Linear',
     identifier: 'alice@example.com',
     applicationName: 'Acme',
@@ -34,18 +34,18 @@ function propsFor(overrides: Partial<ConsentViewProps> = {}): ConsentViewProps {
   };
 }
 
-function renderView(overrides: Partial<ConsentViewProps> = {}) {
+function renderView(overrides: Partial<OAuthConsentViewProps> = {}) {
   render(
     <MosaicProvider>
       <Card.Root renderBranding={false}>
-        <ConsentView {...propsFor(overrides)} />
+        <OAuthConsentView {...propsFor(overrides)} />
       </Card.Root>
     </MosaicProvider>,
   );
   return userEvent.setup();
 }
 
-describe('ConsentView', () => {
+describe('OAuthConsentView', () => {
   describe('scope selection', () => {
     it('labels each checkbox with its scope and shows the description', () => {
       renderView({ scopeSelection: { checked: ['projects'], onCheckedChange: vi.fn() } });
@@ -92,7 +92,7 @@ describe('ConsentView', () => {
       { value: 'org_2', label: 'Globex' },
     ];
 
-    function selection(overrides: Partial<ConsentOrganizationSelection> = {}): ConsentOrganizationSelection {
+    function selection(overrides: Partial<OAuthConsentOrganizationSelection> = {}): OAuthConsentOrganizationSelection {
       return { access: 'all', onAccessChange: vi.fn(), selected: [], onSelectedChange: vi.fn(), ...overrides };
     }
 
