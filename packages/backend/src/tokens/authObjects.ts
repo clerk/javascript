@@ -180,7 +180,7 @@ export type AuthObject =
   | UnauthenticatedMachineObject
   | InvalidTokenAuthObject;
 
-const createDebug = (data: AuthObjectDebugData | undefined) => {
+export const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
     const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
