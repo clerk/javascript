@@ -511,9 +511,9 @@ export const getAuthObjectForAcceptedToken = ({
   // 3. single token: must match exactly, else return appropriate unauthenticated object
   if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
     if (isMachineTokenType(acceptsToken)) {
-      return unauthenticatedMachineObject(acceptsToken, authObject.debug);
+      return unauthenticatedMachineObject(acceptsToken, authObject.debug?.());
     }
-    return signedOutAuthObject(authObject.debug);
+    return signedOutAuthObject(authObject.debug?.());
   }
 
   // 4. default: return as-is
