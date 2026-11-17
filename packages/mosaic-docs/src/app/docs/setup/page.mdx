@@ -1,8 +1,5 @@
 import Setup, { headings as setupHeadings } from '@/content/setup.mdx';
-import { CopyPageButton } from '@/ui/copy-page-button';
-import { DocsArticle, DocsAside } from '@/ui/docs-page';
-import { PageOutline } from '@/ui/page-outline';
-import { TableOfContents } from '@/ui/table-of-contents';
+import { DocsPage } from '@/ui/docs-page';
 
 export const metadata = {
   title: 'Setup',
@@ -11,18 +8,12 @@ export const metadata = {
 
 export default function Layout({ children }) {
   return (
-    <>
-      <DocsArticle>
-        <PageOutline headings={setupHeadings}>
-          <CopyPageButton href='/docs/setup.md' />
-        </PageOutline>
-        {children}
-      </DocsArticle>
-      <DocsAside>
-        <TableOfContents headings={setupHeadings} />
-        <CopyPageButton href='/docs/setup.md' />
-      </DocsAside>
-    </>
+    <DocsPage
+      headings={setupHeadings}
+      markdownHref='/docs/setup.md'
+    >
+      {children}
+    </DocsPage>
   );
 }
 

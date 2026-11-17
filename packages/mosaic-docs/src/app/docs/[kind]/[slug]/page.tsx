@@ -4,11 +4,8 @@ import { notFound } from 'next/navigation';
 import { Preview } from '@/components/preview';
 import { docHeadings } from '@/core/doc-sections';
 import { docEntries, docHref, findDoc, relatedHref } from '@/lib/docs';
-import { CopyPageButton } from '@/ui/copy-page-button';
 import { DocContent } from '@/ui/doc-content';
-import { DocsArticle, DocsAside } from '@/ui/docs-page';
-import { PageOutline } from '@/ui/page-outline';
-import { TableOfContents } from '@/ui/table-of-contents';
+import { DocsPage } from '@/ui/docs-page';
 
 export const dynamicParams = false;
 
@@ -35,25 +32,16 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
     notFound();
   }
 
-  const headings = docHeadings(entry.doc);
-  const markdownHref = `${docHref(entry)}.md`;
-
   return (
-    <>
-      <DocsArticle>
-        <PageOutline headings={headings}>
-          <CopyPageButton href={markdownHref} />
-        </PageOutline>
-        <DocContent
-          doc={entry.doc}
-          preview={<Preview path={`${kind}/${slug}`} />}
-          hrefFor={relatedHref}
-        />
-      </DocsArticle>
-      <DocsAside>
-        <TableOfContents headings={headings} />
-        <CopyPageButton href={markdownHref} />
-      </DocsAside>
-    </>
+    <DocsPage
+      headings={docHeadings(entry.doc)}
+      markdownHref={`${docHref(entry)}.md`}
+    >
+      <DocContent
+        doc={entry.doc}
+        preview={<Preview path={`${kind}/${slug}`} />}
+        hrefFor={relatedHref}
+      />
+    </DocsPage>
   );
 }
