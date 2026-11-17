@@ -81,7 +81,7 @@ export function MobileNav({ tabs, groups }: { tabs: NavItem[]; groups: NavGroup[
             aria-label='Sections'
             className='border-border mb-6 border-b pb-4'
           >
-            <ul className='m-0 list-none p-0'>
+            <ul className='m-0 list-none space-y-px p-0'>
               {tabs.map(tab => (
                 <li key={tab.href}>
                   <Link
