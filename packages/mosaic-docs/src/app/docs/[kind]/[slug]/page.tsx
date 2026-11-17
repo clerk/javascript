@@ -6,6 +6,7 @@ import { docEntries, docHref, findDoc, relatedHref } from '@/lib/docs';
 import { CopyPageButton } from '@/ui/copy-page-button';
 import { DocContent, docHeadings } from '@/ui/doc-content';
 import { DocsArticle, DocsAside } from '@/ui/docs-page';
+import { PageOutline } from '@/ui/page-outline';
 import { TableOfContents } from '@/ui/table-of-contents';
 
 export const dynamicParams = false;
@@ -33,9 +34,15 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
     notFound();
   }
 
+  const headings = docHeadings(entry.doc);
+  const markdownHref = `${docHref(entry)}.md`;
+
   return (
     <>
       <DocsArticle>
+        <PageOutline headings={headings}>
+          <CopyPageButton href={markdownHref} />
+        </PageOutline>
         <DocContent
           doc={entry.doc}
           preview={<Preview path={`${kind}/${slug}`} />}
@@ -43,8 +50,8 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
         />
       </DocsArticle>
       <DocsAside>
-        <TableOfContents headings={docHeadings(entry.doc)} />
-        <CopyPageButton href={`${docHref(entry)}.md`} />
+        <TableOfContents headings={headings} />
+        <CopyPageButton href={markdownHref} />
       </DocsAside>
     </>
   );
