@@ -5,6 +5,8 @@ import type { ReactElement } from 'react';
 import type { OrganizationSwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
 
+export type { OrganizationSwitcherProps };
+
 /**
  * The active organization's avatar, and the menu behind it: switch organization or back to the
  * personal account, join a suggested or invited one, create one, invite members, and open the

@@ -27,4 +27,4 @@ To find the code to update, run:
 git grep -n '<UserProfile'
 ```
 
-New exported types: `ProfileProps`, `CombinedProfileProps` and `ProfileMode`.
+New exported type: `ProfileProps`.
