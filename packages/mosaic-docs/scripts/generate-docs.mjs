@@ -22,15 +22,6 @@ export function toEntries(paths) {
     return { kind, slug, path: path.replace(/\.ts$/, '') };
   });
 
-  const seen = new Set();
-  for (const { kind, slug } of entries) {
-    const key = `${kind}/${slug}`;
-    if (seen.has(key)) {
-      throw new Error(`Two docs share ${key}`);
-    }
-    seen.add(key);
-  }
-
   return entries
     .filter(({ kind, slug }) => !EXCLUDED.has(`${kind}/${slug}`))
     .sort((a, b) => a.kind.localeCompare(b.kind) || a.slug.localeCompare(b.slug));

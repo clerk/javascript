@@ -32,10 +32,6 @@ test('rejects a doc outside the documented locations', () => {
   assert.throws(() => toEntries(['src/blocks/sign-in/sign-in.doc.ts']), /sign-in\.doc\.ts/);
 });
 
-test('rejects two docs with the same kind and slug', () => {
-  assert.throws(() => toEntries(['src/hooks/use-form.doc.ts', 'src/hooks/use-form.doc.ts']), /hooks\/use-form/);
-});
-
 test('renders one typed import per doc', () => {
   const source = renderModule('../../../mosaic', [
     { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },

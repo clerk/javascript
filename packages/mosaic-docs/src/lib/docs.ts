@@ -1,9 +1,9 @@
-import { placeDoc } from '@/core/doc-place';
+import { placeDocs } from '@/core/doc-place';
 import { docEntries as generatedEntries, type DocEntry } from '@/generated/docs';
 
 export type { DocEntry };
 
-export const docEntries: DocEntry[] = generatedEntries.map(entry => ({ ...entry, ...placeDoc(entry, entry.doc) }));
+export const docEntries: DocEntry[] = placeDocs(generatedEntries);
 
 export const docKinds = [
   { kind: 'components', title: 'Components' },
