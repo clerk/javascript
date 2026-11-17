@@ -85,6 +85,14 @@ describe('useReverification passReverificationResult type tests', () => {
     expectTypeOf(useOptional).returns.parameters.toEqualTypeOf<[key?: string]>();
   });
 
+  it('keeps undefined in the result when the fetcher can skip the request', () => {
+    const useSkippable = () =>
+      useReverificationImp((_reverification, key: string) => (key ? Promise.resolve({ key }) : undefined), {
+        passReverificationResult: true,
+      });
+    expectTypeOf(useSkippable).returns.returns.resolves.toEqualTypeOf<{ key: string } | undefined>();
+  });
+
   it('rejects the option on a fetcher that does not take the result first', () => {
     const useMismatch = () =>
       // @ts-expect-error the first parameter must accept the reverification result

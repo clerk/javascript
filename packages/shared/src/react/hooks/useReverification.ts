@@ -139,16 +139,16 @@ type UseReverificationResult<
  * @interface
  */
 type UseReverification = {
-  <Args extends any[], Result>(
+  <Args extends any[], Return extends Promise<any> | undefined>(
     /**
      * A function that returns a promise. Its first argument is the reverification result.
      */
-    fetcher: (reverification: ReverificationResult | undefined, ...args: Args) => Promise<Result> | undefined,
+    fetcher: (reverification: ReverificationResult | undefined, ...args: Args) => Return,
     /**
      * Configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#usereverificationoptions).
      */
     options: UseReverificationWithResultOptions<Args>,
-  ): (...args: Args) => Promise<ExcludeClerkError<Awaited<Result>>>;
+  ): (...args: Args) => Promise<ExcludeClerkError<Awaited<Return>>>;
   <Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     /**
      * A function that returns a promise.
