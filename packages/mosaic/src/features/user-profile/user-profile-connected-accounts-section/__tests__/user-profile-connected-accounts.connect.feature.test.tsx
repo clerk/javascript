@@ -20,6 +20,7 @@ import {
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { InRoutingScope } from '../../../../__tests__/feature/routing';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -214,39 +215,21 @@ describe('connected accounts', () => {
     expect(await screen.findByText('The connection could not start. Please try again.')).toBeInTheDocument();
   });
 
-  it('returns to the profile modal after connecting', async () => {
+  it('returns to the account page of the profile it is in', async () => {
     serveFapi(signedIn([]));
     await renderWithClerk(
-      <UserProfileProvider mode='modal'>
+      <InRoutingScope path='/modal/user'>
         <UserProfileConnectedAccountsSection />
-      </UserProfileProvider>,
+      </InRoutingScope>,
     );
     const request = holdRequests('post', '/v1/me/external_accounts');
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     const body = new URLSearchParams(await request.requests[0]?.text());
-    const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
-    expect(params.has('__clerk_modal_state')).toBe(false);
-    request.fail();
-  });
-
-  it('returns to the page without modal state when connecting from a mounted profile', async () => {
-    serveFapi(signedIn([]));
-    await renderWithClerk(
-      <UserProfileProvider mode='mounted'>
-        <UserProfileConnectedAccountsSection />
-      </UserProfileProvider>,
-    );
-    const request = holdRequests('post', '/v1/me/external_accounts');
-
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    const body = new URLSearchParams(await request.requests[0]?.text());
-    const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.has('__clerk_mosaic_modal')).toBe(false);
-    expect(params.has('__clerk_modal_state')).toBe(false);
+    const returned = new URL(body.get('redirect_url') || '');
+    expect(returned.searchParams.get('.modal.user')).toBe('account');
+    expect(returned.pathname).toBe(window.location.pathname);
     request.fail();
   });
 

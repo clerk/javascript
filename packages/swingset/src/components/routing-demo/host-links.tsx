@@ -13,8 +13,9 @@ export interface HostEntry {
 
 /**
  * The URL a host would link to for these entries in this mode, in the shape the carrier reads:
- * the pathname under the page in path mode, one param per base in hash and query mode. The
- * pathname holds one entry, so path mode takes the first.
+ * the pathname under the page in path mode, one param per base in hash and query mode, and the
+ * query form in virtual mode, which each owner reads into memory and removes. The pathname holds
+ * one entry, so path mode takes the first.
  */
 export function hostUrl({
   mode,
@@ -26,10 +27,7 @@ export function hostUrl({
   pagePath: string;
   entries: readonly HostEntry[];
   query?: Record<string, string>;
-}): string | undefined {
-  if (mode === 'virtual') {
-    return undefined;
-  }
+}): string {
   const search = new URLSearchParams({ mode, ...query });
   const key = (base: string) => base.replaceAll('/', '.');
   const pairs = entries.map(({ base, parts }) => `${key(base)}=${parts}`);
@@ -41,6 +39,7 @@ export function hostUrl({
     }
     case 'hash':
       return `${pagePath}?${search}#${pairs.join('&')}`;
+    case 'virtual':
     case 'query':
       return `${pagePath}?${search}&${pairs.join('&')}`;
   }

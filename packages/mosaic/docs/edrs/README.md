@@ -51,3 +51,4 @@ Bug fixes, implementation detail inside a decided design, and open questions. Op
 | [MEDR-0007](./0007-location-contract-suite.md)         | Every location mode passes one contract suite; differences are declared, not discovered.                                    |
 | [MEDR-0008](./0008-url-carriers.md)                    | A URL mode derives its segment from the host URL and writes the URL back at once; one param per base in hash and query.     |
 | [MEDR-0009](./0009-router-adapter.md)                  | The host router is reached through a plain adapter of optional hooks on `MosaicProvider`; missing ones fall back to window. |
+| [MEDR-0010](./0010-links.md)                           | A link is the query mode's own param in every mode; other owners take it into their carrier and remove it.                  |

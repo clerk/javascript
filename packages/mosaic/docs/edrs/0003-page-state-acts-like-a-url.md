@@ -32,7 +32,7 @@ Routing state is a map above the components. An entry lives while its base has a
 - Leave and return starts fresh; a parked owner resumes where it was; an owner replaced mid-exit keeps its page; StrictMode changes nothing.
 - A parked modal does not resume, since its content is inside a closed dialog; legacy closes modals on navigation too.
 - The parked case is a todo in the contract suite until a React 19 test project exists, since React 18 cannot produce the cycle. The outside-clear case is in the suite, because it is the one a park that also ran on navigation got wrong.
-- Back closes a modal and a URL with the segment opens one in the URL modes. The return after a redirect can become an entry seeded on load.
+- Back closes a modal and a URL with the segment opens one in the URL modes. A link in the query string writes an entry the same way in every mode, and a redirect returns through one, [MEDR-0010](./0010-links.md).
 - Ownership arrives one commit after mount, so an owner's first redirect runs on its second commit.
 - `useSegmentParts` returns `undefined` for a base with no entry; a scope reads that as the root, a modal as closed.
 - A URL carrier was expected to project the map so two writes in one tick could not clobber each other. [MEDR-0008](./0008-url-carriers.md) decided otherwise: a URL location reads and writes the URL directly, and the clobber is accepted.
@@ -48,3 +48,4 @@ Routing state is a map above the components. An entry lives while its base has a
 - **2026-11-06**: Accepted.
 - **2026-11-06**: Amended after review: render from the parked entry while hidden, park tied to its location, compare-and-delete in the sweep, content loaded on any entry.
 - **2026-11-11**: Amended when the URL modes shipped: the projection consequence points at MEDR-0008.
+- **2026-11-17**: Amended: links and the return after a redirect are MEDR-0010.

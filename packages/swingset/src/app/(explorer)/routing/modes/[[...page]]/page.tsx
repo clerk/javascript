@@ -29,8 +29,8 @@ export default function RoutingModesPage() {
           <>
             <p>
               One component, four places for its step. In <code className='font-mono text-xs'>virtual</code> the URL
-              never changes and Back leaves the page. In the others the step is in the URL: Back moves through the
-              steps, a reload keeps the step, and a link can open a step directly.
+              never changes and Back leaves the page, though a link can still open a step. In the others the step is in
+              the URL: Back moves through the steps, a reload keeps the step, and a link can open a step directly.
             </p>
             <p>
               In <code className='font-mono text-xs'>path</code> the component is mounted at{' '}

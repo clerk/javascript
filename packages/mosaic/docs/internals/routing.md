@@ -156,7 +156,6 @@ The URL is attacker-controlled input: anyone can send a user a link. That covers
 ## Open questions
 
 - How routing and machines work together. The URL proposes a step and the machine decides, but the contract is undefined: how a proposal enters the machine, how the decision is written back, and whether the runtime can move to an earlier state on request. A deep link, a back press and a redirect return are the three cases.
-- How the return after a redirect is carried. With the modal open while its entry exists, it can become an entry seeded on load; the query param and its reader exist while legacy shares the page
 - Whether sub-routes nest, for subcomponents with their own steps inside a host-owned container
 - Whether the exit seam returns `clerk-js`'s navigation promise. Four models await it today for busy states, all of them exits. Returning it keeps a dependency on the awaitable navigate; dropping it means busy states end on unmount or a timeout instead. This is desirable to move away from awaitable navigation, but there's some details to figure out.
 - Typed page ids for the profiles. A `const` type parameter on `UserProfile` can infer custom page paths from an inline `customPages` literal, so `pageOrder`, the modal `page` option and the pages controller's `route`/`go` become a union of built-in ids and the consumer's paths instead of `string`. It only narrows for inline or `as const` pages and must drop the `(string & {})` escape hatch, so it is one change across the props, the modal options and the controller

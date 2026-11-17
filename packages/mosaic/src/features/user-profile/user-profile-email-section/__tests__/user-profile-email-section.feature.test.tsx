@@ -25,7 +25,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import { UserProfileProvider } from '../../user-profile.provider';
+import { InRoutingScope } from '../../../../__tests__/feature/routing';
 import { UserProfileEmailSection } from '../user-profile-email-section';
 
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
@@ -270,7 +270,7 @@ describe('the user profile email section', () => {
     await waitFor(() => expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.acme.co/sso')));
   });
 
-  it('returns to the profile modal after verifying through the identity provider', async () => {
+  it('returns to the account page of the profile it is in after verifying through the identity provider', async () => {
     const sso = fapiEmailAddress({
       id: 'idn_sso',
       email_address: 'alice@acme.co',
@@ -278,9 +278,9 @@ describe('the user profile email section', () => {
     });
     serveFapi(signedInWithEmails([PRIMARY, sso]));
     await renderWithClerk(
-      <UserProfileProvider mode='modal'>
+      <InRoutingScope path='/modal/user'>
         <UserProfileEmailSection />
-      </UserProfileProvider>,
+      </InRoutingScope>,
     );
     const actor = userEvent.setup();
     const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
@@ -292,8 +292,7 @@ describe('the user profile email section', () => {
     await waitFor(() => expect(prepare.requests).toHaveLength(1));
     const body = new URLSearchParams(await prepare.requests[0]?.text());
     const params = new URL(body.get('redirect_url') || '').searchParams;
-    expect(params.get('__clerk_mosaic_modal')).toBe('user-profile/account');
-    expect(params.has('__clerk_modal_state')).toBe(false);
+    expect(params.get('.modal.user')).toBe('account');
     prepare.fail();
   });
 

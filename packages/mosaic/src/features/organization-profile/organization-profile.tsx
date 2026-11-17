@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import { MosaicRoutingScope } from '../../routing/routing-scope';
 import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
@@ -119,7 +120,7 @@ function OrganizationProfileSurface({
 }: OrganizationProfileProps & Required<Pick<OrganizationProfileProps, 'path' | 'routing'>>) {
   const model = useOrganizationProfileModel();
   const pages = model.status === 'ready' ? organizationProfilePanels(model.pages, apiKeysProps) : undefined;
-  const { activePage, onPageChange } = useProfilePagesController(
+  const { activePage, onPageChange, scope } = useProfilePagesController(
     pages && organizationProfilePageIds({ pages, customPages, pageOrder }),
     { routing, path },
   );
@@ -133,14 +134,16 @@ function OrganizationProfileSurface({
 
   return (
     <OrganizationProfileProvider afterLeaveOrganizationUrl={afterLeaveOrganizationUrl}>
-      <OrganizationProfileView
-        elevation='flush'
-        activePage={activePage}
-        onPageChange={onPageChange}
-        customPages={customPages}
-        pageOrder={pageOrder}
-        pages={pages}
-      />
+      <MosaicRoutingScope scope={scope}>
+        <OrganizationProfileView
+          elevation='flush'
+          activePage={activePage}
+          onPageChange={onPageChange}
+          customPages={customPages}
+          pageOrder={pageOrder}
+          pages={pages}
+        />
+      </MosaicRoutingScope>
     </OrganizationProfileProvider>
   );
 }
