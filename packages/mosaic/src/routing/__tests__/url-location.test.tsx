@@ -64,17 +64,17 @@ const carriers: CarrierCase[] = [
   },
   {
     routing: 'query',
-    seeded: '/page?q=a+b&p.user=billing/st%2F1&z#top',
-    written: '/page?q=a+b&p.user=security&z#top',
+    seeded: '/page?q=a+b&.user=billing/st%2F1&z#top',
+    written: '/page?q=a+b&.user=security&z#top',
     cleared: '/page?q=a+b&z#top',
-    elsewhere: '/page?p.users=security&user=security',
+    elsewhere: '/page?.users=security&user=security',
   },
   {
     routing: 'hash',
-    seeded: '/page?q=a+b#top&user=billing/st%2F1&z',
-    written: '/page?q=a+b#top&user=security&z',
+    seeded: '/page?q=a+b#top&.user=billing/st%2F1&z',
+    written: '/page?q=a+b#top&.user=security&z',
     cleared: '/page?q=a+b#top&z',
-    elsewhere: '/page#p.user=security',
+    elsewhere: '/page#user=security',
   },
 ];
 
@@ -199,7 +199,7 @@ describe('the pathname', () => {
 });
 
 describe.each(['query', 'hash'] as const)('a %s param', routing => {
-  const seed = (value: string) => at(routing === 'query' ? `/page?p.user=${value}` : `/page#user=${value}`);
+  const seed = (value: string) => at(routing === 'query' ? `/page?.user=${value}` : `/page#.user=${value}`);
 
   it('reads its value decoded, as the host serialises it', () => {
     seed('organization%2Fgeneral');
@@ -332,8 +332,8 @@ describe('the base', () => {
   });
 
   it('names a nested base with dots, and takes the prefix from the provider', () => {
-    at('/?app.modal.user=security#modal.user=members');
-    const query = renderLocation({ routing: 'query', path: '/modal/user' }, { keyPrefix: { query: 'app.' } });
+    at('/?app.modal.user=security#.modal.user=members');
+    const query = renderLocation({ routing: 'query', path: '/modal/user' }, { keyPrefix: { query: 'app' } });
     const hash = renderLocation({ routing: 'hash', path: '/modal/user' });
     expect(query.result.current.parts).toEqual(['security']);
     expect(hash.result.current.parts).toEqual(['members']);
@@ -348,7 +348,7 @@ describe('the base', () => {
     act(() => result.current[1]?.location.write(['members']));
     act(() => result.current[0]?.location.clear());
 
-    expect(url()).toBe('/?p.org=members');
+    expect(url()).toBe('/?.org=members');
     expect(result.current[0]?.parts).toBeUndefined();
     expect(result.current[1]?.parts).toEqual(['members']);
   });
@@ -370,8 +370,8 @@ describe('on a page whose pathname starts with //', () => {
   });
 
   it.each([
-    ['query', '?p.user=security'],
-    ['hash', '#user=security'],
+    ['query', '?.user=security'],
+    ['hash', '#.user=security'],
   ] as const)('refuses a %s clear rather than throwing', (routing, entry) => {
     const warn = warnings();
     at(page(entry));
@@ -414,7 +414,7 @@ describe('with an adapter', () => {
   }
 
   it('takes the query string as URLSearchParams, as Next hands it over', () => {
-    const adapter: RouterAdapter = { useSearchParams: () => new URLSearchParams('p.user=organization/general') };
+    const adapter: RouterAdapter = { useSearchParams: () => new URLSearchParams('.user=organization/general') };
     const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter });
     expect(result.current.parts).toEqual(['organization', 'general']);
   });
@@ -434,7 +434,7 @@ describe('with an adapter', () => {
 
   it('reads the host router instead of the window', () => {
     at('/user/security');
-    const { adapter } = hostRouter({ pathname: '/user/members', search: '?p.user=general', hash: '#user=billing' });
+    const { adapter } = hostRouter({ pathname: '/user/members', search: '?.user=general', hash: '#.user=billing' });
     const read = (routing: MosaicLocationOptions['routing']) =>
       renderLocation({ routing, path: '/user' }, { adapter }).result.current.parts;
 
@@ -444,13 +444,13 @@ describe('with an adapter', () => {
   });
 
   it('navigates through the host router with a URL built from its reads', () => {
-    const { adapter } = hostRouter({ pathname: '/page', search: 'q=1&p.user=x', hash: 'top' });
+    const { adapter } = hostRouter({ pathname: '/page', search: 'q=1&.user=x', hash: 'top' });
     const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter });
 
     act(() => result.current.location.write(['security']));
     act(() => result.current.location.clear());
 
-    expect(adapter.push).toHaveBeenCalledWith('/page?q=1&p.user=security#top');
+    expect(adapter.push).toHaveBeenCalledWith('/page?q=1&.user=security#top');
     expect(adapter.replace).toHaveBeenCalledWith('/page?q=1#top');
     expect(url()).toBe('/');
   });
@@ -460,7 +460,7 @@ describe('with an adapter', () => {
     const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter: { usePathname: () => '/page' } });
 
     act(() => result.current.location.write(['security']));
-    expect(url()).toBe('/docs/page?q=1&p.user=security');
+    expect(url()).toBe('/docs/page?q=1&.user=security');
   });
 
   it('starts a write from the host as this commit rendered it, even from a layout effect', () => {
@@ -485,7 +485,7 @@ describe('with an adapter', () => {
     const { rerender } = render(tree(false));
     host.pathname = '/b';
     rerender(tree(true));
-    expect(push).toHaveBeenCalledWith('/b?p.user=security');
+    expect(push).toHaveBeenCalledWith('/b?.user=security');
   });
 
   it('keeps its location while the host re-renders with a new adapter object', () => {

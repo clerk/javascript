@@ -31,7 +31,7 @@ export function hostUrl({
     return undefined;
   }
   const search = new URLSearchParams({ mode, ...query });
-  const key = (base: string) => base.replace(/^\//, '').replaceAll('/', '.');
+  const key = (base: string) => base.replaceAll('/', '.');
   const pairs = entries.map(({ base, parts }) => `${key(base)}=${parts}`);
   switch (mode) {
     case 'path': {
@@ -42,7 +42,7 @@ export function hostUrl({
     case 'hash':
       return `${pagePath}?${search}#${pairs.join('&')}`;
     case 'query':
-      return `${pagePath}?${search}&${pairs.map(pair => `p.${pair}`).join('&')}`;
+      return `${pagePath}?${search}&${pairs.join('&')}`;
   }
 }
 
