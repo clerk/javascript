@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { GitHubLink } from '@/components/github-link';
+import { MobileNav } from '@/components/mobile-nav';
+import type { NavGroup } from '@/lib/navigation';
 import { site } from '@/lib/site';
 
 const tabs = [
@@ -11,12 +13,16 @@ const tabs = [
   { title: 'Changelog', href: site.changelogUrl },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ navigation }: { navigation: NavGroup[] }) {
   const pathname = usePathname();
 
   return (
     <header className='bg-background/90 sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 px-4 backdrop-blur sm:gap-3 md:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(max-content,1fr)]'>
       <div className='flex min-w-0 items-center gap-2 sm:gap-3 lg:col-start-1'>
+        <MobileNav
+          tabs={tabs}
+          groups={navigation}
+        />
         <Link
           href='/'
           className='text-foreground inline-flex min-w-0 items-center gap-2 text-base font-semibold'

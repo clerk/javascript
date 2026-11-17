@@ -62,6 +62,28 @@
   @apply text-foreground mb-1 flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium;
 }
 
+.drawer {
+  transition:
+    translate 0.2s ease,
+    display 0.2s allow-discrete,
+    overlay 0.2s allow-discrete;
+  translate: -100% 0;
+}
+
+.drawer[open] {
+  translate: 0 0;
+}
+
+@starting-style {
+  .drawer[open] {
+    translate: -100% 0;
+  }
+}
+
+.drawer::backdrop {
+  background: oklch(0 0 0 / 0.4);
+}
+
 .prose {
   --tw-prose-body: var(--docs-foreground);
   --tw-prose-headings: var(--docs-foreground);

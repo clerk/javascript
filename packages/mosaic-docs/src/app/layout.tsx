@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { SiteHeader } from '@/components/site-header';
+import { navigation } from '@/lib/navigation';
 import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Skip to content
         </a>
-        <SiteHeader />
+        <SiteHeader navigation={navigation} />
         {children}
       </body>
     </html>
