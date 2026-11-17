@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { CodeBlock } from '@/components/code-block';
 import { type DocEntry, docHref, findDocByName } from '@/lib/docs';
 import type { TocHeading } from '@/lib/navigation';
 
@@ -98,9 +99,10 @@ export function DocContent({ doc }: { doc: Doc }) {
           {doc.examples.map(example => (
             <section key={example.title}>
               <h3>{example.title}</h3>
-              <pre>
-                <code>{example.code.trim()}</code>
-              </pre>
+              <CodeBlock
+                code={example.code.trim()}
+                lang='tsx'
+              />
             </section>
           ))}
         </>
