@@ -38,7 +38,7 @@ export default function HomePage() {
           <div className='max-w-350 mx-auto px-6'>
             <h1 className='mt-6 max-w-3xl text-balance text-4xl font-medium sm:text-5xl lg:text-6xl'>
               <span className='block'>Mosaic</span>
-              <span className='text-muted-foreground block'>Clerk&apos;s component library</span>
+              <span className='text-muted-foreground block'>Clerk’s component library</span>
             </h1>
             <p className='text-muted-foreground mt-8 max-w-xl text-balance text-lg'>{site.description}</p>
             <div className='mt-8 flex flex-wrap items-center gap-x-6 gap-y-4'>

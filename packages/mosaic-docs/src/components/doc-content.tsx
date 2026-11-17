@@ -57,7 +57,7 @@ export function DocContent({ doc, preview }: { doc: Doc; preview?: ReactNode }) 
           <ul>
             {doc.practices.map(practice => (
               <li key={practice.text}>
-                <strong>{practice.do ? 'Do' : "Don't"}:</strong> <InlineCode text={practice.text} />
+                <strong>{practice.do ? 'Do' : 'Don’t'}:</strong> <InlineCode text={practice.text} />
               </li>
             ))}
           </ul>
