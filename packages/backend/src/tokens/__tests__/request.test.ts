@@ -1861,6 +1861,26 @@ describe('tokens.authenticateRequest(options)', () => {
       );
     });
 
+    test.each([['sesion_token'], ['m2m-token'], [['m2m_token', 'apikey']]])(
+      'throws an error if acceptsToken is %j',
+      async acceptsToken => {
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+
+        await expect(authenticateRequest(request, mockOptions({ acceptsToken }))).rejects.toThrow(
+          `Invalid acceptsToken: ${JSON.stringify(acceptsToken)}.`,
+        );
+      },
+    );
+
+    test('rejects every token if acceptsToken is an empty array', async () => {
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+
+      const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: [] }));
+
+      expect(requestState.status).toBe(AuthStatus.SignedOut);
+      expect(requestState.tokenType).toBeNull();
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];
