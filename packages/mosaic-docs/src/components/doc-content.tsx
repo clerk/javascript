@@ -125,35 +125,37 @@ export function DocContent({ doc }: { doc: Doc }) {
 function PropTable({ props }: { props: PropDocs }) {
   const rows = Object.entries(props).flatMap(([name, prop]) => (prop ? [{ name, ...prop }] : []));
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Prop</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(row => (
-          <tr key={row.name}>
-            <td>
-              <code>{row.name}</code>
-            </td>
-            <td>
-              <code className='break-words'>{row.type}</code>
-            </td>
-            <td>
-              <InlineCode text={row.doc} />
-              {row.default ? (
-                <span className='text-muted-foreground mt-1 block'>
-                  Default: <code>{row.default}</code>
-                </span>
-              ) : null}
-            </td>
+    <div className='table-scroll'>
+      <table>
+        <thead>
+          <tr>
+            <th>Prop</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.name}>
+              <td>
+                <code>{row.name}</code>
+              </td>
+              <td>
+                <code>{row.type}</code>
+              </td>
+              <td>
+                <InlineCode text={row.doc} />
+                {row.default ? (
+                  <span className='text-muted-foreground mt-1 block'>
+                    Default: <code>{row.default}</code>
+                  </span>
+                ) : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

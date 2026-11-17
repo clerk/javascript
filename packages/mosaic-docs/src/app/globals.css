@@ -79,6 +79,12 @@
   --tw-prose-pre-bg: var(--docs-code-background);
   --tw-prose-th-borders: var(--docs-border);
   --tw-prose-td-borders: var(--docs-border);
+  --tw-prose-kbd: inherit;
+  --tw-prose-kbd-shadows: transparent;
+  color: var(--docs-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
 }
 
 .prose :where(h1, h2, h3, h4) {
@@ -126,16 +132,106 @@
   text-underline-offset: 0.2em;
 }
 
-.prose :where(code)::before,
-.prose :where(code)::after {
+.prose :where(hr) {
+  margin: 2.5rem 0;
+}
+
+.prose :where(pre) {
+  background: transparent;
+  border: 1px solid var(--docs-border);
+  border-radius: var(--docs-radius);
+  color: var(--docs-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.prose :where(pre code) {
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  padding: 0;
+}
+
+.prose :where(pre > code) {
+  display: block;
+  max-height: 24rem;
+  overflow: auto;
+  padding: 0 1.25rem 0.375rem;
+  scrollbar-color: var(--docs-border) transparent;
+  scrollbar-width: thin;
+}
+
+.prose :where(pre:has(> code)) {
+  padding-bottom: calc(1rem - 0.375rem);
+}
+
+.prose :where(table) {
+  font-size: 0.8125rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border: 1px solid var(--docs-border);
+  border-radius: var(--docs-radius);
+}
+
+.table-scroll > table {
+  margin: 0;
+}
+
+.table-scroll :is(th, td) {
+  padding: 0.75rem;
+}
+
+.table-scroll th {
+  white-space: nowrap;
+}
+
+.prose :where(td, th) > code,
+.prose :where(td, th) :not(pre) > code {
+  white-space: normal;
+}
+
+@media (max-width: 640px) {
+  .prose :where(h1) {
+    font-size: 2.25rem;
+  }
+
+  .prose :where(h2) {
+    font-size: 1.625rem;
+  }
+}
+
+.prose :not(pre) > code:not(:where([class~='not-prose'] *)) {
+  background: var(--docs-code-background);
+  padding: 0.15em 0.35em;
+  border-radius: 0.3rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
   content: none;
 }
 
-.prose :where(:not(pre) > code) {
-  border: 1px solid var(--docs-border);
-  border-radius: 0.375rem;
+.prose kbd {
   background: var(--docs-muted);
+  border: 1px solid var(--docs-border);
+  border-radius: 0.25rem;
+  box-shadow: none;
+  color: inherit;
+  font-family: var(--font-mono);
   font-size: 0.85em;
-  font-weight: 400;
-  padding: 0.1em 0.3em;
+  font-weight: 500;
+  padding: 0.125rem 0.25rem;
 }
