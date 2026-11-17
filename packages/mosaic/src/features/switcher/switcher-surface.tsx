@@ -4,13 +4,20 @@ import type { MosaicMessages } from '../../localization';
 import { useMessages } from '../../localization';
 import type { SwitcherMode } from './switcher.types';
 
-export type SwitcherSurface = 'user-button' | 'organization-switcher';
+export type SwitcherSurface = 'switcher' | 'user-button' | 'organization-switcher';
 
 export function surfaceForMode(mode: SwitcherMode): SwitcherSurface {
-  return mode === 'organization' ? 'organization-switcher' : 'user-button';
+  switch (mode) {
+    case 'combined':
+      return 'switcher';
+    case 'user':
+      return 'user-button';
+    case 'organization':
+      return 'organization-switcher';
+  }
 }
 
-const SurfaceContext = React.createContext<SwitcherSurface>('user-button');
+const SurfaceContext = React.createContext<SwitcherSurface>('switcher');
 
 export const SwitcherSurfaceProvider = SurfaceContext.Provider;
 

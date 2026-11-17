@@ -9,10 +9,10 @@ components open.
 Wrap the part of your app that uses Mosaic. Every prop is optional.
 
 ```tsx
-import { MosaicProvider, UserButton } from '@clerk/mosaic';
+import { Switcher, MosaicProvider } from '@clerk/mosaic';
 
 <MosaicProvider>
-  <UserButton />
+  <Switcher />
 </MosaicProvider>;
 ```
 
@@ -29,13 +29,13 @@ import { MosaicProvider, UserButton } from '@clerk/mosaic';
 
 ## Experimental
 
-| Option        | Type      | Default | Description                                                                                                                  |
-| ------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `newProfiles` | `boolean` | `false` | `UserButton` and `OrganizationSwitcher` open Mosaic's own `UserProfile` and `OrganizationProfile` instead of Clerk's modals. |
+| Option        | Type      | Default | Description                                                                                                                              |
+| ------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `newProfiles` | `boolean` | `false` | `Switcher`, `UserButton` and `OrganizationSwitcher` open Mosaic's own `UserProfile` and `OrganizationProfile` instead of Clerk's modals. |
 
 ## Profile
 
-`profile` configures the profile that `UserButton`, `OrganizationSwitcher`, `UserProfile` and
+`profile` configures the profile that `Switcher`, `UserButton`, `OrganizationSwitcher`, `UserProfile` and
 `OrganizationProfile` share. `UserProfile` and `OrganizationProfile` use it for any prop they don't set
 themselves.
 
@@ -50,14 +50,14 @@ themselves.
   }}
 >
   <OrganizationSwitcher />
-  <UserButton combined={false} />
+  <UserButton />
 </MosaicProvider>
 ```
 
-`combined` on `MosaicProvider` decides what the profile shows, and `combined` on `UserButton` decides what
-its menu lists.
+`combined` on `MosaicProvider` decides what the profile shows, and the button you pick (`Switcher`,
+`UserButton` or `OrganizationSwitcher`) decides what its menu lists.
 
-`profile.combined` takes effect only with `experimental.newProfiles`. Without it, `UserButton` and
+`profile.combined` takes effect only with `experimental.newProfiles`. Without it, `Switcher`, `UserButton` and
 `OrganizationSwitcher` open Clerk's modals.
 
 | Option                     | Type                       | Default | Description                                                                       |
