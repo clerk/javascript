@@ -8,7 +8,7 @@ const groups = [
   {
     title: 'Docs',
     items: [
-      { title: 'Introduction', href: '/docs' },
+      { title: 'Setup', href: '/docs' },
       ...docKinds.map(({ kind, title }) => ({ title, href: `/docs#${kind}` })),
     ],
   },

@@ -1,11 +1,11 @@
-import { site } from '@/lib/site';
+import Setup, { headings as setupHeadings } from '@/content/setup.mdx';
 import { CopyPageButton } from '@/ui/copy-page-button';
 import { DocsArticle, DocsAside } from '@/ui/docs-page';
 import { PageOutline } from '@/ui/page-outline';
 import { TableOfContents } from '@/ui/table-of-contents';
 
 export const metadata = {
-  title: 'Introduction',
+  title: 'Setup',
   alternates: { types: { 'text/markdown': '/docs.md' } },
 };
 
@@ -13,31 +13,17 @@ export default function Layout({ children }) {
   return (
     <>
       <DocsArticle>
-        <PageOutline headings={headings}>
+        <PageOutline headings={setupHeadings}>
           <CopyPageButton href='/docs.md' />
         </PageOutline>
         {children}
       </DocsArticle>
       <DocsAside>
-        <TableOfContents headings={headings} />
+        <TableOfContents headings={setupHeadings} />
         <CopyPageButton href='/docs.md' />
       </DocsAside>
     </>
   );
 }
 
-# Introduction
-
-<p className='lead'>{site.description}</p>
-
-## Components
-
-Styled, ready-to-use building blocks.
-
-## Primitives
-
-Headless building blocks that components are made from.
-
-## Hooks
-
-React hooks for behavior shared across components.
+<Setup />

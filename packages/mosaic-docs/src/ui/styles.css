@@ -236,6 +236,53 @@
     width: 1.25rem;
   }
 
+  :scope :where(.steps) {
+    counter-reset: step;
+    margin-block: 3rem;
+    padding-inline-start: 2.5rem;
+    position: relative;
+  }
+
+  :scope :where(.steps)::before {
+    background: var(--docs-border);
+    bottom: 0;
+    content: '';
+    inset-inline-start: calc(0.75rem - 0.5px);
+    position: absolute;
+    top: 0.875rem;
+    width: 1px;
+  }
+
+  :scope :where(.steps) > :is(h2, h3):first-child {
+    margin-top: 0;
+  }
+
+  :scope :where(.steps) > :is(h2, h3) {
+    counter-increment: step;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    margin-top: 2.5rem;
+    position: relative;
+  }
+
+  :scope :where(.steps) > :is(h2, h3)::before {
+    align-items: center;
+    background: var(--docs-accent);
+    border-radius: 9999px;
+    color: var(--docs-accent-foreground);
+    content: counter(step);
+    display: flex;
+    font-family: var(--docs-font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    height: 1.5rem;
+    inset-inline-start: -2.5rem;
+    justify-content: center;
+    position: absolute;
+    top: 0.125rem;
+    width: 1.5rem;
+  }
+
   :scope :where(table) {
     font-size: 0.8125rem;
   }

@@ -4,7 +4,7 @@ import type { NavGroup } from '@/ui/docs-nav';
 export const navigation: NavGroup[] = [
   {
     title: 'Get started',
-    items: [{ title: 'Introduction', href: '/docs' }],
+    items: [{ title: 'Setup', href: '/docs' }],
   },
   ...docKinds.map(({ kind, title }) => ({
     title,

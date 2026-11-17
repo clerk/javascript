@@ -1,0 +1,65 @@
+# Setup
+
+Install Mosaic, import its stylesheet, and give your app root its own stacking context.
+
+<Steps>
+
+## Install
+
+```sh
+pnpm add @clerk/mosaic
+```
+
+## Import the stylesheet
+
+Mosaic components carry no runtime style injection. The stylesheet holds every component rule, so nothing renders correctly without it. Import it once, at your app’s CSS entry point:
+
+```css
+@import '@clerk/mosaic/styles.css';
+```
+
+## Isolate your app root
+
+Popups, like the UserButton menu, portal to `document.body` and set no `z-index` of their own. A page element with a high `z-index`, like a sticky header, can paint over them.
+
+Give the element that wraps your page content its own stacking context:
+
+```tsx
+<body>
+  <div style={{ isolation: 'isolate' }}>{children}</div>
+</body>
+```
+
+Every `z-index` inside it then stays below the popups. Don’t put it on `<body>` or `<html>`, because the popups mount inside `<body>`.
+
+</Steps>
+
+## Cascade layers
+
+Name the cascade layer the stylesheet lands in when you import it:
+
+```css
+@import '@clerk/mosaic/styles.css' layer(clerk);
+```
+
+Layered styles lose to unlayered ones, so any rule in a plain stylesheet beats Mosaic’s.
+
+To order Mosaic against your other layers, declare the order first. Later layers win:
+
+```css
+@layer clerk, components, utilities;
+
+@import '@clerk/mosaic/styles.css' layer(clerk);
+```
+
+### With Tailwind
+
+Put Mosaic’s layer before Tailwind’s so utility classes on a Mosaic component win:
+
+```css
+@layer clerk;
+@import '@clerk/mosaic/styles.css' layer(clerk);
+@import 'tailwindcss';
+```
+
+Without a layer, Mosaic’s rules are unlayered and beat Tailwind’s utilities.
