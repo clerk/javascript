@@ -14,10 +14,11 @@ import { styles } from './segmented-control.styles';
 
 type StyledProps<Props> = Omit<Props, 'className' | 'style'> & MosaicStyleProps;
 
-export type SegmentedControlRootProps = StyledProps<HeadlessSegmentedControlRootProps>;
+export type SegmentedControlRootProps<Value = string> = StyledProps<HeadlessSegmentedControlRootProps<Value>>;
 export type SegmentedControlItemProps = StyledProps<HeadlessSegmentedControlItemProps>;
 
-const Root = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(function MosaicSegmentedControlRoot(
+// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the value type parameter; the root only hands back values its caller passed in.
+const Root = React.forwardRef<HTMLDivElement, SegmentedControlRootProps<unknown>>(function MosaicSegmentedControlRoot(
   { xstyle, children, ...rest },
   ref,
 ) {
@@ -32,7 +33,9 @@ const Root = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(functio
       {children}
     </Primitive.Root>
   );
-});
+}) as <Value = string>(
+  props: SegmentedControlRootProps<Value> & { ref?: React.Ref<HTMLDivElement> },
+) => React.ReactElement;
 
 const Item = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(function MosaicSegmentedControlItem(
   { xstyle, children, ...rest },

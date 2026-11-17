@@ -26,6 +26,7 @@ import type {
   GetRolesParams,
   InviteMemberParams,
   InviteMembersParams,
+  OrganizationAccessPolicyJSON,
   OrganizationDomainJSON,
   OrganizationDomainResource,
   OrganizationDomainsBulkOwnershipVerificationJSON,
@@ -59,6 +60,7 @@ import {
   OrganizationInvitation,
   OrganizationMembership,
 } from './internal';
+import { OrganizationAccessPolicy } from './OrganizationAccessPolicy';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -181,6 +183,43 @@ export class Organization extends BaseResource implements OrganizationResource {
     )?.response as unknown as OrganizationDomainJSON;
     return new OrganizationDomain(json);
   };
+
+  getAccessPolicies: OrganizationResource['getAccessPolicies'] = async params => {
+    const { data, total_count } = (
+      await BaseResource._fetch(
+        {
+          path: `/organizations/${encodeURIComponent(this.id)}/access_policies`,
+          method: 'GET',
+          search: convertPageToOffsetSearchParams(params),
+        },
+        { forceUpdateClient: true },
+      )
+    )?.response as unknown as ClerkPaginatedResponse<OrganizationAccessPolicyJSON>;
+
+    return { data: data.map(policy => new OrganizationAccessPolicy(policy)), total_count };
+  };
+
+  getAccessPolicy: OrganizationResource['getAccessPolicy'] = async ({ policyId }) => {
+    const json = (
+      await BaseResource._fetch<OrganizationAccessPolicyJSON>({
+        path: `/organizations/${encodeURIComponent(this.id)}/access_policies/${encodeURIComponent(policyId)}`,
+        method: 'GET',
+      })
+    )?.response as OrganizationAccessPolicyJSON;
+
+    return new OrganizationAccessPolicy(json);
+  };
+
+  createAccessPolicy: OrganizationResource['createAccessPolicy'] = params =>
+    OrganizationAccessPolicy.create(this.id, params);
+
+  prepareAccessPolicyOwnershipVerification: OrganizationResource['prepareAccessPolicyOwnershipVerification'] = ({
+    domains,
+  }) => OrganizationAccessPolicy.ownershipVerification(this.id, 'prepare_ownership_verification', domains);
+
+  attemptAccessPolicyOwnershipVerification: OrganizationResource['attemptAccessPolicyOwnershipVerification'] = ({
+    domains,
+  }) => OrganizationAccessPolicy.ownershipVerification(this.id, 'attempt_ownership_verification', domains);
 
   getEnterpriseConnections = async (
     params?: GetEnterpriseConnectionsParams,

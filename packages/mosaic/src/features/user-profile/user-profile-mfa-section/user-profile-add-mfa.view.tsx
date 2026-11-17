@@ -39,12 +39,11 @@ export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorM
         >
           {errorMessage}
         </Card.Banner>
-        <Item.Group variant='outline'>
+        <Item.Group>
           {methods.map((type, index) => (
             <Item.Root
               key={type}
               ref={index === 0 ? firstMethodRef : undefined}
-              size='lg'
               render={
                 <button
                   type='button'

@@ -184,6 +184,54 @@ describe('Mosaic TagInput', () => {
     expect(new FormData(form).getAll('emails')).toEqual(['preston@clerk.dev']);
   });
 
+  describe('outside the form named by form', () => {
+    function submitInvite(props: Pick<React.ComponentProps<typeof TagInput>, 'required' | 'defaultValue'>) {
+      const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        return new FormData(event.currentTarget).getAll('emails');
+      });
+      render(
+        <>
+          <form
+            id='invite'
+            data-testid='form'
+            onSubmit={onSubmit}
+          />
+          <TagInput
+            aria-label='Email'
+            name='emails'
+            form='invite'
+            {...props}
+          />
+        </>,
+      );
+      const form = screen.getByTestId('form');
+      if (!(form instanceof HTMLFormElement)) {
+        throw new Error('expected a form');
+      }
+      form.requestSubmit();
+      return onSubmit;
+    }
+
+    it('blocks the submit while required and empty', () => {
+      const onSubmit = submitInvite({ required: true });
+
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('submits a required value once it has a tag', () => {
+      const onSubmit = submitInvite({ required: true, defaultValue: ['preston@clerk.dev'] });
+
+      expect(onSubmit).toHaveReturnedWith(['preston@clerk.dev']);
+    });
+
+    it('submits while optional and empty', () => {
+      const onSubmit = submitInvite({});
+
+      expect(onSubmit).toHaveReturnedWith([]);
+    });
+  });
+
   it('forwards the ref and native input props to the text input', () => {
     const ref = React.createRef<HTMLInputElement>();
     render(

@@ -14,6 +14,7 @@ export function UserProfilePhoneSectionView({
   phones,
   defaultPhoneCountry,
   canAdd,
+  isDisabled,
   verification,
   error,
   rowRef,
@@ -37,13 +38,14 @@ export function UserProfilePhoneSectionView({
           color='neutral'
           size='sm'
           variant='outline'
+          disabled={isDisabled}
         />
       }
     >
       <Icon
         glyph={Plus}
         placement='inline-start'
-        size='sm'
+        size='md'
       />
       {messages.contact.add}
     </Dialog.Trigger>
@@ -61,7 +63,7 @@ export function UserProfilePhoneSectionView({
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
-        pendingVerifyId={verification.pendingVerifyId}
+        isDisabled={isDisabled}
       >
         <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>

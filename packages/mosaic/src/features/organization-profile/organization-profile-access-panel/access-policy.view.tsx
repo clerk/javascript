@@ -26,8 +26,9 @@ import { AccessRadio, AccessSelect } from './access-fields.view';
 export function AccessPolicyView({ controller: c }: { controller: AccessController }) {
   const m = useMessages('organizationProfile').access;
   const focus = useFlowAutoFocus<HTMLHeadingElement>();
-  const { form, data, registerAddDomain, registerAddSso } = c;
+  const { form, data, registerAddDomain } = c;
   const p = form.values;
+  const usesSso = p.authentication === 'sso';
   return (
     <Form
       id={form.id}
@@ -35,7 +36,7 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
       {...mergeStyleProps(themeProps('access-policy'), stylex.props(styles.stack))}
     >
       <Section.Error>{form.error}</Section.Error>
-      {p.id ? (
+      {p.id && (!data.live || usesSso) ? (
         <Section.Root>
           <Section.Group>
             <Section.Header>
@@ -94,24 +95,26 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
                       <Section.Actions xstyle={[styles.headerActions, styles.domainActions]}>
                         <span {...stylex.props(styles.domainStatus)}>
                           <Icon
-                            glyph={CheckmarkCircle}
-                            xstyle={styles.verified}
+                            glyph={domain.affiliationVerified ? CheckmarkCircle : XCircle}
+                            xstyle={domain.affiliationVerified && styles.verified}
                           />
-                          {m.association}
+                          {domain.affiliationVerified ? m.association : m.associationUnverified}
                         </span>
-                        <span {...stylex.props(styles.domainStatus)}>
-                          <Icon
-                            glyph={domain.verified ? CheckmarkCircle : XCircle}
-                            xstyle={domain.verified && styles.verified}
-                          />
-                          {domain.verified ? m.verified : m.unverified}
-                        </span>
+                        {usesSso ? (
+                          <span {...stylex.props(styles.domainStatus)}>
+                            <Icon
+                              glyph={domain.verified ? CheckmarkCircle : XCircle}
+                              xstyle={domain.verified && styles.verified}
+                            />
+                            {domain.verified ? m.verified : m.unverified}
+                          </span>
+                        ) : null}
                         <ActionMenu
                           label={m.actions}
                           triggerRef={c.domainRemoval.registerTrigger(domain.name)}
                           disabled={form.isSubmitting}
                           actions={[
-                            ...(!domain.verified
+                            ...(usesSso && !domain.verified && c.canVerifyDomain
                               ? [{ label: m.verify, onClick: () => c.onVerifyDomain(domain.name) }]
                               : []),
                             {
@@ -129,7 +132,7 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
                       </Section.Actions>
                     </Section.Item>
                   </Section.Row>
-                  {p.authentication === 'sso' && !domain.verified ? (
+                  {usesSso && !domain.verified && c.canVerifyDomain ? (
                     <div {...mergeStyleProps(themeProps('access-domain-notice'), stylex.props(styles.notice))}>
                       <Icon glyph={InformationCircle} />
                       <Section.Description>{m.verifyNotice}</Section.Description>
@@ -150,195 +153,113 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      <Section.Root>
-        <Section.Group>
-          <Section.Header>
-            <Section.Title>{m.authentication}</Section.Title>
-          </Section.Header>
-          <Section.Body>
-            <div {...mergeStyleProps(themeProps('access-authentication'), stylex.props(styles.fields))}>
-              <Radio.Group
-                aria-label={m.authentication}
-                value={p.authentication}
-                disabled={form.isSubmitting}
-                onValueChange={c.onAuthenticationChange}
-              >
-                <AccessRadio
-                  value='default'
-                  label={m.defaultAuthentication}
-                  description={m.defaultDescription}
-                />
-                <AccessRadio
-                  value='sso'
-                  label={m.sso}
-                  description={m.ssoDescription}
-                />
-              </Radio.Group>
-              {p.authentication === 'sso' ? (
-                <div {...stylex.props(styles.inset)}>
-                  {p.ssoConnectionIds.map(id => (
-                    <div
-                      key={id}
-                      {...stylex.props(styles.connectionRow)}
-                    >
-                      <div {...stylex.props(styles.connectionControl)}>
-                        <AccessSelect
-                          label={m.connections}
-                          hideLabel={id !== p.ssoConnectionIds[0]}
-                          provider={data.connections.find(item => item.id === id)?.configuration.provider}
-                          value={id}
-                          items={data.connections
-                            .filter(
-                              item => item.kind === 'sso' && (item.id === id || !p.ssoConnectionIds.includes(item.id)),
-                            )
-                            .map(item => ({ value: item.id, label: item.configuration.name }))}
-                          onChange={next =>
-                            form.setValue(
-                              'ssoConnectionIds',
-                              p.ssoConnectionIds.map(value => (value === id ? next : value)),
-                            )
-                          }
-                          disabled={form.isSubmitting}
-                        />
-                      </div>
-                      <Button
-                        variant='outline'
-                        color='neutral'
-                        shape='square'
-                        aria-label={m.manage}
-                        onClick={() =>
-                          c.onSetup(
-                            'sso',
-                            data.connections.find(item => item.id === id),
-                          )
-                        }
-                        disabled={form.isSubmitting}
-                      >
-                        <Icon glyph={Cog6Teeth} />
-                      </Button>
-                      <Button
-                        ref={c.ssoRemoval.registerTrigger(id)}
-                        shape='square'
-                        aria-label={m.remove}
-                        variant='outline'
-                        color='neutral'
-                        disabled={form.isSubmitting}
-                        onClick={() => {
-                          void c.ssoRemoval.remove(id).then(() => c.ssoRemoval.finalFocus()?.focus());
-                        }}
-                      >
-                        <Icon glyph={Trash} />
-                      </Button>
-                    </div>
-                  ))}
-                  {c.availableSsoConnections.length ? (
-                    <Menu.Root>
-                      <Menu.Trigger
-                        ref={registerAddSso}
-                        render={
-                          <Button
-                            variant='outline'
-                            color='neutral'
-                            xstyle={styles.fit}
-                          />
-                        }
-                        disabled={form.isSubmitting}
-                      >
-                        <Icon glyph={Plus} />
-                        {m.addConnection}
-                      </Menu.Trigger>
-                      <Menu.Popup>
-                        {c.availableSsoConnections.map(connection => (
-                          <Menu.Item
-                            key={connection.id}
-                            label={connection.configuration.name}
-                            onClick={() => c.onAttachSso(connection.id)}
-                          >
-                            <Menu.Label>{connection.configuration.name}</Menu.Label>
-                          </Menu.Item>
-                        ))}
-                        <Menu.Item
-                          label={m.ssoTitle}
-                          onClick={() => c.onSetup('sso')}
-                        >
-                          <Menu.Label>{m.ssoTitle}</Menu.Label>
-                        </Menu.Item>
-                      </Menu.Popup>
-                    </Menu.Root>
-                  ) : (
-                    <Button
-                      xstyle={styles.fit}
-                      ref={registerAddSso}
-                      variant='outline'
-                      color='neutral'
-                      onClick={() => c.onSetup('sso')}
+      <PolicyAuthentication controller={c} />
+      <PolicyEnrollment controller={c} />
+    </Form>
+  );
+}
+
+function PolicyAuthentication({ controller: c }: { controller: AccessController }) {
+  const m = useMessages('organizationProfile').access;
+  const { form, data } = c;
+  const p = form.values;
+  const usesSso = p.authentication === 'sso';
+  return (
+    <Section.Root>
+      <Section.Group>
+        <Section.Header>
+          <Section.Title>{m.authentication}</Section.Title>
+        </Section.Header>
+        <Section.Body>
+          <div {...mergeStyleProps(themeProps('access-authentication'), stylex.props(styles.fields))}>
+            {data.live && !data.canEditPolicyAuthentication ? (
+              <>
+                <Section.Label>{usesSso ? m.sso : m.defaultAuthentication}</Section.Label>
+                {p.ssoConnectionIds.map(id => (
+                  <Section.Description key={id}>{p.connectionNames?.[id] ?? id}</Section.Description>
+                ))}
+              </>
+            ) : (
+              <>
+                <Radio.Group
+                  aria-label={m.authentication}
+                  value={p.authentication}
+                  disabled={form.isSubmitting}
+                  onValueChange={c.onAuthenticationChange}
+                >
+                  <AccessRadio
+                    value='default'
+                    label={m.defaultAuthentication}
+                    description={m.defaultDescription}
+                  />
+                  <AccessRadio
+                    value='sso'
+                    label={m.sso}
+                    description={m.ssoDescription}
+                  />
+                </Radio.Group>
+                {usesSso ? <PolicySsoConnections controller={c} /> : !data.live ? <PolicyMfa controller={c} /> : null}
+                {!data.live ? (
+                  <>
+                    <Separator />
+                    <AccessSelect
+                      label={m.reverification}
+                      value={p.reverification}
+                      items={[
+                        { value: '1', label: m.hour },
+                        { value: '12', label: m.twelveHours },
+                        { value: '24', label: m.hours },
+                      ]}
+                      onChange={value => form.setValue('reverification', value)}
                       disabled={form.isSubmitting}
-                    >
-                      <Icon glyph={Plus} />
-                      {m.addConnection}
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <Separator />
-                  <Field.Root
-                    orientation='horizontal'
-                    disabled={form.isSubmitting}
-                  >
-                    <Field.Content>
-                      <Field.Label>{m.mfa}</Field.Label>
-                    </Field.Content>
-                    <Switch
-                      checked={p.mfaEnabled}
-                      onChange={event => form.setValue('mfaEnabled', event.target.checked)}
                     />
-                    <span>{p.mfaEnabled ? m.enabled : m.disabled}</span>
-                  </Field.Root>
-                  {p.mfaEnabled ? (
-                    <Radio.Group
-                      aria-label={m.mfa}
-                      value={p.mfa}
-                      onValueChange={c.onMfaChange}
-                      disabled={form.isSubmitting}
-                    >
-                      <AccessRadio
-                        value='optional'
-                        label={m.optional}
-                        description={m.optionalDescription}
-                      />
-                      <AccessRadio
-                        value='required'
-                        label={m.required}
-                        description={m.requiredDescription}
-                      />
-                    </Radio.Group>
-                  ) : null}
-                </>
-              )}
-              <Separator />
-              <AccessSelect
-                label={m.reverification}
-                value={p.reverification}
-                items={[
-                  { value: '1', label: m.hour },
-                  { value: '12', label: m.twelveHours },
-                  { value: '24', label: m.hours },
-                ]}
-                onChange={value => form.setValue('reverification', value)}
-                disabled={form.isSubmitting}
-              />
-            </div>
-          </Section.Body>
-        </Section.Group>
-      </Section.Root>
-      <Section.Root>
-        <Section.Group>
-          <Section.Header>
-            <Section.Title>{m.enrollment}</Section.Title>
-          </Section.Header>
-          <Section.Body>
-            <div {...mergeStyleProps(themeProps('access-enrollment'), stylex.props(styles.fields))}>
+                  </>
+                ) : null}
+              </>
+            )}
+          </div>
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
+function PolicyEnrollment({ controller: c }: { controller: AccessController }) {
+  const m = useMessages('organizationProfile').access;
+  const { form, data } = c;
+  const p = form.values;
+  const usesSso = p.authentication === 'sso';
+  return (
+    <Section.Root>
+      <Section.Group>
+        <Section.Header>
+          <Section.Title>{m.enrollment}</Section.Title>
+        </Section.Header>
+        <Section.Body>
+          <div {...mergeStyleProps(themeProps('access-enrollment'), stylex.props(styles.fields))}>
+            {data.live && usesSso ? (
+              <>
+                <AccessSelect
+                  label={m.enrollment}
+                  value={p.enrollment === 'directory' ? 'directory' : 'automatic'}
+                  items={[
+                    { value: 'automatic', label: m.automatic },
+                    ...(data.connections.some(item => item.kind === 'directory')
+                      ? [{ value: 'directory', label: m.directory }]
+                      : []),
+                  ]}
+                  onChange={c.onEnrollmentChange}
+                  disabled={form.isSubmitting}
+                />
+                {p.enrollment === 'directory' ? (
+                  <Section.Description>
+                    {p.directoryConnectionId
+                      ? (p.connectionNames?.[p.directoryConnectionId] ?? p.directoryConnectionId)
+                      : null}
+                  </Section.Description>
+                ) : null}
+              </>
+            ) : (
               <Radio.Group
                 aria-label={m.enrollment}
                 value={p.enrollment}
@@ -360,62 +281,212 @@ export function AccessPolicyView({ controller: c }: { controller: AccessControll
                   label={m.request}
                   description={m.requestDescription}
                 />
-                <AccessRadio
-                  value='directory'
-                  label={m.directory}
-                  description={m.directoryDescription}
-                />
+                {!data.live ? (
+                  <AccessRadio
+                    value='directory'
+                    label={m.directory}
+                    description={m.directoryDescription}
+                  />
+                ) : null}
               </Radio.Group>
-              {p.enrollment === 'directory' ? (
-                <div {...stylex.props(styles.inset)}>
-                  {p.directoryConnectionId ? (
-                    <div {...stylex.props(styles.connectionRow)}>
-                      <AccessSelect
-                        label={m.directory}
-                        value={p.directoryConnectionId}
-                        provider={
-                          data.connections.find(item => item.id === p.directoryConnectionId)?.configuration.provider
-                        }
-                        items={data.connections
-                          .filter(item => item.kind === 'directory')
-                          .map(item => ({ value: item.id, label: item.configuration.name }))}
-                        onChange={id => form.setValue('directoryConnectionId', id)}
-                        disabled={form.isSubmitting}
-                      />
-                      <Button
-                        variant='outline'
-                        color='neutral'
-                        shape='square'
-                        aria-label={m.manage}
-                        disabled={form.isSubmitting}
-                        onClick={() =>
-                          c.onSetup(
-                            'directory',
-                            data.connections.find(item => item.id === p.directoryConnectionId),
-                          )
-                        }
-                      >
-                        <Icon glyph={Cog6Teeth} />
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant='outline'
-                      color='neutral'
-                      xstyle={styles.fit}
-                      onClick={() => c.onSetup('directory')}
-                      disabled={form.isSubmitting}
-                    >
-                      <Icon glyph={Plus} />
-                      {m.addDirectory}
-                    </Button>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          </Section.Body>
-        </Section.Group>
-      </Section.Root>
-    </Form>
+            )}
+            {p.enrollment === 'directory' && (!data.live || usesSso) ? <PolicyDirectory controller={c} /> : null}
+          </div>
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
+function PolicySsoConnections({ controller: c }: { controller: AccessController }) {
+  const m = useMessages('organizationProfile').access;
+  const { form, data, registerAddSso } = c;
+  const p = form.values;
+  return (
+    <div {...stylex.props(styles.inset)}>
+      {p.ssoConnectionIds.map(id => (
+        <div
+          key={id}
+          {...stylex.props(styles.connectionRow)}
+        >
+          <div {...stylex.props(styles.connectionControl)}>
+            <AccessSelect
+              label={m.connections}
+              hideLabel={id !== p.ssoConnectionIds[0]}
+              provider={data.connections.find(item => item.id === id)?.configuration.provider}
+              value={id}
+              items={data.connections
+                .filter(item => item.kind === 'sso' && (item.id === id || !p.ssoConnectionIds.includes(item.id)))
+                .map(item => ({ value: item.id, label: item.configuration.name }))}
+              onChange={next =>
+                form.setValue(
+                  'ssoConnectionIds',
+                  p.ssoConnectionIds.map(value => (value === id ? next : value)),
+                )
+              }
+              disabled={form.isSubmitting}
+            />
+          </div>
+          <Button
+            variant='outline'
+            color='neutral'
+            shape='square'
+            aria-label={m.manage}
+            onClick={() => c.onManage(id)}
+            disabled={form.isSubmitting}
+          >
+            <Icon glyph={Cog6Teeth} />
+          </Button>
+          <Button
+            ref={c.ssoRemoval.registerTrigger(id)}
+            shape='square'
+            aria-label={m.remove}
+            variant='outline'
+            color='neutral'
+            disabled={form.isSubmitting}
+            onClick={() => {
+              void c.ssoRemoval.remove(id).then(() => c.ssoRemoval.finalFocus()?.focus());
+            }}
+          >
+            <Icon glyph={Trash} />
+          </Button>
+        </div>
+      ))}
+      {c.availableSsoConnections.length ? (
+        <Menu.Root>
+          <Menu.Trigger
+            ref={registerAddSso}
+            render={
+              <Button
+                variant='outline'
+                color='neutral'
+                xstyle={styles.fit}
+              />
+            }
+            disabled={form.isSubmitting}
+          >
+            <Icon glyph={Plus} />
+            {m.addConnection}
+          </Menu.Trigger>
+          <Menu.Popup>
+            {c.availableSsoConnections.map(connection => (
+              <Menu.Item
+                key={connection.id}
+                label={connection.configuration.name}
+                onClick={() => c.onAttachSso(connection.id)}
+              >
+                <Menu.Label>{connection.configuration.name}</Menu.Label>
+              </Menu.Item>
+            ))}
+            <Menu.Item
+              label={m.ssoTitle}
+              onClick={() => c.onSetup('sso')}
+            >
+              <Menu.Label>{m.ssoTitle}</Menu.Label>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Root>
+      ) : (
+        <Button
+          xstyle={styles.fit}
+          ref={registerAddSso}
+          variant='outline'
+          color='neutral'
+          onClick={() => c.onSetup('sso')}
+          disabled={form.isSubmitting}
+        >
+          <Icon glyph={Plus} />
+          {m.addConnection}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function PolicyDirectory({ controller: c }: { controller: AccessController }) {
+  const m = useMessages('organizationProfile').access;
+  const { form, data } = c;
+  const p = form.values;
+  return (
+    <div {...stylex.props(styles.inset)}>
+      {p.directoryConnectionId || data.live ? (
+        <div {...stylex.props(styles.connectionRow)}>
+          <AccessSelect
+            label={m.directory}
+            value={p.directoryConnectionId}
+            provider={data.connections.find(item => item.id === p.directoryConnectionId)?.configuration.provider}
+            items={data.connections
+              .filter(item => item.kind === 'directory')
+              .map(item => ({ value: item.id, label: item.configuration.name }))}
+            onChange={id => form.setValue('directoryConnectionId', id)}
+            disabled={form.isSubmitting}
+          />
+          <Button
+            variant='outline'
+            color='neutral'
+            shape='square'
+            aria-label={m.manage}
+            disabled={form.isSubmitting || !p.directoryConnectionId}
+            onClick={() => c.onManage(p.directoryConnectionId ?? '')}
+          >
+            <Icon glyph={Cog6Teeth} />
+          </Button>
+        </div>
+      ) : (
+        <Button
+          variant='outline'
+          color='neutral'
+          xstyle={styles.fit}
+          onClick={() => c.onSetup('directory')}
+          disabled={form.isSubmitting}
+        >
+          <Icon glyph={Plus} />
+          {m.addDirectory}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function PolicyMfa({ controller: c }: { controller: AccessController }) {
+  const m = useMessages('organizationProfile').access;
+  const { form } = c;
+  const p = form.values;
+  return (
+    <>
+      <Separator />
+      <Field.Root
+        orientation='horizontal'
+        disabled={form.isSubmitting}
+      >
+        <Field.Content>
+          <Field.Label>{m.mfa}</Field.Label>
+        </Field.Content>
+        <Switch
+          checked={p.mfaEnabled}
+          onChange={event => form.setValue('mfaEnabled', event.target.checked)}
+        />
+        <span>{p.mfaEnabled ? m.enabled : m.disabled}</span>
+      </Field.Root>
+      {p.mfaEnabled ? (
+        <Radio.Group
+          aria-label={m.mfa}
+          value={p.mfa}
+          onValueChange={c.onMfaChange}
+          disabled={form.isSubmitting}
+        >
+          <AccessRadio
+            value='optional'
+            label={m.optional}
+            description={m.optionalDescription}
+          />
+          <AccessRadio
+            value='required'
+            label={m.required}
+            description={m.requiredDescription}
+          />
+        </Radio.Group>
+      ) : null}
+    </>
   );
 }

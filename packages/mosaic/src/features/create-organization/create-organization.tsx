@@ -4,7 +4,10 @@ import type { ReactElement, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { useMembersPanelRolesModel } from '../organization-profile/organization-profile-members-panel/organization-profile-members-panel.model';
-import type { CreateOrganizationReadyModel } from './create-organization.controller';
+import type {
+  CreateOrganizationControllerOptions,
+  CreateOrganizationReadyModel,
+} from './create-organization.controller';
 import {
   useCreateOrganizationController,
   useCreateOrganizationInviteController,
@@ -88,7 +91,7 @@ function ConnectedCreateOrganization({
 
 export function useCreateOrganizationFlow(
   model: CreateOrganizationReadyModel,
-  options: { onRestart?: () => void } = {},
+  options: CreateOrganizationControllerOptions = {},
 ): CreateOrganizationStepsProps {
   const controller = useCreateOrganizationController(model, options);
   const organizationId = controller.step.step === 'create' ? null : controller.step.organizationId;

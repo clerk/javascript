@@ -1,9 +1,12 @@
-import { act, cleanup, render, renderHook, screen, within } from '@testing-library/react';
+import { logger } from '@clerk/shared/logger';
+import { act, cleanup, configure, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
+import { useRouterScope } from '../routing/use-router';
+import { useVirtualSegment, useVirtualWrite } from '../routing/virtual-store';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
@@ -456,5 +459,285 @@ describe('useModal', () => {
         />,
       ),
     ).toThrow(/unknown.*MosaicProvider/);
+  });
+});
+
+describe('a modal surface that routes', () => {
+  function Entry() {
+    return <output data-testid='entry'>{JSON.stringify(useVirtualSegment('/modal/stub') ?? null)}</output>;
+  }
+
+  function routedSurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'routed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: StubContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? options.page.split('/') : []),
+    });
+  }
+
+  function renderRouted(surface = routedSurface()) {
+    const ref: { handle: ModalHandle<StubOptions> | undefined } = { handle: undefined };
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Entry />
+      </>,
+    );
+    return ref;
+  }
+
+  const entry = () => JSON.parse(screen.getByTestId('entry').textContent ?? 'null');
+
+  it('writes an empty entry under its base when opened with no page', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open());
+    await flush();
+
+    expect(entry()).toEqual([]);
+  });
+
+  it('writes the page it was opened at', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open({ page: 'organization/general' }));
+    await flush();
+
+    expect(entry()).toEqual(['organization', 'general']);
+  });
+
+  it('clears its entry when closed, so it reopens fresh', async () => {
+    const ref = renderRouted();
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(entry()).toEqual(['security']);
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(entry()).toBeNull();
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(entry()).toEqual([]);
+  });
+
+  describe('with content that routes', () => {
+    const pages = { account: 'account', security: 'security' } as const;
+
+    function RoutingContent({ path }: ModalContentProps<StubOptions>) {
+      const { route } = useRouterScope(pages, { routing: 'virtual', path, root: 'account' });
+      return <output data-testid='route'>{route}</output>;
+    }
+
+    function routingSurface() {
+      return defineModalSurface<StubOptions>({
+        id: 'routing',
+        variant: 'card',
+        load: () => Promise.resolve({ default: RoutingContent }),
+        path: '/modal/stub',
+        initialParts: options => (options?.page ? options.page.split('/') : []),
+      });
+    }
+
+    function keepExitPending() {
+      const prototype = Element.prototype as { getAnimations?: unknown };
+      const original = prototype.getAnimations;
+      prototype.getAnimations = () => [{ finished: new Promise<void>(() => {}) }];
+      onTestFinished(() => {
+        if (original) {
+          prototype.getAnimations = original;
+        } else {
+          delete prototype.getAnimations;
+        }
+      });
+    }
+
+    it.each([
+      { name: 'normally', strict: false },
+      { name: 'in StrictMode', strict: true },
+    ])('keeps the entry cleared after close, without the content redirecting it back, $name', async ({ strict }) => {
+      if (strict) {
+        configure({ reactStrictMode: true });
+        onTestFinished(() => configure({ reactStrictMode: false }));
+      }
+      const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+      expect(screen.getByTestId('route').textContent).toBe('security');
+
+      act(() => ref.handle?.close());
+      await flush();
+      expect(entry()).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('keeps the entry cleared for the length of the exit transition', async () => {
+      keepExitPending();
+      const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+      act(() => ref.handle?.close());
+      await flush();
+
+      expect(screen.getByTestId('route')).toBeInTheDocument();
+      expect(entry()).toBeNull();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('opens at the requested page when reopened mid-exit', async () => {
+      keepExitPending();
+      const ref = renderRouted(routingSurface());
+
+      act(() => ref.handle?.open());
+      await flush();
+      expect(entry()).toEqual([]);
+      act(() => ref.handle?.close());
+      await flush();
+      act(() => ref.handle?.open({ page: 'security' }));
+      await flush();
+
+      expect(entry()).toEqual(['security']);
+      expect(screen.getByTestId('route').textContent).toBe('security');
+    });
+  });
+
+  it('opens and closes with outside writes to its base, and isOpen follows', async () => {
+    const surface = routedSurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined; write: ReturnType<typeof useVirtualWrite> | undefined } =
+      {
+        handle: undefined,
+        write: undefined,
+      };
+    function Outside({ onWrite }: { onWrite: (write: ReturnType<typeof useVirtualWrite>) => void }) {
+      onWrite(useVirtualWrite());
+      return null;
+    }
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Outside onWrite={w => (ref.write = w)} />
+        <Entry />
+      </>,
+    );
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => ref.write?.('/modal/stub', ['security']));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    act(() => ref.write?.('/modal/stub', undefined));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('does not reuse the options or container of an earlier open for an opening written from outside', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    onTestFinished(() => container.remove());
+    const surface = routedSurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined; write: ReturnType<typeof useVirtualWrite> | undefined } =
+      {
+        handle: undefined,
+        write: undefined,
+      };
+    function Outside({ onWrite }: { onWrite: (write: ReturnType<typeof useVirtualWrite>) => void }) {
+      onWrite(useVirtualWrite());
+      return null;
+    }
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Outside onWrite={w => (ref.write = w)} />
+      </>,
+    );
+
+    act(() => ref.handle?.open({ label: 'first' }, container));
+    await flush();
+    expect(readOptions()).toEqual({ label: 'first' });
+    expect(container).toContainElement(screen.getByLabelText('Stub'));
+
+    act(() => ref.handle?.close());
+    await flush();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    act(() => ref.write?.('/modal/stub', []));
+    await flush();
+    expect(readOptions()).toBeNull();
+    expect(container).not.toContainElement(screen.getByLabelText('Stub'));
+  });
+
+  it('forgets a cancelled open, so an opening written from outside starts fresh', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    onTestFinished(() => container.remove());
+    const surface = routedSurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined; write: ReturnType<typeof useVirtualWrite> | undefined } =
+      {
+        handle: undefined,
+        write: undefined,
+      };
+    function Outside({ onWrite }: { onWrite: (write: ReturnType<typeof useVirtualWrite>) => void }) {
+      onWrite(useVirtualWrite());
+      return null;
+    }
+    renderWithModals(
+      [surface],
+      <>
+        <Caller
+          surface={surface}
+          onHandle={h => (ref.handle = h)}
+        />
+        <Outside onWrite={w => (ref.write = w)} />
+      </>,
+    );
+
+    act(() => {
+      ref.handle?.open({ label: 'cancelled' }, container);
+      ref.handle?.close();
+    });
+    await flush();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    act(() => ref.write?.('/modal/stub', []));
+    await flush();
+    expect(readOptions()).toBeNull();
+    expect(container).not.toContainElement(screen.getByLabelText('Stub'));
+  });
+
+  it('hands its base to the content', async () => {
+    const surface = defineModalSurface<StubOptions>({
+      id: 'based',
+      variant: 'card',
+      load: () =>
+        Promise.resolve({
+          default: ({ path }: ModalContentProps<StubOptions>) => <output data-testid='base'>{path}</output>,
+        }),
+      path: '/modal/based',
+    });
+    const ref = renderRouted(surface);
+
+    act(() => ref.handle?.open());
+    await flush();
+
+    expect(screen.getByTestId('base').textContent).toBe('/modal/based');
   });
 });

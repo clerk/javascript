@@ -79,7 +79,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   },
   ref,
 ) {
-  const [overlayRoot, setOverlayRoot] = React.useState<HTMLDivElement | null>(null);
   const dialog = React.useContext(DialogContext);
   const inline = elevation === 'flush' && !isInDialog(dialog);
   const fullscreen = dialog?.variant === 'fullscreen';
@@ -117,7 +116,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   );
   const context = React.useMemo(
     () => ({
-      overlayRoot,
       titleId,
       renderBranding,
       compact,
@@ -136,7 +134,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       dismiss,
     }),
     [
-      overlayRoot,
       titleId,
       renderBranding,
       compact,
@@ -155,7 +152,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, setOverlayRoot],
+    ref,
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
@@ -254,7 +251,7 @@ function BackButton() {
       >
         <Icon
           glyph={ArrowLeft}
-          size='sm'
+          size='md'
           xstyle={rtl.mirror}
         />
       </span>
@@ -533,7 +530,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
       {label}
       <Icon
         glyph={ChevronDown}
-        size='sm'
+        size='md'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
     </>
@@ -690,7 +687,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * <Profile.Root value={page} onValueChange={setPage}>
  *   <Profile.Title>User profile</Profile.Title>
  *   <Profile.Nav>
- *     <Profile.NavItem value='account' icon={<Icon glyph={UserCircle} size='sm' />}>Account</Profile.NavItem>
+ *     <Profile.NavItem value='account' icon={<Icon glyph={UserCircle} size='md' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
  *   <Profile.Content pageTitle='Account'>
  *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>

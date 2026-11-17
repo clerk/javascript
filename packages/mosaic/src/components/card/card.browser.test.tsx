@@ -1,7 +1,9 @@
 import { cleanup, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { Dialog } from '../dialog';
+import { Flow } from '../flow';
 import { Card } from './card';
 
 afterEach(() => cleanup());
@@ -106,5 +108,116 @@ describe('Card.Root align', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
     expectCentered('media');
     expectCentered('title');
+  });
+});
+
+describe('Card.Footer divider', () => {
+  function borderTop(testId: string) {
+    return getComputedStyle(screen.getByTestId(testId)).borderTopWidth;
+  }
+
+  function Header() {
+    return (
+      <Card.Header>
+        <Card.Title>Title</Card.Title>
+      </Card.Header>
+    );
+  }
+
+  function FlowCard({ step, footer }: { step: ReactNode; footer?: ReactNode }) {
+    return (
+      <Card.Root renderBranding={false}>
+        <Flow.Root
+          value='only'
+          state={null}
+        >
+          {() => <Flow.Step ids={['only']}>{step}</Flow.Step>}
+        </Flow.Root>
+        {footer}
+      </Card.Root>
+    );
+  }
+
+  it('draws a divider when the footer follows content', () => {
+    render(
+      <Card.Root renderBranding={false}>
+        <Header />
+        <Card.Content>Body</Card.Content>
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    expect(borderTop('footer')).toBe('1px');
+  });
+
+  it('draws no divider when the footer directly follows the header', () => {
+    render(
+      <Card.Root renderBranding={false}>
+        <Header />
+        <Card.Footer data-testid='footer'>Footer</Card.Footer>
+      </Card.Root>,
+    );
+
+    expect(borderTop('footer')).toBe('0px');
+  });
+
+  it('draws no divider when the footer directly follows the header inside a flow step', () => {
+    render(
+      <FlowCard
+        step={
+          <>
+            <Header />
+            <Card.Footer data-testid='footer'>Footer</Card.Footer>
+          </>
+        }
+      />,
+    );
+
+    expect(borderTop('footer')).toBe('0px');
+  });
+
+  it('draws a divider when the footer follows a flow whose step has content', () => {
+    render(
+      <FlowCard
+        step={
+          <>
+            <Header />
+            <Card.Content>Body</Card.Content>
+          </>
+        }
+        footer={<Card.Footer data-testid='footer'>Footer</Card.Footer>}
+      />,
+    );
+
+    expect(borderTop('footer')).toBe('1px');
+  });
+
+  it('draws a divider on a step footer and on the card footer after it', () => {
+    render(
+      <FlowCard
+        step={
+          <>
+            <Header />
+            <Card.Content>Body</Card.Content>
+            <Card.Footer data-testid='step-footer'>Step</Card.Footer>
+          </>
+        }
+        footer={<Card.Footer data-testid='card-footer'>Card</Card.Footer>}
+      />,
+    );
+
+    expect(borderTop('step-footer')).toBe('1px');
+    expect(borderTop('card-footer')).toBe('1px');
+  });
+
+  it('draws no divider when the footer follows a flow whose step is only a header', () => {
+    render(
+      <FlowCard
+        step={<Header />}
+        footer={<Card.Footer data-testid='footer'>Footer</Card.Footer>}
+      />,
+    );
+
+    expect(borderTop('footer')).toBe('0px');
   });
 });

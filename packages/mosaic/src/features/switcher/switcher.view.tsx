@@ -273,7 +273,7 @@ function SwitcherRow({
         <SwitcherItemTrailing>
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         </SwitcherItemTrailing>
       ) : null}
@@ -578,7 +578,7 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
         <Menu.Media>
           <Icon
             glyph={Checkmark}
-            size='sm'
+            size='md'
           />
         </Menu.Media>
       ) : null}
@@ -618,7 +618,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           ) : (
             <Icon
               glyph={icon}
-              size='sm'
+              size='md'
             />
           )}
         </SwitcherItemMedia>
@@ -629,7 +629,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           <Icon
             glyph={ChevronRight}
             xstyle={rtl.mirror}
-            size='sm'
+            size='md'
           />
         </SwitcherItemTrailing>
       </Menu.Trigger>
@@ -681,7 +681,7 @@ function SwitchAccountRow() {
           <Menu.Media>
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           </Menu.Media>
           <Menu.Label>{m.accounts.add}</Menu.Label>
@@ -697,7 +697,7 @@ function SwitchAccountRow() {
             <Menu.Media>
               <Icon
                 glyph={SignOut}
-                size='sm'
+                size='md'
                 xstyle={rtl.mirror}
               />
             </Menu.Media>
@@ -743,7 +743,7 @@ function OrganizationSection() {
           icon={
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           }
           label={m.manage.createOrganization}
@@ -807,7 +807,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
         icon={
           <Icon
             glyph={Cog6Teeth}
-            size='sm'
+            size='md'
           />
         }
         label={m.manage.settings}
@@ -830,7 +830,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
           <Menu.Media>
             <Icon
               glyph={target.icon}
-              size='sm'
+              size='md'
             />
           </Menu.Media>
           <Menu.Label>{target.label}</Menu.Label>
@@ -877,7 +877,7 @@ function ManageSection() {
             icon={
               <Icon
                 glyph={UsersAddRight}
-                size='sm'
+                size='md'
               />
             }
             label={m.manage.invite}
@@ -937,7 +937,7 @@ function Footer() {
           icon={
             <Icon
               glyph={Plus}
-              size='sm'
+              size='md'
             />
           }
           label={m.accounts.add}
@@ -952,7 +952,7 @@ function Footer() {
           icon={
             <Icon
               glyph={SignOut}
-              size='sm'
+              size='md'
             />
           }
           label={m.accounts.signOut}
@@ -1093,7 +1093,7 @@ export function SwitcherTrigger({
           ) : null}
           <Icon
             glyph={ChevronDown}
-            size='sm'
+            size='md'
             xstyle={styles.triggerCaret}
           />
         </>

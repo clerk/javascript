@@ -7,6 +7,7 @@ import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
+import { isOAuthCallbackPath } from '../testUtils/setupTestingTokens';
 import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
@@ -102,7 +103,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signUp.setEmailAddress(fakeUserForOAuth.email);
       await u.po.signUp.continue();
       const [callback] = await Promise.all([
-        page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+        page.waitForRequest(request => isOAuthCallbackPath(new URL(request.url()).pathname)),
         u.po.signUp.enterTestOtpCode(),
       ]);
       expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);

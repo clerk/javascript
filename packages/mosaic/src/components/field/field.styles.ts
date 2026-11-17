@@ -13,6 +13,13 @@ export const styles = stylex.create({
     alignItems: 'flex-start',
     flexDirection: 'row',
   },
+  header: {
+    alignItems: 'baseline',
+    columnGap: space['2'],
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
   content: {
     '--_cl-feedback-gap': space['1'],
     gap: space['1'],

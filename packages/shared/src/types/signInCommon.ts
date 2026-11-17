@@ -221,6 +221,10 @@ export type AuthenticateWithPasskeyParams = {
    * `passkey` among its supported second factors.
    */
   flow?: 'autofill' | 'discoverable';
+  /**
+   * Only offer passkeys that are already on the device. When there are none, the request fails without showing the system's "use a passkey from another device" sheet. Supported by `@clerk/expo-passkeys` on iOS 16+ and Android. Browsers ignore it. Defaults to `false`.
+   */
+  preferImmediatelyAvailableCredentials?: boolean;
 };
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {

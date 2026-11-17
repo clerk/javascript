@@ -82,7 +82,7 @@ export function Accounts() {
               {account.active ? (
                 <Icon
                   glyph={Checkmark}
-                  size='sm'
+                  size='md'
                 />
               ) : null}
             </Menu.Indicator>

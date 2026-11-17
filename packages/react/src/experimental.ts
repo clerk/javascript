@@ -20,3 +20,14 @@ export {
   __experimental_CheckoutProvider as CheckoutProvider,
   __experimental_useCheckout as useCheckout,
 } from '@clerk/shared/react';
+
+export {
+  __experimental_useOrganizationAccessPolicies as useOrganizationAccessPolicies,
+  __experimental_useOrganizationAccessPolicy as useOrganizationAccessPolicy,
+} from '@clerk/shared/react';
+export type {
+  UseOrganizationAccessPoliciesParams,
+  UseOrganizationAccessPoliciesReturn,
+  UseOrganizationAccessPolicyParams,
+  UseOrganizationAccessPolicyReturn,
+} from '@clerk/shared/react';

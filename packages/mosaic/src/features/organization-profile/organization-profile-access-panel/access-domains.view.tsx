@@ -20,7 +20,7 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
         open={c.addingDomain}
         onOpenChange={c.onDomainOpenChange}
       >
-        <Dialog.Popup scope='profile'>
+        <Dialog.Popup>
           <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>{m.addDomainTitle}</Card.Title>
@@ -70,7 +70,7 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
         open={c.verifyingDomain !== null}
         onOpenChange={c.onVerifyOpenChange}
       >
-        <Dialog.Popup scope='profile'>
+        <Dialog.Popup>
           <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title xstyle={styles.connectionName}>
@@ -93,13 +93,13 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
                 <DataList.Item>
                   <DataList.Label>{m.host}</DataList.Label>
                   <DataList.Value>
-                    <Badge color='neutral'>{c.verifyingDomain}</Badge>
+                    <Badge color='neutral'>{c.dnsRecord?.name ?? c.verifyingDomain}</Badge>
                   </DataList.Value>
                 </DataList.Item>
               </DataList.Root>
               <AccessCopyField
                 label={m.value}
-                value={c.data.serviceProvider.dnsValue}
+                value={c.dnsRecord?.value ?? c.data.serviceProvider?.dnsValue ?? ''}
               />
             </Card.Content>
             <Card.Footer>
@@ -114,6 +114,7 @@ export function AccessDomainsView({ controller: c }: { controller: AccessControl
               <SubmitButton
                 type='button'
                 isPending={c.verification.isPending}
+                disabled={!c.canCheckDomain}
                 onClick={c.onCheckDomain}
               >
                 {m.check}

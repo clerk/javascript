@@ -11,6 +11,8 @@ const INVITATIONS_KEY = 'invitations';
 
 // Keys for `useAPIKeys`
 const API_KEYS_KEY = 'apiKeys';
+const ORGANIZATION_ACCESS_POLICIES_KEY = 'organizationAccessPolicies';
+const ORGANIZATION_ACCESS_POLICY_KEY = 'organizationAccessPolicy';
 
 // Keys for `useOrganizationCreationDefaults`
 const ORGANIZATION_CREATION_DEFAULTS_KEY = 'organizationCreationDefaults';
@@ -57,6 +59,8 @@ export const STABLE_KEYS = {
 
   // Keys for `useAPIKeys`
   API_KEYS_KEY,
+  ORGANIZATION_ACCESS_POLICIES_KEY,
+  ORGANIZATION_ACCESS_POLICY_KEY,
 
   // Keys for `useOrganizationCreationDefaults`
   ORGANIZATION_CREATION_DEFAULTS_KEY,

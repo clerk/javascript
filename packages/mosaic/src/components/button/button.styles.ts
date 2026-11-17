@@ -57,7 +57,10 @@ export const styles = stylex.create({
     '--_cl-icon-duration': {
       default: durationVars['--cl-duration-base'],
       ':not([data-disabled]):active': durationVars['--cl-duration-instant'],
-      ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
+      },
     },
     borderColor: 'transparent',
     borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
@@ -79,7 +82,10 @@ export const styles = stylex.create({
     transitionDuration: {
       default: durationVars['--cl-duration-base'],
       ':not([data-disabled]):active': durationVars['--cl-duration-instant'],
-      ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
+      },
     },
     transitionProperty: 'background-color, border-color, color, opacity, text-decoration-color',
     // Linear, not `--cl-ease-default`: nothing here moves. An ease on already non-uniform
@@ -275,7 +281,10 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-brand'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
+    textDecorationColor: {
+      default: 'transparent',
+      '@media (hover: hover)': { default: null, ':not([data-disabled]):hover': 'currentColor' },
+    },
     textDecorationLine: 'underline',
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',
@@ -286,7 +295,10 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-foreground'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
+    textDecorationColor: {
+      default: 'transparent',
+      '@media (hover: hover)': { default: null, ':not([data-disabled]):hover': 'currentColor' },
+    },
     textDecorationLine: 'underline',
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',
@@ -297,7 +309,10 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,
     paddingInlineStart: 0,
-    textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
+    textDecorationColor: {
+      default: 'transparent',
+      '@media (hover: hover)': { default: null, ':not([data-disabled]):hover': 'currentColor' },
+    },
     textDecorationLine: 'underline',
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',

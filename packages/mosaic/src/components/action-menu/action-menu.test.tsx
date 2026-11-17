@@ -95,7 +95,7 @@ describe('Mosaic ActionMenu', () => {
     render(<AsyncMenu />);
     await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
     const item = await screen.findByRole('menuitem', { name: 'Regenerate' });
-    expect(item.querySelector('.cl-menu-indicator')).toBeInTheDocument();
+    expect(item.querySelector('.cl-menu-item-indicator')).toBeInTheDocument();
     vi.useFakeTimers();
     try {
       fireEvent.click(item);

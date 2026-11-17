@@ -13,6 +13,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { imageFile, saveCrop } from '../../../__tests__/feature/image';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { CreateOrganizationProps } from '../create-organization';
 import { CreateOrganization } from '../create-organization';
@@ -179,7 +180,8 @@ describe('CreateOrganization', () => {
         return element as HTMLInputElement;
       });
 
-      await user.upload(input, new File(['logo'], 'logo.png', { type: 'image/png' }));
+      await user.upload(input, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
       await create(user, 'Acme');
 
       expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
@@ -191,7 +193,8 @@ describe('CreateOrganization', () => {
       const user = userEvent.setup();
       const row = await screen.findByText('Logo');
 
-      dropFiles(row, new File(['logo'], 'logo.png', { type: 'image/png' }));
+      dropFiles(row, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
 
       expect(screen.queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
       await user.click(screen.getByRole('button', { name: 'Manage logo' }));

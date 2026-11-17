@@ -1,6 +1,7 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
+  AgentActClaim,
   CheckAuthorizationFromSessionClaims,
   Jwt,
   JwtPayload,
@@ -31,6 +32,18 @@ type AuthObjectDebug = () => AuthObjectDebugData;
 
 type Claims = Record<string, any>;
 
+const getAuthAgent = (claims: JwtPayload): AgentActClaim | undefined => {
+  const claim: unknown = claims.agt;
+  if (typeof claim === 'object' && claim !== null && 'id' in claim && typeof claim.id === 'string' && claim.id) {
+    return {
+      type: 'agent',
+      sub: claim.id,
+      ...('tsk' in claim && typeof claim.tsk === 'string' ? { task_id: claim.tsk } : {}),
+    };
+  }
+  return undefined;
+};
+
 /**
  * @internal
  */
@@ -42,6 +55,7 @@ export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
  * @internal
  */
 export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
+  agent?: AgentActClaim;
   /**
    * The allowed token type.
    */
@@ -65,6 +79,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
  * @internal
  */
 export type SignedOutAuthObject = {
+  agent?: undefined;
   sessionClaims: null;
   sessionId: null;
   sessionStatus: SessionStatusClaim | null;
@@ -198,6 +213,7 @@ export function signedInAuthObject(
   const { actor, sessionId, sessionStatus, userId, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge } =
     __experimental_JWTPayloadToAuthObjectProperties(sessionClaims);
   const apiClient = createBackendApiClient(authenticateContext);
+  const agent = getAuthAgent(sessionClaims);
   const getToken = createGetToken({
     sessionId,
     sessionToken,
@@ -206,6 +222,7 @@ export function signedInAuthObject(
   });
   return {
     tokenType: TokenType.SessionToken,
+    ...(agent ? { agent } : {}),
     actor,
     sessionClaims,
     sessionId,

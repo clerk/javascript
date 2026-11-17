@@ -1,5 +1,39 @@
 # @clerk/swingset
 
+## 0.0.72
+
+### Patch Changes
+
+- Updated dependencies [[`30702ab`](https://github.com/clerk/javascript/commit/30702ab37fb1cfdff495e1dc716fbc1eba5bfa2d), [`d09bc82`](https://github.com/clerk/javascript/commit/d09bc82f553b3ba2a761c90aead12ac04a715acc), [`49972da`](https://github.com/clerk/javascript/commit/49972da75f6384b3f7aa362212f0f3966274d4e9), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/mosaic@0.5.0
+  - @clerk/nextjs@7.10.0
+  - @clerk/shared@4.45.1
+
+## 0.0.71
+
+### Patch Changes
+
+- Updated dependencies [[`5b7c4f4`](https://github.com/clerk/javascript/commit/5b7c4f425b0a254fd3c14e10064b31675af67d82)]:
+  - @clerk/mosaic@0.4.0
+
+## 0.0.70
+
+### Patch Changes
+
+- Updated dependencies [[`4cf1302`](https://github.com/clerk/javascript/commit/4cf13022bcee2e002e4dde43ee39a6968dc0b673), [`c9bdae3`](https://github.com/clerk/javascript/commit/c9bdae3b0aef91699a73824fecc6726959196ab4), [`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`2e61b32`](https://github.com/clerk/javascript/commit/2e61b32b9bcd3a0e12d43df22e380fa681880f1d), [`dfe50bc`](https://github.com/clerk/javascript/commit/dfe50bc610bc2d727b4e37d782cde725eb64d50e), [`4169b14`](https://github.com/clerk/javascript/commit/4169b14ce42d202d59d4a083c2008fb6b1eb96f3), [`0564c74`](https://github.com/clerk/javascript/commit/0564c74e173b62f262e81faa0e4ada2edc99c4ec), [`964fbe3`](https://github.com/clerk/javascript/commit/964fbe3c4b8df543885447ac8f1b6821201af813), [`25c6f42`](https://github.com/clerk/javascript/commit/25c6f42f50cc41581b38496935454c085792f507), [`8481b4a`](https://github.com/clerk/javascript/commit/8481b4a52a65a8f308f093370ccf9aa40e6c18cc), [`ce066ae`](https://github.com/clerk/javascript/commit/ce066ae50e5ed93f6012ec65cf55b007891b4981), [`8481b4a`](https://github.com/clerk/javascript/commit/8481b4a52a65a8f308f093370ccf9aa40e6c18cc), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`2e61b32`](https://github.com/clerk/javascript/commit/2e61b32b9bcd3a0e12d43df22e380fa681880f1d), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/mosaic@0.3.0
+  - @clerk/shared@4.45.0
+  - @clerk/nextjs@7.9.26
+
+## 0.0.69
+
+### Patch Changes
+
+- Updated dependencies [[`b0d7c00`](https://github.com/clerk/javascript/commit/b0d7c009c90e71564ede323971dc84092a7922e1), [`21285e3`](https://github.com/clerk/javascript/commit/21285e3bf9ef7a247034510a1b8dd2060c64ce7d), [`f7a0b2d`](https://github.com/clerk/javascript/commit/f7a0b2d968803defec496f06a9dc5b9f40dcea1a), [`79138c0`](https://github.com/clerk/javascript/commit/79138c08a1783f5522644febb3d6c39760c83d87), [`792554b`](https://github.com/clerk/javascript/commit/792554b5b6db6530584d2b38f2857243c099bcde), [`37a923a`](https://github.com/clerk/javascript/commit/37a923ad7280e41630e0e3b10e0ee99b99a3e314), [`d0f65d7`](https://github.com/clerk/javascript/commit/d0f65d79f09f3fc5271e9df88f8fa242907bfb72), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc), [`e57d66a`](https://github.com/clerk/javascript/commit/e57d66ae12008e6d69dbe4686173bcbe1c130109), [`2228237`](https://github.com/clerk/javascript/commit/22282373588a58596bb7136218b8a0ef8af7c6d5), [`62069e5`](https://github.com/clerk/javascript/commit/62069e54345089725cafff3d5af26d300aa5d066)]:
+  - @clerk/mosaic@0.2.2
+  - @clerk/shared@4.44.1
+  - @clerk/nextjs@7.9.25
+
 ## 0.0.68
 
 ### Patch Changes

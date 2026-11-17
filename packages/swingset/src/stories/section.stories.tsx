@@ -223,7 +223,7 @@ export function Cards() {
                 <Icon
                   glyph={Plus}
                   placement='inline-start'
-                  size='sm'
+                  size='md'
                 />
                 Add
               </Button>
@@ -353,7 +353,7 @@ export function ConnectedAccounts() {
                   <Icon
                     glyph={ArrowUpRight}
                     placement='inline-end'
-                    size='sm'
+                    size='md'
                   />
                 </Button>
               </Section.Actions>
@@ -523,7 +523,7 @@ export function ContainedHeader() {
                   <Icon
                     glyph={Plus}
                     placement='inline-start'
-                    size='sm'
+                    size='md'
                   />
                   Add
                 </Button>

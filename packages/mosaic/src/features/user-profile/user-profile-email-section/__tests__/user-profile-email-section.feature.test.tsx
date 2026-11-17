@@ -72,6 +72,50 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
+  it('holds the menu and row order while setting an address as primary, then returns focus', async () => {
+    const other = fapiEmailAddress({ id: 'idn_other', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, other]));
+    const primary = holdRequests('post', '/v1/me');
+    try {
+      await manageEmail(actor, 'bob@example.com', 'Set as primary');
+      await waitFor(() => expect(primary.requests).toHaveLength(1));
+      const menu = screen.getByRole('menu');
+      const item = within(menu).getByRole('menuitem', { name: 'Set as primary' });
+      expect(item).toHaveAttribute('aria-busy', 'true');
+      const manage = screen.getByRole('button', { name: 'Manage bob@example.com' });
+      expect(manage).toHaveAttribute('aria-disabled', 'true');
+      expect(within(menu).getByRole('menuitem', { name: 'Remove email' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
+      expect(await within(item).findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
+      expect(emailsListed()).toEqual(['alice@example.com', 'bob@example.com']);
+    } finally {
+      primary.release();
+      await waitFor(() =>
+        expect(within(emailRow()).getByText('bob@example.com').parentElement).toHaveTextContent('Primary'),
+      );
+    }
+    expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).not.toHaveAttribute('aria-disabled', 'true');
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(emailsListed()).toEqual(['alice@example.com', 'bob@example.com']);
+    expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
+    expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
+  });
+
+  it('sets an address as primary once when Set as primary is double-clicked', async () => {
+    const other = fapiEmailAddress({ id: 'idn_other', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor, fapi } = await renderSection(signedInWithEmails([PRIMARY, other]));
+    const primary = holdRequests('post', '/v1/me');
+
+    await openMenu(actor, within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' }));
+    await actor.dblClick(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await waitFor(() => expect(primary.requests).toHaveLength(1));
+
+    primary.release();
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_other'));
+    expect(primary.requests).toHaveLength(1);
+  });
+
   it('adds an address and verifies the code it was sent', async () => {
     const { actor } = await renderSection(signedInWithEmails([]));
     expect(emailRow()).toHaveTextContent('No email addresses added');
@@ -360,6 +404,7 @@ describe('email reverification', () => {
 
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu', { hidden: true })).toBeNull());
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await actor.keyboard('hunter2{Enter}');
 
@@ -386,6 +431,7 @@ describe('email reverification', () => {
     expect(within(emailRow()).queryByRole('alert')).toBeNull();
     expect(within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
 
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
   });
@@ -662,5 +708,30 @@ describe('Removing an address', () => {
 
     await waitFor(() => expect(emailsListed()).toEqual(['alice@example.com']));
     expect(screen.queryByRole('alertdialog')).toBeNull();
+  });
+
+  it('locks the section while a removal runs, and unlocks it when the removal fails with the error in the dialog', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, second]));
+    const removal = holdRequests('post', '/v1/me/email_addresses/idn_second', { _method: 'DELETE' });
+    const manageAlice = () => screen.getByRole('button', { name: 'Manage alice@example.com', hidden: true });
+    const addEmail = () => screen.getByRole('button', { name: 'Add email', hidden: true });
+
+    await manageEmail(actor, 'bob@example.com', 'Remove email');
+    const dialog = await screen.findByRole('alertdialog', { name: 'Remove email address?' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(removal.requests).toHaveLength(1));
+
+    expect(manageAlice()).toHaveAttribute('aria-disabled', 'true');
+    expect(addEmail()).toBeDisabled();
+
+    removal.fail('last_identification', 'You cannot remove your last sign-in method.');
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.'),
+    );
+    expect(dialog).toBeVisible();
+    expect(manageAlice()).not.toHaveAttribute('aria-disabled', 'true');
+    expect(addEmail()).toBeEnabled();
+    expect(emailsListed()).toEqual(['alice@example.com', 'bob@example.com']);
   });
 });

@@ -23,6 +23,73 @@ const noLeakedConditionalJsx = {
     'Use a ternary (`condition ? <Element /> : null`) for conditional JSX; `&&` renders a falsy left-hand value such as `0`.',
 };
 
+const jsxGuards = [
+  noLeakedConditionalJsx,
+  {
+    selector: "JSXOpeningElement[name.name='form']",
+    message:
+      'Use `Form` from src/primitives/form, driven by `useForm` from src/components/form for values, validation and submit.',
+  },
+  {
+    selector:
+      "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
+    message:
+      'Mosaic parts take `xstyle` instead of `className`/`style`. Define the atoms with `stylex.create` in the sibling `*.styles.ts` file and pass `xstyle={styles.root}`.',
+  },
+  {
+    selector: "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
+    message:
+      'Mosaic parts take `xstyle` instead of `className`/`style`. Define the atoms with `stylex.create` in the sibling `*.styles.ts` file and pass `xstyle={styles.root}`.',
+  },
+  {
+    selector:
+      "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+    message:
+      'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread. Define them with `stylex.create` in the sibling `*.styles.ts` file and pass `xstyle={styles.root}`.',
+  },
+  {
+    selector:
+      "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+    message:
+      'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread. Define them with `stylex.create` in the sibling `*.styles.ts` file and pass `xstyle={styles.root}`.',
+  },
+];
+const renderProp = "JSXAttribute[name.name='render'] > JSXExpressionContainer";
+const renderCallback = `${renderProp} > :matches(ArrowFunctionExpression, FunctionExpression)`;
+const notInRenderProp = `:not(${renderProp} > JSXElement > JSXOpeningElement, ${renderCallback} > JSXElement > JSXOpeningElement, ${renderCallback} > BlockStatement > ReturnStatement > JSXElement > JSXOpeningElement)`;
+const visibleInput = `JSXOpeningElement[name.name='input']${notInRenderProp}:not(:has(> JSXAttribute[name.name='hidden']:matches([value=null], [value.expression.value=true])))`;
+const inputOfType = type => `${visibleInput}:has(> JSXAttribute[name.name='type'][value.value='${type}'])`;
+const inputTypeGuards = [
+  ['password', 'Use `PasswordInput` from src/components/password-input inside `Field` from src/components/field.'],
+  ['tel', 'Use `PhoneInput` from src/components/phone-input inside `Field` from src/components/field.'],
+  [
+    'checkbox',
+    'Use `Checkbox` from src/components/checkbox, or `Switch` from src/components/switch for an on/off setting.',
+  ],
+  ['radio', 'Use `Radio` from src/components/radio.'],
+  [
+    'file',
+    'Use `FileUpload` from src/primitives/file-upload, or `AvatarUpload` from src/blocks/avatar-upload for an avatar or logo.',
+  ],
+];
+const rawElementGuards = [
+  {
+    selector: `JSXOpeningElement[name.name='button']${notInRenderProp}`,
+    message:
+      'Use `Button` from src/components/button, or `SubmitButton` when the click runs an async action (it shows the pending state for you).',
+  },
+  {
+    selector: `JSXOpeningElement[name.name='svg']${notInRenderProp}`,
+    message:
+      'Use an icon from src/icons through `Icon` from src/components/icon. If no icon fits, stop and ask the user; do not add a glyph or draw an `<svg>`.',
+  },
+  ...inputTypeGuards.map(([type, message]) => ({ selector: inputOfType(type), message })),
+  {
+    selector: `${visibleInput}:not(:has(> JSXAttribute[name.name='type'][value.value=/^(hidden|${inputTypeGuards.map(([type]) => type).join('|')})$/]))`,
+    message: 'Use `Input` from src/components/input inside `Field` from src/components/field.',
+  },
+];
+
 export default defineConfig({
   ...rootConfig,
   plugins: [...rootConfig.plugins, 'vitest'],
@@ -49,6 +116,7 @@ export default defineConfig({
       })),
       { type: 'queries', pattern: 'src/queries', partialMatch: false },
       { type: 'modals', pattern: 'src/modals', partialMatch: false },
+      { type: 'routing', pattern: 'src/routing', partialMatch: false },
       { type: 'blocks', pattern: 'src/blocks', partialMatch: false },
       { type: 'features', pattern: 'src/features/*', partialMatch: false, capture: ['feature'] },
       { type: 'root', pattern: 'src', partialMatch: false },
@@ -135,47 +203,14 @@ export default defineConfig({
         '@stylexjs/sort-keys': 'error',
         '@stylexjs/valid-shorthands': 'error',
         '@stylexjs/valid-styles': 'error',
-        'eslint-compat/no-restricted-syntax': [
-          'error',
-          {
-            selector: "Property > Literal.key[value='&:hover']",
-            message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
-          },
-          noLeakedConditionalJsx,
-          {
-            selector: "JSXOpeningElement[name.name='form']",
-            message: 'Use `Form` from mosaic/primitives/form, which turns off the browser validation popup.',
-          },
-          {
-            selector: "Property > Literal.key[value='@media (hover: hover)']",
-            message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
-          },
-          {
-            selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
-            message:
-              "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
-          },
-          {
-            selector:
-              "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
-            message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
-          },
-          {
-            selector:
-              "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
-            message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
-          },
-          {
-            selector:
-              "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
-            message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
-          },
-          {
-            selector:
-              "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
-            message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
-          },
-        ],
+        'eslint-compat/no-restricted-syntax': ['error', ...jsxGuards],
+      },
+    },
+    {
+      files: ['src/features/**/*', 'src/blocks/**/*'],
+      excludeFiles: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}'],
+      rules: {
+        'eslint-compat/no-restricted-syntax': ['error', ...jsxGuards, ...rawElementGuards],
       },
     },
     {
@@ -188,7 +223,37 @@ export default defineConfig({
     {
       files: ['src/**/*.styles.ts'],
       rules: {
-        'eslint-compat/no-restricted-syntax': 'off',
+        'eslint-compat/no-restricted-syntax': [
+          'error',
+          {
+            selector: "Property[key.value=/:hover/]:not(Property[key.value='@media (hover: hover)'] Property)",
+            message:
+              "Put :hover inside '@media (hover: hover)' so it does not stick after a tap on touch devices (docs/stylex.md).",
+          },
+          {
+            selector: 'Property[key.value=/:hover/]:not([key.value=/:not\\([^)]*disabled/])',
+            message:
+              'Skip disabled controls in a :hover key, e.g. \':hover:not(:disabled, [data-disabled], [aria-disabled="true"])\'. Browsers still match :hover on disabled elements (docs/stylex.md).',
+          },
+          {
+            selector:
+              "Property[key.name='transitionProperty']:not(:has(Property[key.value=/prefers-reduced-motion: reduce/])) Literal[value=/(^|,)\\s*(transform|translate|scale|rotate|all)\\s*(,|$)/]:not(Property[key.value=/prefers-reduced-motion: no-preference/] Literal)",
+            message:
+              "A transition that moves something must drop the moving property under '@media (prefers-reduced-motion: reduce)' (docs/motion.md).",
+          },
+          {
+            selector:
+              "Property[key.name='transitionProperty'] Property[key.value=/prefers-reduced-motion: reduce/] Literal[value=/(^|,)\\s*(transform|translate|scale|rotate|all)\\s*(,|$)/]",
+            message:
+              "A transition that moves something must drop the moving property under '@media (prefers-reduced-motion: reduce)' (docs/motion.md).",
+          },
+          {
+            selector:
+              'Property[key.name=/^(transform|translate|scale|rotate)$/]:not(:has(Property[key.value=/prefers-reduced-motion: reduce/])) Property[key.value=/data-(starting|ending)-style/]:not(Property[key.value=/prefers-reduced-motion: no-preference/] Property)',
+            message:
+              "An enter or exit offset must restate the enter and exit values inside '@media (prefers-reduced-motion: reduce)', or it snaps there instead (docs/motion.md).",
+          },
+        ],
       },
     },
     {
@@ -231,6 +296,19 @@ export default defineConfig({
       },
     },
     {
+      files: ['src/**/*.{ts,tsx}'],
+      excludeFiles: [
+        'src/hooks/use-now.ts',
+        'src/mosaic-provider.tsx',
+        'src/**/__tests__/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.test-d.{ts,tsx}',
+      ],
+      rules: {
+        'mosaic/no-render-clock': 'error',
+      },
+    },
+    {
       files: ['src/features/**/*.{ts,tsx}'],
       excludeFiles: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.{ts,tsx}'],
       rules: noUnneededEffects.configs.strict.rules,
@@ -256,7 +334,7 @@ export default defineConfig({
             checkUnknownLocals: true,
             checkInternals: true,
             message:
-              'Mosaic layers import down: features, then blocks, modals and queries, then components, hooks, utils and styles, then primitives. Move the shared piece down a layer, or pass it in as a prop.',
+              'Mosaic layers import down: features, then blocks, modals, queries and routing, then components, hooks, utils and styles, then primitives. Move the shared piece down a layer, or pass it in as a prop.',
             policies: [
               { allow: { to: { module: { origin: ['external', 'core'] } } } },
               { allow: { to: { element: { type: '{{ from.element.type }}' } } } },
@@ -266,6 +344,7 @@ export default defineConfig({
                 from: { element: { type: ['utils', 'hooks', 'styles', 'components', 'localization', 'modals'] } },
                 allow: { to: { element: { type: SHARED } } },
               },
+              { from: { element: { type: 'modals' } }, allow: { to: { element: { type: 'routing' } } } },
               {
                 from: { element: { type: 'localization' } },
                 allow: { to: { file: { categories: 'messages' } } },
@@ -279,7 +358,7 @@ export default defineConfig({
               },
               {
                 from: { element: { type: 'features' } },
-                allow: { to: { element: { type: [...SHARED, 'queries', 'modals', 'blocks'] } } },
+                allow: { to: { element: { type: [...SHARED, 'queries', 'modals', 'blocks', 'routing'] } } },
               },
               {
                 from: FLOW_UI,
@@ -295,7 +374,8 @@ export default defineConfig({
                   to: { file: { categories: 'messages' } },
                   dependency: { kind: 'value', nodeKind: ['import', 'export'] },
                 },
-                message: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
+                message:
+                  "Read copy with `useMessages('<namespace>')` from src/localization, so the customer's locale and overrides apply. Do not import a `*.messages.ts` value.",
               },
               {
                 from: FLOW_UI,

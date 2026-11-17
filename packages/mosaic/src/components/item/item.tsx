@@ -7,110 +7,50 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
+import { useOptionalFieldContext, useRegisterFieldPartId } from '../field/field.context';
 import * as slots from './item.styles';
 
-/** The row's height and gap, and the width of the media column inside it. */
-type Size = 'xs' | 'md' | 'lg';
-
-const DEFAULT_SIZE: Size = 'md';
-
-/** Carries `Item.Root`'s size down to the parts it scales (`Item.Media`). */
-const ItemContext = React.createContext<Size>(DEFAULT_SIZE);
-
-/** How a row presents itself: seated on a shared surface, or bordered as its own card. */
-type Variant = 'default' | 'outline';
-
-const DEFAULT_VARIANT: Variant = 'default';
-
-/** Carries `Item.Group`'s variant down to the rows it borders (`Item.Root`). */
-const ItemGroupContext = React.createContext<Variant>(DEFAULT_VARIANT);
-
-export type ItemProps = MosaicComponentProps<'div'> & {
-  /**
-   * Row height and gap. Also sizes a nested `Item.Media`, which reads this from
-   * context rather than taking its own prop, so a row scales as one unit.
-   *
-   * @default 'md'
-   */
-  size?: Size;
-  /**
-   * `outline` borders the row so it reads as its own card. Set it here for a row
-   * standing on its own, or on `Item.Group` to border a whole set at once — a
-   * row set here wins over the group either way, so a row can opt out of an
-   * outlined group with `default`.
-   *
-   * @default the enclosing `Item.Group`'s variant, or `'default'`
-   */
-  variant?: Variant;
-};
+export type ItemProps = MosaicComponentProps<'div'>;
 
 /**
- * Root row. Renders a `<div>`, or a custom element (link/button) via `render`,
- * which also opts the row into hover and cursor affordances. Provides its `size`
- * to the parts nested within it, and takes its `variant` from the enclosing
- * `Item.Group` unless it sets one of its own.
+ * Root row. Renders a `<div>`, or a custom element (link, button, or
+ * `Radio.Card`) via `render`, which also opts the row into hover and cursor
+ * affordances. Bordered, so it reads as its own card.
  *
  * @example
- * <Item.Root size='xs' render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
+ * <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
  *   <Item.Media><Avatar.Root size='fit'>…</Avatar.Root></Item.Media>
  *   <Item.Content><Item.Label>Clerk</Item.Label></Item.Content>
  * </Item.Root>
  */
-const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem(
-  { size = DEFAULT_SIZE, variant: variantProp, render, xstyle, ...rest },
-  ref,
-) {
-  // A custom render (link/button row) opts into hover + cursor affordances.
+const Root = React.forwardRef<HTMLDivElement, ItemProps>(function MosaicItem({ render, xstyle, ...rest }, ref) {
+  // A custom render (link, button, or radio card row) opts into hover + cursor affordances.
   const interactive = Boolean(render);
-  // The group is the default, not the authority: a row that names a variant keeps it, which is what
-  // lets one row opt out of an outlined group.
-  const groupVariant = React.useContext(ItemGroupContext);
-  const variant = variantProp ?? groupVariant;
-  const element = useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('item', { interactive, size, variant }),
-        stylex.props(
-          reset.base,
-          focusOutline.visible,
-          slots.item.base,
-          slots.item[size],
-          variant === 'outline' && slots.item.outline,
-          interactive && slots.item.interactive,
-          interactive && variant === 'outline' && slots.item.interactiveOutline,
-          xstyle,
-        ),
-        rest,
-      ),
-    },
-  });
-
-  return <ItemContext.Provider value={size}>{element}</ItemContext.Provider>;
-});
-
-/**
- * Square column that centers its media (icon, image, avatar, or spinner). Takes
- * its width from the `size` on the enclosing `Item.Root`, falling back to the
- * default when rendered on its own.
- */
-const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
-  { render, xstyle, ...rest },
-  ref,
-) {
-  const size = React.useContext(ItemContext);
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('item-media', { size }),
-        stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
+        themeProps('item', { interactive }),
+        stylex.props(reset.base, focusOutline.visible, slots.item.base, interactive && slots.item.interactive, xstyle),
         rest,
       ),
+    },
+  });
+});
+
+/** Square column that centers its media (icon, image, avatar, or spinner). */
+const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('item-media'), stylex.props(reset.base, slots.media.base, xstyle), rest),
     },
   });
 });
@@ -148,11 +88,15 @@ export type ItemLabelProps = MosaicComponentProps<'div'> & {
   variant?: LabelVariant;
 };
 
-/** The row's label. Truncates to a single line. */
+/** The row's label. Truncates to a single line. Names the radio of a `Radio.Card` row. */
 const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicItemLabel(
-  { variant = DEFAULT_LABEL_VARIANT, render, xstyle, ...rest },
+  { variant = DEFAULT_LABEL_VARIANT, render, xstyle, id: idProp, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
+  const generatedId = React.useId();
+  const id = idProp ?? (context ? `cl-item-${generatedId}-label` : undefined);
+  useRegisterFieldPartId(id, context?.setLabelIds);
   return useRender({
     defaultTagName: 'div',
     render,
@@ -163,15 +107,20 @@ const Label = React.forwardRef<HTMLDivElement, ItemLabelProps>(function MosaicIt
         stylex.props(reset.base, slots.label.base, slots.label[variant], truncationStyles.singleLine, xstyle),
         rest,
       ),
+      id,
     },
   });
 });
 
-/** Secondary text beneath the label. Truncates to a single line. */
+/** Secondary text beneath the label. Truncates to a single line. Describes the radio of a `Radio.Card` row. */
 const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemDescription(
-  { render, xstyle, ...rest },
+  { render, xstyle, id: idProp, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
+  const generatedId = React.useId();
+  const id = idProp ?? (context ? `cl-item-${generatedId}-description` : undefined);
+  useRegisterFieldPartId(id, context?.setMessageIds);
   return useRender({
     defaultTagName: 'div',
     render,
@@ -182,6 +131,7 @@ const Description = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>
         stylex.props(reset.base, slots.description.base, truncationStyles.singleLine, xstyle),
         rest,
       ),
+      id,
     },
   });
 });
@@ -201,54 +151,17 @@ const Actions = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fu
   });
 });
 
-export type ItemGroupProps = MosaicComponentProps<'div'> & {
-  /**
-   * `default` keeps the rows on one continuous surface, inset by the group's own
-   * gutter. `outline` gives each row a border and reads them as separate cards,
-   * so the group drops its gutter and spaces the rows apart instead. Reaches the
-   * rows through context, so a row only needs its own `variant` to disagree with
-   * the group.
-   *
-   * @default 'default'
-   */
-  variant?: Variant;
-};
-
-/**
- * Vertical wrapper around a set of rows. Layout only; the rows carry their own
- * semantics. Provides its `variant` to the rows nested within it.
- */
-const Group = React.forwardRef<HTMLDivElement, ItemGroupProps>(function MosaicItemGroup(
-  { variant = DEFAULT_VARIANT, render, xstyle, ...rest },
-  ref,
-) {
-  const element = useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('item-group', { variant }),
-        stylex.props(reset.base, slots.group.base, slots.group[variant], xstyle),
-        rest,
-      ),
-    },
-  });
-
-  return <ItemGroupContext.Provider value={variant}>{element}</ItemGroupContext.Provider>;
-});
-
-/** Thin divider (`<hr>`) between rows or groups. */
-const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(function MosaicItemSeparator(
+/** Vertical stack of rows, spaced apart. Layout only; the rows carry their own semantics. */
+const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function MosaicItemGroup(
   { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
-    defaultTagName: 'hr',
+    defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('item-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest),
+      ...mergeStyleProps(themeProps('item-group'), stylex.props(reset.base, slots.group.base, xstyle), rest),
     },
   });
 });
@@ -256,12 +169,8 @@ const Separator = React.forwardRef<HTMLHRElement, MosaicComponentProps<'hr'>>(fu
 /**
  * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
  * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
- * `Item.Label`, `Item.Description`, `Item.Actions`, `Item.Group`,
- * `Item.Separator`. Every part takes a `render` prop and forwards a ref.
- *
- * `size` is set once on `Item.Root` and reaches `Item.Media` through context, so
- * a row scales as a unit rather than per part. `variant` is set on a row, or
- * once on `Item.Group` to reach every row in it.
+ * `Item.Label`, `Item.Description`, `Item.Actions`, `Item.Group`. Every part
+ * takes a `render` prop and forwards a ref.
  */
 export const Item = {
   Root,
@@ -271,5 +180,4 @@ export const Item = {
   Description,
   Actions,
   Group,
-  Separator,
 };

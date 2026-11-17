@@ -37,7 +37,7 @@ describe('tokens.verifyHandshakeToken(token, options)', () => {
 
   it.each([
     ['the session-token category, which is what the handshake minter stamps', JWT_CATEGORY_SESSION_TOKEN],
-    ['no category, for tokens minted before the category rollout', undefined],
+    ['no category, which the edge session-minter handshake signer does not stamp', undefined],
   ])('verifies a handshake token with %s', async (_label, cat) => {
     await expect(verify(await createHandshakeJwt(cat))).resolves.toMatchObject({ handshake: directives });
   });

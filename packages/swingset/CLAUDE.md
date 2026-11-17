@@ -50,4 +50,4 @@ These require reading several files together; the `README.md` covers the step-by
 
 ## Documenting Mosaic components
 
-Before adding a component page or restructuring a story or MDX page, read the house style in `.claude/skills/mosaic/references/documenting-components.md`: layers, `meta` conventions, each archetype's required section order, and the finishing checklist.
+Before adding a component page or restructuring a story or MDX page, read the house style in `packages/mosaic/docs/documenting-components.md`: layers, `meta` conventions, each archetype's required section order, and the finishing checklist.

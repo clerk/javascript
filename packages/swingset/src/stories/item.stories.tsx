@@ -2,13 +2,8 @@ import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Item } from '@clerk/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
-import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
 import { ChevronRight } from '@clerk/mosaic/icons/glyphs/chevron-right';
-import { EllipsisHorizontal } from '@clerk/mosaic/icons/glyphs/ellipsis-horizontal';
-import { LogOut } from '@clerk/mosaic/icons/glyphs/log-out';
-import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
-import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
+import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -85,235 +80,11 @@ export function Interactive() {
   );
 }
 
-export function Sizes() {
-  return (
-    <div className='w-full'>
-      {(['lg', 'md', 'xs'] as const).map(size => (
-        <Item.Root
-          key={size}
-          size={size}
-        >
-          <Item.Media>
-            <Avatar.Root
-              shape='square'
-              size='fit'
-            >
-              <Avatar.Fallback>T</Avatar.Fallback>
-            </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label>Test Organization</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      ))}
-    </div>
-  );
-}
-
 export function Group() {
   return (
     <div className='w-full'>
       <Item.Group>
         <Item.Root>
-          <Item.Media>
-            <Avatar.Root
-              size='fit'
-              shape='circle'
-            >
-              <Avatar.Fallback>C</Avatar.Fallback>
-            </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label>Cameron Walker</Item.Label>
-            <Item.Description>cameron@clerk.com</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <Button
-              variant='outline'
-              size='sm'
-            >
-              Invite
-            </Button>
-          </Item.Actions>
-        </Item.Root>
-      </Item.Group>
-      <Item.Separator />
-      <Item.Group>
-        <Item.Root size='xs'>
-          <Item.Content>
-            <Item.Description>cameron.walker@gmail.com</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='sm'
-              shape='square'
-            >
-              <Icon glyph={EllipsisHorizontal} />
-            </Button>
-          </Item.Actions>
-        </Item.Root>
-        <Item.Root size='xs'>
-          <Item.Media>
-            <Avatar.Root
-              size='fit'
-              shape='square'
-            >
-              <Avatar.Image
-                src='https://github.com/clerk.png'
-                alt='Clerk Cloud'
-              />
-              <Avatar.Fallback>C</Avatar.Fallback>
-            </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label>Clerk</Item.Label>
-          </Item.Content>
-          <Icon
-            glyph={Checkmark}
-            size='md'
-            xstyle={styles.iconWidth}
-          />
-        </Item.Root>
-        <Item.Root
-          size='xs'
-          render={({ children, ...props }) => (
-            <a
-              {...props}
-              href='#two'
-            >
-              {children}
-            </a>
-          )}
-        >
-          <Item.Media>
-            <Avatar.Root
-              size='fit'
-              shape='square'
-            >
-              <Avatar.Image
-                src='https://github.com/clerk.png'
-                alt='Clerk Cloud'
-              />
-              <Avatar.Fallback>C</Avatar.Fallback>
-            </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label>Clerk</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      </Item.Group>
-      <Item.Separator />
-      <Item.Group>
-        <Item.Root
-          size='xs'
-          render={({ children, ...props }) => (
-            <a
-              {...props}
-              href='#two'
-            >
-              {children}
-            </a>
-          )}
-        >
-          <Item.Media>
-            <Avatar.Root
-              size='fit'
-              shape='square'
-            >
-              <Avatar.Fallback>D</Avatar.Fallback>
-            </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label>DesignCloud</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      </Item.Group>
-      <Item.Separator />
-      <Item.Group>
-        <Item.Root
-          size='xs'
-          render={({ children, ...props }) => (
-            <a
-              {...props}
-              href='#two'
-            >
-              {children}
-            </a>
-          )}
-        >
-          <Item.Media>
-            <Icon
-              glyph={Plus}
-              size='sm'
-            />
-          </Item.Media>
-          <Item.Content>
-            <Item.Label variant='interactive'>Add account</Item.Label>
-          </Item.Content>
-        </Item.Root>
-        <Item.Root
-          size='xs'
-          render={({ children, ...props }) => (
-            <button
-              type='button'
-              {...props}
-            >
-              {children}
-            </button>
-          )}
-        >
-          <Item.Media>
-            <Icon
-              glyph={LogOut}
-              size='sm'
-            />
-          </Item.Media>
-          <Item.Content>
-            <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
-          </Item.Content>
-        </Item.Root>
-      </Item.Group>
-    </div>
-  );
-}
-
-export function Outline() {
-  return (
-    <Item.Root
-      variant='outline'
-      size='lg'
-    >
-      <Item.Media>
-        <Avatar.Root
-          shape='square'
-          size='fit'
-        >
-          <Avatar.Fallback>T</Avatar.Fallback>
-        </Avatar.Root>
-      </Item.Media>
-      <Item.Content>
-        <Item.Label>Test Organization</Item.Label>
-        <Item.Description>Member</Item.Description>
-      </Item.Content>
-      <Item.Actions>
-        <Button
-          variant='outline'
-          size='sm'
-        >
-          Manage
-        </Button>
-      </Item.Actions>
-    </Item.Root>
-  );
-}
-
-export function OutlineGroup() {
-  return (
-    <div className='w-full'>
-      <Item.Group variant='outline'>
-        <Item.Root size='lg'>
           <Item.Media>
             <Avatar.Root
               size='fit'
@@ -340,7 +111,6 @@ export function OutlineGroup() {
           </Item.Actions>
         </Item.Root>
         <Item.Root
-          size='lg'
           render={({ children, ...props }) => (
             <a
               {...props}
@@ -368,71 +138,6 @@ export function OutlineGroup() {
             xstyle={styles.iconWidth}
           />
         </Item.Root>
-      </Item.Group>
-    </div>
-  );
-}
-
-const organizations = [
-  'Clerk',
-  'Acme Corporation',
-  'Globex',
-  'Initech',
-  'Umbrella Health',
-  'DesignCloud',
-  'Stark Industries',
-  'Wayne Enterprises',
-  'Cyberdyne Systems',
-  'Soylent Industries',
-  'Tyrell Corporation',
-  'Weyland-Yutani',
-];
-
-// `Item.Group` is the canonical scroll surface, so this shows the atoms doing the minimum: cap a
-// height, spread them on, and the group fades its own edges. The Scroll Area page under Styles
-// carries the full surface — the gutter argument, the resting state, and the theming tokens.
-export function Scrolling() {
-  // `stylex.props()` returns a `className`, so it has to be MERGED with any class of your own
-  // rather than spread beside one — whichever comes last in JSX wins outright.
-  const root = stylex.props(scrollAreaRoot);
-
-  return (
-    <div
-      {...root}
-      className={`${root.className} border-border w-full border`}
-      style={{ height: 200, borderRadius: radiusVars['--cl-radius-sm'] }}
-    >
-      <Item.Group xstyle={scrollAreaViewport()}>
-        {organizations.map(name => (
-          <Item.Root
-            key={name}
-            size='xs'
-            render={({ children, ...props }) => (
-              <button
-                {...props}
-                type='button'
-              >
-                {children}
-              </button>
-            )}
-          >
-            <Item.Media>
-              <Avatar.Root
-                size='fit'
-                shape='square'
-              >
-                <Avatar.Image
-                  src='https://github.com/clerk.png'
-                  alt=''
-                />
-                <Avatar.Fallback>{name[0]}</Avatar.Fallback>
-              </Avatar.Root>
-            </Item.Media>
-            <Item.Content>
-              <Item.Label>{name}</Item.Label>
-            </Item.Content>
-          </Item.Root>
-        ))}
       </Item.Group>
     </div>
   );

@@ -3,6 +3,7 @@ export type {
   FieldDescriptionProps,
   FieldErrorProps,
   FieldFeedbackProps,
+  FieldHeaderProps,
   FieldHintProps,
   FieldLabelProps,
   FieldMessageProps,

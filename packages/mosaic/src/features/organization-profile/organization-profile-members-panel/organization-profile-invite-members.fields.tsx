@@ -64,7 +64,7 @@ export function InviteMembersFields({ emailInputRef, invite }: InviteMembersFiel
         <Field.Label>{m.roleLabel}</Field.Label>
         <Select.Root
           items={roles}
-          value={role ?? undefined}
+          value={role}
           onValueChange={onRoleChange}
         >
           <Select.Trigger placeholder={m.rolePlaceholder} />

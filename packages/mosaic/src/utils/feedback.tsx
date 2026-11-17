@@ -39,7 +39,7 @@ export function FeedbackBody({ icon, children }: { icon: IconComponent; children
     <>
       <Icon
         glyph={icon}
-        size='sm'
+        size='md'
         xstyle={feedbackStyles.icon}
       />
       <span>{children}</span>

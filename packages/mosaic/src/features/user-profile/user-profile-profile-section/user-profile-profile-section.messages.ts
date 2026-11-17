@@ -7,6 +7,16 @@ export const userProfileProfileSectionMessages = {
     manage: 'Manage profile picture',
     change: 'Change avatar',
     remove: 'Remove avatar',
+    crop: {
+      title: 'Adjust profile picture',
+      frame: 'Profile picture crop. Drag or use the arrow keys to move, plus and minus to zoom.',
+      zoom: 'Zoom',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
+      reset: 'Reset',
+      cancel: 'Cancel',
+      save: 'Save',
+    },
   },
   name: {
     label: 'Name',

@@ -1,0 +1,66 @@
+import * as StepperStories from './stepper.stories';
+
+# Stepper
+
+Shows how far the user is through a fixed number of steps: the current step over the total, and
+one segment per step. Steps are 1-based and controlled. With `onValueChange`, each segment is a
+button that moves to its step; without it, the segments are decorative and the label carries the
+progress.
+
+## Example
+
+<Story
+  name='Primary'
+  storyModule={StepperStories}
+/>
+
+## Props
+
+<PropTable
+  meta={StepperStories.meta}
+  extra={[
+    { name: 'value', type: 'number', default: '— (required)', description: 'The current step, 1-based. Kept between 1 and `max`.' },
+    { name: 'max', type: 'number', default: '— (required)', description: 'How many steps there are. At least 1.' },
+    { name: 'onValueChange', type: '(value: number) => void', default: '—', description: 'Called with the step whose segment the user chose. Without it, the segments are not interactive.' },
+    { name: 'label', type: 'string', default: "'Step'", description: 'Text before the count, in the secondary color.' },
+    { name: 'countLabel', type: 'string', default: "'{step} of {total}'", description: 'The current step over the total, with `{step}` and `{total}` filled in.' },
+    { name: 'stepLabel', type: 'string', default: "'Step {step}'", description: 'Accessible name of each segment button, with `{step}` filled in.' },
+  ]}
+/>
+
+## Usage
+
+<Usage
+  component='Stepper'
+  module='@clerk/mosaic/components/stepper'
+  props={{ value: 1, max: 3 }}
+/>
+
+---
+
+## Examples
+
+### Progress
+
+<Story
+  name='Progress'
+  storyModule={StepperStories}
+/>
+
+### Clickable
+
+<Story
+  name='Clickable'
+  storyModule={StepperStories}
+/>
+
+## Styling
+
+| Part         | Class                  | Attributes                                                                         |
+| ------------ | ---------------------- | ---------------------------------------------------------------------------------- |
+| Root         | `.cl-stepper`          | `data-value`, `data-max`                                                           |
+| Text         | `.cl-stepper-text`     |                                                                                    |
+| Label        | `.cl-stepper-label`    |                                                                                    |
+| Count        | `.cl-stepper-count`    |                                                                                    |
+| Segment list | `.cl-stepper-segments` |                                                                                    |
+| Segment      | `.cl-stepper-segment`  | `data-state`: `complete`, `current` or `upcoming`; a `button` with `onValueChange` |

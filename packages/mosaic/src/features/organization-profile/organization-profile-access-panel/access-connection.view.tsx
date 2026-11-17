@@ -7,6 +7,7 @@ import { CopyButton } from '../../../components/copy-button';
 import { EmptyState } from '../../../components/empty-state';
 import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import type { UseFormResult } from '../../../components/form';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Input } from '../../../components/input';
 import { InputGroup } from '../../../components/input-group';
@@ -25,7 +26,7 @@ import { Collapsible } from '../../../primitives/collapsible';
 import { Form } from '../../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { styles } from './access.styles';
-import type { AccessData, AccessProvider } from './access.types';
+import type { AccessData, AccessProvider, ConnectionConfiguration } from './access.types';
 import type { AccessConnectionController } from './access-connection.controller';
 import { AccessCopyField, AccessProviderIcon, AccessSelect } from './access-fields.view';
 
@@ -181,11 +182,11 @@ export function AccessConnectionSteps(props: ConnectionProps) {
   );
 }
 
-export function AccessConnectionHeader({ editing }: { editing: boolean }) {
+export function AccessConnectionHeader() {
   const m = useMessages('organizationProfile').access;
   return (
     <Card.Header xstyle={styles.dialogHeader}>
-      <Card.Title xstyle={styles.dialogTitle}>{editing ? m.manageSso : m.ssoTitle}</Card.Title>
+      <Card.Title xstyle={styles.dialogTitle}>{m.ssoTitle}</Card.Title>
     </Card.Header>
   );
 }
@@ -246,13 +247,15 @@ function ProviderStep({ controller: c }: ConnectionProps) {
     </>
   );
 }
-function ConnectionInput({
+type ConnectionFieldsController = { form: UseFormResult<ConnectionConfiguration>; pending: boolean };
+
+export function ConnectionInput({
   controller: c,
   name,
   label,
   type = 'text',
 }: {
-  controller: AccessConnectionController;
+  controller: ConnectionFieldsController;
   name:
     | 'name'
     | 'metadataUrl'
@@ -286,13 +289,7 @@ function ConfigureStep({ controller: c, data }: ConnectionProps) {
   const m = useMessages('organizationProfile').access;
   return (
     <>
-      <StepTitle>
-        {c.editing
-          ? m.connectionSettings
-          : c.kind === 'sso' && c.form.values.provider !== 'oidc'
-            ? m.createSamlApp
-            : m.configure}
-      </StepTitle>
+      <StepTitle>{c.kind === 'sso' && c.form.values.provider !== 'oidc' ? m.createSamlApp : m.configure}</StepTitle>
       <Form
         id={c.form.id}
         onSubmit={c.form.handleSubmit}
@@ -366,39 +363,113 @@ function SsoConfiguration({ controller: c, data }: ConnectionProps) {
   const oidc = c.form.values.provider === 'oidc';
   return (
     <>
-      {!c.editing ? (
-        <Section.Description>
-          {oidc ? m.oidcInstructions : c.form.values.provider === 'okta' ? m.oktaSamlInstructions : m.samlInstructions}
-        </Section.Description>
-      ) : null}
+      <Section.Description>
+        {oidc ? m.oidcInstructions : c.form.values.provider === 'okta' ? m.oktaSamlInstructions : m.samlInstructions}
+      </Section.Description>
+      {data.live ? (
+        c.configured || data.eligibleSsoDomains?.length ? (
+          <AccessSelect
+            label={m.domain}
+            value={c.form.values.domains?.[0] ?? null}
+            items={(c.configured?.configuration.domains ?? data.eligibleSsoDomains ?? []).map(domain => ({
+              value: domain,
+              label: domain,
+            }))}
+            onChange={domain => c.form.setValue('domains', [domain])}
+            disabled={c.pending || Boolean(c.configured)}
+          />
+        ) : (
+          <Section.Note>{m.ssoRequiresVerifiedDomain}</Section.Note>
+        )
+      ) : (
+        <SsoConnectValues
+          oidc={oidc}
+          serviceProvider={data.serviceProvider}
+        />
+      )}
+    </>
+  );
+}
+
+export function SsoConnectValues({
+  oidc,
+  serviceProvider,
+}: {
+  oidc: boolean;
+  serviceProvider: AccessData['serviceProvider'];
+}) {
+  const m = useMessages('organizationProfile').access;
+  return (
+    <>
       {oidc ? (
         <AccessCopyField
           label={m.redirectUri}
-          value={data.serviceProvider.redirectUri}
+          value={serviceProvider?.redirectUri ?? ''}
         />
       ) : (
         <>
           <AccessCopyField
             label={m.signOnUrl}
-            value={data.serviceProvider.signOnUrl}
+            value={serviceProvider?.signOnUrl ?? ''}
           />
           <AccessCopyField
             label={m.audience}
-            value={data.serviceProvider.audience}
+            value={serviceProvider?.audience ?? ''}
           />
         </>
       )}
     </>
   );
 }
-function MetadataStep({ controller: c }: ConnectionProps) {
+function MetadataStep({ controller: c, data }: ConnectionProps) {
   const m = useMessages('organizationProfile').access;
-  const oidc = c.form.values.provider === 'oidc';
   return (
     <Form
+      id={c.form.id}
       onSubmit={c.form.handleSubmit}
       {...mergeStyleProps(themeProps('access-connection-form'), stylex.props(styles.stepContent))}
     >
+      {data.live && c.configured ? (
+        <>
+          {c.configured.redirectUri ? (
+            <AccessCopyField
+              label={m.redirectUri}
+              value={c.configured.redirectUri}
+            />
+          ) : null}
+          {c.configured.signOnUrl ? (
+            <AccessCopyField
+              label={m.signOnUrl}
+              value={c.configured.signOnUrl}
+            />
+          ) : null}
+          {c.configured.audience ? (
+            <AccessCopyField
+              label={m.audience}
+              value={c.configured.audience}
+            />
+          ) : null}
+        </>
+      ) : null}
+      <SsoMetadataFields
+        controller={c}
+        showInstructions
+      />
+    </Form>
+  );
+}
+
+export function SsoMetadataFields({
+  controller: c,
+  showInstructions = false,
+}: {
+  controller: ConnectionFieldsController & { onModeChange: (value: string) => void };
+  showInstructions?: boolean;
+}) {
+  const m = useMessages('organizationProfile').access;
+  const oidc = c.form.values.provider === 'oidc';
+  return (
+    <>
       {oidc ? (
         <>
           <ConnectionInput
@@ -432,7 +503,7 @@ function MetadataStep({ controller: c }: ConnectionProps) {
               ? m.metadataFile
               : m.manual}
         </StepTitle>
-        {c.form.values.mode === 'metadata' && c.form.values.provider === 'okta' ? (
+        {showInstructions && c.form.values.mode === 'metadata' && c.form.values.provider === 'okta' ? (
           <Section.Description>{m.oktaMetadataInstructions}</Section.Description>
         ) : null}
       </div>
@@ -494,9 +565,39 @@ function MetadataStep({ controller: c }: ConnectionProps) {
           )}
         </>
       ) : null}
-    </Form>
+    </>
   );
 }
+export function GoogleDirectoryCredentials({ controller: c }: { controller: ConnectionFieldsController }) {
+  const m = useMessages('organizationProfile').access;
+  return (
+    <>
+      <ConnectionInput
+        controller={c}
+        name='subjectEmail'
+        label={m.subjectEmail}
+        type='email'
+      />
+      <Field.Root
+        disabled={c.pending}
+        invalid={c.form.fields.serviceAccountFile.feedback?.type === 'error'}
+      >
+        <Field.Label>{m.serviceAccount}</Field.Label>
+        <Input
+          type='file'
+          accept='.json,application/json'
+          onChange={event => {
+            c.form.setValue('serviceAccountFile', event.target.files?.[0] ?? null);
+            c.form.touch('serviceAccountFile');
+          }}
+        />
+        <Field.Description>{c.form.values.serviceAccountFile?.name}</Field.Description>
+        <Field.Feedback feedback={c.form.fields.serviceAccountFile.feedback} />
+      </Field.Root>
+    </>
+  );
+}
+
 function DirectoryConfiguration({ controller: c, data }: ConnectionProps) {
   const m = useMessages('organizationProfile').access;
   return (
@@ -512,45 +613,25 @@ function DirectoryConfiguration({ controller: c, data }: ConnectionProps) {
       ) : null}
       {!c.matchingSsoConnections.length ? <Section.Note>{m.missingSso}</Section.Note> : null}
       {c.form.values.provider === 'google' ? (
-        <>
-          <ConnectionInput
-            controller={c}
-            name='subjectEmail'
-            label={m.subjectEmail}
-            type='email'
-          />
-          <Field.Root
-            disabled={c.pending}
-            invalid={c.form.fields.serviceAccountFile.feedback?.type === 'error'}
-          >
-            <Field.Label>{m.serviceAccount}</Field.Label>
-            <Input
-              type='file'
-              accept='.json,application/json'
-              onChange={event => c.onServiceAccount(event.target.files?.[0] ?? null)}
-            />
-            <Field.Description>{c.form.values.serviceAccountFile?.name}</Field.Description>
-            <Field.Feedback feedback={c.form.fields.serviceAccountFile.feedback} />
-          </Field.Root>
-        </>
+        <GoogleDirectoryCredentials controller={c} />
       ) : (
         <>
           <AccessCopyField
             label={m.scimEndpoint}
-            value={data.serviceProvider.scimUrl}
+            value={c.configured?.endpointUrl ?? data.serviceProvider?.scimUrl ?? ''}
           />
           <div {...stylex.props(styles.connectionRow)}>
             <div {...stylex.props(styles.grow)}>
               <AccessCopyField
                 label={m.bearerToken}
-                value={c.tokenVisible ? data.serviceProvider.token : ''}
+                value={c.tokenVisible ? (c.configured?.token ?? data.serviceProvider?.token ?? '') : ''}
               />
             </div>
             <Button
               variant='outline'
               color='neutral'
-              disabled={c.tokenVisible}
-              onClick={c.onRevealToken}
+              disabled={c.tokenVisible || c.pending || (data.live && !c.form.values.ssoConnectionId)}
+              onClick={c.onCreateDirectory ?? c.onRevealToken}
             >
               <Icon glyph={RotateAntiClockwise} />
               {m.generateToken}
@@ -680,14 +761,23 @@ function TestStep({ controller: c, data }: ConnectionProps) {
       <StepTitle>{c.kind === 'sso' ? m.testYourConnection : m.test}</StepTitle>
       <div {...stylex.props(styles.stepContent)}>
         <Section.Description>{c.kind === 'directory' ? m.directoryTest : m.testDescription}</Section.Description>
-        {c.kind === 'sso' ? (
+        {c.onStartTest ? (
+          <Button
+            type='button'
+            disabled={c.pending}
+            onClick={c.onStartTest}
+          >
+            {m.startTest}
+          </Button>
+        ) : null}
+        {c.kind === 'sso' && (!data.live || c.testUrl) ? (
           <>
             <AccessCopyField
               label={m.testUrl}
-              value={data.serviceProvider.testUrl}
+              value={c.testUrl || data.serviceProvider?.testUrl || ''}
             />
             <a
-              href={data.serviceProvider.testUrl}
+              href={c.testUrl || data.serviceProvider?.testUrl || undefined}
               target='_blank'
               rel='noreferrer'
               {...mergeStyleProps(themeProps('access-test-link'), stylex.props(styles.row, styles.fit))}
@@ -705,7 +795,7 @@ function TestStep({ controller: c, data }: ConnectionProps) {
             color='neutral'
             type='button'
             isPending={c.test.isPending}
-            disabled={c.form.isSubmitting}
+            disabled={c.form.isSubmitting || (data.live && c.kind === 'sso' && !c.testUrl)}
             xstyle={styles.headerActions}
             onClick={c.onTest}
           >
@@ -714,7 +804,8 @@ function TestStep({ controller: c, data }: ConnectionProps) {
           </SubmitButton>
         </div>
         <Section.Error>{c.test.error}</Section.Error>
-        {c.result ? (
+        {c.result?.pending ? <Section.Description role='status'>{m.testPending}</Section.Description> : null}
+        {c.result && !c.result.pending ? (
           <>
             <div role='status'>
               <Badge color={c.result.success ? 'positive' : 'negative'}>{c.result.success ? m.passed : m.failed}</Badge>
@@ -764,7 +855,7 @@ function TestStep({ controller: c, data }: ConnectionProps) {
     </>
   );
 }
-function RolesStep({ controller: c }: ConnectionProps) {
+function RolesStep({ controller: c, data }: ConnectionProps) {
   const m = useMessages('organizationProfile').access;
   const roles = [
     { value: 'member', label: m.member },
@@ -776,13 +867,15 @@ function RolesStep({ controller: c }: ConnectionProps) {
       <StepTitle>{m.roles}</StepTitle>
       <div {...stylex.props(styles.stepContent)}>
         <Section.Description>{m.roleDescription}</Section.Description>
-        <AccessSelect
-          label={m.defaultRole}
-          value={c.form.values.defaultRole}
-          items={roles}
-          onChange={value => c.form.setValue('defaultRole', value)}
-          disabled={c.pending}
-        />
+        {!data.live ? (
+          <AccessSelect
+            label={m.defaultRole}
+            value={c.form.values.defaultRole}
+            items={roles}
+            onChange={value => c.form.setValue('defaultRole', value)}
+            disabled={c.pending}
+          />
+        ) : null}
         <Field.Root
           orientation='horizontal'
           disabled={c.pending}
@@ -797,8 +890,10 @@ function RolesStep({ controller: c }: ConnectionProps) {
           ? c.result?.groups?.map(group => (
               <AccessSelect
                 key={group}
-                label={group}
-                value={c.form.values.groupRoles[group] ?? 'member'}
+                label={c.result?.groupNames?.[group] ?? group}
+                value={
+                  c.form.values.groupRoles[group] ?? c.result?.groupRoles?.[group] ?? (data.live ? 'none' : 'member')
+                }
                 items={roles}
                 onChange={value => c.form.setValue('groupRoles', { ...c.form.values.groupRoles, [group]: value })}
                 disabled={c.pending}
@@ -819,9 +914,7 @@ function SavedStep({ controller: c }: Pick<ConnectionProps, 'controller'>) {
       xstyle={styles.savedState}
     >
       <EmptyState.Icon glyph={ShieldCheck} />
-      <EmptyState.Label>
-        {c.editing ? m.connectionUpdated : c.kind === 'sso' ? m.ssoSaved : m.directorySaved}
-      </EmptyState.Label>
+      <EmptyState.Label>{c.kind === 'sso' ? m.ssoSaved : m.directorySaved}</EmptyState.Label>
       <EmptyState.Description>{m.savedDescription}</EmptyState.Description>
     </EmptyState.Root>
   );

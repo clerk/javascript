@@ -1,5 +1,142 @@
 # @clerk/mosaic
 
+## 0.5.0
+
+### Minor Changes
+
+- Picking a profile picture in `UserProfile`, or a logo in `OrganizationProfile` or `CreateOrganization`, now opens a dialog to crop it to a square before it uploads. Animated images upload as picked. ([#10784](https://github.com/clerk/javascript/pull/10784)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Let the avatar and logo cropper zoom out until the whole image fits, so a wide logo or a tall photo can be uploaded without cutting it off. A JPEG zoomed out this way is saved as a PNG, so the area around it stays transparent. ([#10809](https://github.com/clerk/javascript/pull/10809)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
+## 0.4.0
+
+### Minor Changes
+
+- **Breaking:** Screen readers now announce `Combobox.Empty` when a search matches no options. It renders a polite `role="status"` `<div>` (it was a `<p>`) that stays mounted and shows its children only when nothing matches, so keep it in the popup or beside the list rather than rendering it conditionally. To make this work, `Combobox.Root` now owns the items, and `Combobox.Collection` only renders them: ([#10794](https://github.com/clerk/javascript/pull/10794)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                                      | After                                                       |
+  | --------------------------------------------------------------------------- | ----------------------------------------------------------- |
+  | `<Combobox.Collection items={items} itemToStringLabel={toLabel}>`           | `<Combobox.Root items={items} itemToStringLabel={toLabel}>` |
+  | `<Combobox.Collection empty={<Combobox.Empty>No results</Combobox.Empty>}>` | `<Combobox.Empty>No results</Combobox.Empty>` beside it     |
+  | `{item => …}`                                                               | `{(item: Item) => …}`                                       |
+
+  Without `items` on the root, `Combobox.Empty` always shows its children. The `ComboboxEmpty` ref is now an `HTMLDivElement`.
+
+  Find usages with `git grep -nE "Combobox\.(Collection|Empty)|ComboboxEmpty"`.
+
+## 0.3.0
+
+### Minor Changes
+
+- Add `Combobox.Media`, `Combobox.Label` and `Combobox.Detail` for composing a combobox option, styled through `.cl-combobox-option-media`, `.cl-combobox-option-label` and `.cl-combobox-option-detail`. `PhoneInput` builds its country options from these parts, which centers each country's name in its row and gives the flag, name and calling code targetable classes. ([#10764](https://github.com/clerk/javascript/pull/10764)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `UserProfile` and `OrganizationProfile` now route their pages through a location instead of local state, which changes a few things for consumers: ([#10602](https://github.com/clerk/javascript/pull/10602)) by [@Ephem](https://github.com/Ephem)
+  - The `defaultPage` prop is removed. A profile opens on the first page in its navigation, as the legacy components do. To open on another page, put it first with `pageOrder`, or open the profile as a modal with the `page` option.
+  - A new `path` prop sets the base a profile's pages live under, `/user` and `/organization` by default. Two profiles on one page need different bases.
+  - There is no path or hash mode yet, so urls are not updated, this will come in a later version.
+  - A custom page whose `path` cannot be a route, because it is percent-encoded, starts with a colon, or is the URL segment of a built-in page such as `api-keys`, is left out of the navigation with a console warning instead of rendering a page that cannot be reached.
+
+- **Breaking:** Simplify `Item` to one size and one look. Rows are always bordered and size to their content. TypeScript flags the removed props. ([#10665](https://github.com/clerk/javascript/pull/10665)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                   | After                    |
+  | -------------------------------------------------------- | ------------------------ |
+  | `<Item.Root size='xs' \| 'md' \| 'lg'>`                  | `<Item.Root>`            |
+  | `<Item.Root variant='outline' \| 'default'>`             | `<Item.Root>` (bordered) |
+  | `<Item.Group variant='outline' \| 'default'>`            | `<Item.Group>`           |
+  | `<Item.Separator />`                                     | Removed                  |
+  | `.cl-item[data-size]`, `.cl-item-media[data-size]`       | Removed                  |
+  | `.cl-item[data-variant]`, `.cl-item-group[data-variant]` | Removed                  |
+
+  `Item.Label`'s `variant` is unchanged.
+
+  Find usages with `git grep -nE "Item\.(Root|Group)[^>]*(size|variant)=|Item\.Separator|cl-item(-media|-group)?\[data-(size|variant)"`.
+
+- **Breaking:** Rename the `.cl-` classes on `Menu` item parts to match the `<row>-<part>` scheme used by `Select` and `Combobox`. Components and props are unchanged; only the classes change. ([#10763](https://github.com/clerk/javascript/pull/10763)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before              | After                    |
+  | ------------------- | ------------------------ |
+  | `cl-menu-media`     | `cl-menu-item-media`     |
+  | `cl-menu-label`     | `cl-menu-item-label`     |
+  | `cl-menu-indicator` | `cl-menu-item-indicator` |
+
+  Find usages with `git grep -n "cl-menu-media\|cl-menu-label\|cl-menu-indicator"`.
+
+- Configure the profile on `MosaicProvider` with the new `profile` prop, so `UserButton`, `OrganizationSwitcher` and `UserProfile` share one setup. This makes pairings like a user-only `UserButton` beside an `OrganizationSwitcher` with one combined profile possible. ([#10546](https://github.com/clerk/javascript/pull/10546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  <MosaicProvider profile={{ combined: true, userProfileProps, organizationProfileProps }}>
+    <OrganizationSwitcher />
+    <UserButton combined={false} />
+  </MosaicProvider>
+  ```
+
+  Breaking changes:
+  - `UserButton`: `mode` is replaced by `combined`, which only decides what the menu lists. `mode='user'` becomes `combined={false}`, and to keep the account-only profile too, also set `profile={{ combined: false }}` on `MosaicProvider`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileProps` and `organizationProfileProps` move to `MosaicProvider`'s `profile`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileUrl` and `organizationProfileUrl` move to `MosaicProvider`'s `profile`.
+  - `UserButton` and `OrganizationSwitcher`: `userProfileMode` and `organizationProfileMode` are removed. Setting a URL routes there, and leaving it out opens the modal.
+  - `UserButton` and `OrganizationSwitcher`: `appearance` is no longer accepted in `userProfileProps` or `organizationProfileProps`.
+  - `UserButton` and `OrganizationSwitcher`: link items (`href`) are no longer accepted in `customPages`.
+  - `UserButton` and `OrganizationSwitcher`: `afterLeaveOrganizationUrl` moves to `profile.organizationProfileProps`, which also takes `apiKeysProps`.
+  - `UserProfile`: `mode` is replaced by `combined`. When unset it follows `profile.combined`, and it also picks up the provider's profile props, with its own props winning. `OrganizationProfile` picks them up the same way.
+  - With `experimental.newProfiles`, `OrganizationSwitcher` now opens the combined profile by default. Set `profile={{ combined: false }}` for the standalone organization profile.
+  - The `UserProfileMode` type is removed.
+
+### Patch Changes
+
+- `PhoneInput` requires `countryTriggerLabel`, `countryPopupLabel`, and `countrySearchLabel`, which set the accessible names of its country trigger, popup, and search input. The country picker in UserProfile's add phone number and add SMS verification dialogs can now be localized through the `userProfile.phone.addDialog.phone.*` keys. ([#10694](https://github.com/clerk/javascript/pull/10694)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Draw the divider above a card footer that follows a multi-step flow, and match the OAuth consent "Signed in as" text size to the other task footers. ([#10591](https://github.com/clerk/javascript/pull/10591)) by [@kylemac](https://github.com/kylemac)
+
+- Reduce option re-renders in `Combobox`, `Autocomplete` and `Select`. ([#10621](https://github.com/clerk/javascript/pull/10621)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- On touch devices, link buttons no longer show their underline after a tap. With reduced motion turned on, `Drawer` now opens at its resting position instead of starting below it for a frame. ([#10692](https://github.com/clerk/javascript/pull/10692)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the resend countdown in the email, phone and SMS verification dialogs staying locked too long after the device sleeps or the tab is throttled in the background. ([#10619](https://github.com/clerk/javascript/pull/10619)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the organization profile's page order when `OrganizationSwitcher` or `UserButton` opens the legacy profile for a member who can manage the SSO bypass allowlist. The Security page now stays where `pageOrder` puts it instead of moving to the top. ([#10546](https://github.com/clerk/javascript/pull/10546)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `Radio.Card`, a radio laid out as an `Item` row that picks its `value` when clicked anywhere. Fill it with `Radio.Media` and `Radio.Content`, which holds `Radio.Label` and an optional `Radio.Description`. `Radio.Group` takes `layout='stack' | 'grid'`, and `Radio.Section` splits a group into titled sets. ([#10665](https://github.com/clerk/javascript/pull/10665)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/shared@4.45.0
+
+## 0.2.2
+
+### Patch Changes
+
+- Drop an image onto the profile picture row in `UserProfile` or the logo row in `OrganizationProfile` to upload it. While a file is dragged over the row, the avatar darkens and shows an upload icon. `FileUpload.Dropzone` now ignores drags that carry no files, such as selected text or links. ([#10601](https://github.com/clerk/javascript/pull/10601)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- The logo picker in `CreateOrganization` now matches `UserProfile` and `OrganizationProfile`: once a logo is chosen, the Upload button is replaced by a menu to change or remove it, and an image can be dropped onto the row. Clicking the Logo label opens the file picker, and a rejected file's error now shows below the row instead of replacing the description. In all three, dragging a file of an unsupported type over the avatar shows a blocked icon instead of the upload arrow. In `OrganizationProfile`, the logo menu no longer shows icons, and its Remove item now uses the destructive color, as in `UserProfile`. ([#10604](https://github.com/clerk/javascript/pull/10604)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Controls such as inputs, selects, checkboxes, radios and outline buttons keep the stronger `--cl-color-border`, while containers and dividers (cards, sections, tables, menus, the profile nav) use `--cl-color-border-subtle`. The two are now 12 and 8 percent washes in both modes, which makes light-mode controls firmer and leaves containers close to where they were. The profile opened in a dialog draws a border. Outline buttons fill with the surface color, and their hover and pressed states tint that fill. Banners, badges, toasts and the tag-input error use the `-subtle` tokens, and the neutral badge and banner use `--cl-color-neutral-subtle`. ([#10496](https://github.com/clerk/javascript/pull/10496)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+- Fix keyboard navigation in tabs and accordions. The tab stop now lands on the selected tab even when it isn't the first, and arrow keys pressed in a field inside an accordion panel stay with that field. `ActionBar.Root` now calls `onFocus` and `onBlur` handlers passed by consumers. ([#10573](https://github.com/clerk/javascript/pull/10573)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Confirm dialogs now stay busy until their action finishes, even after you cancel a reverification prompt, and they can't be reopened or confirmed a second time while the request is in flight. ([#10628](https://github.com/clerk/javascript/pull/10628)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep keyboard focus on the input while saving an organization name or slug, renaming a passkey, verifying an authenticator code, or sending organization invitations. Focus previously dropped to the page. ([#10618](https://github.com/clerk/javascript/pull/10618)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- - Fixed an issue where an outgoing Flow step could show content from an update that never appeared on screen. ([#10651](https://github.com/clerk/javascript/pull/10651)) by [@dstaley](https://github.com/dstaley)
+
+  - Fixed an issue where adding a tag while a controlled TagInput update was still pending could use the pending tag list instead of the list shown on screen.
+
+- Move the OAuth consent redirect domain helper into `@clerk/shared` so it can be shared across UI packages. No behavior change. ([#10218](https://github.com/clerk/javascript/pull/10218)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Form submit buttons now show their pending state and keep focus while the form submits, instead of looking disabled. ([#10627](https://github.com/clerk/javascript/pull/10627)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `IconFrame` and `Avatar` now share one size scale and set of corner radii: `xs`, `sm`, `md` and `lg` are 24, 32, 40 and 48px. `IconFrame` sizes are now `xs`, `sm`, `md` and `lg` and the default is `md` (40px), replacing `sm`, `md`, `lg` and `xl`. `Avatar` `md` is 40px instead of 38px, square `Avatar` at `md` has a 6px radius instead of 8px, and provider icons in the connected accounts, enterprise accounts and Web3 wallets sections are 16px instead of 20px. ([#10600](https://github.com/clerk/javascript/pull/10600)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+- Keep the phone entry screen pending until the first verification code is sent in `UserProfile`. Disable Cancel while verifying or resending a phone verification code. ([#10561](https://github.com/clerk/javascript/pull/10561)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/shared@4.44.1
+
 ## 0.2.1
 
 ### Patch Changes

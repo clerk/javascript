@@ -2,6 +2,9 @@ import type { BrowserContext } from '@playwright/test';
 
 const contextTokens = new WeakMap<BrowserContext, Map<string, string>>();
 
+export const isOAuthCallbackPath = (pathname: string) =>
+  pathname === '/v1/oauth_callback' || /^\/v1\/sso\/[a-z0-9_]+\/callback$/.test(pathname);
+
 export const setupTestingTokens = async ({
   context,
   frontendApiOrigin,
@@ -48,7 +51,7 @@ export const setupTestingTokens = async ({
       if (response.status() === 303 && headers.location) {
         const callback = new URL(headers.location, response.url());
         const callbackToken = tokens.get(callback.origin);
-        if (callbackToken && callback.pathname === '/v1/oauth_callback') {
+        if (callbackToken && isOAuthCallbackPath(callback.pathname)) {
           callback.searchParams.set('__clerk_testing_token', callbackToken);
           headers.location = callback.toString();
         }

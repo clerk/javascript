@@ -34,4 +34,5 @@ export type UsePagesOrInfiniteSignature = <
   fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined;
   config: TConfig;
   keys: TCacheKeys;
+  keepPreviousDataWithinScope?: boolean;
 }) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;

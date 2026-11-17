@@ -48,6 +48,7 @@ export function UserProfilePictureRowView({
         />
       </AvatarUpload.Dropzone>
       <Section.Error>{error}</Section.Error>
+      <AvatarUpload.Crop labels={m.picture.crop} />
     </AvatarUpload.Root>
   );
 }

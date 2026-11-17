@@ -1,32 +1,99 @@
 import type { FlowDirection } from '../../components/flow';
-import type { ReverificationMethod, ReverificationOtpChannel } from '../reverification';
+import type { FieldFeedback, UseFormResult } from '../../components/form';
+
+export type SignInFactor =
+  | { id: string; stage: 'first'; strategy: 'password' }
+  | { id: string; stage: 'first' | 'second'; strategy: 'passkey' }
+  | { id: string; stage: 'first'; strategy: 'email_code'; emailAddressId: string; identifier: string }
+  | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
+  | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' }
+  | {
+      id: string;
+      stage: 'first';
+      strategy: 'reset_password_email_code' | 'reset_password_phone_code';
+      identifier: string;
+    };
+
+type SignInCodeChannel = 'email' | 'phone' | 'totp';
+
+export type SignInIdentifierField = 'email' | 'email-or-username' | 'username' | 'phone';
 
 export type SignInStep =
-  | 'start'
-  | 'password'
-  | 'email-code'
-  | 'totp'
-  | 'backup-code'
-  | 'method-picker'
-  | 'help'
-  | 'sign-up'
-  | 'verify-email';
+  | { kind: 'identifier'; field: SignInIdentifierField; nextField?: SignInIdentifierField; lastUsed?: boolean }
+  | { kind: 'identifier'; field: 'phone'; channel: SignInProvider }
+  | { kind: 'credential'; credential: 'password' | 'backup-code' | 'passkey'; identifier: string }
+  | {
+      kind: 'code';
+      purpose:
+        | 'first-factor'
+        | 'second-factor'
+        | 'client-trust'
+        | 'sso-bypass'
+        | 'reset-password'
+        | 'verify-email'
+        | 'verify-phone';
+      channel: SignInCodeChannel;
+      identifier?: string;
+      provider?: string;
+    }
+  | { kind: 'choice'; purpose: 'methods' | 'reset-methods'; options: readonly SignInFactor[] }
+  | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
+  | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
+  | { kind: 'choice'; purpose: 'wallets'; options: readonly SignInProvider[] }
+  | { kind: 'notice'; purpose: 'help' }
+  | { kind: 'notice'; purpose: 'forgot-password'; identifier: string }
+  | { kind: 'notice'; purpose: 'no-methods' | 'password-compromised' | 'enterprise-sso' | 'start-over' }
+  | { kind: 'notice'; purpose: 'action-blocked'; details?: SignInActionBlockedDetails }
+  | { kind: 'notice'; purpose: 'email-link'; identifier: string }
+  | { kind: 'notice'; purpose: 'email-link-status'; status: SignInEmailLinkStatus }
+  | { kind: 'new-password'; reason: 'forgot' | 'required' }
+  | { kind: 'sign-up' };
 
-export type SignInMethod = ReverificationMethod;
+export type SignInEmailLinkStatus =
+  | 'loading'
+  | 'signed-in'
+  | 'signed-in-other-tab'
+  | 'transferable'
+  | 'expired'
+  | 'failed'
+  | 'client-mismatch';
 
-export type SignInOtpChannel = ReverificationOtpChannel;
+export interface SignInActionBlockedDetails {
+  title?: string;
+  description?: string;
+  linkUrl?: string;
+  linkText?: string;
+  traceId?: string;
+}
 
-export interface SignInSocialProvider {
+export interface SignInAccount {
+  id: string;
+  name: string;
+  identifier: string;
+  imageUrl?: string;
+}
+
+export interface SignInProvider {
   id: string;
   name: string;
   iconUrl: string;
 }
 
-export interface SignUpDetails {
+export interface SignInValues {
+  identifier: string;
+  phoneNumber: string;
+  password: string;
+  code: string;
+  backupCode: string;
   firstName: string;
   lastName: string;
-  emailAddress: string;
-  password: string;
+  newPassword: string;
+  confirmPassword: string;
+  signOutOfOtherSessions: boolean;
+}
+
+export interface SignInSubmitEvent {
+  preventDefault: () => void;
 }
 
 export interface SignInViewProps {
@@ -35,31 +102,36 @@ export interface SignInViewProps {
   applicationName: string;
   applicationLogoUrl?: string;
   combined: boolean;
-  socialProviders: readonly SignInSocialProvider[];
+  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
+  lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
-  identifier: string;
-  onIdentifierChange: (value: string) => void;
-  onEditIdentifier: () => void;
-  onSignUp?: () => void;
-  value: string;
-  onValueChange: (value: string) => void;
-  errorMessage?: string;
+  onPasskey?: () => void;
+  form: UseFormResult<SignInValues>;
+  onSubmit: (event?: SignInSubmitEvent) => void;
+  onCodeComplete: (code: string) => void;
   isPending: boolean;
-  onSubmit: () => void;
+  isDisabled: boolean;
+  errorMessage?: string;
+  globalErrorMessage?: string;
+  newPasswordFeedback?: FieldFeedback;
+  onEditIdentifier: () => void;
+  onSwitchField?: () => void;
+  onSignUp?: () => void;
+  onJoinWaitlist?: () => void;
   onForgotPassword?: () => void;
-  onShowMethods: () => void;
+  onCancel?: () => void;
   onShowHelp: () => void;
   onBack: () => void;
+  onStartOver: () => void;
   onEmailSupport: () => void;
-  methods: readonly SignInMethod[];
-  pendingMethodId?: string;
-  onSelectMethod: (id: string) => void;
-  otpChannel?: SignInOtpChannel;
-  onResend: () => void;
+  pendingFactorId?: string;
+  onSelectFactor: (id: string) => void;
+  pendingAccountId?: string;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
+  onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;
-  signUpDetails: SignUpDetails;
-  signUpErrors?: Partial<Record<keyof SignUpDetails, string>>;
-  onSignUpDetailChange: (field: keyof SignUpDetails, value: string) => void;
 }

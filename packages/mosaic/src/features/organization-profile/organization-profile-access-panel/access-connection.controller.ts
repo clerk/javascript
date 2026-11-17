@@ -10,46 +10,63 @@ import type {
   ConnectionKind,
   ConnectionTestResult,
 } from './access.types';
-import { isConnectionConfigured, isDirectoryConfigured, newConnection } from './access.utils';
+import { isConnectionConfigured, isDirectoryConfigured, isServiceAccountFile, newConnection } from './access.utils';
 
 interface ConnectionContext {
   kind: ConnectionKind;
-  id?: string;
   tokenVisible: boolean;
   direction: 1 | -1;
   result: ConnectionTestResult | null;
   saved: AccessConnection | null;
+  configured: AccessConnection | null;
+  testUrl: string;
   onComplete: (connection: AccessConnection) => void;
 }
 type ConnectionEvent =
-  | { type: 'START'; kind: ConnectionKind; id?: string }
+  | { type: 'START'; kind: ConnectionKind }
   | { type: 'REVEAL_TOKEN' }
-  | { type: 'NEXT' }
+  | { type: 'NEXT'; connection?: AccessConnection }
+  | { type: 'TEST_STARTED'; url: string }
+  | { type: 'DIRECTORY_CREATED'; connection: AccessConnection }
   | { type: 'BACK' }
   | { type: 'TESTED'; result: ConnectionTestResult }
   | { type: 'SAVED'; connection: AccessConnection }
   | { type: 'COMPLETE' };
 const { createMachine, assign } = setup<ConnectionContext, ConnectionEvent>();
-const forward = assign(() => ({ direction: 1 as const }));
+const forward = assign((context: ConnectionContext, event: ConnectionEvent) => ({
+  direction: 1 as const,
+  configured: event.type === 'NEXT' ? (event.connection ?? context.configured) : context.configured,
+}));
 const back = assign(() => ({ direction: -1 as const, result: null }));
 const restart = {
   target: 'provider' as const,
   actions: assign((_: ConnectionContext, event: Extract<ConnectionEvent, { type: 'START' }>) => ({
     kind: event.kind,
-    id: event.id,
     direction: 1 as const,
     result: null,
     saved: null,
+    configured: null,
+    testUrl: '',
     tokenVisible: false,
   })),
 };
 export const connectionMachine = createMachine({
   initial: 'provider',
-  context: { kind: 'sso', tokenVisible: false, direction: 1, result: null, saved: null, onComplete: () => undefined },
+  context: {
+    kind: 'sso',
+    tokenVisible: false,
+    direction: 1,
+    result: null,
+    saved: null,
+    configured: null,
+    testUrl: '',
+    onComplete: () => undefined,
+  },
   states: {
     provider: { on: { START: restart, NEXT: { target: 'configure', actions: forward } } },
     configure: {
       on: {
+        DIRECTORY_CREATED: { actions: assign((_, event) => ({ configured: event.connection, tokenVisible: true })) },
         REVEAL_TOKEN: { actions: assign(() => ({ tokenVisible: true })) },
         START: restart,
         NEXT: { target: 'attributes', actions: forward },
@@ -79,6 +96,7 @@ export const connectionMachine = createMachine({
     test: {
       on: {
         START: restart,
+        TEST_STARTED: { actions: assign((_, event) => ({ testUrl: event.url, result: null })) },
         TESTED: { actions: assign((_, event) => ({ result: event.result })) },
         NEXT: {
           guard: context => context.kind === 'directory' && context.result?.success === true,
@@ -127,36 +145,30 @@ export function useAccessConnectionController(
 ) {
   const m = useMessages('organizationProfile').access;
   const [state, send] = useMachine(connectionMachine, { context: { onComplete } });
-  const { kind, id, result } = state.context;
+  const { kind, result, configured, testUrl } = state.context;
   const test = usePendingAction({ errorFallback: m.testError });
   const canSave = state.value === 'roles' || (state.value === 'test' && kind === 'sso' && result?.success === true);
+  const saveStep = (values: ReturnType<typeof newConnection>) => {
+    if (data.live && kind === 'sso' && state.value === 'configure') {
+      return configured ?? data.onSaveConnection?.('sso', values);
+    }
+    if (data.live && kind === 'sso' && state.value === 'metadata') {
+      return data.onSaveConnection?.('sso', values, configured?.id);
+    }
+    if (data.live && kind === 'directory' && state.value === 'configure') {
+      return configured ?? data.onConfigureDirectory?.(values);
+    }
+    if (canSave && data.live && kind === 'sso' && configured) {
+      return data.onEnableSso?.(configured.id);
+    }
+    return canSave ? data.onSaveConnection?.(kind, values) : undefined;
+  };
   const form = useForm({
     initialValues: newConnection(),
     fields: {
       serviceAccountFile: {
-        validateAsync: async file => {
-          if (!file) {
-            return undefined;
-          }
-          try {
-            const key: unknown = JSON.parse(await file.text());
-            if (
-              key &&
-              typeof key === 'object' &&
-              'type' in key &&
-              key.type === 'service_account' &&
-              'private_key' in key &&
-              typeof key.private_key === 'string' &&
-              'client_email' in key &&
-              typeof key.client_email === 'string'
-            ) {
-              return undefined;
-            }
-          } catch {
-            return { type: 'error', message: m.invalidKey };
-          }
-          return { type: 'error', message: m.invalidKey };
-        },
+        validateAsync: async file =>
+          file && !(await isServiceAccountFile(file)) ? { type: 'error', message: m.invalidKey } : undefined,
       },
     },
     canSubmit: values => {
@@ -168,16 +180,28 @@ export function useAccessConnectionController(
       }
       return canSave;
     },
-    onSubmit: values => (canSave ? data.onSaveConnection(kind, values, id) : Promise.resolve(undefined)),
-    onSuccess: connection => send(connection ? { type: 'SAVED', connection } : { type: 'NEXT' }),
+    onSubmit: values => Promise.resolve(saveStep(values)),
+    onSuccess: connection => send(canSave && connection ? { type: 'SAVED', connection } : { type: 'NEXT', connection }),
     errorFallback: m.saveError,
   });
   const matchingSsoConnections = data.connections.filter(
-    connection => connection.kind === 'sso' && connection.configuration.provider === form.values.provider,
+    connection =>
+      connection.kind === 'sso' &&
+      connection.configuration.provider === form.values.provider &&
+      (!data.live ||
+        connection.id === configured?.configuration.ssoConnectionId ||
+        !data.connections.some(
+          item => item.kind === 'directory' && item.configuration.ssoConnectionId === connection.id,
+        )),
   );
+  const validSsoDomains =
+    !data.live || kind !== 'sso' || state.value !== 'configure' || Boolean(form.values.domains?.length);
+  const startTest = data.onStartSsoTest;
   const pending = form.isSubmitting || test.isPending;
   const canContinue =
     !pending &&
+    (!data.live || kind !== 'directory' || state.value !== 'provider' || matchingSsoConnections.length > 0) &&
+    validSsoDomains &&
     (state.value !== 'configure' ||
       (kind === 'directory'
         ? isDirectoryConfigured(form.values) &&
@@ -189,39 +213,59 @@ export function useAccessConnectionController(
   return {
     form,
     matchingSsoConnections,
-    editing: id !== undefined,
     kind,
     step: state.value,
     progress: state.value === 'provider' ? 1 : ['test', 'roles', 'saved', 'complete'].includes(state.value) ? 3 : 2,
     direction: state.context.direction,
     result,
+    configured,
+    testUrl,
+    onStartTest:
+      configured && startTest
+        ? () => {
+            void test.run('start', async () => {
+              const url = await startTest(configured.id);
+              send({ type: 'TEST_STARTED', url });
+            });
+          }
+        : undefined,
     directoryStep: Math.max(1, ['configure', 'attributes', 'test', 'roles'].indexOf(state.value) + 1),
     tokenVisible: state.context.tokenVisible,
     onRevealToken: () => send({ type: 'REVEAL_TOKEN' }),
+    onCreateDirectory:
+      data.live && kind === 'directory'
+        ? () => {
+            const configure = data.onConfigureDirectory;
+            if (configure && isDirectoryConfigured(form.values)) {
+              void test.run('directory', async () => {
+                const connection = await configure(form.values);
+                send({ type: 'DIRECTORY_CREATED', connection });
+              });
+            }
+          }
+        : undefined,
     test,
     pending,
     canContinue,
     canSave,
-    open: (nextKind: ConnectionKind, connection?: AccessConnection) => {
-      form.reset(connection?.configuration ?? { ...newConnection(), name: m.providers.okta });
+    open: (nextKind: ConnectionKind) => {
+      form.reset({ ...newConnection(), name: m.providers.okta, domains: data.eligibleSsoDomains?.slice(0, 1) });
       test.reset();
-      send({ type: 'START', kind: nextKind, id: connection?.id });
-      if (connection) {
-        send({ type: 'NEXT' });
-      }
+      send({ type: 'START', kind: nextKind });
     },
     onProvider: (provider: AccessProvider) => {
       if (provider === form.values.provider) {
         return;
       }
       test.reset();
-      send({ type: 'START', kind, id });
-      form.reset({ ...newConnection(), provider, name: m.providers[provider] });
+      send({ type: 'START', kind });
+      form.reset({
+        ...newConnection(),
+        provider,
+        name: m.providers[provider],
+        domains: data.eligibleSsoDomains?.slice(0, 1),
+      });
       form.setValue('name', m.providers[provider]);
-    },
-    onServiceAccount: (file: File | null) => {
-      form.setValue('serviceAccountFile', file);
-      form.touch('serviceAccountFile');
     },
     onModeChange: (value: string) => {
       if (value === 'metadata' || value === 'file' || value === 'manual') {
@@ -255,8 +299,10 @@ export function useAccessConnectionController(
     },
     onTest: () => {
       void test.run('test', async () => {
-        const result = await data.onTestConnection(kind, form.values);
-        send({ type: 'TESTED', result });
+        const result = await data.onTestConnection?.(kind, form.values, configured?.id);
+        if (result) {
+          send({ type: 'TESTED', result });
+        }
       });
     },
   };

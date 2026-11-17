@@ -1,5 +1,37 @@
 # @clerk/testing
 
+## 2.3.0
+
+### Minor Changes
+
+- Add a Playwright page object for the ConfigureSSO flows. ([#10094](https://github.com/clerk/javascript/pull/10094)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`c5a71bc`](https://github.com/clerk/javascript/commit/c5a71bca0491a712e0cdf62533113f2c1df32832), [`49972da`](https://github.com/clerk/javascript/commit/49972da75f6384b3f7aa362212f0f3966274d4e9), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`7443113`](https://github.com/clerk/javascript/commit/744311344e7320da673177f7741e91c9437ffabf), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/backend@3.29.0
+  - @clerk/shared@4.45.1
+
+## 2.2.56
+
+### Patch Changes
+
+- Document the `ticket` strategy in the JSDoc for `cy.clerkSignIn()`. The command already accepts it, but its JSDoc listed only `password`, `phone_code`, and `email_code`. ([#10652](https://github.com/clerk/javascript/pull/10652)) by [@jescalan](https://github.com/jescalan)
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`b9d10ba`](https://github.com/clerk/javascript/commit/b9d10ba5d3a177d63abc47544f8fdfa27a995761), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d), [`d71a6a1`](https://github.com/clerk/javascript/commit/d71a6a166313d01b48b525294d39eb685aa63934)]:
+  - @clerk/shared@4.45.0
+  - @clerk/backend@3.28.0
+
+## 2.2.55
+
+### Patch Changes
+
+- Make the unstable API keys page object's `selectExpiration` wait for the expiration dropdown to open and close, instead of force-clicking the option while the list is still animating. ([#10647](https://github.com/clerk/javascript/pull/10647)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`11d5dfb`](https://github.com/clerk/javascript/commit/11d5dfb1bec6f3e5f61db0b078e87fc3b8ecd8e2), [`88c99e3`](https://github.com/clerk/javascript/commit/88c99e3762d6f8ce8e198ee027bd3b1c77414ffc)]:
+  - @clerk/backend@3.27.0
+  - @clerk/shared@4.44.1
+
 ## 2.2.54
 
 ### Patch Changes

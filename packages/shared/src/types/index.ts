@@ -41,6 +41,7 @@ export type * from './oauthApplication';
 export type * from './oauthTransport';
 export type * from './organization';
 export type * from './organizationCreationDefaults';
+export type * from './organizationAccessPolicy';
 export type * from './organizationDomain';
 export type * from './organizationInvitation';
 export type * from './organizationMembership';

@@ -23,10 +23,7 @@ export function OrganizationListSkeleton({
       />
       <Card.Content>
         <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-        <Item.Group
-          variant='outline'
-          aria-hidden
-        >
+        <Item.Group aria-hidden>
           {hidePersonal ? null : (
             <SkeletonRow
               name={m.personal}

@@ -6,9 +6,17 @@ import { beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiEnvironment,
+  fapiMembership,
+  fapiOrganization,
+  fapiSession,
+  fapiUser,
+} from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
+import type { MosaicProfile } from '../../profile-pages/use-mosaic-profile';
 
 beforeAll(async () => {
   await import('../user-profile.modal-content');
@@ -148,6 +156,51 @@ describe('UserProfile modal return', () => {
     expect(Array.isArray(window.history.state)).toBe(true);
     expect(window.history.state).toEqual(['router', 'state']);
     expect(window.history.state).not.toHaveProperty('__NA');
+  });
+
+  describe("with the provider's profile", () => {
+    const memberships = [fapiMembership(fapiOrganization({ id: 'org_1', name: 'Acme' }))];
+
+    function serveInOrganization() {
+      serveFapi({
+        environment: fapiEnvironment(),
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: fapiUser({ id: 'user_1', organization_memberships: memberships }),
+            last_active_organization_id: 'org_1',
+          }),
+        ]),
+        memberships,
+      });
+    }
+
+    async function tabsAfterReturning(profile: MosaicProfile) {
+      serveInOrganization();
+      visit('?__clerk_mosaic_modal=user-profile%2Faccount');
+
+      await renderWithClerk(<p>Page</p>, undefined, undefined, undefined, profile);
+
+      const dialog = await screen.findByRole('dialog');
+      await within(dialog).findByRole('tab', { name: 'Account' });
+      return within(dialog)
+        .getAllByRole('tab')
+        .map(tab => tab.textContent);
+    }
+
+    it('keeps the custom pages', async () => {
+      const tabs = await tabsAfterReturning({
+        userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
+      });
+
+      expect(tabs).toContain('Terms');
+    });
+
+    it('stays account-only when the provider turns combined off', async () => {
+      const tabs = await tabsAfterReturning({ combined: false });
+
+      expect(tabs).not.toContain('General');
+    });
   });
 
   it('ignores an unknown value', async () => {

@@ -33,18 +33,18 @@ import { SegmentedControl } from '@/primitives/segmented-control';
 
 ### `SegmentedControl.Root`
 
-| Prop            | Type                      | Default | Description                       |
-| --------------- | ------------------------- | ------- | --------------------------------- |
-| `value`         | `string`                  | —       | Controlled selected value         |
-| `defaultValue`  | `string`                  | `""`    | Initial selected value            |
-| `onValueChange` | `(value: string) => void` | —       | Called when the selection changes |
-| `disabled`      | `boolean`                 | `false` | Disables every item               |
+| Prop            | Type                     | Default | Description                       |
+| --------------- | ------------------------ | ------- | --------------------------------- |
+| `value`         | `Value`                  | —       | Controlled selected value         |
+| `defaultValue`  | `Value`                  | —       | Initial selected value            |
+| `onValueChange` | `(value: Value) => void` | —       | Called when the selection changes |
+| `disabled`      | `boolean`                | `false` | Disables every item               |
 
 ### `SegmentedControl.Item`
 
 | Prop       | Type      | Default      | Description                                                 |
 | ---------- | --------- | ------------ | ----------------------------------------------------------- |
-| `value`    | `string`  | **required** | Unique option identifier                                    |
+| `value`    | `unknown` | **required** | Unique option identifier, compared with `Object.is`         |
 | `disabled` | `boolean` | —            | Disables the item (uses `aria-disabled`, remains focusable) |
 
 ## Keyboard Navigation

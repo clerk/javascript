@@ -119,12 +119,11 @@ function SelectStep({ methods, pendingMethod, errorMessage, onSelect }: TaskSetu
         {errorMessage}
       </Card.Banner>
       <Card.Content>
-        <Item.Group variant='outline'>
+        <Item.Group>
           {methods.map((method, index) => (
             <Item.Root
               key={method}
               ref={index === 0 ? firstMethodRef : undefined}
-              size='lg'
               render={
                 <button
                   type='button'

@@ -7,7 +7,7 @@ import { Pen } from '../../../icons/glyphs/pen';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from '../sign-in.styles';
 
-export interface SignInIdentityPreviewProps {
+interface SignInIdentityPreviewProps {
   identifier: string;
   editLabel: string;
   disabled?: boolean;
