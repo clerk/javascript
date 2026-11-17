@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { GitHubLink } from '@/components/github-link';
-import { docKinds } from '@/lib/docs';
+import { docHref, docKinds, docsOfKind } from '@/lib/docs';
 import { site } from '@/lib/site';
 
 const groups = [
@@ -9,7 +9,10 @@ const groups = [
     title: 'Docs',
     items: [
       { title: 'Setup', href: '/docs/setup' },
-      ...docKinds.map(({ kind, title }) => ({ title, href: `/docs#${kind}` })),
+      ...docKinds.flatMap(({ kind, title }) => {
+        const [first] = docsOfKind(kind);
+        return first ? [{ title, href: docHref(first) }] : [];
+      }),
     ],
   },
   {
