@@ -11,6 +11,7 @@ export interface UserProfileOptions {
    */
   additionalOAuthScopes?: AdditionalOAuthScopes;
   mode?: 'modal' | 'mounted';
+  combined?: boolean;
 }
 
 export interface UserProfileProviderProps extends UserProfileOptions {
@@ -19,8 +20,12 @@ export interface UserProfileProviderProps extends UserProfileOptions {
 
 const UserProfileContext = createContext<UserProfileOptions>({});
 
-export function UserProfileProvider({ additionalOAuthScopes, mode, children }: UserProfileProviderProps) {
-  return <UserProfileContext.Provider value={{ additionalOAuthScopes, mode }}>{children}</UserProfileContext.Provider>;
+export function UserProfileProvider({ additionalOAuthScopes, mode, combined, children }: UserProfileProviderProps) {
+  return (
+    <UserProfileContext.Provider value={{ additionalOAuthScopes, mode, combined }}>
+      {children}
+    </UserProfileContext.Provider>
+  );
 }
 
 export function useUserProfileOptions(): UserProfileOptions {

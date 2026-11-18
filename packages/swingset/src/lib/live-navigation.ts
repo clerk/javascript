@@ -15,6 +15,7 @@ type LiveSidebarGroup = {
 };
 
 const livePages = new Set([
+  '/profile/profile',
   '/user-profile/user-profile',
   '/user-profile/user-profile-profile-panel',
   '/user-profile/user-profile-security-panel',
@@ -49,7 +50,7 @@ const livePages = new Set([
   '/misc/sign-up-button',
   '/misc/sign-out-button',
   '/misc/o-auth-consent',
-  '/user-button/user-button',
+  '/switcher/switcher',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);

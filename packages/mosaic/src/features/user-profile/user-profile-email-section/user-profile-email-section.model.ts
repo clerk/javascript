@@ -36,7 +36,7 @@ function startEmailVerification(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
-  mode: UserProfileOptions['mode'],
+  profile: Pick<UserProfileOptions, 'mode' | 'combined'>,
 ): UserProfileEmailVerification {
   if (email.matchesSsoConnection) {
     return {
@@ -50,7 +50,7 @@ function startEmailVerification(
         save(async () => {
           const prepared = await email.prepareVerification({
             strategy: 'enterprise_sso',
-            redirectUrl: withUserProfileModalReturn(window.location.href, mode),
+            redirectUrl: withUserProfileModalReturn(window.location.href, profile),
           });
           const url = prepared.verification.externalVerificationRedirectURL;
           if (!url) {
@@ -75,10 +75,10 @@ function toEmailVerifier(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
-  mode: UserProfileOptions['mode'],
+  profile: Pick<UserProfileOptions, 'mode' | 'combined'>,
 ): UserProfileEmailVerifier {
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router, mode),
+    start: () => startEmailVerification(email, linkRedirectUrl, router, profile),
     verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
@@ -86,7 +86,7 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
-  const { mode } = useUserProfileOptions();
+  const { mode, combined } = useUserProfileOptions();
   const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
   );
@@ -115,7 +115,8 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
-  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router, mode);
+  const verifierFor = (email: EmailAddressResource) =>
+    toEmailVerifier(email, linkRedirectUrl, router, { mode, combined });
 
   return {
     status: 'ready',

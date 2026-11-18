@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
-import { Card } from './card';
+import { Card } from '.';
 
 afterEach(() => cleanup());
 

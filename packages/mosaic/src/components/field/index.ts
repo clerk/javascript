@@ -1,4 +1,7 @@
-export { Field } from './field';
+'use client';
+
+/** Styled parts for composing an automatically associated single-control field. */
+export * as Field from './field.parts';
 export type {
   FieldDescriptionProps,
   FieldErrorProps,

@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
-import { Select } from './select';
+import { Select } from '.';
 
 type Expiration = '1d' | '7d';
 
