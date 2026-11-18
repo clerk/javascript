@@ -2,7 +2,7 @@
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { type ThemeStyle, useThemeStyle } from './ThemeStyleProvider';
+import { type ThemeStyle, useThemeStyle } from './useThemeStyle';
 
 const items: { label: string; value: ThemeStyle }[] = [
   { label: 'Clerk', value: 'clerk' },

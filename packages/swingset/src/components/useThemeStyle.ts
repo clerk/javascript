@@ -8,16 +8,6 @@ export const THEME_STYLE_STORAGE_KEY = 'swingset-theme-style';
 
 export const THEME_STYLE_INIT_SCRIPT = `try{var s=localStorage.getItem('${THEME_STYLE_STORAGE_KEY}');if(s!=='default')document.documentElement.dataset.swingsetTheme='clerk'}catch(e){document.documentElement.dataset.swingsetTheme='clerk'}`;
 
-interface ThemeStyleContextValue {
-  themeStyle: ThemeStyle;
-  setThemeStyle: (themeStyle: ThemeStyle) => void;
-}
-
-const ThemeStyleContext = React.createContext<ThemeStyleContextValue>({
-  themeStyle: 'clerk',
-  setThemeStyle: () => {},
-});
-
 const listeners = new Set<() => void>();
 
 function subscribe(listener: () => void) {
@@ -49,12 +39,7 @@ function setThemeStyle(next: ThemeStyle) {
   }
 }
 
-export function ThemeStyleProvider({ children }: { children: React.ReactNode }) {
-  const themeStyle = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const value = React.useMemo(() => ({ themeStyle, setThemeStyle }), [themeStyle]);
-  return <ThemeStyleContext.Provider value={value}>{children}</ThemeStyleContext.Provider>;
-}
-
 export function useThemeStyle() {
-  return React.useContext(ThemeStyleContext);
+  const themeStyle = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return { themeStyle, setThemeStyle };
 }
