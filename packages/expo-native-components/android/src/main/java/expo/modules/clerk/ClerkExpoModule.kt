@@ -305,6 +305,14 @@ class ClerkExpoModule : Module() {
     }
 
     private fun createDpopProof(method: String, url: String, authorization: String?, promise: Promise) {
+        if (!isClerkConfigured()) {
+            promise.reject(
+                "E_NOT_CONFIGURED",
+                "Clerk must be configured with configureNative before it can sign requests.",
+                null
+            )
+            return
+        }
         coroutineScope.launch {
             when (val result = dpopBridge.createDpopProof(method, url, authorization)) {
                 is ClerkDpopProofResult.Proof -> promise.resolve(result.value)
