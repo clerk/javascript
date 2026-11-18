@@ -205,7 +205,6 @@ export function ListGroupCheckboxItem({
       >
         <CheckboxInput
           {...props}
-          focusRing={false}
           elementDescriptor={descriptors.listGroupItemCheckbox}
           sx={t => ({
             flexShrink: 0,
