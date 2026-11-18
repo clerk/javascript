@@ -5,12 +5,11 @@ import { site } from '@/lib/site';
 
 export type { DocEntry };
 
-export const docEntries: DocEntry[] = placeDocs(generatedEntries);
+export const docEntries: DocEntry[] = placeDocs(generatedEntries).filter(entry => entry.kind !== 'hooks');
 
 export const docKinds = [
   { kind: 'components', title: 'Components' },
   { kind: 'primitives', title: 'Primitives' },
-  { kind: 'hooks', title: 'Hooks' },
 ] as const;
 
 export function docHref(entry: Pick<DocEntry, 'kind' | 'slug'>): string {
