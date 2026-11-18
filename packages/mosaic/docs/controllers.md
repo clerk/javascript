@@ -156,6 +156,7 @@ The view side is in [Views → Moving between screens](views.md#moving-between-s
 
 - **One wrapper for every action**, so each is wrapped the same way and only one is in flight (`runAction` in `switcher.controller.tsx`).
 - **Hold the surface still while an action runs.** `setActive` swaps the active organization while its promise is in flight, so the live model would rearrange the popup mid-action. Freeze the model the action started from and render it until the action settles (`context.frozenModel ?? model`). This also covers the model dropping `ready → loading` during Clerk's transitive state.
+- **Hold it past the action when the next screen is still loading.** Make the wait a named state with an `always` transition whose guard reads the live model from injected context, and call `actor.recheck()` in a layout effect when that value changes. Leaving the state clears the frozen model, so the hold ends once and does not come back (`handingOff` in `sign-up.controller.ts`).
 - **Derive view props.** A `pendingKey` run through `useSpinDelay`, a `mode` forced by a capability flag: anything the view would otherwise re-derive.
 
 ## Composition and dialog lifetime

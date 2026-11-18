@@ -1,6 +1,6 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { FieldFeedback } from '../../components/form';
 import { useForm } from '../../components/form';
@@ -9,18 +9,12 @@ import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
-import type { DoneInvokeEvent, ErrorInvokeEvent } from '../../machine/types';
+import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
-import type {
-  SignUpData,
-  SignUpDetailsValues,
-  SignUpFinish,
-  SignUpIdentifier,
-  SignUpReadyModel,
-} from './sign-up.model';
+import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
 import type {
@@ -34,10 +28,11 @@ import type {
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
+  isLeaving: boolean;
   error: ErrorDescription | undefined;
 }
 
-type FinishEvent = { type: 'FINISH'; frozenModel: SignUpReadyModel } | { type: 'TASK_READY' };
+type FinishEvent = { type: 'FINISH'; frozenModel: SignUpReadyModel };
 
 const finish = setup<FinishContext, FinishEvent>();
 
@@ -46,6 +41,7 @@ const finishMachine = finish.createMachine({
   initial: 'idle',
   context: {
     frozenModel: null,
+    isLeaving: false,
     error: undefined,
   },
   states: {
@@ -53,38 +49,29 @@ const finishMachine = finish.createMachine({
       on: {
         FINISH: {
           target: 'finishing',
-          actions: finish.assign<Extract<FinishEvent, { type: 'FINISH' }>>((_, event) => ({
-            frozenModel: event.frozenModel,
-            error: undefined,
-          })),
+          actions: finish.assign<FinishEvent>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
         },
       },
     },
     finishing: {
-      invoke: finish.fromPromise(
-        context => context.frozenModel?.finalize() ?? Promise.resolve<SignUpFinish>('leaving'),
-        {
-          onDone: [
-            {
-              guard: (_: FinishContext, event: DoneInvokeEvent<SignUpFinish>) => event.output === 'task',
-              target: 'preparingTask' as const,
-            },
-            { target: 'finished' as const },
-          ],
-          onError: {
-            target: 'idle',
-            actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
-              frozenModel: null,
-              error: toLocalizableError(event.error),
-            })),
-          },
+      invoke: finish.fromPromise(context => context.frozenModel?.finalize() ?? Promise.resolve(), {
+        onDone: { target: 'handingOff' },
+        onError: {
+          target: 'idle',
+          actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
+            frozenModel: null,
+            error: toLocalizableError(event.error),
+          })),
         },
-      ),
+      }),
     },
-    preparingTask: {
-      on: { TASK_READY: { target: 'idle', actions: finish.assign(() => ({ frozenModel: null })) } },
+    handingOff: {
+      always: {
+        guard: context => !context.isLeaving,
+        target: 'idle',
+        actions: finish.assign(() => ({ frozenModel: null })),
+      },
     },
-    finished: {},
   },
 });
 
@@ -152,10 +139,7 @@ function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetail
 type SignUpControllerResult = Omit<
   SignUpViewProps,
   'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization'
-> & {
-  isPreparingTask: boolean;
-  onTaskReady: () => void;
-};
+>;
 
 export function useSignUpController(
   liveModel: SignUpReadyModel,
@@ -166,11 +150,15 @@ export function useSignUpController(
   const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
   const genericError = useMessages('errors').generic;
-  const [finishSnapshot, sendFinish] = useMachine(finishMachine);
+  const isLeaving = liveModel.step.type === 'leaving';
+  const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
+
+  useLayoutEffect(() => {
+    finishActor.recheck();
+  }, [isLeaving, finishActor]);
 
   const model = finishSnapshot.context.frozenModel ?? liveModel;
   const isFinishing = finishSnapshot.value !== 'idle';
-  const onTaskReady = useCallback(() => sendFinish({ type: 'TASK_READY' }), [sendFinish]);
 
   const { step } = model;
   const identifier = chosenIdentifier ?? model.initialIdentifier;
@@ -251,8 +239,6 @@ export function useSignUpController(
   };
 
   return {
-    isPreparingTask: finishSnapshot.value === 'preparingTask',
-    onTaskReady,
     screen,
     attempt: model.signUpId,
     start: { ...details, step: detailsStep('start', startFields, model, identifier) },

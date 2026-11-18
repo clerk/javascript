@@ -2,13 +2,9 @@
 
 import type { SignUpInitialValues } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
-import { useEffect } from 'react';
 
 import type { MosaicLocationOptions, RoutingProps } from '../../routing/use-mosaic-location';
-import {
-  TaskChooseOrganizationContent,
-  useTaskChooseOrganizationReady,
-} from '../task-choose-organization/task-choose-organization';
+import { TaskChooseOrganizationContent } from '../task-choose-organization/task-choose-organization';
 import { useSignUpController } from './sign-up.controller';
 import type { SignUpReadyModel } from './sign-up.model';
 import { useSignUpModel } from './sign-up.model';
@@ -57,41 +53,14 @@ function SignUpFlow({
   routing,
   path,
 }: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement {
-  const { isPreparingTask, onTaskReady, ...view } = useSignUpController(model, { routing, path });
-  const { afterSignUpUrl } = model;
+  const view = useSignUpController(model, { routing, path });
 
   return (
-    <>
-      <SignUpView
-        {...view}
-        applicationName={model.applicationName}
-        applicationLogoUrl={model.applicationLogoUrl}
-        taskChooseOrganization={<TaskChooseOrganizationContent redirectUrlComplete={afterSignUpUrl} />}
-      />
-      {isPreparingTask ? (
-        <TaskChooseOrganizationReady
-          redirectUrlComplete={afterSignUpUrl}
-          onReady={onTaskReady}
-        />
-      ) : null}
-    </>
+    <SignUpView
+      {...view}
+      applicationName={model.applicationName}
+      applicationLogoUrl={model.applicationLogoUrl}
+      taskChooseOrganization={<TaskChooseOrganizationContent redirectUrlComplete={model.afterSignUpUrl} />}
+    />
   );
-}
-
-function TaskChooseOrganizationReady({
-  redirectUrlComplete,
-  onReady,
-}: {
-  redirectUrlComplete: string;
-  onReady: () => void;
-}): null {
-  const ready = useTaskChooseOrganizationReady({ redirectUrlComplete });
-
-  useEffect(() => {
-    if (ready) {
-      onReady();
-    }
-  }, [ready, onReady]);
-
-  return null;
 }
