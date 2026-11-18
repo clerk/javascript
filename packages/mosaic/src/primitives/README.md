@@ -46,12 +46,12 @@ All primitives follow the same compound component pattern. They emit zero styles
 
 ## Consuming from `@clerk/ui`
 
-`@clerk/ui` does not import these primitives today — `@clerk/mosaic` has no public subpath export for them (only the `.` and `./styles.css` entries in its `exports` map). This section documents the pattern for when that becomes needed, once a `@clerk/mosaic/<primitive>` subpath export is added.
+`@clerk/ui` does not import these primitives today. Each one is published at `@clerk/mosaic/primitives/<name>`, and this section documents the pattern for when `@clerk/ui` needs one.
 
 `@clerk/ui` uses `jsxImportSource: '@emotion/react'`, which automatically gives every component that accepts `className: string` a working `css` prop at runtime. Primitive parts already declare `className` (via `ComponentProps<Tag>`), so **the emotion `css` prop works out of the box**:
 
 ```tsx
-import { Dialog } from '@clerk/mosaic/dialog';
+import { Dialog } from '@clerk/mosaic/primitives/dialog';
 
 <Dialog.Popup css={{ padding: 24, borderRadius: 8 }} />;
 ```
@@ -60,7 +60,7 @@ For Clerk's theme-aware **`sx` prop**, each part must be wrapped with `makeCusto
 
 ```tsx
 // packages/ui/src/primitives/Dialog.tsx
-import { Dialog as MosaicDialog } from '@clerk/mosaic/dialog';
+import { Dialog as MosaicDialog } from '@clerk/mosaic/primitives/dialog';
 import type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -70,7 +70,7 @@ import type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from '@clerk/mosaic/dialog';
+} from '@clerk/mosaic/primitives/dialog';
 import type { FunctionComponent } from 'react';
 import { makeCustomizable } from '../customizables/makeCustomizable';
 import type { ThemableCssProp } from '../styledSystem';
