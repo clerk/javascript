@@ -52,6 +52,7 @@ class ClerkExpoModule : Module() {
     private var configuredProxyUrl: String? = null
     @Volatile private var updateRequiredViewEnabled = true
     private var configuredHostSignsRequests = false
+    @Volatile private var hostSignsRequests = false
     private val dpopBridge = ClerkDpopBridge()
 
     private data class AuthFlowStateSnapshot(
@@ -76,8 +77,12 @@ class ClerkExpoModule : Module() {
             mainHandler.removeCallbacksAndMessages(null)
         }
 
-        AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, proxyUrl: String?, hostSignsRequests: Boolean?, promise: Promise ->
-            configureNative(pubKey, seedDeviceToken, proxyUrl, hostSignsRequests == true, promise)
+        AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise ->
+            configureNative(pubKey, seedDeviceToken, proxyUrl, hostSignsRequests, promise)
+        }
+
+        AsyncFunction("setHostSignsRequests") { enabled: Boolean ->
+            hostSignsRequests = enabled
         }
 
         AsyncFunction("createDpopProof") { method: String, url: String, authorization: String?, promise: Promise ->
