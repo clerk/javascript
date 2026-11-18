@@ -1,5 +1,23 @@
 # @clerk/ui
 
+## 1.44.0
+
+### Minor Changes
+
+- Show how an OAuth client's identity was established on `<OAuthConsent />`. Clients that registered themselves through Dynamic Client Registration get an "Unverified app" notice, and clients identified by a Client ID Metadata Document show the host that publishes their details. `OAuthConsentInfo` gains optional `clientRegistration` and `clientMetadataHost` fields, and the notice can be styled with the new `oauthConsentClientIdentity` appearance element. ([#10895](https://github.com/clerk/javascript/pull/10895)) by [@Zertsov](https://github.com/Zertsov)
+
+- Allow users to select or clear optional scopes in `<OAuthConsent />`. Only selected scopes are submitted. When shown, `offline_access` remains checked and cannot be cleared. ([#10134](https://github.com/clerk/javascript/pull/10134)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Customize the scope checkboxes with the new `listGroupItemCheckbox` appearance element. Checkboxes align with the first line of descriptions that wrap onto multiple lines.
+
+### Patch Changes
+
+- Fix a stray scrollbar on the `<OAuthConsent />` and `<OAuthDeviceVerification />` scope list when only one scope is shown. ([#10134](https://github.com/clerk/javascript/pull/10134)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+  - @clerk/localizations@4.26.0
+
 ## 1.43.1
 
 ### Patch Changes

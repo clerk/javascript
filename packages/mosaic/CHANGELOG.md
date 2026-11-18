@@ -1,5 +1,29 @@
 # @clerk/mosaic
 
+## 0.8.0
+
+### Minor Changes
+
+- **Breaking:** The Settings submenu in `UserButton` and `OrganizationSwitcher` now reads "Manage account" instead of "Manage profile", and its message key is renamed to match. TypeScript flags overrides that still use the old key. ([#10908](https://github.com/clerk/javascript/pull/10908)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                | After                                 |
+  | ------------------------------------- | ------------------------------------- |
+  | `userButton.manage.profile`           | `userButton.manage.account`           |
+  | `organizationSwitcher.manage.profile` | `organizationSwitcher.manage.account` |
+
+  Find usages with `git grep -nE "manage\.profile|manage: *\{"`.
+
+- The combined organization and user switcher now shows the user's role in the active organization next to their identifier in the popup header, for example `cameron@clerk.com · Admin`. ([#10869](https://github.com/clerk/javascript/pull/10869)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+### Patch Changes
+
+- Fix a React "unique key" warning that `OAuthConsent` logged on every render in development. It came from copy that puts a link or button inside a styled part of the text, such as the redirect domain in the consent subtitle. ([#10888](https://github.com/clerk/javascript/pull/10888)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Switcher rows and menu items now use the primary foreground color for their text and icons at rest, instead of the secondary color that only darkened on hover. Trailing icons, such as the active checkmark and submenu chevrons, stay secondary. ([#10889](https://github.com/clerk/javascript/pull/10889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+
 ## 0.7.0
 
 ### Minor Changes

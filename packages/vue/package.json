@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "2.5.23",
+  "version": "2.5.24",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
