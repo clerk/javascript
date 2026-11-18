@@ -6,7 +6,7 @@ import Script from 'next/script';
 import type React from 'react';
 
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { THEME_STYLE_INIT_SCRIPT } from '@/components/ThemeStyleProvider';
+import { THEME_STYLE_INIT_SCRIPT, ThemeStyleProvider } from '@/components/ThemeStyleProvider';
 import { cn } from '@/lib/utils';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
@@ -33,7 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className='antialiased'>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ThemeStyleProvider>{children}</ThemeStyleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

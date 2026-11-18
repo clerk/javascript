@@ -18,29 +18,40 @@ const ThemeStyleContext = React.createContext<ThemeStyleContextValue>({
   setThemeStyle: () => {},
 });
 
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function getSnapshot(): ThemeStyle {
+  return document.documentElement.dataset.swingsetTheme === 'clerk' ? 'clerk' : 'default';
+}
+
+function getServerSnapshot(): ThemeStyle {
+  return 'clerk';
+}
+
+function setThemeStyle(next: ThemeStyle) {
+  if (next === 'clerk') {
+    document.documentElement.dataset.swingsetTheme = 'clerk';
+  } else {
+    delete document.documentElement.dataset.swingsetTheme;
+  }
+  listeners.forEach(listener => listener());
+  try {
+    localStorage.setItem(THEME_STYLE_STORAGE_KEY, next);
+  } catch {
+    return;
+  }
+}
+
 export function ThemeStyleProvider({ children }: { children: React.ReactNode }) {
-  const [themeStyle, setThemeStyle] = React.useState<ThemeStyle>('clerk');
-
-  React.useEffect(() => {
-    // eslint-disable-next-line react/set-state-in-effect -- Read the theme the init script applied only after hydration
-    setThemeStyle(document.documentElement.dataset.swingsetTheme === 'clerk' ? 'clerk' : 'default');
-  }, []);
-
-  const selectThemeStyle = React.useCallback((next: ThemeStyle) => {
-    if (next === 'clerk') {
-      document.documentElement.dataset.swingsetTheme = 'clerk';
-    } else {
-      delete document.documentElement.dataset.swingsetTheme;
-    }
-    setThemeStyle(next);
-    try {
-      localStorage.setItem(THEME_STYLE_STORAGE_KEY, next);
-    } catch {
-      return;
-    }
-  }, []);
-
-  const value = React.useMemo(() => ({ themeStyle, setThemeStyle: selectThemeStyle }), [themeStyle, selectThemeStyle]);
+  const themeStyle = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const value = React.useMemo(() => ({ themeStyle, setThemeStyle }), [themeStyle]);
   return <ThemeStyleContext.Provider value={value}>{children}</ThemeStyleContext.Provider>;
 }
 
