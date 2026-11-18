@@ -190,7 +190,7 @@ import {
   clerkUnsupportedEnvironmentWarning,
 } from './errors';
 import { eventBus, events } from './events';
-import type { FapiClient, FapiRequestCallback } from './fapiClient';
+import type { FapiClient, FapiFetchCallback, FapiFetchResponseCallback, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
@@ -3425,6 +3425,14 @@ export class Clerk implements ClerkInterface {
 
   __internal_onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
+  };
+
+  __internal_onBeforeFetch = (callback: FapiFetchCallback): void => {
+    this.#fapiClient.onBeforeFetch(callback);
+  };
+
+  __internal_onFetchResponse = (callback: FapiFetchResponseCallback): void => {
+    this.#fapiClient.onFetchResponse(callback);
   };
 
   // TODO @userland-errors:
