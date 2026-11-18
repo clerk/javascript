@@ -16,7 +16,9 @@ import type {
 export type CreateOrganizationModelOptions = Pick<
   CreateOrganizationProps,
   'afterCreateOrganizationUrl' | 'skipInvitationScreen'
->;
+> & {
+  activateOnLogoFailure?: boolean;
+};
 
 export type CreateOrganizationModel =
   | { status: 'loading' }
@@ -81,7 +83,12 @@ export function useCreateOrganizationModel(options: CreateOrganizationModelOptio
       await save(async () => {
         organization = await createOrganization({ name, ...(slugEnabled ? { slug } : {}) });
         if (logo) {
-          await organization.setLogo({ file: logo });
+          const upload = organization.setLogo({ file: logo });
+          if (options.activateOnLogoFailure) {
+            await Promise.allSettled([upload]);
+          } else {
+            await upload;
+          }
         }
         await clerk.setActive({ organization });
       }, ['name', 'slug']);

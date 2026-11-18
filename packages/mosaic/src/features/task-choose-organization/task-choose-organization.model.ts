@@ -33,7 +33,7 @@ export function useTaskChooseOrganizationModel({
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
-  const createOrganization = useCreateOrganizationModel({ skipInvitationScreen: true });
+  const createOrganization = useCreateOrganizationModel({ skipInvitationScreen: true, activateOnLogoFailure: true });
   const { findOrganization: _findOrganization, ...entries } = useOrganizationListEntries();
   const creationDefaults = useOrganizationCreationDefaults();
 
