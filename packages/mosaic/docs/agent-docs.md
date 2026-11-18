@@ -31,7 +31,7 @@ Worked examples: `src/components/avatar/avatar.doc.ts` (a compound component), `
 
 ## Publishing a unit
 
-Each documented component and primitive is a subpath export that renders from a React Server Component. Hooks are not published. `pnpm build` runs `scripts/check-docs-exports.mjs` and `scripts/check-bundle.mjs`, which fail on a unit that breaks these rules.
+Each documented component and primitive is a subpath export that renders from a React Server Component. `pnpm build` runs `scripts/check-docs-exports.mjs` and `scripts/check-bundle.mjs`, which fail on a unit that breaks these rules.
 
 - Add `./<kind>/<slug>` to `exports` in `package.json` (`types`, `import` and `default` under `./dist/<kind>/<slug>`) and the matching entry in `tsdown.config.mts`, beside `components/avatar`.
 - `index.ts` has no `'use client'`. A compound re-exports its namespace from a directive-free parts module (`src/components/avatar/avatar.parts.ts`, or `parts.ts` in a primitive); a single component re-exports it from its leaf (`src/components/badge/`). A helper a caller needs is a member of the namespace, such as `Panel.usePanelTitle`, and is listed in the doc's `exports`.
