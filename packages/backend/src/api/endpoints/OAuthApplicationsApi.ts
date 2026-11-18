@@ -139,7 +139,7 @@ function isAllowedResourceUrl({ protocol, hostname }: URL) {
 }
 
 const rfc3986AbsoluteUriPattern =
-  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[A-Za-z0-9\-._~:/?@!$&'()*+,;=[\]]|%[0-9A-Fa-f]{2})*$/;
+  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:(?:[A-Za-z0-9\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*@)?(?:\[[0-9A-Fa-f:.]+\]|(?:[A-Za-z0-9\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*)(?::[0-9]*)?(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@/]|%[0-9A-Fa-f]{2})*)?(?:\?(?:[A-Za-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*)?$/;
 
 function assertValidTokenExchangeResource(resource: string) {
   if (resource.includes('#')) {
@@ -157,10 +157,12 @@ function assertValidTokenExchangeResource(resource: string) {
 const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
 
 function assertValidTokenExchangeScope(scope: string[] | undefined) {
-  if (scope?.some(token => !scopeTokenPattern.test(token))) {
-    throw tokenExchangeRequestError(
-      'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
-    );
+  for (const token of scope ?? []) {
+    if (!isString(token) || !scopeTokenPattern.test(token)) {
+      throw tokenExchangeRequestError(
+        'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
+      );
+    }
   }
 }
 
