@@ -677,7 +677,7 @@ describe('OAuthConsent', () => {
       });
 
       await waitFor(() => {
-        expect(getByText('Unverified app: it registered itself, so its name and logo are not verified.')).toBeVisible();
+        expect(getByText('Clerk CLI registered itself, so its name and logo are not verified.')).toBeVisible();
       });
     });
 
@@ -688,7 +688,7 @@ describe('OAuthConsent', () => {
       });
 
       await waitFor(() => {
-        expect(getByText('App details published by claude.ai')).toBeVisible();
+        expect(getByText('Details published by claude.ai.')).toBeVisible();
       });
     });
 
@@ -699,8 +699,8 @@ describe('OAuthConsent', () => {
       });
 
       await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
-      expect(queryByText(/Unverified app/)).toBeNull();
-      expect(queryByText(/App details published by/)).toBeNull();
+      expect(queryByText(/registered itself/)).toBeNull();
+      expect(queryByText(/Details published by/)).toBeNull();
     });
 
     it('shows no notice and still renders for an unknown registration type', async () => {
@@ -710,16 +710,16 @@ describe('OAuthConsent', () => {
       });
 
       await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
-      expect(queryByText(/Unverified app/)).toBeNull();
-      expect(queryByText(/App details published by/)).toBeNull();
+      expect(queryByText(/registered itself/)).toBeNull();
+      expect(queryByText(/Details published by/)).toBeNull();
     });
 
     it('shows no notice when the backend does not send the registration type', async () => {
       const { getByText, queryByText } = await renderWithConsentInfo({});
 
       await waitFor(() => expect(getByText('Clerk CLI')).toBeVisible());
-      expect(queryByText(/Unverified app/)).toBeNull();
-      expect(queryByText(/App details published by/)).toBeNull();
+      expect(queryByText(/registered itself/)).toBeNull();
+      expect(queryByText(/Details published by/)).toBeNull();
     });
   });
 });

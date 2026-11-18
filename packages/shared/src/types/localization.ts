@@ -1557,7 +1557,7 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue<'applicationName'>;
     };
     clientIdentity: {
-      dynamic: LocalizationValue;
+      dynamic: LocalizationValue<'applicationName'>;
       metadataDocument: LocalizationValue<'metadataHost'>;
     };
   };
