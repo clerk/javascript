@@ -22,6 +22,8 @@ export interface SwitcherMembership {
   imageUrl?: string;
   membersCount?: number;
   planLabel?: string;
+  /** The signed-in user's role in this organization, as Clerk names it. */
+  roleName?: string;
 }
 
 export interface SwitcherSuggestion {

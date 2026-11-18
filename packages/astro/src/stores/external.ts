@@ -122,7 +122,9 @@ export const $signUpStore = computed([$clientStore], client => client?.signUp);
  * @example
  * $billingStore.subscribe((billing) => billing.getPlans().then((plans) => console.log(plans.data.length)))
  */
-export const $billingStore = computed([$clerk], clerk => clerk?.billing);
+export const $billingStore = computed([$clerk, $isLoadedStore], (clerk, isLoaded) =>
+  isLoaded ? clerk?.billing : undefined,
+);
 
 /**
  * Records a telemetry event when a store is used to match React hooks telemetry.

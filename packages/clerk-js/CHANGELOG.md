@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.45.0
+
+### Minor Changes
+
+- Add `clientTrustState` to `SignInFuture`, so custom sign-in flows can read whether Clerk trusts the user's device (`'new'`, `'known'`, or `'pending'`). With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, and it's `undefined` before then. Without that update, Clerk returns it on every response. It's `undefined` when Device Trust is off. ([#10775](https://github.com/clerk/javascript/pull/10775)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
 ## 6.44.0
 
 ### Minor Changes

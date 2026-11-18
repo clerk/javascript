@@ -993,7 +993,7 @@ describe('Switcher', () => {
 
       const header = requiredPopup().querySelector('.cl-switcher-header');
       expect(header?.querySelector('.cl-switcher-header-title')).toHaveTextContent('Acme');
-      expect(header?.querySelector('.cl-switcher-header-description')).toHaveTextContent('alice');
+      expect(header?.querySelector('.cl-switcher-header-description')).toHaveTextContent('alice · Member');
       expect(header?.querySelector('.cl-switcher-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
       expect(header?.querySelector('.cl-switcher-avatar-badge > [data-shape]')).toHaveAttribute('data-shape', 'circle');
       expect(within(header ?? requiredPopup()).queryAllByRole('button')).toEqual([]);

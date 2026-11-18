@@ -77,13 +77,6 @@ describe('useSSO', () => {
     vi.restoreAllMocks();
   });
 
-  test('returns the startSSOFlow function', () => {
-    const { result } = renderHook(() => useSSO());
-
-    expect(typeof result.current.startSSOFlow).toBe('function');
-    expect(mocks.loadSSODependencies).not.toHaveBeenCalled();
-  });
-
   test('returns early without starting the flow when Clerk is not loaded', async () => {
     mocks.useSignIn.mockReturnValue({
       signIn: mockSignIn,

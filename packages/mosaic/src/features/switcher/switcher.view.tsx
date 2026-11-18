@@ -155,7 +155,9 @@ function membershipSubtitle(membership: SwitcherMembership, m: Messages, locale:
 
 function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
   if (lead.kind === 'organization') {
-    return lead.user ? identifier : membershipSubtitle(lead.organization, m, locale);
+    return lead.user
+      ? joinDetails(identifier, lead.organization.roleName)
+      : membershipSubtitle(lead.organization, m, locale);
   }
   if (lead.kind === 'none') {
     // No selection is not the account, so it carries no identifier line.
@@ -571,12 +573,12 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
-        <Menu.Media>
+        <Menu.Indicator>
           <Icon
             glyph={Checkmark}
             size='md'
           />
-        </Menu.Media>
+        </Menu.Indicator>
       ) : null}
     </Menu.Item>
   );

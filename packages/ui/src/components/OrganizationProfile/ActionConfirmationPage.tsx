@@ -1,4 +1,4 @@
-import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useReverification, useUser } from '@clerk/shared/react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
@@ -72,7 +72,8 @@ type DeleteOrganizationFormProps = FormProps;
 export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
   const { organization, membership } = useOrganization();
 
-  const deleteOrg = useLeaveWithRevalidations(organization?.destroy);
+  const destroyOrgWithReverification = useReverification(() => organization?.destroy());
+  const deleteOrg = useLeaveWithRevalidations(destroyOrgWithReverification);
 
   if (!organization || !membership) {
     return null;

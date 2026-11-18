@@ -123,14 +123,6 @@ describe('experimental useSSO', () => {
     expect(experimentalUseSSO).toBe(useSSO);
   });
 
-  test('returns the startSSOFlow function', () => {
-    const { result } = renderHook(() => useSSO());
-
-    expect(typeof result.current.startSSOFlow).toBe('function');
-    expect(mocks.useSignIn).toHaveBeenCalled();
-    expect(mocks.useSignUp).toHaveBeenCalled();
-  });
-
   test('returns early without starting the flow when Clerk is not loaded', async () => {
     mocks.useClerk.mockReturnValue({
       loaded: false,

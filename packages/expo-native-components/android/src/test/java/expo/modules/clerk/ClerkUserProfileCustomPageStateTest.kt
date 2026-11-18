@@ -146,6 +146,38 @@ class ClerkUserProfileCustomPageStateTest {
     assertEquals(listOf("dismissed:billing"), events)
   }
 
+  @Test
+  fun aUserArrivingAfterMountKeepsThePresentedPage() {
+    val events = mutableListOf<String>()
+    var popToRootCount = 0
+    val state = state(events, popToRoot = { popToRootCount += 1 })
+    state.userDidChange(null)
+    state.pageDidPresent("billing")
+    events.clear()
+
+    state.userDidChange("user_1")
+
+    assertEquals(listOf("billing"), state.retainedPathsForTesting())
+    assertEquals(0, popToRootCount)
+    assertEquals(emptyList<String>(), events)
+  }
+
+  @Test
+  fun switchingToAnotherUserInvalidatesRetainedNavigation() {
+    val events = mutableListOf<String>()
+    var popToRootCount = 0
+    val state = state(events, popToRoot = { popToRootCount += 1 })
+    state.userDidChange("user_1")
+    state.pageDidPresent("billing")
+    events.clear()
+
+    state.userDidChange("user_2")
+
+    assertEquals(emptyList<String>(), state.retainedPathsForTesting())
+    assertEquals(1, popToRootCount)
+    assertEquals(listOf("dismissed:billing"), events)
+  }
+
   private fun state(
     events: MutableList<String>,
     popToRoot: () -> Unit = {},

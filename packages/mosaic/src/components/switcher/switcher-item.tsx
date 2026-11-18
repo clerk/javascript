@@ -57,8 +57,7 @@ export function SwitcherItemContent({ xstyle, ...rest }: SwitcherItemContentProp
 export type SwitcherItemLabelProps = MosaicElementProps<'div'> & {
   /**
    * `default` names the row's subject (a person, an organization) in its own color. `interactive`
-   * takes the row's color, so it brightens with the row on hover. Use it where the text is the row
-   * itself (`Add account`, `Sign out`).
+   * takes the row's color. Use it where the text is the row itself (`Add account`, `Sign out`).
    *
    * @default 'default'
    */

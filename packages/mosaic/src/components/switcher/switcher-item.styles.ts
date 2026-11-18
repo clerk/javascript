@@ -7,17 +7,14 @@ const cardRadius = radiusVars['--cl-radius-xl'];
 
 export const styles = stylex.create({
   root: {
-    // The icon in the media column rides the row's text strength rather than its own, the way
-    // `Button` does it. `Icon` reads the var (`icon.styles.ts`) — StyleX can't emit a descendant
-    // rule, so the value crosses the element boundary as a custom property. It is restated in
-    // `interactive` rather than gaining a hover branch here: StyleX resolves a property to the
-    // last style that declares it, so the two can't merge.
-    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
+    // The icon in the media column takes the row's text color, the way `Button` does it, rather
+    // than a value an ancestor wrote. `Icon` reads the var (`icon.styles.ts`).
+    '--_cl-icon-color': 'currentColor',
     borderRadius: `max(0px, calc(${cardRadius} - ${groupInset}))`,
     gap: space['1.5'],
     paddingInline: space['1.5'],
     alignItems: 'center',
-    color: colorVars['--cl-color-foreground-secondary'],
+    color: colorVars['--cl-color-foreground'],
     display: 'flex',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -34,13 +31,6 @@ export const styles = stylex.create({
   // `not-allowed`, so every hover branch excludes it. Both spellings count: a row that has to stay
   // focusable while it waits carries `aria-disabled` instead of the native attribute.
   interactive: {
-    '--_cl-icon-color': {
-      default: colorVars['--cl-color-foreground-secondary'],
-      '@media (hover: hover)': {
-        default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
-      },
-    },
     borderStyle: 'none',
     appearance: 'none',
     backgroundColor: {
@@ -48,13 +38,6 @@ export const styles = stylex.create({
       ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
-      },
-    },
-    color: {
-      default: colorVars['--cl-color-foreground-secondary'],
-      '@media (hover: hover)': {
-        default: null,
-        ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
     cursor: {
@@ -103,6 +86,7 @@ export const styles = stylex.create({
   // the row, and truncates beyond it: the `minmax(0, auto)` columns let a button shrink below its
   // label, which a flex item holding `flexShrink: 0` never does.
   trailing: {
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     gap: space['2'],
     alignItems: 'center',
     display: 'grid',

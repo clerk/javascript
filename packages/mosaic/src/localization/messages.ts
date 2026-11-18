@@ -127,7 +127,8 @@ function fold(
       const inner = fold(tokens, token.name, options);
       if (inner.closed) {
         const component = own(options.components, token.name);
-        nodes.push(createElement(Fragment, { key: nodes.length }, component ? component(inner.nodes) : inner.nodes));
+        const children = createElement(Fragment, null, ...inner.nodes);
+        nodes.push(createElement(Fragment, { key: nodes.length }, component ? component(children) : children));
       } else {
         nodes.push(`{#${token.name}}`, ...inner.nodes);
       }
