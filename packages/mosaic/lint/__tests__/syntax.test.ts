@@ -2,23 +2,16 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { RuleTester } from 'oxlint/plugins-dev';
-import { describe, test } from 'vitest';
-
-RuleTester.describe = describe;
-RuleTester.it = test;
+import { describe } from 'vitest';
 
 const require = createRequire(import.meta.url);
-const config = require('../../oxlint.config.mjs').default;
+import { findOverride, jsPluginSpecifier, ruleOptions } from './mosaic-config.ts';
 const ruleTester = new RuleTester({ cwd: path.resolve(import.meta.dirname, '../..') });
 
-const syntaxPlugin = require(config.jsPlugins.find(plugin => plugin.name === 'eslint-compat').specifier).default;
+const syntaxPlugin = require(jsPluginSpecifier('eslint-compat')).default;
 
 describe('style guards', () => {
-  const options = config.overrides
-    .find(
-      override => override.files.includes('src/**/*.styles.ts') && override.rules['eslint-compat/no-restricted-syntax'],
-    )
-    .rules['eslint-compat/no-restricted-syntax'].slice(1);
+  const options = restrictedSyntaxOptions('src/**/*.styles.ts');
   ruleTester.run('no-restricted-syntax', syntaxPlugin.rules['no-restricted-syntax'], {
     valid: [
       {
@@ -273,9 +266,7 @@ describe('style guards', () => {
 });
 
 describe('JSX guards', () => {
-  const options = config.overrides
-    .find(override => override.files.includes('src/**/*') && override.rules['eslint-compat/no-restricted-syntax'])
-    .rules['eslint-compat/no-restricted-syntax'].slice(1);
+  const options = restrictedSyntaxOptions('src/**/*');
   ruleTester.run('no-restricted-syntax', syntaxPlugin.rules['no-restricted-syntax'], {
     valid: [
       'export const Sample = ({ visible }) => <div>{visible ? <Part /> : null}</div>;',
@@ -331,10 +322,7 @@ describe('JSX guards', () => {
 });
 
 describe('raw element guards in features and blocks', () => {
-  const override = config.overrides.find(
-    override => override.files.includes('src/features/**/*') && override.rules['eslint-compat/no-restricted-syntax'],
-  );
-  const options = override.rules['eslint-compat/no-restricted-syntax'].slice(1);
+  const options = restrictedSyntaxOptions('src/features/**/*');
   ruleTester.run('no-restricted-syntax', syntaxPlugin.rules['no-restricted-syntax'], {
     valid: [
       "export const View = () => <Menu.Item render={<button type='button' onClick={onPick} />} />;",
@@ -415,3 +403,11 @@ describe('raw element guards in features and blocks', () => {
     ),
   });
 });
+
+function restrictedSyntaxOptions(files: string) {
+  const rule = 'eslint-compat/no-restricted-syntax';
+  return ruleOptions(
+    findOverride(override => override.files.includes(files) && rule in override.rules),
+    rule,
+  ).slice(1);
+}

@@ -2,19 +2,16 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { RuleTester } from 'oxlint/plugins-dev';
-import { describe, test } from 'vitest';
-
-RuleTester.describe = describe;
-RuleTester.it = test;
 
 const require = createRequire(import.meta.url);
-const config = require('../../oxlint.config.mjs').default;
+import { findOverride, ruleOptions, settings } from './mosaic-config.ts';
 const ruleTester = new RuleTester({ cwd: path.resolve(import.meta.dirname, '../..') });
 
 const boundaries = require('eslint-plugin-boundaries');
-const options = config.overrides
-  .find(override => override.rules['boundaries/dependencies'])
-  .rules['boundaries/dependencies'].slice(1);
+const options = ruleOptions(
+  findOverride(override => 'boundaries/dependencies' in override.rules),
+  'boundaries/dependencies',
+).slice(1);
 
 ruleTester.run('dependencies', boundaries.rules.dependencies, {
   valid: [
@@ -246,7 +243,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       filename: 'src/styles/index.ts',
       code: "export { UserButton } from '../features/user-button/user-button';",
     },
-  ].map(testCase => ({ ...testCase, options, settings: config.settings })),
+  ].map(testCase => ({ ...testCase, options, settings })),
   invalid: [
     {
       name: 'sample.view.ts rejects catalog values and Clerk hooks',
@@ -458,5 +455,5 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       code: "import { useRouter } from '../routing/use-router';",
       errors: [/down/],
     },
-  ].map(testCase => ({ ...testCase, options, settings: config.settings })),
+  ].map(testCase => ({ ...testCase, options, settings })),
 });

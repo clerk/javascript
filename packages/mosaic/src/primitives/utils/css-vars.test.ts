@@ -30,17 +30,15 @@ function createMockState(
     arrowElHeight = 0,
   } = overrides;
 
-  const style = {
-    setProperty: vi.fn(),
-  };
-
-  // Mock arrow element inside floating
-  const arrowEl = arrowElWidth || arrowElHeight ? { clientWidth: arrowElWidth, clientHeight: arrowElHeight } : null;
-
-  const floating = {
-    style,
-    querySelector: vi.fn(() => arrowEl),
-  } as unknown as HTMLElement;
+  const floating = document.createElement('div');
+  vi.spyOn(floating.style, 'setProperty');
+  if (arrowElWidth || arrowElHeight) {
+    const arrowEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    arrowEl.setAttribute('data-side', 'bottom');
+    Object.defineProperty(arrowEl, 'clientWidth', { value: arrowElWidth });
+    Object.defineProperty(arrowEl, 'clientHeight', { value: arrowElHeight });
+    floating.append(arrowEl);
+  }
 
   return {
     placement,
@@ -70,7 +68,7 @@ function createMockState(
     y: 0,
     initialPlacement: placement,
     strategy: 'absolute',
-  } as unknown as MiddlewareState;
+  } as MiddlewareState;
 }
 
 // Helper to extract setProperty calls into a map
