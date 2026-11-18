@@ -1,6 +1,6 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { FieldFeedback } from '../../components/form';
 import { useForm } from '../../components/form';
@@ -10,63 +10,57 @@ import { useResendSeconds } from '../../hooks/use-resend-seconds';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
-import type { ErrorInvokeEvent } from '../../machine/types';
+import type { DoneInvokeEvent, ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
-import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpReadyModel } from './sign-up.model';
+import type {
+  SignUpData,
+  SignUpDetailsValues,
+  SignUpFinish,
+  SignUpIdentifier,
+  SignUpReadyModel,
+} from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
-import { allowedRoute, routeFor, signUpRoutes } from './sign-up.routes';
-import type { SignUpFieldName, SignUpFields, SignUpStep, SignUpValues, SignUpViewProps } from './sign-up.types';
-
-export type SignUpScreen = SignUpRoute | 'startOver';
-
-type CodeChannel = 'email' | 'phone';
+import { allowedRoute, detailsRouteFor, routeFor, signUpRoutes } from './sign-up.routes';
+import type {
+  SignUpDetails,
+  SignUpFieldName,
+  SignUpFields,
+  SignUpScreen,
+  SignUpValues,
+  SignUpVerifyScreen,
+  SignUpViewProps,
+} from './sign-up.types';
 
 interface CodeContext {
-  sendCode: (channel: CodeChannel) => Promise<void>;
-  channel: CodeChannel | undefined;
+  sendCode: () => Promise<void>;
   resendAvailableAt: number | undefined;
   error: ErrorDescription | undefined;
 }
 
-type CodeEvent = { type: 'SEND'; channel: CodeChannel } | { type: 'RESEND'; channel: CodeChannel } | { type: 'LEAVE' };
+type CodeEvent = { type: 'SEND' } | { type: 'RESEND' };
 
 const code = setup<CodeContext, CodeEvent>();
+
+const clearError = code.assign(() => ({ error: undefined }));
 
 const codeMachine = code.createMachine({
   id: 'signUpCode',
   initial: 'idle',
   context: {
     sendCode: () => Promise.resolve(),
-    channel: undefined,
     resendAvailableAt: undefined,
     error: undefined,
   },
   states: {
     idle: {
-      on: {
-        RESEND: {
-          target: 'sending',
-          actions: code.assign<Extract<CodeEvent, { type: 'RESEND' }>>((_, event) => ({
-            channel: event.channel,
-            error: undefined,
-          })),
-        },
-        SEND: {
-          target: 'sending',
-          actions: code.assign<Extract<CodeEvent, { type: 'SEND' }>>((_, event) => ({
-            channel: event.channel,
-            error: undefined,
-          })),
-        },
-      },
+      on: { SEND: 'sending', RESEND: 'sending' },
     },
     sending: {
-      on: { LEAVE: { target: 'idle', actions: code.assign(() => ({ channel: undefined })) } },
-      invoke: code.fromPromise(context => (context.channel ? context.sendCode(context.channel) : Promise.resolve()), {
+      invoke: code.fromPromise(context => context.sendCode(), {
         onDone: {
           target: 'sent',
           actions: code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) })),
@@ -79,34 +73,72 @@ const codeMachine = code.createMachine({
     },
     sent: {
       on: {
+        SEND: { target: 'sending', actions: clearError },
         RESEND: {
           target: 'sending',
           guard: context => isResendUnlocked(context.resendAvailableAt),
-          actions: code.assign(() => ({ error: undefined })),
+          actions: clearError,
         },
-        LEAVE: { target: 'idle', actions: code.assign(() => ({ channel: undefined, resendAvailableAt: undefined })) },
       },
     },
   },
 });
 
-function unsentCodeChannel(step: SignUpNextStep): CodeChannel | undefined {
-  if (step.type === 'verify_email' && !step.sent) {
-    return 'email';
-  }
-  return step.type === 'verify_phone' && !step.sent ? 'phone' : undefined;
+interface FinishContext {
+  frozenModel: SignUpReadyModel | null;
+  error: ErrorDescription | undefined;
 }
 
-function screenCodeChannel(screen: SignUpScreen): CodeChannel | undefined {
-  if (screen === 'verifyEmail') {
-    return 'email';
-  }
-  return screen === 'verifyPhone' ? 'phone' : undefined;
-}
+type FinishEvent = { type: 'FINISH'; frozenModel: SignUpReadyModel } | { type: 'TASK_READY' };
 
-function detailsFieldsFor(screen: SignUpScreen, data: SignUpData, identifier: SignUpIdentifier): SignUpFields {
-  return screen === 'continue' ? data.continueFieldsFor(identifier) : data.startFieldsFor(identifier);
-}
+const finish = setup<FinishContext, FinishEvent>();
+
+const finishMachine = finish.createMachine({
+  id: 'signUpFinish',
+  initial: 'idle',
+  context: {
+    frozenModel: null,
+    error: undefined,
+  },
+  states: {
+    idle: {
+      on: {
+        FINISH: {
+          target: 'finishing',
+          actions: finish.assign<Extract<FinishEvent, { type: 'FINISH' }>>((_, event) => ({
+            frozenModel: event.frozenModel,
+            error: undefined,
+          })),
+        },
+      },
+    },
+    finishing: {
+      invoke: finish.fromPromise(
+        context => context.frozenModel?.finalize() ?? Promise.resolve<SignUpFinish>('leaving'),
+        {
+          onDone: [
+            {
+              guard: (_: FinishContext, event: DoneInvokeEvent<SignUpFinish>) => event.output === 'task',
+              target: 'preparingTask' as const,
+            },
+            { target: 'finished' as const },
+          ],
+          onError: {
+            target: 'idle',
+            actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
+              frozenModel: null,
+              error: toLocalizableError(event.error),
+            })),
+          },
+        },
+      ),
+    },
+    preparingTask: {
+      on: { TASK_READY: { target: 'idle', actions: finish.assign(() => ({ frozenModel: null })) } },
+    },
+    finished: {},
+  },
+});
 
 const emptyValues: SignUpValues = {
   identifier: '',
@@ -124,11 +156,17 @@ const emptyValues: SignUpValues = {
   legalAccepted: false,
 };
 
-export function signUpScreen(route: SignUpRoute, step: SignUpNextStep): SignUpScreen {
-  if (step.type === 'unknown') {
+function screenFor(route: SignUpRoute | undefined, data: SignUpData): SignUpScreen {
+  if (route === undefined || route === 'enterpriseConnections' || route === 'protectCheck') {
     return 'startOver';
   }
-  return allowedRoute(route, step) ? route : (routeFor(step) ?? 'startOver');
+  if (route !== 'start') {
+    return route;
+  }
+  if (data.actionBlocked) {
+    return 'actionBlocked';
+  }
+  return data.mode === 'public' ? 'start' : data.mode;
 }
 
 function otherIdentifier(identifier: SignUpIdentifier): SignUpIdentifier {
@@ -140,38 +178,14 @@ function detailsStep(
   fields: SignUpFields,
   data: SignUpData,
   identifier: SignUpIdentifier,
-): SignUpStep {
+): SignUpDetails {
   const nextField = data.canSwitchIdentifier && identifier ? otherIdentifier(identifier) : undefined;
   return {
-    kind: 'details',
     purpose,
     fields,
     nextField: nextField ?? undefined,
     legalConsent: purpose === 'continue' ? data.continueLegalConsent : data.legalConsent,
   };
-}
-
-export function signUpViewStep(screen: SignUpScreen, data: SignUpData, identifier: SignUpIdentifier): SignUpStep {
-  switch (screen) {
-    case 'start':
-      if (data.actionBlocked) {
-        return { kind: 'notice', purpose: 'action-blocked', details: data.actionBlocked };
-      }
-      if (data.mode !== 'public') {
-        return { kind: 'notice', purpose: data.mode };
-      }
-      return detailsStep('start', data.startFieldsFor(identifier), data, identifier);
-    case 'continue':
-      return detailsStep('continue', data.continueFieldsFor(identifier), data, identifier);
-    case 'verifyEmail':
-      return { kind: 'code', purpose: 'verify-email', identifier: data.emailAddress ?? '' };
-    case 'verifyPhone':
-      return { kind: 'code', purpose: 'verify-phone', identifier: data.phoneNumber ?? '' };
-    case 'enterpriseConnections':
-    case 'protectCheck':
-    case 'startOver':
-      return { kind: 'notice', purpose: 'start-over' };
-  }
 }
 
 function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
@@ -187,61 +201,60 @@ function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetail
   };
 }
 
-type SignUpControllerResult = Omit<SignUpViewProps, 'applicationName' | 'applicationLogoUrl'> & {
-  screen: SignUpScreen;
+type SignUpControllerResult = Omit<
+  SignUpViewProps,
+  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization'
+> & {
+  isPreparingTask: boolean;
+  onTaskReady: () => void;
 };
 
-export function useSignUpController(model: SignUpReadyModel, options: MosaicLocationOptions): SignUpControllerResult {
+export function useSignUpController(
+  liveModel: SignUpReadyModel,
+  options: MosaicLocationOptions,
+): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
-  const [detailsRoute, setDetailsRoute] = useState<'start' | 'continue'>('start');
-  const actions = usePendingAction<'code' | 'finalize' | 'startOver'>();
+  const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
   const genericError = useMessages('errors').generic;
-  const [codeSnapshot, sendCodeEvent, codeActor] = useMachine(codeMachine, {
-    context: {
-      sendCode: channel => (channel === 'phone' ? model.sendPhoneCode() : model.sendEmailCode()),
-    },
-  });
-  const resendSeconds = useResendSeconds(codeSnapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
+  const [finishSnapshot, sendFinish] = useMachine(finishMachine);
 
+  const model = finishSnapshot.context.frozenModel ?? liveModel;
+  const isFinishing = finishSnapshot.value !== 'idle';
+  const onTaskReady = useCallback(() => sendFinish({ type: 'TASK_READY' }), [sendFinish]);
+
+  const { step } = model;
   const identifier = chosenIdentifier ?? model.initialIdentifier;
-  const screen = signUpScreen(route, model.step);
-  const fields = detailsFieldsFor(screen, model, identifier);
+  const shown = step.type === 'unknown' ? undefined : allowedRoute(route, step) ? route : routeFor(step, route);
+  const screen = screenFor(shown, model);
 
   // A route the step does not allow is replaced with the screen that is shown, so the stored route, and the
   // address bar once the URL routing modes land (#10780), never keeps it. Replacing leaves no history entry.
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Syncs the route with the sign-up step, which changes outside this component. */
   useEffect(() => {
-    if (screen !== 'startOver' && screen !== route) {
-      go(screen, {}, { replace: true });
+    if (shown !== undefined && shown !== route) {
+      go(shown, {}, { replace: true });
     }
-  }, [screen, route, go]);
+  }, [shown, route, go]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
-  // TODO: With a URL routing mode (#10780) a reload can mount on a verify screen. Send the code here when the step
-  // says none is out, and finalize a sign-up that is already complete, each once per mount.
-  const goTo = (nextRoute: SignUpRoute) => {
-    sendCodeEvent({ type: 'LEAVE' });
-    go(nextRoute);
-  };
-
-  const next = async (step: SignUpNextStep) => {
-    if (step.type === 'complete') {
-      await model.finalize();
+  // TODO: With a URL routing mode (#10780) a reload can mount on a sign-up that is already complete. Finalize it
+  // here, once per mount.
+  const next = (nextStep: SignUpNextStep) => {
+    if (nextStep.type === 'complete') {
+      sendFinish({ type: 'FINISH', frozenModel: model });
       return;
     }
-    const nextRoute = routeFor(step);
-    if (!nextRoute) {
-      return;
-    }
-    if (screen === 'start' || screen === 'continue') {
-      setDetailsRoute(screen);
-    }
-    goTo(nextRoute);
-    const channel = unsentCodeChannel(step);
-    if (channel) {
-      sendCodeEvent({ type: 'SEND', channel });
+    const nextRoute = routeFor(nextStep, route);
+    if (nextRoute) {
+      go(nextRoute);
     }
   };
+
+  const startFields = model.startFieldsFor(identifier);
+  const continueFields = model.continueFieldsFor(identifier);
+  const fields = screen === 'continue' ? continueFields : startFields;
 
   const form = useForm<SignUpValues, SignUpNextStep | undefined>({
     initialValues: { ...emptyValues, ...model.prefill },
@@ -251,9 +264,9 @@ export function useSignUpController(model: SignUpReadyModel, options: MosaicLoca
         ? model.update(details)
         : model.create({ ...details, ...model.startHiddenValuesFor(identifier) });
     },
-    onSuccess: step => {
-      if (step) {
-        void actions.run('finalize', () => next(step));
+    onSuccess: nextStep => {
+      if (nextStep) {
+        next(nextStep);
       }
     },
   });
@@ -267,47 +280,106 @@ export function useSignUpController(model: SignUpReadyModel, options: MosaicLoca
   const passwordFeedback: FieldFeedback | undefined = strength.isError
     ? { type: 'error', message: genericError }
     : strength.data;
-  const resendChannel = screenCodeChannel(screen);
-  const verify = resendChannel === 'phone' ? model.verifyPhoneCode : model.verifyEmailCode;
+  const isPending = form.isSubmitting || actions.isPending || isFinishing;
+  const finishError = finishSnapshot.context.error ? errorText(finishSnapshot.context.error) : undefined;
+  const globalErrorMessage = form.error ?? finishError ?? actions.error;
 
-  return {
-    screen,
-    step: signUpViewStep(screen, model, identifier),
+  const details = {
     socialProviders: [],
     onSelectProvider: () => undefined,
     form,
-    onSubmit: event => {
-      if (resendChannel) {
-        event?.preventDefault();
-        void actions.run('code', async () => next(await verify(form.values.code)));
-        return;
-      }
-      form.handleSubmit(event ?? { preventDefault: () => undefined });
-    },
-    onCodeComplete: code => void actions.run('code', async () => next(await verify(code))),
-    isPending: form.isSubmitting || actions.isPending,
-    isDisabled: form.isSubmitting || actions.isPending,
+    onSubmit: form.handleSubmit,
+    isPending,
+    isDisabled: isPending,
+    globalErrorMessage,
     passwordFeedback,
-    errorMessage: actions.errorKey === 'code' ? actions.error : undefined,
-    globalErrorMessage:
-      form.error ??
-      (codeSnapshot.context.error ? errorText(codeSnapshot.context.error) : undefined) ??
-      (actions.errorKey === 'code' ? undefined : actions.error),
     onSwitchField: model.canSwitchIdentifier ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined,
     onSignIn: model.goToSignIn,
-    onEmailSupport: supportEmail ? () => window.location.assign(`mailto:${supportEmail}`) : undefined,
-    onJoinWaitlist: model.joinWaitlist,
-    onEditIdentifier: () => goTo(detailsRoute),
-    onBack: () => goTo(detailsRoute),
+  };
+  const verify = {
+    isPending: isFinishing,
+    globalErrorMessage: finishError,
+    onVerified: next,
+    onEditIdentifier: () => go(detailsRouteFor(route)),
+  };
+
+  return {
+    isPreparingTask: finishSnapshot.value === 'preparingTask',
+    onTaskReady,
+    screen,
+    attempt: model.signUpId,
+    start: { ...details, step: detailsStep('start', startFields, model, identifier) },
+    continue: { ...details, step: detailsStep('continue', continueFields, model, identifier) },
+    verifyEmail: {
+      ...verify,
+      identifier: model.emailAddress ?? '',
+      needsCode: step.type === 'verify_email' && !step.sent,
+      sendCode: model.sendEmailCode,
+      verifyCode: model.verifyEmailCode,
+    },
+    verifyPhone: {
+      ...verify,
+      identifier: model.phoneNumber ?? '',
+      needsCode: step.type === 'verify_phone' && !step.sent,
+      sendCode: model.sendPhoneCode,
+      verifyCode: model.verifyPhoneCode,
+    },
+    restricted: {
+      globalErrorMessage,
+      onEmailSupport: supportEmail ? () => window.location.assign(`mailto:${supportEmail}`) : undefined,
+      onJoinWaitlist: model.joinWaitlist,
+      onSignIn: model.goToSignIn,
+    },
+    actionBlocked: model.actionBlocked,
     onStartOver: () =>
       void actions.run('startOver', async () => {
         await model.reset();
         form.reset();
-        goTo('start');
+        go('start');
       }),
-    onResend: resendChannel ? () => sendCodeEvent({ type: 'RESEND', channel: resendChannel }) : undefined,
-    canResend:
-      resendChannel !== undefined && codeActor.can({ type: 'RESEND', channel: resendChannel }) && !actions.isPending,
+  };
+}
+
+type SignUpVerifyOptions = Pick<
+  SignUpVerifyScreen,
+  'needsCode' | 'sendCode' | 'verifyCode' | 'onVerified' | 'isPending' | 'globalErrorMessage'
+>;
+
+export function useSignUpVerifyController({
+  needsCode,
+  sendCode,
+  verifyCode,
+  onVerified,
+  isPending: isFlowPending,
+  globalErrorMessage,
+}: SignUpVerifyOptions) {
+  const [value, setValue] = useState('');
+  const actions = usePendingAction<'code'>();
+  const errorText = useErrorText();
+  const [snapshot, send, actor] = useMachine(codeMachine, { context: { sendCode } });
+  const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
+
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Sends the code when the screen mounts on a step with none out, which a reload or a redirect reaches with no event. */
+  useEffect(() => {
+    if (needsCode) {
+      send({ type: 'SEND' });
+    }
+  }, [needsCode, send]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
+
+  const isPending = actions.isPending || isFlowPending;
+  const submit = (submitted: string) => void actions.run('code', async () => onVerified(await verifyCode(submitted)));
+
+  return {
+    value,
+    onValueChange: setValue,
+    onSubmit: () => submit(value),
+    onComplete: submit,
+    isPending,
+    errorMessage: actions.error,
+    globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
+    onResend: () => send({ type: 'RESEND' }),
+    canResend: actor.can({ type: 'RESEND' }) && !isPending,
     resendRemainingSeconds: resendSeconds || undefined,
   };
 }

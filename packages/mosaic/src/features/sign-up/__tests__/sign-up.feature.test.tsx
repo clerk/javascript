@@ -2,8 +2,14 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
-import { fapiEnvironment, type FapiEnvironmentOverrides } from '../../../__tests__/feature/fapi';
+import {
+  fapiEnvironment,
+  type FapiEnvironmentOverrides,
+  fapiMembership,
+  fapiOrganization,
+} from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { useVirtualSegment, useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp, type SignUpProps } from '../sign-up';
@@ -55,6 +61,20 @@ async function submitStart(user: ReturnType<typeof userEvent.setup>, email = EMA
   await user.click(continueButton());
 }
 
+function watchFor(appeared: () => boolean) {
+  let seen = false;
+  const observer = new MutationObserver(() => {
+    seen ||= appeared();
+  });
+  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+  return () => {
+    observer.disconnect();
+    return seen;
+  };
+}
+
+const watchForHeading = (name: string | RegExp) => watchFor(() => screen.queryByRole('heading', { name }) !== null);
+
 const codeSent = () => screen.findByRole('button', { name: /^Resend \(\d+\)$/ });
 
 async function enterCode(user: ReturnType<typeof userEvent.setup>, code = VERIFICATION_CODE) {
@@ -81,13 +101,104 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
-  it('goes to the session task when the new session has one', async () => {
-    const { user, navigate } = await renderSignUp({ signUp: { sessionTasks: [{ key: 'choose-organization' }] } });
+  it('stays on the code screen after the session is created', async () => {
+    const { user, navigate } = await renderSignUp();
 
     await submitStart(user);
     await enterCode(user);
 
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('tasks/choose-organization')));
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    await tick();
+    await tick();
+    expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
+    expect(continueButton()).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('shows the organization task in the same card when the new session has one', async () => {
+    const { user, navigate } = await renderSignUp({ signUp: { sessionTasks: [{ key: 'choose-organization' }] } });
+
+    await submitStart(user);
+    await codeSent();
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull());
+    const sawStart = watchForHeading('Create your account');
+    const sawSkeleton = watchFor(() => screen.queryByText('Loading organizations…') !== null);
+    await enterCode(user);
+
+    expect(await screen.findByRole('heading', { name: 'Create organization' })).toBeInTheDocument();
+    expect(sawStart()).toBe(false);
+    expect(sawSkeleton()).toBe(false);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('shows the organization task with the creation defaults the instance suggests', async () => {
+    const { user } = await renderSignUp({
+      environment: environment({
+        organization_settings: {
+          force_organization_selection: true,
+          organization_creation_defaults: { enabled: true },
+        },
+      }),
+      signUp: { sessionTasks: [{ key: 'choose-organization' }] },
+      organizationCreationDefaults: {
+        object: 'organization_creation_defaults',
+        id: '',
+        advisory: {
+          code: 'organization_already_exists',
+          severity: 'warning',
+          meta: { organization_name: 'Initech', organization_domain: 'initech.com' },
+        },
+        form: { name: 'Initech', slug: 'initech', logo: null, blur_hash: null },
+      },
+    });
+
+    await submitStart(user);
+    await enterCode(user);
+
+    expect(await screen.findByRole('heading', { name: 'Create organization' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Initech');
+  });
+
+  it('leaves for the after sign-up URL once the organization is chosen', async () => {
+    const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
+    const { user, navigate } = await renderSignUp(
+      { signUp: { sessionTasks: [{ key: 'choose-organization' }] }, memberships: [fapiMembership(acme)] },
+      {},
+      { signUpFallbackRedirectUrl: '/welcome' },
+    );
+
+    await submitStart(user);
+    await enterCode(user);
+    const sawAnotherScreen = watchForHeading(/Create your account|Something went wrong/);
+    await user.click(await screen.findByRole('button', { name: 'Acme' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
+    await tick();
+    await tick();
+    expect(sawAnotherScreen()).toBe(false);
+  });
+
+  it('goes to the task URL the application set', async () => {
+    const { user, navigate } = await renderSignUp(
+      { signUp: { sessionTasks: [{ key: 'choose-organization' }] } },
+      {},
+      { taskUrls: { 'choose-organization': '/onboarding/organization' } },
+    );
+
+    await submitStart(user);
+    await enterCode(user);
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/onboarding/organization')));
+    expect(screen.queryByRole('heading', { name: 'Create organization' })).toBeNull();
+  });
+
+  it('leaves for the sign-in task route for a task it does not show', async () => {
+    const { user, navigate } = await renderSignUp({ signUp: { sessionTasks: [{ key: 'setup-mfa' }] } });
+
+    await submitStart(user);
+    await enterCode(user);
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('tasks/setup-mfa')));
   });
 
   it('shows only required fields until optional fields are asked for', async () => {
@@ -309,6 +420,30 @@ describe('SignUp', () => {
 
     await waitFor(() => expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('start'));
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+  });
+
+  it('sends the code when a verify route is opened before a code is out', async () => {
+    const fapi = serveFapi({ environment: environment() });
+    await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+
+    await submitStart(user);
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    await user.click(await screen.findByRole('button', { name: 'Edit email address' }));
+    await screen.findByRole('heading', { name: 'Create your account' });
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    hold.release();
+    await codeSent();
+    expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
   it('links to sign-in from the form', async () => {

@@ -14,8 +14,8 @@ import {
   getInitialActiveIdentifier,
   minimizeFieldsForExistingSignup,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
-import { __internal_useClerkSignal, useClerk } from '@clerk/shared/react';
-import type { SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
+import type { SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
@@ -27,6 +27,7 @@ import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
 import { useLocale, useMessages } from '../../localization';
 import { save } from '../../utils/errors';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
+import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
 
 export interface SignUpDetailsValues {
@@ -51,8 +52,12 @@ export interface SignUpModelOptions {
   showOptionalFields?: boolean;
 }
 
+export type SignUpFinish = 'leaving' | 'task';
+
 export interface SignUpData {
-  step: SignUpNextStep;
+  signUpId: string | undefined;
+  step: SignUpFlowStep;
+  afterSignUpUrl: string;
   mode: 'public' | 'restricted' | 'waitlist';
   initialIdentifier: SignUpIdentifier;
   canSwitchIdentifier: boolean;
@@ -77,7 +82,7 @@ export interface SignUpCallbacks {
   verifyEmailCode: (code: string) => Promise<SignUpNextStep>;
   sendPhoneCode: () => Promise<void>;
   verifyPhoneCode: (code: string) => Promise<SignUpNextStep>;
-  finalize: () => Promise<void>;
+  finalize: () => Promise<SignUpFinish>;
   reset: () => Promise<void>;
   goToSignIn: () => void;
   validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
@@ -134,6 +139,7 @@ export function useSignUpModel({
   const router = useMosaicRouter();
   const supportEmail = useMosaicSupportEmail();
   const { signUp, errors } = __internal_useClerkSignal('signUp');
+  const { session } = useSession();
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
   const locale = useLocale();
@@ -171,6 +177,20 @@ export function useSignUpModel({
   const next = (resource: SignUpFutureResource): SignUpNextStep => {
     const step = getSignUpNextStep(resource);
     return step.type === 'verify_email' && verifiesEmailByLink ? { type: 'unknown' } : step;
+  };
+
+  const taskInFlow = (task: SessionTask | undefined): SignUpTaskKey | undefined =>
+    task?.key === 'choose-organization' && !clerk.__internal_getOption('taskUrls')?.[task.key] ? task.key : undefined;
+
+  const flowStep = (): SignUpFlowStep => {
+    if (signUp.id) {
+      return next(signUp);
+    }
+    const task = taskInFlow(session?.currentTask);
+    if (task) {
+      return { type: 'task', key: task };
+    }
+    return session === null ? next(signUp) : { type: 'leaving' };
   };
 
   const [lastError] = errors.raw ?? [];
@@ -218,7 +238,9 @@ export function useSignUpModel({
 
   return {
     status: 'ready',
-    step: next(signUp),
+    signUpId: signUp.id,
+    step: flowStep(),
+    afterSignUpUrl: clerk.buildAfterSignUpUrl(),
     mode,
     initialIdentifier:
       getInitialActiveIdentifier(attributes, isProgressiveSignUp, {
@@ -285,11 +307,14 @@ export function useSignUpModel({
       await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
       return next(signUp);
     },
-    finalize: () =>
-      run(() =>
+    finalize: async () => {
+      await run(() =>
         signUp.finalize({
-          navigate: async ({ session, decorateUrl }) => {
-            const task = session.currentTask;
+          navigate: async ({ session: created, decorateUrl }) => {
+            const task = created.currentTask;
+            if (taskInFlow(task)) {
+              return;
+            }
             if (task) {
               await router.navigate(
                 clerk.__internal_getOption('taskUrls')?.[task.key] ??
@@ -306,7 +331,9 @@ export function useSignUpModel({
             await router.navigate(afterSignUpUrl);
           },
         }),
-      ),
+      );
+      return taskInFlow(clerk.session?.currentTask) ? 'task' : 'leaving';
+    },
     reset: () => run(() => signUp.reset()),
     validatePassword,
     goToSignIn: () => void router.navigate(clerk.buildSignInUrl()),

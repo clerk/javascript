@@ -8,14 +8,11 @@ import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { styles } from '../sign-up.styles';
+import type { SignUpRestrictedScreen } from '../sign-up.types';
 
-interface SignUpRestrictedProps {
+interface SignUpRestrictedProps extends SignUpRestrictedScreen {
   waitlist: boolean;
   logo?: { src: string; alt: string };
-  globalErrorMessage?: string;
-  onEmailSupport?: () => void;
-  onJoinWaitlist?: () => void;
-  onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
