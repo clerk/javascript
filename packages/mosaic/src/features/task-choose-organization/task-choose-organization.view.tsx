@@ -31,16 +31,23 @@ type ChooseStepProps = Omit<
   'step' | 'renderBranding' | 'identifier' | 'createSteps' | 'onSignOut'
 >;
 
-export function TaskChooseOrganizationView({
+export function TaskChooseOrganizationView({ renderBranding = true, ...props }: TaskChooseOrganizationViewProps) {
+  return (
+    <Card.Root renderBranding={renderBranding}>
+      <TaskChooseOrganizationSteps {...props} />
+    </Card.Root>
+  );
+}
+
+export function TaskChooseOrganizationSteps({
   step,
-  renderBranding = true,
   identifier,
   createSteps,
   onSignOut,
   ...props
-}: TaskChooseOrganizationViewProps) {
+}: Omit<TaskChooseOrganizationViewProps, 'renderBranding'>) {
   return (
-    <Card.Root renderBranding={renderBranding}>
+    <>
       <Flow.Root
         value={step === 'create' && !createSteps ? 'choose' : step}
         direction={step === 'create' ? 1 : -1}
@@ -63,7 +70,7 @@ export function TaskChooseOrganizationView({
         disabled={Boolean(props.pendingKey)}
         onSignOut={onSignOut}
       />
-    </Card.Root>
+    </>
   );
 }
 

@@ -14,9 +14,12 @@ import {
 } from './task-choose-organization.controller';
 import type { TaskChooseOrganizationModelOptions } from './task-choose-organization.model';
 import { useTaskChooseOrganizationModel } from './task-choose-organization.model';
-import { TaskChooseOrganizationSkeleton } from './task-choose-organization.skeleton';
+import {
+  TaskChooseOrganizationSkeleton,
+  TaskChooseOrganizationSkeletonSteps,
+} from './task-choose-organization.skeleton';
 import type { TaskChooseOrganizationData } from './task-choose-organization.types';
-import { TaskChooseOrganizationView } from './task-choose-organization.view';
+import { TaskChooseOrganizationSteps, TaskChooseOrganizationView } from './task-choose-organization.view';
 
 /** Everything `<TaskChooseOrganization />` takes: where to go once the session has no tasks left. */
 export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
@@ -39,21 +42,54 @@ export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
  * <TaskChooseOrganization redirectUrlComplete='/dashboard' />
  * ```
  */
-export function TaskChooseOrganization({ fallback, ...options }: TaskChooseOrganizationProps): ReactElement | null {
+export function TaskChooseOrganization(props: TaskChooseOrganizationProps): ReactElement | null {
+  return <TaskChooseOrganizationFlow {...props} />;
+}
+
+export function TaskChooseOrganizationContent(props: TaskChooseOrganizationProps): ReactElement | null {
+  return (
+    <TaskChooseOrganizationFlow
+      {...props}
+      embedded
+    />
+  );
+}
+
+export function useTaskChooseOrganizationReady(options: TaskChooseOrganizationModelOptions): boolean {
+  const model = useTaskChooseOrganizationModel(options);
+  return model.status !== 'loading' && !(model.status === 'ready' && model.organizationsLoading);
+}
+
+function TaskChooseOrganizationFlow({
+  fallback,
+  embedded = false,
+  ...options
+}: TaskChooseOrganizationProps & { embedded?: boolean }): ReactElement | null {
   const model = useTaskChooseOrganizationModel(options);
   const controller = useTaskChooseOrganizationController(model);
 
   if (controller.status === 'ready') {
     if (controller.organizationsLoading) {
-      return (
+      const canCreate = Boolean(controller.createOrganization);
+      return embedded ? (
+        <TaskChooseOrganizationSkeletonSteps
+          canCreate={canCreate}
+          identifier={controller.identifier}
+        />
+      ) : (
         <TaskChooseOrganizationSkeleton
-          canCreate={Boolean(controller.createOrganization)}
+          canCreate={canCreate}
           identifier={controller.identifier}
           renderBranding={controller.renderBranding}
         />
       );
     }
-    return <ConnectedTaskChooseOrganization controller={controller} />;
+    return (
+      <ConnectedTaskChooseOrganization
+        controller={controller}
+        embedded={embedded}
+      />
+    );
   }
 
   if (model.status === 'complete') {
@@ -76,12 +112,19 @@ function ContinueAfterTask({ onContinue }: { onContinue: () => Promise<unknown> 
   return null;
 }
 
-function ConnectedTaskChooseOrganization({ controller }: { controller: TaskChooseOrganizationReadyController }) {
+function ConnectedTaskChooseOrganization({
+  controller,
+  embedded,
+}: {
+  controller: TaskChooseOrganizationReadyController;
+  embedded: boolean;
+}) {
   const screen = useTaskChooseOrganizationScreenController(controller);
   const { createOrganization } = controller;
+  const View = embedded ? TaskChooseOrganizationSteps : TaskChooseOrganizationView;
 
   return (
-    <TaskChooseOrganizationView
+    <View
       {...controller}
       step={screen.step}
       createSteps={
