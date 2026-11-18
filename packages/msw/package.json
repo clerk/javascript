@@ -1,6 +1,6 @@
 {
   "name": "@clerk/msw",
-  "version": "0.0.89",
+  "version": "0.0.90",
   "private": true,
   "sideEffects": false,
   "type": "module",

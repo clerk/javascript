@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
-import { SegmentedControl } from './segmented-control';
+import { SegmentedControl } from '.';
 
 type Access = 'all' | 'selected';
 

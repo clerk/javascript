@@ -27,6 +27,7 @@ export type SessionVerificationStatus = 'needs_first_factor' | 'needs_second_fac
 
 /**
  * What a completed reverification did, passed to the fetcher of `useReverification` with `passReverificationResult`.
+ * @inline
  */
 export type ReverificationResult = {
   /**

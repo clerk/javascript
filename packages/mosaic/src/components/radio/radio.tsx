@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -262,13 +264,8 @@ const RadioCard = React.forwardRef<HTMLLabelElement, RadioCardProps>(function Mo
   );
 });
 
-export const Radio = {
-  Group: RadioGroup,
-  Item: RadioItem,
-  Section: RadioSection,
-  Card: RadioCard,
-  Media: Item.Media,
-  Content: Item.Content,
-  Label: Item.Label,
-  Description: Item.Description,
-};
+const RadioMedia = Item.Media;
+const RadioContent = Item.Content;
+const RadioLabel = Item.Label;
+const RadioDescription = Item.Description;
+export { RadioGroup, RadioItem, RadioSection, RadioCard, RadioMedia, RadioContent, RadioLabel, RadioDescription };

@@ -1,9 +1,9 @@
 import { Card } from '../../components/card';
 import { Item } from '../../components/item';
 import { Skeleton } from '../../components/skeleton';
+import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useMessages } from '../../localization';
-import { RowAvatar } from '../switcher/switcher-avatar.view';
 import { TaskChooseOrganizationHeader, TaskChooseOrganizationSignOut } from './task-choose-organization.view';
 
 const PLACEHOLDER_ORGANIZATIONS = ['Acme Corporation', 'Globex'];

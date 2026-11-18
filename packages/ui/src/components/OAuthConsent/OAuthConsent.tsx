@@ -3,7 +3,7 @@ import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
+import { Box, Button, descriptors, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -13,6 +13,7 @@ import { Modal } from '@/ui/elements/Modal';
 import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
+import { getClientIdentityNotice } from './clientIdentity';
 import { InlineAction } from './InlineAction';
 import { getKnownOAuthClient } from './knownClients';
 import {
@@ -97,6 +98,7 @@ function _OAuthConsent() {
   // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
   // the app-owner-set name, so a look-alike name cannot borrow the branding.
   const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
+  const clientIdentityNotice = getClientIdentityNotice(data?.clientRegistration, data?.clientMetadataHost);
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -256,6 +258,14 @@ function _OAuthConsent() {
                   identifier: primaryIdentifier || '',
                 })}
               />
+              {clientIdentityNotice && (
+                <Text
+                  elementDescriptor={descriptors.oauthConsentClientIdentity}
+                  colorScheme={clientIdentityNotice.colorScheme}
+                  variant='caption'
+                  localizationKey={clientIdentityNotice.localizationKey}
+                />
+              )}
             </Header.Root>
             {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
               <OrgSelect

@@ -4,8 +4,8 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Card } from '../../card';
+import { Dialog } from '..';
 import type { DialogRootProps } from '../dialog';
-import { Dialog } from '../dialog';
 
 afterEach(() => cleanup());
 

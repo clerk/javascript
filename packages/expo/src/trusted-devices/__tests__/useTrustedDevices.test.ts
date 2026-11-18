@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { isBiometricCredentialError } from '../../biometric-credentials/errors';
 import { isTrustedDeviceError } from '../errors';
 import { useTrustedDevices as useTrustedDevicesOnUnsupportedPlatform } from '../useTrustedDevices';
 import { useTrustedDevices as useTrustedDevicesOnAndroid } from '../useTrustedDevices.android';
@@ -91,6 +90,6 @@ test('keeps the trusted-device error guard behavior', () => {
   const error = Object.assign(new Error('Unavailable'), { code: 'environment_unavailable' });
   const nonError = { code: 'environment_unavailable' };
 
-  expect(isTrustedDeviceError(error)).toBe(isBiometricCredentialError(error));
-  expect(isTrustedDeviceError(nonError)).toBe(isBiometricCredentialError(nonError));
+  expect(isTrustedDeviceError(error)).toBe(true);
+  expect(isTrustedDeviceError(nonError)).toBe(false);
 });

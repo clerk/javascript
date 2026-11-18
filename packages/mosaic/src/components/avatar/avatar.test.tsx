@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Pen } from '../../icons/glyphs/pen';
 import { Icon } from '../icon';
-import { Avatar } from './avatar';
+import { Avatar } from '.';
 import { styles } from './avatar.styles';
 
 // React reads this off the global object and ships no typing for it.

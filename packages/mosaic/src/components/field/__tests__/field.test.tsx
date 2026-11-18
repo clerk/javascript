@@ -11,7 +11,7 @@ import { Checkbox } from '../../checkbox';
 import type { FieldFeedback } from '../../form';
 import { Input } from '../../input';
 import { Select } from '../../select';
-import { Field } from '../field';
+import { Field } from '..';
 
 const overrides = stylex.create({
   root: { display: 'grid' },

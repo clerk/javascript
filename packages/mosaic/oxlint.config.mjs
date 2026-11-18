@@ -127,6 +127,7 @@ export default defineConfig({
       { category: 'model', pattern: '**/*.model.{ts,tsx}' },
       { category: 'messages', pattern: '**/*.messages.ts' },
       { category: 'css-entry', pattern: 'src/styles/index.ts' },
+      { category: 'doc', pattern: '**/*.doc.ts' },
     ],
     'import/resolver': {
       node: true,
@@ -340,6 +341,7 @@ export default defineConfig({
               { allow: { to: { element: { type: '{{ from.element.type }}' } } } },
               { from: { element: { type: 'root' } }, allow: { to: { element: { type: '*' } } } },
               { from: { file: { categories: 'css-entry' } }, allow: { to: { element: { type: '*' } } } },
+              { from: { file: { categories: 'doc' } }, allow: { to: { element: { type: 'root' } } } },
               {
                 from: { element: { type: ['utils', 'hooks', 'styles', 'components', 'localization', 'modals'] } },
                 allow: { to: { element: { type: SHARED } } },

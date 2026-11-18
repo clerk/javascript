@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { HeadingLevelProvider } from '../heading';
-import { Section } from './section';
+import { Section } from '.';
 
 const overrides = stylex.create({
   root: { containerType: 'inline-size' },
