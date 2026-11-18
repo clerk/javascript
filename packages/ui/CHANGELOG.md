@@ -1,5 +1,19 @@
 # @clerk/ui
 
+## 1.43.1
+
+### Patch Changes
+
+- Add ChatGPT as a supported OAuth provider strategy for instances where Sign in with ChatGPT is enabled. ([#10107](https://github.com/clerk/javascript/pull/10107)) by [@brkalow](https://github.com/brkalow)
+
+- Show an error and re-enable the buttons in `<UserProfile />` Connected Accounts when the OAuth transport fails, for example when an Electron app cannot open the system browser. The connect buttons previously stayed disabled until the component remounted. ([#10878](https://github.com/clerk/javascript/pull/10878)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `<OrganizationProfile />` now prompts for reverification before deleting an organization, when the instance requires it. ([#10871](https://github.com/clerk/javascript/pull/10871)) by [@gabrielmeloc22](https://github.com/gabrielmeloc22)
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+  - @clerk/localizations@4.25.1
+
 ## 1.43.0
 
 ### Minor Changes
