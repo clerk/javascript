@@ -8,3 +8,5 @@ export type {
   AuthenticatedWebViewProps,
   UseAuthenticatedWebViewParams,
 } from './useAuthenticatedWebView';
+export { openInBrowser } from './openInBrowser';
+export type { OpenInBrowserParams } from './openInBrowser';

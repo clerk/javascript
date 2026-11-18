@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -318,16 +320,13 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   return <ButtonContext.Provider value={buttonDefaults}>{element}</ButtonContext.Provider>;
 });
 
-/**
- * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Media`, `Card.Title`,
- * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic
- * `render` prop and forwards its ref.
- *
- * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
- * a `Banner` expands into it while its children hold a message, collapsing again once they are
- * empty, so the slot takes `role='alert'` and stays a live region across both.
- *
- * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
- * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
- */
-export const Card = { Root, Header, Media, Title, Description, Banner: CardBanner, Content, Footer };
+export {
+  Root as CardRoot,
+  Header as CardHeader,
+  Media as CardMedia,
+  Title as CardTitle,
+  Description as CardDescription,
+  CardBanner,
+  Content as CardContent,
+  Footer as CardFooter,
+};

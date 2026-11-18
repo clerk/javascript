@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
-import { EmptyState } from './empty-state';
+import { EmptyState } from '.';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
