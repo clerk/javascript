@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.31.0
+
+### Minor Changes
+
+- Add `transactional_email_blocked` to the `ClerkPolicy` reasons of the `email.suppressed` webhook event type. Clerk sends this reason when a queued transactional email is suppressed because sending was blocked for the instance. ([#10849](https://github.com/clerk/javascript/pull/10849)) by [@jescalan](https://github.com/jescalan)
+
+- Add an optional `secondFactorVerification` parameter (`'fresh' | 'stale'`) to `createSignInToken()`, which lets a user with a second factor enabled complete the sign-in without being prompted for it. `expiresInSeconds` is now optional. ([#10265](https://github.com/clerk/javascript/pull/10265)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- `users.getUserList()` no longer waits for the user count when the page it lists already shows the total: a page with fewer users than its `limit`, or no users at all. The count can be slow for a search over many users, and before this change `getUserList()` failed whenever the count did. Both requests are still sent together, so a page that fills its `limit` takes as long as before. ([#10803](https://github.com/clerk/javascript/pull/10803)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
 ## 3.30.0
 
 ### Minor Changes
