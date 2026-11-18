@@ -116,7 +116,7 @@ const [crop, setCrop] = useState<Crop>(ImageCropper.INITIAL_CROP);
   related: ['AvatarUpload', 'FileUpload'],
   exports: {
     'ImageCropper.cropImage': {
-      description: 'Draws the chosen square into a `Blob`: `cropImage(src, crop, { type, size })`.',
+      description: 'Draws the chosen square into a `Blob`: `ImageCropper.cropImage(src, crop, { type, size })`.',
     },
     'ImageCropper.INITIAL_CROP': {
       description: 'The crop an image starts at: centered in the frame, zoom 1, no rotation.',
