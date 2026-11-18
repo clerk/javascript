@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.128.3
+
+### Patch Changes
+
+- `<OrganizationProfile />` now prompts for reverification before deleting an organization, when the instance requires it. ([#10875](https://github.com/clerk/javascript/pull/10875)) by [@gabrielmeloc22](https://github.com/gabrielmeloc22)
+
 ## 5.128.2
 
 ### Patch Changes
