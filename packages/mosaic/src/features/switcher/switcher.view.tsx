@@ -571,12 +571,12 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
-        <Menu.Media>
+        <Menu.Indicator>
           <Icon
             glyph={Checkmark}
             size='md'
           />
-        </Menu.Media>
+        </Menu.Indicator>
       ) : null}
     </Menu.Item>
   );
