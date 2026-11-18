@@ -14,7 +14,7 @@ export default function CardExample() {
         role='alert'
         color='negative'
       >
-        You need to be an admin to delete this organization.
+        We couldn’t delete the organization. Try again.
       </Card.Banner>
       <Card.Footer>
         <Button color='negative'>Delete organization</Button>

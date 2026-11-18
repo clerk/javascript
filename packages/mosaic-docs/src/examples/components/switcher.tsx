@@ -40,12 +40,11 @@ export default function SwitcherExample() {
               <Switcher.Avatar
                 name='Acme'
                 shape='square'
-                size='sm'
+                size='fit'
               />
             </Switcher.ItemMedia>
             <Switcher.ItemContent>
               <Switcher.ItemLabel>Acme</Switcher.ItemLabel>
-              <Switcher.ItemDescription>Admin</Switcher.ItemDescription>
             </Switcher.ItemContent>
             <Switcher.ItemTrailing>
               <Icon glyph={Checkmark} />
@@ -56,12 +55,11 @@ export default function SwitcherExample() {
               <Switcher.Avatar
                 name='Globex'
                 shape='square'
-                size='sm'
+                size='fit'
               />
             </Switcher.ItemMedia>
             <Switcher.ItemContent>
               <Switcher.ItemLabel>Globex</Switcher.ItemLabel>
-              <Switcher.ItemDescription>Member</Switcher.ItemDescription>
             </Switcher.ItemContent>
           </Switcher.Item>
         </Switcher.Group>

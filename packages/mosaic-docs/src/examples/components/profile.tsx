@@ -16,6 +16,7 @@ export default function ProfileExample() {
     <Profile.Root
       value={page}
       onValueChange={setPage}
+      elevation='flush'
     >
       <Profile.Title>User profile</Profile.Title>
       <Profile.Nav>

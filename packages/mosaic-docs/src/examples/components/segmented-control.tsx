@@ -14,7 +14,7 @@ export default function SegmentedControlExample() {
       </SegmentedControl.Root>
       <SegmentedControl.Root
         aria-label='Theme'
-        defaultValue='system'
+        defaultValue='light'
       >
         <SegmentedControl.Item value='light'>Light</SegmentedControl.Item>
         <SegmentedControl.Item value='dark'>Dark</SegmentedControl.Item>

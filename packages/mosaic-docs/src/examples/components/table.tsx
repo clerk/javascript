@@ -50,7 +50,7 @@ export default function TableExample() {
         >
           {member => (
             <Table.Row>
-              <Table.SelectionCell aria-label={`Select ${member.name}`} />
+              <Table.SelectionCell aria-label='Select' />
               <Table.Cell>{member.name}</Table.Cell>
               <Table.Cell>{member.email}</Table.Cell>
               <Table.Cell align='end'>

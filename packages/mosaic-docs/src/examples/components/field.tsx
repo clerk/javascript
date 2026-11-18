@@ -22,12 +22,22 @@ export default function FieldExample() {
           <Field.Error>That username is taken.</Field.Error>
         </Field.Message>
       </Field.Root>
-      <Radio.Group defaultValue='all'>
+      <Radio.Group
+        defaultValue='all'
+        aria-label='Visibility'
+      >
         <Field.Root orientation='horizontal'>
           <Radio.Item value='all' />
           <Field.Content>
             <Field.Label>All members</Field.Label>
             <Field.Description>Everyone in the organization can see it.</Field.Description>
+          </Field.Content>
+        </Field.Root>
+        <Field.Root orientation='horizontal'>
+          <Radio.Item value='admins' />
+          <Field.Content>
+            <Field.Label>Admins only</Field.Label>
+            <Field.Description>Only admins can see it.</Field.Description>
           </Field.Content>
         </Field.Root>
       </Radio.Group>

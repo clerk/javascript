@@ -21,18 +21,23 @@ export default function ProviderButtonExample() {
           shortLabel='Google'
         />
         <ProviderButton
-          icon={<ProviderIcon provider='github' />}
-          longLabel='Continue with GitHub'
-          shortLabel='GitHub'
+          icon={<ProviderIcon provider='microsoft' />}
+          longLabel='Continue with Microsoft'
+          shortLabel='Microsoft'
         />
       </ProviderButtonGroup>
-      <ProviderButtonGroup layout='stacked'>
-        <ProviderButton
-          icon={<ProviderIcon provider='google' />}
-          longLabel='Continue with Google'
-          shortLabel='Google'
-          badge='Last used'
-        />
+      <ProviderButtonGroup
+        layout='stacked'
+        disabled
+        lastUsed={
+          <ProviderButton
+            icon={<ProviderIcon provider='google' />}
+            longLabel='Continue with Google'
+            shortLabel='Google'
+            badge='Last used'
+          />
+        }
+      >
         <ProviderButton
           icon={<ProviderIcon provider='microsoft' />}
           longLabel='Continue with Microsoft'
