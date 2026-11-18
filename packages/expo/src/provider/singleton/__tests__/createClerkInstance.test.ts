@@ -67,6 +67,8 @@ class MockClerk {
   __internal_getCachedResources?: () => Promise<{ client: unknown; environment: unknown }>;
   __internal_onBeforeRequest = vi.fn();
   __internal_onAfterResponse = vi.fn();
+  __internal_onBeforeFetch = vi.fn();
+  __internal_onFetchResponse = vi.fn();
 }
 
 const createUnavailableResourceCache = () => ({
@@ -653,6 +655,85 @@ describe('createClerkInstance', () => {
       ['token-d', 'token-a'],
     ]);
     expect(tokenCache.saveToken).not.toHaveBeenCalled();
+  });
+
+  describe('device binding', () => {
+    const fetchAttempt = () => ({
+      url: new URL('https://clerk.example.com/v1/client'),
+      method: 'GET' as const,
+      headers: new Headers(),
+      attempt: 0,
+    });
+
+    const deviceBinding = () => ({
+      beforeFetch: vi.fn(() => Promise.resolve()),
+      onFetchResponse: vi.fn(() => Promise.resolve(true)),
+      afterResponse: vi.fn(() => Promise.resolve()),
+    });
+
+    test('runs the binding on every fetch attempt and passes it the token the request sent', async () => {
+      const binding = deviceBinding();
+      const tokenCache = {
+        getToken: vi.fn().mockResolvedValue('bound-token'),
+        saveToken: vi.fn(() => Promise.resolve()),
+      };
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        tokenCache,
+        __internal_deviceBinding: binding,
+      }) as unknown as MockClerk;
+
+      const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+      const beforeFetch = clerk.__internal_onBeforeFetch.mock.calls[0][0];
+      const onFetchResponse = clerk.__internal_onFetchResponse.mock.calls[0][0];
+      const afterResponse = clerk.__internal_onAfterResponse.mock.calls[0][0];
+      const request = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/client') };
+      const attempt = fetchAttempt();
+      const rejected = new Response('{}', { status: 401 });
+      const payload = { errors: [{ code: 'device_binding_proof_missing' }] };
+
+      await beforeRequest(request);
+      await beforeFetch(attempt, request);
+      const refetch = await onFetchResponse(attempt, rejected, request);
+      await afterResponse(request, { status: 401, headers: new Headers(), payload });
+
+      expect(binding.beforeFetch).toHaveBeenCalledWith(attempt);
+      expect(binding.onFetchResponse).toHaveBeenCalledWith(attempt, rejected);
+      expect(refetch).toBe(true);
+      expect(binding.afterResponse).toHaveBeenCalledWith('bound-token', expect.objectContaining({ payload }));
+    });
+
+    test('changes no request without a binding', async () => {
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({ publishableKey: 'pk_test_123' }) as unknown as MockClerk;
+      const attempt = fetchAttempt();
+
+      await clerk.__internal_onBeforeFetch.mock.calls[0][0](attempt, {});
+      const refetch = await clerk.__internal_onFetchResponse.mock.calls[0][0](attempt, new Response('{}'), {});
+
+      expect([...attempt.headers.keys()]).toEqual([]);
+      expect(refetch).toBe(false);
+    });
+
+    test('uses the binding of the latest provider render', async () => {
+      const first = deviceBinding();
+      const latest = deviceBinding();
+      const createClerkInstance = await loadCreateClerkInstance();
+      const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+      const clerk = getClerkInstance({
+        publishableKey: 'pk_test_123',
+        __internal_deviceBinding: first,
+      }) as unknown as MockClerk;
+      getClerkInstance({ publishableKey: 'pk_test_123', __internal_deviceBinding: latest });
+
+      await clerk.__internal_onBeforeFetch.mock.calls[0][0](fetchAttempt(), {});
+
+      expect(first.beforeFetch).not.toHaveBeenCalled();
+      expect(latest.beforeFetch).toHaveBeenCalled();
+    });
   });
 
   describe('initial resource recovery', () => {

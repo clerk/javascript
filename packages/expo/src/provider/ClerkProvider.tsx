@@ -108,6 +108,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
         domain,
         __experimental_passkeys,
         __experimental_resourceCache,
+        __internal_deviceBinding: nativeClientSync?.deviceBinding ?? null,
       })
     : null;
 

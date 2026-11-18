@@ -4,6 +4,7 @@ import NativeClerkModule from '../specs/NativeClerkModule';
 import type {
   NativeAuthFlowModule,
   NativeClientSyncModule,
+  NativeDeviceBindingModule,
   NativeUpdateRequiredViewModule,
 } from '../specs/NativeClerkModule.types';
 
@@ -13,7 +14,8 @@ export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
 } & NativeClientSyncModule &
   Partial<NativeAuthFlowModule> &
-  Partial<NativeUpdateRequiredViewModule>;
+  Partial<NativeUpdateRequiredViewModule> &
+  Partial<NativeDeviceBindingModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {
