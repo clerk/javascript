@@ -24,7 +24,7 @@ import type {
   SignUpReadyModel,
 } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
-import { allowedRoute, detailsRouteFor, routeFor, signUpRoutes } from './sign-up.routes';
+import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
 import type {
   SignUpDetails,
   SignUpFieldName,
@@ -226,18 +226,16 @@ export function useSignUpController(
 
   const { step } = model;
   const identifier = chosenIdentifier ?? model.initialIdentifier;
-  const shown = step.type === 'unknown' ? undefined : allowedRoute(route, step) ? route : routeFor(step, route);
+  const shown = shownRoute(route, step);
   const screen = screenFor(shown, model);
 
   // A route the step does not allow is replaced with the screen that is shown, so the stored route, and the
   // address bar once the URL routing modes land (#10780), never keeps it. Replacing leaves no history entry.
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Syncs the route with the sign-up step, which changes outside this component. */
   useEffect(() => {
     if (shown !== undefined && shown !== route) {
       go(shown, {}, { replace: true });
     }
   }, [shown, route, go]);
-  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   // TODO: With a URL routing mode (#10780) a reload can mount on a sign-up that is already complete. Finalize it
   // here, once per mount.

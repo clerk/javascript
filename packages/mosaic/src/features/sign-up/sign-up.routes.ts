@@ -51,7 +51,7 @@ export function routeFor(step: SignUpFlowStep, from: SignUpRoute): SignUpRoute |
   }
 }
 
-export function allowedRoute(route: SignUpRoute, step: SignUpFlowStep): boolean {
+function allowedRoute(route: SignUpRoute, step: SignUpFlowStep): boolean {
   if (step.type === 'task') {
     return route === routeFor(step, route);
   }
@@ -62,4 +62,11 @@ export function allowedRoute(route: SignUpRoute, step: SignUpFlowStep): boolean 
     return true;
   }
   return route === routeFor(step, route);
+}
+
+export function shownRoute(route: SignUpRoute, step: SignUpFlowStep): SignUpRoute | undefined {
+  if (step.type === 'unknown') {
+    return undefined;
+  }
+  return allowedRoute(route, step) ? route : routeFor(step, route);
 }

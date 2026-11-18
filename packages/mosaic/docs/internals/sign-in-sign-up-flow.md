@@ -17,12 +17,14 @@ The route and the step can disagree: the user went back, opened an old link, or 
 ```tsx
 const { step } = model;
 const { route } = useRouterScope(signInRoutes, { routing, path, root: 'start' });
-const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step) ? route : routeFor(step);
+const shown = step.type === 'unknown' ? undefined : allowedRoute(route, step) ? route : routeFor(step);
 ```
+
+The flow's `*.routes.ts` exports this rule as one function, so the controller and the unit test share it (`shownRoute` in `mosaic/src/features/sign-up/sign-up.routes.ts`). No route means "Start over".
 
 - `routeFor(step)` returns the step's route, from the lists below. Sign-up's also takes the current route, so a verify step reached from `continue` stays under it.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
-- The component that owns the route table computes `screen` during render, with no effect.
+- The component that owns the route table computes the screen during render. Its one effect replaces a route the step does not allow with the route shown, so the stored route never keeps it.
 - This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
 
 ## Mount the screen
