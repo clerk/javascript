@@ -150,7 +150,7 @@ export class Session extends BaseResource implements SessionResource {
   touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
     const { superseded } = await this._touchPost({ intent, skipUpdateClient: false });
 
-    // _touchPost() will have updated `this` in-place
+    // Unless superseded, _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
     if (!superseded && this.lastActiveToken) {
       eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
