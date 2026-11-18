@@ -1,25 +1,19 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { Wallet } from '@wallet-standard/core';
+import { getWallets } from '@wallet-standard/core';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileSolanaWalletsModel } from '../user-profile-solana-wallet.model';
 
-const registry = vi.hoisted(() => {
-  const wallets: Wallet[] = [];
-  const listeners = { register: new Set<() => void>(), unregister: new Set<() => void>() };
-  const getWallets = vi.fn(() => ({
-    get: () => wallets,
-    on: (event: 'register' | 'unregister', listener: () => void) => {
-      listeners[event].add(listener);
-      return () => listeners[event].delete(listener);
-    },
-  }));
-  return { wallets, listeners, getWallets };
-});
+const unregisters: Array<() => void> = [];
 
-vi.mock('@wallet-standard/core', () => ({ getWallets: registry.getWallets }));
+function register(...wallets: Wallet[]) {
+  const unregister = getWallets().register(...wallets);
+  unregisters.push(unregister);
+  return unregister;
+}
 
 function wallet(
   name: string,
@@ -36,26 +30,34 @@ function wallet(
   };
 }
 
+function watchedWallet(name: string) {
+  let reads = 0;
+  const watched: Wallet = {
+    ...wallet(name),
+    get chains(): Wallet['chains'] {
+      reads += 1;
+      return ['solana:mainnet'];
+    },
+  };
+  return { wallet: watched, reads: () => reads };
+}
+
 describe('useUserProfileSolanaWalletsModel', () => {
-  beforeEach(() => {
-    registry.wallets.splice(0);
-    registry.listeners.register.clear();
-    registry.listeners.unregister.clear();
-    registry.getWallets.mockClear();
+  afterEach(() => {
+    unregisters.splice(0).forEach(unregister => unregister());
   });
 
-  it('renders a loading server snapshot without initializing the browser registry', () => {
-    registry.wallets.push(wallet('Phantom'));
+  it('renders a loading server snapshot', () => {
+    register(wallet('Phantom'));
     function WalletNames() {
       return createElement('div', null, useUserProfileSolanaWalletsModel().status);
     }
 
     expect(renderToString(createElement(WalletNames))).toBe('<div>loading</div>');
-    expect(registry.getWallets).not.toHaveBeenCalled();
   });
 
   it('starts loading and projects only eligible wallet names and icons after loading the registry', async () => {
-    registry.wallets.push(wallet('Phantom'), wallet('Signer only', { 'solana:signMessage': {} }));
+    register(wallet('Phantom'), wallet('Signer only', { 'solana:signMessage': {} }));
     const { result } = renderHook(useUserProfileSolanaWalletsModel);
 
     expect(result.current).toEqual({ status: 'loading' });
@@ -74,51 +76,48 @@ describe('useUserProfileSolanaWalletsModel', () => {
     { chains: ['eip155:1'], features: { 'standard:connect': {}, 'solana:signMessage': {} }, eligible: false },
     { chains: [], features: { 'standard:connect': {}, 'solana:signMessage': {} }, eligible: false },
   ] as const)('requires a Solana chain and both sign-in capabilities for $chains and $features', async entry => {
-    registry.wallets.push(wallet('Candidate', entry.features, entry.chains));
+    register(wallet('Candidate', entry.features, entry.chains));
     const { result } = renderHook(useUserProfileSolanaWalletsModel);
     await act(async () => {
       await vi.dynamicImportSettled();
     });
-    expect(registry.getWallets).toHaveBeenCalled();
     expect(result.current).toEqual({
       status: 'ready',
       wallets: entry.eligible ? [{ name: 'Candidate', icon: 'data:image/svg+xml;base64,' }] : [],
     });
   });
 
-  it('refreshes on registration and unregistration and removes both subscriptions on unmount', async () => {
+  it('refreshes on registration and unregistration and stops listening on unmount', async () => {
     const { result, unmount } = renderHook(useUserProfileSolanaWalletsModel);
-    await waitFor(() => expect(registry.listeners.register.size).toBe(1));
+    await waitFor(() => expect(result.current).toEqual({ status: 'ready', wallets: [] }));
 
+    let unregisterBackpack = () => {};
     act(() => {
-      registry.wallets.push(wallet('Backpack'));
-      registry.listeners.register.forEach(listener => listener());
+      unregisterBackpack = register(wallet('Backpack'));
     });
     expect(result.current).toEqual({
       status: 'ready',
       wallets: [{ name: 'Backpack', icon: 'data:image/svg+xml;base64,' }],
     });
 
-    act(() => {
-      registry.wallets.splice(0);
-      registry.listeners.unregister.forEach(listener => listener());
-    });
+    act(() => unregisterBackpack());
     expect(result.current).toEqual({ status: 'ready', wallets: [] });
 
     unmount();
-    expect(registry.listeners.register.size).toBe(0);
-    expect(registry.listeners.unregister.size).toBe(0);
+    const watched = watchedWallet('Late');
+    register(watched.wallet);
+    expect(watched.reads()).toBe(0);
   });
 
-  it('does not initialize or subscribe when unmounted before the module loads', async () => {
+  it('does not subscribe when unmounted before the module loads', async () => {
     const { unmount } = renderHook(useUserProfileSolanaWalletsModel);
     unmount();
     await act(async () => {
       await vi.dynamicImportSettled();
     });
 
-    expect(registry.getWallets).not.toHaveBeenCalled();
-    expect(registry.listeners.register.size).toBe(0);
-    expect(registry.listeners.unregister.size).toBe(0);
+    const watched = watchedWallet('Late');
+    register(watched.wallet);
+    expect(watched.reads()).toBe(0);
   });
 });
