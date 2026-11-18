@@ -84,6 +84,13 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
   role_unavailable: 'This role is no longer available.',
+  sso_bypass_member_not_found: 'No member of this organization has that email address.',
+  sso_bypass_already_added: 'This member is already on the allow list.',
+  sso_bypass_all_already_added: 'Everyone with that role is already on the allow list.',
+  sso_bypass_none_added__domainNotServed:
+    'No members could be added because their email addresses are not served by a connection.',
+  sso_bypass_none_added__notMember: 'No members could be added because they are no longer in the organization.',
+  sso_bypass_none_added__unknown: 'No members could be added.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',
   resource_not_found__role: 'This role is no longer available.',

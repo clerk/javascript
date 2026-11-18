@@ -219,6 +219,16 @@ import {
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
 import {
+  AllowList as OrganizationProfileSecurityPanelAllowList,
+  AllowListLoadError as OrganizationProfileSecurityPanelAllowListLoadError,
+  AllowListLoading as OrganizationProfileSecurityPanelAllowListLoading,
+  AllowListPageError as OrganizationProfileSecurityPanelAllowListPageError,
+  Default as OrganizationProfileSecurityPanelDefault,
+  EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
+  Loading as OrganizationProfileSecurityPanelLoading,
+  meta as organizationProfileSecurityPanelMeta,
+} from '../stories/organization-profile-security-panel.stories';
+import {
   Default as OrganizationSwitcherDefault,
   meta as organizationSwitcherMeta,
   NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
@@ -1440,6 +1450,17 @@ const organizationProfileMembersPanelModule: StoryModule = {
   Empty: OrganizationProfileMembersPanelEmpty,
 };
 
+const organizationProfileSecurityPanelModule: StoryModule = {
+  meta: organizationProfileSecurityPanelMeta,
+  Default: OrganizationProfileSecurityPanelDefault,
+  Loading: OrganizationProfileSecurityPanelLoading,
+  AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
+  AllowList: OrganizationProfileSecurityPanelAllowList,
+  EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,
+  AllowListLoading: OrganizationProfileSecurityPanelAllowListLoading,
+  AllowListPageError: OrganizationProfileSecurityPanelAllowListPageError,
+};
+
 export const registry: StoryModule[] = [
   // Switcher
   switcherModule,
@@ -1473,6 +1494,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
