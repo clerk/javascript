@@ -35,13 +35,13 @@ The full single-file theme the stack is cut from is kept on the local branch `pr
 | `--cl-color-*` foreground, surface, border, input, ring       | Ceramic ink, page, separator and input grays                           | Every component                            |
 | `--cl-color-neutral` and `-neutral-alpha-100/200/300`         | Ceramic gray `#767684` washes in light, white washes in dark           | Hover fills, ghost buttons, subtle borders |
 | `--cl-color-{brand,negative,positive,warning}-subtle/-border` | The 4% wash and 16% ring of each status color                          | Badge, banner, stepper                     |
-| `--cl-font-medium`, `-semibold`, `-bold`                      | 500 everywhere                                                         | Labels, headings, buttons                  |
+| `--cl-font-semibold`, `-bold`                                 | 500, so every weight above regular reads as medium                     | Labels, headings, buttons                  |
 | `--cl-shadow-md`                                              | The menu shadow: 1px ring, two drop layers, an inset highlight in dark | Menu, select, combobox, phone input        |
 | `--cl-shadow-lg`                                              | The panel shadow                                                       | Card, profile, toast, action bar           |
-| `--cl-focus-outline-*`                                        | 2px solid at a 3px offset                                              | Every focus outline                        |
-| `--cl-ease-default`, `--cl-duration-fast/base`                | Ceramic's standard curve, 120ms and 150ms                              | Hover and press transitions                |
+| `--cl-focus-outline-offset`                                   | 3px; width and style already match Mosaic                              | Every focus outline                        |
+| `--cl-ease-default`, `--cl-duration-fast`                     | Ceramic's standard curve and 120ms; base (150ms) already matches       | Hover and press transitions                |
 
-Tokens left on Mosaic's values on purpose: `--cl-spacing` (Mosaic owns spacing), `--cl-ease-enter`/`-exit`/`-in-out` and `--cl-duration-slow`/`-slower` (Ceramic uses springs, which these cannot express; see change 9), and the scrollbar hover and active colors (derived from the thumb).
+Tokens left on Mosaic's values on purpose: `--cl-spacing` (Mosaic owns spacing), `--cl-ease-enter`/`-exit`/`-in-out` and `--cl-duration-slow`/`-slower` (Ceramic uses springs, which these cannot express; see change 9), and the scrollbar hover and active colors (derived from the thumb). Tokens Ceramic already shares with Mosaic are not set: radii `sm` to `xl`, the `xs`, `sm`, `xl` and `2xl` text sizes and leading, `base` size, regular and medium weights, `--cl-duration-base`, focus outline width and style, and `negative-foreground`.
 
 | Gap with tokens only                                                                             | Closed in |
 | ------------------------------------------------------------------------------------------------ | --------- |
