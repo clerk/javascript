@@ -1,125 +1,141 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
+import { Confirmation } from '../../../blocks/confirmation';
 import { ActionMenu } from '../../../components/action-menu';
-import { Avatar } from '../../../components/avatar';
 import { Badge } from '../../../components/badge';
-import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
-import { EmptyState } from '../../../components/empty-state';
-import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
-import { Table } from '../../../components/table';
-import { VisuallyHidden } from '../../../components/visually-hidden';
-import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
+import { Pagination } from '../../../components/pagination';
+import { Section } from '../../../components/section';
 import { Plus } from '../../../icons/glyphs/plus';
-import { Users } from '../../../icons/glyphs/users';
 import { fill, useMessages } from '../../../localization';
-import { mergeStyleProps, themeProps } from '../../../props';
+import { themeProps } from '../../../props';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './organization-profile-security-panel.styles';
-import type { SSOBypassPageController, SSOBypassRow } from './sso-bypass.controller';
+import type { SSOBypassRow, SSOBypassSectionController } from './sso-bypass.controller';
 import { SSOBypassAddDialog } from './sso-bypass-add.dialog';
 
-const getRowId = (row: SSOBypassRow) => row.userId;
+export type SSOBypassSectionViewProps = SSOBypassSectionController;
 
-export type SSOBypassPageViewProps = SSOBypassPageController;
-
-export function SSOBypassPageView({
+export function SSOBypassSectionView({
   rows,
-  search,
-  onSearchChange,
+  page,
+  pageSize,
+  totalCount,
+  onPageChange,
+  isFetching,
   isError,
   onRetry,
   isDisabled,
-  removeError,
-  onRemove,
+  remove,
+  removeFinalFocus,
   registerTrigger,
-  tableRef,
+  sectionRef,
   addButtonRef,
   onAdd,
   addDialog,
-}: SSOBypassPageViewProps) {
-  const m = useMessages('organizationProfile').security.ssoBypassPage;
+}: SSOBypassSectionViewProps) {
+  const m = useMessages('organizationProfile').security.ssoBypass;
+  const showPagination = !isError && Math.ceil(totalCount / pageSize) > 1;
 
   return (
-    <>
-      <div
-        ref={tableRef}
+    <Section.Root {...themeProps('organization-profile-sso-bypass')}>
+      <Section.Group
+        ref={sectionRef}
         tabIndex={-1}
-        {...mergeStyleProps(themeProps('organization-profile-sso-bypass'), stylex.props(styles.page))}
       >
-        <Table.Toolbar>
-          <Table.Search
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value={search}
-            onValueChange={onSearchChange}
-          />
-          <Button
-            ref={addButtonRef}
-            disabled={isDisabled}
-            focusableWhenDisabled
-            onClick={onAdd}
-          >
-            <Icon glyph={Plus} />
-            {m.add}
-          </Button>
-        </Table.Toolbar>
-        {removeError ? (
-          <Banner.Root
-            color='negative'
-            role='alert'
-          >
-            <Banner.Label>{removeError}</Banner.Label>
-          </Banner.Root>
-        ) : null}
-        {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
-        <Table.Root
-          layout='fixed'
-          aria-label={m.tableLabel}
-        >
-          <Table.Header>
-            <Table.Column>{m.user}</Table.Column>
-            <Table.Column
-              align='end'
-              width='4rem'
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.title}</Section.Title>
+            <Section.Description>{m.description}</Section.Description>
+          </Section.Content>
+          <Section.Actions>
+            <Button
+              ref={addButtonRef}
+              aria-label={m.addLabel}
+              color='neutral'
+              size='sm'
+              variant='outline'
+              disabled={isDisabled || isError}
+              focusableWhenDisabled
+              onClick={onAdd}
             >
-              <VisuallyHidden>{m.actions}</VisuallyHidden>
-            </Table.Column>
-          </Table.Header>
-          <Table.Body
-            items={isError ? [] : rows}
-            itemToStringValue={getRowId}
-            renderEmptyState={() =>
-              isError ? (
-                <EmptyState.Root role='alert'>
-                  <EmptyState.Icon glyph={ExclamationCircle} />
-                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
-                  <EmptyState.Actions>
-                    <Button onClick={onRetry}>{m.retry}</Button>
-                  </EmptyState.Actions>
-                </EmptyState.Root>
-              ) : (
-                <EmptyState.Root role='status'>
-                  <EmptyState.Icon glyph={Users} />
-                  <EmptyState.Label>{search.trim() ? m.emptySearch : m.empty}</EmptyState.Label>
-                </EmptyState.Root>
-              )
-            }
-          >
-            {row => (
-              <SSOBypassRowView
-                row={row}
-                isDisabled={isDisabled}
-                onRemove={() => onRemove(row.userId)}
-                triggerRef={registerTrigger(row.userId)}
+              <Icon
+                glyph={Plus}
+                placement='inline-start'
+                size='md'
               />
+              {m.add}
+            </Button>
+          </Section.Actions>
+        </Section.Header>
+        <div {...stylex.props(styles.list)}>
+          <Section.Body>
+            {isError ? (
+              <Section.Row>
+                <Section.Item>
+                  <Section.Content>
+                    <Section.Description>{m.loadError}</Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Button
+                      color='neutral'
+                      size='sm'
+                      variant='outline'
+                      onClick={onRetry}
+                    >
+                      {m.retry}
+                    </Button>
+                  </Section.Actions>
+                </Section.Item>
+              </Section.Row>
+            ) : (
+              <Section.Items aria-label={m.listLabel}>
+                {rows.length === 0 ? (
+                  <Section.Item>
+                    <Section.Content>
+                      <Section.Description>{m.empty}</Section.Description>
+                    </Section.Content>
+                  </Section.Item>
+                ) : (
+                  rows.map(row => (
+                    <SSOBypassRowView
+                      key={row.userId}
+                      row={row}
+                      isDisabled={isDisabled}
+                      onRemove={() => remove.open(row)}
+                      triggerRef={registerTrigger(row.userId)}
+                    />
+                  ))
+                )}
+              </Section.Items>
             )}
-          </Table.Body>
-        </Table.Root>
-      </div>
+          </Section.Body>
+          {showPagination ? (
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              totalItems={totalCount}
+              disabled={isFetching}
+              onChange={onPageChange}
+              label={m.pagination}
+              previousPageLabel={m.previousPage}
+              nextPageLabel={m.nextPage}
+            />
+          ) : null}
+        </div>
+      </Section.Group>
       <SSOBypassAddDialog {...addDialog} />
-    </>
+      <Confirmation
+        controller={remove}
+        title={m.removeDialog.title}
+        description={row => fill(m.removeDialog.description, { name: row.name, email: row.identifier })}
+        actionLabel={m.removeDialog.confirm}
+        cancelLabel={m.removeDialog.cancel}
+        finalFocus={removeFinalFocus}
+      />
+    </Section.Root>
   );
 }
 
@@ -134,35 +150,19 @@ function SSOBypassRowView({
   onRemove: () => void;
   triggerRef: Ref<HTMLButtonElement>;
 }) {
-  const m = useMessages('organizationProfile').security.ssoBypassPage;
+  const m = useMessages('organizationProfile').security.ssoBypass;
   return (
-    <Table.Row>
-      <Table.Cell>
-        <Entity.Root>
-          <Entity.Media>
-            <Avatar.Root
-              size='fit'
-              aria-hidden
-            >
-              {row.imageUrl ? (
-                <Avatar.Image
-                  src={row.imageUrl}
-                  alt=''
-                />
-              ) : null}
-              <Avatar.Fallback />
-            </Avatar.Root>
-          </Entity.Media>
-          <Entity.Content>
-            <Entity.Label>
-              {row.name}
-              {row.isCurrentUser ? <Badge color='neutral'>{m.you}</Badge> : null}
-            </Entity.Label>
-            <Entity.Description>{row.identifier}</Entity.Description>
-          </Entity.Content>
-        </Entity.Root>
-      </Table.Cell>
-      <Table.Cell align='end'>
+    <Section.Item>
+      <Section.Content>
+        <Section.Label xstyle={styles.count}>
+          <span {...stylex.props(truncationStyles.singleLine)}>{row.name}</span>
+          {row.isCurrentUser ? <Badge color='neutral'>{m.you}</Badge> : null}
+        </Section.Label>
+        <Section.Description>
+          <span {...stylex.props(truncationStyles.singleLine)}>{row.identifier}</span>
+        </Section.Description>
+      </Section.Content>
+      <Section.Actions>
         <ActionMenu
           label={fill(m.manageLabel, { name: row.name })}
           triggerRef={triggerRef}
@@ -176,7 +176,7 @@ function SSOBypassRowView({
             },
           ]}
         />
-      </Table.Cell>
-    </Table.Row>
+      </Section.Actions>
+    </Section.Item>
   );
 }

@@ -222,11 +222,11 @@ import {
   AllowList as OrganizationProfileSecurityPanelAllowList,
   AllowListLoadError as OrganizationProfileSecurityPanelAllowListLoadError,
   AllowListLoading as OrganizationProfileSecurityPanelAllowListLoading,
-  AllowListPageError as OrganizationProfileSecurityPanelAllowListPageError,
   Default as OrganizationProfileSecurityPanelDefault,
   EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
   Loading as OrganizationProfileSecurityPanelLoading,
   meta as organizationProfileSecurityPanelMeta,
+  RemoveFails as OrganizationProfileSecurityPanelRemoveFails,
 } from '../stories/organization-profile-security-panel.stories';
 import {
   Default as OrganizationSwitcherDefault,
@@ -1457,8 +1457,8 @@ const organizationProfileSecurityPanelModule: StoryModule = {
   AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
   AllowList: OrganizationProfileSecurityPanelAllowList,
   EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,
+  RemoveFails: OrganizationProfileSecurityPanelRemoveFails,
   AllowListLoading: OrganizationProfileSecurityPanelAllowListLoading,
-  AllowListPageError: OrganizationProfileSecurityPanelAllowListPageError,
 };
 
 export const registry: StoryModule[] = [

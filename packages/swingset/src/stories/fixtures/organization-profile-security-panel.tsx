@@ -1,15 +1,9 @@
-import { useSecurityPanelController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.controller';
 import { OrganizationProfileSecurityPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.view';
-import { useSSOBypassPageController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.controller';
-import { SSOBypassCard } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.dialog';
+import { useSSOBypassSectionController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.controller';
 import type { SSOBypassModel } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.model';
-import {
-  SSOBypassPageSkeleton,
-  SSOBypassSectionSkeleton,
-} from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.skeleton';
+import { SSOBypassSectionSkeleton } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.skeleton';
 import type { SSOBypassEntry } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.types';
-import { SSOBypassPageView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.view';
-import { SSOBypassSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass-section.view';
+import { SSOBypassSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.view';
 import { save } from '@clerk/mosaic/utils/errors';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useState } from 'react';
@@ -64,24 +58,79 @@ const exampleMembers: FixtureMember[] = [
   },
 ];
 
+const sampleNames = [
+  'Ana Souza',
+  'Ben Carter',
+  'Chloe Dubois',
+  'Daniel Novak',
+  'Elena Petrova',
+  'Farah Haddad',
+  'George Lin',
+  'Hana Sato',
+  'Ibrahim Yusuf',
+  'Julia Romano',
+  'Kofi Mensah',
+  'Laura Schmidt',
+  'Mateo Garcia',
+  'Nina Kowalski',
+  'Omar Farouk',
+  'Paula Jensen',
+  'Quentin Moreau',
+  'Rosa Alvarez',
+  'Sven Larsen',
+  'Tara Singh',
+  'Umar Khan',
+  'Vera Ivanova',
+  'William Osei',
+  'Xin Zhao',
+  'Yara Nasser',
+  'Zoe Bennett',
+  'Aiden Walsh',
+  'Bianca Rossi',
+  'Caleb Brooks',
+  'Diana Popescu',
+  'Ethan Park',
+  'Fatima Zahra',
+  'Gabriel Silva',
+  'Helena Berg',
+];
+
+const sampleMembers: FixtureMember[] = sampleNames.map((name, index) => ({
+  userId: `user_sample_${index + 1}`,
+  name,
+  identifier: `${name.toLowerCase().replace(' ', '.')}@acme.com`,
+  username: undefined,
+  imageUrl: undefined,
+  isCurrentUser: false,
+  role: index % 5 === 0 ? 'org:admin' : 'org:member',
+}));
+
+const allMembers = [...exampleMembers, ...sampleMembers];
+
+const defaultAllowlist = allMembers
+  .filter(member => member.userId !== 'user_carol' && member.userId !== 'user_dave')
+  .map(member => member.userId);
+
 const roles = [
   { key: 'org:admin', name: 'Admin' },
   { key: 'org:member', name: 'Member' },
 ];
 
 export function useSSOBypassFixture({
-  initialUserIds = ['user_alice', 'user_bob'],
+  initialUserIds = defaultAllowlist,
   isLoading = false,
   isError = false,
+  removeFails = false,
 }: {
   initialUserIds?: string[];
   isLoading?: boolean;
   isError?: boolean;
+  removeFails?: boolean;
 } = {}): SSOBypassModel {
-  const members = useChaosFixture(exampleMembers, items =>
+  const members = useChaosFixture(allMembers, items =>
     chaosRows(
       items.map(member => ({ ...member, id: member.userId })),
-      24,
+      items.length,
     ).map(({ id, ...member }, index) => ({
       ...member,
       userId: id,
@@ -99,6 +148,7 @@ export function useSSOBypassFixture({
   return {
     entries,
     isLoading,
+    isFetching: false,
     isError,
     isFeatureDisabled: false,
     roles: {
@@ -112,6 +162,11 @@ export function useSSOBypassFixture({
     retry: () => undefined,
     remove: async userId => {
       await delay();
+      if (removeFails) {
+        throw new ClerkRuntimeError('Could not remove this member from the allow list.', {
+          code: 'sso_bypass_remove_failed',
+        });
+      }
       setUserIds(current => current.filter(id => id !== userId));
     },
     addByEmail: async email => {
@@ -161,45 +216,24 @@ export function useSSOBypassFixture({
   };
 }
 
-function SSOBypassPageExample({ model }: { model: SSOBypassModel }) {
-  const controller = useSSOBypassPageController(model);
-  return model.isLoading ? <SSOBypassPageSkeleton /> : <SSOBypassPageView {...controller} />;
+function SSOBypassSectionExample({ model }: { model: SSOBypassModel }) {
+  const controller = useSSOBypassSectionController(model);
+  return model.isLoading ? <SSOBypassSectionSkeleton /> : <SSOBypassSectionView {...controller} />;
 }
 
 export function SecurityPanelExample({
   isLoading = false,
-  sectionError = false,
   ...fixture
-}: Parameters<typeof useSSOBypassFixture>[0] & { sectionError?: boolean } = {}) {
-  const bypass = useSSOBypassFixture(fixture);
-  const ssoBypass = { count: bypass.entries.length, isLoading: false, isError: sectionError };
-  const controller = useSecurityPanelController({ isLoading, ssoBypass });
-
+}: Parameters<typeof useSSOBypassFixture>[0] = {}) {
+  const bypass = useSSOBypassFixture({ isLoading, ...fixture });
   return (
-    <OrganizationProfileSecurityPanelView
-      {...controller}
-      overview={
-        isLoading ? (
-          <SSOBypassSectionSkeleton />
-        ) : controller.onManageSSOBypass ? (
-          <SSOBypassSectionView
-            count={ssoBypass.count}
-            isError={sectionError}
-            onManage={controller.onManageSSOBypass}
-            manageRef={controller.manageSSOBypassRef}
-          />
-        ) : null
-      }
-      ssoBypass={<SSOBypassPageExample model={bypass} />}
-    />
+    <OrganizationProfileSecurityPanelView>
+      <SSOBypassSectionExample model={bypass} />
+    </OrganizationProfileSecurityPanelView>
   );
 }
 
 export function SSOBypassAllowlistExample(props: Parameters<typeof useSSOBypassFixture>[0] = {}) {
   const model = useSSOBypassFixture(props);
-  return (
-    <SSOBypassCard>
-      <SSOBypassPageExample model={model} />
-    </SSOBypassCard>
-  );
+  return <SSOBypassSectionExample model={model} />;
 }

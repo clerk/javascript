@@ -69,7 +69,7 @@ function SSOBypassAddFormStep({
 }: Omit<SSOBypassAddDialogProps, 'open' | 'onOpenChange' | 'finalFocus'> & {
   emailInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
-  const m = useMessages('organizationProfile').security.ssoBypassPage.addDialog;
+  const m = useMessages('organizationProfile').security.ssoBypass.addDialog;
   const mode = form.values.mode;
   const emailField = form.register('emailAddress');
 
@@ -188,7 +188,7 @@ function SSOBypassAddFormStep({
 }
 
 function SSOBypassAddResultStep({ result }: { result: SSOBypassAddResult | undefined }) {
-  const m = useMessages('organizationProfile').security.ssoBypassPage.addDialog;
+  const m = useMessages('organizationProfile').security.ssoBypass.addDialog;
   const locale = useLocale();
   const doneRef = useFlowAutoFocus<HTMLButtonElement>();
   if (!result) {

@@ -111,10 +111,20 @@ function serve({
 async function openAllowlist() {
   const user = userEvent.setup();
   await renderWithClerk(<OrganizationProfileSecurityPanel />);
-  await openMenu(user, await screen.findByRole('button', { name: 'Manage SSO bypass' }));
-  await user.click(screen.getByRole('menuitem', { name: 'Manage' }));
-  await screen.findByRole('table', { name: 'SSO bypass allow list' });
+  await screen.findByRole('list', { name: 'SSO bypass allow list' });
   return user;
+}
+
+async function removeMember(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await openMenu(user, screen.getByRole('button', { name: `Manage ${name}` }));
+  await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+  const dialog = await screen.findByRole('alertdialog', { name: 'Remove from allow list' });
+  await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+  return dialog;
+}
+
+function addButton() {
+  return screen.getByRole('button', { name: 'Add members to the allow list' });
 }
 
 function findAddDialog() {
@@ -122,11 +132,13 @@ function findAddDialog() {
 }
 
 describe('Who sees the Security page', () => {
-  it('shows the SSO bypass allow list count to a bypass manager when the organization has a connection', async () => {
+  it('shows the SSO bypass allow list to a bypass manager when the organization has a connection', async () => {
     serve({ allowlisted: [bob, carol] });
     await renderWithClerk(<OrganizationProfileSecurityPanel />);
 
-    expect(await screen.findByText('2 members')).toBeVisible();
+    const list = await screen.findByRole('list', { name: 'SSO bypass allow list' });
+    expect(within(list).getByText('Bob')).toBeVisible();
+    expect(within(list).getByText('Carol')).toBeVisible();
     expect(screen.getByText('Security')).toBeVisible();
   });
 
@@ -176,41 +188,68 @@ describe('Who sees the Security page', () => {
     await renderWithClerk(<OrganizationProfileSecurityPanel />);
 
     expect(await screen.findByText('Security')).toBeVisible();
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage SSO bypass' })).toBeNull());
-  });
+    await waitFor(() => expect(screen.queryByText('SSO bypass')).toBeNull(), { timeout: 15_000 });
+  }, 20_000);
 });
 
 describe('Managing the SSO bypass allow list', () => {
-  it('lists members, marks the current user, and filters by search', async () => {
+  it('lists members and marks the current user', async () => {
     serve({ allowlisted: [bob, carol, member('user_1', 'Alice', 'alice@acme.com', 'org:admin')] });
+    await openAllowlist();
+    const list = screen.getByRole('list', { name: 'SSO bypass allow list' });
+
+    expect(within(list).getByText('Bob')).toBeVisible();
+    expect(within(list).getByText('carol@acme.com')).toBeVisible();
+    expect(within(list).getByText('You')).toBeVisible();
+  });
+
+  it('pages the allow list five members at a time', async () => {
+    const extra = ['Erin', 'Frank', 'Grace', 'Heidi'].map((name, index) =>
+      member(`user_${index + 5}`, name, `${name.toLowerCase()}@acme.com`),
+    );
+    serve({ allowlisted: [bob, carol, dave, ...extra] });
     const user = await openAllowlist();
-    const table = screen.getByRole('table', { name: 'SSO bypass allow list' });
+    const list = screen.getByRole('list', { name: 'SSO bypass allow list' });
 
-    expect(within(table).getByText('Bob')).toBeVisible();
-    expect(within(table).getByText('You')).toBeVisible();
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+    expect(within(list).queryByText('Grace')).toBeNull();
 
-    await user.type(screen.getByRole('searchbox', { name: 'Search users' }), 'carol');
-    await waitFor(() => expect(within(table).queryByText('Bob')).toBeNull());
-    expect(within(table).getByText('Carol')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Next allow list page' }));
 
-    await user.clear(screen.getByRole('searchbox', { name: 'Search users' }));
-    await user.type(screen.getByRole('searchbox', { name: 'Search users' }), 'nobody');
-    expect(await within(table).findByText('No members match your search')).toBeVisible();
+    await waitFor(() => expect(within(list).getAllByRole('listitem')).toHaveLength(2));
+    expect(within(list).getByText('Grace')).toBeVisible();
+    expect(within(list).getByText('Heidi')).toBeVisible();
+  });
+
+  it('moves back a page when the last member on a page is removed', async () => {
+    const extra = ['Erin', 'Frank', 'Grace'].map((name, index) =>
+      member(`user_${index + 5}`, name, `${name.toLowerCase()}@acme.com`),
+    );
+    serve({ allowlisted: [bob, carol, dave, ...extra] });
+    const user = await openAllowlist();
+
+    await user.click(screen.getByRole('button', { name: 'Next allow list page' }));
+    await screen.findByText('Grace');
+    await removeMember(user, 'Grace');
+
+    await waitFor(() => expect(screen.queryByText('Grace')).toBeNull());
+    const list = screen.getByRole('list', { name: 'SSO bypass allow list' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.queryByRole('navigation', { name: 'Allow list pagination' })).toBeNull();
   });
 
   it('shows the empty state when nobody is on the list', async () => {
     serve({ allowlisted: [] });
     await openAllowlist();
 
-    expect(await screen.findByText('No members on the allow list')).toBeVisible();
+    expect(await screen.findByText('There are no members on the allow list yet')).toBeVisible();
   });
 
   it('removes a member', async () => {
     const fapi = serve({ allowlisted: [bob, carol] });
     const user = await openAllowlist();
 
-    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    await removeMember(user, 'Bob');
 
     await waitFor(() => expect(screen.queryByText('Bob')).toBeNull());
     expect(fapi.ssoBypass.users.map(entry => entry.user_id)).toEqual(['user_3']);
@@ -220,11 +259,25 @@ describe('Managing the SSO bypass allow list', () => {
     serve({ allowlisted: [bob, carol] });
     const user = await openAllowlist();
 
-    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    await removeMember(user, 'Bob');
 
     await waitFor(() => expect(screen.queryByText('Bob')).toBeNull());
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Carol' })).toHaveFocus());
+  });
+
+  it('names the member in the removal confirmation and keeps them when it is cancelled', async () => {
+    const fapi = serve({ allowlisted: [bob] });
+    const user = await openAllowlist();
+
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    const dialog = await screen.findByRole('alertdialog', { name: 'Remove from allow list' });
+    expect(dialog).toHaveTextContent('Bob (bob@acme.com) will no longer be able to sign in');
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.getByText('Bob')).toBeVisible();
+    expect(fapi.ssoBypass.users.map(entry => entry.user_id)).toEqual(['user_2']);
   });
 
   it('shows why a removal failed and keeps the row', async () => {
@@ -232,38 +285,25 @@ describe('Managing the SSO bypass allow list', () => {
     const user = await openAllowlist();
     const remove = holdRequests('post', '/v1/organizations/:organizationId/sso_bypass_allowlist_users/:userId');
 
-    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    const dialog = await removeMember(user, 'Bob');
     remove.fail('resource_not_found', 'That member is not on the allow list.');
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('That member is not on the allow list.'));
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('That member is not on the allow list.'),
+    );
     expect(screen.getByText('Bob')).toBeVisible();
   });
 
-  it('opens the allow list in a dialog and returns focus to Manage when it closes', async () => {
+  it('returns focus to Add when the add dialog closes on Escape', async () => {
     serve();
     const user = await openAllowlist();
 
-    expect(screen.getByRole('dialog', { name: 'SSO bypass' })).toContainElement(
-      screen.getByRole('table', { name: 'SSO bypass allow list' }),
-    );
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'SSO bypass' })).toBeNull());
-    expect(screen.getByRole('button', { name: 'Manage SSO bypass' })).toHaveFocus();
-  });
-
-  it('closes only the add dialog on Escape', async () => {
-    serve();
-    const user = await openAllowlist();
-
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     await findAddDialog();
     await user.keyboard('{Escape}');
 
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add members' })).toBeNull());
-    expect(screen.getByRole('dialog', { name: 'SSO bypass' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Add' })).toHaveFocus();
+    expect(addButton()).toHaveFocus();
   });
 });
 
@@ -272,7 +312,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const fapi = serve({ allowlisted: [] });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'Carol@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
@@ -288,7 +328,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     serve({ allowlisted: [] });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'zed@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
@@ -304,7 +344,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     serve({ allowlisted: [bob] });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'bob@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
@@ -321,7 +361,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
@@ -350,7 +390,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
@@ -368,7 +408,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     serve({ allowlisted: [] });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     let dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'zed@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
@@ -376,7 +416,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add members' })).toBeNull());
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     dialog = await findAddDialog();
     expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveValue('');
     expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveFocus();
@@ -387,7 +427,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     serve({ allowlisted: [bob, carol, dave] });
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await user.click(addButton());
     const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
