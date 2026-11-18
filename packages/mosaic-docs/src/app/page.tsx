@@ -14,6 +14,7 @@ export default function HomePage() {
             <div className='max-w-350 mx-auto px-6'>
               <h1 className='mt-6 max-w-3xl text-balance text-4xl font-medium sm:text-5xl lg:text-6xl'>Mosaic</h1>
               <p className='text-muted-foreground mt-4 max-w-xl text-balance text-lg'>{site.description}</p>
+              <p className='text-muted-foreground mt-2 max-w-xl text-balance text-sm'>{site.status}</p>
               <div className='mt-8'>
                 <AgentPrompt />
               </div>
