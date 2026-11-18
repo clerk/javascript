@@ -92,7 +92,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
           stylex.props(reset.base, styles.content, showPending && styles.contentPending),
         )}
       >
-        {withTruncatableLabel(children)}
+        {withTruncatableLabel(children, { slot: 'button-label' })}
       </span>
       {isPending || showPending ? (
         <Spinner

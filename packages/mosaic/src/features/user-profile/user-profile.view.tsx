@@ -87,12 +87,7 @@ function userProfilePageList(
       : {
           id: entry.id,
           label: labels[entry.id],
-          icon: (
-            <Icon
-              glyph={USER_PROFILE_PAGE_ICONS[entry.id]}
-              size='md'
-            />
-          ),
+          icon: <Icon glyph={USER_PROFILE_PAGE_ICONS[entry.id]} />,
           content: pages[entry.id],
         },
   );

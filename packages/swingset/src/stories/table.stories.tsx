@@ -293,10 +293,7 @@ export function Empty() {
             </EmptyState.Description>
             <EmptyState.Actions>
               <Button size='sm'>
-                <Icon
-                  glyph={Plus}
-                  placement='inline-start'
-                />
+                <Icon glyph={Plus} />
                 Create key
               </Button>
             </EmptyState.Actions>

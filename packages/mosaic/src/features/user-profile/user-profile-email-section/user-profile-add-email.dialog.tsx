@@ -381,11 +381,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
               onClick={props.onConnect}
             >
               {m.sso.connect}
-              <Icon
-                glyph={ArrowUpRight}
-                placement='inline-end'
-                size='md'
-              />
+              <Icon glyph={ArrowUpRight} />
             </Button>
           </Item.Actions>
         </Item.Root>

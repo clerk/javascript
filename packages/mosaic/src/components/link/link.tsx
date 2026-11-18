@@ -45,7 +45,6 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Mosa
             <span {...stylex.props(styles.iconSlot)}>
               <Icon
                 glyph={External}
-                placement='inline-end'
                 size='inherit'
               />
             </span>

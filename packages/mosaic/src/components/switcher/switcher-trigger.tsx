@@ -61,7 +61,6 @@ function SwitcherTriggerContent({
           ) : null}
           <Icon
             glyph={ChevronDown}
-            size='md'
             xstyle={styles.triggerCaret}
           />
         </>

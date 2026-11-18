@@ -41,11 +41,7 @@ export function UserProfileEmailSectionView({
         />
       }
     >
-      <Icon
-        glyph={Plus}
-        placement='inline-start'
-        size='md'
-      />
+      <Icon glyph={Plus} />
       {messages.contact.add}
     </Dialog.Trigger>
   ) : undefined;

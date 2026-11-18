@@ -73,12 +73,7 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
       }
       {...mergeStyleProps(themeProps('combobox-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? (
-        <Icon
-          glyph={ChevronDown}
-          size='md'
-        />
-      )}
+      {children ?? <Icon glyph={ChevronDown} />}
     </HeadlessCombobox.Trigger>
   );
 });
@@ -101,12 +96,7 @@ export const ComboboxClear = React.forwardRef<HTMLButtonElement, ComboboxClearPr
       }
       {...mergeStyleProps(themeProps('combobox-clear'), stylex.props(xstyle), rest)}
     >
-      {children ?? (
-        <Icon
-          glyph={X}
-          size='md'
-        />
-      )}
+      {children ?? <Icon glyph={X} />}
     </HeadlessCombobox.Clear>
   );
 });
@@ -278,12 +268,7 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
         ref={ref}
         {...mergeStyleProps(themeProps('combobox-option-indicator'), stylex.props(styles.indicator, xstyle), rest)}
       >
-        {children ?? (
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
-        )}
+        {children ?? <Icon glyph={Checkmark} />}
       </HeadlessCombobox.OptionIndicator>
     );
   },
