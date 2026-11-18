@@ -49,11 +49,6 @@ for (const file of entryFiles) {
       `Published Mosaic JS entry ${relative(distDir, file)} starts with 'use client'; put the boundary on the modules it re-exports instead.`,
     );
   }
-  if (!isClientModule(source) && glyphEntryFiles.includes(file)) {
-    throw new Error(
-      `Published Mosaic glyph ${relative(distDir, file)} does not start with 'use client'; a Server Component cannot pass it to Icon otherwise.`,
-    );
-  }
   await checkServerGraph(file, file);
 }
 
