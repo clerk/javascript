@@ -1,6 +1,13 @@
 import { useForm } from '@clerk/mosaic/components/form';
 import type { SignInProvider } from '@clerk/mosaic/features/sign-in';
-import type { SignUpStep, SignUpValues } from '@clerk/mosaic/features/sign-up';
+import type {
+  SignUpDetails,
+  SignUpDetailsScreen,
+  SignUpScreen,
+  SignUpValues,
+  SignUpVerifyScreen,
+  SignUpViewProps,
+} from '@clerk/mosaic/features/sign-up';
 import { SignUpView } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
@@ -21,6 +28,7 @@ export const meta: StoryMeta = {
 const APPLICATION_NAME = 'Acme';
 const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const EMAIL = 'new@acme.com';
+const PHONE = '+1 555 555 0123';
 
 const socialProviders: SignInProvider[] = [
   { id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
@@ -49,8 +57,7 @@ const emptyValues: SignUpValues = {
   legalAccepted: false,
 };
 
-const startStep: SignUpStep = {
-  kind: 'details',
+const startStep: SignUpDetails = {
   purpose: 'start',
   fields: {
     firstName: { required: true },
@@ -62,97 +69,120 @@ const startStep: SignUpStep = {
 
 const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' };
 
-function StepPanel({
-  step,
-  providers = socialProviders,
+const noop = () => undefined;
+
+function verifyScreen(identifier: string): SignUpVerifyScreen {
+  return {
+    identifier,
+    needsCode: false,
+    sendCode: () => Promise.resolve(),
+    verifyCode: () => Promise.resolve({ type: 'unknown' }),
+    onVerified: noop,
+    isPending: false,
+    onEditIdentifier: noop,
+  };
+}
+
+type DetailsOverrides = Partial<Omit<SignUpDetailsScreen, 'form'>>;
+
+type ScreenOverrides = Partial<
+  Omit<SignUpViewProps, 'screen' | 'start' | 'continue' | 'alternativePhone' | 'applicationName' | 'applicationLogoUrl'>
+>;
+
+function ScreenPanel({
+  screen,
   identifier = '',
-  isPending = false,
-  pendingProviderId,
-  globalErrorMessage,
-  onSwitchField,
-  onCancel,
-  onEmailSupport,
-  onJoinWaitlist,
-  onRetry,
-  resend = false,
-}: {
-  step: SignUpStep;
-  providers?: SignInProvider[];
+  start,
+  continue: continueDetails,
+  alternativePhone,
+  ...overrides
+}: ScreenOverrides & {
+  screen: SignUpScreen;
   identifier?: string;
-  isPending?: boolean;
-  pendingProviderId?: string;
-  globalErrorMessage?: string;
-  onSwitchField?: () => void;
-  onCancel?: () => void;
-  onEmailSupport?: () => void;
-  onJoinWaitlist?: () => void;
-  onRetry?: () => void;
-  resend?: boolean;
+  start?: DetailsOverrides;
+  continue?: DetailsOverrides;
+  alternativePhone?: Pick<NonNullable<SignUpViewProps['alternativePhone']>, 'channel' | 'legalConsent'>;
 }) {
   const form = useForm<SignUpValues>({
     initialValues: { ...emptyValues, emailAddress: identifier },
     onSubmit: () => Promise.resolve(),
   });
+  const details: SignUpDetailsScreen = {
+    step: startStep,
+    socialProviders,
+    onSelectProvider: noop,
+    form,
+    onSubmit: event => event.preventDefault(),
+    isPending: false,
+    isDisabled: false,
+    onSignIn: noop,
+  };
 
   return (
     <SignUpView
-      step={step}
+      screen={screen}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
-      socialProviders={providers}
-      pendingProviderId={pendingProviderId}
-      onSelectProvider={() => undefined}
-      form={form}
-      onSubmit={event => event?.preventDefault()}
-      onCodeComplete={code => form.setValue('code', code)}
-      isPending={isPending}
-      isDisabled={isPending || Boolean(pendingProviderId)}
-      globalErrorMessage={globalErrorMessage}
-      onSwitchField={onSwitchField}
-      onSignIn={() => undefined}
-      onEditIdentifier={() => undefined}
-      onCancel={onCancel}
-      onBack={() => undefined}
-      onStartOver={() => undefined}
-      onEmailSupport={onEmailSupport}
-      onJoinWaitlist={onJoinWaitlist}
-      onResend={resend ? () => undefined : undefined}
-      canResend
-      onRetry={onRetry}
+      start={{ ...details, ...start }}
+      continue={{ ...details, ...continueDetails }}
+      verifyEmail={verifyScreen(EMAIL)}
+      verifyPhone={verifyScreen(PHONE)}
+      restricted={{ onSignIn: noop }}
+      onStartOver={noop}
+      alternativePhone={
+        alternativePhone
+          ? {
+              ...alternativePhone,
+              form,
+              onSubmit: event => event.preventDefault(),
+              isPending: false,
+              isDisabled: false,
+              onCancel: noop,
+            }
+          : undefined
+      }
+      {...overrides}
     />
   );
 }
 
 export function Default() {
-  return <StepPanel step={startStep} />;
+  return <ScreenPanel screen='start' />;
 }
 
 export function StartSocialOnly() {
-  return <StepPanel step={{ kind: 'details', purpose: 'start', fields: {} }} />;
+  return (
+    <ScreenPanel
+      screen='start'
+      start={{ step: { purpose: 'start', fields: {} } }}
+    />
+  );
 }
 
 export function StartFormOnly() {
   return (
-    <StepPanel
-      step={startStep}
-      providers={[]}
+    <ScreenPanel
+      screen='start'
+      start={{ socialProviders: [] }}
     />
   );
 }
 
 export function StartInvitation() {
   return (
-    <StepPanel
-      providers={[]}
+    <ScreenPanel
+      screen='start'
       identifier='invited@acme.com'
-      step={{
-        kind: 'details',
-        purpose: 'start',
-        fields: {
-          firstName: { required: true },
-          lastName: { required: true },
-          emailAddress: { required: true, disabled: true },
-          password: { required: true },
+      start={{
+        socialProviders: [],
+        step: {
+          purpose: 'start',
+          fields: {
+            firstName: { required: true },
+            lastName: { required: true },
+            emailAddress: { required: true, disabled: true },
+            password: { required: true },
+          },
         },
       }}
     />
@@ -163,29 +193,33 @@ export function StartEmailOrPhone() {
   const [active, setActive] = useState<'emailAddress' | 'phoneNumber'>('emailAddress');
 
   return (
-    <StepPanel
-      providers={[]}
-      step={{
-        kind: 'details',
-        purpose: 'start',
-        fields: { [active]: { required: true }, password: { required: true } },
-        nextField: active === 'emailAddress' ? 'phoneNumber' : 'emailAddress',
+    <ScreenPanel
+      screen='start'
+      start={{
+        socialProviders: [],
+        step: {
+          purpose: 'start',
+          fields: { [active]: { required: true }, password: { required: true } },
+          nextField: active === 'emailAddress' ? 'phoneNumber' : 'emailAddress',
+        },
+        onSwitchField: () => setActive(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress')),
       }}
-      onSwitchField={() => setActive(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress'))}
     />
   );
 }
 
 export function StartLegalConsent() {
   return (
-    <StepPanel
-      providers={[]}
+    <ScreenPanel
+      screen='start'
       identifier={EMAIL}
-      step={{
-        kind: 'details',
-        purpose: 'start',
-        fields: { emailAddress: { required: true }, password: { required: true } },
-        legalConsent,
+      start={{
+        socialProviders: [],
+        step: {
+          purpose: 'start',
+          fields: { emailAddress: { required: true }, password: { required: true } },
+          legalConsent,
+        },
       }}
     />
   );
@@ -196,133 +230,140 @@ export function StartCaptcha() {
   useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('.cl-captcha'));
   return (
     <div ref={ref}>
-      <StepPanel step={startStep} />
+      <ScreenPanel screen='start' />
     </div>
   );
 }
 
 export function StartProviderPending() {
   return (
-    <StepPanel
-      step={startStep}
-      pendingProviderId='oauth_google'
+    <ScreenPanel
+      screen='start'
+      start={{ pendingProviderId: 'oauth_google', isDisabled: true }}
     />
   );
 }
 
 export function Continue() {
   return (
-    <StepPanel
-      providers={[]}
-      step={{
-        kind: 'details',
-        purpose: 'continue',
-        fields: { username: { required: true }, phoneNumber: { required: true }, password: { required: true } },
+    <ScreenPanel
+      screen='continue'
+      continue={{
+        socialProviders: [],
+        step: {
+          purpose: 'continue',
+          fields: { username: { required: true }, phoneNumber: { required: true }, password: { required: true } },
+        },
       }}
     />
   );
 }
 
 export function ContinueLegalConsentOnly() {
-  return <StepPanel step={{ kind: 'details', purpose: 'continue', fields: {}, legalConsent }} />;
+  return (
+    <ScreenPanel
+      screen='continue'
+      continue={{ step: { purpose: 'continue', fields: {}, legalConsent } }}
+    />
+  );
 }
 
 export function ContinueNoFields() {
   return (
-    <StepPanel
-      providers={[]}
-      step={{ kind: 'details', purpose: 'continue', fields: {} }}
+    <ScreenPanel
+      screen='continue'
+      continue={{ socialProviders: [], step: { purpose: 'continue', fields: {} } }}
     />
   );
 }
 
 export function Restricted() {
   return (
-    <StepPanel
-      step={{ kind: 'notice', purpose: 'restricted' }}
-      onEmailSupport={() => undefined}
+    <ScreenPanel
+      screen='restricted'
+      restricted={{ onSignIn: noop, onEmailSupport: noop }}
     />
   );
 }
 
 export function Waitlist() {
   return (
-    <StepPanel
-      step={{ kind: 'notice', purpose: 'waitlist' }}
-      onJoinWaitlist={() => undefined}
+    <ScreenPanel
+      screen='waitlist'
+      restricted={{ onSignIn: noop, onJoinWaitlist: noop }}
     />
   );
 }
 
 export function AlternativePhone() {
   return (
-    <StepPanel
-      step={{ kind: 'alternative-phone', channel: whatsApp }}
-      onCancel={() => undefined}
+    <ScreenPanel
+      screen='alternativePhone'
+      alternativePhone={{ channel: whatsApp }}
     />
   );
 }
 
 export function AlternativePhoneLegalConsent() {
   return (
-    <StepPanel
-      step={{ kind: 'alternative-phone', channel: whatsApp, legalConsent }}
-      onCancel={() => undefined}
+    <ScreenPanel
+      screen='alternativePhone'
+      alternativePhone={{ channel: whatsApp, legalConsent }}
     />
   );
 }
 
 export function VerifyEmail() {
-  return (
-    <StepPanel
-      step={{ kind: 'code', purpose: 'verify-email', identifier: EMAIL }}
-      resend
-    />
-  );
+  return <ScreenPanel screen='verifyEmail' />;
 }
 
 export function VerifyPhone() {
-  return (
-    <StepPanel
-      step={{ kind: 'code', purpose: 'verify-phone', identifier: '+1 555 555 0123' }}
-      resend
-    />
-  );
+  return <ScreenPanel screen='verifyPhone' />;
 }
 
 export function VerifyPhoneAlternativeChannel() {
   return (
-    <StepPanel
-      step={{ kind: 'code', purpose: 'verify-phone', identifier: '+1 555 555 0123', provider: 'WhatsApp' }}
-      onCancel={() => undefined}
-      resend
+    <ScreenPanel
+      screen='verifyPhone'
+      verifyPhone={{ ...verifyScreen(PHONE), provider: 'WhatsApp', onCancel: noop }}
     />
   );
 }
 
 export function VerifyEmailLink() {
   return (
-    <StepPanel
-      step={{ kind: 'notice', purpose: 'verify-email-link', identifier: EMAIL }}
-      resend
+    <ScreenPanel
+      screen='verifyEmailLink'
+      verifyEmailLink={{
+        identifier: EMAIL,
+        isPending: false,
+        onEditIdentifier: noop,
+        onResend: noop,
+        canResend: true,
+      }}
     />
   );
 }
 
 export function EmailLinkSignedUp() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in' }} />;
+  return (
+    <ScreenPanel
+      screen='emailLinkStatus'
+      emailLinkStatus={{ status: 'signed-in' }}
+    />
+  );
 }
 
 export function EnterpriseConnections() {
   return (
-    <StepPanel
-      step={{
-        kind: 'choice',
-        purpose: 'enterprise-connections',
+    <ScreenPanel
+      screen='enterpriseConnections'
+      enterpriseConnections={{
         options: [
           { id: 'acme-okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
           { id: 'acme-google', name: 'Acme Google Workspace', iconUrl: 'https://img.clerk.com/static/google.svg' },
         ],
+        onSelectConnection: noop,
       }}
     />
   );
@@ -330,14 +371,16 @@ export function EnterpriseConnections() {
 
 export function Wallets() {
   return (
-    <StepPanel
-      step={{
-        kind: 'choice',
-        purpose: 'wallets',
+    <ScreenPanel
+      screen='wallets'
+      wallets={{
         options: [
           { id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' },
           { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
         ],
+        isDisabled: false,
+        onSelectWallet: noop,
+        onBack: noop,
       }}
     />
   );
@@ -345,41 +388,40 @@ export function Wallets() {
 
 export function WalletsSingle() {
   return (
-    <StepPanel
-      step={{
-        kind: 'choice',
-        purpose: 'wallets',
+    <ScreenPanel
+      screen='wallets'
+      wallets={{
         options: [{ id: 'phantom', name: 'Phantom', iconUrl: 'https://img.clerk.com/static/phantom.svg' }],
+        isDisabled: false,
+        onSelectWallet: noop,
+        onBack: noop,
       }}
     />
   );
 }
 
 export function Loading() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'loading' }} />;
+  return <ScreenPanel screen='loading' />;
 }
 
 export function StartOver() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+  return <ScreenPanel screen='startOver' />;
 }
 
 export function ProtectCheck() {
   return (
-    <StepPanel
-      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
-      isPending
+    <ScreenPanel
+      screen='protectCheck'
+      protectCheck={{ challenge: false, isPending: true }}
     />
   );
 }
 
 export function ActionBlocked() {
   return (
-    <StepPanel
-      step={{
-        kind: 'notice',
-        purpose: 'action-blocked',
-        details: { linkUrl: 'https://acme.com/support', linkText: 'Contact support', traceId: 'trc_2x7Hq9LmP4' },
-      }}
+    <ScreenPanel
+      screen='actionBlocked'
+      actionBlocked={{ linkUrl: 'https://acme.com/support', linkText: 'Contact support', traceId: 'trc_2x7Hq9LmP4' }}
     />
   );
 }

@@ -25,32 +25,28 @@ The standalone sign-up view. It reuses the sign-up screens the sign-in view show
 
 ## Usage
 
-The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data; every other prop is shared across steps. `form` is one `useForm` holding every step's fields, and each step's form submits through `onSubmit`. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field; `globalErrorMessage` is an error about the whole step and shows in the card's banner. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for the step's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
+The view renders its own `Card.Root` and mounts one screen at a time inside it. `screen` says which one: a route of the sign-up, or a screen the flow shows on top of a route, such as `restricted` or `startOver`. Each screen takes its own props under its own name, so `start` and `continue` hold the details form and `verifyEmail` and `verifyPhone` hold what a code screen needs. `start` and `continue` share one `useForm`, so what the user typed is still there after a trip to a verify screen. A verify screen sends its code when it mounts with `needsCode`, and `attempt` remounts it for a new sign-up. `taskChooseOrganization` is a slot for the session task shown on its route. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for a screen's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
 
 ```tsx
 import { SignUpView } from '@clerk/mosaic/features/sign-up';
 
 <SignUpView
-  step={{ kind: 'details', purpose: 'start', fields: { emailAddress: { required: true } } }}
+  screen='start'
   applicationName='Acme'
-  socialProviders={socialProviders}
-  onSelectProvider={startProvider}
-  form={form}
-  onSubmit={submit}
-  onCodeComplete={verify}
-  isPending={isPending}
-  isDisabled={isDisabled}
-  onEditIdentifier={editIdentifier}
-  onBack={back}
-  canResend
+  start={{ ...details, step: { purpose: 'start', fields: { emailAddress: { required: true } } } }}
+  continue={{ ...details, step: { purpose: 'continue', fields: {} } }}
+  verifyEmail={{ identifier, needsCode, sendCode, verifyCode, onVerified, onEditIdentifier }}
+  verifyPhone={{ identifier: phoneNumber, needsCode: false, sendCode, verifyCode, onVerified, onEditIdentifier }}
+  restricted={{ onSignIn }}
+  onStartOver={startOver}
 />;
 ```
 
-## Steps
+## Screens
 
-### Start step
+### Start
 
-`{ kind: 'details', purpose: 'start' }` draws the first sign-up screen: the social providers, the fields the step lists, and the link to sign in. With no fields it shows the providers alone.
+`start` draws the first sign-up screen: the social providers, the fields its `step` lists, and the link to sign in. With no fields it shows the providers alone.
 
 #### Social only
 
@@ -80,9 +76,9 @@ import { SignUpView } from '@clerk/mosaic/features/sign-up';
 
 <Story name='StartProviderPending' storyModule={Stories} />
 
-### Continue step
+### Continue
 
-`{ kind: 'details', purpose: 'continue' }` asks for what the sign-up still needs. When consent is all that is missing it shows only the checkbox.
+`continue` asks for what the sign-up still needs. When consent is all that is missing it shows only the checkbox.
 
 #### Missing fields
 
@@ -94,7 +90,7 @@ import { SignUpView } from '@clerk/mosaic/features/sign-up';
 
 #### Nothing left to fill in
 
-With no fields and no consent, the step still offers Continue.
+With no fields and no consent, the screen still offers Continue.
 
 <Story name='ContinueNoFields' storyModule={Stories} />
 
