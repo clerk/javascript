@@ -23,6 +23,12 @@ export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J
   return clientJSON ? Client.getOrCreateInstance().fromJSON(clientJSON) : undefined;
 }
 
+let clientRevision = 0;
+
+export function getClientRevision(): number {
+  return clientRevision;
+}
+
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client | null | undefined;
 
@@ -46,6 +52,7 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   static clearInstance() {
+    clientRevision++;
     Client.instance = null;
   }
 
@@ -107,6 +114,7 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   private resetClient(): void {
+    clientRevision++;
     this.id = '';
     this.sessions = [];
     this.signUp = new SignUp(null);
@@ -156,6 +164,7 @@ export class Client extends BaseResource implements ClientResource {
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
+      clientRevision++;
       this.id = data.id;
       // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
       const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));

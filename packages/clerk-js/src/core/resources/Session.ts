@@ -56,7 +56,7 @@ import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
-import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
+import { BaseResource, getClientResourceFromPayload, getClientRevision, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 const TOKEN_REQUEST_TIMEOUT_MS = 10_000;
@@ -118,7 +118,9 @@ export class Session extends BaseResource implements SessionResource {
     { intent, skipUpdateClient }: { intent?: SessionTouchParams['intent']; skipUpdateClient: boolean } = {
       skipUpdateClient: false,
     },
-  ): Promise<FapiResponseJSON<SessionJSON> | null> => {
+  ): Promise<{ json: FapiResponseJSON<SessionJSON> | null; superseded: boolean }> => {
+    const isFocusTouch = intent === 'focus';
+    const revisionAtSend = getClientRevision();
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
@@ -127,21 +129,30 @@ export class Session extends BaseResource implements SessionResource {
         // any is how we type the body in the BaseMutateParams as well
         body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
-      { skipUpdateClient },
+      { skipUpdateClient: skipUpdateClient || isFocusTouch },
     );
+
+    if (isFocusTouch) {
+      if (getClientRevision() !== revisionAtSend) {
+        return { json: null, superseded: true };
+      }
+      if (!skipUpdateClient) {
+        BaseResource._updateClient(json);
+      }
+    }
 
     // Update session in-place from response (same as BaseResource._baseMutate)
     this.fromJSON((json?.response || json) as SessionJSON);
 
-    return json;
+    return { json, superseded: false };
   };
 
   touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
-    await this._touchPost({ intent, skipUpdateClient: false });
+    const { superseded } = await this._touchPost({ intent, skipUpdateClient: false });
 
     // _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
-    if (this.lastActiveToken) {
+    if (!superseded && this.lastActiveToken) {
       eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
     }
 
@@ -159,7 +170,7 @@ export class Session extends BaseResource implements SessionResource {
    * @internal
    */
   __internal_touch = async ({ intent }: SessionTouchParams = {}): Promise<ClientResource | undefined> => {
-    const json = await this._touchPost({ intent, skipUpdateClient: true });
+    const { json } = await this._touchPost({ intent, skipUpdateClient: true });
     return getClientResourceFromPayload(json);
   };
 
