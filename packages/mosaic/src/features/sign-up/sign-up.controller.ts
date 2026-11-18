@@ -179,6 +179,8 @@ export function useSignUpController(
 
   // A route the step does not allow is replaced with the screen that is shown, so the stored route, and the
   // address bar once the URL routing modes land (#10780), never keeps it. Replacing leaves no history entry.
+  // TODO: Once #10780 lands, move this replace into `useRouterScope` as a guard option, so sign-in and sign-up
+  // share one owner redirect instead of each keeping an effect.
   useEffect(() => {
     if (shown !== undefined && shown !== route) {
       go(shown, {}, { replace: true });
