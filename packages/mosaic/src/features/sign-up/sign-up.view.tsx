@@ -54,6 +54,7 @@ export function SignUpView(props: SignUpViewProps) {
           taskChooseOrganization,
         }) => (
           <>
+            {/* / */}
             <Screen ids={['start']}>
               <SignUpDetailsStep
                 {...start}
@@ -61,6 +62,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* /continue */}
             <Screen ids={['continue']}>
               <SignUpDetailsStep
                 {...continueDetails}
@@ -68,6 +70,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* /verify-email-address, /continue/verify-email-address */}
             <Screen ids={['verifyEmail', 'continueVerifyEmail']}>
               <SignUpVerify
                 key={attempt}
@@ -76,6 +79,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* /verify-phone-number, /continue/verify-phone-number */}
             <Screen ids={['verifyPhone', 'continueVerifyPhone']}>
               <SignUpVerify
                 key={attempt}
@@ -84,6 +88,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* / when sign-ups are restricted */}
             <Screen ids={['restricted']}>
               <SignUpRestricted
                 {...restricted}
@@ -92,6 +97,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* / when sign-ups go through the waitlist */}
             <Screen ids={['waitlist']}>
               <SignUpRestricted
                 {...restricted}
@@ -100,6 +106,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* / after a blocked request */}
             <Screen ids={['actionBlocked']}>
               <AuthActionBlocked
                 messages={m.actionBlocked}
@@ -107,6 +114,7 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* Any route, when the sign-up cannot continue */}
             <Screen ids={['startOver']}>
               <AuthStartOver
                 messages={m.startOver}
@@ -114,12 +122,15 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Screen>
 
+            {/* /tasks/choose-organization */}
             <Screen ids={['taskChooseOrganization']}>{taskChooseOrganization}</Screen>
 
+            {/* No route yet */}
             <Screen ids={['loading']}>
               <AuthLoading messages={{ loading: m.loading }} />
             </Screen>
 
+            {/* No route yet */}
             <Screen ids={['alternativePhone']}>
               {alternativePhone ? (
                 <AuthAlternativeChannel
@@ -158,6 +169,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Screen>
 
+            {/* No route yet */}
             <Screen ids={['verifyEmailLink']}>
               {verifyEmailLink ? (
                 <AuthEmailLink
@@ -180,6 +192,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Screen>
 
+            {/* No route yet */}
             <Screen ids={['emailLinkStatus']}>
               {emailLinkStatus ? (
                 <AuthEmailLinkStatus
@@ -190,6 +203,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Screen>
 
+            {/* /enterprise-connections */}
             <Screen ids={['enterpriseConnections']}>
               {enterpriseConnections ? (
                 <AuthEnterpriseConnections
@@ -207,6 +221,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Screen>
 
+            {/* No route yet */}
             <Screen ids={['wallets']}>
               {wallets ? (
                 <AuthWallets
@@ -221,6 +236,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Screen>
 
+            {/* /protect-check */}
             <Screen ids={['protectCheck']}>
               {protectCheck ? (
                 <AuthProtectCheck
