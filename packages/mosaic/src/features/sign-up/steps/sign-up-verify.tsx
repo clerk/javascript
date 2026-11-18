@@ -1,6 +1,9 @@
+import { AuthIdentityPreview } from '../../../blocks/auth';
+import { VerificationCode, verificationResend } from '../../../blocks/verification';
+import { useMessages } from '../../../localization';
 import { useSignUpVerifyController } from '../sign-up.controller';
-import type { SignUpVerifyScreen } from '../sign-up.types';
-import { SignUpCodeStep } from './sign-up-code';
+import type { SignUpCode, SignUpVerifyScreen } from '../sign-up.types';
+import { signUpCodeCopy, signUpCodeIdentity, signUpCodeSecondaryAction } from '../sign-up.utils';
 
 interface SignUpVerifyProps extends SignUpVerifyScreen {
   channel: 'email' | 'phone';
@@ -14,14 +17,54 @@ export function SignUpVerify({
   onCancel,
   ...options
 }: SignUpVerifyProps) {
-  const controller = useSignUpVerifyController(options);
+  const m = useMessages('signUp');
+  const {
+    value,
+    onValueChange,
+    errorMessage,
+    globalErrorMessage,
+    isPending,
+    onSubmit,
+    onComplete,
+    onResend,
+    canResend,
+    resendRemainingSeconds,
+  } = useSignUpVerifyController(options);
+  const step: SignUpCode = { purpose: channel === 'email' ? 'verify-email' : 'verify-phone', identifier, provider };
+  const secondary = signUpCodeSecondaryAction(step, m, onCancel);
+  const identity = signUpCodeIdentity(step, m);
 
   return (
-    <SignUpCodeStep
-      {...controller}
-      step={{ purpose: channel === 'email' ? 'verify-email' : 'verify-phone', identifier, provider }}
-      onEditIdentifier={onEditIdentifier}
-      onCancel={onCancel}
+    <VerificationCode
+      messages={{
+        ...signUpCodeCopy(step, m),
+        secondaryActionLabel: secondary.label,
+        primaryActionLabel: m.submit,
+        pendingLabel: m.verifying,
+      }}
+      resend={verificationResend(channel === 'email' ? m.verifyEmail : m.verifyPhone, {
+        onResend,
+        canResend,
+        remainingSeconds: resendRemainingSeconds,
+      })}
+      identity={
+        identity.identifier ? (
+          <AuthIdentityPreview
+            identifier={identity.identifier}
+            editLabel={identity.editLabel}
+            disabled={isPending}
+            onEdit={onEditIdentifier}
+          />
+        ) : undefined
+      }
+      value={value}
+      onValueChange={onValueChange}
+      errorMessage={errorMessage}
+      globalErrorMessage={globalErrorMessage}
+      isPending={isPending}
+      onSubmit={onSubmit}
+      onComplete={onComplete}
+      onCancel={secondary.onClick}
     />
   );
 }
