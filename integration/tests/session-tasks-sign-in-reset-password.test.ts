@@ -35,8 +35,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
+      const emailCodeAttempt = u.page.waitForResponse(
+        response => response.request().method() === 'POST' && response.url().includes('/attempt_first_factor'),
+      );
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
+      expect((await emailCodeAttempt).ok()).toBe(true);
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
@@ -88,8 +92,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
+      const emailCodeAttempt = u.page.waitForResponse(
+        response => response.request().method() === 'POST' && response.url().includes('/attempt_first_factor'),
+      );
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
+      expect((await emailCodeAttempt).ok()).toBe(true);
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
