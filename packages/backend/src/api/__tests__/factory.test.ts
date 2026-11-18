@@ -241,7 +241,7 @@ describe('api.client', () => {
             data: [userJson],
             cursor: {
               starting_after: 'cursor_next',
-              ending_before: null,
+              ending_before: 'cursor_before',
               has_next_page: true,
               remaining_count_at_least: 1000,
             },
@@ -265,8 +265,36 @@ describe('api.client', () => {
     expect(data.length).toBe(1);
     expect(data[0].id).toBe('user_cafebabe');
     expect(data[0].firstName).toBe('John');
-    expect(cursor).toEqual({ startingAfter: 'cursor_next', hasNextPage: true, remainingCountAtLeast: 1000 });
+    expect(cursor).toEqual({
+      startingAfter: 'cursor_next',
+      endingBefore: 'cursor_before',
+      hasNextPage: true,
+      remainingCountAtLeast: 1000,
+    });
     expect(countHandler).not.toHaveBeenCalled();
+  });
+
+  it('sends endingBefore as ending_before for users.getUserList() paged by cursor', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('ending_before')).toBe('cursor_before');
+          expect(url.searchParams.has('starting_after')).toBe(false);
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: { starting_after: 'cursor_next', ending_before: null, has_next_page: true },
+          });
+        }),
+      ),
+    );
+
+    const { cursor } = await apiClient.users.getUserList({ pagination: 'cursor', endingBefore: 'cursor_before' });
+
+    expect(cursor.endingBefore).toBeNull();
+    expect(cursor.hasNextPage).toBe(true);
   });
 
   it('returns the exact remaining count and a null cursor on the last page of users.getUserList() paged by cursor', async () => {
@@ -286,7 +314,7 @@ describe('api.client', () => {
     const { data, cursor } = await apiClient.users.getUserList({ pagination: 'cursor', remainingCount: 'exact' });
 
     expect(data.length).toBe(1);
-    expect(cursor).toEqual({ startingAfter: null, hasNextPage: false, remainingCountExact: 1 });
+    expect(cursor).toEqual({ startingAfter: null, endingBefore: null, hasNextPage: false, remainingCountExact: 1 });
   });
 
   it('executes users.getUserList() with last_sign_in_at filters', async () => {

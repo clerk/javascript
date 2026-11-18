@@ -117,6 +117,8 @@ export type UserListCursorParams = Omit<UserListParams, 'offset' | 'startingAfte
   pagination: 'cursor';
   /** The `cursor.startingAfter` of the previous page. Omit it for the first page, and keep every other parameter the same across pages. */
   startingAfter?: string;
+  /** The `cursor.endingBefore` of a previous page. Returns the page before that one. It cannot be combined with `startingAfter`. A page read backward can hold fewer users than `limit` even when more users exist. */
+  endingBefore?: string;
   /**
    * Also counts the users from the start of this page onward, this page included. On the first page that is every user the request matches.
    *
@@ -135,6 +137,8 @@ export type UserListCursorParams = Omit<UserListParams, 'offset' | 'startingAfte
 export type UserListCursor = {
   /** The value to pass as `startingAfter` to get the next page, or `null` if this is the last page. */
   startingAfter: string | null;
+  /** The value to pass as `endingBefore` to get the page before this one. It is also set on pages read forward, and is `null` if there is no earlier page. */
+  endingBefore: string | null;
   /** Whether there are more users after this page. */
   hasNextPage: boolean;
   /** The number of users from the start of this page onward. Present when `remainingCount` was passed and the count did not reach its limit. */
@@ -149,7 +153,7 @@ export type UserListCursor = {
 export type UserListCursorResponse = {
   /** The users on this page. */
   data: User[];
-  /** The cursor to the next page, with the count if one was requested. */
+  /** The cursor to the next and previous pages, with the count if one was requested. */
   cursor: UserListCursor;
 };
 
@@ -560,8 +564,8 @@ export class UserAPI extends AbstractAPI {
    */
   public async getUserList(params?: UserListParams): Promise<PaginatedResourceResponse<User[]>>;
   /**
-   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`.
-   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the next page. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
+   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`, or `cursor.endingBefore` as `endingBefore` to get the previous page. The request fails with a 403 when user search is not enabled for the instance.
+   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
    */
   public async getUserList(params: UserListCursorParams): Promise<UserListCursorResponse>;
   public async getUserList(params: UserListParams | UserListCursorParams = {}) {
@@ -596,6 +600,7 @@ export class UserAPI extends AbstractAPI {
       data,
       cursor: {
         startingAfter: cursor.starting_after,
+        endingBefore: cursor.ending_before,
         hasNextPage: cursor.has_next_page,
         remainingCountExact: cursor.remaining_count_exact,
         remainingCountAtLeast: cursor.remaining_count_at_least,
