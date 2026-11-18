@@ -1,6 +1,6 @@
 {
   "name": "@clerk/astro",
-  "version": "2.17.17",
+  "version": "2.17.18",
   "description": "Clerk SDK for Astro",
   "keywords": [
     "auth",
@@ -85,7 +85,8 @@
     "lint": "eslint src env.d.ts",
     "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "pnpm copy:components && publint",
-    "publish:local": "pnpm yalc push --replace --sig"
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",

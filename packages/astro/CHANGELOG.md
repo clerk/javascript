@@ -1,5 +1,13 @@
 # @clerk/astro
 
+## 2.17.18
+
+### Patch Changes
+
+- Fix `$billingStore` so it emits the billing namespace only after Clerk has loaded. Before, it could emit while `clerk.load()` was still running, so a call like `getPlans()` in a subscriber could fail with a `dev_browser_unauthenticated` error on development instances. ([#10901](https://github.com/clerk/javascript/pull/10901)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `clerkMiddleware` so it adds Clerk's tags to the page once, right before the closing `</head>` tag. It now finds that tag even when a streamed response splits it across two chunks. The server data now goes in `<meta>` tags, and clerk-js is preloaded with a `<link>` tag and loaded by the integration's page script. ([#10901](https://github.com/clerk/javascript/pull/10901)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.17.17
 
 ### Patch Changes
