@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 import {
   AuthActionBlocked,
   AuthAlternativeChannel,
@@ -15,15 +13,11 @@ import { verificationResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useMessages } from '../../localization';
-import type { SignUpScreen, SignUpViewProps } from './sign-up.types';
+import type { SignUpViewProps } from './sign-up.types';
 import { SignUpDetailsStep } from './steps/sign-up-details';
 import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
 import { SignUpRestricted } from './steps/sign-up-restricted';
 import { SignUpVerify } from './steps/sign-up-verify';
-
-function Screen({ ids, children }: { ids: readonly SignUpScreen[]; children: ReactNode }) {
-  return <Flow.Step ids={ids}>{children}</Flow.Step>;
-}
 
 export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');
@@ -55,83 +49,83 @@ export function SignUpView(props: SignUpViewProps) {
         }) => (
           <>
             {/* / */}
-            <Screen ids={['start']}>
+            <Flow.Step ids={['start']}>
               <SignUpDetailsStep
                 {...start}
                 logo={logo}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* /continue */}
-            <Screen ids={['continue']}>
+            <Flow.Step ids={['continue']}>
               <SignUpDetailsStep
                 {...continueDetails}
                 logo={logo}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* /verify-email-address, /continue/verify-email-address */}
-            <Screen ids={['verifyEmail', 'continueVerifyEmail']}>
+            <Flow.Step ids={['verifyEmail', 'continueVerifyEmail']}>
               <SignUpVerify
                 key={attempt}
                 channel='email'
                 {...verifyEmail}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* /verify-phone-number, /continue/verify-phone-number */}
-            <Screen ids={['verifyPhone', 'continueVerifyPhone']}>
+            <Flow.Step ids={['verifyPhone', 'continueVerifyPhone']}>
               <SignUpVerify
                 key={attempt}
                 channel='phone'
                 {...verifyPhone}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* / when sign-ups are restricted */}
-            <Screen ids={['restricted']}>
+            <Flow.Step ids={['restricted']}>
               <SignUpRestricted
                 {...restricted}
                 waitlist={false}
                 logo={logo}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* / when sign-ups go through the waitlist */}
-            <Screen ids={['waitlist']}>
+            <Flow.Step ids={['waitlist']}>
               <SignUpRestricted
                 {...restricted}
                 waitlist
                 logo={logo}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* / after a blocked request */}
-            <Screen ids={['actionBlocked']}>
+            <Flow.Step ids={['actionBlocked']}>
               <AuthActionBlocked
                 messages={m.actionBlocked}
                 details={actionBlocked}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* Any route, when the sign-up cannot continue */}
-            <Screen ids={['startOver']}>
+            <Flow.Step ids={['startOver']}>
               <AuthStartOver
                 messages={m.startOver}
                 onStartOver={onStartOver}
               />
-            </Screen>
+            </Flow.Step>
 
             {/* /tasks/choose-organization */}
-            <Screen ids={['taskChooseOrganization']}>{taskChooseOrganization}</Screen>
+            <Flow.Step ids={['taskChooseOrganization']}>{taskChooseOrganization}</Flow.Step>
 
             {/* No route yet */}
-            <Screen ids={['loading']}>
+            <Flow.Step ids={['loading']}>
               <AuthLoading messages={{ loading: m.loading }} />
-            </Screen>
+            </Flow.Step>
 
             {/* No route yet */}
-            <Screen ids={['alternativePhone']}>
+            <Flow.Step ids={['alternativePhone']}>
               {alternativePhone ? (
                 <AuthAlternativeChannel
                   messages={{
@@ -167,10 +161,10 @@ export function SignUpView(props: SignUpViewProps) {
                   ) : null}
                 </AuthAlternativeChannel>
               ) : null}
-            </Screen>
+            </Flow.Step>
 
             {/* No route yet */}
-            <Screen ids={['verifyEmailLink']}>
+            <Flow.Step ids={['verifyEmailLink']}>
               {verifyEmailLink ? (
                 <AuthEmailLink
                   messages={{
@@ -190,10 +184,10 @@ export function SignUpView(props: SignUpViewProps) {
                   })}
                 />
               ) : null}
-            </Screen>
+            </Flow.Step>
 
             {/* No route yet */}
-            <Screen ids={['emailLinkStatus']}>
+            <Flow.Step ids={['emailLinkStatus']}>
               {emailLinkStatus ? (
                 <AuthEmailLinkStatus
                   messages={m.emailLinkStatus}
@@ -201,10 +195,10 @@ export function SignUpView(props: SignUpViewProps) {
                   globalErrorMessage={emailLinkStatus.globalErrorMessage}
                 />
               ) : null}
-            </Screen>
+            </Flow.Step>
 
             {/* /enterprise-connections */}
-            <Screen ids={['enterpriseConnections']}>
+            <Flow.Step ids={['enterpriseConnections']}>
               {enterpriseConnections ? (
                 <AuthEnterpriseConnections
                   messages={{
@@ -219,10 +213,10 @@ export function SignUpView(props: SignUpViewProps) {
                   onSelectConnection={enterpriseConnections.onSelectConnection}
                 />
               ) : null}
-            </Screen>
+            </Flow.Step>
 
             {/* No route yet */}
-            <Screen ids={['wallets']}>
+            <Flow.Step ids={['wallets']}>
               {wallets ? (
                 <AuthWallets
                   messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
@@ -234,10 +228,10 @@ export function SignUpView(props: SignUpViewProps) {
                   onBack={wallets.onBack}
                 />
               ) : null}
-            </Screen>
+            </Flow.Step>
 
             {/* /protect-check */}
-            <Screen ids={['protectCheck']}>
+            <Flow.Step ids={['protectCheck']}>
               {protectCheck ? (
                 <AuthProtectCheck
                   messages={{ ...m.protectCheck, loading: m.loading }}
@@ -249,7 +243,7 @@ export function SignUpView(props: SignUpViewProps) {
                   onRetry={protectCheck.onRetry}
                 />
               ) : null}
-            </Screen>
+            </Flow.Step>
           </>
         )}
       </Flow.Root>
