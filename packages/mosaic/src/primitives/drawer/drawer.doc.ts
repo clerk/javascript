@@ -153,6 +153,14 @@ export default {
     },
   ],
   related: ['Dialog'],
+  exports: {
+    'Drawer.createDrawerHandle': {
+      description: 'Creates a handle that connects a `Drawer.Root` to a trigger rendered outside it.',
+    },
+    'Drawer.registerDrawerCssVars': {
+      description: 'Registers the drag custom properties as non-inheriting. Call it once in the styled layer.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Drawer.Root': DrawerProps;
   'Drawer.Trigger': DrawerTriggerProps;

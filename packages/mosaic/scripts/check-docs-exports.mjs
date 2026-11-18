@@ -38,7 +38,7 @@ for (const file of docFiles) {
     }
     continue;
   }
-  failures.push(...(await checkUnit(unit, doc, readFileSync(resolve(packageDir, file), 'utf8'))));
+  failures.push(...(await checkUnit(unit, doc)));
 }
 
 for (const subpath of Object.keys(packageJson.exports)) {
@@ -54,7 +54,7 @@ if (failures.length > 0) {
 
 console.log(`✅ Every documented Mosaic unit imports from @clerk/mosaic/<kind>/<slug>`);
 
-async function checkUnit(unit, doc, docSource) {
+async function checkUnit(unit, doc) {
   const target = packageJson.exports[`./${unit}`];
   if (!target) {
     return [`${unit} has no "./${unit}" export`];
@@ -63,19 +63,21 @@ async function checkUnit(unit, doc, docSource) {
     return [`${unit} has no types at ${target.types}`];
   }
   const module = await import(pathToFileURL(resolve(packageDir, target.import)).href);
-  const names = 'parts' in doc ? Object.keys(doc.parts) : [doc.name];
-  const mentioned = [...docSource.matchAll(/`([A-Za-z_]\w*)/g)].map(([, name]) => name);
-  const documented = new Set([...names.map(name => name.split('.')[0]), ...mentioned]);
+  const listed = new Set([
+    ...('parts' in doc ? Object.keys(doc.parts) : [doc.name]),
+    ...Object.keys(doc.exports ?? {}),
+  ]);
+  const exported = Object.entries(module).flatMap(([name, value]) =>
+    isNamespace(value) ? Object.keys(value).map(member => `${name}.${member}`) : [name],
+  );
   return [
-    ...names.filter(name => resolveName(module, name) === undefined).map(name => `${unit} does not export ${name}`),
-    ...Object.keys(module)
-      .filter(name => !documented.has(name))
-      .map(name => `${unit} exports ${name}, which its docs do not list`),
+    ...[...listed].filter(name => !exported.includes(name)).map(name => `${unit} does not export ${name}`),
+    ...exported.filter(name => !listed.has(name)).map(name => `${unit} exports ${name}, which its doc does not list`),
   ];
 }
 
-function resolveName(module, name) {
-  return name.split('.').reduce((value, key) => value?.[key], module);
+function isNamespace(value) {
+  return Object.prototype.toString.call(value) === '[object Module]';
 }
 
 function kebab(name) {

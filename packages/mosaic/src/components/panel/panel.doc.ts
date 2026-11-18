@@ -46,6 +46,9 @@ export default {
     },
   ],
   related: ['Profile', 'Section', 'Heading'],
+  exports: {
+    'Panel.usePanelTitle': { description: 'Returns a getter for the `Panel.Title` element, to move focus to it.' },
+  },
 } satisfies ComponentDoc<{
   'Panel.Root': PanelRootProps;
   'Panel.Title': PanelTitleProps;

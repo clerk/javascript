@@ -106,4 +106,7 @@ export default {
     },
   ],
   related: ['Field', 'Form', 'SubmitButton', 'Card'],
+  exports: {
+    FormSubmitError: { description: 'Reject `onSubmit` with it so its errors land on the fields and the form banner.' },
+  },
 } satisfies HookDoc<UseFormOptions<object>, UseFormResult<object>>;

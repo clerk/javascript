@@ -127,6 +127,12 @@ export default {
     },
   ],
   related: ['Heading', 'Skeleton', 'Field'],
+  exports: {
+    'Section.compactStyles': {
+      description:
+        'StyleX styles for content inside a group: `hidden` hides it in the compact layout below 26rem, and `only` shows it only there.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Section.Root': SectionRootProps;
   'Section.Group': SectionGroupProps;

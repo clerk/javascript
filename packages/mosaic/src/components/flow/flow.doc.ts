@@ -72,4 +72,7 @@ export default {
     },
   ],
   related: ['Card', 'Dialog', 'Flow.useFlowAutoFocus'],
+  exports: {
+    'Flow.useFlowAutoFocus': { description: 'Returns a ref for the element a step focuses when it enters.' },
+  },
 } satisfies ComponentDoc<{ 'Flow.Root': FlowRootProps<unknown>; 'Flow.Step': FlowStepProps }>;

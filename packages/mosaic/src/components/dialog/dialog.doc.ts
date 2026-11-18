@@ -106,6 +106,11 @@ export default {
     },
   ],
   related: ['Card', 'useConfirmController', 'Drawer'],
+  exports: {
+    'Dialog.createHandle': {
+      description: 'Creates a handle that connects a `Dialog.Root` to triggers rendered outside it.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Dialog.Root': DialogRootProps;
   'Dialog.Trigger': DialogTriggerProps;

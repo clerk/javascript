@@ -176,6 +176,12 @@ const detail = Dialog.createHandle<{ name: string }>();
     },
   ],
   related: ['Drawer', 'Popover'],
+  exports: {
+    'Dialog.createHandle': {
+      description:
+        'Creates a handle that connects a `Dialog.Root` to triggers rendered outside it. Type a payload with `Dialog.createHandle<Payload>()`.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Dialog.Root': DialogProps;
   'Dialog.Trigger': DialogTriggerProps;

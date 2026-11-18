@@ -84,6 +84,9 @@ function Slots() {
     },
   ],
   related: ['VerificationCode'],
+  exports: {
+    'Otp.useOtp': { description: 'Returns the value and the slot list inside an `Otp.Root`.' },
+  },
 } satisfies ComponentDoc<{
   'Otp.Root': OtpProps;
   'Otp.Input': OtpInputProps;

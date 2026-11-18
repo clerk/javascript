@@ -13,7 +13,8 @@ const validPackage = {
   files: {
     'src/components/thing/thing.doc.ts': `export default { name: 'Thing', parts: { 'Thing.Root': {} } };\n`,
     'dist/components/thing.d.ts': `export {};\n`,
-    'dist/components/thing.js': `export const Thing = { Root: () => null };\n`,
+    'dist/components/thing.js': `export * as Thing from './thing/thing.parts.js';\n`,
+    'dist/components/thing/thing.parts.js': `export const Root = () => null;\n`,
   },
 };
 
@@ -39,5 +40,55 @@ describe('check-docs-exports', () => {
     });
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('components/extra is exported but has no doc');
+  });
+
+  it('fails when a namespace has a member its doc does not list', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'dist/components/thing/thing.parts.js': `export const Root = () => null;\nexport const Secret = () => null;\n`,
+      },
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('components/thing exports Thing.Secret, which its doc does not list');
+  });
+
+  it('fails when a name the doc only mentions in prose is exported', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/thing.doc.ts': `export default { name: 'Thing', description: 'Use \`Other\` instead', parts: { 'Thing.Root': {} } };\n`,
+        'dist/components/thing.js': `export * as Thing from './thing/thing.parts.js';\nexport const Other = () => null;\n`,
+      },
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('components/thing exports Other, which its doc does not list');
+  });
+
+  it('passes when a helper is listed in the doc exports', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/thing.doc.ts': `export default { name: 'Thing', parts: { 'Thing.Root': {} }, exports: { 'Thing.useThing': { description: 'Reads the thing.' } } };\n`,
+        'dist/components/thing/thing.parts.js': `export const Root = () => null;\nexport const useThing = () => null;\n`,
+      },
+    });
+    expect(result.stderr).toBe('');
+    expect(result.status).toBe(0);
+  });
+
+  it('fails when a helper listed in the doc exports is missing', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/thing.doc.ts': `export default { name: 'Thing', parts: { 'Thing.Root': {} }, exports: { 'Thing.useThing': { description: 'Reads the thing.' } } };\n`,
+      },
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('components/thing does not export Thing.useThing');
   });
 });

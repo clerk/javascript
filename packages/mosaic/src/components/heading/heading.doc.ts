@@ -55,4 +55,8 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     },
   ],
   related: ['Panel', 'Text'],
+  exports: {
+    HeadingContext: { description: 'Supplies default props to every `Heading` below it.' },
+    useHeadingLevel: { description: 'Returns the heading level set by the nearest `HeadingLevelProvider`.' },
+  },
 } satisfies ComponentDoc<{ Heading: HeadingProps; HeadingLevelProvider: HeadingLevelProviderProps }>;

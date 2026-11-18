@@ -67,4 +67,8 @@ export default {
 `,
     },
   ],
+  exports: {
+    'Flow.useFlowAutoFocus': { description: 'Returns a ref for the element a step focuses when it enters.' },
+    'Flow.useFlowStepActive': { description: 'Returns `false` inside a step that is exiting.' },
+  },
 } satisfies ComponentDoc<{ 'Flow.Root': FlowRootProps; 'Flow.Step': FlowStepProps }>;
