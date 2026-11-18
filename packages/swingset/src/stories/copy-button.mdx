@@ -2,9 +2,10 @@ import * as Stories from './copy-button.stories';
 
 # CopyButton
 
-Puts a value on the clipboard and confirms it in a toast anchored to the button, which settles after
-`resetAfter`. A toast rather than a tooltip because the confirmation is an event, not a description
-of the control: it announces itself, `F6` reaches it and `Escape` dismisses it.
+Puts a value on the clipboard. Hovering or focusing the button shows a tooltip with its `label`; copying swaps that same
+tooltip to `copiedLabel` with a check that draws in, and it settles back after `resetAfter`. Copying again restarts
+the wait and the check, leaving the button closes the confirmation early, and only one copy button shows a
+confirmation at a time. The tooltip opens and closes after 300ms, and the button looks pressed while it is showing.
 
 <Story
   name='Default'
@@ -36,10 +37,15 @@ of the control: it announces itself, `F6` reaches it and `Escape` dismisses it.
 
 ## Naming what it copies
 
-The button keeps its name while the copy is fresh; the confirmation is announced by the toast's own
-live region, from a landmark the `label` names.
+The button keeps its name while the copy is fresh. The confirmation is announced through a visually hidden status
+region next to the button, so it is spoken even when the tooltip is not.
 
 <Story
   name='Labelled'
   storyModule={Stories}
 />
+
+## Styling
+
+`.cl-copy-button-label` is the hover tooltip text and `.cl-copy-button-copied` is the confirmation; both sit inside
+`.cl-tooltip-popup`. The check is the confirmation's `.cl-icon`.

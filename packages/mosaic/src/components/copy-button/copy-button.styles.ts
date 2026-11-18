@@ -1,49 +1,46 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { durationVars, easingVars, space } from '../../tokens.stylex';
+
+const fadeIn = stylex.keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+});
+
+const draw = stylex.keyframes({
+  from: { strokeDashoffset: 14 },
+  to: { strokeDashoffset: 0 },
+});
 
 export const styles = stylex.create({
-  toast: {
-    borderRadius: radiusVars['--cl-radius-md'],
+  content: {
     gap: space['1'],
-    paddingBlock: space['1'],
-    paddingInline: space['1.5'],
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-foreground'],
-    color: colorVars['--cl-color-surface'],
-    // A copy while one is still showing queues behind the `limit`; only the newest is wanted.
-    display: { default: 'flex', ':where([data-limited])': 'none' },
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    opacity: {
-      default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+    animationDuration: durationVars['--cl-duration-base'],
+    animationName: {
+      default: fadeIn,
+      '@media (prefers-reduced-motion: reduce)': 'none',
     },
-    transform: {
-      default: 'scale(1)',
-      ':where([data-starting-style], [data-ending-style])': 'scale(0.94)',
-      '@media (prefers-reduced-motion: reduce)': {
-        default: 'scale(1)',
-        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
-      },
-    },
-    transformOrigin: 'var(--cl-anchor-origin, center)',
-    transitionDuration: {
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
-      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
-    },
-    transitionProperty: {
-      default: 'opacity, transform',
-      '@media (prefers-reduced-motion: reduce)': 'opacity',
-    },
-    transitionTimingFunction: {
-      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
-      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
-    },
+    animationTimingFunction: easingVars['--cl-ease-enter'],
+    display: 'flex',
     whiteSpace: 'nowrap',
   },
-  title: {
-    font: 'inherit',
-    margin: 0,
+  check: {
+    strokeDasharray: 14,
+    strokeDashoffset: {
+      default: 14,
+      '@media (prefers-reduced-motion: reduce)': 0,
+    },
+    animationDelay: '60ms',
+    animationDuration: durationVars['--cl-duration-base'],
+    animationFillMode: 'forwards',
+    animationName: {
+      default: draw,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: easingVars['--cl-ease-enter'],
+    marginInlineEnd: `calc(-1 * ${space['0.5']})`,
+    position: 'relative',
+    top: '-1px',
   },
 });
