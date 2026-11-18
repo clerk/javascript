@@ -9,9 +9,6 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
-  back: {
-    alignSelf: 'flex-start',
-  },
   count: {
     gap: space['2'],
     alignItems: 'center',

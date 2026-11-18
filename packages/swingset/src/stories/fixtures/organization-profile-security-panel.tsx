@@ -1,6 +1,7 @@
 import { useSecurityPanelController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.controller';
 import { OrganizationProfileSecurityPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.view';
 import { useSSOBypassPageController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.controller';
+import { SSOBypassCard } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.dialog';
 import type { SSOBypassModel } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.model';
 import {
   SSOBypassPageSkeleton,
@@ -180,15 +181,20 @@ export function SecurityPanelExample({
             count={ssoBypass.count}
             isError={sectionError}
             onManage={controller.onManageSSOBypass}
+            manageRef={controller.manageSSOBypassRef}
           />
         ) : null
       }
-      ssoBypass={controller.page === 'ssoBypass' ? <SSOBypassPageExample model={bypass} /> : null}
+      ssoBypass={<SSOBypassPageExample model={bypass} />}
     />
   );
 }
 
 export function SSOBypassAllowlistExample(props: Parameters<typeof useSSOBypassFixture>[0] = {}) {
   const model = useSSOBypassFixture(props);
-  return <SSOBypassPageExample model={model} />;
+  return (
+    <SSOBypassCard>
+      <SSOBypassPageExample model={model} />
+    </SSOBypassCard>
+  );
 }

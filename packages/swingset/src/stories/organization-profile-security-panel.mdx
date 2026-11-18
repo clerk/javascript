@@ -4,11 +4,11 @@ import * as Stories from './organization-profile-security-panel.stories';
 
 ## Example
 
-The overview lists the organization's security settings. A member who can manage the SSO bypass allow list sees its size and a Manage action once the organization has an enterprise connection. Manage opens the allow list in the panel, and the back button returns to the overview.
+The overview lists the organization's security settings. A member who can manage the SSO bypass allow list sees its size and a Manage action once the organization has an enterprise connection. Manage opens the allow list in a dialog over the panel. Closing it returns focus to Manage.
 
 <Story name='Default' storyModule={Stories} composition={[
   { name: 'Panel', href: '/components/panel', layer: 'Components' },
-  { name: 'Flow', href: '/components/flow', layer: 'Components' },
+  { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
   { name: 'Section', href: '/components/section', layer: 'Components' },
   { name: 'Menu', href: '/components/menu', layer: 'Components' },
   { name: 'Badge', href: '/components/badge', layer: 'Components' },
@@ -26,7 +26,7 @@ The overview lists the organization's security settings. A member who can manage
 
 ### Allow list
 
-The allow list filters by name, email or username as you type. Remove runs immediately, as in the legacy component, and moves focus to the next row. Add opens a dialog that adds one member by email, or everyone with a role. Adding by email fails when no member has that address or the member is already listed. Adding by role skips members already listed, and reports members the server skips, such as members whose email domain no connection serves. Try `carol@acme.com`, `zed@acme.com`, or the Member role.
+The allow list filters by name, email or username as you type. Remove runs immediately, as in the legacy component, and moves focus to the next row. Add opens a second dialog over it that adds one member by email, or everyone with a role. Adding by email fails when no member has that address or the member is already listed. Adding by role skips members already listed, and reports members the server skips, such as members whose email domain no connection serves. Try `carol@acme.com`, `zed@acme.com`, or the Member role.
 
 <Story name='AllowList' storyModule={Stories} composition={[
   { name: 'Table', href: '/components/table', layer: 'Components' },

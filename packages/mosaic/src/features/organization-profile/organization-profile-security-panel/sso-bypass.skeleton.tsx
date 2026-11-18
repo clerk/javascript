@@ -10,7 +10,6 @@ import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Skeleton } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
-import { Text } from '../../../components/text';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
@@ -68,7 +67,6 @@ export function SSOBypassPageSkeleton() {
   return (
     <div {...mergeStyleProps(themeProps('organization-profile-sso-bypass'), stylex.props(styles.page))}>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-      <Text color='foreground-secondary'>{m.description}</Text>
       <Table.Toolbar>
         <Table.Search
           label={m.search}

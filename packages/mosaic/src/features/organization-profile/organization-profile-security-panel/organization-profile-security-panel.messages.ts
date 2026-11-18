@@ -1,5 +1,4 @@
 export const organizationProfileSecurityPanelMessages = {
-  back: 'Security',
   errorFallback: 'Something went wrong. Please try again.',
   ssoBypass: {
     title: 'SSO bypass',

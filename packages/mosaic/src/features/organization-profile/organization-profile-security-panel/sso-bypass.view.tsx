@@ -8,10 +8,8 @@ import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
 import { Entity } from '../../../components/entity';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { Table } from '../../../components/table';
-import { Text } from '../../../components/text';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
 import { Plus } from '../../../icons/glyphs/plus';
@@ -42,7 +40,6 @@ export function SSOBypassPageView({
   addDialog,
 }: SSOBypassPageViewProps) {
   const m = useMessages('organizationProfile').security.ssoBypassPage;
-  const searchRef = useFlowAutoFocus<HTMLInputElement>();
 
   return (
     <>
@@ -51,10 +48,8 @@ export function SSOBypassPageView({
         tabIndex={-1}
         {...mergeStyleProps(themeProps('organization-profile-sso-bypass'), stylex.props(styles.page))}
       >
-        <Text color='foreground-secondary'>{m.description}</Text>
         <Table.Toolbar>
           <Table.Search
-            ref={searchRef}
             label={m.search}
             clearLabel={m.clearSearch}
             value={search}

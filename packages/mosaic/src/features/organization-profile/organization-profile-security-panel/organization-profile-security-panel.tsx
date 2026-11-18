@@ -47,10 +47,11 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
             count={ssoBypass.count}
             isError={ssoBypass.isError}
             onManage={controller.onManageSSOBypass}
+            manageRef={controller.manageSSOBypassRef}
           />
         ) : null
       }
-      ssoBypass={controller.page === 'ssoBypass' ? <SSOBypassPage /> : null}
+      ssoBypass={<SSOBypassPage />}
     />
   );
 }

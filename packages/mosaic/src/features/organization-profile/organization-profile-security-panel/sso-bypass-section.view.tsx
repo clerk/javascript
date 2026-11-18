@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Section } from '../../../components/section';
 import { plural, useLocale, useMessages } from '../../../localization';
 import { styles } from './organization-profile-security-panel.styles';
@@ -11,12 +11,12 @@ export interface SSOBypassSectionViewProps {
   count: number;
   isError: boolean;
   onManage: () => void;
+  manageRef?: Ref<HTMLButtonElement>;
 }
 
-export function SSOBypassSectionView({ count, isError, onManage }: SSOBypassSectionViewProps) {
+export function SSOBypassSectionView({ count, isError, onManage, manageRef }: SSOBypassSectionViewProps) {
   const m = useMessages('organizationProfile').security.ssoBypass;
   const locale = useLocale();
-  const manageRef = useFlowAutoFocus<HTMLButtonElement>();
   return (
     <Section.Root>
       <Section.Group>

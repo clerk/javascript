@@ -117,6 +117,10 @@ async function openAllowlist() {
   return user;
 }
 
+function findAddDialog() {
+  return screen.findByRole('dialog', { name: 'Add members' });
+}
+
 describe('Who sees the Security page', () => {
   it('shows the SSO bypass allow list count to a bypass manager when the organization has a connection', async () => {
     serve({ allowlisted: [bob, carol] });
@@ -236,13 +240,30 @@ describe('Managing the SSO bypass allow list', () => {
     expect(screen.getByText('Bob')).toBeVisible();
   });
 
-  it('returns to the overview', async () => {
+  it('opens the allow list in a dialog and returns focus to Manage when it closes', async () => {
     serve();
     const user = await openAllowlist();
 
-    await user.click(screen.getByRole('button', { name: 'Security' }));
+    expect(screen.getByRole('dialog', { name: 'SSO bypass' })).toContainElement(
+      screen.getByRole('table', { name: 'SSO bypass allow list' }),
+    );
+    await user.keyboard('{Escape}');
 
-    expect(await screen.findByRole('button', { name: 'Manage SSO bypass' })).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'SSO bypass' })).toBeNull());
+    expect(screen.getByRole('button', { name: 'Manage SSO bypass' })).toHaveFocus();
+  });
+
+  it('closes only the add dialog on Escape', async () => {
+    serve();
+    const user = await openAllowlist();
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    await findAddDialog();
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add members' })).toBeNull());
+    expect(screen.getByRole('dialog', { name: 'SSO bypass' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveFocus();
   });
 });
 
@@ -252,14 +273,14 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'Carol@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
 
     expect(await within(dialog).findByText('Added member successfully')).toBeVisible();
     expect(fapi.ssoBypass.users.map(entry => entry.user_id)).toEqual(['user_3']);
     await user.click(within(dialog).getByRole('button', { name: 'Done' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add members' })).toBeNull());
     expect(await screen.findByText('Carol')).toBeVisible();
   });
 
@@ -268,7 +289,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'zed@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
 
@@ -284,7 +305,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'bob@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
 
@@ -301,7 +322,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
     await user.click(await screen.findByRole('option', { name: 'Member (3)' }));
@@ -330,7 +351,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
     await user.click(await screen.findByRole('option', { name: 'Member (3)' }));
@@ -348,15 +369,15 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    let dialog = await screen.findByRole('dialog');
+    let dialog = await findAddDialog();
     await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'zed@acme.com');
     await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
     await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('No member'));
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add members' })).toBeNull());
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    dialog = await screen.findByRole('dialog');
+    dialog = await findAddDialog();
     expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveValue('');
     expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveFocus();
     expect(within(dialog).queryByText(/No member/)).toBeNull();
@@ -367,7 +388,7 @@ describe('Adding members to the SSO bypass allow list', () => {
     const user = await openAllowlist();
 
     await user.click(screen.getByRole('button', { name: 'Add' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await findAddDialog();
     await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
     await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
     await user.click(await screen.findByRole('option', { name: 'Member (3)' }));
