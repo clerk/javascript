@@ -1,11 +1,12 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 
-const distDir = resolve(import.meta.dirname, '../dist');
+const packageDir = resolve(process.argv[2] ?? resolve(import.meta.dirname, '..'));
+const distDir = resolve(packageDir, 'dist');
 const jsFiles = (await readdir(distDir, { recursive: true })).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
-const packageJson = JSON.parse(await readFile(resolve(import.meta.dirname, '../package.json'), 'utf8'));
-const entryFile = target => resolve(import.meta.dirname, '..', typeof target === 'string' ? target : target.import);
+const packageJson = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'));
+const entryFile = target => resolve(packageDir, typeof target === 'string' ? target : target.import);
 const unitEntryFiles = Object.entries(packageJson.exports)
   .filter(([subpath]) => /^\.\/(components|primitives)\//.test(subpath))
   .map(([, target]) => entryFile(target));
@@ -16,53 +17,25 @@ const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...h
 
 const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
 const importsOf = source =>
-  [...source.matchAll(/^import\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["'];?$/gm)].map(m => m[1]);
-const importsReact = source =>
-  importsOf(source).some(specifier => specifier === 'react' || specifier.startsWith('react/'));
-const code = source =>
-  source
-    .replace(/\/\/.*$/gm, '')
-    .split('\n')
-    .map(line => line.trim())
-    .filter(Boolean);
+  [...source.matchAll(/^(?:import|export)\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["'];?$/gm)].map(m => m[1]);
 
-const checkNamespaceEntry = async (entryFile, source) => {
-  const display = relative(distDir, entryFile);
-  const lines = code(source);
-  const namedImport = /^import \{ (\w+(?:, \w+)*) \} from "(\.[^"]+)";$/;
-  const namedExport = /^export \{ (\w+(?: as \w+)?(?:, \w+(?: as \w+)?)*) \};$/;
-  if (!lines.every(line => namedImport.test(line) || namedExport.test(line))) {
-    throw new Error(
-      `Published Mosaic JS entry ${display} must start with 'use client' or contain only re-exports of namespaces, 'use client' modules and React-free modules.`,
-    );
+const visited = new Set();
+const checkServerGraph = async (file, entry) => {
+  if (visited.has(file)) {
+    return;
   }
-  for (const line of lines.filter(line => namedImport.test(line))) {
-    const [, bindings, specifier] = line.match(namedImport);
-    const partsFile = resolve(dirname(entryFile), specifier);
-    const parts = await readFile(partsFile, 'utf8');
-    if (isClientModule(parts)) {
-      continue;
+  visited.add(file);
+  const source = await readFile(file, 'utf8');
+  if (isClientModule(source)) {
+    return;
+  }
+  for (const specifier of importsOf(source)) {
+    if (!specifier.startsWith('.')) {
+      throw new Error(
+        `${relative(distDir, file)} is reached from ${relative(distDir, entry)} without a 'use client' module in between, and imports ${specifier}. Start it with 'use client', or move the import into a 'use client' module.`,
+      );
     }
-    const binding = bindings
-      .split(', ')
-      .find(name => new RegExp(`^var ${name} = /\\* @__PURE__ \\*/ __exportAll\\(`, 'm').test(parts));
-    if (!binding) {
-      if (importsReact(parts)) {
-        throw new Error(
-          `${display} imports ${bindings} from ${relative(distDir, partsFile)}, which imports React but is neither a namespace object nor a 'use client' module.`,
-        );
-      }
-      continue;
-    }
-    for (const leafSpecifier of importsOf(parts).filter(specifier => specifier.startsWith('.'))) {
-      const leafFile = resolve(dirname(partsFile), leafSpecifier);
-      const leaf = await readFile(leafFile, 'utf8');
-      if (importsReact(leaf) && !isClientModule(leaf)) {
-        throw new Error(
-          `${relative(distDir, leafFile)}, re-exported by the namespace ${relative(distDir, partsFile)}, imports React but is missing a top-level 'use client' boundary.`,
-        );
-      }
-    }
+    await checkServerGraph(resolve(dirname(file), specifier), entry);
   }
 };
 
@@ -73,9 +46,7 @@ for (const file of entryFiles) {
       `Published Mosaic JS entry ${relative(distDir, file)} starts with 'use client'; put the boundary on the modules it re-exports instead.`,
     );
   }
-  if (!isClientModule(source)) {
-    await checkNamespaceEntry(file, source);
-  }
+  await checkServerGraph(file, file);
 }
 
 const nodeModulesPaths = (await readdir(distDir, { recursive: true })).filter(file =>
