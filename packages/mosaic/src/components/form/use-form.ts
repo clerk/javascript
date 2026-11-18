@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useId, useRef } from 'react';
 
 import { useErrorText, useMessages } from '../../localization';

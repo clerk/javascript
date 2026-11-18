@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const MosaicNowContext = createContext<Date | null>(null);

@@ -1,3 +1,5 @@
+'use client';
+
 import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 

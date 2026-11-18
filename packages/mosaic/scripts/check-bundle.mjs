@@ -9,7 +9,10 @@ const entryFile = target => resolve(import.meta.dirname, '..', typeof target ===
 const unitEntryFiles = Object.entries(packageJson.exports)
   .filter(([subpath]) => /^\.\/(components|primitives)\//.test(subpath))
   .map(([, target]) => entryFile(target));
-const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles];
+const hookEntryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => subpath.startsWith('./hooks/'))
+  .map(([, target]) => entryFile(target));
+const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...hookEntryFiles];
 
 const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
 const importsOf = source =>
