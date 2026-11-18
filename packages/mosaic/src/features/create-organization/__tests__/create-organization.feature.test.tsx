@@ -188,6 +188,29 @@ describe('CreateOrganization', () => {
       expect(fapi.memberships[0]?.organization.has_image).toBe(true);
     });
 
+    it('shows the error and stays on the form when the logo upload fails', async () => {
+      const { fapi } = await renderCreateOrganization();
+      const user = userEvent.setup();
+      const input = await waitFor(() => {
+        const element = document.querySelector<HTMLInputElement>('input[type="file"]');
+        expect(element).not.toBeNull();
+        return element as HTMLInputElement;
+      });
+
+      await user.upload(input, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
+      const logo = holdRequests('post', '/v1/organizations/:organizationId/logo');
+      await create(user, 'Acme');
+      await waitFor(() => expect(logo.requests).toHaveLength(1));
+      logo.fail('generic');
+
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+      );
+      expect(screen.queryByRole('heading', { name: 'Invite new members' })).toBeNull();
+      expect(activeOrganizationId(fapi)).not.toBe(fapi.memberships[0]?.organization.id);
+    });
+
     it('swaps the upload button for a menu once a logo is chosen, and back when it is removed', async () => {
       await renderCreateOrganization();
       const user = userEvent.setup();
