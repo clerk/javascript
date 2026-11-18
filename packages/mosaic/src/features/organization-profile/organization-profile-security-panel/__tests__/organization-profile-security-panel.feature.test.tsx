@@ -1,7 +1,7 @@
 import type { OrganizationMembershipJSON, RoleJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiSSOBypassUser } from '../../../../__tests__/feature/fake-fapi/organization-security';
@@ -185,11 +185,22 @@ describe('Who sees the Security page', () => {
 
   it('hides the SSO bypass section when the instance does not offer it', async () => {
     serve({ permissions: [BYPASS, CONNECTIONS], selfServeSso: true, ssoBypass: { enabled: false } });
-    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+    const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      await renderWithClerk(<OrganizationProfileSecurityPanel />);
+      expect(await screen.findByText('Security')).toBeVisible();
 
-    expect(await screen.findByText('Security')).toBeVisible();
-    await waitFor(() => expect(screen.queryByText('SSO bypass')).toBeNull(), { timeout: 15_000 });
-  }, 20_000);
+      for (let step = 0; step < 20 && screen.queryByText('SSO bypass'); step++) {
+        await act(async () => vi.advanceTimersByTimeAsync(1_000));
+        await settle();
+      }
+
+      expect(screen.queryByText('SSO bypass')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
 describe('Managing the SSO bypass allow list', () => {

@@ -14,8 +14,11 @@ export const organizationProfileSecurityPanelMessages = {
     retry: 'Try again',
     loading: 'Loading the SSO allow list',
     pagination: 'Allow list pagination',
+    range: '{start}–{end} of {total}',
+    firstPage: 'First allow list page',
     previousPage: 'Previous allow list page',
     nextPage: 'Next allow list page',
+    lastPage: 'Last allow list page',
     removeDialog: {
       title: 'Remove from allow list',
       description: '{name} ({email}) will no longer be able to sign in with an email code when SSO is unavailable.',
