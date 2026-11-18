@@ -564,7 +564,7 @@ export class UserAPI extends AbstractAPI {
    */
   public async getUserList(params?: UserListParams): Promise<PaginatedResourceResponse<User[]>>;
   /**
-   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`, or `cursor.endingBefore` as `endingBefore` to get the previous page. The request fails with a 403 when user search is not enabled for the instance.
+   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`, or `cursor.endingBefore` as `endingBefore` to get the previous page.
    * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
    */
   public async getUserList(params: UserListCursorParams): Promise<UserListCursorResponse>;
