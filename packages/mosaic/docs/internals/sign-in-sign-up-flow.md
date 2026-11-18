@@ -51,7 +51,7 @@ submitPassword: async (password: string) => {
 },
 ```
 
-- `complete`: the model's `finalize()`, then leave the flow. Creating the session clears the sign-up, so the live step drops back to `start`. Sign-up renders the model it left from until the navigation takes the flow away, or, when `finalize()` answers that a task continues in the flow, until that task's data has loaded, so the task replaces the screen with no skeleton between them. It keeps the action pending throughout, the way the switcher holds its `frozenModel` ([Controllers → Wrapping actions](../controllers.md#wrapping-actions)). In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
+- `complete`: the model's `finalize()`, then leave the flow. Creating the session clears the sign-up, so the live step drops back to `start`. Sign-up renders the model it left from while the live step is `leaving`: until the navigation takes the flow away, or until a task that continues in the flow has its data loaded, so the task replaces the screen with no skeleton between them. It keeps the action pending throughout, the way the switcher holds its `frozenModel` ([Controllers → Wrapping actions](../controllers.md#wrapping-actions)). In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
 - `transfer` from sign-in: the model's `transfer()` calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
 - `transfer` from sign-up, when the identifier already has an account: the model's `transfer()` calls `signIn.create({ transfer: true })`, then `next` with the sign-in's step.
 - `unknown`: nothing. The screen already shows "Start over".
@@ -82,7 +82,7 @@ Sign-up:
 
 Sign-up's model adds two steps of its own to the ones `getSignUpNextStep` returns, for when there is no sign-up in progress:
 
-- `task` (`key`) → `taskChooseOrganization`: the session has a pending task that sign-up shows in its own card. Only the task route is allowed, so a visit to `start` with the task pending moves to it. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is not a `task` step: the flow leaves for its URL.
+- `task` (`key`) → `taskChooseOrganization`: the session has a pending task that sign-up shows in its own card, and the task's data has loaded. Until it has, the step is `leaving`. Only the task route is allowed, so a visit to `start` with the task pending moves to it. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is not a `task` step: the flow leaves for its URL.
 - `leaving`: a session is active or being activated. It has no route and allows any, so the screen that started the navigation stays up.
 
 Back from a sign-up verify screen goes to the details route above it: `continue` for the two nested routes, `start` for the others (`detailsRouteFor`).

@@ -159,7 +159,7 @@ describe('SignUp', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Initech');
   });
 
-  it('leaves for the after sign-up URL once the organization is chosen', async () => {
+  it('shows the organization list only once it has loaded, and leaves once one is chosen', async () => {
     const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
     const { user, navigate } = await renderSignUp(
       { signUp: { sessionTasks: [{ key: 'choose-organization' }] }, memberships: [fapiMembership(acme)] },
@@ -168,6 +168,8 @@ describe('SignUp', () => {
     );
 
     await submitStart(user);
+    await codeSent();
+    const sawEmptyList = watchForHeading('Create organization');
     await enterCode(user);
     const sawAnotherScreen = watchForHeading(/Create your account|Something went wrong/);
     await user.click(await screen.findByRole('button', { name: 'Acme' }));
@@ -175,6 +177,7 @@ describe('SignUp', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
     await tick();
     await tick();
+    expect(sawEmptyList()).toBe(false);
     expect(sawAnotherScreen()).toBe(false);
   });
 

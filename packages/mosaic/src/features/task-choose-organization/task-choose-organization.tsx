@@ -55,7 +55,9 @@ export function TaskChooseOrganizationContent(props: TaskChooseOrganizationProps
   );
 }
 
-export function useTaskChooseOrganizationReady(options: TaskChooseOrganizationModelOptions): boolean {
+export function useTaskChooseOrganizationReady(
+  options: TaskChooseOrganizationModelOptions & { enabled: boolean },
+): boolean {
   const model = useTaskChooseOrganizationModel(options);
   return model.status !== 'loading' && !(model.status === 'ready' && model.organizationsLoading);
 }
