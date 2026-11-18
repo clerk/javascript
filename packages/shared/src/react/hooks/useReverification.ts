@@ -214,8 +214,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   const handleClick = async () => {
  *     try {
  *       const myData = await enhancedFetcher()
- *       //     ^ is types as `MyData`
- *     } catch (e) {
+ *       //     ^ is typed as `MyData`
+ *     } catch (err) {
  *       // Handle error returned from the fetcher here
  *
  *       // You can also handle cancellation with the following
