@@ -153,6 +153,8 @@ export function useSignUpController(
   const isLeaving = liveModel.step.type === 'leaving';
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
 
+  // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
+  // `useMachine`, in its own PR, so both controllers drop this effect.
   useLayoutEffect(() => {
     finishActor.recheck();
   }, [isLeaving, finishActor]);
