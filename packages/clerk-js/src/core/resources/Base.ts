@@ -13,11 +13,12 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import { type Clerk, getClientResourceFromPayload } from './internal';
+import { type Clerk, getClientResourceFromPayload, getClientRevision } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   skipUpdateClient?: boolean;
+  supersedable?: boolean;
   fetchMaxTries?: number;
   abortSignal?: AbortSignal;
 };
@@ -88,13 +89,15 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
+    const stateAtSend = opts.supersedable ? BaseResource.clientState() : undefined;
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts, stateAtSend));
   }
 
   // TODO @userland-errors:
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
+    stateAtSend = opts.supersedable ? BaseResource.clientState() : undefined,
   ): Promise<FapiResponseJSON<J> | null> {
     if (!BaseResource.fapiClient) {
       clerkMissingFapiClientInResources();
@@ -135,6 +138,7 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
+    const superseded = stateAtSend !== undefined && stateAtSend !== BaseResource.clientState();
 
     if (headers) {
       const country = headers.get('x-country');
@@ -143,12 +147,12 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
+    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient && !superseded) {
       this._updateClient<J>(payload);
     }
 
     if (status >= 200 && status <= 299) {
-      return payload;
+      return superseded ? null : payload;
     }
 
     if (status >= 400) {
@@ -291,6 +295,12 @@ export abstract class BaseResource {
 
   protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
+  }
+
+  // Any new local-only change to the active session or organization must be part of this key, or a stale focus response can overwrite it.
+  private static clientState(): string {
+    const session = BaseResource.clerk?.session;
+    return `${getClientRevision()}:${session?.id}:${session?.lastActiveOrganizationId}`;
   }
 
   private static shouldRethrowOfflineNetworkErrors(): boolean {
