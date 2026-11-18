@@ -25,10 +25,11 @@ import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
 
-import { buildClerkHotloadScript } from './build-clerk-hotload-script';
+import { buildClerkHeadTags } from './build-clerk-head-tags';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
-import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
+import { getSafeEnv } from './get-safe-env';
+import { createHeadInjector } from './head-injector';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
   AstroMiddleware,
@@ -315,65 +316,21 @@ function decorateAstroLocal(
   context.locals.currentUser = createCurrentUser(context);
 }
 
-/**
- * Find the index of the closing head tag in the chunk.
- *
- * Note: This implementation uses a simple approach that works for most of our
- * current use cases.
- */
-function findClosingHeadTagIndex(chunk: Uint8Array, endHeadTag: Uint8Array) {
-  return chunk.findIndex((_, i) => endHeadTag.every((value, j) => value === chunk[i + j]));
-}
-
 function decorateRequest(locals: APIContext['locals'], res: Response): Response {
   /**
    * Populate every page with the authObject. This allows for SSR to work properly
    * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
    */
   if (res.headers.get('content-type') === 'text/html') {
-    const encoder = new TextEncoder();
-    const closingHeadTag = encoder.encode('</head>');
-    const clerkAstroData = encoder.encode(
-      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
-    );
-    const clerkSafeEnvVariables = encoder.encode(
-      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
-    );
-    const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
-
+    const clerkTags = new TextEncoder().encode(buildClerkHeadTags(locals));
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const stream = res.body!.pipeThrough(
-      new TransformStream({
-        transform(chunk, controller) {
-          const index = findClosingHeadTagIndex(chunk, closingHeadTag);
-          const isClosingHeadTagFound = index !== -1;
+    const stream = res.body!.pipeThrough(createHeadInjector(clerkTags));
 
-          /**
-           * Hijack html response to position `__CLERK_ASTRO_DATA__` before the closing `head` html tag
-           */
-          if (isClosingHeadTagFound) {
-            controller.enqueue(chunk.slice(0, index));
-            controller.enqueue(clerkAstroData);
-            controller.enqueue(clerkSafeEnvVariables);
-
-            controller.enqueue(hotloadScript);
-
-            controller.enqueue(closingHeadTag);
-            controller.enqueue(chunk.slice(index + closingHeadTag.length));
-          } else {
-            controller.enqueue(chunk);
-          }
-        },
-      }),
-    );
-
-    const modifiedResponse = new Response(stream, {
+    return new Response(stream, {
       status: res.status,
       statusText: res.statusText,
       headers: res.headers,
     });
-
-    return modifiedResponse;
   }
   return res;
 }
