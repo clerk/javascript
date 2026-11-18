@@ -169,7 +169,7 @@ function screenFor(route: SignUpRoute | undefined, data: SignUpData): SignUpScre
   return data.mode === 'public' ? 'start' : data.mode;
 }
 
-function otherIdentifier(identifier: SignUpIdentifier): SignUpIdentifier {
+function otherIdentifier(identifier: SignUpIdentifier): 'emailAddress' | 'phoneNumber' {
   return identifier === 'phoneNumber' ? 'emailAddress' : 'phoneNumber';
 }
 
@@ -183,7 +183,7 @@ function detailsStep(
   return {
     purpose,
     fields,
-    nextField: nextField ?? undefined,
+    nextField,
     legalConsent: purpose === 'continue' ? data.continueLegalConsent : data.legalConsent,
   };
 }
