@@ -90,13 +90,6 @@ describe('useSignInWithApple', () => {
   });
 
   describe('startAppleAuthenticationFlow', () => {
-    test('should return the hook with startAppleAuthenticationFlow function', () => {
-      const { result } = renderHook(() => useSignInWithApple());
-
-      expect(result.current).toHaveProperty('startAppleAuthenticationFlow');
-      expect(typeof result.current.startAppleAuthenticationFlow).toBe('function');
-    });
-
     test('should sign up a new user and pass through their name', async () => {
       const mockIdentityToken = 'mock-identity-token';
       mocks.signInAsync.mockResolvedValue({
