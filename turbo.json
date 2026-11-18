@@ -706,7 +706,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:sso": {
-      "env": ["CI", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "env": [
+        "CI",
+        "CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET",
+        "CLERK_PLATFORM_API_KEY",
+        "E2E_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "INTEGRATION_STAGING_INSTANCE_KEYS",
+        "NODE_EXTRA_CA_CERTS"
+      ],
       "inputs": ["integration/**", "packages/*/src/**"],
       "outputs": []
     },
