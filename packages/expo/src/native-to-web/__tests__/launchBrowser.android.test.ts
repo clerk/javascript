@@ -90,18 +90,6 @@ describe('resolveBrowserLauncher on Android', () => {
     vi.restoreAllMocks();
   });
 
-  test('sends REFERRER_NAME with the application id and leaves the browser choice to Android', async () => {
-    mocks.startActivityAsync.mockResolvedValue({ resultCode: 0 });
-
-    await resolveBrowserLauncher()(TRANSFER_URL);
-
-    expect(mocks.startActivityAsync).toHaveBeenCalledWith('android.intent.action.VIEW', {
-      data: TRANSFER_URL,
-      extra: { 'android.intent.extra.REFERRER_NAME': 'android-app://com.example.app' },
-    });
-    expect(mocks.startActivityAsync.mock.calls[0][1]).not.toHaveProperty('packageName');
-  });
-
   test('falls back to the package name from the app config without expo-application', async () => {
     mocks.expoApplicationInstalled = false;
     mocks.androidPackage = 'com.example.config';

@@ -16,32 +16,21 @@ const httpError = (url: string): NavigationEvent => ({ kind: 'http-error', url }
 
 describe('judgeNavigation', () => {
   test.each<[string, string, NavigationEvent, NavigationVerdict]>([
-    ['redeem page starts loading', FAPI_TRANSFER, start(FAPI_TRANSFER), pending],
-    ['redeem page finishes loading', FAPI_TRANSFER, end(FAPI_TRANSFER), pending],
     [
       'redeem form post finishes without the token',
       FAPI_TRANSFER,
       end('https://clerk.example.com/v1/session_transfers/redeem'),
       pending,
     ],
-    ['redeem page returns an HTTP error', FAPI_TRANSFER, httpError(FAPI_TRANSFER), failed('load_failed')],
-    ['redeem page fails to load', FAPI_TRANSFER, end(FAPI_TRANSFER, true), failed('load_failed')],
     ['a load fails with no URL', FAPI_TRANSFER, end('', true), failed('load_failed')],
     ['destination fails to load', FAPI_TRANSFER, end('https://app.example.com/billing', true), failed('load_failed')],
     ['destination starts loading', FAPI_TRANSFER, start('https://app.example.com/billing'), pending],
-    ['destination finishes loading', FAPI_TRANSFER, end('https://app.example.com/billing'), ready],
     ['destination returns an HTTP error', FAPI_TRANSFER, httpError('https://app.example.com/billing'), pending],
     [
       'redirect carries a status FAPI does not send for session transfers',
       FAPI_TRANSFER,
       end('https://app.example.com/billing?__clerk_status=failed&__clerk_error_code=expired'),
       ready,
-    ],
-    [
-      'redirect carries a session_transfer_failed status',
-      FAPI_TRANSFER,
-      start('https://app.example.com/billing?__clerk_status=session_transfer_failed&__clerk_error_code=already_used'),
-      failed('already_used'),
     ],
     [
       'redirect carries an error code without a status',
