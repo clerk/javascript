@@ -1102,6 +1102,10 @@ export const heIL: LocalizationResource = {
   oauthConsent: {
     action__allow: 'אישור',
     action__deny: 'דחייה',
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: 'תישאר מחובר עד שתתנתק או תבטל את הגישה.',
     redirectNotice: 'אם תאשר גישה, האפליקציה תעביר אותך אל {{domainAction}}.',
     redirectUriModal: {

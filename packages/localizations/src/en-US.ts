@@ -1141,6 +1141,10 @@ export const enUS: LocalizationResource = {
   oauthConsent: {
     action__allow: 'Allow',
     action__deny: 'Deny',
+    clientIdentity: {
+      dynamic: 'Unverified app: it registered itself, so its name and logo are not verified.',
+      metadataDocument: 'App details published by {{metadataHost}}',
+    },
     offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
     redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
     redirectUriModal: {

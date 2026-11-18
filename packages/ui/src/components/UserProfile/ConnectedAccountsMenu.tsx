@@ -12,7 +12,11 @@ import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
+import {
+  getExternalVerificationRedirectURL,
+  openOAuthTransportWithClerkErrors,
+  reloadUserAfterOAuthCallback,
+} from './oauthTransport';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
@@ -51,7 +55,7 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
       if (transport) {
         const res = await createExternalAccount(String(await transport.getRedirectUrl()));
         const url = getExternalVerificationRedirectURL(res);
-        const { callbackUrl } = await transport.open(url);
+        const { callbackUrl } = await openOAuthTransportWithClerkErrors(transport, url);
         await reloadUserAfterOAuthCallback(user, callbackUrl);
         void sleep(2000).then(() => card.setIdle(strategy));
         return;
