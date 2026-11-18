@@ -1,5 +1,8 @@
+import type { InitialState } from '@clerk/types';
+
 import { $initialState } from '../stores/internal';
 import type { AstroClerkIntegrationParams } from '../types';
+import { CLERK_ASTRO_DATA, CLERK_ASTRO_SAFE_VARS, readHeadData } from '../utils/head-data';
 import { mergeEnvVarsWithParams } from './merge-env-vars-with-params';
 import type { CreateClerkInstanceInternalFn } from './types';
 
@@ -11,16 +14,11 @@ import type { CreateClerkInstanceInternalFn } from './types';
  */
 function createInjectionScriptRunner(creator: CreateClerkInstanceInternalFn) {
   async function runner(astroClerkOptions?: AstroClerkIntegrationParams) {
-    const ssrDataContainer = document.getElementById('__CLERK_ASTRO_DATA__');
-    if (ssrDataContainer) {
-      $initialState.set(JSON.parse(ssrDataContainer.textContent || '{}'));
+    const initialState = readHeadData<InitialState>(CLERK_ASTRO_DATA);
+    if (initialState) {
+      $initialState.set(initialState);
     }
-
-    const clientSafeVarsContainer = document.getElementById('__CLERK_ASTRO_SAFE_VARS__');
-    let clientSafeVars = {};
-    if (clientSafeVarsContainer) {
-      clientSafeVars = JSON.parse(clientSafeVarsContainer.textContent || '{}');
-    }
+    const clientSafeVars = readHeadData<Record<string, unknown>>(CLERK_ASTRO_SAFE_VARS) ?? {};
 
     await creator(mergeEnvVarsWithParams({ ...astroClerkOptions, ...clientSafeVars }));
   }
