@@ -1,4 +1,3 @@
-import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import type { ReactNode, Ref } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
@@ -64,8 +63,7 @@ export interface SignUpVerifyScreen {
   provider?: string;
   needsCode: boolean;
   sendCode: () => Promise<void>;
-  verifyCode: (code: string) => Promise<SignUpNextStep>;
-  onVerified: (step: SignUpNextStep) => void;
+  verifyCode: (code: string) => Promise<void>;
   isPending: boolean;
   globalErrorMessage?: string;
   onEditIdentifier: () => void;

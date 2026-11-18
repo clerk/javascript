@@ -35,8 +35,8 @@ import { SignUpView } from '@clerk/mosaic/features/sign-up';
   applicationName='Acme'
   start={{ ...details, step: { purpose: 'start', fields: { emailAddress: { required: true } } } }}
   continue={{ ...details, step: { purpose: 'continue', fields: {} } }}
-  verifyEmail={{ identifier, needsCode, sendCode, verifyCode, onVerified, onEditIdentifier }}
-  verifyPhone={{ identifier: phoneNumber, needsCode: false, sendCode, verifyCode, onVerified, onEditIdentifier }}
+  verifyEmail={{ identifier, needsCode, sendCode, verifyCode, onEditIdentifier }}
+  verifyPhone={{ identifier: phoneNumber, needsCode: false, sendCode, verifyCode, onEditIdentifier }}
   restricted={{ onSignIn }}
   onStartOver={startOver}
 />;

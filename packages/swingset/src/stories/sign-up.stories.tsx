@@ -76,8 +76,7 @@ function verifyScreen(identifier: string): SignUpVerifyScreen {
     identifier,
     needsCode: false,
     sendCode: () => Promise.resolve(),
-    verifyCode: () => Promise.resolve({ type: 'unknown' }),
-    onVerified: noop,
+    verifyCode: () => Promise.resolve(),
     isPending: false,
     onEditIdentifier: noop,
   };
