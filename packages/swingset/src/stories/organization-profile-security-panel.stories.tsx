@@ -45,11 +45,15 @@ export function ManageOIDCConnection() {
 }
 
 export function AllowListLoadError() {
-  return <SecurityPanelExample sectionError />;
+  return <SecurityPanelExample isError />;
 }
 
 export function AllowList() {
   return <SSOBypassAllowlistExample />;
+}
+
+export function RemoveFails() {
+  return <SSOBypassAllowlistExample removeFails />;
 }
 
 export function EmptyAllowList() {
@@ -58,8 +62,4 @@ export function EmptyAllowList() {
 
 export function AllowListLoading() {
   return <SSOBypassAllowlistExample isLoading />;
-}
-
-export function AllowListPageError() {
-  return <SSOBypassAllowlistExample isError />;
 }

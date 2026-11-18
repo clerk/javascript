@@ -33,5 +33,6 @@ export interface SSOBypassRoles {
 export interface SSOBypassAllowlistData {
   entries: SSOBypassEntry[];
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
 }

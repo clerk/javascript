@@ -52,6 +52,7 @@ export function useSSOBypassModel({
   return {
     entries: data.map(entry => toEntry(entry, user?.id)),
     isLoading: allowlist.isLoading,
+    isFetching: allowlist.isFetching,
     isError: Boolean(allowlist.error) && !isFeatureNotEnabled(allowlist.error),
     isFeatureDisabled: isFeatureNotEnabled(allowlist.error),
     roles: {
@@ -112,14 +113,9 @@ export function useSSOBypassModel({
   };
 }
 
-export function useSSOBypassCountModel({ enabled }: { enabled: boolean }) {
+export function useSSOBypassAvailabilityModel({ enabled }: { enabled: boolean }) {
   const allowlist = __internal_useOrganizationSSOBypassAllowlist({ enabled });
-  return {
-    count: allowlist.data?.length ?? 0,
-    isLoading: allowlist.isLoading,
-    isError: Boolean(allowlist.error) && !isFeatureNotEnabled(allowlist.error),
-    isFeatureDisabled: isFeatureNotEnabled(allowlist.error),
-  };
+  return { isFeatureDisabled: isFeatureNotEnabled(allowlist.error) };
 }
 
 function isFeatureNotEnabled(error: Error | null): boolean {

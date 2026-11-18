@@ -222,7 +222,6 @@ import {
   AllowList as OrganizationProfileSecurityPanelAllowList,
   AllowListLoadError as OrganizationProfileSecurityPanelAllowListLoadError,
   AllowListLoading as OrganizationProfileSecurityPanelAllowListLoading,
-  AllowListPageError as OrganizationProfileSecurityPanelAllowListPageError,
   Default as OrganizationProfileSecurityPanelDefault,
   EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
   Loading as OrganizationProfileSecurityPanelLoading,
@@ -230,6 +229,7 @@ import {
   ManageSAMLConnection as OrganizationProfileSecurityPanelManageSAMLConnection,
   meta as organizationProfileSecurityPanelMeta,
   NoSSOConnections as OrganizationProfileSecurityPanelNoSSOConnections,
+  RemoveFails as OrganizationProfileSecurityPanelRemoveFails,
   SSOLoadError as OrganizationProfileSecurityPanelSSOLoadError,
 } from '../stories/organization-profile-security-panel.stories';
 import {
@@ -1465,8 +1465,8 @@ const organizationProfileSecurityPanelModule: StoryModule = {
   AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
   AllowList: OrganizationProfileSecurityPanelAllowList,
   EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,
+  RemoveFails: OrganizationProfileSecurityPanelRemoveFails,
   AllowListLoading: OrganizationProfileSecurityPanelAllowListLoading,
-  AllowListPageError: OrganizationProfileSecurityPanelAllowListPageError,
 };
 
 export const registry: StoryModule[] = [
