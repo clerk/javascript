@@ -799,4 +799,72 @@ describe('PricingTable - plans visibility', () => {
       );
     });
   });
+
+  it('renders Popular badge on the highlighted plan', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
+
+    props.setProps({ highlightedPlan: 'test' });
+
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
+
+    const { getByText, queryAllByText } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Popular')).toBeVisible();
+      expect(queryAllByText('Popular')).toHaveLength(1);
+    });
+  });
+
+  it('shows subscription badge instead of Popular badge when plan has active subscription', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    props.setProps({ highlightedPlan: 'test' });
+
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active',
+          plan: testPlan,
+          createdAt: new Date('2021-01-01'),
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { queryByText, findByRole } = render(<PricingTable />, { wrapper });
+
+    await findByRole('heading', { name: 'Test Plan' });
+
+    await waitFor(() => {
+      expect(queryByText('Popular')).not.toBeInTheDocument();
+    });
+  });
 });

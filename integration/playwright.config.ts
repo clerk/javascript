@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
 import * as path from 'path';
 
-config({ path: path.resolve(__dirname, '.env.local') });
+config({ path: path.resolve(import.meta.dirname, '.env.local') });
 
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
@@ -26,6 +26,11 @@ export const common: PlaywrightTestConfig = {
 
 export default defineConfig({
   ...common,
+
+  // Emit a machine-readable report in CI so the staging workflow's report job can
+  // classify failures (flaky vs failed, infra vs regression) instead of reading a
+  // single pass/fail boolean. Local runs keep the default human-readable list output.
+  reporter: process.env.CI ? [['list'], ['json', { outputFile: 'playwright-report/results.json' }]] : 'list',
 
   projects: [
     {

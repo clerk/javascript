@@ -1,0 +1,108 @@
+import * as Stories from './destructive.stories';
+
+# Destructive
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+A confirmation for a destructive action that warrants making the user type. Deleting an account, deleting a project, revoking an API key. For actions that do not warrant typing, use [Confirmation](/components/confirmation).
+
+The block holds the typed phrase and compares it to `confirmationValue`. Everything else comes from a controller from `useConfirmController`, which owns whether the dialog is open, pending, or explaining a failure. Resolve `onConfirm` and the dialog closes. Reject it and the dialog stays open. A dialog that sits next to its button takes the button as `trigger`. It is an alert dialog: Escape and the footer's Cancel action cancel, an outside press does not, and the confirm step has no corner dismiss.
+
+```tsx
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { Button } from '@clerk/mosaic/components/button';
+
+const destroy = useConfirmController({ onConfirm: deleteAccount });
+
+<Destructive
+  controller={destroy}
+  trigger={<Button color='negative' variant='outline'>Delete account</Button>}
+  title='Delete account?'
+  description='Are you sure you want to delete your account? All of your data will be permanently deleted.'
+  fieldLabel='Type “Delete account” below to continue'
+  confirmationValue='Delete account'
+  actionLabel='Delete account'
+/>;
+```
+
+## Failure
+
+A rejection leaves the dialog up. A Clerk error is localized by its code. Anything else renders as the controller's `errorFallback`, or the generic error when none is given. The field is marked invalid for as long as the message is set, and the typed phrase stays so the user can retry.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## Reverification
+
+Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Confirmation and verification stay in the same dialog and card, and the typed phrase survives the round trip. The verification steps show a corner dismiss, which cancels the verification; it is withheld while the action is being retried.
+
+```tsx
+import { useReverificationFlow } from '@clerk/mosaic/features/reverification';
+
+const [runDelete, reverification] = useReverificationFlow(deleteAccount);
+const destroy = useConfirmController({ onConfirm: runDelete, reverification });
+
+<Destructive {...copy} controller={destroy} />;
+```
+
+## One block, many rows
+
+A table of projects has a Delete in every row. Give the controller a payload type, mount the block once after the table, and open it from any row with the project it is about. The copy props take a function of that payload, and `onConfirm` receives it.
+
+The user must type `confirmationValue` before the action can run. The typed phrase clears when the dialog closes.
+
+```tsx
+const deleteProject = useConfirmController<Project>({ onConfirm: project => api.deleteProject(project.id) });
+
+<Menu.Item color='negative' label='Delete project' onClick={() => deleteProject.open(project)}>
+  <Menu.Label>Delete project</Menu.Label>
+</Menu.Item>
+
+<Destructive
+  controller={deleteProject}
+  title={project => `Delete ${project.name}?`}
+  description='All project data will be permanently deleted.'
+  fieldLabel='Type the project name to continue'
+  confirmationValue={project => project.name}
+  actionLabel='Delete project'
+/>
+```
+
+Opened from a menu item, focus returns to that menu's trigger when the dialog closes. If deletion removes the trigger, pass `finalFocus` a ref to an element that remains on the page.
+
+<Story
+  name='WithPayload'
+  storyModule={Stories}
+/>
+
+## Props
+
+| Prop                | Type                                           | Default      | Description                                                                              |
+| ------------------- | ---------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------- |
+| `controller`        | `ConfirmController<Payload>`                   | — (required) | From `useConfirmController`. Owns open, pending, the error, and the reverification step. |
+| `trigger`           | `ReactNode`                                    | —            | The button that opens the dialog. Only for a controller without a payload.               |
+| `title`             | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                           |
+| `description`       | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                         |
+| `fieldLabel`        | `string \| (payload: Payload) => string`       | — (required) | Labels the confirmation field.                                                           |
+| `confirmationValue` | `string \| (payload: Payload) => string`       | — (required) | The phrase the user has to type back. Also the field's placeholder.                      |
+| `actionLabel`       | `string \| (payload: Payload) => string`       | — (required) | The confirming button's label.                                                           |
+| `cancelLabel`       | `string`                                       | `'Cancel'`   | The cancel button's label.                                                               |
+| `finalFocus`        | `DialogFocusTarget`                            | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                   |
+
+The controller's options and surface are documented under [Confirmation](/components/confirmation).

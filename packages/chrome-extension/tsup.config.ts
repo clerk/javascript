@@ -13,6 +13,7 @@ export default defineConfig(overrideOptions => {
       './src/index.ts',
       './src/background/index.ts',
       './src/client/index.ts',
+      './src/legacy.ts',
       './src/react/index.ts',
       './src/types/index.ts',
     ],

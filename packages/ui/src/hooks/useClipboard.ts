@@ -27,10 +27,13 @@ export function useClipboard(text: string, optionsOrTimeout: number | UseClipboa
   const { timeout = 1500, ...copyOptions } =
     typeof optionsOrTimeout === 'number' ? { timeout: optionsOrTimeout } : optionsOrTimeout;
 
-  const onCopy = useCallback(() => {
-    const didCopy = copy(text, copyOptions);
-    setHasCopied(didCopy);
-  }, [text, copyOptions]);
+  const onCopy = useCallback(
+    (overrideText?: string) => {
+      const didCopy = copy(overrideText ?? text, copyOptions);
+      setHasCopied(didCopy);
+    },
+    [text, copyOptions],
+  );
 
   useEffect(() => {
     let timeoutId: number | null = null;

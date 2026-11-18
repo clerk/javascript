@@ -9,6 +9,7 @@ export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
     single_session_mode: true,
     claimed_at: null,
     reverification: true,
+    session_minter: false,
   },
   display_config: {
     object: 'display_config',

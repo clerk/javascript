@@ -1,0 +1,11 @@
+---
+import type { OAuthDeviceVerificationProps } from '@clerk/shared/types';
+type Props = OAuthDeviceVerificationProps;
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
+---
+
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='oauth-device-verification'
+/>

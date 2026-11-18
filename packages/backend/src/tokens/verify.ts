@@ -14,6 +14,7 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
+import { isNonSessionJwtCategory, JWT_CATEGORY_JWT_TEMPLATE } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
@@ -34,7 +35,7 @@ export type VerifyTokenOptions = Simplify<
   Omit<VerifyJwtOptions, 'key'> &
     Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
       /**
-       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
+       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/~/api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
        */
       jwtKey?: string;
     }
@@ -44,7 +45,7 @@ export type VerifyTokenOptions = Simplify<
  * > [!WARNING]
  * > This is a lower-level method intended for more advanced use-cases. It's recommended to use [`authenticateRequest()`](https://clerk.com/docs/reference/backend/authenticate-request), which fully authenticates a token passed from the `request` object.
  *
- * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
+ * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/jwks/GET/jwks){{ target: '_blank' }}.
  *
  * @param token - The token to verify.
  * @param options - Options for verifying the token. It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })`.
@@ -118,6 +119,21 @@ export async function verifyToken(
 
   const { header } = decodedResult;
   const { kid } = header;
+
+  // Reject JWTs signed by the same instance key that are not session tokens: machine JWTs
+  // (reciprocal of the machine verifier's `cat` check) and uncategorized tokens such as OIDC
+  // `id_token`s (AISEC-21). JWT-template tokens stay verifiable here for direct callers.
+  if (header.cat !== JWT_CATEGORY_JWT_TEMPLATE && isNonSessionJwtCategory(header.cat)) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          action: TokenVerificationErrorAction.EnsureClerkJWT,
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: 'Invalid session token category.',
+        }),
+      ],
+    };
+  }
 
   try {
     let key: JsonWebKey;
@@ -212,9 +228,21 @@ async function verifyOAuthToken(
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken, { audience: options.audience });
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
+    if (err instanceof TokenVerificationError) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: err.message,
+          }),
+        ],
+      };
+    }
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
 }
@@ -236,7 +264,7 @@ async function verifyAPIKey(
  * Verifies any type of machine token by detecting its type from the prefix or JWT claims.
  * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
- * @param token - The token to verify (e.g. starts with "mt_", "oat_", "ak_", or a JWT)
+ * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
@@ -261,7 +289,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
       } as MachineTokenReturnType<never, MachineTokenVerificationError>;
     }
 
-    if (decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
+    if (typeof decodedResult.payload.sub === 'string' && decodedResult.payload.sub.startsWith(M2M_SUBJECT_PREFIX)) {
       return verifyM2MJwt(token, decodedResult, options);
     }
 

@@ -79,4 +79,16 @@ describe('APIKeys', () => {
       expect(getByText(/No API keys found/i)).toBeVisible();
     });
   });
+
+  it('exposes an accessible label on the search input', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    const { getByRole } = render(<APIKeys />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByRole('searchbox', { name: /search keys/i })).toBeVisible();
+    });
+  });
 });

@@ -14,7 +14,8 @@ function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
   if (!NativeClerkGoogleSignIn) {
     throw new Error(
       'ClerkGoogleSignIn native module is not available. ' +
-        'Ensure the @clerk/expo plugin is added to your app.json and you have run a development build.',
+        'Install @clerk/expo-google-signin (npx expo install @clerk/expo-google-signin), ' +
+        'add "@clerk/expo-google-signin" to the plugins array in your app config, then rebuild your native app.',
     );
   }
   return NativeClerkGoogleSignIn;
@@ -55,6 +56,20 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
   );
 }
 
+// Android's Credential Manager reports provider failures through the same cancellation exception it
+// uses for a dismissed chooser. Only Google Play services prefixes its messages with a status code,
+// so a prefixed message that does not say "cancelled by user" is a failure rather than a dismissal.
+const PLAY_SERVICES_STATUS_PREFIX = /^\s*(?:\[\d+]|\d+:)/;
+const CANCELLED_BY_USER = /cancell?ed by user/i;
+
+function rethrowIfProviderFailure(error: { code: string; message: string }): void {
+  if (!PLAY_SERVICES_STATUS_PREFIX.test(error.message) || CANCELLED_BY_USER.test(error.message)) {
+    return;
+  }
+
+  throw Object.assign(new Error(error.message), { code: 'GOOGLE_SIGN_IN_ERROR', cause: error });
+}
+
 /**
  * Internal Google One Tap Sign-In module.
  *
@@ -85,7 +100,8 @@ export const ClerkGoogleOneTapSignIn = {
    *
    * @param params - Sign-in parameters
    * @param params.nonce - Cryptographic nonce for replay protection
-   * @param params.filterByAuthorizedAccounts - Only show previously authorized accounts (default: true)
+   * @param params.filterByAuthorizedAccounts - Android only. Filter to previously authorized accounts.
+   * @param params.hint - iOS only. Hint for Google Sign-In.
    *
    * @returns Promise resolving to OneTapResponse
    */
@@ -95,6 +111,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
@@ -122,6 +139,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
@@ -149,6 +167,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
       }

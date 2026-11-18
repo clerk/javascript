@@ -16,14 +16,27 @@ describe('ErrorThrower', () => {
 
   it('throws the correct error message and interpolates pkg and known parameters', () => {
     expect(() => errorThrower.throwInvalidPublishableKeyError({ key: 'whatever' })).toThrow(
-      '@clerk/test-package: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=whatever)',
+      '@clerk/test-package: The publishableKey passed to Clerk is invalid (key=whatever, expected format: pk_test_... or pk_live_...).\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
   });
 
   it('throws the correct error message and interpolates pkg if no parameters are provided', () => {
     expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
-      '@clerk/test-package: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/test-package: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
+  });
+
+  it('says init needs no signup, so agents do not read it as requiring an account', () => {
+    expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
+      "'npx clerk@latest init' does not need a Clerk account and writes temporary dev keys.",
+    );
+  });
+
+  it('names the missing key so the secret key error is distinguishable from the publishable key error', () => {
+    expect(() => errorThrower.throwMissingSecretKeyError()).toThrow(
+      '@clerk/test-package: Missing secretKey.\n\nTo use an existing Clerk app, run:\nnpx clerk@latest link\nnpx clerk@latest env pull',
+    );
+    expect(() => errorThrower.throwMissingSecretKeyError()).not.toThrow(/npx clerk@latest init/);
   });
 
   it('throws a custom error message and interpolates pkg and known parameters', () => {
@@ -108,9 +121,15 @@ describe('isUnauthenticatedError', () => {
     expect(isUnauthenticatedError({ status: 422 })).toBe(true);
   });
 
+  it('returns true for terminal user state 403 errors', () => {
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'user_banned' }] })).toBe(true);
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'user_deactivated' }] })).toBe(true);
+  });
+
   it('returns false for other 4xx status codes', () => {
     expect(isUnauthenticatedError({ status: 400 })).toBe(false);
     expect(isUnauthenticatedError({ status: 403 })).toBe(false);
+    expect(isUnauthenticatedError({ status: 403, errors: [{ code: 'not_allowed_access' }] })).toBe(false);
     expect(isUnauthenticatedError({ status: 404 })).toBe(false);
     expect(isUnauthenticatedError({ status: 429 })).toBe(false);
   });

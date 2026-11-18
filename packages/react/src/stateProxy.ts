@@ -134,13 +134,15 @@ export class StateProxy implements State {
 
   private buildSignInProxy() {
     const gateProperty = this.gateProperty.bind(this);
-    const target = () => this.client.signIn.__internal_future;
+    const target = () => this.state.signInSignal().signIn ?? this.client.signIn.__internal_future;
 
     return {
       errors: defaultSignInErrors(),
       fetchStatus: 'idle' as const,
       signIn: {
-        status: 'needs_identifier' as const,
+        get status() {
+          return gateProperty(target, 'status', 'needs_identifier');
+        },
         availableStrategies: [],
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
@@ -148,8 +150,14 @@ export class StateProxy implements State {
         get id() {
           return gateProperty(target, 'id', undefined);
         },
+        get timezone() {
+          return gateProperty(target, 'timezone', null);
+        },
         get supportedFirstFactors() {
           return gateProperty(target, 'supportedFirstFactors', []);
+        },
+        get ssoBypassFirstFactors() {
+          return gateProperty(target, 'ssoBypassFirstFactors', []);
         },
         get supportedSecondFactors() {
           return gateProperty(target, 'supportedSecondFactors', []);
@@ -174,6 +182,9 @@ export class StateProxy implements State {
               throw new Error('__internal_toSnapshot called before Clerk is loaded');
             },
           });
+        },
+        get clientTrustState() {
+          return gateProperty(target, 'clientTrustState', undefined);
         },
         get identifier() {
           return gateProperty(target, 'identifier', null);
@@ -208,12 +219,16 @@ export class StateProxy implements State {
         get canBeDiscarded() {
           return gateProperty(target, 'canBeDiscarded', false);
         },
+        get protectCheck() {
+          return gateProperty(target, 'protectCheck', null);
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
         sso: this.gateMethod(target, 'sso'),
         finalize: this.gateMethod(target, 'finalize'),
         reset: this.gateMethod(target, 'reset'),
+        submitProtectCheck: this.gateMethod(target, 'submitProtectCheck'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
         emailLink: this.wrapStruct(
@@ -240,6 +255,7 @@ export class StateProxy implements State {
           'verifyEmailCode',
           'verifyTOTP',
           'verifyBackupCode',
+          'passkey',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
         passkey: this.gateMethod(target, 'passkey'),
@@ -251,7 +267,7 @@ export class StateProxy implements State {
   private buildSignUpProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const target = () => this.client.signUp.__internal_future;
+    const target = () => this.state.signUpSignal().signUp ?? this.client.signUp.__internal_future;
 
     return {
       errors: defaultSignUpErrors(),
@@ -259,6 +275,9 @@ export class StateProxy implements State {
       signUp: {
         get id() {
           return gateProperty(target, 'id', undefined);
+        },
+        get timezone() {
+          return gateProperty(target, 'timezone', null);
         },
         get requiredFields() {
           return gateProperty(target, 'requiredFields', []);
@@ -320,6 +339,9 @@ export class StateProxy implements State {
         get canBeDiscarded() {
           return gateProperty(target, 'canBeDiscarded', false);
         },
+        get protectCheck() {
+          return gateProperty(target, 'protectCheck', null);
+        },
 
         create: gateMethod(target, 'create'),
         update: gateMethod(target, 'update'),
@@ -329,6 +351,7 @@ export class StateProxy implements State {
         web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
         reset: gateMethod(target, 'reset'),
+        submitProtectCheck: gateMethod(target, 'submitProtectCheck'),
 
         verifications: this.wrapStruct(
           () => target().verifications,
@@ -431,6 +454,7 @@ export class StateProxy implements State {
         },
 
         start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
+        update: this.gateMethod<ReturnType<typeof target>, 'update'>(target, 'update'),
         confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
         finalize: this.gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
       },

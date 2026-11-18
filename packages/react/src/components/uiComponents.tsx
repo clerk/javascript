@@ -1,9 +1,9 @@
 import type {
-  __experimental_ConfigureSSOProps,
   __internal_OAuthConsentProps,
   APIKeysProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -32,6 +32,7 @@ import {
   userProfileLinkRenderedError,
   userProfilePageRenderedError,
 } from '../errors/messages';
+import type { IsomorphicClerk } from '../isomorphicClerk';
 import type {
   CustomPortalsRendererProps,
   MountProps,
@@ -55,10 +56,12 @@ import { withClerk } from './withClerk';
 
 type FallbackProp = {
   /**
-   * An optional element to render while the component is mounting.
+   * The element to render while the component is mounting.
    */
   fallback?: ReactNode;
 };
+
+type ClerkWithInternalUpdateProps = WithClerkProp['clerk'] & Pick<IsomorphicClerk, '__internal_updateProps'>;
 
 type UserProfileExportType = typeof _UserProfile & {
   Page: typeof UserProfilePage;
@@ -127,8 +130,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
 const CustomPortalsRenderer = (props: CustomPortalsRendererProps) => {
   return (
     <>
-      {props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
-      {props?.customMenuItemsPortals?.map((portal, index) => createElement(portal, { key: index }))}
+      {props?.customPagesPortals?.map(({ key, portal }) => createElement(portal, { key }))}
+      {props?.customMenuItemsPortals?.map(({ key, portal }) => createElement(portal, { key }))}
     </>
   );
 };
@@ -645,37 +648,6 @@ export const APIKeys = withClerk(
   { component: 'ApiKeys', renderWhileLoading: true },
 );
 
-/**
- * @experimental This component is in early access and may change in future releases.
- */
-export const ConfigureSSO = withClerk(
-  ({ clerk, component, fallback, ...props }: WithClerkProp<__experimental_ConfigureSSOProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
-    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
-
-    const rendererRootProps = {
-      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
-    };
-
-    return (
-      <>
-        {shouldShowFallback && fallback}
-        {clerk.loaded && (
-          <ClerkHostRenderer
-            component={component}
-            mount={clerk.__experimental_mountConfigureSSO}
-            unmount={clerk.__experimental_unmountConfigureSSO}
-            updateProps={(clerk as any).__internal_updateProps}
-            props={props}
-            rootProps={rendererRootProps}
-          />
-        )}
-      </>
-    );
-  },
-  { component: 'ConfigureSSO', renderWhileLoading: true },
-);
-
 export const OAuthConsent = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<__internal_OAuthConsentProps & FallbackProp>) => {
     const mountingStatus = useWaitForComponentMount(component);
@@ -702,6 +674,48 @@ export const OAuthConsent = withClerk(
     );
   },
   { component: 'OAuthConsent', renderWhileLoading: true },
+);
+
+/**
+ * Renders the OAuth device verification flow for a signed-in user to authorize a device or app.
+ *
+ * @example
+ * ### Add a device verification page
+ *
+ * ```tsx
+ * import { OAuthDeviceVerification } from '@clerk/react';
+ *
+ * export default function DeviceVerificationPage() {
+ *   return <OAuthDeviceVerification />;
+ * }
+ * ```
+ */
+export const OAuthDeviceVerification = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<OAuthDeviceVerificationProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.__internal_mountOAuthDeviceVerification}
+            unmount={clerk.__internal_unmountOAuthDeviceVerification}
+            updateProps={props => void (clerk as ClerkWithInternalUpdateProps).__internal_updateProps(props)}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'OAuthDeviceVerification', renderWhileLoading: true },
 );
 
 export const UserAvatar = withClerk(

@@ -86,6 +86,8 @@ const defaultRules = [
       'should{/,}**',
       'sinon{/,}**',
       '@playwright{/,}**',
+      'e2e',
+      '@e2e-dev{/,}**',
     ],
   },
   {
@@ -102,6 +104,22 @@ const defaultRules = [
     extends: ['monorepo:remix'],
     groupName: 'Remix monorepo',
     matchUpdateTypes: ['patch', 'minor', 'major'],
+  },
+  {
+    matchManagers: ['github-actions'],
+    pinDigests: true,
+    groupName: 'GitHub Actions',
+    groupSlug: 'github-actions',
+    matchUpdateTypes: ['patch', 'minor', 'digest'],
+    semanticCommitScope: 'repo',
+    automerge: false,
+  },
+  {
+    matchManagers: ['github-actions'],
+    matchUpdateTypes: ['major'],
+    groupName: 'GitHub Actions (major)',
+    groupSlug: 'github-actions-major',
+    semanticCommitScope: 'repo',
   },
 ];
 
@@ -186,9 +204,8 @@ const renovateConfig = {
     '.nvmrc',
     'integration/templates/**',
     'packages/upgrade/src/__tests__/fixtures/**',
-    'playground/**',
   ],
-  includePaths: ['package.json', 'packages/**', 'pnpm-workspace.yaml'],
+  includePaths: ['.github/actions/**', '.github/workflows/**', 'package.json', 'packages/**', 'pnpm-workspace.yaml'],
   major: { dependencyDashboardApproval: true },
   minimumReleaseAge: '3 days',
   nvm: { enabled: false },

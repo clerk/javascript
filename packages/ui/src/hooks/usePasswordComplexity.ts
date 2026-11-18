@@ -60,11 +60,6 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
   const [failedValidations, setFailedValidations] = useState<ComplexityErrors>();
   const { t, locale } = useLocalizations();
 
-  // Populates failedValidations state
-  useEffect(() => {
-    getComplexity('');
-  }, []);
-
   const hasPassedComplexity = useMemo(
     () => !!password && Object.keys(failedValidations || {}).length === 0,
     [failedValidations, password],
@@ -96,6 +91,11 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
     return {
       failedValidationsText: generateErrorText(complexity),
     };
+  }, []);
+
+  // Populates failedValidations state
+  useEffect(() => {
+    getComplexity('');
   }, []);
 
   return {

@@ -13,6 +13,8 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
+import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 
 type SignInFactorTwoEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   showClientTrustNotice?: boolean;
@@ -31,14 +33,11 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
   const signInContext = useSignInContext();
   const { signInUrl } = signInContext;
   const { afterSignInUrl } = useSignInContext();
+  const { navigate } = useRouter();
   const { setActive } = useClerk();
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signIn);
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
   const clerk = useClerk();
-
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
 
   const restartVerification = () => {
     cancelEmailLinkFlow();
@@ -65,6 +64,11 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
     const ver = si.secondFactorVerification;
     if (ver.status === 'expired') {
       card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
+    } else if (navigateOnSignInProtectGate(si, navigate, '../protect-check')) {
+      // A Protect gate can surface when the 2FA email link resolves. Unlike the other second-factor
+      // cards this one finalizes inline (no `completeSignInFlow`), so route to the challenge here
+      // instead of falling through to `setActive` with a null `createdSessionId`.
+      return;
     } else if (ver.verifiedFromTheSameClient()) {
       setShowVerifyModal(true);
     } else {
@@ -74,6 +78,10 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
       });
     }
   };
+
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
 
   if (showVerifyModal) {
     return (
@@ -97,6 +105,7 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
         }
         formSubtitle={localizationKeys('signIn.emailLinkMfa.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLinkMfa.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={props.factor.safeIdentifier}
         profileImageUrl={signIn.userData.imageUrl}

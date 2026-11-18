@@ -116,6 +116,19 @@ describe('getAutoProxyUrlFromEnvironment(options)', () => {
     ).toBe('');
   });
 
+  it('returns empty string when auto-proxy is disabled', () => {
+    expect(
+      getAutoProxyUrlFromEnvironment({
+        publishableKey: 'pk_live_Zm9vLmNsZXJrLmNvbSQ=',
+        environment: {
+          CLERK_DISABLE_AUTO_PROXY: 'true',
+          VERCEL_PROJECT_PRODUCTION_URL: 'myapp.vercel.app',
+          VERCEL_TARGET_ENV: 'production',
+        },
+      }),
+    ).toBe('');
+  });
+
   it('returns empty string for ineligible or non-production Vercel environments', () => {
     expect(
       getAutoProxyUrlFromEnvironment({

@@ -1,0 +1,15 @@
+### `signOut()`
+
+Signs out the current user on single-session instances, or all users on multi-session instances.
+
+```typescript
+function signOut(options?: SignOutOptions): Promise<void>
+```
+
+#### `SignOutOptions`
+
+
+| Property | Type | Description |
+| ------ | ------ | ------ |
+| <a id="redirecturl"></a> `redirectUrl?` | `string` | Specify a redirect URL to navigate to after sign-out is complete. |
+| <a id="sessionid"></a> `sessionId?` | `string` | Specify a specific session to sign out. Useful for multi-session applications. |

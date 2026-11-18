@@ -10,8 +10,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    const u = await createTestUtils({ app });
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 
@@ -21,7 +21,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   });
 
   test('sign out through all open tabs at once', async ({ page, context }) => {
-    const mainTab = createTestUtils({ app, page, context });
+    const mainTab = await createTestUtils({ app, page, context });
     await mainTab.po.signIn.goTo();
     await mainTab.po.signIn.setIdentifier(fakeUser.email);
     await mainTab.po.signIn.continue();
@@ -47,7 +47,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   });
 
   test('sign out persisting client', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -70,7 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
   });
 
   test('Protected routes do not persist after sign out', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     // Skip react vite tests
     if (!app.name.includes('next')) {
       return;
@@ -84,9 +84,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
     await u.page.getByTestId('protected').waitFor();
     await u.page.getByRole('link', { name: 'Home' }).click();
-    await u.page.getByRole('button', { name: 'Open user menu' }).click();
+    await u.page.getByRole('button', { name: /Open user menu/i }).click();
 
-    await u.page.getByRole('menuitem', { name: 'Sign out' }).click();
+    await u.page.getByRole('button', { name: 'Sign out' }).click();
     await u.po.expect.toBeSignedOut();
     await u.page.getByRole('link', { name: 'Protected', exact: true }).click();
     await u.page.waitForURL(url => url.href.includes('/sign-in?redirect_url'));
@@ -101,8 +101,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_destroy_client
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser();
+      const u = await createTestUtils({ app });
+      fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
 
@@ -112,7 +112,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes_destroy_client
     });
 
     test('sign out destroying client', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();

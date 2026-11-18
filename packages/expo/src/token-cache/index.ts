@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { AppState, Platform } from 'react-native';
 
 import type { TokenCache } from '../cache';
 import { isNative } from '../utils';
@@ -19,16 +20,23 @@ const createTokenCache = (): TokenCache => {
 
   return {
     getToken: async (key: string) => {
+      const startedWhileActive = AppState.currentState === 'active';
       try {
         const item = await SecureStore.getItemAsync(key, secureStoreOpts);
         return item;
-      } catch {
+      } catch (error) {
+        if (Platform.OS === 'ios' && (!startedWhileActive || AppState.currentState !== 'active')) {
+          throw error;
+        }
         await SecureStore.deleteItemAsync(key, secureStoreOpts);
         return null;
       }
     },
     saveToken: (key: string, token: string) => {
       return SecureStore.setItemAsync(key, token, secureStoreOpts);
+    },
+    clearToken: (key: string) => {
+      return SecureStore.deleteItemAsync(key, secureStoreOpts);
     },
   };
 };
@@ -43,6 +51,7 @@ const createTokenCache = (): TokenCache => {
  * To implement your own token cache, create an object that implements the `TokenCache` interface:
  * - `getToken(key: string): Promise<string | null>`
  * - `saveToken(key: string, token: string): Promise<void>`
+ * - `clearToken(key: string): void | Promise<void>` (optional)
  *
  * @type {TokenCache | undefined} Object with `getToken` and `saveToken` methods, undefined on web
  */

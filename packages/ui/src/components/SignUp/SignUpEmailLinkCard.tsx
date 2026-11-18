@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -10,24 +9,17 @@ import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
-import { useRouter } from '../../router';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 export const SignUpEmailLinkCard = () => {
   const { t } = useLocalizations();
   const signUp = useCoreSignUp();
   const signUpContext = useSignUpContext();
-  const { afterSignUpUrl, navigateOnSetActive } = signUpContext;
   const card = useCardState();
-  const { navigate } = useRouter();
-  const { setActive } = useClerk();
+  const completeSignUpFlow = useCompleteSignUpFlow();
   const [showVerifyModal, setShowVerifyModal] = React.useState(false);
 
   const { startEmailLinkFlow, cancelEmailLinkFlow } = useEmailLink(signUp);
-
-  React.useEffect(() => {
-    void startEmailLinkVerification();
-  }, []);
 
   const restartVerification = () => {
     cancelEmailLinkFlow();
@@ -56,17 +48,14 @@ export const SignUpEmailLinkCard = () => {
         continuePath: '../continue',
         verifyEmailPath: '../verify-email-address',
         verifyPhonePath: '../verify-phone-number',
-        handleComplete: () =>
-          setActive({
-            session: su.createdSessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-            },
-          }),
-        navigate,
+        protectCheckPath: '../protect-check',
       });
     }
   };
+
+  React.useEffect(() => {
+    void startEmailLinkVerification();
+  }, []);
 
   if (showVerifyModal) {
     return (
@@ -86,6 +75,7 @@ export const SignUpEmailLinkCard = () => {
         formTitle={localizationKeys('signUp.emailLink.formTitle')}
         formSubtitle={localizationKeys('signUp.emailLink.formSubtitle')}
         resendButton={localizationKeys('signUp.emailLink.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
         onResendCodeClicked={restartVerification}
         safeIdentifier={signUp.emailAddress}
       />

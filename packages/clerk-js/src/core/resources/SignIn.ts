@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -7,7 +8,6 @@ import {
 } from '@clerk/shared/internal/clerk-js/passkeys';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -31,6 +31,7 @@ import type {
   PhoneCodeFactor,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
+  ProtectCheckResource,
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
@@ -54,6 +55,7 @@ import type {
   SignInFutureResetPasswordSubmitParams,
   SignInFutureResource,
   SignInFutureSSOParams,
+  SignInFutureSubmitProtectCheckParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
   SignInFutureWeb3Params,
@@ -83,8 +85,10 @@ import {
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
+import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -96,7 +100,18 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, UserData, Verification } from './internal';
+import { ProtectCheckGate } from '../protectCheckGate';
+import { type BaseMutateParams, BaseResource, UserData, Verification } from './internal';
+
+/**
+ * Terminal states for email-link verification polling: `verified` (success), `expired`
+ * (link timed out), or `transferable` (`signUpIfMissing` flows — the address was verified
+ * but no user exists, so the caller transfers to sign-up). Shared by the legacy
+ * `createEmailLinkFlow` poll and `SignInFuture.waitForEmailLinkVerification` so the two
+ * loops can't drift apart.
+ */
+const isTerminalEmailLinkVerificationStatus = (status: string | null) =>
+  status === 'verified' || status === 'expired' || status === 'transferable';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';
@@ -106,12 +121,15 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
+  protectCheck: ProtectCheckResource | null = null;
+  timezone: string | null = null;
 
   /**
    * The current status of the sign-in process.
@@ -151,7 +169,33 @@ export class SignIn extends BaseResource implements SignInResource {
    * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
    * of `SignIn`.
    */
-  __internal_basePost = this._basePost.bind(this);
+  __internal_basePost = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePost(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
+    return this;
+  };
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
+   * of `SignIn`.
+   */
+  __internal_basePatch = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePatch(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
+    return this;
+  };
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -175,6 +219,13 @@ export class SignIn extends BaseResource implements SignInResource {
     const browserLocale = getBrowserLocale();
     if (browserLocale) {
       body.locale = browserLocale;
+    }
+
+    if (body.timezone === undefined) {
+      const browserTimezone = getBrowserTimezone();
+      if (browserTimezone) {
+        body.timezone = browserTimezone;
+      }
     }
 
     if (
@@ -254,6 +305,23 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
+      coalesce: true,
+    });
+  };
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-in.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to the updated `SignIn` resource (gate cleared, a chained
+   * challenge, or the completed flow).
+   */
+  submitProtectCheck = (params: { proofToken: string }): Promise<SignInResource> => {
+    debugLogger.debug('SignIn.submitProtectCheck', { id: this.id });
+    return this._basePatch({
+      action: 'protect_check',
+      body: { proof_token: params.proofToken },
     });
   };
 
@@ -307,8 +375,7 @@ export class SignIn extends BaseResource implements SignInResource {
         void run(() => {
           return this.reload()
             .then(res => {
-              const status = res[verificationKey].status;
-              if (status === 'verified' || status === 'expired') {
+              if (isTerminalEmailLinkVerificationStatus(res[verificationKey].status)) {
                 stop();
                 resolve(res);
               }
@@ -329,13 +396,25 @@ export class SignIn extends BaseResource implements SignInResource {
     return this._basePost({
       body: params,
       action: 'prepare_second_factor',
+      coalesce: true,
     });
   };
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
+    let config;
+    switch (params.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...params };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_second_factor',
     });
   };
@@ -344,29 +423,80 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
-      params || {};
+    const {
+      strategy,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      slackTeamIdHint,
+      continueSignIn,
+      enterpriseConnectionId,
+    } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
-    if (!this.id || !continueSignIn) {
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+    const pendingHandOff = () => {
+      const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
+      return status === 'unverified' ? externalVerificationRedirectURL : null;
+    };
+
+    // A pending challenge with nowhere to navigate to. Throw rather than return, so the method still
+    // either navigates or throws: a caller that doesn't handle challenges gets an error it can
+    // recognise instead of a silent success. A caller that does runs the challenge and calls back
+    // in with `continueSignIn`.
+    const throwChallengeRequired = (): never => {
+      throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+        code: ERROR_CODES.PROTECT_CHECK_REQUIRED,
+      });
+    };
+
+    // The hand-off a challenged create built, if any. The server builds it before deciding, so a
+    // challenge on create can arrive with a usable redirect: that means "go to the identity
+    // provider first" and the challenge runs on the way back, where the callback routes to it.
+    let challengedCreateHandOff: URL | null = null;
+
+    const shouldCreateSignIn = !this.id || !continueSignIn;
+    if (shouldCreateSignIn) {
       await this.create({
         strategy,
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
+        oidcPrompt,
+        slackTeamIdHint,
       });
+
+      if (isChallengePending()) {
+        challengedCreateHandOff = pendingHandOff();
+        if (!challengedCreateHandOff) {
+          throwChallengeRequired();
+        }
+      }
     }
 
-    if (strategy === 'enterprise_sso') {
-      await this.prepareFirstFactor({
+    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+      const prepareParams = {
         strategy,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        slackTeamIdHint,
         enterpriseConnectionId,
-      });
+      };
+      await this._basePost({ body: prepareParams, action: 'prepare_first_factor', coalesce: true });
+
+      // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
+      // earlier attempt and may be for another connection. Only this call's create hand-off is safe
+      // to follow.
+      if (isChallengePending()) {
+        if (challengedCreateHandOff) {
+          navigateCallback(challengedCreateHandOff);
+          return;
+        }
+        throwChallengeRequired();
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
@@ -379,7 +509,19 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithRedirect = async (params: AuthenticateWithRedirectParams): Promise<void> => {
-    return this.authenticateWithRedirectOrPopup(params, windowNavigate);
+    const transport = SignIn.clerk.__internal_oauthTransport;
+    if (transport) {
+      return _authenticateWithTransport({
+        clerk: SignIn.clerk,
+        transport,
+        resource: this,
+        authenticateMethod: this.authenticateWithRedirectOrPopup,
+        params,
+        callbackParams: params.__internal_callbackParams ?? {},
+      });
+    }
+
+    return this.authenticateWithRedirectOrPopup(params, SignIn.clerk.__internal_windowNavigate);
   };
 
   public authenticateWithPopup = async (params: AuthenticateWithPopupParams): Promise<void> => {
@@ -503,8 +645,27 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * Authenticates the sign-in with a passkey.
+   *
+   * When called without `params.flow` while the sign-in status is `needs_second_factor` (or
+   * `needs_client_trust`) and the sign-in offers `passkey` among its `supportedSecondFactors`, the
+   * passkey acts as the second factor: the in-progress sign-in is reused via the discrete
+   * prepare/attempt second-factor flow.
+   *
+   * Otherwise the passkey verifies the first factor, with `params.flow` selecting how the ceremony
+   * starts: `'autofill'`/`'discoverable'` create a new sign-in and identify the user from the
+   * passkey itself, discarding any in-progress sign-in, while the default requires a sign-in
+   * created beforehand. A sign-in parked at a second-factor status that does NOT offer passkey (the
+   * backend advertises it only when the instance allows passkeys to satisfy the second factor, the
+   * user has one registered, and the client version supports it) also takes this path, matching
+   * clients that predate passkey second factors: the ceremony starts over instead of failing.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns The updated `SignIn` resource.
+   */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -519,6 +680,34 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
+      });
+    }
+
+    const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
+    const hasPasskeySecondFactor = (this.supportedSecondFactors || []).some(f => f.strategy === 'passkey');
+    if (!flow && isSecondFactor && hasPasskeySecondFactor) {
+      await this.prepareSecondFactor({ strategy: 'passkey' });
+
+      const { nonce: secondFactorNonce } = this.secondFactorVerification;
+      const secondFactorPublicKeyOptions = secondFactorNonce
+        ? convertJSONToPublicKeyRequestOptions(JSON.parse(secondFactorNonce))
+        : null;
+      if (!secondFactorPublicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions: secondFactorPublicKeyOptions,
+        conditionalUI: false,
+        preferImmediatelyAvailableCredentials,
+      });
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      return this.attemptSecondFactor({
+        publicKeyCredential,
+        strategy: 'passkey',
       });
     }
 
@@ -560,6 +749,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
+      preferImmediatelyAvailableCredentials,
     });
 
     if (!publicKeyCredential) {
@@ -589,11 +779,24 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
+      this.ssoBypassFirstFactors = deepSnakeToCamel(data.sso_bypass_first_factors ?? null) as
+        | SignInFirstFactor[]
+        | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
       this.clientTrustState = data.client_trust_state ?? undefined;
+      this.protectCheck = data.protect_check
+        ? {
+            status: data.protect_check.status,
+            token: data.protect_check.token,
+            sdkUrl: data.protect_check.sdk_url,
+            expiresAt: data.protect_check.expires_at,
+            uiHints: data.protect_check.ui_hints,
+          }
+        : null;
+      this.timezone = data.timezone ?? null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -649,11 +852,23 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
+      timezone: this.timezone,
+      client_trust_state: this.clientTrustState,
+      protect_check: this.protectCheck
+        ? {
+            status: this.protectCheck.status,
+            token: this.protectCheck.token,
+            sdk_url: this.protectCheck.sdkUrl,
+            ...(this.protectCheck.expiresAt !== undefined && { expires_at: this.protectCheck.expiresAt }),
+            ...(this.protectCheck.uiHints !== undefined && { ui_hints: this.protectCheck.uiHints }),
+          }
+        : null,
     };
   }
 }
@@ -721,6 +936,7 @@ class SignInFuture implements SignInFutureResource {
     verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
+    passkey: this.verifyMFAPasskey.bind(this),
   };
 
   #canBeDiscarded = false;
@@ -736,6 +952,10 @@ class SignInFuture implements SignInFutureResource {
 
   get identifier() {
     return this.#resource.identifier;
+  }
+
+  get timezone() {
+    return this.#resource.timezone;
   }
 
   get createdSessionId() {
@@ -757,6 +977,10 @@ class SignInFuture implements SignInFutureResource {
 
   get supportedSecondFactors() {
     return this.#resource.supportedSecondFactors ?? [];
+  }
+
+  get ssoBypassFirstFactors() {
+    return this.#resource.ssoBypassFirstFactors ?? [];
   }
 
   get isTransferable() {
@@ -783,6 +1007,30 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.secondFactorVerification;
   }
 
+  get clientTrustState(): ClientTrustState | undefined {
+    return this.#resource.clientTrustState ?? (this.#resource.status === 'needs_client_trust' ? 'new' : undefined);
+  }
+
+  get protectCheck() {
+    return this.#resource.protectCheck;
+  }
+
+  /**
+   * Submits a proof token to resolve a Clerk Protect challenge (`protect_check`) during sign-in.
+   *
+   * @param params - The proof token parameters.
+   * @param params.proofToken - The proof token produced by the Protect challenge SDK.
+   * @returns A promise resolving to `{ error }` — `null` on success, otherwise the encountered error.
+   */
+  async submitProtectCheck(params: SignInFutureSubmitProtectCheckParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePatch({
+        action: 'protect_check',
+        body: { proof_token: params.proofToken },
+      });
+    });
+  }
+
   get canBeDiscarded() {
     return this.#canBeDiscarded;
   }
@@ -806,6 +1054,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'reset_password_email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -849,6 +1098,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'reset_password_phone_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -935,8 +1185,9 @@ class SignInFuture implements SignInFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  private async _create(params: SignInFutureCreateParams): Promise<void> {
+  private async _create(params: SignInFutureCreateParams, options?: { resolveProtectCheck?: boolean }): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
+    const timezone = params.timezone ?? getBrowserTimezone();
 
     const body: Record<string, unknown> = {
       ...params,
@@ -944,12 +1195,16 @@ class SignInFuture implements SignInFutureResource {
       captchaWidgetType,
       captchaError,
       locale: getBrowserLocale() || undefined,
+      ...(timezone !== null ? { timezone } : {}),
     };
 
-    await this.#resource.__internal_basePost({
-      path: this.#resource.pathRoot,
-      body,
-    });
+    await this.#resource.__internal_basePost(
+      {
+        path: this.#resource.pathRoot,
+        body,
+      },
+      options,
+    );
   }
 
   async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
@@ -968,12 +1223,14 @@ class SignInFuture implements SignInFutureResource {
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.#resource.identifier;
       const locale = getBrowserLocale();
+      const timezone = params.timezone ?? this.#resource.timezone ?? getBrowserTimezone();
       await this.#resource.__internal_basePost({
         path: this.#resource.pathRoot,
         body: {
           identifier: identifier || previousIdentifier,
           password: params.password,
           ...(locale ? { locale } : {}),
+          ...(timezone !== null ? { timezone } : {}),
         },
       });
     });
@@ -1006,6 +1263,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId: emailCodeFactor.emailAddressId, strategy: 'email_code' },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1058,6 +1316,7 @@ class SignInFuture implements SignInFutureResource {
           strategy: 'email_link',
         },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1069,8 +1328,7 @@ class SignInFuture implements SignInFutureResource {
         void run(async () => {
           try {
             const res = await this.#resource.__internal_baseGet();
-            const status = res.firstFactorVerification.status;
-            if (status === 'verified' || status === 'expired') {
+            if (isTerminalEmailLinkVerificationStatus(res.firstFactorVerification.status)) {
               stop();
               resolve(res);
             }
@@ -1110,6 +1368,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId: phoneCodeFactor.phoneNumberId, strategy: 'phone_code', channel },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
     });
   }
@@ -1125,8 +1384,16 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
-    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
-      params;
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      popup,
+      oidcPrompt,
+      slackTeamIdHint,
+      enterpriseConnectionId,
+      identifier,
+    } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
       try {
@@ -1145,35 +1412,82 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
-      if (!this.#resource.id) {
-        await this._create({
-          strategy,
-          ...routes,
-          identifier,
-        });
-      }
+      // Reuse the existing sign-in by default so any state already attached to it carries
+      // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
+      // or a discovered identifier). For OAuth, a pending redirect may belong to an
+      // abandoned attempt, including a retry of the same provider (SDK-75), so start
+      // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
+      // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
+      // without a pending redirect, an explicit `slackTeamIdHint` also triggers preparation
+      // so the hint is applied to the existing attempt.
+      const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
+      const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
+      const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
 
-      if (strategy === 'enterprise_sso') {
-        await this.#resource.__internal_basePost({
-          body: {
+      const isChallengePending = () => !!this.#resource.protectCheck || this.#resource.status === 'needs_protect_check';
+      const pendingHandOff = () => {
+        const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+        return status === 'unverified' ? externalVerificationRedirectURL : null;
+      };
+      const resolveChallenge = () => ProtectCheckGate.getInstance().resolve(SignIn.clerk, this.#resource);
+
+      let challengedCreateHandOff: URL | null = null;
+
+      if (shouldCreateSignIn) {
+        await this._create(
+          {
+            strategy,
             ...routes,
+            identifier,
             oidcPrompt,
-            enterpriseConnectionId,
-            strategy: 'enterprise_sso',
+            slackTeamIdHint,
           },
-          action: 'prepare_first_factor',
-        });
+          { resolveProtectCheck: false },
+        );
+
+        if (isChallengePending()) {
+          challengedCreateHandOff = pendingHandOff();
+          if (!challengedCreateHandOff) {
+            await resolveChallenge();
+          }
+        }
       }
 
-      const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+        const prepare = (options?: { resolveProtectCheck?: boolean }) =>
+          this.#resource.__internal_basePost(
+            {
+              body: {
+                ...routes,
+                oidcPrompt,
+                slackTeamIdHint,
+                enterpriseConnectionId,
+                strategy,
+              },
+              action: 'prepare_first_factor',
+              coalesce: true,
+            },
+            options,
+          );
 
-      if (status === 'unverified' && externalVerificationRedirectURL) {
+        await prepare({ resolveProtectCheck: false });
+
+        if (isChallengePending() && !challengedCreateHandOff) {
+          await resolveChallenge();
+          await prepare();
+        }
+      }
+
+      const externalVerificationRedirectURL = challengedCreateHandOff ?? pendingHandOff();
+
+      if (externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignIn.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignIn resource
           await this.#resource.reload();
+          await resolveChallenge();
         } else {
-          windowNavigate(externalVerificationRedirectURL);
+          SignIn.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
       }
     });
@@ -1229,6 +1543,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
         action: 'prepare_first_factor',
+        coalesce: true,
       });
 
       const { message } = this.firstFactorVerification;
@@ -1270,7 +1585,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -1300,6 +1615,7 @@ class SignInFuture implements SignInFutureResource {
         await this.#resource.__internal_basePost({
           body: { strategy: 'passkey' },
           action: 'prepare_first_factor',
+          coalesce: true,
         });
       }
 
@@ -1324,6 +1640,7 @@ class SignInFuture implements SignInFutureResource {
       const { publicKeyCredential, error } = await webAuthnGetCredential({
         publicKeyOptions,
         conditionalUI: canUseConditionalUI,
+        preferImmediatelyAvailableCredentials,
       });
 
       if (!publicKeyCredential) {
@@ -1352,6 +1669,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { phoneNumberId, strategy: 'phone_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
@@ -1378,6 +1696,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { emailAddressId, strategy: 'email_code' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
     });
   }
@@ -1412,9 +1731,59 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  async verifyMFAPasskey(): Promise<{ error: ClerkError | null }> {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.#resource, async () => {
+      const passkeyFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'passkey');
+      if (!passkeyFactor) {
+        throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'passkey' },
+        action: 'prepare_second_factor',
+        coalesce: true,
+      });
+
+      const { nonce } = this.#resource.secondFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+      if (!publicKeyOptions) {
+        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
   async ticket(params?: SignInFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ticket: ticket ?? undefined });
+    return this.create({ strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {

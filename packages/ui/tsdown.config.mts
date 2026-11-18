@@ -6,13 +6,26 @@ import uiPackage from './package.json' with { type: 'json' };
 
 export default defineConfig(({ watch }) => {
   const common = {
-    dts: true,
+    tsconfig: './tsconfig.src.json',
+    dts: {
+      // The .src. file is for typechecking, this overrides the relevant parts for build output
+      compilerOptions: {
+        composite: false,
+        declaration: true,
+        declarationMap: true,
+        emitDeclarationOnly: false,
+        incremental: false,
+        outDir: 'dist',
+        sourcemap: true,
+      },
+    },
     sourcemap: true,
     clean: false,
     target: 'es2022',
     platform: 'browser',
     external: ['react', 'react-dom', '@clerk/localizations', '@clerk/shared'],
     format: ['esm'], // ESM only
+    fixedExtension: false,
     minify: false,
     plugins: [
       svgr({
@@ -39,6 +52,7 @@ export default defineConfig(({ watch }) => {
         './src/internal/index.ts',
         './src/themes/index.ts',
         './src/themes/experimental.ts',
+        './src/experimental/index.ts',
       ],
       outDir: './dist',
       unbundle: true,

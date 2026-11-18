@@ -1,5 +1,5 @@
 import { act } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
@@ -335,5 +335,39 @@ describe('PhoneSection', () => {
     });
   });
 
-  it.todo('Test for verification of added phone number');
+  describe('Add phone with attribute disabled for sign-up but used for sign-in', () => {
+    const disabledForSignUpConfig = createFixtures.config(f => {
+      f.withPhoneNumber({ enabled: false, used_for_first_factor: true });
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+
+    it('renders add phone screen', async () => {
+      const { wrapper } = await createFixtures(disabledForSignUpConfig);
+
+      const { getByRole, userEvent, getByLabelText, findByRole } = render(<PhoneSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add phone number' }));
+      await findByRole('heading', { name: /Add phone number/i });
+      getByLabelText(/phone number/i);
+    });
+
+    it('can add a phone and reach the verification screen', async () => {
+      const { wrapper, fixtures } = await createFixtures(disabledForSignUpConfig);
+
+      const { getByRole, userEvent, getByLabelText, findByRole } = render(<PhoneSection />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Add phone number' }));
+      await findByRole('heading', { name: /Add phone number/i });
+
+      fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(
+        Promise.resolve({
+          phoneNumber: '+16911111111',
+          prepareVerification: vi.fn().mockReturnValueOnce(Promise.resolve({} as any)),
+        } as any),
+      );
+
+      await userEvent.type(getByLabelText(/phone number/i), '6911111111');
+      await userEvent.click(getByRole('button', { name: /add$/i }));
+      expect(fixtures.clerk.user?.createPhoneNumber).toHaveBeenCalledWith({ phoneNumber: '+16911111111' });
+      await findByRole('heading', { name: /Verify phone number/i });
+    });
+  });
 });

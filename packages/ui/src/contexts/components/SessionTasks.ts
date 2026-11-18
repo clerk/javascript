@@ -1,10 +1,10 @@
 import { buildTaskUrl, getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
 import { useRouter, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx, TaskSetupMFACtx } from '../../types';
 
@@ -44,7 +44,7 @@ export const useSessionTasksContext = (): SessionTasksContextType => {
       // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
       // The touch endpoint URL will be an absolute URL starting with http:// or https://
       if (decoratedUrl !== redirectUrlComplete && /^https?:\/\//.test(decoratedUrl)) {
-        windowNavigate(decoratedUrl);
+        clerkWindowNavigate(clerk, decoratedUrl);
         return;
       }
 

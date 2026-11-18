@@ -1,12 +1,12 @@
 'use client';
 import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
+import { errorThrower } from '../../server/errorThrower';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -16,14 +16,6 @@ import { ClerkScripts } from './ClerkScripts';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
-/**
- * LazyCreateKeylessApplication should only be loaded if the conditions below are met.
- * Note: Using lazy() with Suspense instead of dynamic is not possible as React will throw a hydration error when `ClerkProvider` wraps `<html><body>...`
- */
-const LazyCreateKeylessApplication = dynamic(() =>
-  import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
-);
-
 const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
   const { __internal_invokeMiddlewareOnAuthStateChange = true, __internal_scriptsSlot, children } = props;
   const router = useRouter();
@@ -31,7 +23,7 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   const replace = useAwaitableReplace();
 
   useSafeLayoutEffect(() => {
-    window.__internal_onBeforeSetActive = intent => {
+    window.__internal_onBeforeSetActive = async intent => {
       /**
        * We need to invalidate the cache in case the user is navigating to a page that
        * was previously cached using the auth state that was active at the time.
@@ -51,22 +43,20 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
        *  For more information on cache invalidation, see:
        * https://nextjs.org/docs/app/building-your-application/caching#invalidation-1
        */
-      return new Promise(resolve => {
-        const nextVersion = window?.next?.version || '';
+      const nextVersion = window?.next?.version || '';
 
-        // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
-        // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
-        // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
-        // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
-        // SOLUTION:
-        // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
-        // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
-        if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
-          resolve(); // noop
-        } else {
-          void invalidateCacheAction().then(() => resolve());
-        }
-      });
+      // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
+      // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
+      // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
+      // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
+      // SOLUTION:
+      // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
+      // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
+      if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
+        return;
+      }
+
+      await invalidateCacheAction().catch(() => {});
     };
 
     window.__internal_onAfterSetActive = () => {
@@ -87,9 +77,9 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
-        <RouterTelemetry />
-        {__internal_scriptsSlot ?? <ClerkScripts />}
-        {children}
+        <RouterTelemetry key='clerk-router-telemetry' />
+        {__internal_scriptsSlot ?? <ClerkScripts key='clerk-scripts' />}
+        <React.Fragment key='clerk-children'>{children}</React.Fragment>
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );
@@ -115,9 +105,5 @@ export const ClientClerkProvider = <TUi extends Ui = Ui>(
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
   }
 
-  return (
-    <LazyCreateKeylessApplication>
-      <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>
-    </LazyCreateKeylessApplication>
-  );
+  return errorThrower.throwMissingPublishableKeyError();
 };

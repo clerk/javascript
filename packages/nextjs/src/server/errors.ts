@@ -24,7 +24,7 @@ export const getAuthAuthHeaderMissing = () => authAuthHeaderMissing('getAuth', u
 
 export const authAuthHeaderMissing = (helperName = 'auth', prefixSteps?: string[], fileReference = 'middleware') => {
   return `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure the following:
-- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ' '}clerkMiddleware() is used in your Next.js ${fileReference} file.
+- ${prefixSteps ? [...prefixSteps, ''].join('\n- ') : ''}clerkMiddleware() is used in your Next.js ${fileReference} file.
 - Your ${fileReference} matcher is configured to match this route or page.
 - If you are using the src directory, make sure the ${fileReference} file is inside of it.
 

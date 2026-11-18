@@ -6,14 +6,17 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
+import { SignInFactorTwoPasskeyCard } from './SignInFactorTwoPasskeyCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
+import { isOfferableSecondFactor } from './utils';
 
 function SignInFactorTwoInternal(): JSX.Element {
   const clerk = useClerk();
@@ -28,6 +31,11 @@ function SignInFactorTwoInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const webAuthnSupported = useIsWebAuthnSupported();
+  const onShowAlternativeMethodsClicked =
+    (signIn.supportedSecondFactors?.filter(f => isOfferableSecondFactor(f, webAuthnSupported)).length ?? 0) > 1
+      ? toggleAllStrategies
+      : undefined;
 
   React.useEffect(() => {
     if (clerk.__internal_setActiveInProgress) {
@@ -69,7 +77,7 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'totp':
@@ -78,18 +86,20 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'backup_code':
-      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked} />;
+    case 'passkey':
+      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked} />;
     case 'email_code':
       return (
         <SignInFactorTwoEmailCodeCard
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_link':
@@ -98,7 +108,7 @@ function SignInFactorTwoInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     default:

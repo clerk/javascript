@@ -1,5 +1,9 @@
 import { constants } from '@clerk/backend/internal';
 
+const clerkProtectionOrigin = 'https://*.protect.clerk.com';
+// A source with no port matches port 443 only, and these hosts are also requested on other ports.
+const clerkProtectionConnectOrigin = `${clerkProtectionOrigin}:*`;
+
 /**
  * Valid CSP directives according to the CSP Level 3 specification
  */
@@ -102,7 +106,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://api.stripe.com',
       'https://maps.googleapis.com',
       'https://img.clerk.com',
-      'https://images.clerkstage.dev',
+      clerkProtectionConnectOrigin,
     ],
     'default-src': ['self'],
     'form-action': ['self'],
@@ -112,6 +116,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://*.js.stripe.com',
       'https://js.stripe.com',
       'https://hooks.stripe.com',
+      clerkProtectionOrigin,
     ],
     'img-src': ['self', 'https://img.clerk.com'],
     'script-src': [
@@ -123,6 +128,7 @@ class ContentSecurityPolicyDirectiveManager {
       'https://*.js.stripe.com',
       'https://js.stripe.com',
       'https://maps.googleapis.com',
+      clerkProtectionOrigin,
     ],
     'style-src': ['self', 'unsafe-inline'],
     'worker-src': ['self', 'blob:'],

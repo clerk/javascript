@@ -184,6 +184,13 @@ export function buildRequest(options: BuildRequestOptions) {
         });
       }
 
+      if (res.status === 204) {
+        return {
+          data: undefined as T,
+          errors: null,
+        };
+      }
+
       // TODO: Parse JSON or Text response based on a response header
       const isJSONResponse =
         res?.headers && res.headers?.get(constants.Headers.ContentType) === constants.ContentTypes.Json;

@@ -17,6 +17,7 @@ import {
   Spinner,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { useTotalEnabledAuthMethods } from '../hooks/useTotalEnabledAuthMethods';
@@ -68,6 +69,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const card = useCardState();
   const clerk = useClerk();
+  const { t } = useLocalizations();
   const { socialButtonsVariant } = useAppearance().parsedOptions;
 
   type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
@@ -114,6 +116,10 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
   const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
+    const setIdleOnReturn = () => card.setIdle();
+    if (clerk.__internal_hasOAuthTransport && !isWeb3Strategy(strategy)) {
+      window.addEventListener('focus', setIdleOnReturn, { once: true });
+    }
     try {
       if (isWeb3Strategy(strategy)) {
         await web3Callback(strategy);
@@ -123,6 +129,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     } catch {
       await sleep(1000);
       card.setIdle();
+    } finally {
+      window.removeEventListener('focus', setIdleOnReturn);
     }
     if (idleAfterDelay) {
       await sleep(5000);
@@ -171,6 +179,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         >
           {row.map(strategy => {
+            const isLastAuthenticationStrategy = strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1;
             const shouldShowPreText =
               remainingStrategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
               (strategy === lastAuthenticationStrategy && row.length === 1);
@@ -194,7 +203,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 name={strategyToDisplayData[strategy].name}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                aria-hidden
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               />
@@ -208,9 +217,18 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 label={label}
+                aria-label={
+                  preferBlockButtons || isLastAuthenticationStrategy
+                    ? undefined
+                    : t(
+                        localizationKeys('socialButtonsBlockButton', {
+                          provider: strategyToDisplayData[strategy].name,
+                        }),
+                      )
+                }
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1}
+                lastAuthenticationStrategy={isLastAuthenticationStrategy}
               />
             );
           })}
@@ -249,13 +267,19 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       variant='outline'
       colorScheme='neutral'
       hoverAsFocus
-      sx={t => ({
-        minHeight: t.sizes.$8,
-        width: '100%',
-      })}
+      sx={{ width: '100%' }}
       {...rest}
     >
-      {icon}
+      {/* Reserve one line of button text so the icon button matches the height of the
+          block button (and its siblings) across any theme spacing/font size, instead of
+          pinning to a static minHeight that stops tracking the text-based controls. */}
+      <Flex
+        as='span'
+        center
+        sx={{ minHeight: '1lh' }}
+      >
+        {icon}
+      </Flex>
     </Button>
   );
 });

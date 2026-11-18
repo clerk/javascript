@@ -1,0 +1,59 @@
+import type { PreferredSignInStrategy } from '@clerk/shared/types';
+
+import type {
+  ReverificationMethod,
+  ReverificationOtpChannel,
+  ReverificationPreparableMethod,
+  ReverificationStrategy,
+} from './reverification.types';
+
+export function otpChannelFor(strategy: ReverificationStrategy): ReverificationOtpChannel | undefined {
+  if (strategy === 'email_code') {
+    return 'email';
+  }
+  if (strategy === 'phone_code') {
+    return 'phone';
+  }
+  if (strategy === 'totp') {
+    return 'totp';
+  }
+  return undefined;
+}
+
+export function needsPrepare(method: ReverificationMethod): method is ReverificationPreparableMethod {
+  return method.strategy === 'email_code' || method.strategy === 'phone_code';
+}
+
+function pickStartingFirstFactor(
+  methods: readonly ReverificationMethod[],
+  preferredSignInStrategy: PreferredSignInStrategy | undefined,
+): ReverificationMethod | null {
+  if (preferredSignInStrategy === 'password') {
+    return methods.find(method => method.strategy === 'password') ?? methods[0] ?? null;
+  }
+
+  return (
+    methods.find(method => method.strategy === 'email_code' || method.strategy === 'phone_code') ?? methods[0] ?? null
+  );
+}
+
+function pickStartingSecondFactor(methods: readonly ReverificationMethod[]): ReverificationMethod | null {
+  return (
+    methods.find(method => method.strategy === 'totp') ??
+    methods.find(method => method.strategy === 'phone_code') ??
+    methods[0] ??
+    null
+  );
+}
+
+export function pickStartingMethod(
+  methods: readonly ReverificationMethod[],
+  preferredSignInStrategy: PreferredSignInStrategy | undefined,
+): ReverificationMethod | null {
+  return (
+    methods.find(method => method.strategy === 'passkey') ??
+    (methods[0]?.stage === 'second'
+      ? pickStartingSecondFactor(methods)
+      : pickStartingFirstFactor(methods, preferredSignInStrategy))
+  );
+}

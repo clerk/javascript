@@ -15,6 +15,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
@@ -74,6 +75,9 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     void signIn
       .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
       .then(res => {
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'complete':
             return setActive({
@@ -131,6 +135,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               identifier={signIn.identifier}
               avatarUrl={signIn.userData.imageUrl}
               onClick={goBack}
+              editButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
             />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>

@@ -1,10 +1,10 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "skipLibCheck": true,
     "noImplicitReturns": false,
     "strict": false,
     "importHelpers": false
   },
-  "exclude": ["node_modules", "dist", "**/dist/**", "packages/*/dist/**", "**/*.test.ts', '**/*.test.tsx"]
+  "exclude": ["node_modules", "dist", "**/dist/**", "packages/*/dist/**", "**/*.test.ts", "**/*.test.tsx"]
 }

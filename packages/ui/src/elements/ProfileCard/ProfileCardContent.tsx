@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Col, descriptors } from '../../customizables';
 import { useRouter } from '../../router';
-import { common, mqu } from '../../styledSystem';
+import { common } from '../../styledSystem';
 
 type ProfileCardContentProps = React.PropsWithChildren<{
   contentRef?: React.RefObject<HTMLDivElement>;
   scrollBoxId?: string;
 }>;
+
 export const ProfileCardContent = (props: ProfileCardContentProps) => {
   const { contentRef, children, scrollBoxId } = props;
   const router = useRouter();
@@ -53,13 +54,6 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         sx={theme => ({
           flex: `1`,
           scrollbarGutter: 'stable',
-          paddingTop: theme.space.$7,
-          paddingBottom: theme.space.$7,
-          paddingInlineStart: theme.space.$8,
-          paddingInlineEnd: theme.space.$6, //smaller because of stable scrollbar gutter
-          [mqu.sm]: {
-            padding: `${theme.space.$8} ${theme.space.$5}`,
-          },
           ...common.maxHeightScroller(theme),
         })}
         ref={contentRef}

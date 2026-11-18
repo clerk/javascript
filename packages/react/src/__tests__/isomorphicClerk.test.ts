@@ -1,6 +1,13 @@
+import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJSScript, loadClerkUIScript } from '@clerk/shared/loadClerkJsScript';
-import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type {
+  BrowserClerk,
+  HandleOAuthCallbackParams,
+  Resources,
+  SignInResource,
+  UnsubscribeCallback,
+} from '@clerk/shared/types';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
@@ -40,6 +47,45 @@ describe('isomorphicClerk', () => {
     expect(() => {
       new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     }).not.toThrow();
+  });
+
+  // Regression: composed/subcomponent UserProfile reads moduleManager via
+  // `useClerk().__internal_moduleManager`. `useClerk()` returns the
+  // IsomorphicClerk wrapper, so its getter must chain through to the loaded
+  // clerk-js's own `__internal_moduleManager`. This plain property access is
+  // the cross-bundle channel: clerk-js ships standalone from the CDN with its
+  // own inlined @clerk/shared, so module-scoped state cannot bridge the two.
+  //
+  // Without this chain, every dynamic-imported feature (Coinbase Wallet, Base,
+  // Stripe, zxcvbn) falls back to a rejecting manager.
+  it('exposes the inner clerk-js moduleManager through the __internal_moduleManager getter', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const mm = { import: vi.fn(() => Promise.resolve(undefined)) };
+
+    // Before clerk-js loads, the getter is undefined so readers fall back.
+    expect(isomorphicClerk.__internal_moduleManager).toBeUndefined();
+
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_moduleManager: mm,
+    };
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(isomorphicClerk.__internal_moduleManager).toBe(mm);
+  });
+
+  it('exposes the inner clerk-js Protect challenge load timeout', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBeUndefined();
+
+    const innerClerk: any = {
+      addListener: vi.fn(),
+      __internal_protectChallengeLoadTimeoutMs: 25_000,
+    };
+    (isomorphicClerk as any).replayInterceptedInvocations(innerClerk);
+
+    expect(isomorphicClerk.__internal_protectChallengeLoadTimeoutMs).toBe(25_000);
   });
 
   it('updates props asynchronously after clerkjs has loaded', async () => {
@@ -126,6 +172,269 @@ describe('isomorphicClerk', () => {
     expect(listenerCallHistory.length).toBe(0);
   });
 
+  it('queues __internal_handleResourceCallback until clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn();
+    const clerkjs = {
+      addListener: vi.fn(),
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'addListener' | 'loaded' | '__internal_handleResourceCallback'>;
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    await isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
+
+    expect(handleResourceCallback).not.toHaveBeenCalled();
+
+    (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
+
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
+  // Regression: a call queued before clerk-js loads is replayed by
+  // `replayInterceptedInvocations`, whose loop discards whatever its callbacks
+  // return. The queued copy therefore has no caller left to reject to -- the
+  // original `await` resolved the moment the call was queued -- so without its
+  // own rejection handler a failed resume becomes an unhandled rejection in the
+  // host app. Asserting that `catch` is attached, rather than waiting for the
+  // symptom, keeps the check deterministic under fake timers.
+  it('attaches a rejection handler to __internal_resumeAfterProtectCheck when it is queued until clerk-js has loaded', async () => {
+    const params = { continuation: 'transfer_to_sign_up' } as const;
+    const catchSpy = vi.fn();
+    const resumeAfterProtectCheck = vi.fn().mockReturnValue({ catch: catchSpy });
+    const clerkjs = {
+      addListener: vi.fn(),
+      loaded: true,
+      __internal_resumeAfterProtectCheck: resumeAfterProtectCheck,
+    } as unknown as BrowserClerk;
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    const customNavigate = vi.fn();
+
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
+
+    expect(resumeAfterProtectCheck).not.toHaveBeenCalled();
+
+    (isomorphicClerk as any).replayInterceptedInvocations(clerkjs);
+
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('attaches a rejection handler to __internal_resumeAfterProtectCheck after clerk-js has loaded', async () => {
+    const params = { continuation: 'transfer_to_sign_up' } as const;
+    const catchSpy = vi.fn();
+    const resumeAfterProtectCheck = vi.fn().mockReturnValue({ catch: catchSpy });
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = {
+      loaded: true,
+      __internal_resumeAfterProtectCheck: resumeAfterProtectCheck,
+    } as unknown as BrowserClerk;
+
+    const customNavigate = vi.fn();
+
+    await isomorphicClerk.__internal_resumeAfterProtectCheck(params, customNavigate);
+
+    // The navigator is the component router's; dropping it falls back to Clerk.navigate,
+    // which resolves component-relative destinations against the origin instead.
+    expect(resumeAfterProtectCheck).toHaveBeenCalledWith(params, customNavigate);
+    expect(catchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  // This wrapper is always defined on IsomorphicClerk, so it cannot itself signal whether the
+  // loaded runtime supports the call. An older clerk-js has no such method, and calling straight
+  // through would throw a TypeError at a host caller instead of doing nothing.
+  it('does nothing when the loaded clerk-js predates __internal_resumeAfterProtectCheck', async () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = { loaded: true } as unknown as BrowserClerk;
+
+    await expect(
+      isomorphicClerk.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' }),
+    ).resolves.toBeUndefined();
+  });
+
+  it('does nothing when clerk-js predates OAuth device verification mounting', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const node = document.createElement('div');
+
+    isomorphicClerk.__internal_mountOAuthDeviceVerification(node);
+
+    expect(() =>
+      (isomorphicClerk as any).replayInterceptedInvocations({
+        addListener: vi.fn(),
+        loaded: true,
+      } as unknown as BrowserClerk),
+    ).not.toThrow();
+    expect(() => isomorphicClerk.__internal_mountOAuthDeviceVerification(node)).not.toThrow();
+    expect(() => isomorphicClerk.__internal_unmountOAuthDeviceVerification(node)).not.toThrow();
+  });
+
+  it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
+    const signInOrUp = {} as unknown as SignInResource;
+    const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+    const customNavigate = vi.fn();
+    const handleResourceCallback = vi.fn().mockResolvedValue('done');
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+    (isomorphicClerk as any).clerkjs = {
+      loaded: true,
+      __internal_handleResourceCallback: handleResourceCallback,
+    } satisfies Pick<BrowserClerk, 'loaded' | '__internal_handleResourceCallback'>;
+
+    await expect(isomorphicClerk.__internal_handleResourceCallback(signInOrUp, params, customNavigate)).resolves.toBe(
+      'done',
+    );
+    expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
+  });
+
+  describe('a headless Clerk instance whose load failed', () => {
+    function createFailingHeadlessClerk({ finishesBeforeLoadRejects = false, throwingListener = false } = {}) {
+      const eventBus = createClerkEventBus();
+      let status = 'loading';
+      eventBus.prioritizedOn(clerkEvents.Status, next => (status = next));
+      const clerkjs = {
+        get loaded() {
+          return status === 'ready' || status === 'degraded';
+        },
+        get status() {
+          return status;
+        },
+        load: vi.fn(() => {
+          eventBus.emit(clerkEvents.Status, 'error');
+          if (finishesBeforeLoadRejects) {
+            eventBus.emit(clerkEvents.Status, 'ready');
+          }
+          return Promise.reject(new Error('Unsupported app version'));
+        }),
+        on: eventBus.on,
+        off: eventBus.off,
+        addListener: vi.fn(() => {
+          if (throwingListener) {
+            throw new Error('listener failed');
+          }
+        }),
+        finishLoad: (next: 'ready' | 'degraded' = 'ready') => eventBus.emit(clerkEvents.Status, next),
+      };
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: clerkjs as any,
+        experimental: { runtimeEnvironment: 'headless' },
+      });
+      return { clerkjs, isomorphicClerk };
+    }
+
+    it('replays the queued calls once when clerk-js finishes loading the same instance', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk();
+      const statuses: string[] = [];
+      isomorphicClerk.on('status', status => statuses.push(status));
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('error');
+      expect(clerkjs.addListener).not.toHaveBeenCalled();
+
+      clerkjs.finishLoad();
+      await vi.advanceTimersByTimeAsync(0);
+      clerkjs.finishLoad();
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('ready');
+      expect(isomorphicClerk.loaded).toBe(true);
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+      expect(statuses).toContain('ready');
+    });
+
+    it('replays the queued calls when clerk-js finished loading before the failure was handled', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk({ finishesBeforeLoadRejects: true });
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('ready');
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it('replays once when the replay after a successful load throws', async () => {
+      const eventBus = createClerkEventBus();
+      let status = 'loading';
+      eventBus.prioritizedOn(clerkEvents.Status, next => (status = next));
+      const clerkjs = {
+        get loaded() {
+          return status === 'ready';
+        },
+        get status() {
+          return status;
+        },
+        load: vi.fn(() => {
+          eventBus.emit(clerkEvents.Status, 'ready');
+          return Promise.resolve();
+        }),
+        on: eventBus.on,
+        off: eventBus.off,
+        addListener: vi.fn(() => {
+          throw new Error('listener failed');
+        }),
+      };
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: clerkjs as any,
+        experimental: { runtimeEnvironment: 'headless' },
+      });
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      ['after the failure was handled', false],
+      ['before the failure was handled', true],
+    ])('reports an error when the replay throws for a load that finished %s', async (_, finishesBeforeLoadRejects) => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk({
+        finishesBeforeLoadRejects,
+        throwingListener: true,
+      });
+      const statuses: string[] = [];
+      isomorphicClerk.on('status', status => statuses.push(status));
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      if (!finishesBeforeLoadRejects) {
+        clerkjs.finishLoad();
+        await vi.advanceTimersByTimeAsync(0);
+      }
+
+      expect(clerkjs.addListener).toHaveBeenCalledTimes(1);
+      expect(statuses.at(-1)).toBe('error');
+    });
+
+    it('waits while clerk-js is still failing', async () => {
+      const { clerkjs, isomorphicClerk } = createFailingHeadlessClerk();
+      isomorphicClerk.addListener(vi.fn());
+      await vi.advanceTimersByTimeAsync(0);
+
+      clerkjs.finishLoad('error' as 'ready');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(isomorphicClerk.status).toBe('error');
+      expect(clerkjs.addListener).not.toHaveBeenCalled();
+    });
+
+    it('lets every other status listener on clerk-js see the finished load', async () => {
+      const { clerkjs } = createFailingHeadlessClerk();
+      await vi.advanceTimersByTimeAsync(0);
+      const laterListener = vi.fn();
+      clerkjs.on('status', laterListener);
+
+      clerkjs.finishLoad();
+
+      expect(laterListener).toHaveBeenCalledWith('ready');
+    });
+  });
+
   describe('__internal_* URL precedence', () => {
     it('__internal_clerkJSUrl causes script loading even when Clerk prop is provided', async () => {
       const mockClerkCtor = vi.fn().mockImplementation(() => ({
@@ -170,7 +479,9 @@ describe('isomorphicClerk', () => {
         load: vi.fn().mockResolvedValue(undefined),
         loaded: false,
       };
-      const mockClerkCtor = vi.fn().mockImplementation(() => mockInstance);
+      const mockClerkCtor = vi.fn().mockImplementation(function () {
+        return mockInstance;
+      });
       mockClerkCtor.prototype = {};
 
       const clerk = new IsomorphicClerk({
@@ -387,6 +698,96 @@ describe('isomorphicClerk', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('__internal_windowNavigate', () => {
+    let originalLocation: Location;
+    let hrefSetter: Mock<(value: unknown) => void>;
+    let warnSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      originalLocation = window.location;
+      hrefSetter = vi.fn<(value: unknown) => void>();
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: new Proxy(
+          { href: 'https://example.com/' },
+          {
+            set: (target, prop, value) => {
+              if (prop === 'href') {
+                hrefSetter(value);
+              }
+              (target as any)[prop] = value;
+              return true;
+            },
+          },
+        ),
+      });
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      Object.defineProperty(window, 'location', { configurable: true, value: originalLocation });
+      warnSpy.mockRestore();
+    });
+
+    it('delegates to clerk-js when the navigation chokepoint is available', () => {
+      const navigate = vi.fn();
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = { __internal_windowNavigate: navigate };
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in', { useStaticAllowlistOnly: true });
+
+      expect(navigate).toHaveBeenCalledWith('/sign-in', { useStaticAllowlistOnly: true });
+      expect(hrefSetter).not.toHaveBeenCalled();
+    });
+
+    it('falls back to navigation when clerk-js is older and lacks the chokepoint', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      // An older clerk-js that does not expose __internal_windowNavigate.
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('/sign-in');
+
+      expect(hrefSetter).toHaveBeenCalledWith('https://example.com/sign-in');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback honors the customer-supplied allowedRedirectProtocols option', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123');
+
+      expect(hrefSetter).toHaveBeenCalledWith('slack://channel/123');
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('fallback fails closed for disallowed protocols', () => {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('javascript:alert(1)');
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('fallback ignores customer protocols when useStaticAllowlistOnly is set', () => {
+      const isomorphicClerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        allowedRedirectProtocols: ['slack:'],
+      });
+      (isomorphicClerk as any).clerkjs = {};
+
+      isomorphicClerk.__internal_windowNavigate('slack://channel/123', { useStaticAllowlistOnly: true });
+
+      expect(hrefSetter).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

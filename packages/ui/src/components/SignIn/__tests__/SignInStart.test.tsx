@@ -1,15 +1,18 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { simulateCaptchaInteractive, simulateCaptchaResolved } from '@/test/captcha';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from '../shared';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -73,13 +76,44 @@ describe('SignInStart', () => {
       screen.getByText(/email address/i);
     });
 
+    it('sets autocomplete=email on an email-only identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute('autocomplete', 'email');
+    });
+
+    it('sets autocomplete=username when email and username are both enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUsername();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address or username/i })).toHaveAttribute(
+        'autocomplete',
+        'username',
+      );
+    });
+
+    it('sets autocomplete=tel on a phone identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('autocomplete', 'tel');
+    });
+
     it('enables login with username', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUsername();
       });
 
       render(<SignInStart />, { wrapper });
-      screen.getByText(/username/i);
+      expect(screen.getByRole('textbox', { name: /username/i })).toHaveAttribute('autocomplete', 'username');
     });
 
     it('enables login with phone number', async () => {
@@ -149,6 +183,117 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+        expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute(
+          'autocomplete',
+          'email webauthn',
+        );
+      });
+
+      it('does not display related-origin errors from passkey autofill', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: true,
+          });
+        });
+
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValue(
+          new ClerkWebAuthnError('The operation is insecure.', {
+            code: 'passkey_invalid_rpID_or_domain',
+          }),
+        );
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+        expect(screen.queryByText(/operation is insecure/i)).not.toBeInTheDocument();
+        screen.getByText('Use passkey instead');
+      });
+
+      it('skips autofill when the host reports no autofill support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        const isAutoFillSupported = vi.fn(() => Promise.resolve(false));
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = isAutoFillSupported;
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(isAutoFillSupported).toHaveBeenCalled();
+        });
+        expect(fixtures.signIn.authenticateWithPasskey).not.toHaveBeenCalled();
+      });
+
+      it('hides the passkey action when the host reports no WebAuthn support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => false;
+        render(<SignInStart />, { wrapper });
+
+        expect(screen.queryByText('Use passkey instead')).not.toBeInTheDocument();
+      });
+    });
+
+    describe('with a host-provided WebAuthn implementation', () => {
+      it('starts autofill when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnAutofillSupported = () => Promise.resolve(true);
+        fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
+          status: 'complete',
+        } as SignInResource);
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+      });
+
+      it('shows the passkey action when the host reports support', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+
+        // @ts-expect-error - This is not a public API
+        fixtures.clerk.__internal_isWebAuthnSupported = () => true;
+        render(<SignInStart />, { wrapper });
+
+        screen.getByText('Use passkey instead');
       });
     });
   });
@@ -284,6 +429,23 @@ describe('SignInStart', () => {
         });
       });
     });
+
+    it('explains a challenge the social button cannot run, instead of showing the raw error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(
+        new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+          code: 'protect_check_required',
+        }),
+      );
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Continue with Google'));
+
+      expect(await screen.findByText(/needs an extra verification step/i)).toBeInTheDocument();
+      expect(screen.queryByText(/code="protect_check_required"/)).not.toBeInTheDocument();
+    });
   });
 
   describe('navigation', () => {
@@ -315,6 +477,38 @@ describe('SignInStart', () => {
         expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
           flow: 'discoverable',
         });
+      });
+
+      it('resumes the existing session when passkey sign-in returns session_exists', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            show_sign_in_button: true,
+          });
+        });
+        fixtures.clerk.client.lastActiveSessionId = 'sess_123';
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'session_exists',
+                long_message: "You're already signed in.",
+                message: 'Session exists',
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInStart />, { wrapper });
+        await userEvent.click(screen.getByText('Use passkey instead'));
+        await waitFor(() => {
+          expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+            session: 'sess_123',
+            navigate: expect.any(Function),
+          });
+        });
+        expect(screen.queryByText("You're already signed in.")).not.toBeInTheDocument();
       });
     });
 
@@ -365,6 +559,69 @@ describe('SignInStart', () => {
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
+    });
+
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+          ssoBypassFirstFactors: [
+            { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+          ],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
+    });
+
+    it('routes to the challenge when preparing the hand-off raises one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      // No redirect is issued: the sign-in comes back sitting on the challenge and the call throws.
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('protect-check');
+    });
+
+    it('does not route to the challenge for other hand-off errors', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        throw new ClerkRuntimeError('something else', { code: 'captcha_unavailable' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('protect-check');
     });
   });
 
@@ -445,6 +702,18 @@ describe('SignInStart', () => {
 
       expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('type', 'tel');
     });
+
+    it('ignores paste events without clipboard data', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withSupportEmail();
+      });
+      render(<SignInStart />, { wrapper });
+
+      const input = screen.getByRole('textbox', { name: /phone number/i });
+
+      expect(() => fireEvent.paste(input, { clipboardData: null })).not.toThrow();
+    });
   });
 
   describe('initialValues', () => {
@@ -476,6 +745,47 @@ describe('SignInStart', () => {
       props.setProps({ initialValues: { username: 'foo' } });
       render(<SignInStart />, { wrapper });
       screen.getByDisplayValue(/foo/i);
+    });
+  });
+
+  describe('Forgot password on instant password field', () => {
+    it('navigates to factor-one with reset intent when clicking Forgot password', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      const instantPasswordField = container.querySelector('#password-field') as Element;
+      fireEvent.change(instantPasswordField, { target: { value: 'some-password' } });
+
+      await userEvent.click(screen.getByText(/Forgot password/i));
+
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({
+          identifier: 'hello@clerk.com',
+        });
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one', {
+          searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
+        });
+      });
+    });
+
+    it('does not call create when identifier is empty', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+
+      const instantPasswordField = container.querySelector('#password-field') as Element;
+      fireEvent.change(instantPasswordField, { target: { value: 'some-password' } });
+
+      await userEvent.click(screen.getByText(/Forgot password/i));
+
+      expect(fixtures.signIn.create).not.toHaveBeenCalled();
     });
   });
 
@@ -528,6 +838,52 @@ describe('SignInStart', () => {
           });
         });
       });
+    });
+  });
+
+  describe('Instant password field a11y', () => {
+    it('hides the empty instant password field from the a11y tree via aria-hidden', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      expect(passwordField).not.toBeNull();
+
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+      expect(row).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('reveals the instant password field when the browser autofills it', async () => {
+      // Simulate the browser's :autofill animation that the component polls for
+      mockGetComputedStyle.mockReturnValue({
+        animationName: 'onAutoFillStart',
+        pointerEvents: 'auto',
+        getPropertyValue: vi.fn().mockReturnValue(''),
+      });
+
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+      });
+      const { container } = render(<SignInStart />, { wrapper });
+
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      const row = passwordField.closest('[class*="formFieldRow"]') as HTMLElement;
+
+      // initially hidden from a11y tree until the autofill poll fires
+      expect(row).toHaveAttribute('aria-hidden', 'true');
+
+      await waitFor(
+        () => {
+          expect(row).not.toHaveAttribute('aria-hidden');
+        },
+        { timeout: 2000 },
+      );
+      // Forgot password action only renders once the field is shown
+      screen.getByText(/Forgot password/i);
     });
   });
 
@@ -606,6 +962,134 @@ describe('SignInStart', () => {
     });
   });
 
+  describe('signUpIfMissing', () => {
+    it('passes signUpIfMissing: true when combined flow and enumeration protection are enabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when enumeration protection is disabled', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when not in combined flow', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when password is present', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { container, userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      const passwordField = container.querySelector('#password-field') as Element;
+      expect(passwordField).not.toBeNull();
+      fireEvent.change(passwordField, { target: { value: 'some-password' } });
+      const form = container.querySelector('form') as Element;
+      fireEvent.submit(form);
+      await waitFor(() => {
+        expect(fixtures.signIn.create).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            signUpIfMissing: true,
+          }),
+        );
+      });
+    });
+
+    it('does not pass signUpIfMissing when sign-up mode is restricted', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withRestrictedMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when sign-up mode is waitlist', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withEnumerationProtection();
+        f.withWaitlistMode();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+
+    it('does not pass signUpIfMissing when the identifier is a username', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUsername();
+        f.withEnumerationProtection();
+      });
+      props.setProps({ withSignUp: true });
+      fixtures.signIn.create.mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/username/i), 'hello');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.create).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          signUpIfMissing: true,
+        }),
+      );
+    });
+  });
+
   describe('ticket flow', () => {
     it('calls the appropriate resource function upon detecting the ticket', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -671,6 +1155,101 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        ssoBypassFirstFactors: [
+          { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+        ],
+      } as unknown as SignInResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-in?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Captcha', () => {
+    it('renders the captcha widget in the form (email) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      render(<SignInStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+
+    it('renders the captcha widget in the social-only (no form) config', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignInStart />, { wrapper });
+      expect(document.getElementById(CAPTCHA_ELEMENT_ID)).not.toBeNull();
+    });
+  });
+
+  describe('Captcha spotlight', () => {
+    const getCaptcha = () => document.getElementById(CAPTCHA_ELEMENT_ID) as HTMLElement;
+
+    it('inerts the form/social subtree while interactive — never the captcha or header — and restores', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'google' });
+      });
+      render(<SignInStart />, { wrapper });
+
+      const google = screen.getByText(/continue with google/i);
+      expect(google.closest('[inert]')).toBeNull();
+
+      simulateCaptchaInteractive(getCaptcha());
+
+      await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+      // The captcha widget and the header stay outside the inert subtree.
+      expect(getCaptcha().closest('[inert]')).toBeNull();
+      expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
+
+      simulateCaptchaResolved(getCaptcha());
+      await waitFor(() => expect(google.closest('[inert]')).toBeNull());
+    });
+
+    mockWebAuthn(() => {
+      it('keeps the passkey action available (outside the inert subtree) during the spotlight', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+        render(<SignInStart />, { wrapper });
+
+        simulateCaptchaInteractive(getCaptcha());
+        // Spotlight is active (the form is inert)...
+        await waitFor(() => expect(screen.getByText(/email address/i).closest('[inert]')).not.toBeNull());
+        // ...but the passkey action remains reachable.
+        expect(screen.getByText('Use passkey instead').closest('[inert]')).toBeNull();
+      });
     });
   });
 });

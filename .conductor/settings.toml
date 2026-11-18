@@ -1,0 +1,11 @@
+"$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
+
+[scripts]
+run_mode = "concurrent"
+setup = "pnpm install"
+
+[scripts.run.run]
+available_in = "local"
+command = "PORT=$CONDUCTOR_PORT pnpm run dev:sandbox"
+default = true
+icon = "play"

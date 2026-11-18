@@ -6,6 +6,7 @@ import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { useSecurityRouteAccess } from './useSecurityRouteAccess';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -37,16 +38,37 @@ const OrganizationPaymentAttemptPage = lazy(() =>
   })),
 );
 
-export const OrganizationProfileRoutes = () => {
+const CreditHistoryPage = lazy(() =>
+  import(/* webpackChunkName: "credit-history-page"*/ '../AccountCredits').then(module => ({
+    default: module.CreditHistoryPage,
+  })),
+);
+
+const OrganizationSecurityPage = lazy(() =>
+  import(/* webpackChunkName: "op-security-page"*/ './OrganizationSecurityPage').then(module => ({
+    default: module.OrganizationSecurityPage,
+  })),
+);
+
+type OrganizationProfileRoutesProps = {
+  contentRef: React.RefObject<HTMLDivElement>;
+};
+
+export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRoutesProps) => {
   const {
     pages,
     isMembersPageRoot,
     isGeneralPageRoot,
     isBillingPageRoot,
     isAPIKeysPageRoot,
+    isSecurityPageRoot,
     shouldShowBilling,
+    shouldShowSecurityPage,
     apiKeysProps,
   } = useOrganizationProfileContext();
+
+  const securityRouteAccess = useSecurityRouteAccess();
+  const allowSecurityRoute = securityRouteAccess.allowed || securityRouteAccess.pending;
 
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
@@ -121,6 +143,11 @@ export const OrganizationProfileRoutes = () => {
                     <OrganizationPaymentAttemptPage />
                   </Suspense>
                 </Route>
+                <Route path='credit-history'>
+                  <Suspense fallback={''}>
+                    <CreditHistoryPage />
+                  </Suspense>
+                </Route>
               </Switch>
             </Route>
           </Protect>
@@ -142,6 +169,17 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         )}
+        {shouldShowSecurityPage && allowSecurityRoute ? (
+          <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationSecurityPage contentRef={contentRef} />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        ) : null}
       </Route>
     </Switch>
   );

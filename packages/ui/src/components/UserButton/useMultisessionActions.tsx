@@ -1,18 +1,20 @@
 import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk, usePortalRoot } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
 import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
+import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
+import { useSignOutWithRedirect } from '../../hooks/useSignOutWithRedirect';
 import { useRouter } from '../../router';
 
 type UseMultisessionActionsParams = {
   user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
+  afterSignOutUrl?: string;
   navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;
   afterSwitchSessionUrl?: string;
@@ -22,7 +24,9 @@ type UseMultisessionActionsParams = {
 } & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
-  const { setActive, signOut, openUserProfile } = useClerk();
+  const clerk = useClerk();
+  const signOutWithRedirect = useSignOutWithRedirect();
+  const { setActive, signOut, openUserProfile } = clerk;
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
@@ -31,7 +35,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut(opts.navigateAfterSignOut);
+      return signOutWithRedirect(opts.navigateAfterSignOut, opts.afterSignOutUrl);
     }
     return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(() =>
       card.setIdle(),
@@ -70,7 +74,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleSignOutAllClicked = () => {
-    return signOut(opts.navigateAfterSignOut);
+    return signOutWithRedirect(opts.navigateAfterSignOut, opts.afterSignOutUrl);
   };
 
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {
@@ -101,7 +105,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    windowNavigate(opts.signInUrl || window.location.href);
+    clerkWindowNavigate(clerk, opts.signInUrl || window.location.href);
     return sleep(2000);
   };
 

@@ -1,19 +1,21 @@
-import { __internal_useUserEnterpriseConnections, useOrganization, useUser } from '@clerk/shared/react';
-import type { __experimental_ConfigureSSOProps } from '@clerk/shared/types';
+import { useSession } from '@clerk/shared/react';
+import type { ConfigureSSOProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { useEnvironment, withCoreUserGuard } from '@/contexts';
-import { Box, Col, descriptors, Flex, Flow, Icon, localizationKeys, Text, useAppearance } from '@/customizables';
-import { ApplicationLogo } from '@/elements/ApplicationLogo';
+import { useProtect } from '@/common';
+import { withCoreUserGuard } from '@/contexts';
+import { Col, Flex, Flow, Heading, Icon, localizationKeys, Text } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
-import { NavBar, NavbarContextProvider } from '@/elements/Navbar';
 import { ProfileCard } from '@/elements/ProfileCard';
-import { BoxIcon } from '@/icons';
+import { ExclamationTriangle } from '@/icons';
 import { Route, Switch } from '@/router';
 
-import { ConfigureSSOFlowProvider } from './ConfigureSSOContext';
-import { ConfigureCreateApp, ConfirmationStep, ProvideEmail, TestConfigurationStep, VerifyDomainStep } from './steps';
-import { ConfigureSSOWizard } from './wizard';
+import { ConfigureSSONavbar } from './ConfigureSSONavbar';
+import { ConfigureSSOSkeleton } from './ConfigureSSOSkeleton';
+import { ConfigureSSOWizard } from './ConfigureSSOWizard';
+import { ProfileCardFooter, ProfileCardHeader } from './elements/ProfileCard';
+import { Step } from './elements/Step';
+import { useOrganizationEnterpriseConnection } from './hooks/useOrganizationEnterpriseConnection';
 
 const ConfigureSSOInternal = () => {
   return (
@@ -29,181 +31,111 @@ const ConfigureSSOInternal = () => {
 
 const AuthenticatedContent = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { applicationName, logoImageUrl } = useEnvironment().displayConfig;
-  const { organizationSettings } = useEnvironment();
-  const { parsedOptions } = useAppearance();
-  const hasLogo = Boolean(parsedOptions.logoImageUrl || logoImageUrl);
-
-  const { data: enterpriseConnections, isLoading: isLoadingEnterpriseConnections } =
-    __internal_useUserEnterpriseConnections({ enabled: true });
-  // Currently FAPI only supports one enterprise connection per user
-  const enterpriseConnection = enterpriseConnections?.[0];
 
   return (
     <ProfileCard.Root
       sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
     >
-      <NavbarContextProvider contentRef={contentRef}>
-        <NavBar
-          header={
-            <Flex
-              align='center'
-              sx={t => ({
-                gap: t.space.$2,
-                padding: `${t.space.$none} ${t.space.$3}`,
-                maxWidth: '100%',
-              })}
-            >
-              {hasLogo ? (
-                <ApplicationLogo
-                  sx={t => ({ width: t.space.$9, height: t.space.$9, borderRadius: t.radii.$md, overflow: 'hidden' })}
-                />
-              ) : (
-                <Box
-                  sx={t => ({
-                    width: t.space.$9,
-                    height: t.space.$9,
-                    flexShrink: 0,
-                    borderRadius: t.radii.$md,
-                    backgroundColor: t.colors.$primary500,
-                    color: t.colors.$colorPrimaryForeground,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  })}
-                  aria-hidden
-                >
-                  <Icon
-                    icon={BoxIcon}
-                    sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-                  />
-                </Box>
-              )}
-
-              <Col sx={{ minWidth: 0 }}>
-                <Text
-                  as='p'
-                  truncate
-                >
-                  {applicationName}
-                </Text>
-                {organizationSettings.enabled && <OrganizationSidebarSubtitle />}
-              </Col>
-            </Flex>
-          }
-          titleSx={t => ({ fontSize: t.fontSizes.$lg })}
-          title={localizationKeys('configureSSO.navbar.title')}
-          routes={[]}
-          contentRef={contentRef}
-        />
-        <Col
-          ref={contentRef}
-          elementDescriptor={descriptors.scrollBox}
-          sx={t => ({
-            backgroundColor: t.colors.$colorBackground,
-            position: 'relative',
-            borderRadius: t.radii.$lg,
-            width: '100%',
-            overflow: 'hidden',
-            borderWidth: t.borderWidths.$normal,
-            borderStyle: t.borderStyles.$solid,
-            borderColor: t.colors.$borderAlpha150,
-            marginBlock: '-1px',
-            marginInlineEnd: '-1px',
-            flex: 1,
-          })}
-        >
-          <ConfigureSSOFlowProvider
-            enterpriseConnection={enterpriseConnection}
-            isLoading={isLoadingEnterpriseConnections}
-          >
-            <ConfigureSSOSteps />
-          </ConfigureSSOFlowProvider>
-        </Col>
-      </NavbarContextProvider>
+      <ConfigureSSONavbar contentRef={contentRef}>
+        <ConfigureSSOContent contentRef={contentRef} />
+      </ConfigureSSONavbar>
     </ProfileCard.Root>
   );
 });
 
-const ConfigureSSOSteps = () => {
-  const { user } = useUser();
+export const ConfigureSSOContent = ({ contentRef }: { contentRef: React.RefObject<HTMLDivElement> }) => {
+  const {
+    isLoading,
+    enterpriseConnection,
+    connectionDomains,
+    setConnectionDomains,
+    claimedDomains,
+    organizationEnterpriseConnection,
+    testRuns,
+    enterpriseConnectionMutations,
+    organizationDomains,
+    organizationDomainMutations,
+  } = useOrganizationEnterpriseConnection();
 
-  const primaryEmailAddress = user?.primaryEmailAddress;
-
-  return (
-    <ConfigureSSOWizard>
-      <ConfigureSSOWizard.Step
-        id='verify-email-domain'
-        path='verify-email-domain'
-        label='Verify domain'
-      >
-        <ConfigureSSOWizard>
-          {!primaryEmailAddress && (
-            <ConfigureSSOWizard.Step
-              id='provide-email'
-              path='provide-email'
-            >
-              <ProvideEmail />
-            </ConfigureSSOWizard.Step>
-          )}
-          <ConfigureSSOWizard.Step
-            id='verify-domain'
-            path='verify-domain'
-          >
-            <VerifyDomainStep />
-          </ConfigureSSOWizard.Step>
-        </ConfigureSSOWizard>
-      </ConfigureSSOWizard.Step>
-      <ConfigureSSOWizard.Step
-        id='configure'
-        path='configure'
-        label='Configure'
-      >
-        <ConfigureSSOWizard>
-          {/* TODO: Implement configure steps */}
-          <ConfigureSSOWizard.Step
-            id='create-app'
-            path='create-app'
-          >
-            <ConfigureCreateApp />
-          </ConfigureSSOWizard.Step>
-        </ConfigureSSOWizard>
-      </ConfigureSSOWizard.Step>
-      <ConfigureSSOWizard.Step
-        id='test'
-        path='test'
-        label='Test'
-      >
-        <TestConfigurationStep />
-      </ConfigureSSOWizard.Step>
-      <ConfigureSSOWizard.Step
-        id='confirmation'
-        path='confirmation'
-        label='Confirmation'
-      >
-        <ConfirmationStep />
-      </ConfigureSSOWizard.Step>
-    </ConfigureSSOWizard>
-  );
-};
-
-const OrganizationSidebarSubtitle = () => {
-  const { organization } = useOrganization();
-
-  if (!organization) {
-    return null;
+  if (isLoading) {
+    return <ConfigureSSOSkeleton />;
   }
 
   return (
-    <Text
-      as='span'
-      truncate
-      sx={t => ({ color: t.colors.$colorMutedForeground })}
-    >
-      {organization?.name}
-    </Text>
+    <ConfigureSSOProtect>
+      <ConfigureSSOWizard
+        organizationEnterpriseConnection={organizationEnterpriseConnection}
+        testRuns={testRuns}
+        enterpriseConnection={enterpriseConnection}
+        connectionDomains={connectionDomains}
+        setConnectionDomains={setConnectionDomains}
+        claimedDomains={claimedDomains}
+        contentRef={contentRef}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationDomainMutations={organizationDomainMutations}
+        organizationDomains={organizationDomains}
+      />
+    </ConfigureSSOProtect>
   );
 };
 
-export const ConfigureSSO: React.ComponentType<__experimental_ConfigureSSOProps> =
-  withCardStateProvider(ConfigureSSOInternal);
+/** Permission gate shared by the wizard's hosts — personal workspaces pass, since there is no membership to check. */
+export const ConfigureSSOProtect = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useSession();
+  const isPersonalWorkspace = !session?.lastActiveOrganizationId;
+  const canManageEnterpriseConnections = useProtect(
+    has => isPersonalWorkspace || has({ permission: 'org:sys_entconns:manage' }),
+  );
+
+  if (!canManageEnterpriseConnections) {
+    return <MissingManageEnterpriseConnectionsPermission />;
+  }
+
+  return children;
+};
+
+const MissingManageEnterpriseConnectionsPermission = () => (
+  <>
+    <ProfileCardHeader />
+
+    <Step.Body>
+      <Step.Section
+        sx={{ flex: 1 }}
+        align='center'
+        justify='center'
+      >
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, padding: t.space.$8 })}
+        >
+          <Col
+            align='center'
+            sx={t => ({ gap: t.space.$2, textAlign: 'center', maxWidth: t.sizes.$94 })}
+          >
+            <Icon
+              icon={ExclamationTriangle}
+              sx={t => ({ width: t.sizes.$8, height: t.sizes.$8, color: t.colors.$neutralAlpha600 })}
+            />
+            <Heading
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.title')}
+              textVariant='h1'
+              sx={t => ({ fontSize: t.fontSizes.$lg, textWrap: 'balance' })}
+            />
+            <Text
+              as='p'
+              variant='body'
+              colorScheme='secondary'
+              localizationKey={localizationKeys('configureSSO.missingManageEnterpriseConnectionsPermission.subtitle')}
+              sx={{ textWrap: 'balance' }}
+            />
+          </Col>
+        </Flex>
+      </Step.Section>
+    </Step.Body>
+
+    <ProfileCardFooter />
+  </>
+);
+
+export const ConfigureSSO: React.ComponentType<ConfigureSSOProps> = withCardStateProvider(ConfigureSSOInternal);

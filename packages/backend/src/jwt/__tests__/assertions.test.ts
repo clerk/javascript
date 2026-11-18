@@ -8,6 +8,8 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertIssuerClaim,
+  assertOAuthAudienceClaim,
   assertSubClaim,
 } from '../assertions';
 
@@ -93,6 +95,12 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
     );
   });
 
+  it('throws error when audience string[] has no intersection with aud string[]', () => {
+    expect(() => assertAudienceClaim([audience], [invalidAudience])).toThrow(
+      `Invalid JWT audience claim array (aud) ${JSON.stringify([audience])}. Is not included in "${JSON.stringify([invalidAudience])}".`,
+    );
+  });
+
   it('throws error when aud is a substring of audience', () => {
     expect(() => assertAudienceClaim(audience.slice(0, -2), audience)).toThrow(
       `Invalid JWT audience claim (aud) "${audience.slice(0, -2)}". Is not included in "${JSON.stringify([audience])}".`,
@@ -106,11 +114,38 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
   });
 });
 
+describe('assertOAuthAudienceClaim(aud, audience?)', () => {
+  const audience = 'https://resource.example.com';
+  const otherAudience = 'https://other.example.com';
+
+  it.each([
+    { aud: audience, expected: audience },
+    { aud: [otherAudience, audience], expected: audience },
+    { aud: audience, expected: [otherAudience, audience] },
+    { aud: [otherAudience, audience], expected: [audience] },
+  ])('accepts aud=$aud with expected audience=$expected', ({ aud, expected }) => {
+    expect(() => assertOAuthAudienceClaim(aud, expected)).not.toThrow();
+  });
+
+  it.each([undefined, null, '', []])('rejects missing or empty aud=%j when an audience is expected', aud => {
+    expect(() => assertOAuthAudienceClaim(aud, audience)).toThrow('Invalid OAuth audience claim');
+  });
+
+  it.each([undefined, '', []])('skips audience validation when expected audience=%j', expected => {
+    expect(() => assertOAuthAudienceClaim(undefined, expected)).not.toThrow();
+  });
+});
+
 describe('assertHeaderType(typ?, allowedTypes?)', () => {
-  it('does not throw error if type is missing', () => {
+  it('does not throw error if type is missing and allowed types are not configured', () => {
     expect(() => assertHeaderType(undefined)).not.toThrow();
-    expect(() => assertHeaderType(undefined, 'JWT')).not.toThrow();
-    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).not.toThrow();
+  });
+
+  it('throws error if type is missing and allowed types are configured', () => {
+    expect(() => assertHeaderType(undefined, 'JWT')).toThrow(`Invalid JWT type undefined. Expected "JWT".`);
+    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).toThrow(
+      `Invalid JWT type undefined. Expected "JWT, at+jwt".`,
+    );
   });
 
   it('does not throw error if type matches default allowed type (JWT)', () => {
@@ -193,10 +228,21 @@ describe('assertSubClaim(sub?)', () => {
 });
 
 describe('assertAuthorizedPartiesClaim(azp?, authorizedParties?)', () => {
-  it('does not throw if azp missing or empty', () => {
+  it('does not throw if azp missing or empty and no authorizedParties are configured', () => {
     expect(() => assertAuthorizedPartiesClaim()).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim('')).not.toThrow();
     expect(() => assertAuthorizedPartiesClaim(undefined)).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim('', [])).not.toThrow();
+    expect(() => assertAuthorizedPartiesClaim(undefined, [])).not.toThrow();
+  });
+
+  it('throws error if azp is missing or empty but authorizedParties are configured', () => {
+    expect(() => assertAuthorizedPartiesClaim('', ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) "". Expected "azp-1".`,
+    );
+    expect(() => assertAuthorizedPartiesClaim(undefined, ['azp-1'])).toThrow(
+      `Invalid JWT Authorized party claim (azp) undefined. Expected "azp-1".`,
+    );
   });
 
   it('does not throw if authorizedParties missing or empty', () => {
@@ -216,6 +262,43 @@ describe('assertAuthorizedPartiesClaim(azp?, authorizedParties?)', () => {
 
   it('does not throw if azp is included in authorizedParties', () => {
     expect(() => assertAuthorizedPartiesClaim('azp', ['azp'])).not.toThrow();
+  });
+});
+
+describe('assertIssuerClaim(iss, issuer?)', () => {
+  const iss = 'https://clerk.example.com';
+
+  it('does not throw if no issuer is provided (opt-in)', () => {
+    expect(() => assertIssuerClaim(iss)).not.toThrow();
+    expect(() => assertIssuerClaim(iss, undefined)).not.toThrow();
+    expect(() => assertIssuerClaim(undefined)).not.toThrow();
+    expect(() => assertIssuerClaim(iss, '')).not.toThrow();
+    expect(() => assertIssuerClaim(iss, [])).not.toThrow();
+  });
+
+  it('does not throw if iss exactly matches the issuer string', () => {
+    expect(() => assertIssuerClaim(iss, iss)).not.toThrow();
+  });
+
+  it('does not throw if iss is included in the issuer list', () => {
+    expect(() => assertIssuerClaim(iss, ['https://clerk.other.com', iss])).not.toThrow();
+  });
+
+  it('throws if iss does not match the issuer string', () => {
+    expect(() => assertIssuerClaim(iss, 'https://clerk.evil.com')).toThrow(
+      `Invalid JWT issuer claim (iss) "https://clerk.example.com".`,
+    );
+  });
+
+  it('throws if iss is not included in the issuer list', () => {
+    expect(() => assertIssuerClaim(iss, ['https://clerk.evil.com', 'https://clerk.other.com'])).toThrow(
+      `Invalid JWT issuer claim (iss) "https://clerk.example.com".`,
+    );
+  });
+
+  it('throws if iss is missing or not a string when an issuer is required', () => {
+    expect(() => assertIssuerClaim(undefined, iss)).toThrow(`Invalid JWT issuer claim (iss) undefined.`);
+    expect(() => assertIssuerClaim(42, iss)).toThrow(`Invalid JWT issuer claim (iss) 42.`);
   });
 });
 

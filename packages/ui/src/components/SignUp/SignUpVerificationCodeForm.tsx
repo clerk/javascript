@@ -1,5 +1,4 @@
 import { forwardClerkQueryParams } from '@clerk/shared/internal/clerk-js/queryParams';
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -9,7 +8,7 @@ import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { SignInContext, useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { useRouter } from '../../router';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 type SignInFactorOneCodeFormProps = {
   cardTitle: LocalizationKey;
@@ -19,15 +18,16 @@ type SignInFactorOneCodeFormProps = {
   prepare: () => Promise<SignUpResource | void> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
   safeIdentifier?: string | undefined | null;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
   alternativeMethodsLabel?: LocalizationKey;
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
   showAlternativeMethods?: boolean;
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const { afterSignUpUrl, navigateOnSetActive, isCombinedFlow: _isCombinedFlow } = useSignUpContext();
-  const { setActive } = useClerk();
+  const { isCombinedFlow: _isCombinedFlow } = useSignUpContext();
   const { navigate } = useRouter();
+  const completeSignUpFlow = useCompleteSignUpFlow();
 
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const isCombinedFlow = !!(isWithinSignInContext && _isCombinedFlow);
@@ -46,15 +46,8 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           signUp: res,
           verifyEmailPath: '../verify-email-address',
           verifyPhonePath: '../verify-phone-number',
+          protectCheckPath: '../protect-check',
           continuePath: '../continue',
-          handleComplete: () =>
-            setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            }),
-          navigate,
         });
       })
       .catch(err => {
@@ -72,6 +65,7 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
       onResendCodeClicked={props.prepare}
       safeIdentifier={props.safeIdentifier}
       onIdentityPreviewEditClicked={goBack}
+      identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       alternativeMethodsLabel={props.alternativeMethodsLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}

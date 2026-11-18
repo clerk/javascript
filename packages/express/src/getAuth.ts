@@ -8,7 +8,7 @@ import { requestHasAuthObject } from './utils';
 /**
  * Retrieves the Clerk AuthObject using the current request object.
  *
- * @param {GetAuthOptions} options - Optional configuration for retriving auth object.
+ * @param {GetAuthOptions} options - Optional configuration for retrieving auth object.
  * @returns {AuthObject} Object with information about the request state and claims.
  * @throws {Error} `clerkMiddleware` or `requireAuth` is required to be set in the middleware chain before this util is used.
  */

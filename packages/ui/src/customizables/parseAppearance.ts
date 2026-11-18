@@ -51,6 +51,8 @@ const defaultOptions: ParsedOptions = {
   shimmer: true,
   animations: true,
   unsafe_disableDevelopmentModeWarnings: false,
+  autoFocus: true,
+  elevation: 'raised',
 };
 
 const defaultCaptchaOptions: ParsedCaptcha = {

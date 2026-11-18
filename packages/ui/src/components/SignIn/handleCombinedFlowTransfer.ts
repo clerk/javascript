@@ -23,6 +23,7 @@ type HandleCombinedFlowTransferProps = {
   handleError: (err: any) => void;
   redirectUrl?: string;
   redirectUrlComplete?: string;
+  oidcPrompt?: string;
   passwordEnabled: boolean;
   alternativePhoneCodeChannel?: PhoneCodeChannel | null;
   navigateOnSetActive: (opts: {
@@ -48,6 +49,7 @@ export function handleCombinedFlowTransfer({
   handleError,
   redirectUrl,
   redirectUrlComplete,
+  oidcPrompt,
   passwordEnabled,
   navigateOnSetActive,
   alternativePhoneCodeChannel,
@@ -100,6 +102,7 @@ export function handleCombinedFlowTransfer({
           signUp: res,
           verifyEmailPath: 'create/verify-email-address',
           verifyPhonePath: 'create/verify-phone-number',
+          protectCheckPath: 'create/protect-check',
           handleComplete: () =>
             clerk.setActive({
               session: res.createdSessionId,
@@ -110,6 +113,7 @@ export function handleCombinedFlowTransfer({
           navigate,
           redirectUrl,
           redirectUrlComplete,
+          oidcPrompt,
         });
       })
       .catch(err => handleError(err));

@@ -11,8 +11,8 @@ import {
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 import { clearFetchCache } from '@/ui/hooks/useFetch';
 
-import { TaskChooseOrganization } from '..';
 import type { FakeOrganizationParams } from '../../../../CreateOrganization/__tests__/CreateOrganization.test';
+import { TaskChooseOrganization } from '..';
 
 type FakeOrganizationParams = {
   id: string;
@@ -245,7 +245,7 @@ describe('TaskChooseOrganization', () => {
 
     await userEvent.click(signOutButton);
 
-    expect(fixtures.clerk.signOut).toHaveBeenCalled();
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
   });
 
   it('renders with username when email is not available', async () => {

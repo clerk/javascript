@@ -49,10 +49,10 @@ vi.mock('react-native', () => {
 vi.mock('../../specs/NativeClerkModule', () => {
   return {
     default: {
-      configure: vi.fn(),
-      getSession: vi.fn(),
-      getClientToken: vi.fn(),
-      signOut: vi.fn(),
+      configureNative: vi.fn(),
+      getDeviceToken: vi.fn(),
+      setDeviceToken: vi.fn(),
+      refreshClient: vi.fn(),
     },
   };
 });

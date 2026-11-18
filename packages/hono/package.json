@@ -1,6 +1,6 @@
 {
   "name": "@clerk/hono",
-  "version": "0.1.24",
+  "version": "0.1.101",
   "description": "Clerk SDK for Hono",
   "keywords": [
     "auth",
@@ -56,12 +56,14 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
-    "build": "tsup --env.NODE_ENV production",
+    "build": "tsdown",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -76,7 +78,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "hono": "^4.12.14"
+    "hono": "^4.13.7"
   },
   "peerDependencies": {
     "hono": ">=4"

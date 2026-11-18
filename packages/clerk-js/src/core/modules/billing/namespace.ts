@@ -1,5 +1,9 @@
 import type {
   BillingCheckoutJSON,
+  BillingCreditBalanceJSON,
+  BillingCreditBalanceResource,
+  BillingCreditLedgerJSON,
+  BillingCreditLedgerResource,
   BillingNamespace,
   BillingPaymentJSON,
   BillingPaymentResource,
@@ -11,16 +15,21 @@ import type {
   BillingSubscriptionResource,
   ClerkPaginatedResponse,
   CreateCheckoutParams,
+  GetCreditBalanceParams,
+  GetCreditHistoryParams,
   GetPaymentAttemptsParams,
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
+  UpdateCheckoutParams,
 } from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
   BaseResource,
   BillingCheckout,
+  BillingCreditBalance,
+  BillingCreditLedger,
   BillingPayment,
   BillingPlan,
   BillingStatement,
@@ -36,8 +45,13 @@ export class Billing implements BillingNamespace {
   }
 
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
-    const { for: forParam, ...safeParams } = params || {};
-    const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
+    const { for: forParam, orgId, minSeats, ...safeParams } = params || {};
+    const searchParams = {
+      ...safeParams,
+      payer_type: forParam === 'organization' ? 'org' : 'user',
+      org_id: orgId,
+      min_seats: minSeats,
+    };
     return await BaseResource._fetch({
       path: `${Billing.#pathRoot}/plans`,
       method: 'GET',
@@ -134,5 +148,43 @@ export class Billing implements BillingNamespace {
     )?.response as unknown as BillingCheckoutJSON;
 
     return new BillingCheckout(json);
+  };
+
+  updateCheckout = async (params: UpdateCheckoutParams) => {
+    const { id, orgId, ...rest } = params;
+    const json = (
+      await BaseResource._fetch<BillingCheckoutJSON>({
+        path: Billing.path(`/checkouts/${id}`, { orgId }),
+        method: 'PATCH',
+        body: rest as any,
+      })
+    )?.response as unknown as BillingCheckoutJSON;
+
+    return new BillingCheckout(json);
+  };
+
+  getCreditBalance = async (params: GetCreditBalanceParams): Promise<BillingCreditBalanceResource> => {
+    return await BaseResource._fetch({
+      path: Billing.path('/credits', { orgId: params.orgId }),
+      method: 'GET',
+    }).then(res => new BillingCreditBalance(res?.response as unknown as BillingCreditBalanceJSON));
+  };
+
+  getCreditHistory = async (
+    params: GetCreditHistoryParams,
+  ): Promise<ClerkPaginatedResponse<BillingCreditLedgerResource>> => {
+    return await BaseResource._fetch({
+      path: Billing.path('/credits/history', { orgId: params.orgId }),
+      method: 'GET',
+    }).then(res => {
+      const { data, total_count } = res?.response as unknown as {
+        data: BillingCreditLedgerJSON[];
+        total_count: number;
+      };
+      return {
+        total_count,
+        data: data.map(item => new BillingCreditLedger(item)),
+      };
+    });
   };
 }

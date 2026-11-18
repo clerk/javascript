@@ -3,6 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/utils';
+
 import { useEnabledThirdPartyProviders } from '../useEnabledThirdPartyProviders';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -29,10 +30,12 @@ describe('useEnabledThirdPartyProviders', () => {
     const { authenticatableOauthStrategies } = result.current;
 
     expect(authenticatableOauthStrategies).toStrictEqual([
+      'oauth_agentid',
       'oauth_apple',
       'oauth_atlassian',
       'oauth_bitbucket',
       'oauth_box',
+      'oauth_chatgpt',
       'oauth_coinbase',
       'oauth_discord',
       'oauth_dropbox',

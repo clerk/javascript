@@ -9,8 +9,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })('sign in 
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
+    const u = await createTestUtils({ app });
+    fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
     });
@@ -26,7 +26,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })('sign in 
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo({ searchParams: new URLSearchParams({ redirect_url: 'https://www.clerk.com' }) });
     await u.page.waitForFunction(async () => {
       // Emulate ClerkProvider being unmounted and mounted again

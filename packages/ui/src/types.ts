@@ -1,15 +1,16 @@
 import type {
-  __experimental_ConfigureSSOProps,
   __internal_CheckoutProps,
-  OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   APIKeysProps,
   ClerkAppearanceTheme,
+  ConfigureSSOProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
+  OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -34,6 +35,7 @@ import type { WithInternalRouting } from './internal';
 
 export type {
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -65,8 +67,9 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | __experimental_ConfigureSSOProps
+  | ConfigureSSOProps
   | OAuthConsentProps
+  | OAuthDeviceVerificationProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
@@ -147,8 +150,13 @@ export type APIKeysCtx = APIKeysProps & {
   mode?: ComponentMode;
 };
 
-export type ConfigureSSOCtx = __experimental_ConfigureSSOProps & {
+export type ConfigureSSOCtx = ConfigureSSOProps & {
   componentName: 'ConfigureSSO';
+  mode?: ComponentMode;
+};
+
+export type ConfigureDirectorySyncCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureDirectorySync';
   mode?: ComponentMode;
 };
 
@@ -158,7 +166,7 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
-  redirectOnActiveSession?: MutableRefObject<boolean>;
+  redirectOnActiveSessionRef?: MutableRefObject<boolean>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
@@ -227,6 +235,10 @@ export type OAuthConsentCtx = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type OAuthDeviceVerificationCtx = OAuthDeviceVerificationProps & {
+  componentName: 'OAuthDeviceVerification';
+};
+
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
   componentName: 'SubscriptionDetails';
 };
@@ -252,7 +264,9 @@ export type AvailableComponentCtx =
   | CheckoutCtx
   | APIKeysCtx
   | ConfigureSSOCtx
+  | ConfigureDirectorySyncCtx
   | OAuthConsentCtx
+  | OAuthDeviceVerificationCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx

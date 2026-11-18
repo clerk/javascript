@@ -1,6 +1,28 @@
-import { describe, expect, it } from 'vitest';
+import type { EnterpriseConnectionJSON, OrganizationJSON } from '@clerk/shared/types';
+import { describe, expect, it, vi } from 'vitest';
 
-import { Organization } from '../internal';
+import { BaseResource, Organization } from '../internal';
+
+const ORG_ID = 'org_123';
+
+function createOrganization(): Organization {
+  return new Organization({
+    object: 'organization',
+    id: ORG_ID,
+    name: 'Acme Corp',
+    slug: 'acme',
+    image_url: '',
+    has_image: false,
+    public_metadata: {},
+    members_count: 1,
+    pending_invitations_count: 0,
+    max_allowed_memberships: 5,
+    admin_delete_enabled: true,
+    self_serve_sso_enabled: true,
+    created_at: 1,
+    updated_at: 2,
+  } as unknown as OrganizationJSON);
+}
 
 describe('Organization', () => {
   it('has the same initial properties', () => {
@@ -19,6 +41,7 @@ describe('Organization', () => {
       admin_delete_enabled: true,
       max_allowed_memberships: 3,
       has_image: true,
+      self_serve_sso_enabled: true,
     });
 
     expect(organization).toMatchObject({
@@ -32,11 +55,526 @@ describe('Organization', () => {
       pendingInvitationsCount: 10,
       maxAllowedMemberships: 3,
       adminDeleteEnabled: true,
+      selfServeSSOEnabled: true,
+      selfServeDirectorySyncEnabled: false,
       createdAt: expect.any(Date),
       updatedAt: expect.any(Date),
       publicMetadata: {
         public: 'metadata',
       },
+    });
+  });
+
+  it('parses self_serve_directory_sync_enabled and keeps it in the snapshot', () => {
+    const organization = new Organization({
+      object: 'organization',
+      id: 'test_id',
+      name: 'test_name',
+      public_metadata: {},
+      slug: 'test_slug',
+      image_url: '',
+      created_at: 12345,
+      updated_at: 5678,
+      members_count: 1,
+      pending_invitations_count: 0,
+      admin_delete_enabled: true,
+      max_allowed_memberships: 3,
+      has_image: false,
+      self_serve_sso_enabled: false,
+      self_serve_directory_sync_enabled: true,
+    });
+
+    expect(organization.selfServeSSOEnabled).toBe(false);
+    expect(organization.selfServeDirectorySyncEnabled).toBe(true);
+    expect(organization.__internal_toSnapshot()).toMatchObject({
+      self_serve_sso_enabled: false,
+      self_serve_directory_sync_enabled: true,
+    });
+  });
+
+  describe('enterprise connections', () => {
+    it('fetches enterprise connections from the org-scoped path', async () => {
+      const enterpriseConnectionsJSON: EnterpriseConnectionJSON[] = [
+        {
+          id: 'ec_123',
+          object: 'enterprise_connection',
+          name: 'Acme Corp SSO',
+          active: true,
+          allow_organization_account_linking: true,
+          provider: 'saml_okta',
+          logo_public_url: null,
+          domains: ['acme.com'],
+          organization_id: ORG_ID,
+          sync_user_attributes: true,
+          disable_additional_identifications: false,
+          custom_attributes: [],
+          oauth_config: null,
+          saml_connection: {
+            id: 'saml_123',
+            name: 'Acme Corp SSO',
+            active: true,
+            idp_entity_id: 'https://idp.acme.com/entity',
+            idp_sso_url: 'https://idp.acme.com/sso',
+            idp_certificate: 'MIICertificatePlaceholder',
+            idp_certificate_issued_at: 1672531200000,
+            idp_certificate_expires_at: 1704067200000,
+            idp_certificates: [
+              { certificate: 'MIICertificatePlaceholder', issued_at: 1672531200000, expires_at: 1704067200000 },
+              { certificate: 'MIINextCertificatePlaceholder', issued_at: null, expires_at: null },
+            ],
+            idp_metadata_url: 'https://idp.acme.com/metadata',
+            idp_metadata: '',
+            acs_url: 'https://clerk.example.com/v1/saml/acs',
+            sp_entity_id: 'https://clerk.example.com',
+            sp_metadata_url: 'https://clerk.example.com/v1/saml/metadata',
+            allow_subdomains: false,
+            allow_idp_initiated: false,
+            force_authn: false,
+          },
+          created_at: 1234567890,
+          updated_at: 1234567890,
+        },
+      ];
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionsJSON }));
+
+      const organization = createOrganization();
+
+      const connections = await organization.getEnterpriseConnections();
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'GET',
+        path: `/organizations/${ORG_ID}/enterprise_connections`,
+      });
+
+      expect(connections).toHaveLength(1);
+      expect(connections[0].name).toBe('Acme Corp SSO');
+      expect(connections[0].allowOrganizationAccountLinking).toBe(true);
+      expect(connections[0].samlConnection?.idpCertificates).toEqual([
+        { certificate: 'MIICertificatePlaceholder', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+        { certificate: 'MIINextCertificatePlaceholder', issuedAt: null, expiresAt: null },
+      ]);
+      expect(connections[0].__internal_toSnapshot().saml_connection?.idp_certificates).toEqual(
+        enterpriseConnectionsJSON[0].saml_connection?.idp_certificates,
+      );
+    });
+
+    it('creates an enterprise connection without forwarding organization_id in the body', async () => {
+      const enterpriseConnectionJSON = {
+        id: 'ec_new',
+        object: 'enterprise_connection' as const,
+        name: 'New SSO',
+        active: true,
+        provider: 'saml_okta',
+        logo_public_url: null,
+        domains: [],
+        organization_id: ORG_ID,
+        sync_user_attributes: true,
+        disable_additional_identifications: false,
+        allow_organization_account_linking: false,
+        custom_attributes: [],
+        oauth_config: null,
+        saml_connection: null,
+        created_at: 1234567890,
+        updated_at: 1234567890,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+      const organization = createOrganization();
+
+      const conn = await organization.createEnterpriseConnection({
+        provider: 'saml_okta',
+        name: 'New SSO',
+        // `domains` is required by the org-scoped create endpoint; it is sent as
+        // a `domains` array on the body and serialized as repeated form fields
+        // (`domains=acme.com`) by the form serializer downstream.
+        domains: ['acme.com'],
+        // Even though callers may still pass this for convenience, the SDK
+        // must not include it in the body — the org URL is authoritative.
+        organizationId: ORG_ID,
+        saml: { idpEntityId: 'https://idp.example.com', idpCertificates: ['cert_a', 'cert_b'] },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: `/organizations/${ORG_ID}/enterprise_connections`,
+        body: {
+          provider: 'saml_okta',
+          name: 'New SSO',
+          domains: ['acme.com'],
+          saml_idp_entity_id: 'https://idp.example.com',
+          saml_idp_certificates: ['cert_a', 'cert_b'],
+        },
+      });
+
+      // @ts-ignore
+      const callBody = BaseResource._fetch.mock.calls[0][0].body;
+      expect(callBody.organization_id).toBeUndefined();
+
+      expect(conn.id).toBe('ec_new');
+      expect(conn.name).toBe('New SSO');
+    });
+
+    it('omits domains from the create body when none are provided', async () => {
+      const enterpriseConnectionJSON = {
+        id: 'ec_new',
+        object: 'enterprise_connection' as const,
+        name: 'New SSO',
+        active: true,
+        provider: 'saml_okta',
+        logo_public_url: null,
+        domains: [],
+        organization_id: ORG_ID,
+        sync_user_attributes: true,
+        disable_additional_identifications: false,
+        allow_organization_account_linking: false,
+        custom_attributes: [],
+        oauth_config: null,
+        saml_connection: null,
+        created_at: 1234567890,
+        updated_at: 1234567890,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+      const organization = createOrganization();
+
+      await organization.createEnterpriseConnection({
+        provider: 'saml_okta',
+        name: 'New SSO',
+      });
+
+      // @ts-ignore
+      const callBody = BaseResource._fetch.mock.calls[0][0].body;
+      // Backwards-compatible: an omitted (or empty) `domains` is not sent.
+      expect('domains' in callBody).toBe(false);
+    });
+
+    it('updates an enterprise connection without forwarding organization_id in the body', async () => {
+      const enterpriseConnectionJSON = {
+        id: 'ec_123',
+        object: 'enterprise_connection' as const,
+        name: 'Updated',
+        active: false,
+        provider: 'saml_okta',
+        logo_public_url: null,
+        domains: [],
+        organization_id: ORG_ID,
+        sync_user_attributes: true,
+        disable_additional_identifications: false,
+        allow_organization_account_linking: false,
+        custom_attributes: [],
+        oauth_config: null,
+        saml_connection: null,
+        created_at: 1234567890,
+        updated_at: 1234567900,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: enterpriseConnectionJSON }));
+
+      const organization = createOrganization();
+
+      await organization.updateEnterpriseConnection('ec_123', {
+        name: 'Updated',
+        active: false,
+        syncUserAttributes: true,
+        organizationId: ORG_ID,
+        saml: { idpCertificates: ['cert_a', 'cert_b'] },
+      });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'PATCH',
+        path: `/organizations/${ORG_ID}/enterprise_connections/ec_123`,
+        body: {
+          name: 'Updated',
+          active: false,
+          sync_user_attributes: true,
+          saml_idp_certificates: ['cert_a', 'cert_b'],
+        },
+      });
+
+      // @ts-ignore
+      const callBody = BaseResource._fetch.mock.calls[0][0].body;
+      expect(callBody.organization_id).toBeUndefined();
+    });
+
+    it('deletes an enterprise connection', async () => {
+      const deletedJSON = {
+        object: 'enterprise_connection',
+        id: 'ec_123',
+        deleted: true,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: deletedJSON }));
+
+      const organization = createOrganization();
+
+      const result = await organization.deleteEnterpriseConnection('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'DELETE',
+        path: `/organizations/${ORG_ID}/enterprise_connections/ec_123`,
+      });
+
+      expect(result.id).toBe('ec_123');
+      expect(result.deleted).toBe(true);
+    });
+
+    it('creates an enterprise connection test run', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: { url: 'https://example.com/test' } }));
+
+      const organization = createOrganization();
+
+      const init = await organization.createEnterpriseConnectionTestRun('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: `/organizations/${ORG_ID}/enterprise_connections/ec_123/test_runs`,
+      });
+
+      expect(init.url).toBe('https://example.com/test');
+    });
+
+    it('lists enterprise connection test runs', async () => {
+      const paginated = {
+        data: [
+          {
+            object: 'enterprise_connection_test_run' as const,
+            id: 'run_1',
+            status: 'success',
+            connection_type: 'saml' as const,
+            created_at: 1700000000000,
+          },
+        ],
+        total_count: 1,
+      };
+
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: paginated }));
+
+      const organization = createOrganization();
+
+      const result = await organization.getEnterpriseConnectionTestRuns('ec_123', {
+        initialPage: 1,
+        pageSize: 10,
+        status: ['pending', 'success'],
+      });
+
+      // @ts-ignore
+      const call = BaseResource._fetch.mock.calls[0][0];
+      expect(call.method).toBe('GET');
+      expect(call.path).toBe(`/organizations/${ORG_ID}/enterprise_connections/ec_123/test_runs`);
+      expect(call.search.get('limit')).toBe('10');
+      expect(call.search.get('offset')).toBe('0');
+      expect(call.search.getAll('status')).toEqual(['pending', 'success']);
+
+      expect(result.total_count).toBe(1);
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].id).toBe('run_1');
+      expect(result.data[0].connectionType).toBe('saml');
+    });
+  });
+
+  describe('directory sync', () => {
+    const DIRECTORY_PATH = `/organizations/${ORG_ID}/enterprise_connections/ec_123/directory`;
+
+    const directoryJSON = {
+      object: 'directory' as const,
+      id: 'scimdir_1',
+      name: 'Acme Okta',
+      enterprise_connection_id: 'ec_123',
+      endpoint_url: 'https://api.example.com/scim/v2',
+      provider: 'okta' as const,
+      enabled: false,
+      group_role_mapping_enabled: false,
+      attribute_mapping: { 'name.givenName': 'first_name' },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('fetches the directory from the connection-scoped path', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      const result = await organization.getDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: DIRECTORY_PATH });
+      expect(result.id).toBe('scimdir_1');
+      expect(result.endpointUrl).toBe('https://api.example.com/scim/v2');
+      expect(result.provider).toBe('okta');
+      expect(result.attributeMapping).toEqual({ 'name.givenName': 'first_name' });
+      expect(result.apiKey).toBeNull();
+    });
+
+    it('creates the directory and exposes the show-once token', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, api_key: 'ak_secret' } }));
+
+      const organization = createOrganization();
+      const result = await organization.createDirectorySync('ec_123', { name: 'Acme Okta' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: 'Acme Okta' },
+      });
+      expect(result.apiKey).toBe('ak_secret');
+      expect(result.__internal_toSnapshot()).not.toHaveProperty('api_key');
+    });
+
+    it('creates the directory without a name, leaving it to the FAPI client to drop the undefined field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      await organization.createDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: undefined },
+      });
+    });
+  });
+
+  describe('SSO bypass allowlist', () => {
+    const ALLOWLIST_PATH = `/organizations/${ORG_ID}/sso_bypass_allowlist_users`;
+
+    const entryJSON = {
+      object: 'sso_bypass_allowlist_user' as const,
+      user_id: 'user_1',
+      public_user_data: {
+        first_name: 'Cameron',
+        last_name: 'Walker',
+        image_url: 'https://img.clerk.com/cameron',
+        has_image: true,
+        identifier: 'cameron@example.com',
+        username: null,
+      },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('lists the allowlisted users', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: [entryJSON] }));
+
+      const organization = createOrganization();
+      const entries = await organization.ssoBypassAllowlist.getUsers();
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: ALLOWLIST_PATH });
+      expect(entries).toHaveLength(1);
+      expect(entries[0].id).toBe('user_1');
+      expect(entries[0].userId).toBe('user_1');
+      expect(entries[0].publicUserData.firstName).toBe('Cameron');
+      expect(entries[0].publicUserData.identifier).toBe('cameron@example.com');
+      expect(entries[0].createdAt).toEqual(new Date(1700000000000));
+      expect(entries[0].__internal_toSnapshot()).toMatchObject({
+        object: 'sso_bypass_allowlist_user',
+        user_id: 'user_1',
+      });
+    });
+
+    it('adds a user by id as a form field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: entryJSON }));
+
+      const organization = createOrganization();
+      const entry = await organization.ssoBypassAllowlist.addUser({ userId: 'user_1' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: ALLOWLIST_PATH,
+        body: { user_id: 'user_1' },
+      });
+      expect(entry.userId).toBe('user_1');
+    });
+
+    it('adds users in chunks of 100 and merges the partial results', async () => {
+      const userIds = Array.from({ length: 150 }, (_, i) => `user_${i}`);
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: { data: [entryJSON], errors: [{ user_id: 'user_5', code: 'sso_bypass_domain_not_served' }] },
+        })
+        .mockResolvedValueOnce({
+          response: { data: [{ ...entryJSON, user_id: 'user_120' }], errors: [] },
+        });
+      // @ts-ignore
+      BaseResource._fetch = fetchMock;
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenNthCalledWith(1, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(0, 100) },
+      });
+      expect(fetchMock).toHaveBeenNthCalledWith(2, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(100) },
+      });
+      expect(result.data.map(entry => entry.userId)).toEqual(['user_1', 'user_120']);
+      expect(result.errors).toEqual([{ userId: 'user_5', code: 'sso_bypass_domain_not_served' }]);
+    });
+
+    it('sends nothing for an empty batch', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn();
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds: [] });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).not.toHaveBeenCalled();
+      expect(result).toEqual({ data: [], errors: [] });
+    });
+
+    it('removes a user by id', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(
+          Promise.resolve({ response: { object: 'sso_bypass_allowlist_user', id: 'user_1', deleted: true } }),
+        );
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.removeUser('user_1');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'DELETE', path: `${ALLOWLIST_PATH}/user_1` });
+      expect(result.id).toBe('user_1');
+      expect(result.deleted).toBe(true);
+    });
+
+    it('does not create a cycle when the organization is serialized', () => {
+      const organization = createOrganization();
+
+      expect(() => JSON.stringify(organization)).not.toThrow();
+      expect(JSON.parse(JSON.stringify(organization)).ssoBypassAllowlist).toEqual({});
     });
   });
 });

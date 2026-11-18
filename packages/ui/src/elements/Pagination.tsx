@@ -1,6 +1,6 @@
 import { Button, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { CaretLeft, CaretRight } from '../icons';
+import { ChevronLeft, ChevronRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
 import { range } from '../utils/range';
@@ -150,7 +150,7 @@ export const Pagination = (props: PaginationProps) => {
       >
         <PageButton
           isDisabled={page <= 1}
-          icon={CaretLeft}
+          icon={ChevronLeft}
           aria-label={t(localizationKeys('paginationButton__previous'))}
           onClick={() => {
             onChange?.(page - 1);
@@ -180,7 +180,7 @@ export const Pagination = (props: PaginationProps) => {
         })}
         <PageButton
           isDisabled={page >= count || page < 1}
-          icon={CaretRight}
+          icon={ChevronRight}
           aria-label={t(localizationKeys('paginationButton__next'))}
           onClick={() => {
             onChange?.(page + 1);

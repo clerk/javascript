@@ -83,14 +83,21 @@ describe('proxy', () => {
   describe('clerkFrontendApiProxy', () => {
     const mockFetch = vi.fn();
     const originalFetch = global.fetch;
+    const originalFapiUrl = process.env.CLERK_FAPI_URL;
 
     beforeEach(() => {
       global.fetch = mockFetch;
       mockFetch.mockReset();
+      delete process.env.CLERK_FAPI_URL;
     });
 
     afterEach(() => {
       global.fetch = originalFetch;
+      if (originalFapiUrl === undefined) {
+        delete process.env.CLERK_FAPI_URL;
+      } else {
+        process.env.CLERK_FAPI_URL = originalFapiUrl;
+      }
     });
 
     it('returns error when publishableKey is missing', async () => {
@@ -195,6 +202,77 @@ describe('proxy', () => {
       expect(options.headers.get('Host')).toBe('frontend-api.clerk.dev');
 
       expect(response.status).toBe(200);
+    });
+
+    it('uses the configured FAPI URL over CLERK_FAPI_URL and the publishable key', async () => {
+      process.env.CLERK_FAPI_URL = 'https://frontend-api.clerkstage.dev';
+      mockFetch.mockResolvedValue(new Response(JSON.stringify({ client: {} }), { status: 200 }));
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+        fapiUrl: 'http://localhost:8001/',
+      });
+
+      const [url, options] = mockFetch.mock.calls[0];
+      expect(url).toBe('http://localhost:8001/v1/client');
+      expect(options.headers.get('Host')).toBe('localhost:8001');
+    });
+
+    it('uses CLERK_FAPI_URL when no FAPI URL is configured', async () => {
+      process.env.CLERK_FAPI_URL = 'https://frontend-api.clerkstage.dev';
+      mockFetch.mockResolvedValue(new Response(JSON.stringify({ client: {} }), { status: 200 }));
+
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+      });
+
+      expect(mockFetch.mock.calls[0][0]).toBe('https://frontend-api.clerkstage.dev/v1/client');
+    });
+
+    it.each([
+      ['unsupported scheme', 'ftp://frontend-api.clerk.dev', undefined, 'FAPI URL must use http or https'],
+      [
+        'credentials',
+        'https://user:password@frontend-api.clerk.dev',
+        undefined,
+        'FAPI URL must not include credentials, a query string, or a hash',
+      ],
+      [
+        'query string',
+        'https://frontend-api.clerk.dev?env=staging',
+        undefined,
+        'FAPI URL must not include credentials, a query string, or a hash',
+      ],
+      [
+        'fragment',
+        'https://frontend-api.clerk.dev#staging',
+        undefined,
+        'FAPI URL must not include credentials, a query string, or a hash',
+      ],
+      ['invalid environment value', undefined, 'not-a-url', 'Invalid URL'],
+    ])('returns a configuration error for an invalid FAPI URL with %s', async (_case, fapiUrl, envFapiUrl, message) => {
+      if (envFapiUrl) {
+        process.env.CLERK_FAPI_URL = envFapiUrl;
+      }
+      const request = new Request('https://example.com/__clerk/v1/client');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+        ...(fapiUrl ? { fapiUrl } : {}),
+      });
+
+      expect(response.status).toBe(500);
+      expect(mockFetch).not.toHaveBeenCalled();
+      await expect(response.json()).resolves.toMatchObject({
+        errors: [{ code: 'proxy_configuration_error', message }],
+      });
     });
 
     it('forwards POST request with body', async () => {
@@ -471,6 +549,27 @@ describe('proxy', () => {
       const response = await clerkFrontendApiProxy(request, {
         publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
         secretKey: 'sk_test_xxx',
+      });
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe('https://example.com/__clerk/v1/oauth/callback?code=123');
+    });
+
+    it('rewrites redirects from a configured FAPI URL', async () => {
+      const mockResponse = new Response(null, {
+        status: 302,
+        headers: {
+          Location: 'http://localhost:8001/v1/oauth/callback?code=123',
+        },
+      });
+      mockFetch.mockResolvedValue(mockResponse);
+
+      const request = new Request('https://example.com/__clerk/v1/oauth/authorize');
+
+      const response = await clerkFrontendApiProxy(request, {
+        publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k',
+        secretKey: 'sk_test_xxx',
+        fapiUrl: 'http://localhost:8001',
       });
 
       expect(response.status).toBe(302);

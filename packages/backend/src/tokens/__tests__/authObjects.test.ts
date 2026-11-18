@@ -1,13 +1,16 @@
-import type { JwtPayload } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import type { AgentActClaim, JwtPayload } from '@clerk/shared/types';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { createBackendApiClient } from '../../api/factory';
+import { createJwt, mockJwtPayload } from '../../fixtures';
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
+import { decodeJwt } from '../../jwt';
 import type { AuthenticateContext } from '../authenticateContext';
 import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../authObjects';
 import {
   authenticatedMachineObject,
   getAuthObjectForAcceptedToken,
+  getAuthObjectFromJwt,
   makeAuthObjectSerializable,
   signedInAuthObject,
   signedOutAuthObject,
@@ -31,6 +34,71 @@ describe('makeAuthObjectSerializable', () => {
 });
 
 describe('signedInAuthObject', () => {
+  it.each([
+    { name: 'ordinary Session has no agent', claims: {}, expected: undefined },
+    {
+      name: 'impersonation remains actor attribution',
+      claims: { act: { sub: 'impersonator' } },
+      expected: undefined,
+    },
+    {
+      name: 'agent-task Session uses the existing Session agent shape',
+      claims: { agt: { id: 'agent_123', tsk: 'agtsk_123', reg: 'https://clerk.com' } },
+      expected: { type: 'agent', sub: 'agent_123', task_id: 'agtsk_123' },
+    },
+    {
+      name: 'Poppy Session uses the existing Session agent shape',
+      claims: { agt: { id: 'https://agent.example', poppy: { session_id: 'protocol-session' } } },
+      expected: { type: 'agent', sub: 'https://agent.example' },
+    },
+    {
+      name: 'malformed agent claim is not exposed',
+      claims: { agt: { id: 123, tsk: 'agtsk_123' } },
+      expected: undefined,
+    },
+  ])('$name', ({ claims, expected }) => {
+    const auth = signedInAuthObject({}, 'token', {
+      ...mockJwtPayload,
+      __raw: 'token',
+      ...claims,
+      sub: 'user_123',
+      sid: 'sess_123',
+    });
+
+    expect(auth.agent).toEqual(expected);
+    expectTypeOf(auth.agent).toEqualTypeOf<AgentActClaim | undefined>();
+    expect(auth.userId).toBe('user_123');
+    expect(auth.actor).toEqual('act' in claims ? claims.act : undefined);
+    expect(auth).not.toHaveProperty('poppy');
+  });
+
+  it('omits agent attribution from signed-out auth', async () => {
+    const auth = signedOutAuthObject();
+
+    expect(auth).not.toHaveProperty('agent');
+    expect(auth.userId).toBeNull();
+    expect(auth.sessionId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
+    expect(auth.has({ permission: 'org:admin' })).toBe(false);
+    expect(await auth.getToken()).toBeNull();
+  });
+
+  it('omits agent attribution when a pending Clerk Session is treated as signed out', () => {
+    const auth = getAuthObjectFromJwt(
+      decodeJwt(
+        createJwt({
+          payload: { sub: 'user_123', sid: 'sess_123', sts: 'pending', agt: { id: 'https://agent.example' } },
+        }),
+      ),
+      {},
+    );
+
+    expect(auth).not.toHaveProperty('agent');
+    expect(auth.isAuthenticated).toBe(false);
+    expect(auth.userId).toBeNull();
+    expect(auth.sessionStatus).toBe('pending');
+  });
+
   it('getToken returns the token passed in', async () => {
     const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
     const authObject = signedInAuthObject(mockAuthenticateContext, 'token', {
@@ -45,6 +113,36 @@ describe('signedInAuthObject', () => {
 
     const token = await authObject.getToken();
     expect(token).toBe('token');
+  });
+
+  it('redacts raw session and machine tokens from debug output', () => {
+    const rawSessionToken = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.this-segment-must-never-be-logged';
+    const mockAuthenticateContext = {
+      tokenInHeader: 'eyJhbGciOiJSUzI1NiJ9.header-bearer.this-segment-must-never-be-logged',
+      sessionTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.cookie-bearer.this-segment-must-never-be-logged',
+      refreshTokenInCookie: 'eyJhbGciOiJSUzI1NiJ9.refresh-bearer.this-segment-must-never-be-logged',
+      devBrowserToken: 'eyJhbGciOiJSUzI1NiJ9.devbrowser-bearer.this-segment-must-never-be-logged',
+      handshakeToken: 'eyJhbGciOiJSUzI1NiJ9.handshake-bearer.this-segment-must-never-be-logged',
+    } as unknown as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, rawSessionToken, {
+      sub: 'userId',
+    } as unknown as JwtPayload);
+
+    const debug = authObject.debug() as Record<string, string>;
+
+    // Only a short, non-reconstructable prefix of each bearer credential is exposed.
+    expect(debug.sessionToken).toBe('eyJhbGc');
+    expect(debug.tokenInHeader).toBe('eyJhbGc');
+    expect(debug.sessionTokenInCookie).toBe('eyJhbGc');
+    expect(debug.refreshTokenInCookie).toBe('eyJhbGc');
+    expect(debug.devBrowserToken).toBe('eyJhbGc');
+    expect(debug.handshakeToken).toBe('eyJhbGc');
+
+    // The full tokens must not be recoverable from the serialized debug payload.
+    const serialized = JSON.stringify(debug);
+    expect(serialized).not.toContain('this-segment-must-never-be-logged');
+    expect(serialized).not.toContain(rawSessionToken);
   });
 
   describe('JWT v1', () => {

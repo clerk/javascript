@@ -45,6 +45,7 @@ const fontStyles = Object.freeze({
 const fonts = Object.freeze({
   main: clerkCssVar('font-family', 'inherit'),
   buttons: clerkCssVar('font-family-buttons', clerkCssVar('font-family', 'inherit')),
+  mono: clerkCssVar('font-family-mono', 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'),
 } as const);
 
 export { fontSizes, fontWeights, letterSpacings, lineHeights, fonts, fontStyles };

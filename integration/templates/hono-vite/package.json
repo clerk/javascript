@@ -12,7 +12,7 @@
     "@hono/node-server": "^1.19.14",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "hono": "^4.12.7",
+    "hono": "^4.13.7",
     "tsx": "^4.20.3",
     "vite-express": "^0.21.1"
   },
@@ -20,6 +20,6 @@
     "@types/express": "^5.0.3",
     "@types/node": "^24.2.1",
     "typescript": "^5.8.3",
-    "vite": "^6.3.3"
+    "vite": "^7.3.3"
   }
 }

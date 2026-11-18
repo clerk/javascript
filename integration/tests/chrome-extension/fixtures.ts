@@ -1,15 +1,18 @@
 import * as path from 'node:path';
 
-import { test as base } from '@playwright/test';
 import type { BrowserContext, Page } from '@playwright/test';
+import { test as base } from '@playwright/test';
 
-import { appConfigs } from '../../presets';
 import type { Application } from '../../models/application';
+import type { EnvironmentConfig } from '../../models/environment';
+import { appConfigs } from '../../presets';
 import { getExtensionId, launchExtensionContext, setupClerkTestingEnv } from './helpers';
 
 type WorkerFixtures = {
   extensionDistPath: string;
   extensionApp: Application;
+  extensionEnv: EnvironmentConfig;
+  extensionTestingToken: boolean;
 };
 
 type TestFixtures = {
@@ -25,10 +28,11 @@ type TestFixtures = {
  * Test-scoped fixtures create a fresh persistent context per test.
  */
 export const test = base.extend<TestFixtures, WorkerFixtures>({
+  extensionEnv: [appConfigs.envs.withEmailCodes, { scope: 'worker', option: true }],
+  extensionTestingToken: [true, { scope: 'worker', option: true }],
   // Worker-scoped: build the extension once and set up testing tokens
   extensionApp: [
-    async ({}, use) => {
-      const env = appConfigs.envs.withEmailCodes;
+    async ({ extensionEnv: env, extensionTestingToken }, use) => {
       const config = appConfigs.chromeExtension.vite;
 
       const app = await config.commit();
@@ -36,7 +40,9 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       await app.setup();
       await app.build();
 
-      await setupClerkTestingEnv(env);
+      if (extensionTestingToken) {
+        await setupClerkTestingEnv(env);
+      }
 
       await use(app);
       await app.teardown();
@@ -53,8 +59,11 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   ],
 
   // Test-scoped: fresh persistent context per test with the extension loaded
-  context: async ({ extensionDistPath }, use) => {
-    const context = await launchExtensionContext(extensionDistPath, { bypassCSP: true });
+  context: async ({ extensionDistPath, extensionTestingToken }, use) => {
+    const context = await launchExtensionContext(extensionDistPath, {
+      bypassCSP: false,
+      testingToken: extensionTestingToken,
+    });
     await use(context);
     await context.close();
   },

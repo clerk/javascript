@@ -14,10 +14,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Impersona
   let user2Created: User;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
 
-    user1 = u.services.users.createFakeUser();
-    user2 = u.services.users.createFakeUser();
+    user1 = u.services.users.createFakeUser(test);
+    user2 = u.services.users.createFakeUser(test);
 
     user1Created = await u.services.users.createBapiUser(user1);
     user2Created = await u.services.users.createBapiUser(user2);
@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Impersona
   });
 
   test('should handle user impersonation flow correctly', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // User 1 logs in
     await u.po.signIn.goTo();

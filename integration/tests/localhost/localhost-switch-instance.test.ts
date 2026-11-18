@@ -31,8 +31,8 @@ test.describe('switching instances on localhost same port @localhost', () => {
     // Create app and user for the 1st app
     const { app } = await prepareApplication('sessions-dev-1', port);
     let page = await context.newPage();
-    let u = createTestUtils({ app, page, context, useTestingToken: false });
-    let fakeUser = u.services.users.createFakeUser();
+    let u = await createTestUtils({ app, page, context, useTestingToken: false });
+    let fakeUser = u.services.users.createFakeUser(test);
     fakeUsers.push(fakeUser);
 
     await u.services.users.createBapiUser(fakeUser);
@@ -44,12 +44,12 @@ test.describe('switching instances on localhost same port @localhost', () => {
     await app.stop();
 
     // Create app and user for the 2nd app with a different instance key
-    await app.withEnv(getEnvForMultiAppInstance('sessions-dev-2'));
+    await app.withEnv(await getEnvForMultiAppInstance('sessions-dev-2'));
     await app.dev({ port });
 
     page = await context.newPage();
-    u = createTestUtils({ app, page, context, useTestingToken: false });
-    fakeUser = u.services.users.createFakeUser();
+    u = await createTestUtils({ app, page, context, useTestingToken: false });
+    fakeUser = u.services.users.createFakeUser(test);
     fakeUsers.push(fakeUser);
     await u.services.users.createBapiUser(fakeUser);
 

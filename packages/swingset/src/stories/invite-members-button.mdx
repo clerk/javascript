@@ -1,0 +1,82 @@
+import * as InviteMembersButtonStories from './invite-members-button.stories';
+
+# InviteMembersButton
+
+A headless button that opens the invite-members dialog for the active organization. It ships no
+styles: by default it renders a plain `<button>` labelled "Invite members", and `render` swaps that
+element for your own. It reads the organization and the user's permissions from Clerk and takes no
+data.
+
+The dialog takes one or more email addresses and a role. Malformed addresses, and any the server
+rejects, show as invalid tags and disable sending. The role starts at the organization's default
+role, or at the only role when there is one. After the invitations send, the dialog closes, a toast
+confirms, and focus returns to the button.
+
+It renders `fallback` while Clerk loads, and nothing without an active organization or the
+`org:sys_memberships:manage` permission.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={InviteMembersButtonStories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'TagInput', href: '/components/tag-input', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Toast', href: '/components/toast', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { InviteMembersButton } from '@clerk/mosaic/features/invite-members-button/invite-members-button';
+
+<InviteMembersButton />;
+```
+
+## Props
+
+| Prop           | Type                   | Default            | Description                                                                          |
+| -------------- | ---------------------- | ------------------ | ------------------------------------------------------------------------------------ |
+| `render`       | `ReactElement \| func` | —                  | The element to render. The button's props are merged into it.                        |
+| `children`     | `ReactNode`            | `'Invite members'` | The button's content. The default label is localized as `inviteMembersButton.label`. |
+| `nativeButton` | `boolean`              | `true`             | Set to `false` when `render` is not a `<button>`, to apply button semantics.         |
+| `onClick`      | `MouseEventHandler`    | —                  | Runs alongside opening the dialog.                                                   |
+| `fallback`     | `ReactNode`            | —                  | Rendered while Clerk loads.                                                          |
+
+Other `<button>` attributes pass through to the rendered element.
+
+## Your own element
+
+<Story
+  name='CustomElement'
+  storyModule={InviteMembersButtonStories}
+/>
+
+## Unavailable
+
+The button is disabled until the organization's roles load.
+
+<Story
+  name='Unavailable'
+  storyModule={InviteMembersButtonStories}
+/>
+
+## Styling
+
+The button emits no class. Style it with your own `className`, or through the element you pass to
+`render`.
+
+| Attribute       | Description                                  |
+| --------------- | -------------------------------------------- |
+| `data-disabled` | Present while the organization's roles load. |
+
+```css
+.invite-members[data-disabled] {
+  cursor: progress;
+}
+```

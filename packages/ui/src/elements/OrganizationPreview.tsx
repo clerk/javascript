@@ -48,7 +48,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
     <Flex
       elementDescriptor={descriptors.organizationPreview}
       elementId={descriptors.organizationPreview.setId(elementId)}
-      gap={3}
+      gap={4}
       align='center'
       as='span'
       sx={[{ minWidth: '0' }, sx]}

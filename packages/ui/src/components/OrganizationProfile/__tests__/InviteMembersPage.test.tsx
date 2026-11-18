@@ -4,7 +4,7 @@ import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { fireEvent, render } from '@/test/utils';
 
 import { Action } from '../../../elements/Action';
 import { clearFetchCache } from '../../../hooks';
@@ -92,6 +92,28 @@ describe('InviteMembersPage', () => {
 
     await waitFor(async () => expect(await findByText('Invite new members')).toBeInTheDocument());
     getByText('Enter or paste one or more email addresses, separated by spaces or commas.');
+  });
+
+  it('ignores paste events without clipboard data', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', role: 'admin' }],
+      });
+    });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+    const { getByTestId } = render(
+      <Action.Root>
+        <InviteMembersScreen />
+      </Action.Root>,
+      { wrapper },
+    );
+
+    expect(() => fireEvent.paste(getByTestId('tag-input'), { clipboardData: null })).not.toThrow();
   });
 
   describe('with default role', () => {

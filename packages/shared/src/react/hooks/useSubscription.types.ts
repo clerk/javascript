@@ -37,11 +37,11 @@ export type SubscriptionResult = {
    */
   error: Error | undefined;
   /**
-   * A boolean that indicates whether the initial data is still being fetched.
+   * Indicates whether the initial data is still being fetched.
    */
   isLoading: boolean;
   /**
-   * A boolean that indicates whether any request is still in flight, including background updates.
+   * Indicates whether any request is still in flight, including background updates.
    */
   isFetching: boolean;
   /**

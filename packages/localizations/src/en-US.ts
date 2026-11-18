@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
@@ -36,20 +41,22 @@ export const enUS: LocalizationResource = {
     menuAction__revoke: 'Revoke key',
     revokeConfirmation: {
       confirmationText: 'Revoke',
-      inputLabel: 'Type "Revoke" to confirm',
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
+      inputLabel: 'Type "Revoke" to confirm',
     },
-    tableHeader__name: 'Name',
-    tableHeader__lastUsed: 'Last used',
     tableHeader__actions: 'Actions',
+    tableHeader__lastUsed: 'Last used',
+    tableHeader__name: 'Name',
   },
   backButton: 'Back',
   badge__activePlan: 'Active',
+  badge__banned: 'Banned',
   badge__canceledEndsAt: "Canceled • Ends {{ date | shortDate('en-US') }}",
   badge__currentPlan: 'Current plan',
   badge__default: 'Default',
+  badge__deprovisioned: 'Deprovisioned',
   badge__endsAt: "Ends {{ date | shortDate('en-US') }}",
   badge__expired: 'Expired',
   badge__freeTrial: 'Free trial',
@@ -66,15 +73,16 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
-  badge__banned: 'Banned',
   billing: {
+    accountCredit: 'Account credit',
     addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
     annually: 'Annually',
     availableFeatures: 'Available features',
     billedAnnually: 'Billed annually',
-    billedMonthlyOnly: 'Only billed monthly',
     billedAnnuallyOnly: 'Only billed annually',
+    billedMonthly: 'Billed monthly',
+    billedMonthlyOnly: 'Only billed monthly',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
       "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
@@ -91,8 +99,11 @@ export const enUS: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'You cannot subscribe to this plan. Your existing subscription is more expensive than this plan.',
     checkout: {
+      addPromoCode: 'Add promo code',
+      applyPromoCode: 'Apply',
       description__paymentSuccessful: 'Your payment was successful.',
       description__subscriptionSuccessful: 'Your new subscription is all set.',
+      discount: 'Discount',
       downgradeNotice:
         'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
       emailForm: {
@@ -108,20 +119,24 @@ export const enUS: LocalizationResource = {
       },
       pastDueNotice: 'Your previous subscription was past due, with no payment.',
       perMonth: 'per month',
+      promoCodePlaceholder: 'Enter promo code',
+      removePromoCode: 'Remove promo code',
       title: 'Checkout',
       title__paymentSuccessful: 'Payment was successful!',
       title__subscriptionSuccessful: 'Success!',
       title__trialSuccess: 'Trial successfully started!',
       totalDueAfterTrial: 'Total Due after trial ends in {{days}} days',
+      totalDuePerPeriod: 'Total Due per period',
     },
     credit: 'Credit',
-    prorationCredit: 'Prorated credit',
-    accountCredit: 'Account credit',
     creditRemainder: 'Credit for the remainder of your current subscription.',
-    payerCreditRemainder: 'Credit from account balance.',
     defaultFreePlanActive: "You're currently on the Free plan",
+    discountAmount: '{{amount}} off',
+    discountCyclesRemaining: '{{cycles}} {{period}} remaining',
+    discountDuration: '{{amount}} off first {{cycles}} {{period}}',
     free: 'Free',
     getStarted: 'Get started',
+    highlightedPlanBadge: 'Popular',
     keepFreeTrial: 'Keep free trial',
     keepSubscription: 'Keep subscription',
     manage: 'Manage',
@@ -130,8 +145,10 @@ export const enUS: LocalizationResource = {
     monthAbbreviation: 'mo',
     monthPerUnit: 'Month per {{unitName}}',
     monthly: 'Monthly',
+    months: 'Months',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
+    payerCreditRemainder: 'Credit from account balance.',
     paymentMethod: {
       applePayDescription: {
         annual: 'Annual payment',
@@ -147,26 +164,32 @@ export const enUS: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Payment Methods',
-    popular: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
       included: 'Included',
       seatCost: {
-        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
-        upToSeats: 'Up to {{endsAfterBlock}} seats',
-        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
-        includedSeats: '{{includedSeats}} seats included',
         additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} for additional)',
-        unlimitedSeats: 'Unlimited seats',
+        freeUpToSeats: 'Free up to {{endsAfterBlock}} seats',
+        includedSeats: '{{includedSeats}} seats included',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} per seat',
         tooltip: {
-          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
           additionalSeatsEach: 'Additional seats are {{feePerBlockAmount}}/{{period}} each.',
           firstSeatsIncludedInPlan: 'First {{endsAfterBlock}} seats are included in the plan.',
+          freeForUpToSeats: 'Free for up to {{endsAfterBlock}} seats.',
         },
+        unlimitedSeats: 'Unlimited seats',
+        upToSeats: 'Up to {{endsAfterBlock}} seats',
       },
     },
+    proratedDiscount: 'Prorated discount',
+    prorationCredit: 'Prorated credit',
     reSubscribe: 'Resubscribe',
+    seatBreakdownIncludedPlural: '{{chargeable}} seats at {{rate}}/mo ({{totalSeats}} total - {{included}} included)',
+    seatBreakdownIncludedSingular: '1 seat at {{rate}}/mo ({{totalSeats}} total - {{included}} included)',
+    seatBreakdownPlural: '{{chargeable}} seats at {{rate}}/mo',
+    seatBreakdownSingular: '1 seat at {{rate}}/mo',
     seats: 'Seats',
+    seatsWithLimit: 'Seats (up to {{limit}})',
     seeAllFeatures: 'See all features',
     startFreeTrial: 'Start free trial',
     startFreeTrial__days: 'Start {{days}}-day free trial',
@@ -187,22 +210,841 @@ export const enUS: LocalizationResource = {
       trialStartedOn: 'Trial started on',
     },
     subtotal: 'Subtotal',
+    subtotalRenewal: 'Subtotal per period',
     switchPlan: 'Switch to this plan',
     switchToAnnual: 'Switch to annual',
-    switchToAnnualWithAnnualPrice: 'Switch to annual {{currency}}{{price}} / year',
+    switchToAnnualWithAnnualPrice: 'Switch to annual {{price}} / year',
     switchToMonthly: 'Switch to monthly',
-    switchToMonthlyWithPrice: 'Switch to monthly {{currency}}{{price}} / month',
+    switchToMonthlyWithPrice: 'Switch to monthly {{price}} / month',
     totalDue: 'Total due',
-    totalDueToday: 'Total Due Today',
+    totalDuePerPeriod: 'Total per period',
+    totalDueToday: 'Total due today',
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
     yearAbbreviation: 'yr',
     yearPerUnit: 'Year per {{unitName}}',
+    years: 'Years',
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: 'User attributes',
+        directoryAttribute: 'Directory attributes',
+      },
+      subtitle: 'Standard directory attributes are pre-configured. Attributes not listed here are ignored.',
+      title: 'Attribute review',
+    },
+    configureStep: {
+      actionLabel__generateToken: 'Generate new token',
+      actionLabel__replaceKey: 'Replace JSON key',
+      actionLabel__retry: 'Try again',
+      actionLabel__uploadKey: 'Upload JSON key',
+      badge__credentialsConfigured: 'Configured',
+      badge__credentialsMissing: 'Not configured',
+      domainsLabel: 'Domains:',
+      error__invalidKeyFile: 'That file is not valid JSON. Upload the key file downloaded from Google.',
+      error__ssoRequired: {
+        subtitle:
+          'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
+        title: 'Single Sign-On is not configured yet',
+      },
+      formFieldHint__subjectEmail: 'The directory is read as this admin. They must be an active Workspace admin.',
+      formFieldInputPlaceholder__subjectEmail: 'admin@yourcompany.com',
+      formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
+      formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__serviceAccountKey: 'Service account key',
+      formFieldLabel__subjectEmail: 'Google Workspace admin email',
+      formFieldLabel__token: 'Bearer token',
+      instructions: {
+        actionLabel__toggle: 'View instructions',
+        custom: {
+          step1: 'Create a SCIM 2.0 provisioning integration in your identity provider.',
+          step2: 'Paste the SCIM endpoint URL as the base URL for the integration.',
+          step3: 'Configure the integration to authenticate with the bearer token below.',
+          step4: 'Enable provisioning for user create, update, and deactivate events.',
+        },
+        entra: {
+          step1:
+            'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+          step2:
+            'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
+          step3: 'Select Provisioning and set the provisioning mode to Automatic.',
+          step4: 'Assign the users and groups to provision, then turn provisioning On.',
+        },
+        google: {
+          step1:
+            'In the Google Cloud console, create a project and a service account, then create a JSON key for it and download the file.',
+          step2: 'Enable the Admin SDK API for that project.',
+          step3:
+            'In the Google Admin console, open Security, then API controls, then Domain-wide delegation, and add the service account using its client ID.',
+          step4:
+            'Grant it the read-only directory scopes: https://www.googleapis.com/auth/admin.directory.user.readonly and https://www.googleapis.com/auth/admin.directory.group.readonly.',
+          step5: 'Upload the JSON key below and enter the email of a Google Workspace admin to read the directory as.',
+        },
+        okta: {
+          step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
+          step2: 'Open the Provisioning tab and select the Integration setting.',
+          step3: 'Paste the SCIM endpoint URL and bearer token found below.',
+          step4: 'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
+        },
+      },
+      notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
+      subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
+      title: 'Configure',
+      warning__ssoInactive:
+        "This SSO connection is configured but not yet active. You can provision members, but they won't be able to sign in until it's active.",
+    },
+    navbar: {
+      title: 'Configure Directory Sync',
+    },
+    providers: {
+      custom: 'Custom SCIM provider',
+      entra: 'Microsoft Entra ID',
+      google: 'Google Workspace',
+      okta: 'Okta Workforce',
+    },
+    roleMappingStep: {
+      actionHint__reorder: 'Drag to reorder, or use the arrow keys',
+      actionLabel__reorder: 'Reorder {{group}} mapping',
+      alert__missingManageMembersPermission: {
+        subtitle: 'Ask someone who can manage members to change role sync or the group role mappings.',
+        title: 'Role mapping is read-only',
+      },
+      columns: {
+        directoryGroup: 'Directory group',
+        priority: 'Priority',
+        role: 'Role',
+      },
+      disableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Disable role sync',
+        subtitle:
+          "Members keep their current roles, but new members won't get a role from their directory group. Your mappings are saved, and turning role sync back on reapplies them to every member, overwriting any manual role changes.",
+        title: 'Disabling role sync',
+      },
+      empty__noGroups: {
+        subtitle: 'Push groups from {{provider}} and they will appear here, ready to map.',
+        title: 'No groups provisioned yet',
+      },
+      enableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Enable role sync',
+        subtitle:
+          "Members' organization roles will be overwritten by the role mapped to their directory group, including roles that were assigned manually.",
+        title: 'Enabling role sync',
+      },
+      error__loadMappings: 'Could not load role mappings',
+      everyoneElse: 'Everyone else',
+      formFieldLabel__syncRoles: 'Sync roles',
+      roleOption__unassigned: 'Unassigned',
+      subtitle:
+        'Members get a role from the directory group they belong to. Members belonging to multiple groups are assigned the highest priority role.',
+      title: 'Role mapping',
+    },
+    stepper: {
+      attributes: 'Attributes',
+      configure: 'Configure',
+      roles: 'Roles',
+      test: 'Test',
+    },
+    testStep: {
+      actionLabel__complete: 'Complete',
+      actionLabel__syncNow: 'Sync now',
+      badge__active: 'Active',
+      badge__deprovisioned: 'Deprovisioned',
+      description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      description__pull:
+        'Your directory is read on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__noUsersProvisioned: 'No users have been provisioned yet.',
+      empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
+      empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__lastSyncFailed: 'The last sync failed',
+      error__loadUsers: 'Could not load provisioned users',
+      error__syncFailed: 'Could not start the sync. Check your connection and try again.',
+      note: 'only users with an email address from a configured domain will be processed.',
+      noteLabel: 'Note:',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      syncRow: {
+        neverSynced: 'Not synced yet',
+        title: 'Directory sync',
+      },
+      syncStatus__cancelled: 'Cancelled',
+      syncStatus__failed: 'Failed',
+      syncStatus__running: 'Running',
+      syncStatus__succeeded: 'Succeeded',
+      title: 'Test provisioning',
+    },
   },
   configureSSO: {
+    activate: {
+      activateButton: 'Activate SSO',
+      activeSubtitle: 'Anyone signing in with {{domain}} must use your identity provider.',
+      activeTitle: 'SSO connection is active',
+      doneButton: 'Done',
+      skipButton: 'Skip for now',
+      subtitle:
+        'Your SSO connection is ready. Once activated, anyone signing in with {{domain}} must use your identity provider.',
+      title: 'SSO connection configured',
+    },
+    changeProviderDialog: {
+      cancelButton: 'Cancel',
+      confirmButton: 'Change provider',
+      subtitle:
+        'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
+      title: 'Change provider to {{provider}}',
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: 'Dismiss',
+        title:
+          'This connection is active. Saving changes applies immediately and may disrupt sign-in for current members.',
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: 'Optional',
+          required: 'Required',
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: 'Client ID',
+            placeholder: 'Paste client ID here...',
+          },
+          clientSecret: {
+            label: 'Client secret',
+            placeholder: 'Paste client secret here...',
+          },
+          headerSubtitle: 'Add your application credentials',
+          paragraph: 'In your identity provider’s OIDC application, retrieve these values.',
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description:
+              'In your identity provider’s OIDC application, retrieve the discovery endpoint. Paste it below.',
+            label: 'Discovery endpoint',
+            placeholder: 'Paste URL here...',
+          },
+          headerSubtitle: 'Add your identity provider’s endpoints',
+          manual: {
+            authUrl: {
+              label: 'Authorization URL',
+              placeholder: 'Paste URL here...',
+            },
+            description: 'In your identity provider’s OIDC application, retrieve these values.',
+            tokenUrl: {
+              label: 'Token URL',
+              placeholder: 'Paste URL here...',
+            },
+            userInfoUrl: {
+              label: 'User Info URL',
+              placeholder: 'Paste URL here...',
+            },
+          },
+          modes: {
+            ariaLabel: 'OIDC endpoint configuration method',
+            discoveryUrl: 'Add via discovery endpoint',
+            manual: 'Configure manually',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+        redirectUriStep: {
+          claims: {
+            description: 'Ensure your ID token includes the following claims:',
+            table: {
+              columns: {
+                attribute: 'Clerk attribute',
+                claim: 'ID token claim',
+              },
+              rows: {
+                email: {
+                  attribute: 'Primary email',
+                },
+                firstName: {
+                  attribute: 'First name',
+                },
+                lastName: {
+                  attribute: 'Last name',
+                },
+                subject: {
+                  attribute: 'External user ID',
+                },
+              },
+            },
+          },
+          headerSubtitle: 'Create a new OIDC application in your identity provider’s dashboard',
+          paragraph:
+            'In your identity provider’s dashboard, create a new OIDC application that supports the authorization code grant type, and use the following redirect URI:',
+          redirectUri: {
+            label: 'Authorized redirect URI',
+          },
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: 'Assign users or groups to your SAML application',
+          paragraph: 'Assign users or groups to your app before they can sign in with SSO.',
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: 'Attribute Name',
+              userAttribute: 'User Attribute',
+            },
+            rows: {
+              email: {
+                attributeName: 'Primary email',
+                userAttribute: 'mail',
+              },
+              firstName: {
+                attributeName: 'First name',
+                userAttribute: 'firstName',
+              },
+              lastName: {
+                attributeName: 'Last name',
+                userAttribute: 'lastName',
+              },
+            },
+          },
+          headerSubtitle: 'Map user attributes from your identity provider to your application.',
+          paragraph: 'Your SAML response must include the following attributes:',
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph:
+              'In your identity provider’s dashboard, create a new SAML 2.0 application and use the following service provider details:',
+          },
+          headerSubtitle: 'Create a new SAML application in your identity provider’s dashboard',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Assertion consumer service (ACS) URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Configure identity provider metadata',
+          manual: {
+            description: 'In your identity provider SAML application, retrieve these values.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificates',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description: 'In your identity provider SAML application, retrieve the metadata URL. Paste it below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration ',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure your identity provider',
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: 'App attribute',
+              googleAttribute: 'Google attribute',
+            },
+            rows: {
+              email: {
+                appAttribute: 'email',
+                googleAttribute: 'Primary email',
+              },
+              firstName: {
+                appAttribute: 'firstName',
+                googleAttribute: 'First name',
+              },
+              lastName: {
+                appAttribute: 'lastName',
+                googleAttribute: 'Last name',
+              },
+            },
+          },
+          headerSubtitle: 'Map user attributes from Google Workspace to your application',
+          paragraph: 'We expect your SAML response to return the user’s email, first name and last name.',
+          step1: 'In the <bold>Google Admin Console</bold>, find the <bold>Attributes</bold> section.',
+          step2:
+            'Select <bold>Add mapping</bold> for each attribute, and enter the following Google and app attribute:',
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1:
+              "Once the configuration is complete in Google, you'll be redirected to the app's overview page.",
+            paragraph2:
+              'Google may take up to 24 hours to propagate these changes. The connection will remain inactive until they take effect.',
+            step1: 'Open the <bold>User access</bold> section.',
+            step2: 'Select <bold>ON for everyone.</bold>',
+            step3: 'Select <bold>Save</bold>.',
+          },
+          headerSubtitle: 'Enable your Google Workspace SAML application',
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: 'In the side navigation, under <bold>Apps</bold>, select <bold>Web and mobile apps.</bold>',
+            step2: 'Select <bold>Add app</bold>, then <bold>Add custom SAML app.</bold>',
+            step3: 'Enter an <bold>App name.</bold>',
+            step4: 'Select <bold>Continue</bold>.',
+            title: 'In Google Workspace, create a new SAML application:',
+          },
+          headerSubtitle: 'Create a new SAML application in Google Workspace',
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Google Workspace application metadata',
+          manual: {
+            description: 'In your Google Workspace app, retrieve these values.',
+            issuer: {
+              label: 'Entity ID',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'SSO URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificates',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataFile: {
+            description: 'In your Google Workspace app, download the IdP metadata and upload it below.',
+            fileUploaded: 'File uploaded',
+            label: 'IdP metadata',
+            removeFile: 'Remove file',
+            replaceFile: 'Replace file',
+            uploadFile: 'Upload file',
+          },
+          modes: {
+            ariaLabel: 'Configuration',
+            manual: 'Configure manually',
+            metadataFile: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Google Workspace',
+        serviceProviderStep: {
+          headerSubtitle: 'Configure service provider',
+          nameIdInstructions: {
+            step1:
+              'Under the <bold>Name ID</bold> section, select the <bold>Name ID</bold> format dropdown and select <bold>Email</bold>.',
+            step2: 'Select <bold>Continue</bold>',
+          },
+          paragraph:
+            'To configure your service provider, you must add these two fields to your Google Workspace SAML application:',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'ACS URL',
+            },
+            spEntityId: {
+              label: 'Entity ID',
+            },
+          },
+          title: 'Configure service provider',
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: 'Attribute',
+              claimName: 'Claim name',
+              value: 'Value',
+            },
+            copyClaimName: 'Copy claim name',
+            copyClaimNameCopied: 'Copied',
+            rows: {
+              email: {
+                attribute: 'Email address',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+                value: 'user.mail',
+              },
+              firstName: {
+                attribute: 'First name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+                value: 'user.givenname',
+              },
+              lastName: {
+                attribute: 'Last name',
+                claimName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+                value: 'user.surname',
+              },
+            },
+          },
+          headerSubtitle: 'Set the attributes Microsoft Entra includes in your SAML response',
+          step1: 'On the <bold>SAML-based Sign-on</bold> page, find the <bold>Attributes & Claims</bold> section.',
+          step2: 'Select <bold>Edit.</bold>',
+          title: 'Your SAML response must include the following attributes:',
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: 'In the <bold>Getting Started</bold> section, select the <bold>Assign users and groups.</bold>',
+            step2: "Select <bold>Add user/group.</bold> You'll be redirected to the <bold>Add Assignment page.</bold>",
+            step3: 'Select the <bold>None Selected link.</bold>',
+            step4:
+              "Select <bold>Select</bold> at the bottom of the page. You'll be redirected to the <bold>Add Assignment</bold> page.",
+            step5: 'Select <bold>Assign</bold>',
+            title: 'Assign your users or groups in Microsoft',
+          },
+          createAppInstructions: {
+            step1: 'Sign in to Microsoft Azure Portal and go to <bold>Enterprise applications.</bold>',
+            step2:
+              "Click <bold>New application.</bold> You'll be redirected to the <bold>Browse Microsoft Entra Gallery</bold> page.",
+            step3: 'Select <bold>Create your own application.</bold>',
+            step4: {
+              label: 'In the modal that opens:',
+              subSteps: {
+                appName: 'Fill out your application name.',
+                create: 'Select <bold>Create</bold>.',
+                nonGallery:
+                  "Select <bold>Integrate any other application you don't find in the gallery (Non-gallery)</bold>.",
+              },
+            },
+            title: 'Create a new enterprise application',
+          },
+          headerSubtitle: 'Create a new enterprise application in your Azure Portal',
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Microsoft Entra application metadata',
+          manual: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section. Retrieve these values and add them below.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificates',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description:
+              'On the <bold>SAML-based Sign-on</bold> page, find the <bold>SAML Certificates</bold> section and copy the <bold>App Federation Metadata Url</bold>. Paste below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration ',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Microsoft Entra',
+        serviceProviderStep: {
+          headerSubtitle: 'Add service provider configuration to Microsoft Entra',
+          serviceProviderFields: {
+            acsUrl: {
+              label: 'Reply URL (Assertion Consumer Service URL)',
+            },
+            spEntityId: {
+              label: 'Identifier (Entity ID)',
+            },
+          },
+          step1: 'In the side navigation, open the <bold>Manage</bold> dropdown and select Single sign-on.',
+          step2: 'In the <bold>Select a single sign-on method</bold> section, select <bold>SAML</bold>.',
+          step3: 'Find the <bold>Basic SAML Configuration</bold> section.',
+          step4: 'Select <bold>Edit</bold>. The <bold>Basic SAML Configuration</bold> panel will open.',
+          step5:
+            'Copy the following values into <bold>Identifier (Entity ID)</bold> and <bold>Reply URL (ACS URL)</bold>:',
+          step6: 'Select <bold>Save</bold> at the top of the panel. Close the panel.',
+          title: 'Add service provider details',
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: 'Assign users or groups to your Okta application before they can sign in with SSO',
+            step1: 'In the Okta dashboard, select the <bold>Assignments</bold> tab.',
+            step2:
+              'Open the <bold>Assign</bold> dropdown and select <bold>Assign to people</bold> or <bold>Assign to groups</bold>.',
+            step3: 'Search for the user or group to assign.',
+            step4: 'Click <bold>Assign</bold> next to the user or group.',
+            step5: 'Click <bold>Done.</bold>',
+          },
+          headerSubtitle: 'Assign users to your Okta application',
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: 'Expression',
+              name: 'Attribute name',
+            },
+            rows: {
+              email: {
+                expression: 'user.profile.email',
+                name: 'mail',
+              },
+              firstName: {
+                expression: 'user.profile.firstName',
+                name: 'firstName',
+              },
+              lastName: {
+                expression: 'user.profile.lastName',
+                name: 'lastName',
+              },
+            },
+          },
+          headerSubtitle: 'Set the attributes Okta includes in your SAML response',
+          paragraph: 'Your SAML response must include the following attributes:',
+          step1: 'In the Okta dashboard, find the <bold>Attribute Statements</bold> section.',
+          step2:
+            'Select <bold>Add Expression</bold> for each attribute, and enter the following name and expression pairs:',
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: 'From the <bold>Feedback</bold>, select <bold>This is an internal app that we have created.</bold>',
+            step2: 'Click <bold>Finish</bold> to complete the integration.',
+            title: 'Complete the SAML integration',
+          },
+          createAppInstructions: {
+            step1: 'Sign in to Okta and go to <bold>Admin → Applications.</bold>',
+            step2: 'Click <bold>Create App Integration.</bold> and select <bold>SAML 2.0.</bold>',
+            step3: 'Fill in the General Settings. The app name is required.',
+            step4: 'Click <bold>Next</bold> to finish creating the application.',
+            title: 'Create a new SAML application in Okta',
+          },
+          headerSubtitle: 'Create and configure a SAML application in your Okta Dashboard',
+          serviceProviderInstructions: {
+            paragraph1:
+              "After completing <bold>General Settings</bold>, you'll see the <bold>Configure SAML</bold> page.",
+            paragraph2: 'Add these two fields to your Okta application to configure your service provider.',
+            serviceProviderFields: {
+              acsUrl: {
+                label: 'Single sign-on URL',
+              },
+              spEntityId: {
+                label: 'Audience URI (SP Entity ID)',
+              },
+            },
+            title: 'Configure service provider',
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: 'Add your Okta application metadata',
+          manual: {
+            description: 'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve these values.',
+            issuer: {
+              label: 'Issuer',
+              placeholder: 'Paste URL here...',
+            },
+            signOnUrl: {
+              label: 'Sign on URL',
+              placeholder: 'Paste URL here...',
+            },
+            signingCertificate: {
+              fileUploaded: 'File uploaded',
+              label: 'Signing certificates',
+              removeFile: 'Remove file',
+              replaceFile: 'Replace file',
+              uploadFile: 'Upload file',
+            },
+          },
+          metadataUrl: {
+            description:
+              'In your Okta SAML application, go to the <bold>Sign On</bold> tab and retrieve the metadata URL. Paste it below.',
+            label: 'Metadata URL',
+            placeholder: 'Paste URL here...',
+          },
+          modes: {
+            ariaLabel: 'Configuration',
+            manual: 'Configure manually',
+            metadataUrl: 'Add via metadata',
+          },
+        },
+        mainHeaderTitle: 'Configure Okta Workforce',
+      },
+      unsupportedProvider: {
+        description:
+          'This identity provider isn’t supported in this version of Clerk. Update to the latest version to finish setting it up.',
+        title: 'Unsupported provider',
+      },
+    },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: "Contact your organization's administrator to upgrade your permissions.",
+      title: 'You do not have permission to manage Single Sign-on (SSO)',
+    },
     navbar: {
       title: 'Configure Single Sign-On (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__claimed: 'Used by another connection',
+        badge__expired: 'Expired',
+        badge__unverified: 'Unverified',
+        badge__verified: 'Verified',
+        checkboxLabel: 'Use {{domain}} for this connection',
+        expiredAtLabel:
+          "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
+        expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
+        removeButtonTooltip__lastVerifiedDomain: 'At least one verified domain is required to set up SSO.',
+        removeButtonTooltip__lastVerifiedDomainActive: 'At least one verified domain is required to keep SSO enabled.',
+        txtRecord: {
+          hostLabel: 'Host / Name',
+          instructions: "Add this TXT record to your DNS provider. We'll verify automatically once the record is live.",
+          typeLabel: 'Type',
+          valueLabel: 'Value',
+        },
+        verifiedAtLabel: "Verified on {{ date | shortDate('en-US') }}",
+        verifyAgainButton: 'Verify again',
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: 'Add {{domain}}',
+        messageLabel: 'Your email uses {{domain}}. Do you want to add it?',
+      },
+      formButtonPrimary__add: 'Add',
+      formFieldInputPlaceholder__domain: 'Type your domain here and click add to start',
+      formFieldLabel__domain: 'Domain',
+      removeDomainDialog: {
+        cancelButton: 'Cancel',
+        removeButton: 'Remove domain',
+        subtitle__active:
+          "You're about to remove {{domain}} from this enterprise connection. Users won't be able to sign-in with {{domain}} anymore.",
+        subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
+        title: 'Removing domain',
+      },
+      subtitle:
+        'Add and verify ownership of the domains your organization uses to sign in, then pick the ones this connection covers.',
+      title: 'Add SSO domains',
+    },
+    resetConnectionDialog: {
+      cancelButton: 'Cancel',
+      confirmationFieldLabel: 'Type "{{name}}" below to continue',
+      confirmationFieldPlaceholder: '{{name}}',
+      resetButton: 'Reset connection',
+      subtitle:
+        'Are you sure you want to reset the connection "{{name}}"? This action is irreversible and you will have to configure all steps again',
+      title: 'Reset connection',
+    },
+    selectProviderStep: {
+      oidc: {
+        groupLabel: 'OpenID Connect (OIDC)',
+        oidcProvider: 'OIDC Provider',
+      },
+      saml: {
+        customSaml: 'Custom SAML Provider',
+        google: 'Google Workspace',
+        groupLabel: 'SAML',
+        microsoft: 'Microsoft Entra (formerly AD)',
+        okta: 'Okta Workforce',
+      },
+      subtitle: "You'll configure the connection details in the next step",
+      title: 'Select your identity provider',
+      warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    signingCertificates: {
+      addCertificate: 'Add certificate',
+      expired: 'Expired {{date}}',
+      expires: 'Expires {{date}}',
+      expiryAfterSave: 'Expiry shows after you save.',
+      fileUnreadable: 'The file could not be read. Try again.',
+      notACertificate: 'One of the uploaded files is not a certificate.',
+      primary: 'Primary',
+      primaryTooltip: 'Checked first when verifying a sign-in. Every certificate in this list is trusted.',
+      removeCertificate: 'Remove certificate',
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun:
+        'You need at least one successful test run before you can continue. Generate a test URL and complete the sign-in flow.',
+      subtitle: 'Sign in through the test URL to verify your SSO connection is configured correctly',
+      testResults: {
+        actionLabel__refresh: 'Refresh logs',
+        empty: {
+          subtitle: 'Select <bold>Open test URL</bold> to run your first test',
+          title: 'No test results',
+        },
+        polling: 'Waiting for the test run to complete…',
+        status__failed: 'Failed',
+        status__pending: 'Pending',
+        status__success: 'Success',
+        title: 'Your test results',
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: 'View documentation',
+          oauth_access_denied: {
+            description:
+              "This error occurs when the user clicked Cancel or Deny on the OAuth provider's authorization screen, or the provider rejected the authorization request. Verify that the OAuth application credentials (Client ID and Client Secret) are correctly configured.",
+          },
+          oauth_fetch_user_error: {
+            intro: 'To fix this error, follow these steps:',
+            step1:
+              'Verify that the OAuth scopes configured in your connection settings include the necessary permissions to read user profile information.',
+            step2: 'Ensure that the user info endpoint URL is correctly configured.',
+          },
+          oauth_token_exchange_error: {
+            description:
+              "Verify that your OAuth application's Client ID and Client Secret are correctly configured and match the credentials from your OAuth provider's dashboard.",
+          },
+          saml_email_address_domain_mismatch: {
+            description:
+              'Verify that the user is signing in with an email address that matches one of the allowed domains for this connection. If you need to add additional domains, update the allowed domains in your connection settings.',
+          },
+          saml_response_relaystate_missing: {
+            description:
+              'Check that your identity provider is correctly returning the RelayState parameter that was sent in the original request.',
+          },
+          saml_user_attribute_missing: {
+            intro: 'To fix this error, follow these steps:',
+            step1: "Access your identity provider's configuration dashboard.",
+            step2: "Navigate to your application's SAML settings or attribute mapping configuration.",
+            step3: "Ensure that the 'mail' attribute is properly mapped to the user's email address field.",
+          },
+          sectionTitle: 'How to fix',
+        },
+        parsedUserInfo: {
+          email: 'Email',
+          firstName: 'First name',
+          sectionTitle: 'Parsed user info',
+        },
+        runDetails: {
+          actionLabel__copied: 'Copied',
+          actionLabel__copy: 'Copy message',
+          errorCode: 'Error code',
+          fullMessage: 'Full message',
+          sectionTitle: 'Run details',
+          status: 'Status',
+          timestamp: 'Timestamp',
+        },
+        title: 'Test run',
+      },
+      testUrl: {
+        actionLabel__open: 'Open test URL',
+      },
+      title: 'Test your SSO connection',
     },
   },
   createOrganization: {
@@ -229,6 +1071,8 @@ export const enUS: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -249,8 +1093,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Organization name',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Enter your password',
-  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
+  formFieldInputPlaceholder__signUpPassword: 'Create a password',
   formFieldInputPlaceholder__username: 'Enter your username',
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
   formFieldLabel__apiKey: 'API key',
@@ -281,6 +1125,9 @@ export const enUS: LocalizationResource = {
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__username: 'Username',
+  identityPreviewEditButton__emailAddress: 'Edit email address',
+  identityPreviewEditButton__identifier: 'Edit identifier',
+  identityPreviewEditButton__phoneNumber: 'Edit phone number',
   impersonationFab: {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
@@ -291,6 +1138,65 @@ export const enUS: LocalizationResource = {
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
+  oauthConsent: {
+    action__allow: 'Allow',
+    action__deny: 'Deny',
+    offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
+    redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
+    redirectUriModal: {
+      subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
+      title: 'Redirect URL',
+    },
+    scopeList: {
+      privateMetadata: 'Your private metadata set by {{applicationName}}, which may include sensitive information',
+      title: 'This will allow {{applicationName}} access to:',
+    },
+    subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
+    viewFullUrl: 'View full URL',
+    warning:
+      'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: 'Enter another code',
+    confirmation: {
+      action__approve: 'Approve',
+      action__deny: 'Deny',
+      scopeListTitle: 'This will allow {{applicationName}} access to:',
+      subtitle: 'Confirm this request for {{identifier}}',
+      title: 'Allow {{applicationName}} to access your account?',
+      warning: 'Only approve this request if you started it on your other device.',
+    },
+    error: {
+      expiredSubtitle: 'Start over on your device.',
+      expiredTitle: 'This code expired',
+      genericSubtitle: 'Check your connection and try again.',
+      genericTitle: 'We could not verify this code',
+      invalidCode: 'Enter a valid 8-character code.',
+      rateLimitedSubtitle: 'Wait before trying another code.',
+      rateLimitedTitle: 'Too many attempts',
+      unknownCode: "We couldn't find that code. Check it and try again.",
+    },
+    start: {
+      action__continue: 'Continue',
+      subtitle: 'Enter the code shown on the device or app you want to authorize.',
+      title: 'Verify a device',
+      userCodeLabel: 'Device code',
+    },
+    status: {
+      alreadyApprovedSubtitle: 'Return to your device to continue.',
+      alreadyApprovedTitle: "You've approved this",
+      alreadyDecidedSubtitle: 'It was decided elsewhere. Return to your device.',
+      alreadyDecidedTitle: 'This request was already completed',
+      alreadyDeniedSubtitle: 'Start over on your device if you want to try again.',
+      alreadyDeniedTitle: 'This request was denied',
+      approvedSubtitle: 'You approved this request. Return to your device to continue.',
+      approvedTitle: 'Device approved',
+      consumedSubtitle: 'Your device is authorized. You can close this window.',
+      consumedTitle: 'This code has already been used',
+      deniedSubtitle: 'You denied this request. Return to your device.',
+      deniedTitle: 'Access denied',
+    },
+  },
   organizationList: {
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
@@ -302,32 +1208,25 @@ export const enUS: LocalizationResource = {
     title: 'Choose an account',
     titleWithoutPersonal: 'Choose an organization',
   },
-  oauthConsent: {
-    action__allow: 'Allow',
-    action__deny: 'Deny',
-    offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
-    redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
-    redirectUriModal: {
-      subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
-      title: 'Redirect URL',
-    },
-    scopeList: {
-      title: 'This will allow {{applicationName}} access to:',
-    },
-    subtitle: 'wants to access {{applicationName}} on behalf of {{identifier}}',
-    viewFullUrl: 'View full URL',
-    warning:
-      'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
-  },
   organizationProfile: {
     apiKeysPage: {
       title: 'API keys',
     },
     badge__automaticInvitation: 'Automatic invitations',
     badge__automaticSuggestion: 'Automatic suggestions',
+    badge__enterpriseSso: 'Enterprise SSO',
     badge__manualInvitation: 'No automatic enrollment',
     badge__unverified: 'Unverified',
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -362,8 +1261,8 @@ export const enUS: LocalizationResource = {
       statementsSection: {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__payerCredit: 'Credit from account balance',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -375,6 +1274,11 @@ export const enUS: LocalizationResource = {
         actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        includedSeatsUsage: '{{includedSeats}} seats included',
+        overview: 'Overview',
+        paidSeatsUsage: '{{seatsQuantity}} seats x {{amount}}',
+        seatLimit: 'Up to {{seatLimit}} seats',
+        seatLimitAndIncludedSeats: 'Up to {{seatLimit}} seats ({{includedSeats}} included)',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Start date',
@@ -397,6 +1301,7 @@ export const enUS: LocalizationResource = {
       detailsTitle__inviteFailed:
         'The invitations could not be sent. There are already pending invitations for the following email addresses: {{email_addresses}}.',
       formButtonPrimary__continue: 'Send invitations',
+      formButtonPrimary__purchaseSeats: 'Purchase additional seats',
       selectDropdown__role: 'Select role',
       subtitle: 'Enter or paste one or more email addresses, separated by spaces or commas.',
       successMessage: 'Invitations successfully sent',
@@ -456,6 +1361,7 @@ export const enUS: LocalizationResource = {
       description: 'Manage your organization.',
       general: 'General',
       members: 'Members',
+      security: 'Security',
       title: 'Organization',
     },
     plansPage: {
@@ -503,13 +1409,177 @@ export const enUS: LocalizationResource = {
       successMessage: '{{domain}} has been removed.',
       title: 'Remove domain',
     },
+    securityPage: {
+      connectionPage: {
+        actions: {
+          activate: 'Activate',
+          continueSetup: 'Continue setup',
+        },
+        dangerZone: {
+          deactivateButton: 'Deactivate connection',
+          removeButton: 'Remove connection',
+          title: 'Danger zone',
+        },
+        domains: {
+          title: 'Domains',
+        },
+        identityProvider: {
+          certificateExpires: 'Certificate expires',
+          certificates: 'Certificates',
+          certificatesCount: '{{count}} certificates',
+          certificatesSummary: '{{count}} certificates, earliest expires {{date}}',
+          certificatesSummaryExpired: '{{count}} certificates, one expired {{date}}',
+          clientSecret: {
+            placeholder: 'Leave empty to keep the current secret',
+          },
+          editButton: 'Edit',
+          form: {
+            title: 'Edit identity provider',
+          },
+          title: 'Identity provider',
+        },
+        name: {
+          editButton: 'Edit',
+          form: {
+            title: 'Rename connection',
+          },
+          title: 'Name',
+        },
+        serviceProvider: {
+          acsUrl: 'Assertion consumer service (ACS) URL',
+          entityId: 'Entity ID',
+          metadataUrl: 'Metadata URL',
+          redirectUri: 'Redirect URI',
+          title: 'Service provider',
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: 'Members may keep other sign-in methods.',
+            label: 'Allow additional identifiers',
+          },
+          allowIdpInitiated: {
+            description: 'Sign-in may start from the identity provider.',
+            label: 'Allow IdP-initiated flow',
+          },
+          allowSubdomains: {
+            description: "Also match subdomains of the connection's domains.",
+            label: 'Allow subdomains',
+          },
+          forceAuthn: {
+            description: 'Re-authenticate at the identity provider on every sign-in.',
+            label: 'Force re-authentication',
+          },
+          syncUserAttributes: {
+            description: 'Refresh name and email from the identity provider on each sign-in.',
+            label: 'Sync user attributes',
+          },
+          title: 'Settings',
+        },
+      },
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
+        error__load: 'Could not load Directory Sync',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__configure: 'Configure',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
+      removeDialog: {
+        confirmButton: 'Remove connection',
+        subtitle:
+          'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
+        title: 'Remove SSO connection',
+      },
+      ssoBypassPage: {
+        action__add: 'Add',
+        action__search: 'Search users',
+        addForm: {
+          emailPlaceholder: "Enter the member's email address",
+          error__allAlreadyAdded: 'Everyone with that role is already on the allow list.',
+          error__alreadyAdded: 'This member is already on the allow list.',
+          error__memberNotFound: 'No member of this organization has that email address.',
+          modeLabel: 'Add by',
+          mode__email: 'Email',
+          mode__role: 'Role',
+          roleOption: '{{role}} ({{count}})',
+          roleWarning: 'This list does not sync, members are managed manually.',
+          submitButton: 'Add members',
+          subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
+          title: 'Add members',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members',
+          addedMember: 'Added member successfully',
+          added__one: 'Added 1 member',
+          domainNotServed:
+            '{{count}} members could not be added because their email address is not served by a connection.',
+          domainNotServed__one:
+            '1 member could not be added because their email address is not served by a connection.',
+          notMember: '{{count}} members could not be added because they are no longer in the organization.',
+          notMember__one: '1 member could not be added because they are no longer in the organization.',
+          unknown: '{{count}} members could not be added.',
+          unknown__one: '1 member could not be added.',
+        },
+        table: {
+          emptyState: 'No members on the allow list',
+          emptyState__search: 'No members match your search',
+          header__actions: 'Actions',
+          header__user: 'User',
+          menuAction__remove: 'Remove',
+        },
+        title: 'SSO bypass',
+      },
+      ssoBypassSection: {
+        allowlistCount: '{{count}} members',
+        allowlistCount__one: '1 member',
+        allowlistLabel: 'Allow list:',
+        description: 'Members on this list can sign in with an email code when SSO is unavailable.',
+        error__load: 'Could not load the SSO allow list',
+        menuAction__manage: 'Manage',
+        title: 'SSO bypass',
+      },
+      ssoSection: {
+        badge__active: 'Active',
+        badge__inProgress: 'In Progress',
+        badge__inactive: 'Inactive',
+        badge__unconfigured: 'Unconfigured',
+        descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
+        domainLabel: 'Domains:',
+        menuAction__activate: 'Activate',
+        menuAction__continue: 'Continue configuration',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
+        primaryButton__continueConfiguration: 'Continue configuration',
+        primaryButton__startConfiguration: 'Start configuration',
+        title: 'SSO',
+        tooltip:
+          'Members without a matching domain can still sign in using existing auth methods. New members will be assigned to {{role}} in this organization.',
+        tooltipLabel: 'More information',
+        tooltip__noRole: 'Members without a matching domain can still sign in using existing auth methods.',
+      },
+      title: 'Security',
+    },
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
       membershipSeatUsageLabel: '{{count}} of {{limit}} seats used',
       profileSection: {
         primaryButton: 'Update profile',
-        title: 'Organization Profile',
+        title: 'Profile',
         uploadAction__title: 'Logo',
       },
     },
@@ -605,10 +1675,26 @@ export const enUS: LocalizationResource = {
         'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
       title: 'Use your passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: 'Use your passkey',
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Verification required',
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter your current password to continue',
       title: 'Verification required',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword:
+        "Your current password can't be used anymore. Confirm it's you to save your new password.",
+      title: 'Password compromised',
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword:
+        "Your current password was found in a data breach. Confirm it's you to save your new password.",
+      title: 'Password compromised',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -622,11 +1708,30 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the code sent to your phone to continue',
       title: 'Verification required',
     },
+    resetPassword: {
+      formButtonPrimary: 'Continue',
+      title: 'Set new password',
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: 'Reset your password',
+      label__alternativeMethods: 'Or, verify with another method',
+    },
+    resetPasswordCode: {
+      formTitle: 'Reset password code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle__saveNewPassword_email: 'Enter the code sent to your email address to save your new password',
+      subtitle__saveNewPassword_phone: 'Enter the code sent to your phone to save your new password',
+      title__saveNewPassword_email: 'Check your email',
+      title__saveNewPassword_phone: 'Check your phone',
+    },
     totpMfa: {
       formTitle: 'Verification code',
       subtitle: 'Enter the code generated by your authenticator app to continue',
       title: 'Verification required',
     },
+  },
+  searchInput: {
+    action__clear: 'Clear search',
   },
   signIn: {
     accountSwitcher: {
@@ -711,6 +1816,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      verifiedTransferable: {
+        subtitle: 'Return to original tab to continue',
+        title: 'Email verified',
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Use the verification link sent to your email',
@@ -719,8 +1828,11 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: 'Continue with SSO',
     },
     forgotPassword: {
       formTitle: 'Reset password code',
@@ -743,6 +1855,10 @@ export const enUS: LocalizationResource = {
       title: 'Cannot sign in',
     },
     passkey: {
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+      title: 'Use your passkey',
+    },
+    passkeyMfa: {
       subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
       title: 'Use your passkey',
     },
@@ -772,6 +1888,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'To continue, please enter the verification code sent to your phone',
       title: 'Check your phone',
     },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
+    },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
       requiredMessage: 'For security reasons, it is required to reset your password.',
@@ -780,6 +1902,15 @@ export const enUS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
+    },
+    ssoBypass: {
+      actionLink: "Can't use SSO?",
+      code: {
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'to continue to {{applicationName}}',
+        title: 'Check your email',
+      },
+      notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
     },
     start: {
       actionLink: 'Sign up',
@@ -856,8 +1987,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
@@ -877,6 +2008,12 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the verification code sent to your phone',
       title: 'Verify your phone',
+    },
+    protectCheck: {
+      loading: 'Loading…',
+      retryButton: 'Try again',
+      subtitle: 'Please wait while we verify your request.',
+      title: 'Verifying your request',
     },
     restrictedAccess: {
       actionLink: 'Sign in',
@@ -1023,6 +2160,7 @@ export const enUS: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     api_key_name_already_exists: 'API Key name already exists.',
     api_key_usage_exceeded: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
@@ -1031,6 +2169,7 @@ export const enUS: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    external_account_not_found: 'Account not found. Please sign up or try signing in to a different account.',
     form_code_incorrect: undefined,
     form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
@@ -1052,6 +2191,8 @@ export const enUS: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
+    form_password_matches_identifier:
+      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_or_identifier_incorrect: undefined,
     form_password_pwned:
@@ -1066,7 +2207,12 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
     form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
+    insufficient_seats_change_plan:
+      'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
+    insufficient_seats_contact_support:
+      'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
     not_allowed_access: undefined,
+    oauth_access_denied: 'You did not grant access to your account.',
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1092,7 +2238,29 @@ export const enUS: LocalizationResource = {
       sentencePrefix: 'Your password must contain',
     },
     phone_number_exists: undefined,
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: "Verification didn't complete. Please try again.",
+    protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
+    protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
+    protect_check_script_load_failed:
+      "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
+    protect_check_timed_out: "Verification didn't complete in time. Please try again.",
+    protect_check_unsupported_environment:
+      "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    signup_rate_limit_exceeded: 'Too many requests. Please try again in a bit.',
+    something_went_wrong: 'Something went wrong. Please try again.',
+    sso_bypass_domain_not_served:
+      'This member could not be added because their email address is not served by a connection.',
+    ticket_expired_code: 'This link has expired. Please start again or request a new link.',
+    ticket_invalid_code:
+      'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_requests: 'Too many requests. Please try again in a bit.',
+    too_many_unverified_identifications:
+      'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:
@@ -1144,6 +2312,9 @@ export const enUS: LocalizationResource = {
     action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
+    label__accountActions: 'Account actions',
+    label__activeSessions: 'Active sessions',
+    label__userButtonPopover: 'Account panel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1166,6 +2337,15 @@ export const enUS: LocalizationResource = {
       title__codelist: 'Backup codes',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: 'Account credits',
+        viewHistory: 'View credit history',
+      },
+      creditHistoryPage: {
+        tableHeader__amount: 'Amount',
+        tableHeader__date: 'Date',
+        title: 'Account credit history',
+      },
       paymentHistorySection: {
         empty: 'No payment history',
         notFound: 'Payment attempt not found',
@@ -1200,8 +2380,8 @@ export const enUS: LocalizationResource = {
       statementsSection: {
         empty: 'No statements to display',
         itemCaption__paidForPlan: 'Paid for {{plan}} {{period}} plan',
-        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__payerCredit: 'Credit from account balance',
+        itemCaption__proratedCredit: 'Prorated credit for partial usage of previous subscription',
         itemCaption__subscribedAndPaidForPlan: 'Subscribed and paid for {{plan}} {{period}} plan',
         notFound: 'Statement not found',
         tableHeader__amount: 'Amount',
@@ -1213,6 +2393,7 @@ export const enUS: LocalizationResource = {
         actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
+        overview: 'Overview',
         tableHeader__edit: 'Edit',
         tableHeader__plan: 'Plan',
         tableHeader__startDate: 'Start date',

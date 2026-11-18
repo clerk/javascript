@@ -1,9 +1,10 @@
 import type { MachineAuthObject } from '@clerk/backend';
 import type { AuthenticatedMachineObject, MachineTokenType, SignedOutAuthObject } from '@clerk/backend/internal';
-import { constants } from '@clerk/backend/internal';
+import { AuthStatus, constants } from '@clerk/backend/internal';
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { HmacSHA1 } from '../../vendor/crypto-es';
 import { getAuthDataFromRequest } from '../data/getAuthDataFromRequest';
 import { encryptClerkRequestData } from '../utils';
 
@@ -306,7 +307,7 @@ describe('getAuthDataFromRequest', () => {
     const mockM2MJwt = [
       toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' })),
       toBase64Url(JSON.stringify({ sub: 'mch_testmachine123', exp: 9999999999, iat: 1666648250 })),
-      'fakesignature',
+      toBase64Url('signature'),
     ].join('.');
 
     it('returns signed-out when JWT-format M2M token is sent to a session-only endpoint', () => {
@@ -350,6 +351,25 @@ describe('getAuthDataFromRequest', () => {
       // m2m_token is accepted but no encrypted machineAuthObject was set by middleware
       const auth = getAuthDataFromRequest(req, { acceptsToken: ['api_key', 'm2m_token'] });
 
+      expect(auth.isAuthenticated).toBe(false);
+    });
+
+    it('returns signed-out when a verified JWT-format M2M token is sent with a padded Authorization header', () => {
+      const req = mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: `Bearer ${mockM2MJwt} x`,
+          [constants.Headers.AuthStatus]: AuthStatus.SignedIn,
+          [constants.Headers.AuthToken]: mockM2MJwt,
+          [constants.Headers.AuthSignature]: HmacSHA1(mockM2MJwt, 'sk_test_xxxxxxxxxxxxxxxxxx').toString(),
+        }),
+        machineAuthObject: createMockMachineAuthObject({ tokenType: 'm2m_token', isAuthenticated: true }),
+      });
+
+      const auth = getAuthDataFromRequest(req);
+
+      expect(auth.tokenType).toBe('session_token');
+      expect((auth as SignedOutAuthObject).userId).toBeNull();
       expect(auth.isAuthenticated).toBe(false);
     });
   });

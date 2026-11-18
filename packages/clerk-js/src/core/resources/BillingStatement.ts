@@ -6,7 +6,7 @@ import type {
   BillingStatementTotals,
 } from '@clerk/shared/types';
 
-import { billingTotalsFromJSON } from '../../utils';
+import { billingStatementTotalsFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, BillingPayment } from './internal';
 
@@ -30,7 +30,7 @@ export class BillingStatement extends BaseResource implements BillingStatementRe
     this.id = data.id;
     this.status = data.status;
     this.timestamp = unixEpochToDate(data.timestamp);
-    this.totals = billingTotalsFromJSON(data.totals);
+    this.totals = billingStatementTotalsFromJSON(data.totals);
     this.groups = data.groups.map(group => new BillingStatementGroup(group));
     return this;
   }

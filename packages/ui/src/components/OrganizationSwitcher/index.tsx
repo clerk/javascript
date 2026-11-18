@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { cloneElement, useId } from 'react';
+import { cloneElement, useCallback, useId, useRef } from 'react';
 
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
 import { Popover } from '@/ui/elements/Popover';
@@ -13,33 +13,47 @@ import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
   const { defaultOpen } = useOrganizationSwitcherContext();
 
-  const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
-    defaultOpen,
-    placement: 'bottom-start',
-    offset: 8,
-  });
+  const { floating, reference, styles, toggle, isOpen, nodeId, context, getReferenceProps, getFloatingProps } =
+    usePopover({
+      defaultOpen,
+      placement: 'bottom-start',
+      offset: 8,
+    });
 
   const switcherButtonMenuId = useId();
+  const popoverRef = useRef<HTMLElement | null>(null);
+  const floatingRef = useCallback(
+    (node: HTMLElement | null) => {
+      floating(node);
+      popoverRef.current = node;
+    },
+    [floating],
+  );
 
   return (
     <>
       <OrganizationSwitcherTrigger
         ref={reference}
-        onClick={toggle}
         isOpen={isOpen}
-        aria-controls={isOpen ? switcherButtonMenuId : undefined}
-        aria-expanded={isOpen}
+        {...getReferenceProps({
+          'aria-controls': isOpen ? switcherButtonMenuId : undefined,
+        })}
       />
       <Popover
         nodeId={nodeId}
         context={context}
         isOpen={isOpen}
+        order={['content']}
+        initialFocus={popoverRef}
       >
         {cloneElement(children, {
-          id: switcherButtonMenuId,
+          ...getFloatingProps({
+            id: switcherButtonMenuId,
+            tabIndex: -1,
+            ref: floatingRef,
+            style: styles,
+          }),
           close: toggle,
-          ref: floating,
-          style: styles,
         })}
       </Popover>
     </>

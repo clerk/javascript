@@ -17,8 +17,8 @@ test.describe('Custom Flows Sign Up @custom', () => {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
+    const u = await createTestUtils({ app });
+    fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
       withPhoneNumber: true,
@@ -35,7 +35,7 @@ test.describe('Custom Flows Sign Up @custom', () => {
   });
 
   test('can sign up with email and password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-up');
     await expect(u.page.getByText('Sign up', { exact: true })).toBeVisible();
 

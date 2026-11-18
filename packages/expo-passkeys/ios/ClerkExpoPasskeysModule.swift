@@ -1,5 +1,10 @@
 import ExpoModulesCore
 
+struct GetPasskeyOptions: Record {
+    @Field var preferImmediatelyAvailableCredentials: Bool = false
+    @Field var userVerification: String? = nil
+}
+
 @available(iOS 15.0, *)
 public class ClerkExpoPasskeysModule: Module {
     let credentialManager = AccountManager()
@@ -7,12 +12,16 @@ public class ClerkExpoPasskeysModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ClerkExpoPasskeys")
         
-        AsyncFunction("create") { (challenge: String, rpId:String, userId: String, displayName: String, promise: Promise) in
-            self.credentialManager.createPasskey(challengeBase64: challenge, rpId:rpId, displayName:displayName, userIdBase64: userId, promise: promise)
+        AsyncFunction("create") { (challenge: String, rpId:String, userId: String, displayName: String, excludeCredentialIds: [String], promise: Promise) in
+            self.credentialManager.createPasskey(challengeBase64: challenge, rpId:rpId, displayName:displayName, userIdBase64: userId, excludeCredentialIdsBase64: excludeCredentialIds, promise: promise)
         }
         
         AsyncFunction("get") { (challenge: String, rpId:String, promise: Promise) in
-            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, promise: promise)
+            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: false, userVerification: nil, promise: promise)
+        }
+        
+        AsyncFunction("getWithOptions") { (challenge: String, rpId: String, options: GetPasskeyOptions, promise: Promise) in
+            self.credentialManager.getPasskey(challengeBase64URL: challenge, rpId: rpId, preferImmediatelyAvailableCredentials: options.preferImmediatelyAvailableCredentials, userVerification: options.userVerification, promise: promise)
         }
         
         AsyncFunction("autofill") { (challenge: String, rpId:String, promise: Promise) in

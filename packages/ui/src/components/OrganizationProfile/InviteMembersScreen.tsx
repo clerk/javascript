@@ -8,7 +8,7 @@ import { SuccessPage } from '@/ui/elements/SuccessPage';
 import { useWizard, Wizard } from '../../common';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { Email } from '../../icons';
+import { Envelope } from '../../icons';
 import { InviteMembersForm } from './InviteMembersForm';
 type InviteMembersScreenProps = {
   onReset?: () => void;
@@ -57,7 +57,7 @@ export const InvitationsSentMessage = () => {
       <IconCircle
         boxElementDescriptor={descriptors.invitationsSentIconBox}
         iconElementDescriptor={descriptors.invitationsSentIcon}
-        icon={Email}
+        icon={Envelope}
       />
       <Text localizationKey={localizationKeys('organizationProfile.invitePage.successMessage')} />
     </Flex>

@@ -2,9 +2,11 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
+import { VirtualRouter } from '@/ui/router';
 
-import { OrganizationProfile } from '../';
+import { OrganizationProfile } from '..';
+import { OrganizationProfileRoutes } from '../OrganizationProfileRoutes';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -392,6 +394,32 @@ describe('OrganizationProfile', () => {
   });
 
   describe('API Keys visibility', () => {
+    it.each([
+      { permissions: [], visible: false },
+      { permissions: ['org:sys_memberships:read'], visible: false },
+      { permissions: ['org:sys_api_keys:read'], visible: true },
+      { permissions: ['org:sys_api_keys:manage'], visible: true },
+      { permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'], visible: true },
+    ])('sets API Keys visibility to $visible for permissions $permissions', async ({ permissions, visible }) => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions }],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+
+      render(<OrganizationProfile />, { wrapper });
+
+      if (visible) {
+        expect(await screen.findByText('API keys')).toBeDefined();
+      } else {
+        await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+      }
+    });
+
     it('does not include API Keys when hide prop is true', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -473,6 +501,161 @@ describe('OrganizationProfile', () => {
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+    });
+  });
+
+  describe('SSO visibility', () => {
+    it('includes SSO when enabled at the instance and the org has opted in', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: true,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Security')).toBeDefined();
+    });
+
+    it('does not include SSO when disabled at the instance level', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: false });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: true,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(queryByText('Security')).toBeNull());
+    });
+
+    it('does not include SSO when the org has not opted in, even if the instance has it enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: false,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(queryByText('Security')).toBeNull());
+    });
+
+    it('includes Security when only Directory Sync is enabled for the org', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: false,
+              self_serve_directory_sync_enabled: true,
+              permissions: ['org:sys_entconns:manage'],
+            },
+          ],
+        });
+      });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('Security')).toBeDefined();
+    });
+
+    it('does not include SSO when the user lacks the manage enterprise connections permission', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEnterpriseSso({ selfServeSSO: true });
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              self_serve_sso_enabled: true,
+              permissions: [],
+            },
+          ],
+        });
+      });
+
+      const { queryByText } = render(<OrganizationProfile />, { wrapper });
+      expect(queryByText('Security')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('SSO route guard', () => {
+    const SECURITY_DESCRIPTION =
+      'Require members with a matching email domain to sign in through your identity provider.';
+
+    // The navbar tests above only prove the link is hidden. This block exercises the
+    // route guard wrapping the security route, so direct navigation is blocked too.
+    // The shared fixture wrapper installs a mocked RouteContext that never matches a
+    // path, so the guarded sub-route only mounts under a real router seeded to its path.
+    const renderSecurityRoute = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
+      render(
+        <VirtualRouter startPath='/organization-security'>
+          <OrganizationProfileRoutes contentRef={{ current: null }} />
+        </VirtualRouter>,
+        { wrapper },
+      );
+
+    const withSelfServeSSO = (permissions: string[]) => (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+      f.withEnterpriseSso({ selfServeSSO: true });
+      f.withEmailAddress();
+      f.withOrganizations();
+      f.withOrganizationDomains(undefined, 'org:member');
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', self_serve_sso_enabled: true, permissions }],
+      });
+    };
+
+    it('renders the security page on the guarded route when the user can manage enterprise connections', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSelfServeSSO(['org:sys_entconns:manage']));
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderSecurityRoute(wrapper);
+
+      expect(await screen.findByText(SECURITY_DESCRIPTION)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Configure' })).toBeInTheDocument();
+    });
+
+    it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSelfServeSSO([]));
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      renderSecurityRoute(wrapper);
+
+      await act(() => new Promise<void>(resolve => setTimeout(resolve, 50)));
+
+      expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+      expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
     });
   });
 

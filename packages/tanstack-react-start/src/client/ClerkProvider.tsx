@@ -1,4 +1,5 @@
 import { InternalClerkProvider as ReactClerkProvider, type Ui } from '@clerk/react/internal';
+import { htmlSafeJson } from '@clerk/shared/htmlSafeJson';
 import { ScriptOnce } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';
@@ -8,8 +9,6 @@ import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 import { mergeWithPublicEnvs, parseUrlForNavigation, pickFromClerkInitState } from './utils';
-
-export * from '@clerk/react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -32,26 +31,16 @@ export function ClerkProvider<TUi extends Ui = Ui>({
 
   const clerkInitState = isClient() ? (window as any).__clerk_init_state : clerkInitialState;
 
-  const { clerkSsrState, __keylessClaimUrl, __keylessApiKeysUrl, ...restInitState } = pickFromClerkInitState(
-    clerkInitState?.__internal_clerk_state,
-  );
+  const { clerkSsrState, ...restInitState } = pickFromClerkInitState(clerkInitState?.__internal_clerk_state);
 
   const mergedProps = {
     ...mergeWithPublicEnvs(restInitState),
     ...providerProps,
   };
 
-  // Add keyless mode props if present
-  const keylessProps = __keylessClaimUrl
-    ? {
-        __internal_keyless_claimKeylessApplicationUrl: __keylessClaimUrl,
-        __internal_keyless_copyInstanceKeysUrl: __keylessApiKeysUrl,
-      }
-    : {};
-
   return (
     <>
-      <ScriptOnce>{`window.__clerk_init_state = ${JSON.stringify(clerkInitialState)};`}</ScriptOnce>
+      <ScriptOnce>{`window.__clerk_init_state = ${htmlSafeJson(clerkInitialState)};`}</ScriptOnce>
       <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
           initialState={clerkSsrState}
@@ -75,7 +64,6 @@ export function ClerkProvider<TUi extends Ui = Ui>({
             });
           }}
           {...mergedProps}
-          {...keylessProps}
         >
           {children}
         </ReactClerkProvider>

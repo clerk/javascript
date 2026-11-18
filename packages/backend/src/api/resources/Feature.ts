@@ -7,25 +7,15 @@ import type { FeatureJSON } from './JSON';
  */
 export class Feature {
   constructor(
-    /**
-     * The unique identifier for the Feature.
-     */
+    /** The unique identifier for the Feature. */
     readonly id: string,
-    /**
-     * The name of the Feature.
-     */
+    /** The name of the Feature. */
     readonly name: string,
-    /**
-     * The description of the Feature.
-     */
+    /** The description of the Feature. */
     readonly description: string | null,
-    /**
-     * The URL-friendly identifier of the Feature.
-     */
+    /** The URL-friendly identifier of the Feature. */
     readonly slug: string,
-    /**
-     * The URL of the Feature's avatar image.
-     */
+    /** The URL of the Feature's avatar image. */
     readonly avatarUrl: string | null,
   ) {}
 

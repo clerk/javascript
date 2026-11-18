@@ -1,3 +1,4 @@
+import { getRedirectDisplay } from '@clerk/shared/internal/clerk-js/oauthConsent';
 import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
@@ -13,6 +14,7 @@ import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
+import { getKnownOAuthClient } from './knownClients';
 import {
   ListGroup,
   ListGroupContent,
@@ -21,11 +23,12 @@ import {
   ListGroupItem,
   ListGroupItemLabel,
 } from './ListGroup';
-import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupSeparator } from './LogoGroup';
+import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
-import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
+import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
+const PRIVATE_METADATA_SCOPE = 'private_metadata';
 const USER_ORG_READ_SCOPE = 'user:org:read';
 
 function _OAuthConsent() {
@@ -50,9 +53,11 @@ function _OAuthConsent() {
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
+  const redirectUri = ctx.redirectUrl ?? getRedirectUriFromSearch();
   const { data, isLoading, error } = useOAuthConsent({
     oauthClientId,
     scope,
+    redirectUri: redirectUri || undefined,
     // TODO: Remove this once account portal is refactored to use this component
     enabled: !hasContextCallbacks,
   });
@@ -69,7 +74,7 @@ function _OAuthConsent() {
   const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
-  const redirectUrl = ctx.redirectUrl ?? getRedirectUriFromSearch();
+  const redirectUrl = ctx.redirectUrl ?? redirectUri;
 
   const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
   const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
@@ -85,8 +90,13 @@ function _OAuthConsent() {
   const effectiveOrg = selectedOrg ?? defaultOrg;
 
   const { t } = useLocalizations();
-  const domainAction = getRedirectDisplay(redirectUrl);
+  const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const viewFullUrlText = t(localizationKeys('oauthConsent.viewFullUrl'));
+
+  // When the OAuth app has no uploaded logo, fall back to a recognized client's
+  // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
+  // the app-owner-set name, so a look-alike name cannot borrow the branding.
+  const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -140,7 +150,15 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes.filter(item => ![OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE].includes(item.scope));
+  const displayedScopes = scopes
+    .filter(item => item.scope !== OFFLINE_ACCESS_SCOPE)
+    .map(item => ({
+      ...item,
+      description:
+        item.scope === PRIVATE_METADATA_SCOPE
+          ? t(localizationKeys('oauthConsent.scopeList.privateMetadata', { applicationName }))
+          : item.description,
+    }));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
@@ -157,16 +175,20 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
@@ -174,20 +196,24 @@ function _OAuthConsent() {
               {oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
                   <Box sx={{ position: 'relative' }}>
-                    <ApplicationLogo
-                      src={oauthApplicationLogoUrl}
-                      alt={oauthApplicationName}
-                      href={oauthApplicationUrl}
-                      isExternal
-                    />
-                    <LogoGroupIcon
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo
+                        src={oauthApplicationLogoUrl}
+                        alt={oauthApplicationName}
+                        href={oauthApplicationUrl}
+                        isExternal
+                      />
+                    </LogoGroupItemContainer>
+                    <LogoGroupItemContainer
                       size='sm'
                       sx={t => ({
                         position: 'absolute',
-                        bottom: `calc(${t.space.$3} * -1)`,
-                        insetInlineEnd: `calc(${t.space.$3} * -1)`,
+                        bottom: `calc(${t.space.$2x5} * -1)`,
+                        insetInlineEnd: `calc(${t.space.$2x5} * -1)`,
                       })}
-                    />
+                    >
+                      <LogoGroupIcon />
+                    </LogoGroupItemContainer>
                   </Box>
                 </LogoGroup>
               )}
@@ -195,18 +221,32 @@ function _OAuthConsent() {
               {!oauthApplicationLogoUrl && logoImageUrl && (
                 <LogoGroup>
                   <LogoGroupItem justify='end'>
-                    <LogoGroupIcon />
+                    <LogoGroupItemContainer>
+                      <LogoGroupIcon
+                        icon={knownClient?.icon}
+                        iconSx={knownClient?.iconSx}
+                        label={knownClient?.name}
+                      />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                   <LogoGroupSeparator />
                   <LogoGroupItem justify='start'>
-                    <ApplicationLogo />
+                    <LogoGroupItemContainer>
+                      <ApplicationLogo />
+                    </LogoGroupItemContainer>
                   </LogoGroupItem>
                 </LogoGroup>
               )}
               {/* no avatars */}
               {!oauthApplicationLogoUrl && !logoImageUrl && (
                 <LogoGroup>
-                  <LogoGroupIcon />
+                  <LogoGroupItemContainer>
+                    <LogoGroupIcon
+                      icon={knownClient?.icon}
+                      iconSx={knownClient?.iconSx}
+                      label={knownClient?.name}
+                    />
+                  </LogoGroupItemContainer>
                 </LogoGroup>
               )}
               <Header.Title localizationKey={oauthApplicationName} />
@@ -224,22 +264,24 @@ function _OAuthConsent() {
                 onChange={setSelectedOrg}
               />
             )}
-            <ListGroup>
-              <ListGroupHeader>
-                <ListGroupHeaderTitle
-                  localizationKey={localizationKeys('oauthConsent.scopeList.title', {
-                    applicationName: oauthApplicationName,
-                  })}
-                />
-              </ListGroupHeader>
-              <ListGroupContent>
-                {displayedScopes.map(item => (
-                  <ListGroupItem key={item.scope}>
-                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
-                  </ListGroupItem>
-                ))}
-              </ListGroupContent>
-            </ListGroup>
+            {displayedScopes.length > 0 && (
+              <ListGroup>
+                <ListGroupHeader>
+                  <ListGroupHeaderTitle
+                    localizationKey={localizationKeys('oauthConsent.scopeList.title', {
+                      applicationName: oauthApplicationName,
+                    })}
+                  />
+                </ListGroupHeader>
+                <ListGroupContent>
+                  {displayedScopes.map(item => (
+                    <ListGroupItem key={item.scope}>
+                      <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                    </ListGroupItem>
+                  ))}
+                </ListGroupContent>
+              </ListGroup>
+            )}
             <Alert colorScheme='warning'>
               <Text
                 colorScheme='warning'

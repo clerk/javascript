@@ -11,11 +11,11 @@ export { MultisessionAppSupport } from './client-boundary/controlComponents';
 /**
  * @deprecated Import `OAuthConsent` from `@clerk/nextjs` instead.
  */
-const OAuthConsent = OAuthConsentOriginal;
+const OAuthConsent: typeof OAuthConsentOriginal = OAuthConsentOriginal;
 export { OAuthConsent };
 
 /**
  * @deprecated Import `useOAuthConsent` from `@clerk/nextjs` instead.
  */
-const useOAuthConsent = useOAuthConsentOriginal;
+const useOAuthConsent: typeof useOAuthConsentOriginal = useOAuthConsentOriginal;
 export { useOAuthConsent };

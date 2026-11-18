@@ -1,0 +1,316 @@
+import * as DialogStories from './dialog.component.stories';
+
+# Dialog
+
+<Preview
+  name='Default'
+  storyModule={DialogStories}
+/>
+
+## Props
+
+<PropTable
+  meta={DialogStories.meta}
+  extra={[
+    { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'" },
+    { name: 'shouldCloseOnInteractOutside', type: 'boolean', default: "true (always false for 'alertdialog')" },
+    { name: 'showCloseButton', type: 'boolean', default: "true for 'dialog', false for 'alertdialog'" },
+    { name: 'open', type: 'boolean' },
+    { name: 'defaultOpen', type: 'boolean', default: 'false' },
+    { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
+    { name: 'modal', type: 'boolean', default: 'true' },
+  ]}
+/>
+
+`variant` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
+
+## Usage
+
+```tsx
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+
+<Dialog.Root>
+  <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
+  <Dialog.Popup>
+    <Card.Root elevation='overlay'>
+      <Card.Header>
+        <Card.Title>Confirm action</Card.Title>
+        <Card.Description>Are you sure you want to proceed?</Card.Description>
+      </Card.Header>
+      <Card.Footer>
+        <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+        <Button>Proceed</Button>
+      </Card.Footer>
+    </Card.Root>
+  </Dialog.Popup>
+</Dialog.Root>;
+```
+
+`Dialog.Trigger` is optional — omit it for a dialog driven by `open` alone.
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  …
+</Dialog.Root>;
+```
+
+Every close the dialog owns — Escape, outside press, `Dialog.Close`, `Dialog.CloseButton`,
+`handle.close()` — goes through `onOpenChange`, so a controlled consumer can veto one by not
+committing.
+
+### Variant
+
+| Value        | Width                                       | For                                                                  |
+| ------------ | ------------------------------------------- | -------------------------------------------------------------------- |
+| `card`       | Width from its `Card`, height from content  | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile`    | Width from its surface, fills the height    | Account profile and settings — a surface you navigate                |
+| `fullscreen` | Fills the viewport at every width, no inset | The same profile surface taking the whole screen                     |
+
+### Every dialog brings its own surface
+
+The dialog **paints nothing**. A `card` holds a `Card`, and a `profile` holds a `Profile` (or
+`UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
+
+A popup with no surface inside renders an unpainted box.
+
+A `card` dialog is as wide as its `Card`. Pass `size='lg'` to `Card.Root` for a form that needs more room.
+
+<Story
+  name='CardSurface'
+  storyModule={DialogStories}
+/>
+
+A `profile` composes the same way, with the user page in place of the card.
+
+```tsx
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+
+<Dialog.Root>
+  <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
+  <Dialog.Popup variant='profile'>
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
+    />
+  </Dialog.Popup>
+</Dialog.Root>;
+```
+
+`fullscreen` holds the same `Profile` and fills the viewport at every width, with no inset around
+it. The profile replaces its corner dismiss with a "Back to app" row above the navigation; below
+`48rem`, where the navigation collapses into the page title, the corner dismiss returns.
+
+### Compact placement
+
+In the compact band, a window under `40rem`, a card is a bottom sheet: flush to the sides and the
+bottom edge, sliding up from it. `compactPlacement='center'` keeps it centered there instead.
+
+<Story
+  name='Sheet'
+  storyModule={DialogStories}
+/>
+
+| Value    | Compact band (`< 40rem`)             | Above it |
+| -------- | ------------------------------------ | -------- |
+| `sheet`  | Bottom-anchored, slides up (default) | Centered |
+| `center` | Centered                             | Centered |
+
+A `profile` and a `fullscreen` take no placement and warn in dev if given one.
+
+### Alert dialogs
+
+`role='alertdialog'` on the root makes a dialog that interrupts to ask for a decision — a
+destructive confirmation, a "discard changes?".
+
+<Story
+  name='Alert'
+  storyModule={DialogStories}
+/>
+
+What follows from the role:
+
+- Announced as an interruption.
+- No outside-press dismissal; Escape still cancels.
+- A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
+  when missing.
+- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns, unless the root sets
+  `showCloseButton`.
+
+### Confirming a discard
+
+Press Cancel to open a discard confirmation above the profile form. Keep editing returns to the form with the draft intact; Discard clears the draft and closes both dialogs. The dialogs share one scrim, and the form beneath dims and recedes.
+
+<Story
+  name='Stacked'
+  storyModule={DialogStories}
+/>
+
+### Responsive behaviour
+
+The gap to the screen edge is a fixed inset, not a percentage:
+
+| Container     | Top & bottom | Sides  |
+| ------------- | ------------ | ------ |
+| `< 48rem`     | `1.25rem`    | `1rem` |
+| `48rem–90rem` | `2rem`       | `2rem` |
+| `>= 90rem`    | `3rem`       | `3rem` |
+
+The inset bands are **container queries** against the dialog's viewport element (named
+`cl-dialog`). The compact placement band is a media query: below `40rem` a card dialog pins to the
+bottom and slides up, unless `compactPlacement='center'`.
+
+### Close button
+
+The surface carries the dismiss: `Card.Header` renders one in flow, and `Profile` anchors its own
+through `Dialog.CloseButton`.
+
+Focus opens on the first tabbable element, which is why `Card.Header` renders its dismiss first in
+the DOM. Point `initialFocus` on `Dialog.Popup` at the field that should have it instead.
+
+### Dismissal
+
+Escape always closes. `shouldCloseOnInteractOutside={false}` keeps a `dialog` open on an outside
+press, for a task an accidental press would throw away, such as entering a verification code. An
+`alertdialog` never closes on an outside press.
+
+| Root                                                 | Escape | Outside press | Programmatic |
+| ---------------------------------------------------- | ------ | ------------- | ------------ |
+| `role='dialog'`                                      | ✅     | ✅            | ✅           |
+| `role='dialog' shouldCloseOnInteractOutside={false}` | ✅     | ❌            | ✅           |
+| `role='alertdialog'`                                 | ✅     | ❌            | ✅           |
+
+### Keyboard
+
+| Key                | Does                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| Enter (in a field) | Submits the dialog's form — the primary action                    |
+| Escape             | Cancels                                                           |
+| Tab                | Moves through the popup in visual order: field → Cancel → confirm |
+
+Tab follows the layout (WCAG 2.4.3), so a dialog with a field should be a form with the primary
+action as its submit.
+
+```tsx
+<Card.Content render={<form id='update-profile' onSubmit={save} />}>
+  <Input value={name} onChange={…} />
+</Card.Content>
+<Card.Footer>
+  <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
+  <Button type='submit' form='update-profile'>Save</Button>
+</Card.Footer>
+```
+
+## Parts
+
+| Part                 | Slot                  | Description                                                                               |
+| -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                             |
+| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
+| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
+| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                          |
+
+The name, the description and the button row come from the surface — `Card.Title`,
+`Card.Description` and `Card.Footer` — not from the dialog.
+
+`Dialog.Popup` also renders the scrim (`dialog-backdrop`), the viewport (`dialog-viewport`, the
+`cl-dialog` container) and the centering track inside it (`dialog-track`, which carries the inset).
+
+## Styling
+
+Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/mosaic/styles.css`:
+
+```css
+@import '@clerk/mosaic/styles.css' layer(components);
+
+@layer overrides {
+  .cl-dialog-popup[data-variant='profile'] {
+    max-width: 60rem;
+  }
+}
+```
+
+State attributes:
+
+| Attribute                                   | Applies to                         | Description                           |
+| ------------------------------------------- | ---------------------------------- | ------------------------------------- |
+| `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state (`closed` during the exit) |
+| `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Entering frame / exit animation       |
+| `data-variant`                              | Viewport, Track, Popup             | Resolved variant                      |
+| `data-nested`                               | Backdrop, Viewport, Popup          | Opened inside another overlay         |
+| `data-stacked` / `data-stack-base`          | Popup                              | On top of / beneath another dialog    |
+
+### Nested dialogs and stacks
+
+A dialog opened inside another is one of two relationships, decided by the variant beneath it:
+
+|                     | Nested                      | Stack                              |
+| ------------------- | --------------------------- | ---------------------------------- |
+| Opens over          | a `profile` or `fullscreen` | a `card`                           |
+| Its own scrim       | Yes, lighter than the base  | None — one scrim serves the stack  |
+| The surface beneath | Unchanged                   | Dims and recedes                   |
+| Attributes          | `data-nested`               | `data-stacked` / `data-stack-base` |
+
+A `profile` and a `fullscreen` never open inside another dialog — they warn in dev. A `card` is
+what opens over one.
+
+---
+
+## Examples
+
+### A profile
+
+<Story
+  name='Nested'
+  storyModule={DialogStories}
+/>
+
+### Scrolling a tall card
+
+<Story
+  name='OutsideScroll'
+  storyModule={DialogStories}
+/>
+
+### Detached triggers
+
+`Dialog.createHandle()` links a `Dialog.Trigger` to a `Dialog.Root` anywhere in the tree. The
+handle also has `open()` / `close()` / `isOpen` for opens with no trigger element.
+
+<Story
+  name='DetachedTrigger'
+  storyModule={DialogStories}
+/>
+
+### Multiple triggers
+
+Several triggers can share one dialog through a handle. Give each an `id` and a `payload`, and make
+the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`, and
+every trigger on that handle must pass a payload.
+
+<Story
+  name='MultipleTriggers'
+  storyModule={DialogStories}
+/>
+
+### Custom focus management
+
+`initialFocus` and `finalFocus` on `Dialog.Popup` take `true`, `false`, a ref, or a function of the
+interaction type (`'mouse' | 'touch' | 'pen' | 'keyboard' | ''`).
+
+<Story
+  name='CustomFocus'
+  storyModule={DialogStories}
+/>

@@ -1,8 +1,9 @@
-import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/shared/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -10,14 +11,32 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { isResettingPassword } from './utils';
 
-function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
+/** Search param set when navigating from the start page "Forgot password?" action. */
+export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
+
+/**
+ * @param onSecondFactor - invoked when the passkey attempt resolves to a second factor.
+ * @param protectCheckPath - route to the protect-check card relative to the caller's mount.
+ *   Defaults to the factor-one mount (`'../protect-check'`); `SignInStart` (index route) must pass
+ *   `'protect-check'`, otherwise an autofill-triggered, gated passkey sign-in dead-ends at the app
+ *   root instead of `/sign-in/protect-check`.
+ */
+function useHandleAuthenticateWithPasskey(
+  onSecondFactor: () => Promise<unknown>,
+  protectCheckPath = '../protect-check',
+): (...args: Parameters<SignInResource['authenticateWithPasskey']>) => Promise<unknown> {
   const card = useCardState();
+  const clerk = useClerk();
   // @ts-expect-error -- private method for the time being
-  const { setActive, __internal_navigateWithError } = useClerk();
+  const { setActive, __internal_navigateWithError } = clerk;
   const supportEmail = useSupportEmail();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
   const { authenticateWithPasskey } = useCoreSignIn();
+  const { navigate } = useRouter();
 
   useEffect(() => {
     return () => {
@@ -28,8 +47,23 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
     try {
       const res = await authenticateWithPasskey(...args);
+      // A protect_check gate can fire on attempt_first_factor, which is what
+      // authenticateWithPasskey calls under the hood.
+      if (navigateOnSignInProtectGate(res, navigate, protectCheckPath)) {
+        return;
+      }
       switch (res.status) {
         case 'complete':
+          // A passkey can complete the SECOND factor of a reset-password
+          // sign-in (reset password -> needs_second_factor -> passkey); that
+          // flow ends on the reset-password success screen, mirroring the
+          // other factor-two cards. Unreachable from factor-one usages of
+          // this hook, where the first-factor strategy is the passkey itself.
+          if (isResettingPassword(res) && res.createdSessionId) {
+            const queryParams = new URLSearchParams();
+            queryParams.set('createdSessionId', res.createdSessionId);
+            return navigate(`../reset-password-success?${queryParams.toString()}`);
+          }
           return setActive({
             session: res.createdSessionId,
             navigate: async ({ session, decorateUrl }) => {
@@ -49,10 +83,22 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
         if (err.code === 'passkey_operation_aborted') {
           return;
         }
-        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
-        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
+        // Autofill runs in the background, so browser rejections must not surface as form errors.
+        if (
+          flow === 'autofill' &&
+          (err.code === 'passkey_retrieval_cancelled' || err.code === 'passkey_invalid_rpID_or_domain')
+        ) {
           return;
         }
+      }
+
+      if (isClerkAPIResponseError(err) && err.errors.some(e => e.code === ERROR_CODES.SESSION_EXISTS)) {
+        return setActive({
+          session: clerk.client.lastActiveSessionId,
+          navigate: async ({ session, decorateUrl }) => {
+            await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+          },
+        });
       }
 
       if (isUserLockedError(err)) {
@@ -63,28 +109,9 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   }, []);
 }
 
-/**
- * Type guard that checks if all factors in the array are enterprise SSO factors
- * with both `enterpriseConnectionId` and `enterpriseConnectionName` properties.
- * This is used to determine if the user should be presented with a choice
- * between multiple enterprise connections.
- * @experimental
- */
-function hasMultipleEnterpriseConnections(
-  factors: SignInFirstFactor[] | null,
-): factors is Array<EnterpriseSSOFactor & { enterpriseConnectionId: string; enterpriseConnectionName: string }> {
-  if (!factors?.length) {
-    return false;
-  }
-
-  return (
-    factors.filter(
-      factor =>
-        factor.strategy === 'enterprise_sso' &&
-        'enterpriseConnectionId' in factor &&
-        'enterpriseConnectionName' in factor,
-    ).length > 1
-  );
-}
-
-export { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };
+export {
+  getEnterpriseConnectionFactors,
+  getSSOBypassFactor,
+  hasMultipleEnterpriseConnections,
+} from './enterpriseSSOFactors';
+export { useHandleAuthenticateWithPasskey };

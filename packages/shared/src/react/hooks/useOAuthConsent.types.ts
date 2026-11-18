@@ -4,7 +4,7 @@ import type { GetOAuthConsentInfoParams, OAuthConsentInfo } from '../../types';
 /**
  * @interface
  */
-export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope'> & {
+export type UseOAuthConsentParams = Pick<GetOAuthConsentInfoParams, 'oauthClientId' | 'scope' | 'redirectUri'> & {
   /**
    * If `true`, the previous data will be kept in the cache until new data is fetched.
    *

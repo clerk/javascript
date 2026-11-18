@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
+[![Follow on X](https://img.shields.io/twitter/follow/clerk?style=social)](https://x.com/intent/follow?screen_name=clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/nextjs/CHANGELOG.md)
 ·
@@ -34,11 +34,15 @@
 - Next.js 15.2.8 or later
 - React 18 or later
 - Node.js `>=20.9.0` or later
-- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
+- A Clerk application. `npx -y clerk@latest init` creates or links one and writes its keys to your env file. Agents and new projects get temporary development keys with no Clerk account; in an existing project, a signed-out user is asked to log in unless they pass `--accountless`. Or [create your account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs) and copy the keys from the dashboard.
 
 ### Installation
 
-The fastest way to get started with Clerk is by following the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
+The fastest way to get started is the Clerk CLI. In an existing Next.js project, run `npx -y clerk@latest init`. In an empty directory, run `npx -y clerk@latest init --framework next --pm npm` and it scaffolds the Next.js app as well; there is no lockfile to detect a package manager from, so name one.
+
+Either way it installs `@clerk/nextjs`, creates or links a Clerk application, writes the keys to your env file, and adds `<ClerkProvider>`, the middleware, and sign-in and sign-up pages. When an agent runs it, or when you start in an empty directory, no Clerk account is needed: the CLI provisions temporary development keys. In an existing project, a signed-out user is asked to log in, or can pass `--accountless` to use temporary keys instead.
+
+To set things up by hand instead, follow the [Next.js Quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart?utm_source=github&utm_medium=clerk_nextjs).
 
 You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `<ClerkProvider>` to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 
@@ -52,10 +56,11 @@ For further information, guides, and examples visit the [Next.js reference docum
 
 ## Support
 
-You can get in touch with us in any of the following ways:
+For help, visit our [support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs).
 
-- Join our official community [Discord server](https://clerk.com/discord)
-- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
+## Community
+
+Join our [Discord community](https://clerk.com/discord) to connect with other developers.
 
 ## Contributing
 

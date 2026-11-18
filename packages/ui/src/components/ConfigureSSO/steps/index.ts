@@ -1,6 +1,5 @@
-export { ConfigureCreateApp } from './ConfigureCreateAppStep';
-export { ConfirmationStep } from './ConfirmationStep';
-export { ProvideEmail } from './ProvideEmailStep';
-export { StepLayout } from './StepLayout';
+export { ActivateStep } from './ActivateStep';
+export { ConfigureStep } from './ConfigureStep';
+export { OrganizationDomainsStep } from './OrganizationDomainsStep';
+export { SelectProviderStep } from './SelectProviderStep';
 export { TestConfigurationStep } from './TestConfigurationStep';
-export { VerifyDomainStep } from './VerifyDomainStep';

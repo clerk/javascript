@@ -31,6 +31,11 @@ type FapiQueryStringParameters = {
 
 type FapiRequestOptions = {
   fetchMaxTries?: number;
+  /**
+   * Accepts an empty body on a successful response, resolving with a `null` payload, for endpoints that answer with
+   * no content. Without it, an empty body fails to parse, so a required resource never loads from an empty response.
+   */
+  allowEmptyBody?: boolean;
 };
 
 export type FapiResponse<T> = Response & {
@@ -43,6 +48,7 @@ export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiR
 export interface FapiResponseJSON<T> {
   response: T;
   client?: ClientJSON;
+  sign_out_url?: string;
   errors?: ClerkAPIErrorJSON[];
   meta?: {
     client?: ClientJSON;
@@ -65,14 +71,44 @@ export interface FapiClient {
 // List of paths that should not receive the session ID parameter in the URL
 const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
+// The requests Protect gates. Params are attached to these and nothing else.
+const protectPathPrefixes = ['/client/sign_ins', '/client/sign_ups'];
+
 type FapiClientOptions = {
   frontendApi: string;
   domain?: string;
   proxyUrl?: string;
   instanceType: InstanceType;
   getSessionId: () => string | undefined;
+  /**
+   * Resolves the Protect params to merge into the body of a sign-in or sign-up POST, or `undefined`
+   * when this instance contributes none. Resolves to `undefined` before the environment has loaded,
+   * so early requests carry nothing.
+   */
+  getProtectParams?: () => Promise<Record<string, string | undefined> | undefined>;
   isSatellite?: boolean;
 };
+
+function isProtectGatedRequest(method: string, path: string | undefined): boolean {
+  if (method === 'GET' || !path) {
+    return false;
+  }
+  return protectPathPrefixes.some(prefix => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/** Only a plain-object body (or none at all) can take extra params without changing its shape. */
+function isMergeableBody(body: unknown): body is Record<string, unknown> | undefined {
+  if (body === undefined) {
+    return true;
+  }
+  if (typeof body !== 'object' || body === null) {
+    return false;
+  }
+  // Spreading anything else — a Blob, a typed array, a stream — would discard the caller's payload
+  // rather than add to it.
+  const prototype = Object.getPrototypeOf(body);
+  return prototype === Object.prototype || prototype === null;
+}
 
 export function createFapiClient(options: FapiClientOptions): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
@@ -195,7 +231,23 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
-    const { method = 'GET', body } = requestInit;
+    const { method = 'GET' } = requestInit;
+    let { body } = requestInit;
+
+    // Protect params ride in the form-encoded body of sign-in and sign-up POSTs. They have to be
+    // merged here, before the body is stringified below — the onBeforeRequest callbacks run after
+    // stringification, so they cannot add a body param. A body param also keeps the request
+    // CORS-simple; a custom header would trigger the preflight that breaks cookie dropping in
+    // Safari, the same reason `_method` is a query param.
+    if (options.getProtectParams && isProtectGatedRequest(method, requestInit.path) && isMergeableBody(body)) {
+      // Protect can degrade a sign-in but must never fail one, so a rejection here costs the
+      // params and nothing else.
+      const protectParams = await options.getProtectParams().catch(() => undefined);
+      if (protectParams) {
+        body = { ...((body ?? {}) as Record<string, unknown>), ...protectParams } as unknown as BodyInit;
+        requestInit.body = body;
+      }
+    }
 
     if (body && typeof body === 'object' && !(body instanceof FormData)) {
       requestInit.body = filterUndefinedValues(body);
@@ -257,8 +309,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
           initialDelay: 700,
           maxDelayBetweenRetries: 5000,
           shouldRetry: (_: unknown, iterations: number) => {
-            // We want to retry only GET requests, as other methods are not idempotent.
-            return overwrittenRequestMethod === 'GET' && iterations < maxTries;
+            // We want to retry only GET requests, as other methods are not idempotent,
+            // and stop as soon as the caller aborted the request.
+            return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
           },
           onBeforeRetry: (iteration: number): void => {
             // Add the retry attempt to the query string params.
@@ -275,14 +328,31 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       clerkNetworkError(urlStr, e);
     }
 
-    // 204 No Content responses do not have a body so we should not try to parse it
-    const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
-    const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    // 204 No Content responses do not have a body so we should not try to parse it.
+    // Gateway errors may not be JSON (e.g. a proxy's HTML 502); they resolve to `undefined` so they keep their
+    // status instead of throwing a parse error, and skip the after response callbacks since they did not come from FAPI.
+    const parseBody = (): Promise<FapiResponseJSON<T> | null> =>
+      requestOptions?.allowEmptyBody && response.ok
+        ? // Proxies can drop Content-Length, so the body itself has to be read to know it's empty.
+          response.text().then(text => (text === '' ? null : (JSON.parse(text) as FapiResponseJSON<T>)))
+        : response.json();
+    const json: FapiResponseJSON<T> | null | undefined =
+      response.status === 204
+        ? null
+        : await parseBody().catch(e => {
+            if (response.status >= 500) {
+              return undefined;
+            }
+            throw e;
+          });
+    const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json ?? null });
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
     }
-    // TODO @userland-errors:
-    await runAfterResponseCallbacks(requestInit, fapiResponse);
+    if (json !== undefined) {
+      // TODO @userland-errors:
+      await runAfterResponseCallbacks(requestInit, fapiResponse);
+    }
     return fapiResponse;
   }
 

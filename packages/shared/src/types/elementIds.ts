@@ -15,6 +15,7 @@ export type FieldId =
   | 'identifier'
   | 'username'
   | 'code'
+  | 'userCode'
   | 'role'
   | 'deleteConfirmation'
   | 'deleteOrganizationConfirmation'
@@ -26,7 +27,27 @@ export type FieldId =
   | 'apiKeyExpirationDate'
   | 'apiKeyRevokeConfirmation'
   | 'apiKeySecret'
-  | 'web3WalletName';
+  | 'idpCertificate'
+  | 'idpEntityId'
+  | 'idpMetadata'
+  | 'idpMetadataUrl'
+  | 'idpSsoUrl'
+  | 'discoveryUrl'
+  | 'authUrl'
+  | 'tokenUrl'
+  | 'userInfoUrl'
+  | 'clientId'
+  | 'clientSecret'
+  | 'redirectUri'
+  | 'acsUrl'
+  | 'spEntityId'
+  | 'syncUserAttributes'
+  | 'allowAdditionalIdentifiers'
+  | 'allowSubdomains'
+  | 'allowIdpInitiated'
+  | 'forceAuthn'
+  | 'web3WalletName'
+  | 'domain';
 export type ProfileSectionId =
   | 'profile'
   | 'username'
@@ -45,8 +66,32 @@ export type ProfileSectionId =
   | 'organizationDomains'
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
-  | 'paymentMethods';
-export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
+  | 'paymentMethods'
+  | 'sso'
+  | 'directorySync'
+  | 'ssoStatus'
+  | 'enableSso'
+  | 'ssoDomain'
+  | 'ssoConfiguration'
+  | 'configureAgain'
+  | 'resetSso'
+  | 'testSsoUrl'
+  | 'testResults'
+  | 'ssoConnectionName'
+  | 'ssoConnectionDomains'
+  | 'ssoConnectionServiceProvider'
+  | 'ssoConnectionIdentityProvider'
+  | 'ssoConnectionSettings'
+  | 'ssoConnectionDangerZone'
+  | 'ssoBypass'
+  | 'accountCredits';
+export type ProfilePageId =
+  | 'account'
+  | 'security'
+  | 'organizationGeneral'
+  | 'organizationMembers'
+  | 'organizationSecurity'
+  | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =
@@ -63,7 +108,8 @@ export type CardActionId =
   | 'signIn'
   | 'usePasskey'
   | 'waitlist'
-  | 'signOut';
+  | 'signOut'
+  | 'ssoBypass';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role' | 'paymentMethod' | 'apiKeyExpiration';

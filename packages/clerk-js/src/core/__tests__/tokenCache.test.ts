@@ -31,13 +31,41 @@ function createJwtWithTtl(iatSeconds: number, ttlSeconds: number): string {
   return `${headerB64}.${payloadB64}.${signature}`;
 }
 
+/**
+ * Helper to create a JWT with custom iat AND oiat header for monotonic-freshness tests
+ */
+function createJwtWithOiat(iatSeconds: number, oiatSeconds: number, ttlSeconds = 60): string {
+  const header = { alg: 'HS256', typ: 'JWT', oiat: oiatSeconds };
+  const payload = { sid: 'session_123', exp: iatSeconds + ttlSeconds, iat: iatSeconds };
+  const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return `${b64(header)}.${b64(payload)}.test-signature`;
+}
+
+/**
+ * Flush enough microtasks for setInternal's tokenResolver.then handler to run.
+ */
+const tick = async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+};
+
+const makeToken = (raw: string, id = 'session_123') => new Token({ id, jwt: raw, object: 'token' }) as TokenResource;
+
+const deferred = () => {
+  let resolve!: (token: TokenResource) => void;
+  const promise = new Promise<TokenResource>(r => {
+    resolve = r;
+  });
+  return { promise, resolve };
+};
+
 describe('SessionTokenCache', () => {
   let mockBroadcastChannel: {
     addEventListener: ReturnType<typeof vi.fn>;
     close: ReturnType<typeof vi.fn>;
     postMessage: ReturnType<typeof vi.fn>;
   };
-  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void;
+  let broadcastListener: (e: MessageEvent<SessionTokenEvent>) => void | Promise<void>;
   let originalBroadcastChannel: any;
 
   beforeEach(() => {
@@ -63,7 +91,9 @@ describe('SessionTokenCache', () => {
     SessionTokenCache.close();
 
     // Now mock BroadcastChannel so next initialization uses the mock
-    global.BroadcastChannel = vi.fn(() => mockBroadcastChannel) as any;
+    global.BroadcastChannel = vi.fn(function () {
+      return mockBroadcastChannel;
+    }) as any;
 
     SessionTokenCache.clear();
 
@@ -193,26 +223,27 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.size()).toBe(0);
     });
 
-    it('enforces monotonicity: does not overwrite newer token with older one', () => {
+    it('enforces monotonicity: does not overwrite newer token with older one', async () => {
+      // Both tokens carry oiat (the production case post-rollout). Older oiat
+      // broadcast must not clobber the newer one already in cache.
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250);
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190);
+
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
           sessionId: 'session_123',
           template: undefined,
           tokenId: 'session_123',
-          tokenRaw: mockJwt,
+          tokenRaw: newerJwt,
           traceId: 'test_trace_7',
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(newerEvent);
+      await broadcastListener(newerEvent);
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
-      const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
-      // mockJwt has iat: 1666648250, so create an older one with iat: 1666648190 (60 seconds earlier)
-      const olderJwt =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg4NTAsImlhdCI6MTY2NjY0ODE5MH0.Z1BC47lImYvaAtluJlY-kBo0qOoAk42Xb-gNrB2SxJg';
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
           organizationId: null,
@@ -224,11 +255,100 @@ describe('SessionTokenCache', () => {
         },
       } as MessageEvent<SessionTokenEvent>;
 
-      broadcastListener(olderEvent);
+      await broadcastListener(olderEvent);
 
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
-      expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
+      expect(resultAfterOlder?.token?.getRawString()).toBe(newerJwt);
+    });
+
+    it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
+      // Inverse of the previous test: a fresher-oiat broadcast must overwrite
+      // an older-oiat token already in cache. Use ttl=120 so both tokens stay
+      // valid against the test clock (nowSec=1666648260) — cache.get drops
+      // entries past their expiry.
+      const olderJwt = createJwtWithOiat(1666648190, 1666648190, 120);
+      const newerJwt = createJwtWithOiat(1666648250, 1666648250, 120);
+
+      const olderEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: olderJwt,
+          traceId: 'test_trace_older_first',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(olderEvent);
+      const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterOlder).toBeDefined();
+      expect(resultAfterOlder?.token?.getRawString()).toBe(olderJwt);
+
+      const newerEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: newerJwt,
+          traceId: 'test_trace_newer_second',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(newerEvent);
+
+      const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(resultAfterNewer).toBeDefined();
+      expect(resultAfterNewer?.token?.getRawString()).toBe(newerJwt);
+    });
+
+    it('ignores a broadcast staler than the reconciled served token even when the resolver is staler', async () => {
+      // The resolver reconcile can leave the served token FRESHER than the token its
+      // tokenResolver resolves to (a staler resolve keeps the previous token). The broadcast guard
+      // must compare against the served token (the freshest known), not the staler resolver, otherwise
+      // a broadcast staler than the served token slips past the guard and runs setInternal, which
+      // clears the refresh timer without reinstalling one.
+      const tokenId = 'session_123';
+
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // Cache the high-oiat token and let it resolve so the served token = high.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+
+      // Overwrite with a resolver that resolves to a LOWER-oiat token. The resolver reconciles
+      // against the previous token, so the served token stays high while its resolver
+      // resolved to low.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(lowRaw)) });
+      await tick();
+      const before = SessionTokenCache.get({ tokenId });
+      expect(before?.token?.getRawString()).toBe(highRaw);
+
+      // Broadcast a token staler than high (but fresher than low, so the staler resolver would
+      // have let it through under the bug).
+      const stalerRaw = createJwtWithOiat(1666648220, 1666648220, 120);
+      const stalerEvent: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId,
+          tokenRaw: stalerRaw,
+          traceId: 'test_trace_carry_forward',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      await broadcastListener(stalerEvent);
+
+      const after = SessionTokenCache.get({ tokenId });
+      expect(after?.token?.getRawString()).toBe(highRaw);
+      // The same resolver proves the broadcast was dropped before setInternal ran; the bug
+      // would have replaced it with the broadcast's resolver.
+      expect(after?.tokenResolver).toBe(before?.tokenResolver);
     });
 
     it('successfully updates cache with valid token', () => {
@@ -247,7 +367,6 @@ describe('SessionTokenCache', () => {
 
       const result = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('session_123');
     });
 
     it('does not re-broadcast when receiving a broadcast message', async () => {
@@ -314,6 +433,220 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('same-tab monotonic resolve', () => {
+    const tokenId = 'session_123';
+
+    it('keeps the fresher token when a staler set resolves after it', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // A fresher token is cached and resolved, then a staler set() replaces the entry and resolves.
+      // The staler resolve reconciles against the previous token (carried onto the new entry's
+      // freshest token at set time) and loses.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(lowRaw)) });
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('advances to a fresher token when it resolves after a staler one', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // Inverse direction: a genuinely fresher set() must win, not stay pinned to the old token.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(lowRaw)) });
+      await tick();
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('publishes the later token on a full oiat+iat tie with different raw payloads', async () => {
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      const header = { alg: 'HS256', typ: 'JWT', oiat: 1666648250 };
+      const firstRaw = `${b64(header)}.${b64({ sid: tokenId, sub: 'user_A', exp: 1666648370, iat: 1666648250 })}.sig`;
+      const laterRaw = `${b64(header)}.${b64({ sid: tokenId, sub: 'user_B', exp: 1666648370, iat: 1666648250 })}.sig`;
+
+      // On a full oiat+iat tie the later resolve wins: pickFreshestJwt returns the incoming token.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(firstRaw)) });
+      await tick();
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(laterRaw)) });
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(laterRaw);
+    });
+
+    it('leaves the token undefined while a replacement resolver is pending, so getToken awaits', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+
+      // A set() with a still-pending resolver must NOT synchronously serve the previous token.
+      // The token stays undefined during the pending window, so getToken() awaits the resolver
+      // instead of serving stale — matching behavior before the monotonic guard.
+      const pending = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: pending.promise });
+
+      expect(SessionTokenCache.get({ tokenId })?.token).toBeUndefined();
+    });
+
+    it('does not resurrect a cleared key when its pending resolver settles', async () => {
+      const raw = createJwtWithOiat(1666648250, 1666648250, 120);
+
+      const pending = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: pending.promise });
+
+      SessionTokenCache.clear();
+
+      pending.resolve(makeToken(raw));
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('derives the deletion timer from the fresher token, not from a later staler resolve', async () => {
+      // high: longer ttl AND fresher oiat; low: short ttl AND staler oiat.
+      const highRaw = createJwtWithOiat(1666648250, 1666648260, 300);
+      const lowRaw = createJwtWithOiat(1666648255, 1666648250, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+      // A staler, shorter-ttl token resolves afterward; it must not replace
+      // the fresher token's deletion timer with its own short one.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(lowRaw)) });
+      await tick();
+
+      // Past low's 60s ttl but well before high's 300s ttl.
+      vi.advanceTimersByTime(120 * 1000);
+
+      const result = SessionTokenCache.get({ tokenId });
+      expect(result).toBeDefined();
+      expect(result?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('overlapping resolvers, fresh resolves first then stale: entry keeps high and stamps high iat', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // Two concurrent sets, both pending. The first (fresher) is replaced by the second (staler)
+      // before either resolves. When the fresher one resolves it is now foreign, so it only raises
+      // the live entry's freshest token, leaving the token undefined. The staler live resolve then
+      // reconciles against that freshest token and the entry publishes the fresher token.
+      const dHigh = deferred();
+      const dLow = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: dHigh.promise });
+      SessionTokenCache.set({ tokenId, tokenResolver: dLow.promise });
+
+      dHigh.resolve(makeToken(highRaw));
+      await tick();
+      // A foreign resolve never populates the pending entry's served token.
+      expect(SessionTokenCache.get({ tokenId })?.token).toBeUndefined();
+
+      dLow.resolve(makeToken(lowRaw));
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+
+      // The entry's TTL comes from the published winner, high (exp 1666648370), not low
+      // (exp 1666648310). An entry timed from low would already be evicted at this point.
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('overlapping resolvers, stale resolves first then fresh: entry ends high', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // Inverse ordering of the previous test: the staler set is replaced by the fresher one before
+      // either resolves. The staler foreign resolve lands first and only advances the freshest token; the
+      // fresher live resolve then publishes high directly.
+      const dLow = deferred();
+      const dHigh = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: dLow.promise });
+      SessionTokenCache.set({ tokenId, tokenResolver: dHigh.promise });
+
+      dLow.resolve(makeToken(lowRaw));
+      await tick();
+      expect(SessionTokenCache.get({ tokenId })?.token).toBeUndefined();
+
+      dHigh.resolve(makeToken(highRaw));
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('advances an already-resolved staler entry when a fresher foreign resolve lands late', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // The live entry (d2) resolves staler first and publishes low. The replaced resolver (d1)
+      // resolves fresher afterward. Because the entry is no longer pending, the fresher foreign token
+      // advances the served token to high and re-derives the entry's timers, rather than only raising the
+      // freshest token.
+      const dHigh = deferred();
+      const dLow = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: dHigh.promise });
+      SessionTokenCache.set({ tokenId, tokenResolver: dLow.promise });
+
+      dLow.resolve(makeToken(lowRaw));
+      await tick();
+      // The live entry resolved first, so it publishes the staler token.
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(lowRaw);
+
+      dHigh.resolve(makeToken(highRaw));
+      await tick();
+
+      // The late foreign resolve advances the already-resolved entry to the fresher token.
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('never exposes the freshest token while a replacement is pending, then publishes high once it resolves', async () => {
+      const highRaw = createJwtWithOiat(1666648250, 1666648250, 120);
+      const lowRaw = createJwtWithOiat(1666648190, 1666648190, 120);
+
+      // The first set resolves to high, so the entry's served token and freshest token are both high.
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(highRaw)) });
+      await tick();
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+
+      // A replacement whose resolver never settles must not expose the carried freshest token: the entry
+      // reads as pending (token undefined) so callers keep awaiting the in-flight fetch.
+      const pending = deferred();
+      SessionTokenCache.set({ tokenId, tokenResolver: pending.promise });
+      expect(SessionTokenCache.get({ tokenId })?.token).toBeUndefined();
+
+      // When it finally resolves staler, the own resolve reconciles against the freshest token and the entry
+      // publishes high.
+      pending.resolve(makeToken(lowRaw));
+      await tick();
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(highRaw);
+    });
+
+    it('schedules timers from the winner remaining ttl, not a full lifetime from now', async () => {
+      // Aged winner: minted 30s before the mocked now with a 120s lifetime, so 90s
+      // actually remain. Refresh must fire at remaining - leeway - lead time
+      // (90 - 15 - 2 = 73s) and the entry must be evicted by its real expiry, not a
+      // full 120s from now.
+      const agedRaw = createJwtWithOiat(1666648230, 1666648230, 120);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(agedRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(74 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+
+      // Past the real 90s expiry: the deletion timer has already dropped the entry.
+      vi.advanceTimersByTime(17 * 1000);
+      expect(SessionTokenCache.size()).toBe(0);
+    });
+  });
+
   describe('token expiration with absolute time', () => {
     it('returns token when expiresAt is far in the future', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
@@ -333,7 +666,7 @@ describe('SessionTokenCache', () => {
 
       const result = SessionTokenCache.get({ tokenId: 'future_token' });
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('future_token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
     });
 
     it('removes token when it has already expired based on duration', async () => {
@@ -347,7 +680,7 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ createdAt: nowSeconds - 70, tokenId: 'expired_token', tokenResolver });
+      SessionTokenCache.set({ tokenId: 'expired_token', tokenResolver });
 
       await tokenResolver;
 
@@ -357,7 +690,7 @@ describe('SessionTokenCache', () => {
 
     it('returns token when remaining TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
-      const iat = nowSeconds;
+      const iat = nowSeconds - 11;
       const exp = iat + 20;
       const soonJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
 
@@ -366,15 +699,15 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      // Token has 20s TTL, created 11s ago = 9s remaining (> 5s poller interval)
-      SessionTokenCache.set({ createdAt: nowSeconds - 11, tokenId: 'soon_expired_token', tokenResolver });
+      // Token has 20s TTL, issued 11s ago = 9s remaining (> 5s poller interval)
+      SessionTokenCache.set({ tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
       // Token is still valid (9s > 5s poller interval), so it should be returned
       const result = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('soon_expired_token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
     });
 
     it('returns token when expiresAt is undefined (promise not yet resolved)', () => {
@@ -385,7 +718,259 @@ describe('SessionTokenCache', () => {
 
       const result = SessionTokenCache.get({ tokenId: 'pending_token' });
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('pending_token');
+      expect(result?.tokenResolver).toBe(pendingTokenResolver);
+    });
+  });
+
+  describe('device clock skew', () => {
+    const tokenId = 'session_123';
+    const deviceNow = 1666648260;
+    const deviceLag = 40;
+
+    it('does not serve a fresh token past its server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not serve a broadcast token past its server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      await broadcastListener({
+        data: { organizationId: null, sessionId: tokenId, tokenId, tokenRaw: freshRaw, traceId: 'skew' },
+      } as MessageEvent<SessionTokenEvent>);
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('fires the proactive refresh before server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(44 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops serving a token early, not late, when the device clock is ahead', async () => {
+      const deviceLead = 30;
+      const freshRaw = createJwtWithOiat(deviceNow - deviceLead, deviceNow - deviceLead, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps the fresher token expiry when a later fetch resolves with a staler token', async () => {
+      const fresherRaw = createJwtWithOiat(deviceNow - 10, deviceNow - 10, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow - 50, deviceNow - 50, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(fresherRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(fresherRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is cached again on a synced clock', async () => {
+      const raw = createJwtWithOiat(deviceNow, deviceNow, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(raw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(raw)) });
+      await tick();
+
+      vi.advanceTimersByTime(26 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend an aged token to a full lifetime from cache insert', async () => {
+      const agedRaw = createJwtWithOiat(deviceNow - 40, deviceNow - 40, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(agedRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(10 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(11 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps the fresher token expiry when it is carried into a later entry', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is cached again as a new Token', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is received by broadcast after a local cache', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      await broadcastListener({
+        data: { organizationId: null, sessionId: tokenId, tokenId, tokenRaw: freshRaw, traceId: 'skew' },
+      } as MessageEvent<SessionTokenEvent>);
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('counts a replaced resolver token lifetime from its own set, not the live entry', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+      const dFresh = deferred();
+      const dStaler = deferred();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: dFresh.promise });
+
+      vi.advanceTimersByTime(10 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: dStaler.promise });
+
+      dFresh.resolve(makeToken(freshRaw));
+      await tick();
+      dStaler.resolve(makeToken(stalerRaw));
+      await tick();
+
+      vi.advanceTimersByTime(40 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('gives a fresher token with a different raw string its own lifetime', async () => {
+      const firstRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const fresherRaw = createJwtWithOiat(deviceNow + 30 + deviceLag, deviceNow + 30 + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(firstRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(fresherRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(26 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(fresherRaw);
+
+      vi.advanceTimersByTime(30 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('fires the proactive refresh from the carried token expiry, not the later entry', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow, deviceNow, 60);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(12 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('takes the earlier expiry when a replaced resolver delivers the same token after the entry resolved', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const dFirst = deferred();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: dFirst.promise });
+
+      vi.advanceTimersByTime(10 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      dFirst.resolve(makeToken(freshRaw));
+      await tick();
+
+      vi.advanceTimersByTime(40 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(freshRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps a pending entry when the token carried into it is close to expiry', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(50 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: deferred().promise });
+
+      vi.advanceTimersByTime(8 * 1000);
+      const result = SessionTokenCache.get({ tokenId });
+      expect(result).toBeDefined();
+      expect(result?.token).toBeUndefined();
     });
   });
 
@@ -394,7 +979,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
       } as any);
 
       SessionTokenCache.set({
@@ -421,7 +1006,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730 } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600 } },
       } as any);
 
       SessionTokenCache.set({
@@ -438,7 +1023,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
       } as any);
 
       SessionTokenCache.set({
@@ -449,6 +1034,42 @@ describe('SessionTokenCache', () => {
       await tokenResolver;
 
       expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('broadcast resilience', () => {
+    it('a failing postMessage does not evict the freshly cached token', async () => {
+      // A broadcast failure (postMessage throwing, e.g. InvalidStateError when the
+      // channel races a close) is a side effect that must not evict the freshly
+      // cached token or force an unnecessary refetch (SDK-119).
+      mockBroadcastChannel.postMessage.mockImplementationOnce(() => {
+        throw new Error('channel closed');
+      });
+
+      const futureExp = Math.floor(Date.now() / 1000) + 3600;
+      const tokenResolver = Promise.resolve({
+        getRawString: () => mockJwt,
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
+      } as any);
+
+      expect(() =>
+        SessionTokenCache.set({
+          tokenId: 'session_123',
+          tokenResolver,
+        }),
+      ).not.toThrow();
+
+      await tokenResolver;
+      // Flush the cache write's .then (broadcast) and .catch microtasks. Fake timers
+      // are active in this suite, so flush microtasks rather than using a setTimeout.
+      for (let i = 0; i < 5; i++) {
+        await Promise.resolve();
+      }
+
+      // The broadcast was attempted and threw, but the token must stay cached.
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+      expect(SessionTokenCache.size()).toBe(1);
+      expect(SessionTokenCache.get({ tokenId: 'session_123' })).toBeDefined();
     });
   });
 
@@ -474,7 +1095,7 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key)).toBeDefined();
       expect(SessionTokenCache.size()).toBe(1);
 
       SessionTokenCache.clear();
@@ -517,7 +1138,7 @@ describe('SessionTokenCache', () => {
 
       const resultWhilePending = SessionTokenCache.get(key);
       expect(resultWhilePending).toBeDefined();
-      expect(resultWhilePending?.entry.tokenId).toBe('lifecycle-token');
+      expect(resultWhilePending?.tokenResolver).toBe(tokenResolver);
       expect(isResolved).toBe(false);
 
       vi.advanceTimersByTime(100);
@@ -526,7 +1147,7 @@ describe('SessionTokenCache', () => {
       const resultAfterResolved = SessionTokenCache.get(key);
       expect(isResolved).toBe(true);
       expect(resultAfterResolved).toBeDefined();
-      expect(resultAfterResolved?.entry.tokenId).toBe('lifecycle-token');
+      expect(resultAfterResolved?.tokenResolver).toBe(tokenResolver);
 
       vi.advanceTimersByTime(60 * 1000);
 
@@ -584,14 +1205,14 @@ describe('SessionTokenCache', () => {
 
       // Token should still be cached and retrievable
       const result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('no-callback-token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
 
       // Advance past when timer would fire - nothing should happen
       vi.advanceTimersByTime(50 * 1000);
 
       // Token should still be valid (10s remaining)
       const stillCached = SessionTokenCache.get(key);
-      expect(stillCached?.entry.tokenId).toBe('no-callback-token');
+      expect(stillCached?.tokenResolver).toBe(tokenResolver);
     });
 
     it('clears refresh timer when entry is deleted', async () => {
@@ -670,7 +1291,7 @@ describe('SessionTokenCache', () => {
 
       // Token should still be retrievable (10s remaining, > 5s poller interval)
       const result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('still-valid-token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
     });
   });
 
@@ -854,7 +1475,7 @@ describe('SessionTokenCache', () => {
       // Token B should still be in cache (identity check in deleteKey prevents stale removal)
       const result = SessionTokenCache.get(key);
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('no-interference-token');
+      expect(result?.token).toBe(tokenB);
 
       // Token B should survive well past Token A's original expiry
       vi.advanceTimersByTime(100 * 1000);
@@ -923,12 +1544,12 @@ describe('SessionTokenCache', () => {
 
       // 60s remaining
       let result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('above-cutoff-token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
 
       // 10s remaining (above 5s cutoff)
       vi.advanceTimersByTime(50 * 1000);
       result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('above-cutoff-token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
     });
 
     it('forces synchronous refresh when token has less than poller interval remaining', async () => {
@@ -950,7 +1571,7 @@ describe('SessionTokenCache', () => {
       // 6s remaining (just above 5s cutoff)
       vi.advanceTimersByTime(54 * 1000);
       let result = SessionTokenCache.get(key);
-      expect(result?.entry.tokenId).toBe('hard-cutoff-token');
+      expect(result?.tokenResolver).toBe(tokenResolver);
 
       // 4s remaining (below 5s cutoff) - forces sync refresh
       vi.advanceTimersByTime(2 * 1000);
@@ -976,7 +1597,7 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key)).toBeDefined();
 
       vi.advanceTimersByTime(30 * 1000);
 
@@ -999,10 +1620,10 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key)).toBeDefined();
 
       vi.advanceTimersByTime(90 * 1000);
-      expect(SessionTokenCache.get(key)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key)).toBeDefined();
 
       vi.advanceTimersByTime(30 * 1000);
       expect(SessionTokenCache.get(key)).toBeUndefined();
@@ -1028,7 +1649,7 @@ describe('SessionTokenCache', () => {
         SessionTokenCache.set({ tokenId: label, tokenResolver });
         await tokenResolver;
 
-        expect(SessionTokenCache.get({ tokenId: label })?.entry).toBeDefined();
+        expect(SessionTokenCache.get({ tokenId: label })).toBeDefined();
 
         vi.advanceTimersByTime(ttl * 1000);
         expect(SessionTokenCache.get({ tokenId: label })).toBeUndefined();
@@ -1058,7 +1679,7 @@ describe('SessionTokenCache', () => {
 
       const result = SessionTokenCache.get(keyWithAudience);
       expect(result).toBeDefined();
-      expect(result?.entry.audience).toBe('https://api.example.com');
+      expect(result?.tokenResolver).toBe(tokenResolver);
     });
 
     it('treats tokens with different audiences as separate entries', async () => {
@@ -1081,8 +1702,8 @@ describe('SessionTokenCache', () => {
       await Promise.all([resolver1, resolver2]);
 
       expect(SessionTokenCache.size()).toBe(2);
-      expect(SessionTokenCache.get(key1)?.entry).toBeDefined();
-      expect(SessionTokenCache.get(key2)?.entry).toBeDefined();
+      expect(SessionTokenCache.get(key1)).toBeDefined();
+      expect(SessionTokenCache.get(key2)).toBeDefined();
     });
   });
 
@@ -1134,7 +1755,7 @@ describe('SessionTokenCache', () => {
     });
   });
 
-  describe('resolvedToken', () => {
+  describe('token', () => {
     it('is populated after tokenResolver resolves', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
@@ -1150,42 +1771,17 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({ ...key, tokenResolver });
 
-      // Before promise resolves, resolvedToken should be undefined
+      // Before promise resolves, token should be undefined
       let result = SessionTokenCache.get(key);
-      expect(result?.entry.resolvedToken).toBeUndefined();
+      expect(result?.token).toBeUndefined();
 
       // Wait for promise to resolve
       await tokenResolver;
 
-      // After promise resolves, resolvedToken should be populated
+      // After promise resolves, token should be populated
       result = SessionTokenCache.get(key);
-      expect(result?.entry.resolvedToken).toBeDefined();
-      expect(result?.entry.resolvedToken?.getRawString()).toBeTruthy();
-    });
-
-    it('can be provided when setting a pre-resolved token', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'pre-resolved-token',
-        jwt,
-        object: 'token',
-      });
-
-      const key = { tokenId: 'pre-resolved-token' };
-
-      // Set with both tokenResolver and resolvedToken
-      SessionTokenCache.set({
-        ...key,
-        resolvedToken: token,
-        tokenResolver: Promise.resolve(token),
-      });
-
-      // resolvedToken should be immediately available
-      const result = SessionTokenCache.get(key);
-      expect(result?.entry.resolvedToken).toBeDefined();
-      expect(result?.entry.resolvedToken).toBe(token);
+      expect(result?.token).toBeDefined();
+      expect(result?.token?.getRawString()).toBeTruthy();
     });
   });
 
@@ -1258,7 +1854,7 @@ describe('SessionTokenCache', () => {
       vi.advanceTimersByTime(31 * 1000);
       const result = SessionTokenCache.get(key);
       expect(result).toBeDefined();
-      expect(result?.entry.tokenId).toBe('exp-overwrite');
+      expect(result?.token).toBe(token2);
     });
 
     it('simulates multiple refresh cycles without timer accumulation', async () => {
@@ -1436,7 +2032,6 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({
         audience: undefined,
-        createdAt: nowSeconds,
         tokenId: session1Id,
         tokenResolver: session1Resolver,
       });
@@ -1471,15 +2066,14 @@ describe('SessionTokenCache', () => {
       // (not session2's token) - tokens are isolated by tokenId
       const retrievedSession1Token = SessionTokenCache.get({ tokenId: session1Id });
       expect(retrievedSession1Token).toBeDefined();
-      const resolvedSession1Token = await retrievedSession1Token!.entry.tokenResolver;
+      const resolvedSession1Token = await retrievedSession1Token!.tokenResolver;
       expect(resolvedSession1Token.jwt?.claims?.iat).toBe(nowSeconds);
-      expect(retrievedSession1Token!.entry.tokenId).toBe(session1Id);
+      expect(retrievedSession1Token!.tokenResolver).toBe(session1Resolver);
 
       // Verify session2's token is separate
       const retrievedSession2Token = SessionTokenCache.get({ tokenId: session2Id });
       expect(retrievedSession2Token).toBeDefined();
-      expect(retrievedSession2Token!.entry.tokenId).toBe(session2Id);
-      expect(retrievedSession2Token!.entry.tokenId).not.toBe(session1Id);
+      expect(retrievedSession2Token!.tokenResolver).not.toBe(session1Resolver);
     });
 
     it('accepts broadcast messages from the same session ID', async () => {
@@ -1496,7 +2090,6 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({
         audience: undefined,
-        createdAt: nowSeconds - 10,
         tokenId: sessionId,
         tokenResolver: initialResolver,
       });
@@ -1505,7 +2098,7 @@ describe('SessionTokenCache', () => {
 
       const cachedToken = SessionTokenCache.get({ tokenId: sessionId });
       expect(cachedToken).toBeDefined();
-      const resolvedToken = await cachedToken!.entry.tokenResolver;
+      const resolvedToken = await cachedToken!.tokenResolver;
       expect(resolvedToken.jwt?.claims?.iat).toBe(nowSeconds - 10);
 
       const newerJwt = createJwtWithTtl(nowSeconds, 60);
@@ -1525,11 +2118,93 @@ describe('SessionTokenCache', () => {
       await vi.waitFor(async () => {
         const updatedCached = SessionTokenCache.get({ tokenId: sessionId });
         expect(updatedCached).toBeDefined();
-        const updatedToken = await updatedCached!.entry.tokenResolver;
+        const updatedToken = await updatedCached!.tokenResolver;
         expect(updatedToken.jwt?.claims?.iat).toBe(nowSeconds);
       });
 
       expect(SessionTokenCache.size()).toBe(1);
+    });
+  });
+
+  // --- SDK-117 characterization backfill ---------------------------------
+  // These lock in current, intended behavior before the cache is split into
+  // separate storage / scheduler / cross-tab collaborators. They are the
+  // regression bar for that refactor, covering the gaps the audit surfaced:
+  // BroadcastChannel lifecycle, broadcast-failure resilience, graceful
+  // degradation without BroadcastChannel, and audience key coalescing.
+
+  describe('BroadcastChannel lifecycle', () => {
+    it('close() closes the underlying channel', () => {
+      expect(mockBroadcastChannel.close).not.toHaveBeenCalled();
+
+      SessionTokenCache.close();
+
+      expect(mockBroadcastChannel.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('lazily reopens a new channel on the next operation after close()', () => {
+      SessionTokenCache.close();
+      (global.BroadcastChannel as unknown as ReturnType<typeof vi.fn>).mockClear();
+
+      // get() calls ensureBroadcastChannel(), which must reconstruct the channel
+      SessionTokenCache.get({ tokenId: 'anything' });
+
+      expect(global.BroadcastChannel).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('graceful degradation without BroadcastChannel', () => {
+    it('continues to cache and retrieve tokens when BroadcastChannel is unavailable', async () => {
+      // Simulate a runtime that does not provide BroadcastChannel.
+      SessionTokenCache.close();
+      (global as any).BroadcastChannel = undefined;
+
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'no-bc-token', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'no-bc-token' };
+
+      expect(() => SessionTokenCache.set({ ...key, tokenResolver })).not.toThrow();
+      await tokenResolver;
+
+      const result = SessionTokenCache.get(key);
+      expect(result?.tokenResolver).toBe(tokenResolver);
+    });
+  });
+
+  describe('audience key coalescing', () => {
+    it('treats empty-string audience and undefined audience as the same entry', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const token = new Token({ id: 'aud-coalesce', jwt, object: 'token' });
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+
+      SessionTokenCache.set({ audience: '', tokenId: 'aud-coalesce', tokenResolver });
+      await tokenResolver;
+
+      // `audience || ''` collapses '' and undefined to the same key.
+      expect(SessionTokenCache.get({ tokenId: 'aud-coalesce' })?.tokenResolver).toBe(tokenResolver);
+      expect(SessionTokenCache.get({ audience: '', tokenId: 'aud-coalesce' })?.tokenResolver).toBe(tokenResolver);
+      expect(SessionTokenCache.size()).toBe(1);
+    });
+
+    it('isolates an audience-scoped token from the no-audience token of the same id', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const tokenA = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+      const tokenB = new Token({ id: 'aud-split', jwt: createJwtWithTtl(nowSeconds, 60), object: 'token' });
+
+      SessionTokenCache.set({ tokenId: 'aud-split', tokenResolver: Promise.resolve<TokenResource>(tokenA) });
+      SessionTokenCache.set({
+        audience: 'https://api.example.com',
+        tokenId: 'aud-split',
+        tokenResolver: Promise.resolve<TokenResource>(tokenB),
+      });
+      await Promise.resolve();
+
+      expect(SessionTokenCache.size()).toBe(2);
+      expect(SessionTokenCache.get({ tokenId: 'aud-split' })).toBeDefined();
+      expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'aud-split' })).toBeDefined();
     });
   });
 });

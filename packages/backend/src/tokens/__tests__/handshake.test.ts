@@ -25,7 +25,7 @@ vi.mock('../verify.js', async importOriginal => {
 vi.mock('../../jwt/verifyJwt.js', () => ({
   decodeJwt: vi.fn().mockReturnValue({
     data: {
-      header: { typ: 'JWT', alg: 'RS256', kid: 'test-kid' },
+      header: { typ: 'JWT', alg: 'RS256', kid: 'test-kid', cat: 'cl_B7d4PD111AAA' },
       payload: {
         sub: 'user_123',
         __raw: 'raw-token',
@@ -447,7 +447,7 @@ describe('HandshakeService', () => {
 
       // Verify all required parameters are present
       expect(url.searchParams.get('redirect_url')).toBeDefined();
-      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-11-10');
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2026-05-12');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
     });

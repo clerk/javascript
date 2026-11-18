@@ -1,0 +1,110 @@
+import * as OrganizationListStories from './organization-list.stories';
+
+# OrganizationList
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={OrganizationListStories}
+  composition={[
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Skeleton', href: '/components/skeleton', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'CreateOrganization', href: '/misc/create-organization', layer: 'Misc' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+<OrganizationList />;
+```
+
+`afterSelectOrganizationUrl`, `afterSelectPersonalUrl`, and `afterCreateOrganizationUrl` take a
+`:param` template, a plain path, or a function of the selected organization or user. Without one,
+selecting makes the account active and stays on the page.
+
+```tsx
+<OrganizationList
+  afterSelectOrganizationUrl='/orgs/:slug'
+  afterSelectPersonalUrl='/dashboard'
+/>
+```
+
+It renders `fallback` while Clerk loads and nothing when nobody is signed in.
+
+## Accounts
+
+The list runs in a fixed order: the personal account, the organizations the user belongs to, then
+invitations, then suggestions. Invitations and suggestions appear once every page before them has
+loaded. More pages load as the foot of the list scrolls into view.
+
+**Join** accepts an invitation, and the row then selects its organization like any other.
+**Request to join** files a request on a suggestion, and the button then reads **Pending approval**
+and is disabled.
+
+## Without a personal account
+
+`hidePersonal` leaves the personal account out. It is also left out when the instance requires an
+organization to be selected.
+
+<Story
+  name='WithoutPersonal'
+  storyModule={OrganizationListStories}
+/>
+
+## Loading
+
+The rows stand in as placeholders until the first page of every list has loaded.
+
+<Story
+  name='Loading'
+  storyModule={OrganizationListStories}
+/>
+
+## Creating an organization
+
+**Create organization** replaces the list with the [CreateOrganization](/misc/create-organization)
+flow, and **Cancel** returns to it. Once the organization is created, the list returns and the flow
+goes to `afterCreateOrganizationUrl`. The button is left out for users who cannot create
+organizations.
+
+When the personal account is hidden and there is nothing to list, the flow opens straight away and
+offers no way back.
+
+<Story
+  name='Empty'
+  storyModule={OrganizationListStories}
+/>
+
+## Errors
+
+A failed action shows its error above the list. Selecting an organization the user is no longer a
+member of explains that, and suggests creating another one where the user may.
+
+<Story
+  name='WithError'
+  storyModule={OrganizationListStories}
+/>
+
+## Styling
+
+| Slot                   | Attributes                    |
+| ---------------------- | ----------------------------- |
+| `.cl-card-root`        | `data-elevation`, `data-size` |
+| `.cl-card-header`      |                               |
+| `.cl-card-title`       |                               |
+| `.cl-card-description` |                               |
+| `.cl-card-banner`      |                               |
+| `.cl-card-content`     |                               |
+| `.cl-card-footer`      | `data-elevation`              |
+| `.cl-item-group`       |                               |
+| `.cl-item`             | `data-interactive`            |
+| `.cl-item-media`       |                               |
+| `.cl-item-content`     |                               |
+| `.cl-item-label`       | `data-variant`                |
+| `.cl-item-actions`     |                               |

@@ -14,8 +14,8 @@ The deprecated `verifySecret()`, `verifyAccessToken()`, and `verifyToken()` meth
 - await clerkClient.apiKeys.verifySecret(secret);
 + await clerkClient.apiKeys.verify(secret);
 
-- await clerkClient.idpOAuthAccessToken.verifyAccessToken(accessToken);
-+ await clerkClient.idpOAuthAccessToken.verify(accessToken);
+- await clerkClient.idPOAuthAccessToken.verifyAccessToken(accessToken);
++ await clerkClient.idPOAuthAccessToken.verify(accessToken);
 
 - await clerkClient.m2m.verifyToken(params);
 + await clerkClient.m2m.verify(params);

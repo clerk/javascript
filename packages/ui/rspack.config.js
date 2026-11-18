@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { merge } from 'webpack-merge';
-import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { ReactRefreshRspackPlugin as ReactRefreshPlugin } from '@rspack/plugin-react-refresh';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
 
@@ -166,7 +166,7 @@ const commonForProdBrowser = ({ targets = 'last 2 years', useCoreJs = false } = 
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
-      libraryTarget: 'umd',
+      library: { type: 'umd' },
       globalObject: 'globalThis',
     },
     module: {
@@ -265,7 +265,7 @@ const devConfig = (mode, env) => {
       publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
       filename: `[name].js`,
-      libraryTarget: 'umd',
+      library: { type: 'umd' },
     },
     optimization: {
       minimize: false,
@@ -281,11 +281,8 @@ const devConfig = (mode, env) => {
       liveReload: false,
       client: { webSocketURL: `auto://${devUrl.host}/ws` },
     },
-    cache: false,
-    experiments: {
-      cache: {
-        type: 'memory',
-      },
+    cache: {
+      type: 'memory',
     },
     lazyCompilation: false,
     // Only externalize React when using the shared variant (e.g., with @clerk/react).

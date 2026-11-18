@@ -30,6 +30,7 @@ export class Web3Wallet extends BaseResource implements Web3WalletResource {
   prepareVerification = (params: PrepareWeb3WalletVerificationParams): Promise<this> => {
     return this._basePost<Web3WalletJSON>({
       action: 'prepare_verification',
+      coalesce: true,
       body: { ...params },
     });
   };

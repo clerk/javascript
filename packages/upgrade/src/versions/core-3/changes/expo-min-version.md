@@ -1,7 +1,7 @@
 ---
 title: 'Minimum Expo version increased to 53'
 packages: ['expo']
-matcher: "expo\":\\s*\"(?:^|~|>|=|\\s)*(?:50|51|52)\\..*?"
+matcher: "expo\":\\s*\"(?:\\^|~|>|=|\\s)*(?:50|51|52)\\..*?"
 matcherFlags: 'm'
 category: 'version'
 ---

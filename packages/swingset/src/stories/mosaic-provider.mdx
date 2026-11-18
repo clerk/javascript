@@ -1,0 +1,89 @@
+# MosaicProvider
+
+`MosaicProvider` holds the settings shared by the Mosaic components below it: reading direction, icons,
+localization, experimental features and the profile. It also renders the toasts and profile modals those
+components open.
+
+## Usage
+
+Wrap the part of your app that uses Mosaic. Every prop is optional.
+
+```tsx
+import { Switcher, MosaicProvider } from '@clerk/mosaic';
+
+<MosaicProvider>
+  <Switcher />
+</MosaicProvider>;
+```
+
+## Props
+
+| Prop           | Type                  | Default | Description                                                                   |
+| -------------- | --------------------- | ------- | ----------------------------------------------------------------------------- |
+| `children`     | `ReactNode`           | —       | The components that use these settings.                                       |
+| `direction`    | `'ltr' \| 'rtl'`      | `'ltr'` | The direction arrow-key navigation follows. Set it to match the page's `dir`. |
+| `icons`        | `MosaicIconOverrides` | —       | Glyph overrides by name. See [Icon](/components/icon).                        |
+| `localization` | `MosaicLocalization`  | —       | Locale and strings. See [Localization](/localization/localization).           |
+| `experimental` | `MosaicExperimental`  | —       | Features still being tried out. Names and behavior can change in any release. |
+| `profile`      | `MosaicProfile`       | —       | The profile shared by the profile components, described below.                |
+
+## Experimental
+
+| Option        | Type      | Default | Description                                                                                                                              |
+| ------------- | --------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `newProfiles` | `boolean` | `false` | `Switcher`, `UserButton` and `OrganizationSwitcher` open Mosaic's own `UserProfile` and `OrganizationProfile` instead of Clerk's modals. |
+
+## Profile
+
+`profile` configures the profile that `Switcher`, `UserButton`, `OrganizationSwitcher`, `UserProfile` and
+`OrganizationProfile` share. `UserProfile` and `OrganizationProfile` use it for any prop they don't set
+themselves.
+
+```tsx
+<MosaicProvider
+  experimental={{ newProfiles: true }}
+  profile={{
+    combined: true,
+    userProfileUrl: '/account',
+    userProfileProps: { customPages },
+    organizationProfileProps: { pageOrder, afterLeaveOrganizationUrl: '/' },
+  }}
+>
+  <OrganizationSwitcher />
+  <UserButton />
+</MosaicProvider>
+```
+
+The button you pick (`Switcher`, `UserButton` or `OrganizationSwitcher`) decides what its menu lists and
+which profile it opens. `combined` on `MosaicProvider` decides whether a combined `Switcher` opens one
+profile or two, and what a `<Profile />` without a `mode` shows.
+
+For `Switcher`, `UserButton` and `OrganizationSwitcher`, `profile.combined` takes effect only with
+`experimental.newProfiles`. Without it, they open Clerk's modals. A `<Profile />` without a `mode` follows
+`profile.combined` either way.
+
+| Option                     | Type                       | Default | Description                                                                       |
+| -------------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------- |
+| `combined`                 | `boolean`                  | `true`  | Whether a combined menu, or a `<Profile />` without a `mode`, shows both groups.  |
+| `userProfileUrl`           | `string`                   | —       | Your own user profile page. Setting it routes there instead of opening the modal. |
+| `organizationProfileUrl`   | `string`                   | —       | Your own organization profile page. Setting it routes there instead of the modal. |
+| `userProfileProps`         | `ProfileUserProps`         | —       | Options for the user profile.                                                     |
+| `organizationProfileProps` | `ProfileOrganizationProps` | —       | Options for the organization profile, or its pages in a combined profile.         |
+
+### `userProfileProps`
+
+| Option                  | Type                    | Default | Description                                                  |
+| ----------------------- | ----------------------- | ------- | ------------------------------------------------------------ |
+| `customPages`           | `CustomProfilePage[]`   | —       | Your own pages inside the profile.                           |
+| `pageOrder`             | `string[]`              | —       | Navigation order, by built-in page id or custom page `path`. |
+| `additionalOAuthScopes` | `AdditionalOAuthScopes` | —       | Extra access to request from each OAuth provider.            |
+| `apiKeysProps`          | `APIKeysPageProps`      | —       | Options for the API keys page.                               |
+
+### `organizationProfileProps`
+
+| Option                      | Type                  | Default | Description                                                  |
+| --------------------------- | --------------------- | ------- | ------------------------------------------------------------ |
+| `customPages`               | `CustomProfilePage[]` | —       | Your own pages inside the profile.                           |
+| `pageOrder`                 | `string[]`            | —       | Navigation order, by built-in page id or custom page `path`. |
+| `afterLeaveOrganizationUrl` | `string`              | —       | Where the user lands after leaving the organization.         |
+| `apiKeysProps`              | `APIKeysPageProps`    | —       | Options for the API keys page.                               |

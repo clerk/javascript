@@ -366,4 +366,56 @@ describe('SecurityPage', () => {
       }
     });
   });
+
+  it('does not leak the previous user device activity across a user switch', async () => {
+    const makeSession = (sessionId: string, city: string) =>
+      ({
+        pathRoot: '/me/sessions',
+        id: sessionId,
+        status: 'active',
+        expireAt: '2022-12-01T01:55:44.636Z',
+        abandonAt: '2022-12-24T01:55:44.636Z',
+        lastActiveAt: '2022-11-24T12:11:49.328Z',
+        latestActivity: {
+          id: 'sess_activity_1',
+          deviceType: 'Macintosh',
+          browserName: 'Chrome',
+          browserVersion: '107.0.0.0',
+          country: 'Greece',
+          city,
+          isMobile: false,
+        },
+        actor: null,
+        revoke: vi.fn().mockResolvedValue({}),
+      }) as any as SessionWithActivitiesResource;
+
+    // User A renders the Security page, caching their sessions in the
+    // module-scoped `useFetch` cache.
+    const { wrapper: wrapperA, fixtures: fixturesA } = await createFixtures(f => {
+      f.withUser({ id: 'user_a', email_addresses: ['a@clerk.com'] });
+    });
+    fixturesA.clerk.user!.getSessions.mockReturnValue(
+      Promise.resolve([makeSession(fixturesA.clerk.session!.id, 'Athens')]),
+    );
+
+    const { unmount } = render(<SecurityPage />, { wrapper: wrapperA });
+    await waitFor(() => expect(fixturesA.clerk.user?.getSessions).toHaveBeenCalled());
+    await screen.findByText(/Athens/i);
+    unmount();
+
+    // User B mounts the Security page within the stale window. Because the cache
+    // is keyed by `user.id`, B must trigger a fresh fetch and never sees A's
+    // cached device activity.
+    const { wrapper: wrapperB, fixtures: fixturesB } = await createFixtures(f => {
+      f.withUser({ id: 'user_b', email_addresses: ['b@clerk.com'] });
+    });
+    fixturesB.clerk.user!.getSessions.mockReturnValue(
+      Promise.resolve([makeSession(fixturesB.clerk.session!.id, 'Berlin')]),
+    );
+
+    render(<SecurityPage />, { wrapper: wrapperB });
+    await waitFor(() => expect(fixturesB.clerk.user?.getSessions).toHaveBeenCalled());
+    await screen.findByText(/Berlin/i);
+    expect(screen.queryByText(/Athens/i)).not.toBeInTheDocument();
+  });
 });

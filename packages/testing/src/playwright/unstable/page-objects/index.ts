@@ -4,9 +4,11 @@ import { createAPIKeysComponentPageObject } from './apiKeys';
 import { createAppPageObject } from './app';
 import { createCheckoutPageObject } from './checkout';
 import { createClerkPageObject } from './clerk';
+import { createConfigureSSOPageObject } from './configureSSO';
 import { createExpectPageObject } from './expect';
 import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
+import { createOrganizationProfileComponentPageObject } from './organizationProfile';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createPlanDetailsPageObject } from './planDetails';
 import { createPricingTablePageObject } from './pricingTable';
@@ -37,9 +39,11 @@ export const createPageObjects = ({
     page: app,
     clerk: createClerkPageObject(testArgs),
     checkout: createCheckoutPageObject(testArgs),
+    configureSSO: createConfigureSSOPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
     impersonation: createImpersonationPageObject(testArgs),
     keylessPopover: createKeylessPopoverPageObject(testArgs),
+    organizationProfile: createOrganizationProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     pricingTable: createPricingTablePageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),

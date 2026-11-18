@@ -1,5 +1,7 @@
 import type * as ClerkBackend from '@clerk/backend';
 import type { Request, RequestHandler, Response } from 'express';
+import express from 'express';
+import supertest from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockClerkFrontendApiProxy } = vi.hoisted(() => ({
@@ -25,9 +27,17 @@ vi.mock('@clerk/backend', async () => {
   };
 });
 
+const { mockWarnOnce } = vi.hoisted(() => ({
+  mockWarnOnce: vi.fn(),
+}));
+vi.mock('@clerk/shared/logger', () => ({
+  logger: { warnOnce: mockWarnOnce, logOnce: vi.fn() },
+}));
+
 import { authenticateAndDecorateRequest, authenticateRequest } from '../authenticateRequest';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
+import { requireAuth } from '../requireAuth';
 import { assertNoDebugHeaders, assertSignedOutDebugHeaders, runMiddleware, runMiddlewareOnPath } from './helpers';
 
 describe('clerkMiddleware', () => {
@@ -331,6 +341,87 @@ describe('clerkMiddleware', () => {
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
   });
 
+  describe('foreign req.auth values (authentication bypass hardening)', () => {
+    beforeEach(() => {
+      mockWarnOnce.mockClear();
+    });
+
+    it('authenticates the request even when a previous middleware set req.auth to a plain object (express-jwt style)', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: { sub: 'attacker' } });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, clerkMiddleware()], {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      assertSignedOutDebugHeaders(response);
+      expect(mockWarnOnce).toHaveBeenCalledTimes(1);
+    });
+
+    it('overwrites a foreign req.auth function so getAuth returns Clerk state', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: () => ({ userId: 'attacker' }) });
+        next();
+      };
+
+      let capturedUserId: string | null | undefined;
+      const capture: RequestHandler = (req, _res, next) => {
+        capturedUserId = getAuth(req).userId;
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, clerkMiddleware(), capture], {
+        Cookie: '__clerk_db_jwt=deadbeef;',
+      }).expect(200, 'Hello world!');
+
+      assertSignedOutDebugHeaders(response);
+      expect(capturedUserId).toBeNull();
+    });
+
+    it('does not re-authenticate when clerkMiddleware runs twice', async () => {
+      const authenticateRequestSpy = vi.fn().mockResolvedValue({
+        headers: new Headers(),
+        status: 'signed-out',
+        toAuth: () => ({ userId: null }),
+      });
+      const clerkClient = { authenticateRequest: authenticateRequestSpy } as any;
+
+      await runMiddleware([clerkMiddleware({ clerkClient }), clerkMiddleware({ clerkClient })]).expect(
+        200,
+        'Hello world!',
+      );
+
+      expect(authenticateRequestSpy).toHaveBeenCalledTimes(1);
+      expect(mockWarnOnce).not.toHaveBeenCalled();
+    });
+
+    it('requireAuth is not bypassed by a foreign req.auth that reports a userId', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: () => ({ userId: 'attacker' }) });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, requireAuth({ signInUrl: '/sign-in' })]);
+
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/sign-in');
+    });
+
+    it('requireAuth redirects (does not 500) when a foreign req.auth is a plain object', async () => {
+      const foreignAuth: RequestHandler = (req, _res, next) => {
+        Object.assign(req, { auth: { sub: 'attacker' } });
+        next();
+      };
+
+      const response = await runMiddleware([foreignAuth, requireAuth({ signInUrl: '/sign-in' })]);
+
+      expect(response.status).toBe(302);
+      expect(response.headers.location).toBe('/sign-in');
+    });
+  });
+
   describe('Frontend API proxy handling', () => {
     beforeEach(() => {
       mockClerkFrontendApiProxy.mockReset();
@@ -476,19 +567,46 @@ describe('clerkMiddleware', () => {
     });
   });
 
-  it('calls next with an error when request URL is invalid', () => {
-    const req = {
-      url: '//',
-      cookies: {},
-      headers: { host: 'example.com' },
-    } as Request;
-    const res = {} as Response;
-    const mockNext = vi.fn();
+  describe('requests that cannot be converted to a web Request', () => {
+    it('responds 400 without calling next when the request URL is invalid', async () => {
+      const req = {
+        method: 'GET',
+        url: '//',
+        cookies: {},
+        headers: { host: 'example.com' },
+      } as Request;
+      const status = vi.fn().mockReturnThis();
+      const end = vi.fn();
+      const res = { status, end } as unknown as Response;
+      const mockNext = vi.fn();
 
-    clerkMiddleware()(req, res, mockNext);
+      await clerkMiddleware()(req, res, mockNext);
 
-    expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
+      expect(status).toHaveBeenCalledWith(400);
+      expect(end).toHaveBeenCalled();
+      expect(mockNext).not.toHaveBeenCalled();
+    });
 
-    mockNext.mockReset();
+    it('responds 400 to a hostless // request target', async () => {
+      await runMiddlewareOnPath(clerkMiddleware(), '//').expect(400);
+    });
+
+    it('responds 400 to a request target that parses as a credentialed URL', async () => {
+      await runMiddlewareOnPath(clerkMiddleware(), '//$%7B%23context@example.com%7D.action').expect(400);
+    });
+
+    it('responds 400 to a forbidden method (TRACE)', async () => {
+      const app = express();
+      app.use(clerkMiddleware());
+      app.use((_req, res) => res.end('Hello world!'));
+
+      await supertest(app).trace('/').expect(400);
+    });
+
+    it('responds 400 to a hostless // request target when proxy is enabled', async () => {
+      await runMiddlewareOnPath(clerkMiddleware({ frontendApiProxy: { enabled: true } }), '//').expect(400);
+
+      expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    });
   });
 });

@@ -1,8 +1,8 @@
 import { getQueryParams, stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
-import { withLeadingSlash } from '@clerk/shared/url';
 import type { NavigateOptions } from '@clerk/shared/types';
+import { withLeadingSlash } from '@clerk/shared/url';
 import React from 'react';
 import { flushSync } from 'react-dom';
 
@@ -40,9 +40,10 @@ function ensurePushStatePatched(): void {
   if (originalPushState) {
     return;
   }
-  originalPushState = history.pushState.bind(history);
+  const original = history.pushState.bind(history);
+  originalPushState = original;
   history.pushState = (...args: Parameters<History['pushState']>) => {
-    originalPushState!(...args);
+    original(...args);
     pushStateSubscribers.forEach(fn => fn());
   };
 }
@@ -51,9 +52,10 @@ function ensureReplaceStatePatched(): void {
   if (originalReplaceState) {
     return;
   }
-  originalReplaceState = history.replaceState.bind(history);
+  const original = history.replaceState.bind(history);
+  originalReplaceState = original;
   history.replaceState = (...args: Parameters<History['replaceState']>) => {
-    originalReplaceState!(...args);
+    original(...args);
     replaceStateSubscribers.forEach(fn => fn());
   };
 }
@@ -146,6 +148,9 @@ interface BaseRouterProps {
   children: React.ReactNode;
 }
 
+export const isInternalRoute = (toURL: URL, basePath: string): boolean =>
+  toURL.origin === window.location.origin && toURL.pathname.startsWith(withLeadingSlash(basePath));
+
 export const BaseRouter = ({
   basePath,
   startPath,
@@ -235,10 +240,7 @@ export const BaseRouter = ({
       return;
     }
 
-    const isCrossOrigin = toURL.origin !== window.location.origin;
-    const isOutsideOfUIComponent = !toURL.pathname.startsWith(normalizedBasePath);
-
-    if (isOutsideOfUIComponent || isCrossOrigin) {
+    if (!isInternalRoute(toURL, basePath)) {
       isNavigatingRef.current = true;
       try {
         return await clerkNavigate(toURL.href);

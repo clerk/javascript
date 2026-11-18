@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "3.2.9",
+  "version": "4.16.2",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -29,8 +29,12 @@
       "default": "./dist/index.js"
     },
     "./app.plugin.js": "./app.plugin.js",
+    "./native-components": {
+      "types": "./native-components/index.d.ts",
+      "default": "./dist/native-components/index.js"
+    },
     "./native": {
-      "types": "./dist/native/index.d.ts",
+      "types": "./native/index.d.ts",
       "default": "./dist/native/index.js"
     },
     "./web": {
@@ -61,6 +65,18 @@
       "types": "./dist/apple/index.d.ts",
       "default": "./dist/apple/index.js"
     },
+    "./biometrics": {
+      "types": "./dist/biometrics/index.d.ts",
+      "default": "./dist/biometrics/index.js"
+    },
+    "./hosted-auth": {
+      "types": "./dist/hosted-auth/index.d.ts",
+      "default": "./dist/hosted-auth/index.js"
+    },
+    "./native-to-web": {
+      "types": "./dist/native-to-web/index.d.ts",
+      "default": "./dist/native-to-web/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -81,8 +97,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "android",
-    "ios",
+    "native-components",
     "native",
     "web",
     "local-credentials",
@@ -92,19 +107,19 @@
     "token-cache",
     "google",
     "apple",
+    "biometrics",
+    "hosted-auth",
+    "native-to-web",
     "experimental",
     "legacy",
-    "src/specs",
-    "expo-module.config.json",
-    "react-native.config.js",
     "app.plugin.js",
     "app.plugin.d.ts"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
-    "dev": "tsup --watch",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -117,42 +132,65 @@
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "base-64": "^1.0.0",
-    "react-native-url-polyfill": "2.0.0",
-    "tslib": "catalog:repo"
+    "react-native-url-polyfill": "4.0.0"
   },
   "devDependencies": {
+    "@clerk/expo-biometrics": "workspace:*",
+    "@clerk/expo-google-signin": "workspace:*",
+    "@clerk/expo-native-components": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
-    "esbuild": "^0.28.0",
-    "expo-apple-authentication": "^7.2.4",
-    "expo-auth-session": "^5.5.2",
+    "expo-apple-authentication": "^8.0.8",
+    "expo-application": "^7.0.8",
+    "expo-auth-session": "^7.0.11",
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
-    "expo-local-authentication": "^13.8.0",
-    "expo-secure-store": "^12.8.1",
-    "expo-web-browser": "^12.8.2",
-    "react-native": "^0.85.2"
+    "expo-intent-launcher": "^13.0.8",
+    "expo-local-authentication": "^17.0.8",
+    "expo-secure-store": "^15.0.8",
+    "expo-web-browser": "^15.0.11",
+    "react-native": "^0.86.0",
+    "react-native-webview": "^14.0.1",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
+    "@clerk/expo-biometrics": ">=0.1.0",
+    "@clerk/expo-google-signin": ">=0.1.0",
+    "@clerk/expo-native-components": ">=0.3.0",
     "@clerk/expo-passkeys": ">=0.0.6",
-    "expo": ">=53 <56",
+    "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",
+    "expo-application": ">=5.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
     "expo-crypto": ">=12",
+    "expo-intent-launcher": ">=12",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-native": ">=0.73"
+    "react-native": ">=0.75",
+    "react-native-webview": ">=13.0.0"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-biometrics": {
+      "optional": true
+    },
+    "@clerk/expo-google-signin": {
+      "optional": true
+    },
+    "@clerk/expo-native-components": {
+      "optional": true
+    },
     "@clerk/expo-passkeys": {
       "optional": true
     },
     "expo-apple-authentication": {
+      "optional": true
+    },
+    "expo-application": {
       "optional": true
     },
     "expo-auth-session": {
@@ -164,6 +202,9 @@
     "expo-crypto": {
       "optional": true
     },
+    "expo-intent-launcher": {
+      "optional": true
+    },
     "expo-local-authentication": {
       "optional": true
     },
@@ -172,6 +213,12 @@
     },
     "expo-web-browser": {
       "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-native-webview": {
+      "optional": true
     }
   },
   "engines": {
@@ -179,13 +226,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "codegenConfig": {
-    "name": "ClerkExpoSpec",
-    "type": "all",
-    "jsSrcsDir": "src/specs",
-    "android": {
-      "javaPackageName": "expo.modules.clerk"
-    }
   }
 }

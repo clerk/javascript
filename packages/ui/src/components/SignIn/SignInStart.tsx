@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
@@ -10,7 +11,7 @@ import type {
   SignInCreateParams,
   SignInResource,
 } from '@clerk/shared/types';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -19,6 +20,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -26,6 +28,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
+  ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -34,12 +37,18 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
+import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import {
+  hasOnlyEnterpriseSSOFirstFactors,
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -52,13 +61,15 @@ const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnAutofillSupported } = useClerk();
 
   useEffect(() => {
     async function runAutofillPasskey() {
-      const _isSupported = await isWebAuthnAutofillSupported();
+      const _isSupported = await (__internal_isWebAuthnAutofillSupported ?? isWebAuthnAutofillSupported)();
       setIsSupported(_isSupported);
       if (!_isSupported) {
         return;
@@ -85,7 +96,7 @@ function SignInStartInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
   const ctx = useSignInContext();
-  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
+  const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
@@ -99,8 +110,8 @@ function SignInStartInternal(): JSX.Element {
    */
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
-  const isWebSupported = isWebAuthnSupported();
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
+  const isWebSupported = useIsWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -154,6 +165,9 @@ function SignInStartInternal(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeChannels.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
@@ -200,6 +214,240 @@ function SignInStartInternal(): JSX.Element {
     }
   }, [identifierField.value, identifierAttributes]);
 
+  const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
+    const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+
+    /**
+     * FAPI will return an error when password is submitted but the user's email matches requires enterprise sso authentication.
+     * We need to strip password from the create request, and reconstruct it later.
+     */
+    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
+      fields = fields.filter(f => f.name !== 'password');
+    }
+    return {
+      ...buildRequest(fields),
+      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' }),
+    } as SignInCreateParams;
+  };
+
+  const safePasswordSignInForEnterpriseSSOInstance = (
+    signInCreatePromise: Promise<SignInResource>,
+    fields: Array<FormControlState<string>>,
+  ) => {
+    return signInCreatePromise.then(signInResource => {
+      if (!userSettings.enterpriseSSO.enabled) {
+        return signInResource;
+      }
+      /**
+       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
+       */
+      const passwordField = fields.find(f => f.name === 'password')?.value;
+      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+        return signInResource;
+      }
+      return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
+    });
+  };
+
+  const signInWithFields = async (
+    fields: Array<FormControlState<string>>,
+    options?: { resetPasswordIntent?: boolean },
+  ) => {
+    // If the user has already selected an alternative phone code provider, we use that.
+    const preferredAlternativePhoneChannel =
+      alternativePhoneCodeProvider?.channel ||
+      getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
+    if (preferredAlternativePhoneChannel) {
+      // We need to send the alternative phone code provider channel in the sign in request
+      // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
+      const noop = () => {};
+      fields.push({
+        id: 'strategy',
+        value: 'phone_code',
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+      fields.push({
+        id: 'channel',
+        value: preferredAlternativePhoneChannel,
+        clearFeedback: noop,
+        setValue: noop,
+        onChange: noop,
+        setError: noop,
+      } as any);
+    }
+    try {
+      // On top of the context-level preconditions, sign-up-if-missing only
+      // supports identifiers that can be verified out-of-band.
+      const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
+      const signUpAttribute = getSignUpAttributeFromIdentifier(identifierField);
+      const shouldSignUpIfMissing = signUpIfMissingEnabled && signUpAttribute !== 'username' && !hasPassword;
+
+      const res = await safePasswordSignInForEnterpriseSSOInstance(
+        signIn.create({
+          ...buildSignInParams(fields),
+          ...(shouldSignUpIfMissing && { signUpIfMissing: true }),
+        }),
+        fields,
+      );
+
+      if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+        return;
+      }
+
+      switch (res.status) {
+        case 'needs_identifier':
+          // Check if we need to initiate an enterprise sso flow
+          if (shouldHandOffUnidentifiedToEnterpriseConnection(res)) {
+            await authenticateWithEnterpriseSSO();
+          }
+          break;
+        case 'needs_first_factor': {
+          if (!shouldHandOffToEnterpriseConnection(res)) {
+            if (options?.resetPasswordIntent) {
+              return navigate('factor-one', {
+                searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
+              });
+            }
+            return navigate('factor-one');
+          }
+
+          // Awaited so a failed hand-off reaches the catch below instead of escaping this try.
+          return await authenticateWithEnterpriseSSO();
+        }
+        case 'needs_second_factor':
+          return navigate('factor-two');
+        case 'needs_client_trust':
+          return navigate('client-trust');
+        case 'complete':
+          return clerk.setActive({
+            session: res.createdSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+            },
+          });
+        default: {
+          console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+          return;
+        }
+      }
+    } catch (e: any) {
+      return attemptToRecoverFromSignInError(e);
+    }
+  };
+
+  const authenticateWithEnterpriseSSO = async () => {
+    const redirectUrl = ctx.ssoCallbackUrl;
+    const redirectUrlComplete = ctx.afterSignInUrl || '/';
+
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead. Handled here because the callers' recovery path drops
+      // errors that didn't come from the API.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, 'protect-check')) {
+        return;
+      }
+      throw err;
+    }
+  };
+
+  const attemptToRecoverFromSignInError = async (e: any) => {
+    if (!e.errors) {
+      return;
+    }
+    const instantPasswordError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) =>
+        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
+        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
+    );
+
+    const sessionAlreadyExistsError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
+    );
+    const alreadySignedInError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
+    );
+    const accountDoesNotExistError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) =>
+        e.code === ERROR_CODES.INVITATION_ACCOUNT_NOT_EXISTS || e.code === ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND,
+    );
+
+    if (instantPasswordError) {
+      await signInWithFields([identifierField]);
+    } else if (sessionAlreadyExistsError) {
+      await clerk.setActive({
+        session: clerk.client.lastActiveSessionId,
+        navigate: async ({ session, decorateUrl }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+        },
+      });
+    } else if (alreadySignedInError) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const sid = alreadySignedInError.meta!.sessionId!;
+      await clerk.setActive({
+        session: sid,
+        navigate: async ({ session, decorateUrl }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+        },
+      });
+    } else if (isCombinedFlow && accountDoesNotExistError) {
+      const attribute = getSignUpAttributeFromIdentifier(identifierField);
+
+      if (userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
+        const waitlistUrl = clerk.buildWaitlistUrl(
+          attribute === 'emailAddress'
+            ? {
+                initialValues: {
+                  [attribute]: identifierField.value,
+                },
+              }
+            : {},
+        );
+        return navigate(waitlistUrl);
+      }
+
+      const redirectUrl = ctx.ssoCallbackUrl;
+      const redirectUrlComplete = ctx.afterSignUpUrl || '/';
+
+      return handleCombinedFlowTransfer({
+        afterSignUpUrl: ctx.afterSignUpUrl || '/',
+        clerk,
+        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
+        identifierAttribute: attribute,
+        identifierValue: identifierField.value,
+        navigate,
+        organizationTicket,
+        signUpMode: userSettings.signUp.mode,
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        navigateOnSetActive,
+        passwordEnabled: userSettings.attributes.password?.required ?? false,
+        alternativePhoneCodeChannel:
+          alternativePhoneCodeProvider?.channel ||
+          getPreferredAlternativePhoneChannelForCombinedFlow(
+            authConfig.preferredChannels,
+            attribute,
+            identifierField.value,
+          ),
+        unsafeMetadata: ctx.unsafeMetadata,
+      });
+    } else {
+      handleError(e, [identifierField, instantPasswordField], card.setError);
+    }
+  };
+
   useEffect(() => {
     if (!organizationTicket) {
       return;
@@ -224,9 +472,12 @@ function SignInStartInternal(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
+        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (!shouldHandOffToEnterpriseConnection(res)) {
               return navigate('factor-one');
             }
 
@@ -276,31 +527,33 @@ function SignInStartInternal(): JSX.Element {
 
       const error = signIn?.firstFactorVerification?.error;
       if (error) {
-        switch (error.code) {
-          case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
-          case ERROR_CODES.OAUTH_ACCESS_DENIED:
-          case ERROR_CODES.NOT_ALLOWED_ACCESS:
-          case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
-          case ERROR_CODES.USER_LOCKED:
-          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
-          case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
-          case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
-          case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
-          case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
-          case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
-          case ERROR_CODES.CAPTCHA_INVALID:
-          case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
-          case ERROR_CODES.FRAUD_ACTION_BLOCKED:
-          case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
-          case ERROR_CODES.USER_BANNED:
-          case ERROR_CODES.USER_DEACTIVATED:
-            card.setError(error);
-            break;
-          default:
-            defaultErrorHandler();
+        if (!card.error) {
+          switch (error.code) {
+            case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+            case ERROR_CODES.OAUTH_ACCESS_DENIED:
+            case ERROR_CODES.NOT_ALLOWED_ACCESS:
+            case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+            case ERROR_CODES.USER_LOCKED:
+            case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED:
+            case ERROR_CODES.SIGN_UP_MODE_RESTRICTED_WAITLIST:
+            case ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING:
+            case ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
+            case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
+            case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+            case ERROR_CODES.CAPTCHA_INVALID:
+            case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
+            case ERROR_CODES.FRAUD_ACTION_BLOCKED:
+            case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+            case ERROR_CODES.USER_BANNED:
+            case ERROR_CODES.USER_DEACTIVATED:
+              card.setError(error);
+              break;
+            default:
+              defaultErrorHandler();
+          }
         }
 
         // TODO: This is a workaround in order to reset the sign in attempt
@@ -312,209 +565,20 @@ function SignInStartInternal(): JSX.Element {
     void handleOauthError();
   }, []);
 
-  const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
-    const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
-
-    /**
-     * FAPI will return an error when password is submitted but the user's email matches requires enterprise sso authentication.
-     * We need to strip password from the create request, and reconstruct it later.
-     */
-    if (!hasPassword || userSettings.enterpriseSSO.enabled) {
-      fields = fields.filter(f => f.name !== 'password');
-    }
-    return {
-      ...buildRequest(fields),
-      ...(hasPassword && !userSettings.enterpriseSSO.enabled && { strategy: 'password' }),
-    } as SignInCreateParams;
-  };
-
-  const safePasswordSignInForEnterpriseSSOInstance = (
-    signInCreatePromise: Promise<SignInResource>,
-    fields: Array<FormControlState<string>>,
-  ) => {
-    return signInCreatePromise.then(signInResource => {
-      if (!userSettings.enterpriseSSO.enabled) {
-        return signInResource;
-      }
-      /**
-       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
-       */
-      const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
-        return signInResource;
-      }
-      return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
-    });
-  };
-
-  const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
-    // If the user has already selected an alternative phone code provider, we use that.
-    const preferredAlternativePhoneChannel =
-      alternativePhoneCodeProvider?.channel ||
-      getPreferredAlternativePhoneChannel(fields, authConfig.preferredChannels, 'identifier');
-    if (preferredAlternativePhoneChannel) {
-      // We need to send the alternative phone code provider channel in the sign in request
-      // together with the phone_code strategy, in order for FAPI to create a Verification upon this first request.
-      const noop = () => {};
-      fields.push({
-        id: 'strategy',
-        value: 'phone_code',
-        clearFeedback: noop,
-        setValue: noop,
-        onChange: noop,
-        setError: noop,
-      } as any);
-      fields.push({
-        id: 'channel',
-        value: preferredAlternativePhoneChannel,
-        clearFeedback: noop,
-        setValue: noop,
-        onChange: noop,
-        setError: noop,
-      } as any);
-    }
-    try {
-      const res = await safePasswordSignInForEnterpriseSSOInstance(signIn.create(buildSignInParams(fields)), fields);
-
-      switch (res.status) {
-        case 'needs_identifier':
-          // Check if we need to initiate an enterprise sso flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
-            await authenticateWithEnterpriseSSO();
-          }
-          break;
-        case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
-            return navigate('factor-one');
-          }
-
-          return authenticateWithEnterpriseSSO();
-        }
-        case 'needs_second_factor':
-          return navigate('factor-two');
-        case 'needs_client_trust':
-          return navigate('client-trust');
-        case 'complete':
-          return clerk.setActive({
-            session: res.createdSessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-            },
-          });
-        default: {
-          console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-          return;
-        }
-      }
-    } catch (e: any) {
-      return attemptToRecoverFromSignInError(e);
-    }
-  };
-
-  const authenticateWithEnterpriseSSO = async () => {
-    const redirectUrl = ctx.ssoCallbackUrl;
-    const redirectUrlComplete = ctx.afterSignInUrl || '/';
-
-    return signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-    });
-  };
-
-  const attemptToRecoverFromSignInError = async (e: any) => {
-    if (!e.errors) {
-      return;
-    }
-    const instantPasswordError: ClerkAPIError = e.errors.find(
-      (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
-        e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
-        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
-    );
-
-    const sessionAlreadyExistsError: ClerkAPIError = e.errors.find(
-      (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
-    );
-    const alreadySignedInError: ClerkAPIError = e.errors.find(
-      (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
-    );
-    const accountDoesNotExistError: ClerkAPIError = e.errors.find(
-      (e: ClerkAPIError) =>
-        e.code === ERROR_CODES.INVITATION_ACCOUNT_NOT_EXISTS || e.code === ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND,
-    );
-
-    if (instantPasswordError) {
-      await signInWithFields(identifierField);
-    } else if (sessionAlreadyExistsError) {
-      await clerk.setActive({
-        session: clerk.client.lastActiveSessionId,
-        navigate: async ({ session, decorateUrl }) => {
-          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-        },
-      });
-    } else if (alreadySignedInError) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const sid = alreadySignedInError.meta!.sessionId!;
-      await clerk.setActive({
-        session: sid,
-        navigate: async ({ session, decorateUrl }) => {
-          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-        },
-      });
-    } else if (isCombinedFlow && accountDoesNotExistError) {
-      const attribute = getSignUpAttributeFromIdentifier(identifierField);
-
-      if (userSettings.signUp.mode === SIGN_UP_MODES.WAITLIST) {
-        const waitlistUrl = clerk.buildWaitlistUrl(
-          attribute === 'emailAddress'
-            ? {
-                initialValues: {
-                  [attribute]: identifierField.value,
-                },
-              }
-            : {},
-        );
-        return navigate(waitlistUrl);
-      }
-
-      clerk.client.signUp[attribute] = identifierField.value;
-
-      const redirectUrl = ctx.ssoCallbackUrl;
-      const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
-      return handleCombinedFlowTransfer({
-        afterSignUpUrl: ctx.afterSignUpUrl || '/',
-        clerk,
-        handleError: e => handleError(e, [identifierField, instantPasswordField], card.setError),
-        identifierAttribute: attribute,
-        identifierValue: identifierField.value,
-        navigate,
-        organizationTicket,
-        signUpMode: userSettings.signUp.mode,
-        redirectUrl,
-        redirectUrlComplete,
-        navigateOnSetActive,
-        passwordEnabled: userSettings.attributes.password?.required ?? false,
-        alternativePhoneCodeChannel:
-          alternativePhoneCodeProvider?.channel ||
-          getPreferredAlternativePhoneChannelForCombinedFlow(
-            authConfig.preferredChannels,
-            attribute,
-            identifierField.value,
-          ),
-        unsafeMetadata: ctx.unsafeMetadata,
-      });
-    } else {
-      handleError(e, [identifierField, instantPasswordField], card.setError);
-    }
-  };
-
   const handleFirstPartySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    return signInWithFields(identifierField, instantPasswordField);
+    return signInWithFields([identifierField, instantPasswordField]);
+  };
+
+  const handleForgotPasswordClick: React.MouseEventHandler = e => {
+    e.preventDefault();
+    // Surface the same native required-field validation as the Continue button
+    // when the identifier is missing
+    const form = e.currentTarget.closest('form');
+    if (form && !form.reportValidity()) {
+      return;
+    }
+    void signInWithFields([identifierField], { resetPasswordIntent: true });
   };
 
   const DynamicField = useMemo(() => {
@@ -542,6 +606,11 @@ function SignInStartInternal(): JSX.Element {
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
+
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
 
   return (
     <Flow.Part part='start'>
@@ -574,6 +643,12 @@ function SignInStartInternal(): JSX.Element {
             <Col
               elementDescriptor={descriptors.main}
               gap={6}
+              {...inertProps(captchaIsInteractive)}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {hasSocialOrWeb3Buttons && (
@@ -596,31 +671,41 @@ function SignInStartInternal(): JSX.Element {
                           onActionClicked={switchToNextIdentifier}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
-                          autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          autoComplete={
+                            isWebAuthnAutofillSupported
+                              ? `${currentIdentifier.autoComplete} webauthn`
+                              : currentIdentifier.autoComplete
+                          }
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
-                      <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                      <InstantPasswordRow
+                        field={passwordBasedInstance ? instantPasswordField : undefined}
+                        onForgotPasswordClick={handleForgotPasswordClick}
+                      />
                     </Col>
                     <Col center>
-                      <CaptchaElement />
                       <Form.SubmitButton hasArrow />
                     </Col>
                   </Form.Root>
                 ) : null}
               </SocialButtonsReversibleContainerWithDivider>
-              {!standardFormAttributes.length && <CaptchaElement />}
-              {userSettings.attributes.passkey?.enabled &&
-                userSettings.passkeySettings.show_sign_in_button &&
-                isWebSupported && (
-                  <Card.Action elementId={'usePasskey'}>
-                    <Card.ActionLink
-                      localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                      onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
-                    />
-                  </Card.Action>
-                )}
             </Col>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
+            {/* Kept outside descriptors.main so the spotlight's `inert` leaves this alternative action reachable. */}
+            {userSettings.attributes.passkey?.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Card.Content>
           <Card.Footer>
             {userSettings.signUp.mode === SIGN_UP_MODES.PUBLIC && !isCombinedFlow && (
@@ -655,15 +740,13 @@ function SignInStartInternal(): JSX.Element {
   );
 }
 
-const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn.supportedFirstFactors?.length) {
-    return false;
-  }
-
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
-};
-
-const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
+const InstantPasswordRow = ({
+  field,
+  onForgotPasswordClick,
+}: {
+  field?: FormControlState<'password'>;
+  onForgotPasswordClick?: React.MouseEventHandler;
+}) => {
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   const show = !!(autofilled || field?.value);
@@ -702,12 +785,26 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   return (
     <Form.ControlRow
       elementId={field.id}
-      sx={show ? undefined : { position: 'absolute', opacity: 0, height: 0, pointerEvents: 'none', marginTop: '-1rem' }}
+      aria-hidden={show ? undefined : true}
+      sx={
+        show
+          ? undefined
+          : {
+              position: 'absolute',
+              opacity: 0,
+              height: 0,
+              overflow: 'hidden',
+              pointerEvents: 'none',
+              marginTop: '-1rem',
+            }
+      }
     >
       <Form.PasswordInput
         {...field.props}
-        ref={ref}
+        actionLabel={show ? localizationKeys('formFieldAction__forgotPassword') : undefined}
+        onActionClicked={show ? onForgotPasswordClick : undefined}
         tabIndex={show ? undefined : -1}
+        ref={ref}
       />
     </Form.ControlRow>
   );

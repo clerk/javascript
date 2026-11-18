@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
+import { OptionsProvider } from '../../../contexts';
 import { OAuthConsent } from '../OAuthConsent';
 
 const { createFixtures } = bindCreateFixtures('OAuthConsent');
@@ -13,6 +14,7 @@ const fakeConsentInfo = {
   oauthApplicationUrl: 'https://example.com',
   clientId: 'client_test',
   state: 'abc',
+  redirectDomain: 'example.com',
   scopes: [
     { scope: 'openid', description: 'View your identity', requiresConsent: true },
     { scope: 'email', description: 'Access your email address', requiresConsent: true },
@@ -24,6 +26,14 @@ const fakeConsentInfoWithOrgScope = {
   scopes: [
     ...fakeConsentInfo.scopes,
     { scope: 'user:org:read', description: 'Access your organizations', requiresConsent: true },
+  ],
+};
+
+const fakeConsentInfoWithPrivateMetadataScope = {
+  ...fakeConsentInfo,
+  scopes: [
+    ...fakeConsentInfo.scopes,
+    { scope: 'private_metadata', description: 'Your private metadata', requiresConsent: true },
   ],
 };
 
@@ -88,12 +98,92 @@ describe('OAuthConsent', () => {
 
     await waitFor(() => {
       expect(getByText('Clerk CLI')).toBeVisible();
+      expect(getByText('This will allow Clerk CLI access to:')).toBeVisible();
       expect(getByText('View your identity')).toBeVisible();
       expect(getByText('Access your email address')).toBeVisible();
     });
 
     expect(getConsentInfo).toHaveBeenCalledWith({
       oauthClientId: 'client_test',
+      redirectUri: 'https://app.example/callback',
+    });
+  });
+
+  it('identifies private metadata as potentially sensitive data set by the Clerk application', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithPrivateMetadataScope),
+    });
+
+    const { getByText, queryByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Your private metadata set by TestApp, which may include sensitive information')).toBeVisible();
+    });
+    expect(queryByText('Your private metadata')).toBeNull();
+  });
+
+  it('hides the scope list when only offline_access is requested', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({
+        ...fakeConsentInfo,
+        scopes: [{ scope: 'offline_access', description: 'Offline access', requiresConsent: true }],
+      }),
+    });
+
+    const { getByText, queryByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText(/You'll stay signed in until you sign out or revoke access\./)).toBeVisible();
+    });
+    expect(queryByText('This will allow Clerk CLI access to:')).toBeNull();
+  });
+
+  it('supports localizing the private metadata scope description', async () => {
+    const {
+      wrapper: Wrapper,
+      fixtures,
+      props,
+    } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithPrivateMetadataScope),
+    });
+
+    const wrapper = ({ children }) => (
+      <Wrapper>
+        <OptionsProvider
+          value={{
+            localization: {
+              oauthConsent: {
+                scopeList: {
+                  privateMetadata: 'Localized private metadata from {{applicationName}}',
+                },
+              },
+            },
+          }}
+        >
+          {children}
+        </OptionsProvider>
+      </Wrapper>
+    );
+
+    const { getByText } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Localized private metadata from TestApp')).toBeVisible();
     });
   });
 
@@ -204,6 +294,7 @@ describe('OAuthConsent', () => {
       expect(getConsentInfo).toHaveBeenCalledWith({
         oauthClientId: 'override_id',
         scope: 'openid email',
+        redirectUri: 'https://app.example/callback',
       });
     });
   });
@@ -390,7 +481,7 @@ describe('OAuthConsent', () => {
       });
     });
 
-    it('does not display user:org:read in the scopes list', async () => {
+    it('displays user:org:read in the scopes list', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['jane@example.com'],
@@ -407,7 +498,7 @@ describe('OAuthConsent', () => {
       const { queryByText } = render(<OAuthConsent />, { wrapper });
 
       await waitFor(() => {
-        expect(queryByText('Access your organizations')).toBeNull();
+        expect(queryByText('Access your organizations')).toBeVisible();
       });
     });
 
@@ -537,6 +628,33 @@ describe('OAuthConsent', () => {
         expect(hiddenInput).not.toBeNull();
         expect(hiddenInput!.value).toBe('org_1');
       });
+    });
+  });
+
+  it('renders the branded logo badge for a recognized client with no uploaded logo', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({
+        ...fakeConsentInfo,
+        oauthApplicationName: 'Claude',
+        oauthApplicationLogoUrl: '',
+        redirectDomain: 'claude.ai',
+      }),
+    });
+
+    const { getByText, baseElement } = render(<OAuthConsent />, { wrapper });
+
+    await waitFor(() => {
+      expect(getByText('Claude')).toBeVisible();
+      const icon = baseElement.querySelector('.cl-logoGroupIcon');
+      expect(icon).not.toBeNull();
+      // The brand mark conveys which app is requesting access, so it needs an accessible name.
+      expect(icon).toHaveAttribute('role', 'img');
+      expect(icon).toHaveAttribute('aria-label', 'Claude');
     });
   });
 });

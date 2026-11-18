@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_chrome_extension)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
+[![Follow on X](https://img.shields.io/twitter/follow/clerk?style=social)](https://x.com/intent/follow?screen_name=clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/chrome-extension/CHANGELOG.md)
 ·
@@ -55,7 +55,7 @@ Please see the latest extension [authentication support matrix](https://clerk.co
          -d '{"allowed_origins": ["chrome-extension://<YOUR_EXTENSION_KEY>"]}'
    ```
 
-4. **Set Environment Variables:** Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys&utm_source=github&utm_medium=clerk_chrome_extension) and set it as an environment variable.
+4. **Set Environment Variables:** Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/~/api-keys?utm_source=github&utm_medium=clerk_chrome_extension) and set it as an environment variable.
 
    ```sh
    # Vite
@@ -82,10 +82,11 @@ Please see the latest extension [authentication support matrix](https://clerk.co
 
 ## Support
 
-You can get in touch with us in any of the following ways:
+For help, visit our [support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_chrome_extension).
 
-- Join our official community [Discord server](https://clerk.com/discord)
-- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_chrome_extension)
+## Community
+
+Join our [Discord community](https://clerk.com/discord) to connect with other developers.
 
 ## Contributing
 

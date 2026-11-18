@@ -2,6 +2,8 @@ export { assertContextExists, createContextAndHook } from './createContextAndHoo
 export { useAPIKeys } from './useAPIKeys';
 export { useOAuthConsent } from './useOAuthConsent';
 export type { UseOAuthConsentParams, UseOAuthConsentReturn } from './useOAuthConsent.types';
+export { useOAuthDeviceVerification } from './useOAuthDeviceVerification';
+export type { UseOAuthDeviceVerificationReturn } from './useOAuthDeviceVerification.types';
 export { useOrganization } from './useOrganization';
 export { useOrganizationCreationDefaults } from './useOrganizationCreationDefaults';
 export type {
@@ -23,6 +25,7 @@ export { usePaymentMethods as __experimental_usePaymentMethods } from './usePaym
 export { usePlans as __experimental_usePlans } from './usePlans';
 export { useSubscription as __experimental_useSubscription } from './useSubscription';
 export { useCheckout as __experimental_useCheckout } from './useCheckout';
+export { __internal_useCreditBalanceQuery } from './useCreditBalance';
 
 /**
  * Internal hooks to be consumed only by `@clerk/clerk-js`.
@@ -30,6 +33,7 @@ export { useCheckout as __experimental_useCheckout } from './useCheckout';
  *
  * These exist here in order to keep React Query implementations in a centralized place.
  */
+export { __internal_useCreditHistoryQuery } from './useCreditHistory';
 export { __internal_useStatementQuery } from './useStatementQuery';
 export { __internal_usePlanDetailsQuery } from './usePlanDetailsQuery';
 export { __internal_usePaymentAttemptQuery } from './usePaymentAttemptQuery';
@@ -38,6 +42,49 @@ export type {
   UseUserEnterpriseConnectionsParams,
   UseUserEnterpriseConnectionsReturn,
 } from './useUserEnterpriseConnections';
+export { __internal_useOrganizationEnterpriseConnections } from './useOrganizationEnterpriseConnections';
+export type {
+  UseOrganizationEnterpriseConnectionsParams,
+  UseOrganizationEnterpriseConnectionsReturn,
+} from './useOrganizationEnterpriseConnections';
+export { __internal_useOrganizationDomains } from './useOrganizationDomains';
+export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from './useOrganizationDomains';
+export { __internal_useOrganizationDirectorySync } from './useOrganizationDirectorySync';
+export type {
+  UseOrganizationDirectorySyncParams,
+  UseOrganizationDirectorySyncReturn,
+} from './useOrganizationDirectorySync';
+export { __internal_useOrganizationDirectorySyncUsers } from './useOrganizationDirectorySyncUsers';
+export type {
+  UseOrganizationDirectorySyncUsersParams,
+  UseOrganizationDirectorySyncUsersReturn,
+} from './useOrganizationDirectorySyncUsers';
+export { __internal_useOrganizationDirectorySyncStatus } from './useOrganizationDirectorySyncStatus';
+export { __internal_useOrganizationDirectorySyncGroupRoleMappings } from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  DirectorySyncGroupRoleMappingsData,
+  UseOrganizationDirectorySyncGroupRoleMappingsParams,
+  UseOrganizationDirectorySyncGroupRoleMappingsReturn,
+} from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  UseOrganizationDirectorySyncStatusParams,
+  UseOrganizationDirectorySyncStatusReturn,
+} from './useOrganizationDirectorySyncStatus';
+export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
+export type {
+  UseOrganizationEnterpriseConnectionTestRunsParams,
+  UseOrganizationEnterpriseConnectionTestRunsRevalidateResult,
+  UseOrganizationEnterpriseConnectionTestRunsReturn,
+} from './useOrganizationEnterpriseConnectionTestRuns';
+export { __internal_useOrganizationSSOBypassAllowlist } from './useOrganizationSSOBypassAllowlist';
+export type {
+  UseOrganizationSSOBypassAllowlistParams,
+  UseOrganizationSSOBypassAllowlistReturn,
+} from './useOrganizationSSOBypassAllowlist';
+
+export { createCacheKeys as __internal_createCacheKeys } from './createCacheKeys';
+export { useClearQueriesOnSignOut as __internal_useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
+export { useClerkQuery as __internal_useClerkQuery } from '../query/useQuery';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

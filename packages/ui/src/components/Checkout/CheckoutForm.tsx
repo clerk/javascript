@@ -1,21 +1,42 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { DevModeOverlay } from '@/ui/elements/DevModeNotice';
 import { Drawer } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { getSeatUnitPrice } from '@/ui/utils/billingPlanSeats';
+import { getDiscountDescription, toNegativeAmount } from '@/ui/utils/billing';
+import {
+  getCheckoutSeatUnitTotal,
+  getIncludedSeatsUnitTotalTier,
+  getPaidSeatsUnitTotalTier,
+  getSeatUnitPrice,
+} from '@/ui/utils/billingPlanSeats';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
-import { ChevronUpDown, InformationCircle } from '../../icons';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Form,
+  Icon,
+  Input,
+  localizationKeys,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '../../customizables';
+import { ChevronUpDown, Close, InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
@@ -27,8 +48,173 @@ const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 const HIDDEN_INPUT_NAME = 'payment_method_id';
 
+const promoCodeErrorMessage = (error: unknown) => {
+  if (isClerkAPIResponseError(error)) {
+    return error.errors[0]?.longMessage || error.errors[0]?.message;
+  }
+  return error instanceof Error ? error.message : undefined;
+};
+
+const useUpdatePromoCode = () => {
+  const { checkout } = useCheckout();
+  const { t } = useLocalizations();
+  const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const updatePromoCode = async (value: string) => {
+    setError(undefined);
+    setIsLoading(true);
+    const result = await checkout.update({ promoCode: value });
+    setIsLoading(false);
+
+    if (result.error) {
+      setError(promoCodeErrorMessage(result.error) || t(localizationKeys('unstable__errors.form_param_value_invalid')));
+      return false;
+    }
+
+    return true;
+  };
+
+  return { error, isLoading, setError, updatePromoCode };
+};
+
+const AppliedPromoCodeRow = () => {
+  const { checkout } = useCheckout();
+  const { $, t } = useLocalizations();
+  const { isLoading, updatePromoCode } = useUpdatePromoCode();
+  const discount = checkout.status === 'needs_confirmation' ? checkout.totals.discounts?.discount : undefined;
+  const appliedPromoCode = discount?.promoCode;
+
+  if (!discount || !appliedPromoCode) {
+    return null;
+  }
+
+  return (
+    <LineItems.Group
+      variant='primary'
+      borderTop
+    >
+      <LineItems.Title
+        title={appliedPromoCode}
+        description={
+          checkout.planPeriod
+            ? getDiscountDescription(discount, discount.cyclesRemaining, checkout.planPeriod, { $, t })
+            : undefined
+        }
+        badge={
+          <Button
+            elementDescriptor={descriptors.checkoutFormPromoCodeRemoveButton}
+            type='button'
+            variant='ghost'
+            colorScheme='neutral'
+            aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
+            isDisabled={isLoading}
+            onClick={() => void updatePromoCode('')}
+            sx={{
+              padding: 0,
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: '-18px',
+              },
+            }}
+          >
+            <Icon
+              icon={Close}
+              size='xs'
+            />
+          </Button>
+        }
+      />
+      <LineItems.Description
+        text={$(toNegativeAmount(discount.amount))}
+        descriptionInnerAlignment='start'
+      />
+    </LineItems.Group>
+  );
+};
+
+const PromoCodeInput = () => {
+  const { checkout } = useCheckout();
+  const { t } = useLocalizations();
+  const [promoCode, setPromoCode] = useState('');
+  const { error, isLoading, setError, updatePromoCode } = useUpdatePromoCode();
+
+  if (checkout.status !== 'needs_confirmation' || checkout.totals.discounts?.discount) {
+    return null;
+  }
+
+  const errorId = 'checkout-promo-code-error';
+
+  return (
+    <Box
+      elementDescriptor={descriptors.checkoutFormPromoCodeRoot}
+      sx={theme => ({
+        padding: theme.space.$4,
+        borderBottomWidth: theme.borderWidths.$normal,
+        borderBottomStyle: theme.borderStyles.$solid,
+        borderBottomColor: theme.colors.$borderAlpha100,
+      })}
+    >
+      <Box
+        as='form'
+        onSubmit={event => {
+          event.preventDefault();
+          void updatePromoCode(promoCode.trim()).then(success => {
+            if (success) {
+              setPromoCode('');
+            }
+          });
+        }}
+        sx={theme => ({
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) auto',
+          gap: theme.space.$2,
+        })}
+      >
+        <Input
+          elementDescriptor={descriptors.checkoutFormPromoCodeInput}
+          aria-label={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          aria-describedby={error ? errorId : undefined}
+          hasError={Boolean(error)}
+          isDisabled={isLoading}
+          placeholder={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          value={promoCode}
+          onChange={event => {
+            setPromoCode(event.target.value);
+            setError(undefined);
+          }}
+        />
+        <Button
+          elementDescriptor={descriptors.checkoutFormPromoCodeApplyButton}
+          type='submit'
+          variant='bordered'
+          colorScheme='secondary'
+          isDisabled={!promoCode.trim()}
+          isLoading={isLoading}
+          localizationKey={localizationKeys('billing.checkout.applyPromoCode')}
+        />
+        {error ? (
+          <Text
+            elementDescriptor={descriptors.checkoutFormPromoCodeErrorText}
+            id={errorId}
+            role='alert'
+            variant='caption'
+            colorScheme='danger'
+            sx={{ gridColumn: '1 / -1' }}
+          >
+            {error}
+          </Text>
+        ) : null}
+      </Box>
+    </Box>
+  );
+};
+
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
+  const { $ } = useLocalizations();
 
   const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
@@ -39,18 +225,27 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showProratedCredit = !!totals.credits?.proration?.amount && totals.credits.proration.amount.amount > 0;
   const showAccountCredits = !!totals.credits?.payer?.appliedAmount && totals.credits.payer.appliedAmount.amount > 0;
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
+  const showProratedDiscount = !!totals.discounts?.proration?.amount && totals.discounts.proration.amount.amount > 0;
+  const showRenewalTotals =
+    !!totals.totalsDuePerPeriod &&
+    totals.totalDueNow &&
+    totals.totalsDuePerPeriod.grandTotal.amount !== totals.totalDueNow.amount;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee =
-    planPeriod === 'month'
-      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.fee!
-      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        plan.annualMonthlyFee!;
+  const seatPerUnitTotal = getCheckoutSeatUnitTotal(totals);
+  const includedSeatsTier = getIncludedSeatsUnitTotalTier(seatPerUnitTotal);
+  const paidSeatsTier = getPaidSeatsUnitTotalTier(seatPerUnitTotal);
 
-  const descriptionElements = [];
+  const descriptionElements: Array<ReturnType<typeof localizationKeys>> = [];
   if (planPeriod === 'annual') {
     descriptionElements.push(localizationKeys('billing.billedAnnually'));
+  }
+  if (includedSeatsTier && includedSeatsTier.quantity !== null) {
+    descriptionElements.push(
+      localizationKeys('billing.pricingTable.seatCost.includedSeats', {
+        includedSeats: includedSeatsTier.quantity,
+      }),
+    );
   }
   const seatUnitPrice = getSeatUnitPrice(plan);
   if (seatUnitPrice && seatUnitPrice.tiers.length === 1 && seatUnitPrice.tiers[0].feePerBlock.amount === 0) {
@@ -85,24 +280,36 @@ export const CheckoutForm = withCardStateProvider(() => {
                 ) : null
               }
             />
-            <LineItems.Description
-              prefix={planPeriod === 'annual' ? 'x12' : undefined}
-              text={`${fee.currencySymbol}${fee.amountFormatted}`}
-              suffix={localizationKeys('billing.checkout.perMonth')}
-            />
+            {totals.baseFee ? (
+              <LineItems.Description
+                text={$(totals.baseFee)}
+                suffix={planPeriod === 'month' ? localizationKeys('billing.checkout.perMonth') : undefined}
+              />
+            ) : null}
           </LineItems.Group>
-          <LineItems.Group
-            borderTop
-            variant='tertiary'
-          >
-            <LineItems.Title title={localizationKeys('billing.subtotal')} />
-            <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
-          </LineItems.Group>
+          {paidSeatsTier && paidSeatsTier.quantity !== null && (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.seats')} />
+              <LineItems.Description
+                prefix={`${paidSeatsTier.quantity} x`}
+                text={$(paidSeatsTier.feePerBlock)}
+                suffix={localizationKeys('billing.checkout.perMonth')}
+              />
+            </LineItems.Group>
+          )}
+          {showProratedDiscount && (
+            <LineItems.Group variant='tertiary'>
+              <LineItems.Title title={localizationKeys('billing.proratedDiscount')} />
+              <LineItems.Description
+                text={totals.discounts?.proration?.amount ? $(toNegativeAmount(totals.discounts.proration.amount)) : ''}
+              />
+            </LineItems.Group>
+          )}
           {showProratedCredit && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
               <LineItems.Description
-                text={`- ${totals.credits?.proration?.amount.currencySymbol}${totals.credits?.proration?.amount.amountFormatted}`}
+                text={totals.credits?.proration?.amount ? $(toNegativeAmount(totals.credits.proration.amount)) : ''}
               />
             </LineItems.Group>
           )}
@@ -110,7 +317,9 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Group variant='tertiary'>
               <LineItems.Title title={localizationKeys('billing.payerCreditRemainder')} />
               <LineItems.Description
-                text={`- ${totals.credits?.payer?.appliedAmount?.currencySymbol}${totals.credits?.payer?.appliedAmount?.amountFormatted}`}
+                text={
+                  totals.credits?.payer?.appliedAmount ? $(toNegativeAmount(totals.credits.payer.appliedAmount)) : ''
+                }
               />
             </LineItems.Group>
           )}
@@ -125,29 +334,48 @@ export const CheckoutForm = withCardStateProvider(() => {
                 </Tooltip.Trigger>
                 <Tooltip.Content text={localizationKeys('billing.checkout.pastDueNotice')} />
               </Tooltip.Root>
-              <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
+              <LineItems.Description text={totals.pastDue ? $(totals.pastDue) : ''} />
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
+          <AppliedPromoCodeRow />
+
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial ? (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('billing.checkout.totalDueAfterTrial', {
                   days: plan.freeTrialDays,
                 })}
               />
-              <LineItems.Description
-                text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
-              />
+              <LineItems.Description text={$(totals.totalDueAfterFreeTrial)} />
+            </LineItems.Group>
+          ) : showRenewalTotals ? null : totals.totalDuePerPeriod ? (
+            <LineItems.Group
+              borderTop
+              variant='tertiary'
+            >
+              <LineItems.Title title={localizationKeys('billing.checkout.totalDuePerPeriod')} />
+              <LineItems.Description text={$(totals.totalDuePerPeriod)} />
+            </LineItems.Group>
+          ) : null}
+
+          {totals.totalDueNow ? (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
+              <LineItems.Description text={$(totals.totalDueNow)} />
+            </LineItems.Group>
+          ) : null}
+
+          {showRenewalTotals && (
+            <LineItems.Group borderTop>
+              <LineItems.Title title={localizationKeys('billing.totalDuePerPeriod')} />
+              <LineItems.Description text={totals.totalsDuePerPeriod ? $(totals.totalsDuePerPeriod.grandTotal) : ''} />
             </LineItems.Group>
           )}
-
-          <LineItems.Group borderTop>
-            <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
-          </LineItems.Group>
         </LineItems.Root>
       </Box>
+
+      <PromoCodeInput />
 
       {showDowngradeInfo && (
         <Box
@@ -320,17 +548,10 @@ export const PayWithTestPaymentMethod = () => {
         flexDirection: 'column',
         rowGap: t.space.$2,
         position: 'relative',
+        overflow: 'hidden',
       })}
     >
-      <Box
-        sx={t => ({
-          position: 'absolute',
-          inset: 0,
-          background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-          maskImage: `linear-gradient(transparent 20%, black)`,
-          pointerEvents: 'none',
-        })}
-      />
+      <DevModeOverlay />
       <Flex
         sx={t => ({
           alignItems: 'center',
@@ -362,6 +583,8 @@ export const PayWithTestPaymentMethod = () => {
 
 const useSubmitLabel = () => {
   const { checkout } = useCheckout();
+  const { seatsQuantity } = useCheckoutContext();
+  const { $ } = useLocalizations();
   const { status, freeTrialEndsAt, totals } = checkout;
 
   if (status === 'needs_initialization') {
@@ -369,12 +592,17 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
+    if (seatsQuantity && totals.totalDueNow) {
+      return localizationKeys('billing.pay', {
+        amount: $(totals.totalDueNow),
+      });
+    }
     return localizationKeys('billing.startFreeTrial');
   }
 
-  if (totals.totalDueNow.amount > 0) {
+  if (totals.totalDueNow && totals.totalDueNow.amount > 0) {
     return localizationKeys('billing.pay', {
-      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+      amount: $(totals.totalDueNow),
     });
   }
 

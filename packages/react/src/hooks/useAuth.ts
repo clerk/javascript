@@ -8,7 +8,7 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/shared/types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
@@ -33,9 +33,9 @@ type UseAuthOptions = PendingSessionOptions | undefined | null;
  * </If>
  *
  * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
+ * ["Loading", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @param [options] - An object containing options for the `useAuth()` hook. `treatPendingAsSignedOut` indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
  *
  * @function
  *
@@ -99,8 +99,8 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
   const authState = useAuthBase();
 
   const isomorphicClerk = useIsomorphicClerkContext();
-  const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
-  const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
+  const getToken: GetToken = useMemo(() => createGetToken(isomorphicClerk), [isomorphicClerk]);
+  const signOut: SignOut = useMemo(() => createSignOut(isomorphicClerk), [isomorphicClerk]);
 
   isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
 

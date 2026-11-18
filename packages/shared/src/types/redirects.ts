@@ -1,12 +1,15 @@
+import type { HandleOAuthCallbackParams } from './clerk';
 import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
+/** @generateWithEmptyComment */
 export type AfterSignOutUrl = {
   /**
-   * Full URL or path to navigate to after successful sign out.
+   * The full URL or path to navigate to after successful sign out.
    */
   afterSignOutUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type AfterMultiSessionSingleSignOutUrl = {
   /**
    * The full URL or path to navigate to after signing out the current user is complete.
@@ -17,7 +20,6 @@ export type AfterMultiSessionSingleSignOutUrl = {
 
 /**
  * Redirect URLs for different actions.
- * Mainly used to be used to type internal Clerk functions.
  */
 export type RedirectOptions = SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -25,6 +27,7 @@ export type RedirectOptions = SignInForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   RedirectUrlProp;
 
+/** @generateWithEmptyComment */
 export type AuthenticateWithRedirectParams = {
   /**
    * The full URL or path to the route that will complete the OAuth or SAML flow.
@@ -39,7 +42,7 @@ export type AuthenticateWithRedirectParams = {
   redirectUrlComplete: string;
 
   /**
-   * Whether to continue (i.e. PATCH) an existing SignUp (if present) or create a new SignUp.
+   * Whether to continue (i.e., PATCH) an existing SignUp (if present) or create a new SignUp.
    */
   continueSignUp?: boolean;
 
@@ -73,6 +76,19 @@ export type AuthenticateWithRedirectParams = {
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamIdHint?: string;
+
+  /**
+   * Internal OAuth callback context, consumed only when an OAuth transport completes the
+   * flow in-process. Ignored by the web redirect/popup paths. Shape matches the params
+   * the prebuilt SSO callback route passes to `handleRedirectCallback`.
+   *
+   * @internal
+   */
+  __internal_callbackParams?: HandleOAuthCallbackParams;
 
   /**
    * @experimental
@@ -82,6 +98,7 @@ export type AuthenticateWithRedirectParams = {
 
 export type AuthenticateWithPopupParams = AuthenticateWithRedirectParams & { popup: Window | null };
 
+/** @generateWithEmptyComment */
 export type RedirectUrlProp = {
   /**
    * Full URL or path to navigate to after a successful action.
@@ -89,13 +106,15 @@ export type RedirectUrlProp = {
   redirectUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type SignUpForceRedirectUrl = {
   /**
-   * This URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * If provided, this URL will always be redirected to after the user signs up. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signUpForceRedirectUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type SignUpFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
@@ -105,6 +124,7 @@ export type SignUpFallbackRedirectUrl = {
   signUpFallbackRedirectUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type SignInFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
@@ -114,16 +134,18 @@ export type SignInFallbackRedirectUrl = {
   signInFallbackRedirectUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type SignInForceRedirectUrl = {
   /**
-   * This URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   * If provided, this URL will always be redirected to after the user signs in. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
    */
   signInForceRedirectUrl?: string | null;
 };
 
+/** @generateWithEmptyComment */
 export type NewSubscriptionRedirectUrl = {
   /**
-   * The URL to navigate to after the user completes the checkout and clicks the "Continue" button.
+   * The full URL or path to navigate to after the user completes the checkout and clicks the "Continue" button.
    */
   newSubscriptionRedirectUrl?: string | null;
 };

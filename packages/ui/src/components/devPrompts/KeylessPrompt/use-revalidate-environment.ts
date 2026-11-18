@@ -12,10 +12,11 @@ const THROTTLE_DURATION_MS = 10 * 1000;
  */
 function useRevalidateEnvironment() {
   const clerk = useClerk();
-  const lastTouchTimestamp = useRef(Date.now());
+  const lastTouchTimestamp = useRef(0);
   const [, forceUpdate] = useReducer(v => v + 1, 0);
 
   useEffect(() => {
+    lastTouchTimestamp.current = Date.now();
     const controller = new AbortController();
     window.addEventListener(
       'focus',

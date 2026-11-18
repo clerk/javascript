@@ -1,6 +1,10 @@
 import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } from './devCache';
 import type { AccountlessApplication } from './types';
 
+const KEYLESS_SOURCE_FALLBACK = 'javascript';
+// Keep the source compact for BAPI metadata dimensions while covering common framework identifiers.
+const KEYLESS_SOURCE_MAX_LENGTH = 36;
+
 /**
  * Storage adapter interface for keyless mode.
  * Implementations can use file system, cookies, or other storage mechanisms.
@@ -38,17 +42,19 @@ export interface KeylessAPI {
    * Creates a new accountless application.
    *
    * @param requestHeaders - Optional headers to include with the request.
+   * @param source - Optional source value to include with the request.
    * @returns The created AccountlessApplication or null if failed.
    */
-  createAccountlessApplication(requestHeaders?: Headers): Promise<AccountlessApplication | null>;
+  createAccountlessApplication(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
 
   /**
    * Notifies the backend that onboarding is complete (instance has been claimed).
    *
    * @param requestHeaders - Optional headers to include with the request.
+   * @param source - Optional source value to include with the request.
    * @returns The updated AccountlessApplication or null if failed.
    */
-  completeOnboarding(requestHeaders?: Headers): Promise<AccountlessApplication | null>;
+  completeOnboarding(requestHeaders?: Headers, source?: string): Promise<AccountlessApplication | null>;
 }
 
 /**
@@ -145,6 +151,16 @@ function createMetadataHeaders(framework?: string, frameworkVersion?: string): H
   return headers;
 }
 
+function createSource(framework?: string): string {
+  const source = (framework || KEYLESS_SOURCE_FALLBACK)
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, KEYLESS_SOURCE_MAX_LENGTH);
+
+  return source || KEYLESS_SOURCE_FALLBACK;
+}
+
 /**
  * Creates a keyless service that handles accountless application creation and storage.
  * This provides a simple API for frameworks to integrate keyless mode.
@@ -172,6 +188,7 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
   const { storage, api, framework, frameworkVersion } = options;
 
   let hasLoggedKeylessMessage = false;
+  const source = createSource(framework);
 
   const safeParseConfig = (): AccountlessApplication | undefined => {
     try {
@@ -197,7 +214,7 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
       const headers = createMetadataHeaders(framework, frameworkVersion);
 
       // Create new keys via the API
-      const accountlessApplication = await api.createAccountlessApplication(headers);
+      const accountlessApplication = await api.createAccountlessApplication(headers, source);
 
       if (accountlessApplication) {
         storage.write(JSON.stringify(accountlessApplication));
@@ -216,7 +233,7 @@ export function createKeylessService(options: KeylessServiceOptions): KeylessSer
 
     async completeOnboarding(): Promise<AccountlessApplication | null> {
       const headers = createMetadataHeaders(framework, frameworkVersion);
-      return api.completeOnboarding(headers);
+      return api.completeOnboarding(headers, source);
     },
 
     logKeylessMessage(claimUrl: string): void {

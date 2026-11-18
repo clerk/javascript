@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "2.4.1",
+  "version": "3.1.25",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -55,11 +55,13 @@
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -78,12 +80,12 @@
   },
   "devDependencies": {
     "h3": "^1.15.4",
-    "nuxt": "^4.4.4",
+    "nuxt": "^4.5.1",
     "typescript": "catalog:repo",
     "vue": "catalog:repo"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "publishConfig": {
     "access": "public"

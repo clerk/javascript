@@ -1,7 +1,8 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
-import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
@@ -11,13 +12,14 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
-import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
@@ -30,7 +32,7 @@ import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFo
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { SignUpStartAlternativePhoneCodePhoneNumberCard } from './SignUpStartAlternativePhoneCodePhoneNumberCard';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
@@ -41,10 +43,10 @@ function SignUpStartInternal(): JSX.Element {
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
-  const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
+  const { signInUrl, unsafeMetadata } = ctx;
+  const completeSignUpFlow = useCompleteSignUpFlow();
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
@@ -65,6 +67,9 @@ function SignUpStartInternal(): JSX.Element {
   );
 
   const [missingRequirementsWithTicket, setMissingRequirementsWithTicket] = React.useState(false);
+  // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
+  // rest of the card (see the descriptors.main column below).
+  const [captchaIsInteractive, setCaptchaIsInteractive] = React.useState(false);
 
   const {
     userSettings: { passwordSettings, usernameSettings },
@@ -128,7 +133,6 @@ function SignUpStartInternal(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
-  const oidcPrompt = ctx.oidcPrompt;
 
   const fields = determineActiveFields({
     attributes,
@@ -155,28 +159,12 @@ function SignUpStartInternal(): JSX.Element {
           setMissingRequirementsWithTicket(true);
         }
 
-        const redirectUrl = ctx.ssoCallbackUrl;
-        const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
         return completeSignUpFlow({
           signUp,
-          redirectUrl,
-          redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          protectCheckPath: 'protect-check',
           continuePath: 'continue',
-          handleComplete: () => {
-            removeClerkQueryParam('__clerk_ticket');
-            removeClerkQueryParam('__clerk_invitation_token');
-            return setActive({
-              session: signUp.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            });
-          },
-          navigate,
-          oidcPrompt,
         });
       })
       .catch(err => {
@@ -337,9 +325,6 @@ function SignUpStartInternal(): JSX.Element {
     card.setLoading();
     card.setError(undefined);
 
-    const redirectUrl = ctx.ssoCallbackUrl;
-    const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
     let signUpAttempt: Promise<SignUpResource>;
     if (!fields.ticket && !hasExistingSignUpWithTicket) {
       signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
@@ -353,17 +338,7 @@ function SignUpStartInternal(): JSX.Element {
           signUp: res,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () =>
-            setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            }),
-          navigate,
-          redirectUrl,
-          redirectUrlComplete,
-          oidcPrompt,
+          protectCheckPath: 'protect-check',
         }),
       )
       .catch(err => {
@@ -412,6 +387,11 @@ function SignUpStartInternal(): JSX.Element {
     setAlternativePhoneCodeProvider(phoneCodeProvider);
   };
 
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
+
   if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
     return <SignUpRestrictedAccess />;
   }
@@ -442,6 +422,12 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
+              {...inertProps(captchaIsInteractive)}
+              // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
+              // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
+              // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
+              // redundant-but-harmless.
+              sx={captchaIsInteractive ? { display: 'none' } : undefined}
             >
               <SocialButtonsReversibleContainerWithDivider>
                 {(showOauthProviders || showWeb3Providers || showAlternativePhoneCodeProviders) && (
@@ -464,8 +450,11 @@ function SignUpStartInternal(): JSX.Element {
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
-              {!shouldShowForm && <CaptchaElement />}
             </Flex>
+            <CaptchaElement
+              gapless
+              onInteractiveChange={setCaptchaIsInteractive}
+            />
           </Card.Content>
 
           <Card.Footer>

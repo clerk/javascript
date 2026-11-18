@@ -3,7 +3,7 @@ import React, { isValidElement } from 'react';
 import type { Button, LocalizationKey } from '../customizables';
 import { Flex, Icon, SimpleButton, Spinner, Text } from '../customizables';
 import type { ElementDescriptor, ElementId } from '../customizables/elementDescriptors';
-import { ArrowRightIcon } from '../icons';
+import { ArrowRight } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
@@ -27,7 +27,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
 
 export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockButtonProps>((props, ref) => {
   const {
-    rightIcon = ArrowRightIcon,
+    rightIcon = ArrowRight,
     rightIconSx,
     leftIcon,
     leftIconSx,
@@ -67,14 +67,14 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
           padding: `${theme.space.$1x5} ${theme.space.$3} ${theme.space.$1x5} ${theme.space.$2x5}`,
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2})`,
-          '&:hover,&:focus ': {
+          '&:hover,&:focus-visible ': {
             '--arrow-opacity': '0.5',
             '--arrow-transform': 'translateX(0px)',
           },
           '[dir="rtl"] &': {
             '--arrow-transform': `translateX(${theme.space.$2})`,
           },
-          '[dir="rtl"] &:hover, [dir="rtl"] &:focus': {
+          '[dir="rtl"] &:hover, [dir="rtl"] &:focus-visible': {
             '--arrow-transform': 'translateX(0px)',
           },
         },

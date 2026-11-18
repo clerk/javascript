@@ -18,8 +18,8 @@ describe('createSessionCookie', () => {
   const mockToken = 'test-token';
   const mockExpires = new Date('2024-12-31');
   const defaultOptions = { usePartitionedCookies: () => false };
-  const mockSet = vi.fn();
-  const mockRemove = vi.fn();
+  const mockSet = vi.fn<(name: string, value: string, attributes?: object) => void>();
+  const mockRemove = vi.fn<(name: string, attributes?: object) => void>();
   const mockGet = vi.fn();
 
   beforeEach(() => {
@@ -29,9 +29,13 @@ describe('createSessionCookie', () => {
     (inCrossOriginIframe as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      set: mockSet,
-      remove: mockRemove,
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
+      set: (value: string, attributes?: object) => {
+        mockSet(name, value, attributes);
+      },
+      remove: (attributes?: object) => {
+        mockRemove(name, attributes);
+      },
       get: mockGet,
     }));
   });
@@ -48,7 +52,7 @@ describe('createSessionCookie', () => {
     cookieHandler.set(mockToken);
 
     expect(mockSet).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'Lax',
       secure: true,
@@ -61,7 +65,7 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
@@ -87,17 +91,17 @@ describe('createSessionCookie', () => {
       partitioned: false,
     };
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'Lax',
       secure: true,
       partitioned: false,
     });
 
-    expect(mockRemove).toHaveBeenCalledWith(expectedAttributes);
+    expect(mockRemove).toHaveBeenCalledWith('__session', expectedAttributes);
     expect(mockRemove).toHaveBeenCalledTimes(2);
-    expect(mockRemove).toHaveBeenNthCalledWith(1, expectedAttributes);
-    expect(mockRemove).toHaveBeenNthCalledWith(2, expectedAttributes);
+    expect(mockRemove).toHaveBeenNthCalledWith(1, '__session', expectedAttributes);
+    expect(mockRemove).toHaveBeenNthCalledWith(2, '__session_test-suffix', expectedAttributes);
   });
 
   it('should get cookie value from suffixed cookie first, then fallback to non-suffixed', () => {
@@ -123,7 +127,7 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(mockToken);
 
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
@@ -135,12 +139,62 @@ describe('createSessionCookie', () => {
     const cookieHandler = createSessionCookie(mockCookieSuffix, { usePartitionedCookies: () => true });
     cookieHandler.set(mockToken);
 
-    expect(mockRemove).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith(mockToken, {
+    expect(mockRemove).toHaveBeenCalledTimes(4);
+    expect(mockSet).toHaveBeenCalledWith('__session', mockToken, {
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
       partitioned: true,
     });
+  });
+
+  it('clears non-partitioned variants before writing partitioned cookies after the environment changes', () => {
+    let usePartitionedCookies = false;
+    const cookieHandler = createSessionCookie(mockCookieSuffix, {
+      usePartitionedCookies: () => usePartitionedCookies,
+    });
+
+    cookieHandler.set('non-partitioned-token');
+    usePartitionedCookies = true;
+    mockSet.mockClear();
+    mockRemove.mockClear();
+    cookieHandler.set('partitioned-token');
+
+    expect(mockRemove.mock.calls).toEqual([
+      ['__session', { sameSite: 'Lax', secure: true, partitioned: false }],
+      ['__session_test-suffix', { sameSite: 'Lax', secure: true, partitioned: false }],
+      ['__session', { sameSite: 'None', secure: true, partitioned: false }],
+      ['__session_test-suffix', { sameSite: 'None', secure: true, partitioned: false }],
+    ]);
+    expect(mockSet.mock.calls).toEqual([
+      [
+        '__session',
+        'partitioned-token',
+        {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+      [
+        '__session_test-suffix',
+        'partitioned-token',
+        {
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+    ]);
+    const firstInvocationOrder = mockRemove.mock.invocationCallOrder[0];
+    expect(mockRemove.mock.invocationCallOrder).toEqual([
+      firstInvocationOrder,
+      firstInvocationOrder + 1,
+      firstInvocationOrder + 2,
+      firstInvocationOrder + 3,
+    ]);
+    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 4, firstInvocationOrder + 5]);
   });
 });

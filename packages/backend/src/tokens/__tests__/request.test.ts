@@ -7,7 +7,10 @@ import {
   mockInvalidSignatureJwt,
   mockJwks,
   mockJwt,
+  mockJwtHeader,
   mockJwtPayload,
+  mockM2MJwtPayload,
+  pemEncodedPublicKey,
   signingJwks,
 } from '../../fixtures';
 import {
@@ -18,8 +21,10 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
+import { getCookieSuffix } from '../../util/shared';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
+import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -41,8 +46,8 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  interface Assertion<T = any> extends CustomMatchers<T> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unused-vars
+  interface Assertion<R, T> extends CustomMatchers<R> {}
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
@@ -507,6 +512,122 @@ describe('tokens.authenticateRequest(options)', () => {
     vi.clearAllMocks();
   });
 
+  describe('agent Session JWT authentication', () => {
+    const identity = { session_id: 'protocol-session', client_id: 'https://agent.example', user_id: 'pseudonym' };
+
+    it.each([
+      { name: 'valid bearer token', cookie: false, expired: false },
+      { name: 'valid session cookie', cookie: true, expired: false },
+      { name: 'expired bearer token', cookie: false, expired: true },
+    ])('uses normal JWT verification for $name without a backend call', async ({ cookie, expired }) => {
+      const { data: jwt } = await signJwt(
+        {
+          ...mockJwtPayload,
+          ...(expired ? { exp: mockJwtPayload.iat - 10 } : {}),
+          agt: { id: identity.client_id, poppy: identity },
+        },
+        signingJwks,
+        { algorithm: 'RS256', header: { ...mockJwtHeader } },
+      );
+      const fetch = vi.spyOn(globalThis, 'fetch');
+      const request = cookie
+        ? mockRequestWithCookies({}, { __session: jwt, __client_uat: mockJwtPayload.iat })
+        : mockRequestWithHeaderAuth({ authorization: `Bearer ${jwt}` });
+      const state = await authenticateRequest(
+        request,
+        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE }),
+      );
+      expect(fetch).not.toHaveBeenCalled();
+      expect(state.isAuthenticated).toBe(!expired);
+      if (expired) {
+        expect(state.status).toBe(AuthStatus.Handshake);
+        expect(state.toAuth()).toBeNull();
+      } else {
+        expect(state.toAuth()).toMatchObject({
+          userId: mockJwtPayload.sub,
+          sessionId: mockJwtPayload.sid,
+          agent: {
+            type: 'agent',
+            sub: identity.client_id,
+          },
+        });
+      }
+      fetch.mockRestore();
+    });
+
+    it.each([
+      { production: true, discovery: true },
+      { production: true, discovery: false },
+      { production: false, discovery: true },
+      { production: false, discovery: false },
+    ])(
+      'accepts a signed agent handshake with production=$production and discovery=$discovery',
+      async ({ production, discovery }) => {
+        const publishableKey = production ? PK_LIVE : PK_TEST;
+        const suffix = await getCookieSuffix(publishableKey);
+        const { data: sessionToken } = await signJwt(
+          { ...mockJwtPayload, agt: { id: identity.client_id, reg: identity.client_id, poppy: identity } },
+          signingJwks,
+          { algorithm: 'RS256', header: { ...mockJwtHeader, cat: JWT_CATEGORY_SESSION_TOKEN } },
+        );
+        const cookies = {
+          __client_uat: String(mockJwtPayload.iat),
+          [`__client_uat_${suffix}`]: String(mockJwtPayload.iat),
+          [`__session_${suffix}`]: sessionToken!,
+          ...(!production ? { [`__clerk_db_jwt_${suffix}`]: 'dev-browser' } : {}),
+        };
+        const directives = Object.entries(cookies).map(
+          ([name, value]) => `${name}=${value}; Path=/; SameSite=Lax; Secure`,
+        );
+        if (production) {
+          directives.unshift('__clerk_handshake=; Path=/; Max-Age=0');
+        }
+        const { data: handshake } = await signJwt({ handshake: directives }, signingJwks, {
+          algorithm: 'RS256',
+          header: { ...mockJwtHeader, cat: JWT_CATEGORY_SESSION_TOKEN },
+        });
+        const url = new URL('https://example.com/');
+        if (!production) {
+          url.searchParams.set('__clerk_handshake', handshake!);
+          url.searchParams.set('__clerk_db_jwt', 'dev-browser');
+        }
+        const fetch = vi.spyOn(globalThis, 'fetch');
+        const options = mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey, poppy: discovery });
+        const state = await authenticateRequest(
+          mockRequestWithCookies({}, production ? { __clerk_handshake: handshake! } : {}, url.toString()),
+          options,
+        );
+        const expectedAuth = {
+          userId: mockJwtPayload.sub,
+          sessionId: mockJwtPayload.sid,
+          agent: { type: 'agent', sub: identity.client_id },
+        };
+        expect(state.isAuthenticated).toBe(true);
+        expect(state.toAuth()).toMatchObject(expectedAuth);
+        expect(state.headers.getSetCookie()).toEqual(directives);
+        expect(state.headers.get('location')).toBe(production ? null : 'https://example.com/');
+        const nextRequest = await authenticateRequest(
+          mockRequestWithCookies({}, cookies, 'https://example.com/'),
+          options,
+        );
+        expect(nextRequest.isAuthenticated).toBe(true);
+        expect(nextRequest.toAuth()).toMatchObject(expectedAuth);
+        expect(fetch).not.toHaveBeenCalled();
+        fetch.mockRestore();
+      },
+    );
+
+    it('does not interpret an application cookie as authenticated agent identity', async () => {
+      const state = await authenticateRequest(
+        mockRequestWithCookies({}, { '__Host-poppy_session': 'untrusted' }),
+        mockOptions({ jwtKey: pemEncodedPublicKey, publishableKey: PK_LIVE, poppy: true }),
+      );
+      expect(state.isAuthenticated).toBe(false);
+      expect(state.toAuth()).toMatchObject({ userId: null, sessionId: null });
+      expect(state.toAuth()).not.toHaveProperty('agent');
+    });
+  });
+
   //
   // HTTP Authorization exists
   //
@@ -954,6 +1075,40 @@ describe('tokens.authenticateRequest(options)', () => {
     });
   });
 
+  test('cookieToken: logs satellite-domain guidance when satellite sync enters a redirect loop', async () => {
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        {
+          __client_uat: '0',
+          __clerk_redirect_count: '3',
+        },
+        `http://satellite.example/path?__clerk_synced=false`,
+      ),
+      mockOptions({
+        secretKey: 'deadbeef',
+        publishableKey: PK_LIVE,
+        signInUrl: 'https://primary.example/sign-in',
+        isSatellite: true,
+        domain: 'satellite.example',
+      }),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.SatelliteCookieNeedsSyncing,
+      isSatellite: true,
+      domain: 'satellite.example',
+      signInUrl: 'https://primary.example/sign-in',
+    });
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Satellite-domain authentication'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('configured primary or satellite domain'));
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('preview deployments'));
+
+    consoleSpy.mockRestore();
+  });
+
   test('cookieToken: triggers handshake when satelliteAutoSync is not set but __clerk_synced=false is present - dev', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
@@ -1198,7 +1353,7 @@ describe('tokens.authenticateRequest(options)', () => {
     const { sub: _, ...payloadWithoutSub } = mockJwtPayload;
     const { data: malformedJwt } = await signJwt(payloadWithoutSub, signingJwks, {
       algorithm: 'RS256',
-      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_SESSION_TOKEN },
     });
 
     const requestState = await authenticateRequest(
@@ -1243,6 +1398,108 @@ describe('tokens.authenticateRequest(options)', () => {
 
     expect(requestState).toBeSignedIn();
     expect(requestState.toAuth()).toBeSignedInToAuth();
+  });
+
+  test('cookieToken: returns signed out when an M2M JWT is presented in the __session cookie (SDK-107)', async () => {
+    // A same-instance M2M JWT carries the instance issuer, so it survives the suffixed-cookie check.
+    const { data: m2mJwt } = await signJwt({ ...mockM2MJwtPayload, iss: mockJwtPayload.iss }, signingJwks, {
+      algorithm: 'RS256',
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_M2M_TOKEN },
+    });
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: m2mJwt!,
+        },
+      ),
+      mockOptions(),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: AuthErrorReason.TokenTypeMismatch,
+      message: '',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
+  // Regression tests for SEC-340. A JWT-template token is signed by the same instance key and
+  // passes verifyToken(), but carries no `sid`, so it outlives revocation of the session that
+  // minted it and must not authenticate one.
+  const templateInHeader = (jwt: string) => mockRequestWithHeaderAuth({ authorization: jwt });
+  describe.each([
+    ['headerToken', templateInHeader, {}],
+    [
+      'cookieToken',
+      (jwt: string) =>
+        mockRequestWithCookies(
+          {},
+          { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+        ),
+      {},
+    ],
+    ['headerToken, acceptsToken: any', templateInHeader, { acceptsToken: 'any' as const }],
+    [
+      'headerToken, acceptsToken: [session_token, m2m_token]',
+      templateInHeader,
+      { acceptsToken: ['session_token', 'm2m_token'] as const },
+    ],
+  ])('%s: JWT-template token presented as a session token (SEC-340)', (_label, buildRequest, options) => {
+    test('returns signed out', async () => {
+      const { sid: _sid, ...payloadWithoutSid } = mockJwtPayload;
+      const { data: templateJwt } = await signJwt(payloadWithoutSid, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_JWT_TEMPLATE },
+      });
+
+      const requestState = await authenticateRequest(buildRequest(templateJwt!), mockOptions(options));
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+      expect(requestState.toAuth()).toBeSignedOutToAuth();
+    });
+  });
+
+  describe.each([
+    ['headerToken', templateInHeader, {}],
+    [
+      'cookieToken',
+      (jwt: string) =>
+        mockRequestWithCookies(
+          {},
+          { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+        ),
+      {},
+    ],
+    ['headerToken, acceptsToken: any', templateInHeader, { acceptsToken: 'any' as const }],
+    [
+      'headerToken, acceptsToken: [session_token, m2m_token]',
+      templateInHeader,
+      { acceptsToken: ['session_token', 'm2m_token'] as const },
+    ],
+  ])('%s: OIDC id_token presented as a session token (AISEC-21)', (_label, buildRequest, options) => {
+    test('returns signed out', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const { azp: _azp, ...payloadWithoutAzp } = mockJwtPayload;
+      const { data: idToken } = await signJwt(
+        { ...payloadWithoutAzp, aud: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc' },
+        signingJwks,
+        { algorithm: 'RS256', header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' } },
+      );
+
+      const requestState = await authenticateRequest(buildRequest(idToken!), mockOptions(options));
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+      expect(requestState.toAuth()).toBeSignedOutToAuth();
+    });
   });
 
   // todo(
@@ -1454,6 +1711,23 @@ describe('tokens.authenticateRequest(options)', () => {
       vi.clearAllMocks();
     });
 
+    test('ignores a session issuer when authenticating an M2M JWT', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+
+      const { data: m2mJwt } = await signJwt(mockM2MJwtPayload, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+      });
+
+      const request = mockRequest({ authorization: `Bearer ${m2mJwt}` });
+      const requestState = await authenticateRequest(
+        request,
+        mockOptions({ acceptsToken: 'm2m_token', issuer: mockJwtPayload.iss }),
+      );
+
+      expect(requestState).toBeMachineAuthenticated();
+    });
+
     // Test each token type with parameterized tests
     const tokenTypes = [TokenType.ApiKey, TokenType.OAuthToken, TokenType.M2MToken];
 
@@ -1495,6 +1769,68 @@ describe('tokens.authenticateRequest(options)', () => {
           isAuthenticated: false,
         });
       });
+    });
+
+    test.each(['oauth_token', 'any'] as const)(
+      'rejects an opaque OAuth audience mismatch when acceptsToken is %s',
+      async acceptsToken => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+            return HttpResponse.json({
+              ...mockVerificationResults.oauth_token,
+              aud: 'https://other.example.com',
+            });
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'OAuth audience mismatch. Verification expected audience ["https://resource.example.com"], but incoming token has aud "https://other.example.com". (code=token-verification-failed, status=n/a)',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      },
+    );
+
+    describe.each(['opaque', 'JWT'] as const)('%s OAuth token without aud', format => {
+      test.each(['oauth_token', 'any'] as const)(
+        'rejects a configured audience when acceptsToken is %s',
+        async acceptsToken => {
+          server.use(
+            http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+              return HttpResponse.json(mockVerificationResults.oauth_token);
+            }),
+            http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
+          );
+          const token = format === 'opaque' ? mockTokens.oauth_token : mockSignedOAuthAccessTokenJwt;
+          const request = mockRequest({ authorization: `Bearer ${token}` });
+          const requestState = await authenticateRequest(
+            request,
+            mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+          );
+
+          expect(requestState).toBeMachineUnauthenticated({
+            tokenType: 'oauth_token',
+            reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message:
+              'Invalid OAuth audience claim (aud) undefined. Expected a non-empty string or a non-empty array of non-empty strings. (code=token-verification-failed, status=n/a)',
+          });
+          expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+            tokenType: 'oauth_token',
+            isAuthenticated: false,
+          });
+        },
+      );
     });
 
     test('accepts machine secret when verifying machine-to-machine token', async () => {
@@ -2024,7 +2360,8 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test('does not trigger handshake when referer is from production accounts portal', async () => {
+    // accounts.example.com is not this instance's derived accounts portal, so it must not be trusted.
+    test('triggers handshake when referer is an unrelated accounts.* domain', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.example.com/sign-in',
@@ -2046,6 +2383,36 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
+        domain: 'primary.com',
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (current format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://foo-bar-13.accounts.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
       expect(requestState).toBeSignedIn({
         domain: 'primary.com',
         isSatellite: false,
@@ -2053,7 +2420,38 @@ describe('tokens.authenticateRequest(options)', () => {
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (current format)', async () => {
+    test('does not trigger cross-origin handshake when referer is from dev accounts portal on a dev instance (legacy format)', async () => {
+      const request = mockRequestWithCookies(
+        {
+          referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-site': 'cross-site',
+        },
+        {
+          __session: mockJwt,
+          __client_uat: '12345',
+          __clerk_db_jwt: mockJwt,
+        },
+        'https://primary.com/dashboard',
+      );
+
+      const requestState = await authenticateRequest(request, {
+        ...mockOptions(),
+        publishableKey: PK_TEST,
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+
+      expect(requestState).toBeSignedIn({
+        domain: 'primary.com',
+        isSatellite: false,
+        signInUrl: 'https://primary.com/sign-in',
+      });
+    });
+
+    // A production instance must not trust dev-portal referrers, which are freely obtainable.
+    test('triggers handshake when referer is a dev accounts portal on a production instance (current format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://foo-bar-13.accounts.dev/sign-in',
@@ -2075,14 +2473,14 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });
 
-    test('does not trigger handshake when referer is from dev accounts portal (legacy format)', async () => {
+    test('triggers handshake when referer is a dev accounts portal on a production instance (legacy format)', async () => {
       const request = mockRequestWithCookies(
         {
           referer: 'https://accounts.foo-bar-13.lcl.dev/sign-in',
@@ -2104,9 +2502,9 @@ describe('tokens.authenticateRequest(options)', () => {
         signInUrl: 'https://primary.com/sign-in',
       });
 
-      expect(requestState).toBeSignedIn({
+      expect(requestState).toMatchHandshake({
+        reason: AuthErrorReason.PrimaryDomainCrossOriginSync,
         domain: 'primary.com',
-        isSatellite: false,
         signInUrl: 'https://primary.com/sign-in',
       });
     });

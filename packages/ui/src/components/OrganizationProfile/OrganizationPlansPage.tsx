@@ -1,5 +1,6 @@
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
+import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { Protect } from '../../common';
 import { PricingTableContext, SubscriberTypeContext } from '../../contexts';
@@ -12,7 +13,7 @@ const OrganizationPlansPageInternal = () => {
   const { navigate } = useRouter();
 
   return (
-    <>
+    <ProfileCard.Page>
       <Header.Root
         sx={t => ({
           borderBottomWidth: t.borderWidths.$normal,
@@ -47,7 +48,7 @@ const OrganizationPlansPageInternal = () => {
           <PricingTable />
         </PricingTableContext.Provider>
       </Flex>
-    </>
+    </ProfileCard.Page>
   );
 };
 

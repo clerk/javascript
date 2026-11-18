@@ -1,6 +1,6 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
@@ -47,6 +47,9 @@ describe('UserButton', () => {
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
     await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+    expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByRole('menuitem')).toBeNull();
     expect(getByText('Manage account')).not.toBeNull();
   });
 
@@ -65,24 +68,33 @@ describe('UserButton', () => {
     expect(fixtures.clerk.openUserProfile).toHaveBeenCalled();
   });
 
-  it('signs out user when "Sign out" is clicked', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({
-        first_name: 'First',
-        last_name: 'Last',
-        username: 'username1',
-        email_addresses: ['test@clerk.com'],
+  it.each(['/', '/signed-out?tab=security#settings'])(
+    'passes destination %s when signing out the last account',
+    async redirectUrl => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
       });
-    });
 
-    fixtures.clerk.signOut.mockImplementationOnce(callback => callback());
+      vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+      fixtures.clerk.signOut.mockImplementation(async callback => {
+        if (typeof callback !== 'function') {
+          throw new Error('Expected the legacy navigation callback');
+        }
+        await callback();
+      });
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+      await userEvent.click(getByText('Sign out'));
 
-    const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-    await userEvent.click(getByText('Sign out'));
-
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-  });
+      expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
+      expect(fixtures.router.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
+    },
+  );
 
   it.todo('navigates to sign in url when "Add account" is clicked');
 
@@ -100,7 +112,7 @@ describe('UserButton', () => {
         });
       });
 
-      const { getByText, getByRole, userEvent } = render(
+      const { getByRole, userEvent } = render(
         <UNSAFE_PortalProvider getContainer={getContainer}>
           <UserButton />
         </UNSAFE_PortalProvider>,
@@ -179,18 +191,141 @@ describe('UserButton', () => {
       });
     });
 
-    it('signs out of all currently active session when clicking "Sign out of all accounts"', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-      fixtures.clerk.signOut.mockImplementationOnce(callback => {
-        return Promise.resolve(callback());
+    it.each(['/', 'https://satellite.test/signed-out?tab=security#settings'])(
+      'passes destination %s when signing out all accounts',
+      async redirectUrl => {
+        const { wrapper, fixtures } = await createFixtures(initConfig);
+        vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+        fixtures.clerk.signOut.mockImplementation(async callback => {
+          if (typeof callback !== 'function') {
+            throw new Error('Expected the legacy navigation callback');
+          }
+          await callback();
+        });
+        const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+        await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+        await userEvent.click(getByText('Sign out of all accounts'));
+        expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
+        expect(fixtures.router.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
+      },
+    );
+  });
+
+  describe('Accessibility', () => {
+    it('uses dialog semantics for the trigger button', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
       });
-      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+
+      expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+      await userEvent.click(trigger);
+
+      expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.queryByRole('menuitem')).toBeNull();
+    });
+
+    it('focuses the dialog container on open, not the first interactive item', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+      await userEvent.click(trigger);
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      expect(dialog).toBeInTheDocument();
+      expect(dialog).toHaveFocus();
+    });
+
+    it('traps focus within the popover when open', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+      await userEvent.click(trigger);
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      expect(dialog).toBeInTheDocument();
+
+      for (let i = 0; i < 10; i++) {
+        await userEvent.tab();
+        expect(dialog.contains(document.activeElement)).toBe(true);
+      }
+
+      expect(screen.getByRole('dialog', { name: 'Account panel' })).toBeInTheDocument();
+    });
+
+    it('labels action groups for screen readers', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-      await userEvent.click(getByText('Sign out of all accounts'));
-      await waitFor(() => {
-        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
-        expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+
+      const dialog = screen.getByRole('dialog', { name: 'Account panel' });
+      const groups = dialog.querySelectorAll('[role="group"]');
+      expect(groups.length).toBeGreaterThan(0);
+      for (const group of groups) {
+        expect(group).toHaveAttribute('aria-label');
+        expect(group.getAttribute('aria-label')).not.toBe('');
+      }
+    });
+
+    it('closes on escape and restores focus to the trigger', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({
+          first_name: 'First',
+          last_name: 'Last',
+          username: 'username1',
+          email_addresses: ['test@clerk.com'],
+        });
       });
+
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+      const trigger = getByRole('button', { name: 'Open user menu' });
+
+      await userEvent.click(trigger);
+
+      const clerkLogoLink = await screen.findByRole('link', { name: 'Clerk logo' });
+      for (let i = 0; i < 4 && document.activeElement !== clerkLogoLink; i++) {
+        await userEvent.tab();
+      }
+      expect(clerkLogoLink).toHaveFocus();
+
+      await userEvent.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog', { name: 'Account panel' })).not.toBeInTheDocument();
+      });
+      expect(trigger).toHaveFocus();
     });
   });
 

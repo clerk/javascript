@@ -38,13 +38,17 @@ inputs:
     description: 'Enable verbose output'
     required: false
     default: 'false'
+  cache-enabled:
+    description: 'Enable setup-node pnpm cache and Playwright cache restore. Defaults to false so privileged jobs that hold id-token: write cannot accidentally restore poisonable cache state. Callers that want cache (ordinary CI) must opt in with cache-enabled: true.'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
   steps:
     - name: Configure Turborepo
       id: turbo
-      uses: actions/github-script@v7
+      uses: actions/github-script@v7.1.0
       env:
         # envs are required to pass inputs to the script
         CACHE: ${{ inputs.turbo-cache }}
@@ -106,20 +110,24 @@ runs:
       run: echo $TURBO_ARGS
 
     - name: Install PNPM
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6.1.0
 
     - name: Setup NodeJS ${{ inputs.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v4.4.0
       with:
-        cache: pnpm
+        cache: ${{ inputs.cache-enabled == 'true' && 'pnpm' || '' }}
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install PNPM Dependencies
       env:
         CYPRESS_INSTALL_BINARY: 0
-      run: pnpm install
+      run: pnpm install --frozen-lockfile
       shell: bash
+
+    - name: Export Node version
+      shell: bash
+      run: node -p '"NODE_VERSION=" + process.versions.node' >> "$GITHUB_ENV"
 
     - name: Add node_modules/.bin to PATH
       run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
@@ -134,8 +142,8 @@ runs:
         echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
     - name: Cache Playwright Binaries
-      if: inputs.playwright-enabled == 'true'
-      uses: actions/cache@v4
+      if: inputs.playwright-enabled == 'true' && inputs.cache-enabled == 'true'
+      uses: actions/cache@v4.3.0
       id: playwright-cache
       with:
         path: ~/.cache/ms-playwright

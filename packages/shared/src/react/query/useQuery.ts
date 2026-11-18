@@ -1,4 +1,4 @@
-import type { DefaultError, NoInfer, QueryKey } from '@tanstack/query-core';
+import type { DefaultError, QueryKey } from '@tanstack/query-core';
 import { QueryObserver } from '@tanstack/query-core';
 
 import type { DefinedInitialDataOptions, UndefinedInitialDataOptions } from './queryOptions';

@@ -23,4 +23,4 @@ const AppearanceProvider = (props: AppearanceProviderProps) => {
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
 
-export { AppearanceProvider, useAppearance };
+export { AppearanceContext, AppearanceProvider, useAppearance };

@@ -1,6 +1,7 @@
 import type {
   GoogleOneTapProps,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -207,3 +208,14 @@ export const OAuthConsent = withClerk(({ clerk, ...props }: WithClerkProp<OAuthC
     />
   );
 }, 'OAuthConsent');
+
+export const OAuthDeviceVerification = withClerk(({ clerk, ...props }: WithClerkProp<OAuthDeviceVerificationProps>) => {
+  return (
+    <Portal
+      mount={clerk?.__internal_mountOAuthDeviceVerification}
+      unmount={clerk?.__internal_unmountOAuthDeviceVerification}
+      updateProps={(clerk as any)?.__internal_updateProps}
+      props={props}
+    />
+  );
+}, 'OAuthDeviceVerification');

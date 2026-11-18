@@ -5,6 +5,7 @@ import supertest from 'supertest';
 import { expect, vi } from 'vitest';
 
 import type { ExpressRequestWithAuth } from '../types';
+import { brandRequestAuth } from '../utils';
 
 // Inspired by https://github.com/helmetjs/helmet/blob/main/test/helpers.ts
 export function runMiddleware(middleware: RequestHandler | RequestHandler[], headers: Record<string, string> = {}) {
@@ -41,13 +42,13 @@ export function mockRequest(): ExpressRequest {
 
 export function mockRequestWithAuth(auth: Partial<AuthObject> = {}): ExpressRequestWithAuth {
   return {
-    auth: () => ({
+    auth: brandRequestAuth(() => ({
       getToken: () => Promise.resolve(''),
       has: () => false,
       debug: () => ({}),
       tokenType: 'session_token',
       ...auth,
-    }),
+    })),
   } as unknown as ExpressRequestWithAuth;
 }
 

@@ -1,0 +1,1614 @@
+// Import stories explicitly to control order and avoid type casting through unknown.
+import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as ActionBarDefault,
+  InDialog as ActionBarInDialog,
+  Inline as ActionBarInline,
+  meta as actionBarMeta,
+} from '../stories/action-bar.stories';
+import {
+  Default as APIKeysTableDefault,
+  Empty as APIKeysTableEmpty,
+  meta as apiKeysTableMeta,
+  Organization as APIKeysTableOrganization,
+  ProposedTable as APIKeysTableProposedTable,
+} from '../stories/api-keys-table.stories';
+import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
+import {
+  Fallback as AvatarFallbackStory,
+  Interactive as AvatarInteractive,
+  meta as avatarMeta,
+  Primary as AvatarPrimary,
+  Shapes as AvatarShapes,
+  Sizes as AvatarSizes,
+} from '../stories/avatar.stories';
+import {
+  Colors as BadgeColors,
+  meta as badgeMeta,
+  Primary as BadgePrimary,
+  WithIcon as BadgeWithIcon,
+} from '../stories/badge.stories';
+import {
+  Announced as BannerAnnounced,
+  Colors as BannerColors,
+  Default as BannerDefault,
+  LabelOnly as BannerLabelOnly,
+  meta as bannerMeta,
+} from '../stories/banner.stories';
+import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
+import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import {
+  Default as CheckboxDefault,
+  meta as checkboxMeta,
+  Sizes as CheckboxSizes,
+  States as CheckboxStates,
+} from '../stories/checkbox.stories';
+import { meta as collapsibleMeta } from '../stories/collapsible.stories';
+import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
+import {
+  Default as ComboboxDefault,
+  meta as comboboxMeta,
+  Scrolling as ComboboxScrolling,
+} from '../stories/combobox.stories';
+import {
+  Default as ConfirmationDefault,
+  meta as confirmationMeta,
+  WithError as ConfirmationWithError,
+} from '../stories/confirmation.stories';
+import {
+  Default as CopyButtonDefault,
+  Inline as CopyButtonInline,
+  Labelled as CopyButtonLabelled,
+  meta as copyButtonMeta,
+} from '../stories/copy-button.stories';
+import {
+  Default as CreateOrganizationDefault,
+  meta as createOrganizationMeta,
+  WithError as CreateOrganizationWithError,
+  WithoutSlug as CreateOrganizationWithoutSlug,
+} from '../stories/create-organization.stories';
+import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
+import {
+  Default as DestructiveDefault,
+  meta as destructiveMeta,
+  WithError as DestructiveWithError,
+} from '../stories/destructive.stories';
+import { Default as DialogDefault, meta as dialogComponentMeta } from '../stories/dialog.component.stories';
+import { meta as dialogMeta } from '../stories/dialog.stories';
+import {
+  Default as DrawerComponentDefault,
+  InsideProfile as DrawerComponentInsideProfile,
+  meta as drawerComponentMeta,
+} from '../stories/drawer.component.stories';
+import { meta as drawerMeta } from '../stories/drawer.stories';
+import {
+  Default as EmptyStateDefault,
+  LabelOnly as EmptyStateLabelOnly,
+  meta as emptyStateMeta,
+  NoResults as EmptyStateNoResults,
+} from '../stories/empty-state.stories';
+import {
+  Default as EntityDefault,
+  LabelOnly as EntityLabelOnly,
+  meta as entityMeta,
+  Truncation as EntityTruncation,
+  WithBadge as EntityWithBadge,
+} from '../stories/entity.stories';
+import {
+  Default as FieldDefault,
+  meta as fieldMeta,
+  VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
+} from '../stories/field.component.stories';
+import { meta as fileUploadMeta } from '../stories/file-upload.stories';
+import { Default as FlowDefault, meta as flowComponentMeta } from '../stories/flow.component.stories';
+import { meta as flowMeta } from '../stories/flow.stories';
+import {
+  Colors as HeadingColors,
+  Default as HeadingDefault,
+  meta as headingMeta,
+  Sizes as HeadingSizes,
+} from '../stories/heading.stories';
+import {
+  Default as IconDefault,
+  meta as iconMeta,
+  Names as IconNames,
+  Override as IconOverride,
+  Sizes as IconSizes,
+} from '../stories/icon.stories';
+import {
+  BrandIcons as IconFrameBrandIcons,
+  CustomSurface as IconFrameCustomSurface,
+  Default as IconFrameDefault,
+  meta as iconFrameMeta,
+  Sizes as IconFrameSizes,
+  Treatments as IconFrameTreatments,
+} from '../stories/icon-frame.stories';
+import { meta as imageCropperMeta } from '../stories/image-cropper.stories';
+import {
+  Default,
+  Disabled as InputDisabled,
+  Ghost as InputGhost,
+  Invalid,
+  meta as inputMeta,
+  Sizes as InputSizes,
+} from '../stories/input.stories';
+import {
+  Default as InputGroupDefault,
+  Disabled as InputGroupDisabled,
+  Invalid as InputGroupInvalid,
+  meta as inputGroupMeta,
+  Sizes as InputGroupSizes,
+} from '../stories/input-group.stories';
+import {
+  CustomElement as InviteMembersButtonCustomElement,
+  Default as InviteMembersButtonDefault,
+  meta as inviteMembersButtonMeta,
+  Unavailable as InviteMembersButtonUnavailable,
+} from '../stories/invite-members-button.stories';
+import {
+  Default as ItemDefault,
+  Group as ItemGroup,
+  Interactive as ItemInteractive,
+  meta as itemMeta,
+} from '../stories/item.stories';
+import {
+  External as LinkExternal,
+  ExternalWrapping as LinkExternalWrapping,
+  meta as linkMeta,
+  Primary as LinkPrimary,
+} from '../stories/link.stories';
+import {
+  Catalog as LocalizationCatalog,
+  CatalogWithOverrides as LocalizationCatalogWithOverrides,
+  Fallback as LocalizationFallback,
+  Helpers as LocalizationHelpers,
+  meta as localizationMeta,
+  Overrides as LocalizationOverrides,
+  PluralRules as LocalizationPluralRules,
+} from '../stories/localization.stories';
+import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
+import { meta as menuMeta } from '../stories/menu.stories';
+import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
+import {
+  Default as OAuthConsentDefault,
+  ManyScopes as OAuthConsentManyScopes,
+  meta as oauthConsentMeta,
+  MultipleOrganizations as OAuthConsentMultipleOrganizations,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
+import {
+  Default as OrganizationListDefault,
+  Empty as OrganizationListEmpty,
+  Loading as OrganizationListLoading,
+  meta as organizationListMeta,
+  WithError as OrganizationListWithError,
+  WithoutPersonal as OrganizationListWithoutPersonal,
+} from '../stories/organization-list.stories';
+import {
+  Default as OrganizationProfileDefault,
+  meta as organizationProfileMeta,
+  Overlay as OrganizationProfileOverlay,
+} from '../stories/organization-profile.stories';
+import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
+  Default as OrganizationProfileDangerSectionDefault,
+  LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
+  meta as organizationProfileDangerSectionMeta,
+  WithError as OrganizationProfileDangerSectionWithError,
+} from '../stories/organization-profile-danger-section.stories';
+import {
+  Default as OrganizationProfileGeneralPanelDefault,
+  meta as organizationProfileGeneralPanelMeta,
+  ReadOnly as OrganizationProfileGeneralPanelReadOnly,
+} from '../stories/organization-profile-general-panel.stories';
+import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
+import {
+  Default as OrganizationProfileProfileSectionDefault,
+  meta as organizationProfileProfileSectionMeta,
+  SaveFails as OrganizationProfileProfileSectionSaveFails,
+} from '../stories/organization-profile-profile-section.stories';
+import {
+  Default as OrganizationSwitcherDefault,
+  meta as organizationSwitcherMeta,
+  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
+} from '../stories/organization-switcher.stories';
+import {
+  Default as OtpComponentDefault,
+  Disabled as OtpComponentDisabled,
+  Error as OtpComponentError,
+  meta as otpComponentMeta,
+  Success as OtpComponentSuccess,
+} from '../stories/otp.component.stories';
+import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Disabled as PaginationDisabled,
+  FirstLast as PaginationFirstLast,
+  meta as paginationMeta,
+  MiddlePage as PaginationMiddlePage,
+  Primary as PaginationPrimary,
+  SinglePage as PaginationSinglePage,
+} from '../stories/pagination.stories';
+import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
+import {
+  Default as PasswordInputDefault,
+  Disabled as PasswordInputDisabled,
+  Invalid as PasswordInputInvalid,
+  meta as passwordInputMeta,
+  Sizes as PasswordInputSizes,
+} from '../stories/password-input.stories';
+import {
+  Default as PhoneInputDefault,
+  Disabled as PhoneInputDisabled,
+  Invalid as PhoneInputInvalid,
+  meta as phoneInputMeta,
+  Prefilled as PhoneInputPrefilled,
+  Sizes as PhoneInputSizes,
+} from '../stories/phone-input.stories';
+import {
+  Alignment as PopoverComponentAlignment,
+  Default as PopoverComponentDefault,
+  meta as popoverComponentMeta,
+  Placement as PopoverComponentPlacement,
+} from '../stories/popover.component.stories';
+import { meta as popoverMeta } from '../stories/popover.stories';
+import { meta as portalMeta } from '../stories/portal.stories';
+import {
+  Customized as ProfileCustomized,
+  Default as ProfileDefault,
+  meta as profileComponentMeta,
+  Transitions as ProfileTransitions,
+} from '../stories/profile.component.stories';
+import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
+import {
+  Default as ProviderButtonDefault,
+  Many as ProviderButtonMany,
+  meta as providerButtonMeta,
+  One as ProviderButtonOne,
+  Pending as ProviderButtonPending,
+  Stacked as ProviderButtonStacked,
+} from '../stories/provider-button.stories';
+import {
+  Default as RadioDefault,
+  Descriptions as RadioDescriptions,
+  meta as radioMeta,
+  Sizes as RadioSizes,
+  States as RadioStates,
+} from '../stories/radio.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
+import {
+  AuthenticatorOTP as ReverificationAuthenticatorOTP,
+  BackupCode as ReverificationBackupCode,
+  BackupCodeError as ReverificationBackupCodeError,
+  BackupCodePending as ReverificationBackupCodePending,
+  Default as ReverificationDefault,
+  Help as ReverificationHelp,
+  meta as reverificationMeta,
+  MethodPicker as ReverificationMethodPicker,
+  MethodPickerPending as ReverificationMethodPickerPending,
+  OTP as ReverificationOTP,
+  OTPError as ReverificationOTPError,
+  OTPPending as ReverificationOTPPending,
+  OTPResending as ReverificationOTPResending,
+  Passkey as ReverificationPasskey,
+  PasskeyError as ReverificationPasskeyError,
+  PasskeyPending as ReverificationPasskeyPending,
+  Password as ReverificationPassword,
+  PasswordError as ReverificationPasswordError,
+  PasswordPending as ReverificationPasswordPending,
+} from '../stories/reverification.stories';
+import {
+  Default as ScrollAreaDefault,
+  Gutter as ScrollAreaGutter,
+  Horizontal as ScrollAreaHorizontal,
+  HoverReveal as ScrollAreaHoverReveal,
+  meta as scrollAreaMeta,
+  NotScrollable as ScrollAreaNotScrollable,
+  ShadowIndicators as ScrollAreaShadowIndicators,
+  ThemedScrollbar as ScrollAreaThemedScrollbar,
+} from '../stories/scroll-area.stories';
+import {
+  ConnectedAccounts as SectionConnectedAccounts,
+  Default as SectionDefault,
+  Destructive as SectionDestructive,
+  IconFrameMedia as SectionIconFrameMedia,
+  meta as sectionMeta,
+} from '../stories/section.stories';
+import {
+  Default as SegmentedControlDefault,
+  Disabled as SegmentedControlDisabled,
+  meta as segmentedControlMeta,
+} from '../stories/segmented-control.stories';
+import {
+  Controlled as SelectComponentControlled,
+  Default as SelectComponentDefault,
+  Descriptions as SelectComponentDescriptions,
+  Ghost as SelectComponentGhost,
+  meta as selectComponentMeta,
+  Overflowing as SelectComponentOverflowing,
+  Placeholder as SelectComponentPlaceholder,
+} from '../stories/select.component.stories';
+import { meta as selectMeta } from '../stories/select.stories';
+import {
+  Default as SeparatorDefault,
+  Labelled as SeparatorLabelled,
+  meta as separatorMeta,
+} from '../stories/separator.stories';
+import {
+  ChoiceEnterpriseConnections as SignInChoiceEnterpriseConnections,
+  ChoiceMethods as SignInChoiceMethods,
+  ChoiceResetMethods as SignInChoiceResetMethods,
+  CodeAlternativePhoneChannel as SignInCodeAlternativePhoneChannel,
+  CodeAuthenticatorApp as SignInCodeAuthenticatorApp,
+  CodeClientTrust as SignInCodeClientTrust,
+  CodeEmail as SignInCodeEmail,
+  CodePhone as SignInCodePhone,
+  CodeResetPassword as SignInCodeResetPassword,
+  CodeResetPasswordPhone as SignInCodeResetPasswordPhone,
+  CodeSecondFactorEmail as SignInCodeSecondFactorEmail,
+  CodeSecondFactorPhone as SignInCodeSecondFactorPhone,
+  CodeSsoBypass as SignInCodeSsoBypass,
+  CodeVerifyEmail as SignInCodeVerifyEmail,
+  CodeVerifyPhone as SignInCodeVerifyPhone,
+  CredentialBackupCode as SignInCredentialBackupCode,
+  CredentialPasskey as SignInCredentialPasskey,
+  CredentialPassword as SignInCredentialPassword,
+  CredentialPasswordError as SignInCredentialPasswordError,
+  CredentialPasswordPending as SignInCredentialPasswordPending,
+  Default as SignInDefault,
+  IdentifierBannerError as SignInIdentifierBannerError,
+  IdentifierDefault as SignInIdentifierDefault,
+  IdentifierError as SignInIdentifierError,
+  IdentifierLocked as SignInIdentifierLocked,
+  IdentifierManyProviders as SignInIdentifierManyProviders,
+  IdentifierProviderPending as SignInIdentifierProviderPending,
+  IdentifierSignInOnly as SignInIdentifierSignInOnly,
+  meta as signInMeta,
+  NewPasswordRequired as SignInNewPasswordRequired,
+  NewPasswordReset as SignInNewPasswordReset,
+  NoticeActionBlocked as SignInNoticeActionBlocked,
+  NoticeEmailLinkClientMismatch as SignInNoticeEmailLinkClientMismatch,
+  NoticeEmailLinkExpired as SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid as SignInNoticeEmailLinkInvalid,
+  NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedIn as SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkSignedInOtherTab as SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkSigningIn as SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkVerified as SignInNoticeEmailLinkVerified,
+  NoticeEnterpriseSso as SignInNoticeEnterpriseSso,
+  NoticeForgotPassword as SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
+  NoticeHelp as SignInNoticeHelp,
+  NoticeNoMethods as SignInNoticeNoMethods,
+  NoticePasswordCompromised as SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
+  NoticeStartOver as SignInNoticeStartOver,
+  SignUpDetails as SignInSignUpDetails,
+  SignUpEmailLinkSignedUp as SignInSignUpEmailLinkSignedUp,
+  SignUpEmailOrPhone as SignInSignUpEmailOrPhone,
+  SignUpLegalConsent as SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly as SignInSignUpLegalConsentOnly,
+  SignUpOptionalFields as SignInSignUpOptionalFields,
+  SignUpPasswordRequirements as SignInSignUpPasswordRequirements,
+  SignUpSettingsFields as SignInSignUpSettingsFields,
+  SignUpVerifyEmailLink as SignInSignUpVerifyEmailLink,
+} from '../stories/sign-in.stories';
+import {
+  CustomElement as SignInButtonCustomElement,
+  Default as SignInButtonDefault,
+  meta as signInButtonMeta,
+  Pending as SignInButtonPending,
+} from '../stories/sign-in-button.stories';
+import {
+  CustomElement as SignInWithMetamaskButtonCustomElement,
+  Default as SignInWithMetamaskButtonDefault,
+  meta as signInWithMetamaskButtonMeta,
+  Pending as SignInWithMetamaskButtonPending,
+} from '../stories/sign-in-with-metamask-button.stories';
+import {
+  CustomElement as SignOutButtonCustomElement,
+  Default as SignOutButtonDefault,
+  meta as signOutButtonMeta,
+  Pending as SignOutButtonPending,
+} from '../stories/sign-out-button.stories';
+import {
+  ActionBlocked as SignUpActionBlocked,
+  AlternativePhone as SignUpAlternativePhone,
+  Continue as SignUpContinue,
+  ContinueLegalConsentOnly as SignUpContinueLegalConsentOnly,
+  Default as SignUpDefault,
+  EmailLinkSignedUp as SignUpEmailLinkSignedUp,
+  EnterpriseConnections as SignUpEnterpriseConnections,
+  Loading as SignUpLoading,
+  meta as signUpMeta,
+  ProtectCheck as SignUpProtectCheck,
+  Restricted as SignUpRestricted,
+  StartCaptcha as SignUpStartCaptcha,
+  StartEmailOrPhone as SignUpStartEmailOrPhone,
+  StartFormOnly as SignUpStartFormOnly,
+  StartInvitation as SignUpStartInvitation,
+  StartLegalConsent as SignUpStartLegalConsent,
+  StartProviderPending as SignUpStartProviderPending,
+  StartSocialOnly as SignUpStartSocialOnly,
+  VerifyEmail as SignUpVerifyEmail,
+  VerifyEmailLink as SignUpVerifyEmailLink,
+  VerifyPhone as SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel as SignUpVerifyPhoneAlternativeChannel,
+  Waitlist as SignUpWaitlist,
+  Wallets as SignUpWallets,
+} from '../stories/sign-up.stories';
+import {
+  CustomElement as SignUpButtonCustomElement,
+  Default as SignUpButtonDefault,
+  meta as signUpButtonMeta,
+  Pending as SignUpButtonPending,
+} from '../stories/sign-up-button.stories';
+import {
+  Elements as SkeletonElements,
+  HoldSpace as SkeletonHoldSpace,
+  meta as skeletonMeta,
+  NotShown as SkeletonNotShown,
+  Primary as SkeletonPrimary,
+  Shapes as SkeletonShapes,
+  TextContent as SkeletonTextContent,
+} from '../stories/skeleton.stories';
+import {
+  Clickable as StepperClickable,
+  meta as stepperMeta,
+  Primary as StepperPrimary,
+  Progress as StepperProgress,
+} from '../stories/stepper.stories';
+import {
+  Default as SwitchDefault,
+  meta as switchMeta,
+  Sizes as SwitchSizes,
+  States as SwitchStates,
+  WithField as SwitchWithField,
+} from '../stories/switch.stories';
+import { Combined as SwitcherCombined, meta as switcherMeta } from '../stories/switcher.stories';
+import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
+import {
+  Default as TableDefault,
+  Empty as TableEmpty,
+  meta as tableMeta,
+  Overflow as TableOverflow,
+  Search as TableSearch,
+  Selection as TableSelection,
+  Sorting as TableSorting,
+} from '../stories/table.stories';
+import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
+import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TagInputComponentDefault,
+  Disabled as TagInputComponentDisabled,
+  Invalid as TagInputComponentInvalid,
+  meta as tagInputComponentMeta,
+  Validation as TagInputComponentValidation,
+} from '../stories/tag-input.component.stories';
+import { meta as tagInputMeta } from '../stories/tag-input.stories';
+import {
+  Default as TaskChooseOrganizationDefault,
+  Empty as TaskChooseOrganizationEmpty,
+  Loading as TaskChooseOrganizationLoading,
+  meta as taskChooseOrganizationMeta,
+  Unavailable as TaskChooseOrganizationUnavailable,
+  WithDefaults as TaskChooseOrganizationWithDefaults,
+  WithError as TaskChooseOrganizationWithError,
+  WithoutCreate as TaskChooseOrganizationWithoutCreate,
+} from '../stories/task-choose-organization.stories';
+import {
+  AuthenticatorOnly as TaskSetupMfaAuthenticatorOnly,
+  Default as TaskSetupMfaDefault,
+  meta as taskSetupMfaMeta,
+  NewPhone as TaskSetupMfaNewPhone,
+  SmsOnly as TaskSetupMfaSmsOnly,
+} from '../stories/task-setup-mfa.stories';
+import {
+  Colors as TextColors,
+  Default as TextDefault,
+  meta as textMeta,
+  Sizes as TextSizes,
+} from '../stories/text.stories';
+import { meta as toastPrimitiveMeta } from '../stories/toast.primitive.stories';
+import { Anchored as ToastAnchored, Default as ToastDefault, meta as toastMeta } from '../stories/toast.stories';
+import {
+  Default as TooltipComponentDefault,
+  Group as TooltipComponentGroup,
+  meta as tooltipComponentMeta,
+  Placement as TooltipComponentPlacement,
+} from '../stories/tooltip.component.stories';
+import { meta as tooltipMeta } from '../stories/tooltip.stories';
+import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
+import {
+  Default as UserAvatarDefault,
+  meta as userAvatarMeta,
+  NoImage as UserAvatarNoImage,
+  Shapes as UserAvatarShapes,
+  Sizes as UserAvatarSizes,
+} from '../stories/user-avatar.stories';
+import { Default as UserButtonDefault, meta as userButtonMeta } from '../stories/user-button.stories';
+import {
+  Default as UserProfileDefault,
+  meta as userProfileMeta,
+  Overlay as UserProfileOverlay,
+} from '../stories/user-profile.stories';
+import {
+  Default as UserProfileActiveDevicesSectionDefault,
+  Impersonation as UserProfileActiveDevicesSectionImpersonation,
+  meta as userProfileActiveDevicesSectionMeta,
+  SignOutError as UserProfileActiveDevicesSectionSignOutError,
+} from '../stories/user-profile-active-devices-section.stories';
+import {
+  Default as UserProfileApiKeysPanelDefault,
+  Empty as UserProfileApiKeysPanelEmpty,
+  meta as userProfileApiKeysPanelMeta,
+} from '../stories/user-profile-api-keys-panel.stories';
+import {
+  Default as UserProfileBillingHistorySectionDefault,
+  Empty as UserProfileBillingHistorySectionEmpty,
+  meta as userProfileBillingHistorySectionMeta,
+} from '../stories/user-profile-billing-history-section.stories';
+import {
+  Default as UserProfileBillingPanelDefault,
+  meta as userProfileBillingPanelMeta,
+} from '../stories/user-profile-billing-panel.stories';
+import {
+  ConnectionError as ConnectedAccountsConnectionError,
+  ConnectOnly as ConnectedAccountsConnectOnly,
+  Default as UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts as ConnectedAccountsLinkedAccounts,
+  meta as userProfileConnectedAccountsSectionMeta,
+  ReconnectRequired as ConnectedAccountsReconnectRequired,
+  RemovalError as ConnectedAccountsRemovalError,
+  RemovalPending as ConnectedAccountsRemovalPending,
+  VerificationError as ConnectedAccountsVerificationError,
+} from '../stories/user-profile-connected-accounts-section.stories';
+import {
+  Default as UserProfileDangerSectionDefault,
+  meta as userProfileDangerSectionMeta,
+  WithError as UserProfileDangerSectionWithError,
+} from '../stories/user-profile-danger-section.stories';
+import {
+  AddEmailFails as UserProfileEmailSectionAddEmailFails,
+  Default as UserProfileEmailSectionDefault,
+  EmailLinkFails as UserProfileEmailSectionEmailLinkFails,
+  EmailLinkVerification as UserProfileEmailSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileEmailSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileEmailSectionEmailRemovalPending,
+  EmailSsoFails as UserProfileEmailSectionEmailSsoFails,
+  EmailSsoVerification as UserProfileEmailSectionEmailSsoVerification,
+  meta as userProfileEmailSectionMeta,
+} from '../stories/user-profile-email-section.stories';
+import {
+  ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
+  ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
+  Default as UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts as UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  meta as userProfileEnterpriseAccountsSectionMeta,
+  RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
+} from '../stories/user-profile-enterprise-accounts-section.stories';
+import {
+  Default as UserProfileMfaSectionDefault,
+  meta as userProfileMfaSectionMeta,
+} from '../stories/user-profile-mfa-section.stories';
+import {
+  CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
+  Default as UserProfilePasskeysSectionDefault,
+  Empty as UserProfilePasskeysSectionEmpty,
+  meta as userProfilePasskeysSectionMeta,
+  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
+} from '../stories/user-profile-passkeys-section.stories';
+import {
+  Default as UserProfilePasswordSectionDefault,
+  EditPasswordFails as UserProfilePasswordSectionEditPasswordFails,
+  ManagedByEnterprise as UserProfilePasswordSectionManagedByEnterprise,
+  meta as userProfilePasswordSectionMeta,
+  SetPassword as UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword as UserProfilePasswordSectionWithoutCurrentPassword,
+} from '../stories/user-profile-password-section.stories';
+import {
+  Default as UserProfilePaymentMethodsSectionDefault,
+  Empty as UserProfilePaymentMethodsSectionEmpty,
+  meta as userProfilePaymentMethodsSectionMeta,
+} from '../stories/user-profile-payment-methods-section.stories';
+import {
+  AddPhoneFails as UserProfilePhoneSectionAddPhoneFails,
+  Default as UserProfilePhoneSectionDefault,
+  meta as userProfilePhoneSectionMeta,
+  PhoneRemovalError as UserProfilePhoneSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfilePhoneSectionPhoneRemovalPending,
+} from '../stories/user-profile-phone-section.stories';
+import {
+  Default as UserProfileProfilePanelDefault,
+  meta as userProfileProfilePanelMeta,
+} from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileProfileSectionDefault,
+  EditNameFails as UserProfileProfileSectionEditNameFails,
+  EditUsernameFails as UserProfileProfileSectionEditUsernameFails,
+  meta as userProfileProfileSectionMeta,
+  NameManagedByConnection as UserProfileProfileSectionNameManagedByConnection,
+} from '../stories/user-profile-profile-section.stories';
+import {
+  Default as UserProfileSecurityPanelDefault,
+  meta as userProfileSecurityPanelMeta,
+} from '../stories/user-profile-security-panel.stories';
+import {
+  Default as UserProfileSubscriptionSectionDefault,
+  meta as userProfileSubscriptionSectionMeta,
+} from '../stories/user-profile-subscription-section.stories';
+import {
+  ConnectedWallets as UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectionError as UserProfileWeb3WalletsSectionConnectionError,
+  ConnectOnly as UserProfileWeb3WalletsSectionConnectOnly,
+  Default as UserProfileWeb3WalletsSectionDefault,
+  meta as userProfileWeb3WalletsSectionMeta,
+  PrimaryError as UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalError as UserProfileWeb3WalletsSectionRemovalError,
+  RemovalPending as UserProfileWeb3WalletsSectionRemovalPending,
+  UnverifiedWallet as UserProfileWeb3WalletsSectionUnverifiedWallet,
+} from '../stories/user-profile-web3-wallets-section.stories';
+import {
+  Default as VisuallyHiddenDefault,
+  LiveRegion as VisuallyHiddenLiveRegion,
+  meta as visuallyHiddenMeta,
+} from '../stories/visually-hidden.stories';
+import {
+  Default as WaitlistDefault,
+  Joined as WaitlistJoined,
+  meta as waitlistMeta,
+  Redirecting as WaitlistRedirecting,
+} from '../stories/waitlist.stories';
+import { toSlug } from './slug';
+import type { StoryModule } from './types';
+
+const sectionModule: StoryModule = {
+  meta: sectionMeta,
+  Default: SectionDefault,
+  ConnectedAccounts: SectionConnectedAccounts,
+  IconFrameMedia: SectionIconFrameMedia,
+  Destructive: SectionDestructive,
+};
+const dialogComponentModule: StoryModule = { meta: dialogComponentMeta, Default: DialogDefault };
+const drawerComponentModule: StoryModule = {
+  meta: drawerComponentMeta,
+  Default: DrawerComponentDefault,
+  InsideProfile: DrawerComponentInsideProfile,
+};
+
+const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+
+const checkboxModule: StoryModule = {
+  meta: checkboxMeta,
+  Default: CheckboxDefault,
+  States: CheckboxStates,
+  Sizes: CheckboxSizes,
+};
+
+const emptyStateModule: StoryModule = {
+  meta: emptyStateMeta,
+  Default: EmptyStateDefault,
+  NoResults: EmptyStateNoResults,
+  LabelOnly: EmptyStateLabelOnly,
+};
+
+const comboboxModule: StoryModule = {
+  meta: comboboxMeta,
+  Default: ComboboxDefault,
+  Scrolling: ComboboxScrolling,
+};
+
+const copyButtonModule: StoryModule = {
+  meta: copyButtonMeta,
+  Default: CopyButtonDefault,
+  Inline: CopyButtonInline,
+  Labelled: CopyButtonLabelled,
+};
+
+const providerButtonModule: StoryModule = {
+  meta: providerButtonMeta,
+  Default: ProviderButtonDefault,
+  One: ProviderButtonOne,
+  Many: ProviderButtonMany,
+  Stacked: ProviderButtonStacked,
+  Pending: ProviderButtonPending,
+};
+
+const organizationProfileModule: StoryModule = {
+  meta: organizationProfileMeta,
+  Default: OrganizationProfileDefault,
+  Overlay: OrganizationProfileOverlay,
+};
+
+const organizationProfileGeneralPanelModule: StoryModule = {
+  meta: organizationProfileGeneralPanelMeta,
+  Default: OrganizationProfileGeneralPanelDefault,
+  ReadOnly: OrganizationProfileGeneralPanelReadOnly,
+};
+
+const organizationProfileProfileSectionModule: StoryModule = {
+  meta: organizationProfileProfileSectionMeta,
+  Default: OrganizationProfileProfileSectionDefault,
+  SaveFails: OrganizationProfileProfileSectionSaveFails,
+};
+
+const organizationProfileDangerSectionModule: StoryModule = {
+  meta: organizationProfileDangerSectionMeta,
+  Default: OrganizationProfileDangerSectionDefault,
+  WithError: OrganizationProfileDangerSectionWithError,
+  LeaveOnly: OrganizationProfileDangerSectionLeaveOnly,
+};
+
+const actionBarModule: StoryModule = {
+  meta: actionBarMeta,
+  Default: ActionBarDefault,
+  InDialog: ActionBarInDialog,
+  Inline: ActionBarInline,
+};
+
+const avatarModule: StoryModule = {
+  meta: avatarMeta,
+  Primary: AvatarPrimary,
+  Interactive: AvatarInteractive,
+  Fallback: AvatarFallbackStory,
+  Sizes: AvatarSizes,
+  Shapes: AvatarShapes,
+};
+
+const skeletonModule: StoryModule = {
+  meta: skeletonMeta,
+  Primary: SkeletonPrimary,
+  TextContent: SkeletonTextContent,
+  Elements: SkeletonElements,
+  Shapes: SkeletonShapes,
+  HoldSpace: SkeletonHoldSpace,
+  NotShown: SkeletonNotShown,
+};
+
+const linkModule: StoryModule = {
+  meta: linkMeta,
+  Primary: LinkPrimary,
+  External: LinkExternal,
+  ExternalWrapping: LinkExternalWrapping,
+};
+
+const badgeModule: StoryModule = {
+  meta: badgeMeta,
+  Primary: BadgePrimary,
+  Colors: BadgeColors,
+  WithIcon: BadgeWithIcon,
+};
+
+const bannerModule: StoryModule = {
+  meta: bannerMeta,
+  Default: BannerDefault,
+  Colors: BannerColors,
+  LabelOnly: BannerLabelOnly,
+  Announced: BannerAnnounced,
+};
+
+const buttonModule: StoryModule = { meta: buttonMeta, Primary, Sizes, Disabled };
+
+const inputModule: StoryModule = {
+  meta: inputMeta,
+  Default,
+  Sizes: InputSizes,
+  Disabled: InputDisabled,
+  Invalid,
+  Ghost: InputGhost,
+};
+
+const inputGroupModule: StoryModule = {
+  meta: inputGroupMeta,
+  Default: InputGroupDefault,
+  Sizes: InputGroupSizes,
+  Disabled: InputGroupDisabled,
+  Invalid: InputGroupInvalid,
+};
+
+const paginationModule: StoryModule = {
+  meta: paginationMeta,
+  Primary: PaginationPrimary,
+  FirstLast: PaginationFirstLast,
+  MiddlePage: PaginationMiddlePage,
+  SinglePage: PaginationSinglePage,
+  Disabled: PaginationDisabled,
+};
+
+const stepperModule: StoryModule = {
+  meta: stepperMeta,
+  Primary: StepperPrimary,
+  Progress: StepperProgress,
+  Clickable: StepperClickable,
+};
+
+const passwordInputModule: StoryModule = {
+  meta: passwordInputMeta,
+  Default: PasswordInputDefault,
+  Sizes: PasswordInputSizes,
+  Disabled: PasswordInputDisabled,
+  Invalid: PasswordInputInvalid,
+};
+const phoneInputModule: StoryModule = {
+  meta: phoneInputMeta,
+  Default: PhoneInputDefault,
+  Sizes: PhoneInputSizes,
+  Prefilled: PhoneInputPrefilled,
+  Disabled: PhoneInputDisabled,
+  Invalid: PhoneInputInvalid,
+};
+
+const popoverComponentModule: StoryModule = {
+  meta: popoverComponentMeta,
+  Default: PopoverComponentDefault,
+  Placement: PopoverComponentPlacement,
+  Alignment: PopoverComponentAlignment,
+};
+const panelModule: StoryModule = { meta: panelMeta, Default: PanelDefault };
+const profileComponentModule: StoryModule = {
+  meta: profileComponentMeta,
+  Default: ProfileDefault,
+  Customized: ProfileCustomized,
+  Transitions: ProfileTransitions,
+};
+const radioModule: StoryModule = {
+  meta: radioMeta,
+  Default: RadioDefault,
+  Descriptions: RadioDescriptions,
+  States: RadioStates,
+  Sizes: RadioSizes,
+};
+
+const revealModule: StoryModule = { meta: revealMeta, Default: RevealDefault };
+
+const dataListModule: StoryModule = {
+  meta: dataListMeta,
+  Default: DataListDefault,
+  Plain: DataListPlain,
+};
+
+const entityModule: StoryModule = {
+  meta: entityMeta,
+  Default: EntityDefault,
+  WithBadge: EntityWithBadge,
+  LabelOnly: EntityLabelOnly,
+  Truncation: EntityTruncation,
+};
+
+const itemModule: StoryModule = {
+  meta: itemMeta,
+  Default: ItemDefault,
+  Interactive: ItemInteractive,
+  Group: ItemGroup,
+};
+
+const switcherModule: StoryModule = {
+  meta: switcherMeta,
+  Combined: SwitcherCombined,
+};
+
+const userButtonModule: StoryModule = {
+  meta: userButtonMeta,
+  Default: UserButtonDefault,
+};
+
+const taskSetupMfaModule: StoryModule = {
+  meta: taskSetupMfaMeta,
+  Default: TaskSetupMfaDefault,
+  SmsOnly: TaskSetupMfaSmsOnly,
+  AuthenticatorOnly: TaskSetupMfaAuthenticatorOnly,
+  NewPhone: TaskSetupMfaNewPhone,
+};
+
+const inviteMembersButtonModule: StoryModule = {
+  meta: inviteMembersButtonMeta,
+  Default: InviteMembersButtonDefault,
+  CustomElement: InviteMembersButtonCustomElement,
+  Unavailable: InviteMembersButtonUnavailable,
+};
+
+const waitlistModule: StoryModule = {
+  meta: waitlistMeta,
+  Default: WaitlistDefault,
+  Joined: WaitlistJoined,
+  Redirecting: WaitlistRedirecting,
+};
+
+const signInButtonModule: StoryModule = {
+  meta: signInButtonMeta,
+  Default: SignInButtonDefault,
+  CustomElement: SignInButtonCustomElement,
+  Pending: SignInButtonPending,
+};
+
+const signInWithMetamaskButtonModule: StoryModule = {
+  meta: signInWithMetamaskButtonMeta,
+  Default: SignInWithMetamaskButtonDefault,
+  CustomElement: SignInWithMetamaskButtonCustomElement,
+  Pending: SignInWithMetamaskButtonPending,
+};
+
+const signOutButtonModule: StoryModule = {
+  meta: signOutButtonMeta,
+  Default: SignOutButtonDefault,
+  CustomElement: SignOutButtonCustomElement,
+  Pending: SignOutButtonPending,
+};
+
+const signUpButtonModule: StoryModule = {
+  meta: signUpButtonMeta,
+  Default: SignUpButtonDefault,
+  CustomElement: SignUpButtonCustomElement,
+  Pending: SignUpButtonPending,
+};
+
+const userAvatarModule: StoryModule = {
+  meta: userAvatarMeta,
+  Default: UserAvatarDefault,
+  NoImage: UserAvatarNoImage,
+  Shapes: UserAvatarShapes,
+  Sizes: UserAvatarSizes,
+};
+
+const organizationSwitcherModule: StoryModule = {
+  meta: organizationSwitcherMeta,
+  Default: OrganizationSwitcherDefault,
+  NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
+};
+
+const createOrganizationModule: StoryModule = {
+  meta: createOrganizationMeta,
+  Default: CreateOrganizationDefault,
+  WithoutSlug: CreateOrganizationWithoutSlug,
+  WithError: CreateOrganizationWithError,
+};
+
+const organizationListModule: StoryModule = {
+  meta: organizationListMeta,
+  Default: OrganizationListDefault,
+  WithoutPersonal: OrganizationListWithoutPersonal,
+  Loading: OrganizationListLoading,
+  Empty: OrganizationListEmpty,
+  WithError: OrganizationListWithError,
+};
+
+const taskChooseOrganizationModule: StoryModule = {
+  meta: taskChooseOrganizationMeta,
+  Default: TaskChooseOrganizationDefault,
+  WithoutCreate: TaskChooseOrganizationWithoutCreate,
+  Empty: TaskChooseOrganizationEmpty,
+  WithDefaults: TaskChooseOrganizationWithDefaults,
+  Unavailable: TaskChooseOrganizationUnavailable,
+  Loading: TaskChooseOrganizationLoading,
+  WithError: TaskChooseOrganizationWithError,
+};
+
+const headingModule: StoryModule = {
+  meta: headingMeta,
+  Default: HeadingDefault,
+  Sizes: HeadingSizes,
+  Colors: HeadingColors,
+};
+
+const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
+
+const selectComponentModule: StoryModule = {
+  meta: selectComponentMeta,
+  Default: SelectComponentDefault,
+  Descriptions: SelectComponentDescriptions,
+  Ghost: SelectComponentGhost,
+  Placeholder: SelectComponentPlaceholder,
+  Controlled: SelectComponentControlled,
+  Overflowing: SelectComponentOverflowing,
+};
+
+const otpComponentModule: StoryModule = {
+  meta: otpComponentMeta,
+  Default: OtpComponentDefault,
+  Success: OtpComponentSuccess,
+  Error: OtpComponentError,
+  Disabled: OtpComponentDisabled,
+};
+
+const tagInputComponentModule: StoryModule = {
+  meta: tagInputComponentMeta,
+  Default: TagInputComponentDefault,
+  Validation: TagInputComponentValidation,
+  Invalid: TagInputComponentInvalid,
+  Disabled: TagInputComponentDisabled,
+};
+
+const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
+
+const tooltipComponentModule: StoryModule = {
+  meta: tooltipComponentMeta,
+  Default: TooltipComponentDefault,
+  Placement: TooltipComponentPlacement,
+  Group: TooltipComponentGroup,
+};
+
+const fieldModule: StoryModule = {
+  meta: fieldMeta,
+  Default: FieldDefault,
+  VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
+};
+
+const captchaModule: StoryModule = {
+  meta: captchaMeta,
+  Default: CaptchaDefault,
+};
+
+const visuallyHiddenModule: StoryModule = {
+  meta: visuallyHiddenMeta,
+  Default: VisuallyHiddenDefault,
+  LiveRegion: VisuallyHiddenLiveRegion,
+};
+
+const flowComponentModule: StoryModule = {
+  meta: flowComponentMeta,
+  Default: FlowDefault,
+};
+
+const iconModule: StoryModule = {
+  meta: iconMeta,
+  Default: IconDefault,
+  Sizes: IconSizes,
+  Names: IconNames,
+  Override: IconOverride,
+};
+
+const iconFrameModule: StoryModule = {
+  meta: iconFrameMeta,
+  Default: IconFrameDefault,
+  Sizes: IconFrameSizes,
+  Treatments: IconFrameTreatments,
+  CustomSurface: IconFrameCustomSurface,
+  BrandIcons: IconFrameBrandIcons,
+};
+
+// Headless primitives carry just `meta` (no story functions). Like every component
+// they're documented as a single overview page; their live demos come from `<Story>` /
+// `<Preview>` embeds in the MDX, which import the stories module directly.
+const accordionModule: StoryModule = { meta: accordionMeta };
+const autocompleteModule: StoryModule = { meta: autocompleteMeta };
+const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
+const collapsibleModule: StoryModule = { meta: collapsibleMeta };
+const dialogModule: StoryModule = { meta: dialogMeta };
+const drawerModule: StoryModule = { meta: drawerMeta };
+const fileUploadModule: StoryModule = { meta: fileUploadMeta };
+const flowModule: StoryModule = { meta: flowMeta };
+const imageCropperModule: StoryModule = { meta: imageCropperMeta };
+const menuModule: StoryModule = { meta: menuMeta };
+const otpModule: StoryModule = { meta: otpMeta };
+const popoverModule: StoryModule = { meta: popoverMeta };
+const portalModule: StoryModule = { meta: portalMeta };
+const selectModule: StoryModule = { meta: selectMeta };
+const tablePrimitiveModule: StoryModule = { meta: tablePrimitiveMeta };
+const tabsModule: StoryModule = { meta: tabsMeta };
+const tagInputModule: StoryModule = { meta: tagInputMeta };
+const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
+const tooltipModule: StoryModule = { meta: tooltipMeta };
+
+const scrollAreaModule: StoryModule = {
+  meta: scrollAreaMeta,
+  Default: ScrollAreaDefault,
+  NotScrollable: ScrollAreaNotScrollable,
+  Gutter: ScrollAreaGutter,
+  Horizontal: ScrollAreaHorizontal,
+  HoverReveal: ScrollAreaHoverReveal,
+  ThemedScrollbar: ScrollAreaThemedScrollbar,
+  ShadowIndicators: ScrollAreaShadowIndicators,
+};
+
+const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
+
+const localizationModule: StoryModule = {
+  meta: localizationMeta,
+  Overrides: LocalizationOverrides,
+  Catalog: LocalizationCatalog,
+  CatalogWithOverrides: LocalizationCatalogWithOverrides,
+  Helpers: LocalizationHelpers,
+  Fallback: LocalizationFallback,
+  PluralRules: LocalizationPluralRules,
+};
+
+const tableModule: StoryModule = {
+  meta: tableMeta,
+  Default: TableDefault,
+  Sorting: TableSorting,
+  Search: TableSearch,
+  Selection: TableSelection,
+  Empty: TableEmpty,
+  Overflow: TableOverflow,
+};
+
+const segmentedControlModule: StoryModule = {
+  meta: segmentedControlMeta,
+  Default: SegmentedControlDefault,
+  Disabled: SegmentedControlDisabled,
+};
+
+const separatorModule: StoryModule = {
+  meta: separatorMeta,
+  Default: SeparatorDefault,
+  Labelled: SeparatorLabelled,
+};
+
+const switchModule: StoryModule = {
+  meta: switchMeta,
+  Default: SwitchDefault,
+  States: SwitchStates,
+  Sizes: SwitchSizes,
+  WithField: SwitchWithField,
+};
+
+const tabsComponentModule: StoryModule = {
+  meta: tabsComponentMeta,
+  Default: TabsComponentDefault,
+};
+
+// Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
+const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Anchored: ToastAnchored };
+
+const userProfileApiKeysPanelModule: StoryModule = {
+  meta: userProfileApiKeysPanelMeta,
+  Default: UserProfileApiKeysPanelDefault,
+  Empty: UserProfileApiKeysPanelEmpty,
+};
+const profileFeatureModule: StoryModule = {
+  meta: profileFeatureMeta,
+  Default: ProfileFeatureDefault,
+};
+
+const userProfileModule: StoryModule = {
+  meta: userProfileMeta,
+  Default: UserProfileDefault,
+  Overlay: UserProfileOverlay,
+};
+
+const userProfileProfileSectionModule: StoryModule = {
+  meta: userProfileProfileSectionMeta,
+  Default: UserProfileProfileSectionDefault,
+  NameManagedByConnection: UserProfileProfileSectionNameManagedByConnection,
+  EditNameFails: UserProfileProfileSectionEditNameFails,
+  EditUsernameFails: UserProfileProfileSectionEditUsernameFails,
+};
+
+const userProfileEmailSectionModule: StoryModule = {
+  meta: userProfileEmailSectionMeta,
+  Default: UserProfileEmailSectionDefault,
+  AddEmailFails: UserProfileEmailSectionAddEmailFails,
+  EmailLinkVerification: UserProfileEmailSectionEmailLinkVerification,
+  EmailLinkFails: UserProfileEmailSectionEmailLinkFails,
+  EmailSsoVerification: UserProfileEmailSectionEmailSsoVerification,
+  EmailSsoFails: UserProfileEmailSectionEmailSsoFails,
+  EmailRemovalPending: UserProfileEmailSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileEmailSectionEmailRemovalError,
+};
+
+const userProfilePhoneSectionModule: StoryModule = {
+  meta: userProfilePhoneSectionMeta,
+  Default: UserProfilePhoneSectionDefault,
+  AddPhoneFails: UserProfilePhoneSectionAddPhoneFails,
+  PhoneRemovalPending: UserProfilePhoneSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfilePhoneSectionPhoneRemovalError,
+};
+const userProfileProfilePanelModule: StoryModule = {
+  meta: userProfileProfilePanelMeta,
+  Default: UserProfileProfilePanelDefault,
+};
+const userProfileSecurityPanelModule: StoryModule = {
+  meta: userProfileSecurityPanelMeta,
+  Default: UserProfileSecurityPanelDefault,
+};
+const userProfileBillingPanelModule: StoryModule = {
+  meta: userProfileBillingPanelMeta,
+  Default: UserProfileBillingPanelDefault,
+};
+const userProfileBillingHistorySectionModule: StoryModule = {
+  meta: userProfileBillingHistorySectionMeta,
+  Default: UserProfileBillingHistorySectionDefault,
+  Empty: UserProfileBillingHistorySectionEmpty,
+};
+const userProfilePasswordSectionModule: StoryModule = {
+  meta: userProfilePasswordSectionMeta,
+  Default: UserProfilePasswordSectionDefault,
+  SetPassword: UserProfilePasswordSectionSetPassword,
+  WithoutCurrentPassword: UserProfilePasswordSectionWithoutCurrentPassword,
+  ManagedByEnterprise: UserProfilePasswordSectionManagedByEnterprise,
+  EditPasswordFails: UserProfilePasswordSectionEditPasswordFails,
+};
+const userProfilePasskeysSectionModule: StoryModule = {
+  meta: userProfilePasskeysSectionMeta,
+  CreationUnavailable: UserProfilePasskeysSectionCreationUnavailable,
+  Default: UserProfilePasskeysSectionDefault,
+  Empty: UserProfilePasskeysSectionEmpty,
+  RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
+};
+const userProfileMfaSectionModule: StoryModule = {
+  meta: userProfileMfaSectionMeta,
+  Default: UserProfileMfaSectionDefault,
+};
+const userProfileActiveDevicesSectionModule: StoryModule = {
+  meta: userProfileActiveDevicesSectionMeta,
+  Default: UserProfileActiveDevicesSectionDefault,
+  SignOutError: UserProfileActiveDevicesSectionSignOutError,
+  Impersonation: UserProfileActiveDevicesSectionImpersonation,
+};
+const userProfileSubscriptionSectionModule: StoryModule = {
+  meta: userProfileSubscriptionSectionMeta,
+  Default: UserProfileSubscriptionSectionDefault,
+};
+const userProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: userProfilePaymentMethodsSectionMeta,
+  Default: UserProfilePaymentMethodsSectionDefault,
+  Empty: UserProfilePaymentMethodsSectionEmpty,
+};
+const userProfileEnterpriseAccountsSectionModule: StoryModule = {
+  meta: userProfileEnterpriseAccountsSectionMeta,
+  Default: UserProfileEnterpriseAccountsSectionDefault,
+  LinkedAccounts: UserProfileEnterpriseAccountsSectionLinkedAccounts,
+  RequiresAction: UserProfileEnterpriseAccountsSectionRequiresAction,
+  ConnectOnly: UserProfileEnterpriseAccountsSectionConnectOnly,
+  ConnectionError: UserProfileEnterpriseAccountsSectionConnectionError,
+};
+const userProfileConnectedAccountsSectionModule: StoryModule = {
+  meta: userProfileConnectedAccountsSectionMeta,
+  Default: UserProfileConnectedAccountsSectionDefault,
+  LinkedAccounts: ConnectedAccountsLinkedAccounts,
+  ConnectOnly: ConnectedAccountsConnectOnly,
+  ReconnectRequired: ConnectedAccountsReconnectRequired,
+  VerificationError: ConnectedAccountsVerificationError,
+  ConnectionError: ConnectedAccountsConnectionError,
+  RemovalPending: ConnectedAccountsRemovalPending,
+  RemovalError: ConnectedAccountsRemovalError,
+};
+const userProfileWeb3WalletsSectionModule: StoryModule = {
+  meta: userProfileWeb3WalletsSectionMeta,
+  Default: UserProfileWeb3WalletsSectionDefault,
+  ConnectedWallets: UserProfileWeb3WalletsSectionConnectedWallets,
+  ConnectOnly: UserProfileWeb3WalletsSectionConnectOnly,
+  ConnectionError: UserProfileWeb3WalletsSectionConnectionError,
+  PrimaryError: UserProfileWeb3WalletsSectionPrimaryError,
+  RemovalPending: UserProfileWeb3WalletsSectionRemovalPending,
+  RemovalError: UserProfileWeb3WalletsSectionRemovalError,
+  UnverifiedWallet: UserProfileWeb3WalletsSectionUnverifiedWallet,
+};
+const userProfileDangerSectionModule: StoryModule = {
+  meta: userProfileDangerSectionMeta,
+  Default: UserProfileDangerSectionDefault,
+  WithError: UserProfileDangerSectionWithError,
+};
+
+const confirmationModule: StoryModule = {
+  meta: confirmationMeta,
+  Default: ConfirmationDefault,
+  WithError: ConfirmationWithError,
+};
+
+const destructiveModule: StoryModule = {
+  meta: destructiveMeta,
+  Default: DestructiveDefault,
+  WithError: DestructiveWithError,
+};
+
+const apiKeysTableModule: StoryModule = {
+  meta: apiKeysTableMeta,
+  Default: APIKeysTableDefault,
+  Organization: APIKeysTableOrganization,
+  ProposedTable: APIKeysTableProposedTable,
+  Empty: APIKeysTableEmpty,
+};
+
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
+  MultipleOrganizations: OAuthConsentMultipleOrganizations,
+  OfflineAccess: OAuthConsentOfflineAccess,
+};
+
+const reverificationModule: StoryModule = {
+  meta: reverificationMeta,
+  Default: ReverificationDefault,
+  Password: ReverificationPassword,
+  PasswordPending: ReverificationPasswordPending,
+  PasswordError: ReverificationPasswordError,
+  Passkey: ReverificationPasskey,
+  PasskeyPending: ReverificationPasskeyPending,
+  PasskeyError: ReverificationPasskeyError,
+  OTP: ReverificationOTP,
+  AuthenticatorOTP: ReverificationAuthenticatorOTP,
+  OTPPending: ReverificationOTPPending,
+  OTPError: ReverificationOTPError,
+  OTPResending: ReverificationOTPResending,
+  BackupCode: ReverificationBackupCode,
+  BackupCodePending: ReverificationBackupCodePending,
+  BackupCodeError: ReverificationBackupCodeError,
+  MethodPicker: ReverificationMethodPicker,
+  MethodPickerPending: ReverificationMethodPickerPending,
+  Help: ReverificationHelp,
+};
+
+const signUpModule: StoryModule = {
+  meta: signUpMeta,
+  Default: SignUpDefault,
+  StartSocialOnly: SignUpStartSocialOnly,
+  StartFormOnly: SignUpStartFormOnly,
+  StartInvitation: SignUpStartInvitation,
+  StartEmailOrPhone: SignUpStartEmailOrPhone,
+  StartLegalConsent: SignUpStartLegalConsent,
+  StartCaptcha: SignUpStartCaptcha,
+  StartProviderPending: SignUpStartProviderPending,
+  Continue: SignUpContinue,
+  ContinueLegalConsentOnly: SignUpContinueLegalConsentOnly,
+  Restricted: SignUpRestricted,
+  Waitlist: SignUpWaitlist,
+  AlternativePhone: SignUpAlternativePhone,
+  VerifyEmail: SignUpVerifyEmail,
+  VerifyPhone: SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel: SignUpVerifyPhoneAlternativeChannel,
+  VerifyEmailLink: SignUpVerifyEmailLink,
+  EmailLinkSignedUp: SignUpEmailLinkSignedUp,
+  EnterpriseConnections: SignUpEnterpriseConnections,
+  Wallets: SignUpWallets,
+  Loading: SignUpLoading,
+  ProtectCheck: SignUpProtectCheck,
+  ActionBlocked: SignUpActionBlocked,
+};
+
+const signInModule: StoryModule = {
+  meta: signInMeta,
+  Default: SignInDefault,
+  IdentifierDefault: SignInIdentifierDefault,
+  IdentifierSignInOnly: SignInIdentifierSignInOnly,
+  IdentifierManyProviders: SignInIdentifierManyProviders,
+  IdentifierProviderPending: SignInIdentifierProviderPending,
+  IdentifierError: SignInIdentifierError,
+  IdentifierBannerError: SignInIdentifierBannerError,
+  IdentifierLocked: SignInIdentifierLocked,
+  CredentialPassword: SignInCredentialPassword,
+  CredentialPasswordPending: SignInCredentialPasswordPending,
+  CredentialPasswordError: SignInCredentialPasswordError,
+  CredentialBackupCode: SignInCredentialBackupCode,
+  CredentialPasskey: SignInCredentialPasskey,
+  CodeEmail: SignInCodeEmail,
+  CodeAuthenticatorApp: SignInCodeAuthenticatorApp,
+  CodeClientTrust: SignInCodeClientTrust,
+  CodeVerifyPhone: SignInCodeVerifyPhone,
+  NoticeEnterpriseSso: SignInNoticeEnterpriseSso,
+  CodePhone: SignInCodePhone,
+  CodeAlternativePhoneChannel: SignInCodeAlternativePhoneChannel,
+  CodeSecondFactorPhone: SignInCodeSecondFactorPhone,
+  CodeSecondFactorEmail: SignInCodeSecondFactorEmail,
+  CodeSsoBypass: SignInCodeSsoBypass,
+  CodeResetPassword: SignInCodeResetPassword,
+  CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
+  CodeVerifyEmail: SignInCodeVerifyEmail,
+  ChoiceMethods: SignInChoiceMethods,
+  ChoiceEnterpriseConnections: SignInChoiceEnterpriseConnections,
+  ChoiceResetMethods: SignInChoiceResetMethods,
+  NoticeHelp: SignInNoticeHelp,
+  NoticeForgotPassword: SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending: SignInNoticeForgotPasswordPending,
+  NoticeNoMethods: SignInNoticeNoMethods,
+  NoticeActionBlocked: SignInNoticeActionBlocked,
+  NoticePasswordCompromised: SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending: SignInNoticePasswordCompromisedPending,
+  NoticeEmailLinkSent: SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedInOtherTab: SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkVerified: SignInNoticeEmailLinkVerified,
+  NoticeEmailLinkSigningIn: SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkSignedIn: SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkExpired: SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid: SignInNoticeEmailLinkInvalid,
+  NoticeEmailLinkClientMismatch: SignInNoticeEmailLinkClientMismatch,
+  NoticeStartOver: SignInNoticeStartOver,
+  NewPasswordReset: SignInNewPasswordReset,
+  NewPasswordRequired: SignInNewPasswordRequired,
+  SignUpDetails: SignInSignUpDetails,
+  SignUpSettingsFields: SignInSignUpSettingsFields,
+  SignUpOptionalFields: SignInSignUpOptionalFields,
+  SignUpEmailOrPhone: SignInSignUpEmailOrPhone,
+  SignUpLegalConsent: SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly: SignInSignUpLegalConsentOnly,
+  SignUpPasswordRequirements: SignInSignUpPasswordRequirements,
+  SignUpVerifyEmailLink: SignInSignUpVerifyEmailLink,
+  SignUpEmailLinkSignedUp: SignInSignUpEmailLinkSignedUp,
+};
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+};
+
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
+};
+
+export const registry: StoryModule[] = [
+  // Switcher
+  switcherModule,
+  // Profile
+  profileFeatureModule,
+  // User Profile
+  userProfileModule,
+  // User Profile · Panels
+  userProfileProfilePanelModule,
+  userProfileSecurityPanelModule,
+  userProfileBillingPanelModule,
+  userProfileApiKeysPanelModule,
+  // User Profile · Sections
+  userProfileProfileSectionModule,
+  userProfileEmailSectionModule,
+  userProfilePhoneSectionModule,
+  userProfilePasswordSectionModule,
+  userProfilePasskeysSectionModule,
+  userProfileMfaSectionModule,
+  userProfileActiveDevicesSectionModule,
+  userProfileSubscriptionSectionModule,
+  userProfilePaymentMethodsSectionModule,
+  userProfileBillingHistorySectionModule,
+  userProfileConnectedAccountsSectionModule,
+  userProfileEnterpriseAccountsSectionModule,
+  userProfileWeb3WalletsSectionModule,
+  userProfileDangerSectionModule,
+  // Organization Profile
+  organizationProfileModule,
+  // Organization Profile · Panels
+  organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
+  // Organization Profile · Sections
+  organizationProfileProfileSectionModule,
+  organizationProfileDangerSectionModule,
+  // Misc
+  { meta: mosaicProviderMeta },
+  userButtonModule,
+  organizationSwitcherModule,
+  createOrganizationModule,
+  organizationListModule,
+  taskChooseOrganizationModule,
+  userAvatarModule,
+  inviteMembersButtonModule,
+  apiKeysTableModule,
+  oauthConsentModule,
+  reverificationModule,
+  waitlistModule,
+  taskSetupMfaModule,
+  signInButtonModule,
+  signInWithMetamaskButtonModule,
+  signUpButtonModule,
+  signOutButtonModule,
+  // Authentication
+  signInModule,
+  signUpModule,
+  // Blocks — flows assembled from components, wired by the caller's machine.
+  confirmationModule,
+  destructiveModule,
+  // Components
+  actionBarModule,
+  avatarModule,
+  badgeModule,
+  skeletonModule,
+  bannerModule,
+  buttonModule,
+  linkModule,
+  cardComponentModule,
+  checkboxModule,
+  comboboxModule,
+  copyButtonModule,
+  providerButtonModule,
+  flowComponentModule,
+  inputModule,
+  inputGroupModule,
+  passwordInputModule,
+  phoneInputModule,
+  dataListModule,
+  itemModule,
+  dialogComponentModule,
+  drawerComponentModule,
+  emptyStateModule,
+  entityModule,
+  headingModule,
+  iconModule,
+  iconFrameModule,
+  menuComponentModule,
+  otpComponentModule,
+  paginationModule,
+  panelModule,
+  popoverComponentModule,
+  profileComponentModule,
+  radioModule,
+  revealModule,
+  sectionModule,
+  segmentedControlModule,
+  separatorModule,
+  stepperModule,
+  selectComponentModule,
+  switchModule,
+  tableModule,
+  tabsComponentModule,
+  tagInputComponentModule,
+  textModule,
+  toastModule,
+  tooltipComponentModule,
+  fieldModule,
+  captchaModule,
+  visuallyHiddenModule,
+  // Primitives
+  accordionModule,
+  autocompleteModule,
+  comboboxPrimitiveModule,
+  collapsibleModule,
+  dialogModule,
+  drawerModule,
+  fileUploadModule,
+  flowModule,
+  imageCropperModule,
+  menuModule,
+  otpModule,
+  popoverModule,
+  portalModule,
+  selectModule,
+  tablePrimitiveModule,
+  tabsModule,
+  tagInputModule,
+  toastPrimitiveModule,
+  tooltipModule,
+  // Styles — atomic styles that ship as StyleX atoms rather than components.
+  scrollAreaModule,
+  // Hooks
+  useFormModule,
+  // Localization
+  localizationModule,
+];
+
+/**
+ * Look up a component's story module by its group + component slug (both derived from `meta`).
+ * Group-aware so identically-titled entries in different groups (e.g. the headless `Dialog`
+ * primitive and the styled `Dialog` component) resolve to distinct pages.
+ */
+export function getModule(groupSlug: string, componentSlug: string): StoryModule | undefined {
+  return registry.find(mod => toSlug(mod.meta.group) === groupSlug && toSlug(mod.meta.title) === componentSlug);
+}
+
+const ALPHABETICAL_GROUPS = new Set(['Blocks', 'Components', 'Primitives', 'Styles', 'Hooks']);
+
+export function getSidebarGroups(): Array<{
+  group: string;
+  groupSlug: string;
+  components: Array<{ mod: StoryModule; componentSlug: string }>;
+}> {
+  const groupMap = new Map<string, Array<{ mod: StoryModule; componentSlug: string }>>();
+
+  for (const mod of registry) {
+    const { group, title } = mod.meta;
+    if (!groupMap.has(group)) {
+      groupMap.set(group, []);
+    }
+    groupMap.get(group)?.push({ mod, componentSlug: toSlug(title) });
+  }
+
+  return Array.from(groupMap.entries()).map(([group, components]) => ({
+    group,
+    groupSlug: toSlug(group),
+    components: ALPHABETICAL_GROUPS.has(group)
+      ? [...components].sort((a, b) => a.mod.meta.title.localeCompare(b.mod.meta.title))
+      : components,
+  }));
+}

@@ -15,6 +15,13 @@ type PopoverProps = PropsWithChildren<{
    */
   outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
+  /**
+   * Whether focus is trapped inside the floating element and outside elements
+   * are marked `aria-hidden`. Dialogs should be `true`; menus / dropdowns should
+   * be `false` so the trigger remains in the accessibility tree.
+   * @default true
+   */
+  modal?: boolean;
   portal?: boolean;
   /**
    * The root element to render the portal into.
@@ -29,6 +36,7 @@ export const Popover = (props: PopoverProps) => {
     initialFocus,
     outsideElementsInert = false,
     order = ['reference', 'content'],
+    modal = true,
     nodeId,
     isOpen,
     portal = true,
@@ -49,6 +57,7 @@ export const Popover = (props: PopoverProps) => {
               initialFocus={initialFocus}
               outsideElementsInert={outsideElementsInert}
               order={order}
+              modal={modal}
             >
               <>{children}</>
             </FloatingFocusManager>
@@ -65,6 +74,7 @@ export const Popover = (props: PopoverProps) => {
           context={context}
           initialFocus={initialFocus}
           order={order}
+          modal={modal}
         >
           <>{children}</>
         </FloatingFocusManager>

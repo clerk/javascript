@@ -11,8 +11,10 @@ import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 
+import { buildSignUpOAuthCallbackParams } from '../SignIn/buildOAuthCallbackParams';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
+import { SignUpProtectCheck } from './SignUpProtectCheck';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -34,6 +36,13 @@ function SignUpRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signUp'>
       <Switch>
+        {/* No canActivate guard here. `!!signUp.protectCheck` flips to false
+            when submitProtectCheck resolves and clears protectCheck, which
+            unmounts this card mid-navigation and blanks the route. The card
+            owns its own post-resolution routing. */}
+        <Route path='protect-check'>
+          <SignUpProtectCheck oauthCallbackParams={buildSignUpOAuthCallbackParams(signUpContext)} />
+        </Route>
         <Route
           path='verify-email-address'
           canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -56,17 +65,26 @@ function SignUpRoutes(): JSX.Element {
             continueSignUpUrl='../continue'
             verifyEmailAddressUrl='../verify-email-address'
             verifyPhoneNumberUrl='../verify-phone-number'
+            signUpProtectCheckUrl='../protect-check'
             unsafeMetadata={signUpContext.unsafeMetadata}
           />
         </Route>
         <Route path='verify'>
           <SignUpEmailLinkFlowComplete
             redirectUrlComplete={signUpContext.afterSignUpUrl}
+            ssoCallbackUrl={signUpContext.ssoCallbackUrl}
+            oidcPrompt={signUpContext.oidcPrompt}
             verifyEmailPath='../verify-email-address'
             verifyPhonePath='../verify-phone-number'
           />
         </Route>
         <Route path='continue'>
+          {/* No canActivate guard: same resolution race as the top-level
+              protect-check route; the card owns its own routing. */}
+          <Route path='protect-check'>
+            {/* Under `continue`, the continue index is `..`, not `../continue`. */}
+            <SignUpProtectCheck continuePath='..' />
+          </Route>
           <Route
             path='verify-email-address'
             canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -138,4 +156,12 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   );
 };
 
-export { SignUpContinue, SignUpSSOCallback, SignUpStart, SignUpVerifyEmail, SignUpVerifyPhone };
+export {
+  SignUpContinue,
+  SignUpEnterpriseConnections,
+  SignUpProtectCheck,
+  SignUpSSOCallback,
+  SignUpStart,
+  SignUpVerifyEmail,
+  SignUpVerifyPhone,
+};

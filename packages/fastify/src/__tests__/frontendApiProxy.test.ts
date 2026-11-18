@@ -158,6 +158,25 @@ describe('Frontend API proxy handling', () => {
     expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
   });
 
+  it('responds 400 to a hostless // request target when proxy is enabled', async () => {
+    const response = await injectOnPath({ frontendApiProxy: { enabled: true } }, '//');
+
+    expect(response.statusCode).toEqual(400);
+    expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('responds 400 to a forbidden method (TRACE) on the proxy path', async () => {
+    const fastify = Fastify();
+    await fastify.register(clerkPlugin, { frontendApiProxy: { enabled: true } });
+
+    const response = await fastify.inject({ method: 'TRACE' as 'GET', path: '/__clerk/v1/client' });
+
+    expect(response.statusCode).toEqual(400);
+    expect(mockClerkFrontendApiProxy).not.toHaveBeenCalled();
+    expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
   it('auto-derives proxyUrl for authentication when proxy is enabled', async () => {
     authenticateRequestMock.mockResolvedValueOnce({
       headers: new Headers(),
