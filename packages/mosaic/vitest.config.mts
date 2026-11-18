@@ -62,9 +62,18 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          name: 'lint-rules',
+          environment: 'node',
+          include: ['lint/**/*.test.ts'],
+          setupFiles: ['./lint/vitest.setup.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: ['src/primitives/**', featureTests, webkitTests, browserTests, visualTests],
+          exclude: ['lint/**', 'src/primitives/**', featureTests, webkitTests, browserTests, visualTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },

@@ -100,7 +100,7 @@ export default defineConfig({
     { name: '@eslint-community/eslint-comments', specifier: '@eslint-community/eslint-plugin-eslint-comments' },
     { name: '@stylexjs', specifier: '@stylexjs/eslint-plugin' },
     'eslint-plugin-sonarjs',
-    { name: 'mosaic', specifier: './eslint/plugin.mjs' },
+    { name: 'mosaic', specifier: './lint/plugin.ts' },
     'eslint-plugin-boundaries',
     'eslint-plugin-react-you-might-not-need-an-effect',
   ],
