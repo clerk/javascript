@@ -231,7 +231,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  * ### Handle a password reset during reverification
  *
- * If reverification reset the password, the new password is already saved. Reload the user instead of sending the
+ * If reverification reset the password, Clerk already saved the new password. Reload the user instead of sending the
  * original password update again.
  *
  * ```tsx
