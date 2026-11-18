@@ -11,29 +11,17 @@ import { Verification } from './Verification';
  */
 export class PhoneNumber {
   constructor(
-    /**
-     * The unique identifier for this phone number.
-     */
+    /** The unique identifier for this phone number. */
     readonly id: string,
-    /**
-     * The value of this phone number, in [E.164 format](https://en.wikipedia.org/wiki/E.164).
-     */
+    /** The value of this phone number, in [E.164 format](https://en.wikipedia.org/wiki/E.164). */
     readonly phoneNumber: string,
-    /**
-     * Set to `true` if this phone number is reserved for multi-factor authentication (2FA). Set to `false` otherwise.
-     */
+    /** Whether the phone number is reserved for multi-factor authentication (2FA). */
     readonly reservedForSecondFactor: boolean,
-    /**
-     * Set to `true` if this phone number is the default second factor. Set to `false` otherwise. A user must have exactly one default second factor, if multi-factor authentication (2FA) is enabled.
-     */
+    /** Whether the phone number is the default second factor. A user must have exactly one default second factor, if multi-factor authentication (2FA) is enabled. */
     readonly defaultSecondFactor: boolean,
-    /**
-     * An object holding information on the verification of this phone number.
-     */
+    /** An object holding information on the verification of this phone number. */
     readonly verification: Verification | null,
-    /**
-     * An object containing information about any other identification that might be linked to this phone number.
-     */
+    /** An object containing information about any other identification that might be linked to this phone number. */
     readonly linkedTo: IdentificationLink[],
   ) {}
 

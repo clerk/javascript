@@ -15,6 +15,7 @@ export const SignInFactorOnePhoneCodeCard = (props: SignInFactorOnePhoneCodeCard
         cardSubtitle={localizationKeys('signIn.phoneCode.subtitle')}
         inputLabel={localizationKeys('signIn.phoneCode.formTitle')}
         resendButton={localizationKeys('signIn.phoneCode.resendButton')}
+        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
       />
     </Flow.Part>
   );

@@ -1,0 +1,197 @@
+# Tabs
+
+A tabbed interface with automatic or manual activation, keyboard navigation, and an optional indicator element. Every panel element stays in the DOM; a panel's children render only while it is shown or animating out.
+
+## When to Use
+
+- Switching between views or content sections within the same page area.
+- When you need accessible tab navigation with `role="tablist"` / `role="tab"` / `role="tabpanel"`.
+- Prefer Tabs over Accordion when content sections are mutually exclusive and should feel like parallel views.
+
+## Usage
+
+```tsx
+import { Tabs } from '@/primitives/tabs';
+
+<Tabs.Root defaultValue='tab1'>
+  <Tabs.List>
+    <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+    <Tabs.Tab value='tab2'>Security</Tabs.Tab>
+    <Tabs.Tab value='tab3'>Notifications</Tabs.Tab>
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Panel value='tab1'>Account settings content</Tabs.Panel>
+  <Tabs.Panel value='tab2'>Security settings content</Tabs.Panel>
+  <Tabs.Panel value='tab3'>Notification preferences content</Tabs.Panel>
+</Tabs.Root>;
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState('tab1');
+
+<Tabs
+  value={value}
+  onValueChange={setValue}
+>
+  {/* ... */}
+</Tabs.Root>;
+```
+
+### Manual Activation
+
+By default, arrowing to a tab immediately activates it. Use `activationMode="manual"` to require Enter/Space:
+
+```tsx
+<Tabs.Root activationMode='manual'>{/* Arrow keys move focus, Enter/Space activates */}</Tabs.Root>
+```
+
+### Vertical Orientation
+
+```tsx
+<Tabs.Root orientation='vertical'>{/* Arrow Up/Down navigates instead of Left/Right */}</Tabs.Root>
+```
+
+## Parts
+
+| Part             | Default Element | Description                                        |
+| ---------------- | --------------- | -------------------------------------------------- |
+| `Tabs.Root`      | —               | Root context provider                              |
+| `Tabs.List`      | `<div>`         | Container for tabs (`role="tablist"`)              |
+| `Tabs.Tab`       | `<button>`      | A tab trigger inside `Tabs.List` (`role="tab"`)    |
+| `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` |
+| `Tabs.Panel`     | `<div>`         | Content panel (`role="tabpanel"`)                  |
+| `Tabs.Indicator` | `<span>`        | Decorative element for the selection               |
+
+## Props
+
+### `Tabs.Root`
+
+| Prop             | Type                         | Default        | Description                               |
+| ---------------- | ---------------------------- | -------------- | ----------------------------------------- |
+| `value`          | `string`                     | —              | Controlled active tab                     |
+| `defaultValue`   | `string`                     | `""`           | Initial active tab (uncontrolled)         |
+| `onValueChange`  | `(value: string) => void`    | —              | Called when active tab changes            |
+| `orientation`    | `"horizontal" \| "vertical"` | `"horizontal"` | Arrow key direction                       |
+| `activationMode` | `"automatic" \| "manual"`    | `"automatic"`  | Whether focus activates a tab immediately |
+
+### `Tabs.Tab`
+
+| Prop       | Type      | Default      | Description                                                |
+| ---------- | --------- | ------------ | ---------------------------------------------------------- |
+| `value`    | `string`  | **required** | Unique tab identifier, must match a Panel's `value`        |
+| `disabled` | `boolean` | —            | Disables the tab (uses `aria-disabled`, remains focusable) |
+
+### `Tabs.Trigger`
+
+A standalone tab button for use outside `Tabs.List`. Unlike `Tabs.Tab`, it does not participate in roving tabindex keyboard navigation — it's a plain button with `onClick`.
+
+| Prop       | Type      | Default      | Description                                  |
+| ---------- | --------- | ------------ | -------------------------------------------- |
+| `value`    | `string`  | **required** | Tab identifier, must match a Panel's `value` |
+| `disabled` | `boolean` | —            | Disables the trigger                         |
+
+### `Tabs.Panel`
+
+| Prop          | Type      | Default      | Description                                                |
+| ------------- | --------- | ------------ | ---------------------------------------------------------- |
+| `value`       | `string`  | **required** | Must match a Tab's `value`                                 |
+| `keepMounted` | `boolean` | —            | When true, renders the panel's children while it is hidden |
+
+### `Tabs.List`, `Tabs.Indicator`
+
+No additional props beyond standard HTML attributes and the `render` prop.
+
+## Keyboard Navigation
+
+| Key               | Action (horizontal)        | Action (vertical)          |
+| ----------------- | -------------------------- | -------------------------- |
+| `ArrowRight`      | Next tab                   | —                          |
+| `ArrowLeft`       | Previous tab               | —                          |
+| `ArrowDown`       | —                          | Next tab                   |
+| `ArrowUp`         | —                          | Previous tab               |
+| `Enter` / `Space` | Activate tab (manual mode) | Activate tab (manual mode) |
+
+## Data Attributes
+
+| Attribute             | Applies To   | Description                            |
+| --------------------- | ------------ | -------------------------------------- |
+| `data-selected`       | Tab, Trigger | Active tab                             |
+| `data-direction`      | Indicator    | `forward` or `backward`, see below     |
+| `data-disabled`       | Tab, Trigger | Disabled tab                           |
+| `data-hidden`         | Panel        | Hidden panel                           |
+| `data-open`           | Panel        | Selected panel                         |
+| `data-closed`         | Panel        | Deselected panel while it animates out |
+| `data-starting-style` | Panel        | Enter animation frame                  |
+| `data-ending-style`   | Panel        | Exit animation frame                   |
+
+## Indicator
+
+`Tabs.Indicator` carries `data-direction`: `forward` when the selection last moved to a later tab, `backward` when it moved to an earlier one. Position it with CSS anchor positioning:
+
+```css
+.cl-tabs-list {
+  position: relative;
+  anchor-scope: --active-tab;
+}
+.cl-tabs-tab[data-selected] {
+  anchor-name: --active-tab;
+}
+.cl-tabs-indicator {
+  position: absolute;
+  position-anchor: --active-tab;
+  inset-inline: anchor(start) anchor(end);
+  bottom: 0;
+  height: 2px;
+  transition:
+    inset-inline-start 200ms,
+    inset-inline-end 200ms;
+}
+```
+
+## CSS Variables
+
+### Panel
+
+Panels expose a direction variable for directional animations:
+
+| CSS Variable                    | Description                                                    |
+| ------------------------------- | -------------------------------------------------------------- |
+| `--cl-tab-transition-direction` | `"1"` when navigating forward, `"-1"` when navigating backward |
+
+Use this to drive directional slide animations:
+
+```css
+.cl-tabs-panel {
+  --_direction: var(--cl-tab-transition-direction, 1);
+  transition:
+    opacity 200ms,
+    translate 200ms;
+}
+.cl-tabs-panel[data-starting-style],
+.cl-tabs-panel[data-ending-style] {
+  opacity: 0;
+}
+.cl-tabs-panel[data-starting-style] {
+  translate: calc(var(--_direction) * 8px) 0;
+}
+.cl-tabs-panel[data-ending-style] {
+  translate: calc(var(--_direction) * -8px) 0;
+}
+```
+
+## Important Notes
+
+- **Panel children unmount when the panel is hidden.** A deselected panel keeps its children, with `inert` and `data-ending-style`, until its exit animations finish, then gains `hidden` and unmounts them. State inside a panel resets when it is hidden; pass `keepMounted` to keep the children rendered.
+- **Leaving panel content freezes.** While a deselected panel animates out, its children are wrapped in `Freeze` (`../utils`) and hold their last frame instead of re-rendering under the animation.
+- **The initially selected panel appears instantly** (no enter animation on page load).
+- **`Tabs.Trigger` vs `Tabs.Tab`**: Use `Tabs.Tab` inside `Tabs.List` for keyboard-navigable tabs with roving tabindex. Use `Tabs.Trigger` for standalone tab buttons placed anywhere in the tree (e.g., in a sidebar).
+- **Disabled tabs use `aria-disabled`**, not the native `disabled` attribute, keeping them focusable for keyboard users.
+- **Indicator is `aria-hidden`** — it's purely decorative.
+
+## ARIA
+
+- List: `role="tablist"`
+- Tab: `role="tab"`, `aria-selected`, `aria-controls` (pointing to its panel), `aria-disabled`
+- Panel: `role="tabpanel"`, `aria-labelledby` (pointing to its tab), `tabIndex={0}`

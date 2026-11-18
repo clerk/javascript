@@ -435,7 +435,6 @@ Located in `packages/ui/src/themes/`:
 - **dark.ts**: Dark mode theme with inverted colors
 - **shadcn.ts**: Integration with shadcn/ui design system
 - **neobrutalism.ts**: Bold, high-contrast design
-- **lightDark.ts**: Automatic light/dark mode using CSS `light-dark()`
 - **shadesOfPurple.ts**: Purple-themed variant
 
 **Theme Export:**
@@ -467,10 +466,9 @@ export * from './neobrutalism';
 
 ## Adding New Element Descriptors
 
-1. **Add Type Definition**: Add to `ElementsConfig` in `packages/shared/src/types/appearance.ts` or `packages/ui/src/internal/appearance.ts`
-2. **Build Types Package**: `cd packages/types && pnpm build` (if using shared types)
-3. **Add to APPEARANCE_KEYS**: Append to `APPEARANCE_KEYS` array in `packages/ui/src/customizables/elementDescriptors.ts`
-4. **Use in Component**: Apply descriptor in component: `elementDescriptor={descriptors.myNewElement}`
+1. **Add Type Definition**: Add to `ElementsConfig` in `packages/ui/src/internal/appearance.ts`
+2. **Add to APPEARANCE_KEYS**: Append to `APPEARANCE_KEYS` array in `packages/ui/src/customizables/elementDescriptors.ts`
+3. **Use in Component**: Apply descriptor in component: `elementDescriptor={descriptors.myNewElement}`
 
 **Example:**
 

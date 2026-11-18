@@ -34,6 +34,24 @@ export const resolveServerUrl = (
   return fallbackServerUrl || `http://localhost:${port}`;
 };
 
+export const createAppRuntimeEnv = (env?: EnvironmentConfig): Record<string, string> => {
+  if (!env?.publicVariables || !env?.privateVariables) {
+    return {};
+  }
+
+  const runtimeEnv: Record<string, string> = {};
+  // Private variables intentionally win when the same runtime key exists in both maps.
+  for (const [key, value] of [...env.publicVariables, ...env.privateVariables]) {
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    runtimeEnv[key] = String(value);
+  }
+
+  return runtimeEnv;
+};
+
 export const application = (
   config: ApplicationConfig,
   appDirPath: string,
@@ -48,6 +66,7 @@ export const application = (
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
   let buildOutput = '';
+  let devOutput = '';
   let serveOutput = '';
 
   const self = {
@@ -61,6 +80,7 @@ export const application = (
       return state.env;
     },
     withEnv: async (env: EnvironmentConfig) => {
+      await env.resolve();
       state.env = env;
       return envWriter(appDirPath, env);
     },
@@ -87,7 +107,15 @@ export const application = (
         await run('pnpm list @clerk/* --depth 100', { cwd: appDirPath, log: clerkPackagesLog });
       }
     },
-    dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
+    dev: async (
+      opts: {
+        port?: number;
+        manualStart?: boolean;
+        detached?: boolean;
+        serverUrl?: string;
+        acceptAnyResponse?: boolean;
+      } = {},
+    ) => {
       const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
       const runtimeServerUrl = resolveServerUrl(opts.serverUrl, serverUrl, port);
@@ -103,15 +131,25 @@ export const application = (
 
       const proc = run(scripts.dev, {
         cwd: appDirPath,
-        env: { PORT: port.toString() },
+        env: { ...createAppRuntimeEnv(state.env), PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
-        log: opts.detached ? undefined : log,
+        log: opts.detached
+          ? undefined
+          : (msg: string) => {
+              devOutput += `\n${msg}`;
+              log(msg);
+            },
       });
 
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      await waitForServer(runtimeServerUrl, {
+        log,
+        maxAttempts: Infinity,
+        shouldExit,
+        acceptAnyResponse: opts.acceptAnyResponse,
+      });
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
@@ -158,6 +196,7 @@ export const application = (
       const log = logger.child({ prefix: 'build' }).info;
       await run(scripts.build, {
         cwd: appDirPath,
+        env: createAppRuntimeEnv(state.env),
         log: (msg: string) => {
           buildOutput += `\n${msg}`;
           log(msg);
@@ -166,6 +205,9 @@ export const application = (
     },
     get buildOutput() {
       return buildOutput;
+    },
+    get devOutput() {
+      return devOutput;
     },
     get serveOutput() {
       return serveOutput;
@@ -200,7 +242,7 @@ export const application = (
 
       const proc = run(scripts.serve, {
         cwd: appDirPath,
-        env: { ...envFromFile, PORT: port.toString() },
+        env: { ...envFromFile, ...createAppRuntimeEnv(state.env), PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,

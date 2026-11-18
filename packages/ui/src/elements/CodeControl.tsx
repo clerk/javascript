@@ -5,7 +5,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useCallback } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Box, descriptors, Flex, OTPInputSegment } from '../customizables';
+import { Box, descriptors, Flex, OTPInputSegment, useAppearance } from '../customizables';
 import { useCardState } from '../elements/contexts';
 import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -166,6 +166,7 @@ export const OTPResendButton = () => {
 export const OTPCodeControl = () => {
   const [disabled, setDisabled] = React.useState(false);
   const { otpControl, isLoading, isDisabled } = useOTPInputContext();
+  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useEffect(() => {
@@ -180,7 +181,7 @@ export const OTPCodeControl = () => {
       sx={{ position: 'relative' }}
     >
       <OTPInput
-        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+        autoFocus={optionAutoFocus} // eslint-disable-line jsx-a11y/no-autofocus
         aria-label='Enter verification code'
         aria-required
         maxLength={length}
@@ -201,7 +202,7 @@ export const OTPCodeControl = () => {
             role='group'
           >
             {slots.map((slot, index: number) => (
-              <Slot
+              <OTPInputSlot
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 elementDescriptor={descriptors.otpCodeFieldInput}
@@ -218,36 +219,41 @@ export const OTPCodeControl = () => {
   );
 };
 
-function Slot(props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean }) {
+export function OTPInputSlot(
+  props: SlotProps & PropsOfComponent<typeof OTPInputSegment> & { isSuccessfullyFilled?: boolean },
+) {
   const { isSuccessfullyFilled, ...otpProps } = props;
-  const { char, hasFakeCaret, isActive, placeholderChar, ...rest } = otpProps;
+  const { char, hasFakeCaret, isActive, placeholderChar, sx, ...rest } = otpProps;
   return (
     <OTPInputSegment
       data-testid='otp-input-segment'
       {...rest}
       focusRing={isActive}
       variant='default'
-      sx={t => ({
-        textAlign: 'center',
-        ...common.textVariants(t).h2,
-        padding: `${t.space.$0x5} 0`,
-        boxSizing: 'border-box',
-        display: 'flex',
-        position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: t.space.$10,
-        width: t.space.$10,
-        color: t.colors.$colorInputForeground,
-        borderWidth: t.borderWidths.$normal,
-        borderRadius: t.radii.$md,
-        ...(isSuccessfullyFilled ? { borderColor: t.colors.$success500 } : common.borderColor(t, props)),
-        backgroundColor: 'unset',
-        [mqu.sm]: {
-          height: t.space.$8,
-          width: t.space.$8,
-        },
-      })}
+      sx={[
+        t => ({
+          textAlign: 'center',
+          ...common.textVariants(t).h2,
+          padding: `${t.space.$0x5} 0`,
+          boxSizing: 'border-box',
+          display: 'flex',
+          position: 'relative',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: t.space.$10,
+          width: t.space.$10,
+          color: t.colors.$colorInputForeground,
+          borderWidth: t.borderWidths.$normal,
+          borderRadius: t.radii.$md,
+          ...(isSuccessfullyFilled ? { borderColor: t.colors.$success500 } : common.borderColor(t, props)),
+          backgroundColor: 'unset',
+          [mqu.sm]: {
+            height: t.space.$8,
+            width: t.space.$8,
+          },
+        }),
+        sx,
+      ]}
     >
       {char !== null && <div>{char}</div>}
       {hasFakeCaret && <FakeCaret />}

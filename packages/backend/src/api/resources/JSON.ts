@@ -1,4 +1,12 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
+import type {
+  BillingPerUnitTotalJSON,
+  BillingSubscriptionItemNextPaymentJSON,
+  BillingSubscriptionItemSeatsJSON,
+  BillingTotalsJSON as SharedBillingTotalsJSON,
+  LastAuthenticationStrategy,
+  SignUpStatus,
+  VerificationStatus,
+} from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,
@@ -25,6 +33,8 @@ export const ObjectType = {
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  DirectoryGroup: 'directory_group',
+  DirectoryGroupMembership: 'directory_group_membership',
   Domain: 'domain',
   Email: 'email',
   EnterpriseAccount: 'enterprise_account',
@@ -189,6 +199,7 @@ export interface EmailJSON extends ClerkResourceJSON {
   status?: string;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
+  suppression_reason?: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -231,6 +242,10 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
 
 export interface ExternalAccountJSON extends ClerkResourceJSON {
   object: typeof ObjectType.ExternalAccount;
+  /**
+   * The `eac_`-prefixed external account id. Only present for Google and Facebook accounts.
+   */
+  external_account_id?: string;
   provider: string;
   identification_id: string;
   provider_user_id: string;
@@ -470,25 +485,15 @@ export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitati
   user_id: string;
 }
 
-/**
- * @interface
- */
+/** @inline */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
-  /**
-   * The name of the Organization.
-   */
+  /** The name of the Organization. */
   name: string;
-  /**
-   * The slug of the Organization.
-   */
+  /** The slug of the Organization. */
   slug: string;
-  /**
-   * Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
-   */
+  /** Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization). */
   image_url?: string;
-  /**
-   * Whether the Organization has a profile image.
-   */
+  /** Whether the Organization has a profile image. */
   has_image: boolean;
 }
 
@@ -599,6 +604,10 @@ export interface SignInTokenJSON extends ClerkResourceJSON {
 export interface AgentTaskJSON extends ClerkResourceJSON {
   object: typeof ObjectType.AgentTask;
   agent_id: string;
+  agent_task_id: string;
+  /**
+   * @deprecated Use `agent_task_id` instead.
+   */
   task_id: string;
   url: string;
 }
@@ -687,6 +696,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_sign_in_at: number | null;
   banned: boolean;
   locked: boolean;
+  deprovisioned: boolean;
   lockout_expires_in_seconds: number | null;
   verification_attempts_remaining: number | null;
   created_at: number;
@@ -700,6 +710,10 @@ export interface UserJSON extends ClerkResourceJSON {
    * The locale of the user in BCP-47 format.
    */
   locale: string | null;
+  /**
+   * The timezone of the user.
+   */
+  timezone: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -749,33 +763,126 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
   external_id?: string;
 }
 
+/**
+ * The result of merging one user into another.
+ * Used for `user.merged` webhook events and the response of the merge user endpoint.
+ */
+export interface UserMergedJSON {
+  /**
+   * The user that remains, as it is after the merge.
+   */
+  user: UserJSON;
+  /**
+   * The merged user as it was before it was deleted.
+   */
+  deleted_user: UserJSON;
+}
+
+/**
+ * Directory group webhook event payload: a group as the identity provider reported it to a directory.
+ * Used for `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced` and `directoryGroup.deleted` webhook events.
+ */
+export interface DirectoryGroupWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroup;
+  /**
+   * The group ID, as assigned by the directory.
+   */
+  id: string;
+  directory_id: string;
+  display_name: string;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership webhook event payload: one user's membership in a directory group.
+ * `user_id` is null until the member has been provisioned into Clerk.
+ * Used for `directoryGroupMembership.created` webhook events.
+ */
+export interface DirectoryGroupMembershipWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroupMembership;
+  /**
+   * Never set: the payload has no ID. Declared so `event.data.id` keeps the same type across every `WebhookEvent`.
+   */
+  id?: never;
+  directory_id: string;
+  group: {
+    object: typeof ObjectType.DirectoryGroup;
+    id: string;
+    display_name: string;
+  };
+  directory_user_id: string;
+  user_id: string | null;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership deletion webhook event payload that extends `DirectoryGroupMembershipWebhookEventJSON`
+ * with `cause`: `group_deleted` when the whole group is gone, `member_removed` when the identity provider took this
+ * user out of it. Used for `directoryGroupMembership.deleted` webhook events.
+ */
+export interface DeletedDirectoryGroupMembershipWebhookEventJSON extends DirectoryGroupMembershipWebhookEventJSON {
+  cause: 'group_deleted' | 'member_removed';
+}
+
 export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
 }
 
+export interface EnterpriseConnectionSamlConnectionLoginHintJSON {
+  mode: 'email_address' | 'custom_attribute' | 'off';
+  source?: string;
+}
+
+export interface EnterpriseConnectionCustomAttributeJSON {
+  name: string;
+  key: string;
+  sso_path: string;
+  scim_path: string;
+  multi_valued: boolean;
+}
+
+export interface SamlConnectionIdpCertificateJSON {
+  certificate: string;
+  issued_at: number | null;
+  expires_at: number | null;
+}
+
 export interface EnterpriseConnectionSamlConnectionJSON {
   id: string;
   name: string;
-  idp_entity_id: string;
-  idp_sso_url: string;
-  idp_certificate: string;
-  idp_metadata_url: string;
-  idp_metadata: string;
-  acs_url: string;
-  sp_entity_id: string;
-  sp_metadata_url: string;
-  sync_user_attributes: boolean;
+  idp_entity_id?: string;
+  idp_sso_url?: string;
+  idp_certificate?: string;
+  idp_certificate_issued_at?: number;
+  idp_certificate_expires_at?: number;
+  idp_certificates?: SamlConnectionIdpCertificateJSON[];
+  idp_metadata_url?: string;
+  /** @deprecated The Backend API does not return this field. */
+  idp_metadata?: string;
+  acs_url?: string;
+  sp_entity_id?: string;
+  sp_metadata_url?: string;
+  /** @deprecated The Backend API does not return this field on the nested SAML connection. Use the top-level `sync_user_attributes` instead. */
+  sync_user_attributes?: boolean;
+  active: boolean;
   allow_subdomains: boolean;
   allow_idp_initiated: boolean;
+  force_authn: boolean;
+  login_hint: EnterpriseConnectionSamlConnectionLoginHintJSON;
 }
 
 export interface EnterpriseConnectionOauthConfigJSON {
   id: string;
+  provider_key: string;
   name: string;
-  client_id: string;
-  discovery_url: string;
-  logo_public_url: string;
+  client_id?: string;
+  discovery_url?: string;
+  auth_url?: string;
+  token_url?: string;
+  user_info_url?: string;
+  logo_public_url?: string;
+  requires_pkce: boolean;
   created_at: number;
   updated_at: number;
 }
@@ -783,12 +890,19 @@ export interface EnterpriseConnectionOauthConfigJSON {
 export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.EnterpriseConnection;
   name: string;
+  provider: string;
+  logo_public_url?: string;
   domains: string[];
-  organization_id: string | null;
+  organization_id?: string | null;
   active: boolean;
   sync_user_attributes: boolean;
-  allow_subdomains: boolean;
+  /** @deprecated The Backend API does not return this field at the top level. Use `saml_connection.allow_subdomains` instead. */
+  allow_subdomains?: boolean;
   disable_additional_identifications: boolean;
+  allow_organization_account_linking: boolean;
+  authenticatable: boolean;
+  disable_jit_provisioning: boolean;
+  custom_attributes?: EnterpriseConnectionCustomAttributeJSON[];
   created_at: number;
   updated_at: number;
   saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
@@ -803,6 +917,9 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_entity_id: string;
   idp_sso_url: string;
   idp_certificate: string;
+  idp_certificate_issued_at: number;
+  idp_certificate_expires_at: number;
+  idp_certificates: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -836,7 +953,7 @@ export interface RoleJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Role;
   key: string;
   name: string;
-  description: string;
+  description: string | null;
   permissions: PermissionJSON[];
   is_creator_eligible: boolean;
   created_at: number;
@@ -922,6 +1039,14 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenActorJSON {
+  iss?: string;
+  sub: string;
+  act?: IdPOAuthAccessTokenActorJSON;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {
@@ -989,14 +1114,27 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   avatar_url: string | null;
 }
 
-type BillingSubscriptionItemStatus =
+/**
+ * The possible lifecycle states of a Backend `BillingSubscriptionItem`.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export type BillingSubscriptionItemStatus =
+  /** The Subscription Item is in the abandoned state. */
   | 'abandoned'
+  /** The Subscription Item is active. */
   | 'active'
+  /** The Subscription Item is canceled. */
   | 'canceled'
+  /** The Subscription Item has ended. */
   | 'ended'
+  /** The Subscription Item has expired. */
   | 'expired'
+  /** The Subscription Item is incomplete. */
   | 'incomplete'
+  /** The Subscription Item has a past-due payment. */
   | 'past_due'
+  /** The Subscription Item is upcoming. */
   | 'upcoming';
 
 /**
@@ -1004,25 +1142,25 @@ type BillingSubscriptionItemStatus =
  */
 export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
+  instance_id: string;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
   payer_id?: string;
+  price_id?: string;
   period_start: number;
   period_end: number | null;
-  is_free_trial?: boolean;
+  is_free_trial: boolean;
   ended_at: number | null;
   created_at: number;
   updated_at: number;
   canceled_at: number | null;
   past_due_at: number | null;
-  lifetime_paid: BillingMoneyAmountJSON | null;
-  next_payment?: {
-    amount: number;
-    date: number;
-  } | null;
-  amount: BillingMoneyAmountJSON;
+  lifetime_paid?: BillingMoneyAmountJSON | null;
+  next_payment?: BillingSubscriptionItemNextPaymentJSON | null;
+  amount?: BillingMoneyAmountJSON | null;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
+  seats?: BillingSubscriptionItemSeatsJSON;
 }
 
 /**
@@ -1125,6 +1263,7 @@ export interface BillingSubscriptionWebhookEventJSON extends ClerkResourceJSON {
 
 export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscription;
+  instance_id: string;
   status: 'active' | 'past_due' | 'canceled' | 'ended' | 'abandoned' | 'incomplete';
   payer_id: string;
   created_at: number;
@@ -1135,6 +1274,8 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   next_payment?: {
     date: number;
     amount: BillingMoneyAmountJSON;
+    per_unit_totals?: BillingPerUnitTotalJSON[];
+    totals?: SharedBillingTotalsJSON;
   };
   eligible_for_free_trial?: boolean;
 }

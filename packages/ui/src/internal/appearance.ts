@@ -183,6 +183,7 @@ export type ElementsConfig = {
 
   logoGroup: WithOptions;
   logoGroupItem: WithOptions;
+  logoGroupItemContainer: WithOptions;
   logoGroupIcon: WithOptions;
   logoGroupSeparator: WithOptions;
 
@@ -232,6 +233,11 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
 
   checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormPromoCodeRoot: WithOptions;
+  checkoutFormPromoCodeInput: WithOptions;
+  checkoutFormPromoCodeApplyButton: WithOptions;
+  checkoutFormPromoCodeErrorText: WithOptions;
+  checkoutFormPromoCodeRemoveButton: WithOptions;
   checkoutFormElementsRoot: WithOptions;
 
   checkoutSuccessRoot: WithOptions;
@@ -273,6 +279,12 @@ export type ElementsConfig = {
   formHeaderSubtitle: WithOptions<never, ErrorState>;
   formResendCodeLink: WithOptions;
 
+  actionBlockedIconBox: WithOptions;
+  actionBlockedIcon: WithOptions;
+  actionBlockedLink: WithOptions;
+  actionBlockedTraceIdBox: WithOptions;
+  actionBlockedTraceIdLabel: WithOptions;
+  actionBlockedTraceId: WithOptions;
   verificationLinkStatusBox: WithOptions;
   verificationLinkStatusIconBox: WithOptions;
   verificationLinkStatusIcon: WithOptions;
@@ -306,6 +318,8 @@ export type ElementsConfig = {
   formFieldInputShowPasswordIcon: WithOptions;
   formFieldInputCopyToClipboardButton: WithOptions;
   formFieldInputCopyToClipboardIcon: WithOptions;
+  searchInput: WithOptions;
+  searchInputClearButton: WithOptions;
 
   phoneInputBox: WithOptions<never, ControlState>;
   formInputGroup: WithOptions<never, ControlState>;
@@ -362,6 +376,29 @@ export type ElementsConfig = {
 
   organizationProfileMembersSearchInputIcon: WithOptions;
   organizationProfileMembersSearchInput: WithOptions;
+
+  organizationProfileSecuritySsoBadge: WithOptions<string>;
+  organizationProfileSecuritySsoDescription: WithOptions;
+  organizationProfileSecuritySsoConfigureButton: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRows: WithOptions;
+  organizationProfileSecuritySsoDetailRow: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLabel: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
+  organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
+  organizationProfileSecuritySsoProviderIcon: WithOptions;
+  organizationProfileSecuritySsoConnectionRow: WithOptions;
+  organizationProfileSecuritySsoConnectionPage: WithOptions;
+  organizationProfileSecuritySsoBypassDescription: WithOptions;
+  organizationProfileSecuritySsoBypassCountLabel: WithOptions;
+  organizationProfileSecuritySsoBypassCountBadge: WithOptions;
+  organizationProfileSecuritySsoBypassPage: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInput: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInputIcon: WithOptions;
+  organizationProfileSecuritySsoBypassAddButton: WithOptions;
+  organizationProfileSecuritySsoBypassEmailInput: WithOptions;
+  organizationProfileSecuritySsoBypassRoleWarning: WithOptions;
+  organizationProfileSecuritySsoBypassFailure: WithOptions;
+  organizationProfileSecuritySsoBypassBulkResult: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
@@ -423,6 +460,7 @@ export type ElementsConfig = {
   pricingTableCardHeader: WithOptions;
   pricingTableCardTitleContainer: WithOptions;
   pricingTableCardTitle: WithOptions;
+  pricingTableCardBadge: WithOptions;
   pricingTableCardDescription: WithOptions;
   pricingTableCardFeeContainer: WithOptions;
   pricingTableCardFee: WithOptions;
@@ -586,6 +624,7 @@ export type ElementsConfig = {
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
   profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
+  profilePageContent: WithOptions;
 
   // TODO: review
   formattedPhoneNumber: WithOptions;
@@ -672,15 +711,149 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
-  configureSSOWizardHeader: WithOptions;
-  configureSSOWizardHeaderItem: WithOptions<string, ActiveState>;
-  configureSSOWizardHeaderItemBullet: WithOptions<string, ActiveState>;
-  configureSSOWizardHeaderItemLabel: WithOptions<string>;
-  configureSSOWizardHeaderSeparator: WithOptions;
-  configureSSOWizardBody: WithOptions<string>;
-  configureSSOWizardStepIndicator: WithOptions;
-  configureSSOWizardFooterPreviousButton: WithOptions;
-  configureSSOWizardFooterContinueButton: WithOptions;
+  configureSSOConnectionScopeBanner: WithOptions;
+  configureSSOHeader: WithOptions;
+  configureSSOHeaderBackButton: WithOptions;
+  configureSSOMobileNavbar: WithOptions;
+  configureSSOStepper: WithOptions;
+  configureSSOStepperItem: WithOptions<string, ActiveState>;
+  configureSSOStepperItemBullet: WithOptions<string, ActiveState>;
+  configureSSOStepperItemLabel: WithOptions<string>;
+  configureSSOStepperSeparator: WithOptions;
+  configureSSOStep: WithOptions<string>;
+  configureSSOStepHeader: WithOptions;
+  configureSSOStepHeaderTitle: WithOptions;
+  configureSSOStepHeaderDescription: WithOptions;
+  configureSSOStepBody: WithOptions;
+  configureSSOStepSection: WithOptions;
+  configureSSOStepCounter: WithOptions;
+  configureSSOFooter: WithOptions;
+  configureSSOFooterPreviousButton: WithOptions;
+  configureSSOFooterContinueButton: WithOptions;
+  configureSSOFooterResetButton: WithOptions;
+
+  configureSSOProviderGroup: WithOptions<string>;
+  configureSSOProviderGroupLabel: WithOptions<string>;
+  configureSSOProviderGrid: WithOptions;
+  configureSSOProviderCard: WithOptions<string, ActiveState>;
+  configureSSOProviderCardRadio: WithOptions<string>;
+  configureSSOProviderCardIcon: WithOptions<string>;
+  configureSSOProviderCardLabel: WithOptions<string>;
+
+  configureSSOVerifyDomainErrorRoot: WithOptions;
+  configureSSOVerifyDomainErrorIcon: WithOptions;
+  configureSSOVerifyDomainErrorTitle: WithOptions;
+  configureSSOVerifyDomainErrorSubtitle: WithOptions;
+  configureSSOVerifyDomainList: WithOptions;
+  configureSSOVerifyDomainSuggestion: WithOptions;
+  configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired' | 'claimed'>;
+  configureSSOVerifyDomainCardCheckbox: WithOptions;
+  configureSSOVerifyDomainCardRemoveButton: WithOptions;
+  configureSSOVerifyDomainCardTxtRecord: WithOptions;
+  configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
+  configureSSOVerifyDomainCardExpired: WithOptions;
+  configureSSOEmailVerificationForm: WithOptions<string>;
+  configureSSOEmailVerificationIcon: WithOptions<string>;
+  configureSSOEmailVerificationTitle: WithOptions<string>;
+  configureSSOEmailVerificationSubtitle: WithOptions<string>;
+  configureSSOEmailVerificationInput: WithOptions<string>;
+  configureSSOEmailVerificationError: WithOptions;
+
+  configureSSOInstructionsHeading: WithOptions;
+  configureSSOInstructionsList: WithOptions;
+  configureSSOInstructionsListItem: WithOptions;
+  configureSSOAttributeMappingTable: WithOptions;
+  configureSSOAttributeMappingBadge: WithOptions<string>;
+  configureSSOCertificateUploadButton: WithOptions;
+  configureSSOCertificateFileBadge: WithOptions;
+  configureSSOCertificateFileName: WithOptions;
+  configureSSOCertificateRemoveButton: WithOptions;
+  configureSSOCertificateList: WithOptions;
+  configureSSOCertificateListItem: WithOptions;
+  configureSSOCertificateListItemBody: WithOptions;
+  configureSSOCertificateListItemExpiry: WithOptions;
+  configureSSOCertificateListItemRemoveButton: WithOptions;
+  configureSSOCertificatePrimaryBadge: WithOptions;
+
+  configureSSOTestUrlOpenButton: WithOptions;
+  configureSSOTestRefreshButton: WithOptions;
+  configureSSOTestResultsTable: WithOptions;
+  configureSSOTestResultsRow: WithOptions;
+  configureSSOTestResultsEmpty: WithOptions;
+  configureSSOTestResultsLoadingSpinner: WithOptions;
+  configureSSOTestRunStatusBadge: WithOptions<string>;
+  configureSSOTestRunFullMessage: WithOptions;
+  configureSSOTestRunFullMessageCopyButton: WithOptions;
+  configureSSOTestRunHowToFixSection: WithOptions;
+  configureSSOTestRunHowToFixDocsLink: WithOptions;
+  configureSSOTestRunParsedUserInfo: WithOptions;
+  configureSSOTestError: WithOptions;
+
+  configureSSOActivate: WithOptions;
+  configureSSOActivateIcon: WithOptions;
+  configureSSOActivateTitle: WithOptions;
+  configureSSOActivateSubtitle: WithOptions;
+  configureSSOActivateButton: WithOptions;
+  configureSSOActivateSkipButton: WithOptions;
+
+  configureSSOResetConnectionDialog: WithOptions;
+  configureSSOResetConnectionDialogCancelButton: WithOptions;
+  configureSSOResetConnectionDialogConfirmationInput: WithOptions;
+  configureSSOResetConnectionDialogSubmitButton: WithOptions;
+
+  configureSSOChangeProviderDialog: WithOptions;
+  configureSSOChangeProviderDialogCancelButton: WithOptions;
+  configureSSOChangeProviderDialogConfirmButton: WithOptions;
+
+  configureSSORemoveDomainDialog: WithOptions;
+  configureSSORemoveDomainDialogCancelButton: WithOptions;
+  configureSSORemoveDomainDialogSubmitButton: WithOptions;
+
+  configureDirectorySyncConnectionCard: WithOptions;
+  configureDirectorySyncConnectionCardName: WithOptions;
+  configureDirectorySyncConnectionCardDomains: WithOptions;
+  configureDirectorySyncConnectionCardDomainBadge: WithOptions;
+  configureDirectorySyncInstructionsToggle: WithOptions;
+  configureDirectorySyncInstructionsList: WithOptions;
+  configureDirectorySyncInstructionsListItem: WithOptions;
+  configureDirectorySyncFieldLabel: WithOptions<string>;
+  configureDirectorySyncEndpointUrlInput: WithOptions;
+  configureDirectorySyncTokenInput: WithOptions;
+  configureDirectorySyncGenerateTokenButton: WithOptions;
+  configureDirectorySyncTokenNotice: WithOptions;
+  configureDirectorySyncRetryButton: WithOptions;
+  configureDirectorySyncAttributeMappingTable: WithOptions;
+  configureDirectorySyncAttributeMappingHeader: WithOptions<string>;
+  configureDirectorySyncAttributeMappingValue: WithOptions<string>;
+  configureDirectorySyncUsersList: WithOptions;
+  configureDirectorySyncUsersRow: WithOptions;
+  configureDirectorySyncUserIdentifier: WithOptions;
+  configureDirectorySyncUserName: WithOptions;
+  configureDirectorySyncUserTimestamp: WithOptions;
+  configureDirectorySyncUserStatusBadge: WithOptions<string>;
+  configureDirectorySyncUsersEmpty: WithOptions;
+  configureDirectorySyncCompleteButton: WithOptions;
+  configureDirectorySyncCredentialsForm: WithOptions;
+  configureDirectorySyncCredentialsBadge: WithOptions;
+  configureDirectorySyncUploadKeyButton: WithOptions;
+  configureDirectorySyncUploadedFileName: WithOptions;
+  configureDirectorySyncSubjectEmailInput: WithOptions;
+  configureDirectorySyncSyncRow: WithOptions;
+  configureDirectorySyncSyncNowButton: WithOptions;
+  configureDirectorySyncStatusBadge: WithOptions<string>;
+  configureDirectorySyncLastSyncedAt: WithOptions;
+  configureDirectorySyncRoleMappingToggle: WithOptions;
+  configureDirectorySyncRoleMappingTable: WithOptions;
+  configureDirectorySyncRoleMappingHeader: WithOptions;
+  configureDirectorySyncRoleMappingRow: WithOptions;
+  configureDirectorySyncRoleMappingReorderButton: WithOptions;
+  configureDirectorySyncRoleMappingPriority: WithOptions;
+  configureDirectorySyncRoleMappingGroupName: WithOptions;
+  configureDirectorySyncRoleMappingEmpty: WithOptions;
+  configureDirectorySyncRoleSyncDialog: WithOptions;
+  configureDirectorySyncRoleSyncDialogCancelButton: WithOptions;
+  configureDirectorySyncRoleSyncDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -823,6 +996,13 @@ export type Variables = {
    */
   fontFamilyButtons?: FontFamily;
   /**
+   * The default monospace font that will be used for monospaced text (e.g. code, OTP inputs).
+   * See {@link Variables.fontFamily} for details on accepted values.
+   *
+   * @default 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+   */
+  fontFamilyMono?: FontFamily;
+  /**
    * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
    *
@@ -859,7 +1039,7 @@ export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerN
 export type Theme = {
   /**
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customization, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
    *
@@ -985,6 +1165,33 @@ export type Options = {
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
+  /**
+   * Controls whether inputs will automatically receive focus when a component is mounted.
+   * Set to false to prevent the components from auto-focusing any input fields.
+   *
+   * @default true
+   */
+  autoFocus?: boolean;
+
+  /**
+   * Controls the visual elevation of card-based components.
+   *
+   * - `'raised'` (default) — the card renders with its border, box-shadow, border-radius, and padding.
+   * - `'flush'` — removes the card border, box-shadow, border-radius, outer padding, and footer
+   *   background so the component sits flat against its container.
+   *
+   * Applies to all card-based components including `<SignIn />`, `<SignUp />`,
+   * `<Waitlist />`, `<CreateOrganization />`, `<OrganizationList />`,
+   * `<OAuthConsent />`, `<UserVerification />`, and session task components.
+   *
+   * Does **not** affect profile components (`<UserProfile />`, `<OrganizationProfile />`)
+   * or popover components (`<UserButton />`, `<OrganizationSwitcher />`), which always render as raised.
+   *
+   * When a component is opened as a modal, it always renders as raised regardless of this setting.
+   *
+   * @default 'raised'
+   */
+  elevation?: 'raised' | 'flush';
 };
 
 export type CaptchaAppearanceOptions = {
@@ -1024,8 +1231,9 @@ export type CheckoutTheme = Theme;
 export type PlanDetailTheme = Theme;
 export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
-export type __experimental_ConfigureSSOTheme = Theme;
+export type ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type OAuthDeviceVerificationTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
 export type TaskSetupMFATheme = Theme;
@@ -1104,11 +1312,19 @@ export type Appearance<T = Theme> = T &
     /**
      * Theme overrides that only apply to the `<ConfigureSSO />` component
      */
-    __experimental_configureSSO?: T;
+    configureSSO?: T;
+    /**
+     * Theme overrides that only apply to the `<ConfigureDirectorySync />` component
+     */
+    configureDirectorySync?: T;
     /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<OAuthDeviceVerification />` component
+     */
+    oauthDeviceVerification?: T;
     /**
      * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */

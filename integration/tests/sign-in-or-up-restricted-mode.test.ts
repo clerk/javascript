@@ -17,8 +17,8 @@ test.describe('sign-in-or-up restricted mode @nextjs', () => {
     await app.withEnv(appConfigs.envs.withSignInOrUpwithRestrictedModeFlow);
     await app.dev();
 
-    const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser();
+    const m = await createTestUtils({ app });
+    fakeUser = m.services.users.createFakeUser(test);
   });
 
   test.afterAll(async () => {
@@ -27,7 +27,7 @@ test.describe('sign-in-or-up restricted mode @nextjs', () => {
   });
 
   test('It does not allow sign-in-or-up flow', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await expect(u.page.getByText(/continue to/i)).toBeHidden();

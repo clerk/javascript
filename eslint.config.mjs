@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -14,10 +17,45 @@ import pluginYml from 'eslint-plugin-yml';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
+
+const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
-  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+  // turbo lint runs `eslint src` from each package cwd; these must be repo-absolute
+  IMPORT_RESOLVER_TSCONFIGS = [`${REPO_ROOT}/integration/tsconfig.json`],
+  IMPORT_RESOLVER_TSCONFIG_NAMES = ['tsconfig.json', 'tsconfig.src.json', 'tsconfig.test.json', 'tsconfig.mosaic.json'];
+
+// Each package must see only its own tsconfigs. Several packages define `@/*`, and a
+// shared project list lets the resolver apply clerk-js's alias to UI or shared files.
+const PACKAGE_IMPORT_RESOLVER_CONFIGS = fs
+  .readdirSync(path.join(REPO_ROOT, 'packages'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(REPO_ROOT, 'packages', entry.name, 'package.json')))
+  .flatMap(entry => {
+    const project = IMPORT_RESOLVER_TSCONFIG_NAMES.map(name =>
+      path.join(REPO_ROOT, 'packages', entry.name, name),
+    ).filter(file => fs.existsSync(file));
+    if (project.length === 0) {
+      return [];
+    }
+    return [
+      {
+        name: `packages/${entry.name}/import-resolver`,
+        files: [`packages/${entry.name}/**/*.{ts,tsx,js,jsx,mts,cts}`],
+        settings: {
+          'import/resolver': {
+            node: true,
+            typescript: {
+              alwaysTryTypes: true,
+              project,
+            },
+          },
+        },
+      },
+    ];
+  });
 
 const noNavigateUseClerk = {
   meta: {
@@ -170,6 +208,30 @@ const noUnstableMethods = {
   },
 };
 
+const noRawInert = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow the raw `inert` JSX attribute',
+      recommended: false,
+    },
+    messages: {
+      useInertProps:
+        "Use `{...inertProps(active)}` from '@clerk/shared/inert' instead of a raw `inert` attribute. React 18 and 19 need different `inert` values.",
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      JSXAttribute(node) {
+        if (node.name.type === 'JSXIdentifier' && node.name.name === 'inert') {
+          context.report({ node, messageId: 'useInertProps' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -261,17 +323,19 @@ export default tseslint.config([
       '**/build/*',
       '**/coverage/*',
       '**/dist/*',
+      '**/integration/expo-native/**/*',
       '**/integration/templates/**/*',
       '**/node_modules/**',
       '*.snap',
       'commitlint.config.ts',
       'packages/*/dist/**',
       'packages/*/examples',
-      'playground/*',
       'pnpm-lock.json',
       'eslint.config.mjs',
       'typedoc.config.mjs',
       'vitest.workspace.mjs',
+      'packages/mosaic/**',
+      'packages/swingset/**',
       // package specific ignores
       'packages/astro/src/astro-components/**/*.ts',
       'packages/backend/src/runtime/**/*',
@@ -322,8 +386,10 @@ export default tseslint.config([
       'custom-rules': {
         rules: {
           'no-global-object': noGlobalObject,
+          'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'no-raw-inert': noRawInert,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -336,12 +402,13 @@ export default tseslint.config([
         node: true,
         typescript: {
           alwaysTryTypes: true,
-          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+          project: IMPORT_RESOLVER_TSCONFIGS,
         },
       },
     },
     rules: {
       'custom-rules/no-unstable-methods': 'error',
+      'custom-rules/no-raw-inert': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -515,16 +582,16 @@ export default tseslint.config([
     },
   },
   {
+    name: 'repo/react-hooks/test',
+    files: TEST_FILES,
+    rules: {
+      'react-hooks/globals': 'off',
+    },
+  },
+  ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
+  {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
-    plugins: {
-      'custom-rules': {
-        rules: {
-          'no-navigate-useClerk': noNavigateUseClerk,
-          'no-unstable-methods': noUnstableMethods,
-        },
-      },
-    },
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
@@ -533,8 +600,12 @@ export default tseslint.config([
   {
     name: 'packages/ui',
     files: ['packages/ui/src/**/*'],
+    // Tests assert on style values they receive; they are not authoring styles.
+    ignores: ['packages/ui/src/**/__tests__/**', 'packages/ui/src/**/*.test.{ts,tsx}'],
     rules: {
       'custom-rules/no-physical-css-properties': 'error',
+      'custom-rules/no-navigate-useClerk': 'error',
+      'custom-rules/no-unstable-methods': 'error',
     },
   },
   {
@@ -542,6 +613,19 @@ export default tseslint.config([
     files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
       '@typescript-eslint/unbound-method': 'off',
+      // vitest's `importOriginal<typeof import('...')>()` has no type-import equivalent.
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', disallowTypeAnnotations: false, fixStyle: 'separate-type-imports' },
+      ],
+    },
+  },
+  {
+    name: 'packages - vitest type tests',
+    files: ['packages/*/src/**/*.test-d.ts'],
+    rules: {
+      // Type tests bind values only to read their type back off with `typeof`.
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   {
@@ -641,7 +725,11 @@ export default tseslint.config([
       'jsdoc/informative-docs': 'warn',
       'jsdoc/check-tag-names': [
         'warn',
-        { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
+        {
+          // Derived from the Typedoc tooling's custom tags (`.typedoc/custom-tags.mjs`) so the two cannot drift.
+          definedTags: [...CUSTOM_BLOCK_TAGS, ...CUSTOM_MODIFIER_TAGS].map(tag => tag.slice(1)),
+          typed: false,
+        },
       ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
       'jsdoc/require-description': 'off',

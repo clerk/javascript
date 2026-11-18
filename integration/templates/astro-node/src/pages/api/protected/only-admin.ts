@@ -5,6 +5,12 @@ export const GET: APIRoute = async context => {
   const { locals } = context;
   const { auth } = locals;
 
+  if (!auth().userId) {
+    return new Response(JSON.stringify({ error: 'unauthorized access' }), {
+      status: 401,
+    });
+  }
+
   if (auth().has({ role: 'org:admin' })) {
     return new Response(
       JSON.stringify(

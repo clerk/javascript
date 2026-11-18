@@ -1,10 +1,11 @@
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import type { PasskeyJSON, PasskeyResource } from '@clerk/shared/types';
 import { act } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, waitFor } from '@/test/utils';
-import { CardStateProvider } from '@/ui/elements/contexts';
+import { fireEvent, render, waitFor } from '@/test/utils';
+import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 
 import { PasskeySection } from '../PasskeySection';
 
@@ -75,6 +76,73 @@ describe('PasskeySection', () => {
 
       await userEvent.click(getByRole('button', { name: 'Add a passkey' }));
       expect(fixtures.clerk.user?.createPasskey).toHaveBeenCalled();
+    });
+
+    it('ignores repeat clicks while a registration is in flight', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPasskeys);
+
+      fixtures.clerk.user?.createPasskey.mockImplementation(() => new Promise(() => {}));
+      const { getByRole, userEvent } = render(
+        <CardStateProvider>
+          <PasskeySection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = getByRole('button', { name: 'Add a passkey' });
+      await userEvent.click(button);
+      fireEvent.click(button);
+
+      expect(button).toBeDisabled();
+      expect(fixtures.clerk.user?.createPasskey).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-enables the button after a failed registration', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPasskeys);
+
+      fixtures.clerk.user?.createPasskey.mockRejectedValue(
+        new ClerkWebAuthnError('Passkey registration was cancelled or timed out.', {
+          code: 'passkey_registration_cancelled',
+        }),
+      );
+      const { getByRole, userEvent } = render(
+        <CardStateProvider>
+          <PasskeySection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = getByRole('button', { name: 'Add a passkey' });
+      await userEvent.click(button);
+
+      await waitFor(() => expect(button).not.toBeDisabled());
+    });
+
+    it('clears the previous error when a retry succeeds', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPasskeys);
+
+      fixtures.clerk.user?.createPasskey.mockRejectedValueOnce(
+        new ClerkWebAuthnError('Passkey registration was cancelled or timed out.', {
+          code: 'passkey_registration_cancelled',
+        }),
+      );
+      const CardError = () => <span data-testid='card-error'>{useCardState().error ?? ''}</span>;
+      const { getByRole, getByTestId, userEvent } = render(
+        <CardStateProvider>
+          <PasskeySection />
+          <CardError />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = getByRole('button', { name: 'Add a passkey' });
+      await userEvent.click(button);
+      await waitFor(() => expect(getByTestId('card-error')).toHaveTextContent(/cancelled or timed out/i));
+
+      fixtures.clerk.user?.createPasskey.mockResolvedValueOnce({} as any);
+      await userEvent.click(button);
+
+      await waitFor(() => expect(getByTestId('card-error')).toHaveTextContent(''));
     });
   });
 

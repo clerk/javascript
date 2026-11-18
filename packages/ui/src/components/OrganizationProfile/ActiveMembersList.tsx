@@ -85,10 +85,11 @@ const MemberRow = (props: {
   const { user } = useUser();
 
   const isCurrentUser = user?.id === membership.publicUserData?.userId;
+  const isDeprovisioned = membership.publicUserData?.deprovisioned;
   const unlocalizedRoleLabel = options?.find(a => a.value === membership.role)?.label;
 
   return (
-    <RowContainer>
+    <RowContainer isDisabled={isDeprovisioned}>
       <Td>
         <UserPreview
           sx={{ maxWidth: '30ch' }}
@@ -98,6 +99,11 @@ const MemberRow = (props: {
           badge={
             isCurrentUser ? (
               <Badge localizationKey={localizationKeys('badge__you')} />
+            ) : isDeprovisioned ? (
+              <Badge
+                colorScheme='secondary'
+                localizationKey={localizationKeys('badge__deprovisioned')}
+              />
             ) : membership.publicUserData?.banned ? (
               <Badge
                 colorScheme='danger'
@@ -126,7 +132,7 @@ const MemberRow = (props: {
           }
         >
           <RoleSelect
-            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration}
+            isDisabled={card.isLoading || !onRoleChange || hasRoleSetMigration || isDeprovisioned}
             value={membership.role}
             fallbackLabel={membership.roleName}
             onChange={onRoleChange}
@@ -142,7 +148,7 @@ const MemberRow = (props: {
                 label: localizationKeys('organizationProfile.membersPage.activeMembersTab.menuAction__remove'),
                 isDestructive: true,
                 onClick: onRemove,
-                isDisabled: isCurrentUser,
+                isDisabled: isCurrentUser || isDeprovisioned,
               },
             ]}
             elementId={'member'}

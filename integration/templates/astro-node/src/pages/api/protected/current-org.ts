@@ -1,14 +1,13 @@
 import type { APIRoute } from 'astro';
 import { clerkClient } from '@clerk/astro/server';
 
-const empty = () => new Response(null);
-
 export const GET: APIRoute = async context => {
   const { locals } = context;
   const { userId, orgId } = locals.auth();
   if (!userId) {
-    // We are handling this at the middleware level
-    return empty();
+    return new Response(JSON.stringify({ error: 'unauthorized access' }), {
+      status: 401,
+    });
   }
 
   if (!orgId) {

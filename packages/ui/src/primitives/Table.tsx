@@ -47,10 +47,10 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderInlineEndWidth: '0px',
         borderColor: theme.colors.$borderAlpha150,
       },
-      'tr:hover td:first-of-type': {
+      'tr:last-of-type:hover td:first-of-type': {
         borderEndStartRadius: theme.radii.$lg,
       },
-      'tr:hover td:last-of-type': {
+      'tr:last-of-type:hover td:last-of-type': {
         borderEndEndRadius: theme.radii.$lg,
       },
       'tr > th:first-of-type': {

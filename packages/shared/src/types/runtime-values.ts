@@ -214,13 +214,24 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     provider: 'enstall',
     strategy: 'oauth_enstall',
     name: 'Enstall',
-    docsUrl: 'https://clerk.com/docs/authentication/social-connections/enstall',
   },
   {
     provider: 'huggingface',
     strategy: 'oauth_huggingface',
     name: 'Hugging Face',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/huggingface',
+  },
+  {
+    provider: 'vercel',
+    strategy: 'oauth_vercel',
+    name: 'Vercel',
+    docsUrl: 'https://clerk.com/docs/authentication/social-connections/vercel',
+  },
+  {
+    provider: 'agentid',
+    strategy: 'oauth_agentid',
+    name: 'AgentID',
+    docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/agentid',
   },
 ];
 

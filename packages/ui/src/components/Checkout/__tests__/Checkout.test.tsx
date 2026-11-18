@@ -61,6 +61,39 @@ describe('Checkout', () => {
     });
   });
 
+  it('passes seatsQuantity to checkout initialization', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
+
+    render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_with_seats'
+          planPeriod='month'
+          seatsQuantity={7}
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(fixtures.clerk.billing.startCheckout).toHaveBeenCalledWith(
+        expect.objectContaining({
+          planId: 'plan_with_seats',
+          planPeriod: 'month',
+          seatsQuantity: 7,
+        }),
+      );
+    });
+  });
+
   it('renders drawer structure and localization correctly', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
@@ -345,6 +378,7 @@ describe('Checkout', () => {
         },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 2500, amountFormatted: '25.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -412,8 +446,8 @@ describe('Checkout', () => {
     expect(prorationCreditRow).toBeInTheDocument();
     expect(accountCreditRow).toBeInTheDocument();
 
-    expect(prorationCreditRow).toHaveTextContent('- $5.00');
-    expect(accountCreditRow).toHaveTextContent('- $10.00');
+    expect(prorationCreditRow).toHaveTextContent('-$5.00');
+    expect(accountCreditRow).toHaveTextContent('-$10.00');
   });
 
   it('renders free trial details during confirmation stage', async () => {
@@ -442,6 +476,7 @@ describe('Checkout', () => {
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueAfterFreeTrial: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -526,6 +561,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -606,6 +642,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -699,6 +736,7 @@ describe('Checkout', () => {
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,
       planPeriod: 'month',
@@ -825,6 +863,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -965,6 +1004,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1092,6 +1132,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1187,6 +1228,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1278,6 +1320,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1383,6 +1426,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: true,
         planPeriod: 'month',
@@ -1515,6 +1559,7 @@ describe('Checkout', () => {
           credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
           totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDuePerPeriod: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         },
         isImmediatePlanChange: false,
         planPeriod: 'month',
@@ -1597,6 +1642,408 @@ describe('Checkout', () => {
 
         expect(queryByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('promo codes', () => {
+    const money = (amount: number, amountFormatted: string) => ({
+      amount,
+      amountFormatted,
+      currency: 'USD',
+      currencySymbol: '$',
+    });
+
+    const plan = {
+      id: 'plan_promo',
+      name: 'Pro',
+      description: 'Pro plan',
+      features: [],
+      fee: money(12989, '129.89'),
+      annualFee: money(155868, '1,558.68'),
+      annualMonthlyFee: money(12989, '129.89'),
+      slug: 'pro',
+      avatarUrl: '',
+      publiclyVisible: true,
+      isDefault: true,
+      isRecurring: true,
+      hasBaseFee: true,
+      forPayerType: 'user',
+      freeTrialDays: 0,
+      freeTrialEnabled: false,
+    };
+
+    const checkout = {
+      id: 'chk_promo',
+      status: 'needs_confirmation',
+      externalClientSecret: 'cs_test_promo',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: money(12989, '129.89'),
+        baseFee: money(12989, '129.89'),
+        grandTotal: money(12989, '129.89'),
+        taxTotal: money(0, '0.00'),
+        credit: money(0, '0.00'),
+        pastDue: money(0, '0.00'),
+        totalDueNow: money(12989, '129.89'),
+        totalDuePerPeriod: money(12989, '129.89'),
+        discounts: null,
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan,
+      payer: { organizationId: null },
+      paymentMethod: undefined,
+      confirm: vi.fn(),
+      freeTrialEndsAt: null,
+      needsPaymentMethod: false,
+    };
+
+    it('shows an inline error when a promo code cannot be applied', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+      fixtures.clerk.billing.startCheckout.mockResolvedValue(checkout as any);
+      fixtures.clerk.billing.updateCheckout.mockRejectedValue(new Error('Invalid promo code'));
+
+      const { baseElement, getByRole, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_promo_error'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      const input = await waitFor(() => getByRole('textbox', { name: 'Enter promo code' }));
+      const lineItemsRoot = baseElement.querySelector('.cl-checkoutFormLineItemsRoot');
+      expect(lineItemsRoot?.nextElementSibling).toContainElement(input);
+      await userEvent.type(input, 'INVALID');
+      await userEvent.click(getByRole('button', { name: 'Apply' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.billing.updateCheckout).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 'chk_promo', promoCode: 'INVALID' }),
+        );
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+        expect(getByRole('alert')).toHaveTextContent('Invalid promo code');
+      });
+    });
+
+    it('shows and removes an applied promo code with its applied amount and duration', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      const appliedCheckout = {
+        ...checkout,
+        totals: {
+          ...checkout.totals,
+          grandTotal: money(10391, '103.91'),
+          totalDueNow: money(10391, '103.91'),
+          discounts: {
+            proration: {
+              amount: money(500, '5.00'),
+              cycleDaysPassed: 15,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 50,
+            },
+            discount: {
+              amount: money(2598, '25.98'),
+              amountOff: money(5000, '50.00'),
+              discountId: 'disc_20',
+              name: '20% off first month',
+              effect: 'percentage',
+              percentOff: 20,
+              promoCode: 'WELCOME20',
+              cyclesRemaining: 1,
+              durationInCycles: 1,
+            },
+            total: money(2598, '25.98'),
+          },
+        },
+      };
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+      fixtures.clerk.billing.startCheckout.mockResolvedValue(checkout as any);
+      fixtures.clerk.billing.updateCheckout
+        .mockResolvedValueOnce(appliedCheckout as any)
+        .mockResolvedValueOnce(checkout as any);
+
+      const { getByRole, getByText, queryByRole, queryByText, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_promo_success'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await userEvent.type(await waitFor(() => getByRole('textbox', { name: 'Enter promo code' })), 'WELCOME20');
+      await userEvent.click(getByRole('button', { name: 'Apply' }));
+
+      await waitFor(() => {
+        expect(getByText('WELCOME20')).toBeVisible();
+        expect(getByText('20% off first 1 month')).toBeVisible();
+        expect(getByText('-$25.98')).toBeVisible();
+        expect(queryByText('-$50.00')).toBeNull();
+        expect(getByText('Prorated discount').closest('.cl-lineItemsGroup')?.nextElementSibling).toBe(
+          getByText('WELCOME20').closest('.cl-lineItemsGroup'),
+        );
+        expect(queryByRole('textbox', { name: 'Enter promo code' })).toBeNull();
+      });
+
+      await userEvent.click(getByRole('button', { name: 'Remove promo code' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.billing.updateCheckout).toHaveBeenLastCalledWith(
+          expect.objectContaining({ id: 'chk_promo', promoCode: '' }),
+        );
+        expect(queryByText('WELCOME20')).toBeNull();
+        expect(getByRole('textbox', { name: 'Enter promo code' })).toBeVisible();
+      });
+    });
+  });
+
+  describe('differentiates between new subscriptions and mid-cycle seat additions in checkout totals', () => {
+    const proPlan = {
+      id: 'plan_totals',
+      name: 'Pro',
+      description: 'Pro plan',
+      features: [],
+      fee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      annualFee: { amount: 12000, amountFormatted: '120.00', currency: 'USD', currencySymbol: '$' },
+      annualMonthlyFee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      slug: 'pro',
+      avatarUrl: '',
+      publiclyVisible: true,
+      isDefault: true,
+      isRecurring: true,
+      hasBaseFee: false,
+      forPayerType: 'user',
+      freeTrialDays: 0,
+      freeTrialEnabled: false,
+    };
+
+    const money = (amount: number, amountFormatted: string) => ({
+      amount,
+      amountFormatted,
+      currency: 'USD',
+      currencySymbol: '$',
+    });
+
+    it('shows prorated discount and renewal totals for a mid-cycle seat addition', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_proration',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_proration',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1500, '15.00'),
+          baseFee: money(0, '0.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: {
+            proration: {
+              amount: money(500, '5.00'),
+              cycleDaysPassed: 15,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 50,
+            },
+            total: money(500, '5.00'),
+          },
+          totalDuePerPeriod: money(3000, '30.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(3000, '30.00'),
+            baseFee: money(0, '0.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(3000, '30.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, getByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      const proratedDiscountRow = getByText('Prorated discount').closest('.cl-lineItemsGroup');
+      expect(proratedDiscountRow).toBeInTheDocument();
+      expect(proratedDiscountRow).toHaveTextContent('-$5.00');
+
+      const totalPerPeriodRow = getByText('Total per period').closest('.cl-lineItemsGroup');
+      expect(totalPerPeriodRow).toBeInTheDocument();
+      expect(totalPerPeriodRow).toHaveTextContent('$30.00');
+    });
+
+    it('hides renewal totals for a new subscription where the renewal equals the amount due now', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_new_sub',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_new_sub',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1000, '10.00'),
+          baseFee: money(1000, '10.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: null,
+          totalDuePerPeriod: money(1000, '10.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(1000, '10.00'),
+            baseFee: money(1000, '10.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(1000, '10.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, getByText, queryByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      // The "Total due today" row is still shown, but no renewal/discount rows are added
+      expect(getByText('Total due today')).toBeVisible();
+      expect(queryByText('Subtotal per period')).toBeNull();
+      expect(queryByText('Total per period')).toBeNull();
+      expect(queryByText('Prorated discount')).toBeNull();
+    });
+
+    it('hides the prorated discount row when the discount amount is zero', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({ data: [], total_count: 0 });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_totals_zero_discount',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_totals_zero_discount',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: money(1000, '10.00'),
+          baseFee: money(0, '0.00'),
+          grandTotal: money(1000, '10.00'),
+          taxTotal: money(0, '0.00'),
+          credit: money(0, '0.00'),
+          pastDue: money(0, '0.00'),
+          totalDueNow: money(1000, '10.00'),
+          discounts: {
+            proration: {
+              amount: money(0, '0.00'),
+              cycleDaysPassed: 0,
+              cycleDaysTotal: 30,
+              cyclePassedPercent: 0,
+            },
+            total: money(0, '0.00'),
+          },
+          totalDuePerPeriod: money(1000, '10.00'),
+          totalsDuePerPeriod: {
+            subtotal: money(1000, '10.00'),
+            baseFee: money(0, '0.00'),
+            taxTotal: money(0, '0.00'),
+            grandTotal: money(1000, '10.00'),
+          },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: proPlan,
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+        needsPaymentMethod: false,
+      } as any);
+
+      const { getByRole, queryByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_totals'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      expect(queryByText('Prorated discount')).toBeNull();
     });
   });
 });

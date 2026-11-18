@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,
   SignUpContext,
@@ -20,8 +20,11 @@ import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
+import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpEnterpriseConnections,
+  LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
   LazySignUpVerifyEmail,
@@ -32,8 +35,10 @@ import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
+import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
+import { SignInProtectCheck } from './SignInProtectCheck';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
 
@@ -52,6 +57,14 @@ function SignInRoutes(): JSX.Element {
   return (
     <Flow.Root flow='signIn'>
       <Switch>
+        {/* No canActivate guard here. `!!signIn.protectCheck` flips to false the
+            instant the check resolves (submitProtectCheck clears protectCheck),
+            which would unmount this card mid-navigation and blank the route
+            (RouteGuard renders null + navigateToFlowStart). The card owns its
+            own routing — it navigates to the next step on resolution. */}
+        <Route path='protect-check'>
+          <SignInProtectCheck />
+        </Route>
         <Route path='factor-one'>
           <SignInFactorOne />
         </Route>
@@ -68,18 +81,7 @@ function SignInRoutes(): JSX.Element {
           <ResetPasswordSuccess />
         </Route>
         <Route path='sso-callback'>
-          <SignInSSOCallback
-            signUpUrl={signInContext.signUpUrl}
-            signInUrl={signInContext.signInUrl}
-            signInForceRedirectUrl={signInContext.afterSignInUrl}
-            signUpForceRedirectUrl={signInContext.afterSignUpUrl}
-            continueSignUpUrl={signInContext.signUpContinueUrl}
-            transferable={signInContext.transferable}
-            firstFactorUrl={'../factor-one'}
-            secondFactorUrl={'../factor-two'}
-            resetPasswordUrl={'../reset-password'}
-            unsafeMetadata={signInContext.unsafeMetadata}
-          />
+          <SignInSSOCallback {...buildSignInOAuthCallbackParams(signInContext)} />
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
@@ -88,14 +90,16 @@ function SignInRoutes(): JSX.Element {
           <SignInFactorOneSolanaWalletsCard />
         </Route>
         <Route path='verify'>
-          <SignInEmailLinkFlowComplete
-            redirectUrlComplete={signInContext.afterSignInUrl}
-            redirectUrl='../factor-two'
-          />
+          <SignInEmailLinkVerify />
         </Route>
 
         {signInContext.isCombinedFlow && (
           <Route path='create'>
+            {/* No canActivate guard — same resolution race as the sign-in
+                protect-check route above; the card owns its own routing. */}
+            <Route path='protect-check'>
+              <LazySignUpProtectCheck oauthCallbackParams={buildCombinedFlowOAuthCallbackParams(signUpContext)} />
+            </Route>
             <Route
               path='verify-email-address'
               canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -109,27 +113,25 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback
-                signUpUrl={signUpContext.signUpUrl}
-                signInUrl={signUpContext.signInUrl}
-                signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
-                signInForceRedirectUrl={signUpContext.afterSignInUrl}
-                secondFactorUrl={signUpContext.secondFactorUrl}
-                continueSignUpUrl='../continue'
-                verifyEmailAddressUrl='../verify-email-address'
-                verifyPhoneNumberUrl='../verify-phone-number'
-                unsafeMetadata={signUpContext.unsafeMetadata}
-              />
+              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete
                 redirectUrlComplete={signUpContext.afterSignUpUrl}
+                ssoCallbackUrl={signUpContext.ssoCallbackUrl}
+                oidcPrompt={signUpContext.oidcPrompt}
                 verifyEmailPath='../verify-email-address'
                 verifyPhonePath='../verify-phone-number'
                 continuePath='../continue'
               />
             </Route>
             <Route path='continue'>
+              {/* No canActivate guard — same resolution race as the sign-in
+                  protect-check route; the card owns its own routing. */}
+              <Route path='protect-check'>
+                {/* Under `create/continue`, the continue index is `..`, not `../continue`. */}
+                <LazySignUpProtectCheck continuePath='..' />
+              </Route>
               <Route
                 path='verify-email-address'
                 canActivate={clerk => !!clerk.client.signUp.emailAddress}
@@ -148,6 +150,9 @@ function SignInRoutes(): JSX.Element {
             </Route>
             <Route path='tasks'>
               <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
+            </Route>
+            <Route path='enterprise-connections'>
+              <LazySignUpEnterpriseConnections />
             </Route>
             <Route index>
               <LazySignUpStart />
@@ -177,6 +182,7 @@ function SignInRoot() {
     componentName: 'SignUp',
     emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
     ssoCallbackUrl: signInContext.ssoCallbackUrl,
+    oidcPrompt: signInContext.oidcPrompt,
     forceRedirectUrl: signInContext.signUpForceRedirectUrl,
     fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
     signInUrl: signInContext.signInUrl,

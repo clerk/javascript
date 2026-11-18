@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, VerificationStrategy } from '@clerk/shared/types';
 import React, { Fragment, useState } from 'react';
 
@@ -14,7 +14,7 @@ import { useEnvironment } from '../../contexts';
 import { Badge, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { AuthApp, DotCircle, Mobile } from '../../icons';
+import { AuthApp, Mobile, ThreeDotsCircle } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { MfaBackupCodeCreateScreen, MfaScreen, RemoveMfaPhoneCodeScreen, RemoveMfaTOTPScreen } from './MfaScreens';
 
@@ -106,7 +106,7 @@ export const MfaSection = () => {
 
                     <MfaPhoneCodeMenu
                       phone={phone}
-                      isDefault={isDefault}
+                      showSetDefaultAction={!showTOTP && !phone.defaultSecondFactor}
                       hidePhoneCodeDeleteAction={hidePhoneCodeDeleteAction}
                     />
                   </ProfileSection.Item>
@@ -128,7 +128,7 @@ export const MfaSection = () => {
               >
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
-                    icon={DotCircle}
+                    icon={ThreeDotsCircle}
                     sx={theme => ({ color: theme.colors.$neutralAlpha700 })}
                   />
 
@@ -158,21 +158,22 @@ export const MfaSection = () => {
 
 type MfaPhoneCodeMenuProps = {
   phone: PhoneNumberResource;
-  isDefault: boolean;
+  showSetDefaultAction: boolean;
   hidePhoneCodeDeleteAction: boolean;
 };
 
-const MfaPhoneCodeMenu = ({ phone, isDefault, hidePhoneCodeDeleteAction }: MfaPhoneCodeMenuProps) => {
+const MfaPhoneCodeMenu = ({ phone, showSetDefaultAction, hidePhoneCodeDeleteAction }: MfaPhoneCodeMenuProps) => {
   const { open } = useActionContext();
   const card = useCardState();
   const phoneId = phone.id;
+  const makeDefaultSecondFactor = useReverification(() => phone.makeDefaultSecondFactor());
 
   const actions = (
     [
-      !isDefault
+      showSetDefaultAction
         ? {
             label: localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault'),
-            onClick: () => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
+            onClick: () => makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
           }
         : null,
       !hidePhoneCodeDeleteAction
@@ -240,7 +241,7 @@ const strategiesMap = {
     key: 'totp',
   },
   backup_code: {
-    icon: DotCircle,
+    icon: ThreeDotsCircle,
     text: 'Backup code',
     key: 'backup_code',
   },

@@ -2,12 +2,20 @@ import { ClerkAPIResponseError, ClerkOfflineError } from '@clerk/shared/error';
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { clerkMock, createUser, mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import {
+  restoreDocument,
+  setDocument,
+  setDocumentHasFocus,
+  setDocumentHasFocusValue,
+  setDocumentVisibilityState,
+} from '@/test/document-helpers';
+import { TokenId } from '@/utils/tokenId';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
-import { BaseResource, Organization, Session } from '../internal';
+import { BaseResource, Client, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -28,20 +36,117 @@ describe('Session', () => {
 
   afterEach(() => {
     SessionTokenCache.clear();
+    restoreDocument();
     vi.useRealTimers();
   });
 
   describe('getToken()', () => {
     let dispatchSpy;
+    let cacheSetSpy;
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
+      cacheSetSpy = vi.spyOn(SessionTokenCache, 'set');
       BaseResource.clerk = clerkMock();
     });
 
     afterEach(() => {
       dispatchSpy?.mockRestore();
+      cacheSetSpy?.mockRestore();
       BaseResource.clerk = null as any;
+    });
+
+    describe('focus-biased proactive refresh', () => {
+      const createSession = (lastActiveToken?: SessionJSON['last_active_token']) =>
+        new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: lastActiveToken,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+      it('registers proactive refresh after a focused network mint', async () => {
+        setDocumentHasFocus(true);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
+      });
+
+      it('does not register proactive refresh after an unfocused network mint', async () => {
+        setDocumentHasFocus(false);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
+      });
+
+      it('does not register proactive refresh for an unfocused hydrated token', async () => {
+        setDocumentHasFocus(false);
+
+        createSession({ object: 'token', jwt: mockJwt });
+        await Promise.resolve();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({ tokenId, tokenResolver: expect.any(Promise) });
+      });
+
+      it('registers proactive refresh when document.hasFocus is not callable', async () => {
+        setDocumentHasFocusValue(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
+      });
+
+      it('registers proactive refresh when document.hasFocus throws', async () => {
+        setDocumentHasFocusValue(() => {
+          throw new Error('broken document');
+        });
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
+      });
+
+      it('registers proactive refresh when document is missing', async () => {
+        setDocument(undefined);
+
+        const session = createSession();
+        await session.getToken();
+
+        const tokenId = TokenId.build('session_1', undefined, null);
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId,
+          tokenResolver: expect.any(Promise),
+        });
+      });
     });
 
     it('dispatches token:update event on getToken without active organization', async () => {
@@ -297,7 +402,7 @@ describe('Session', () => {
         expect(ClerkOfflineError.is(error)).toBe(true);
       });
 
-      it('retries 3 times before throwing when offline without making network requests', async () => {
+      it('still attempts the network request on each retry when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -321,7 +426,80 @@ describe('Session', () => {
         await errorPromise;
 
         expect(getTokenSpy).toHaveBeenCalledTimes(4);
-        expect(global.fetch).toHaveBeenCalledTimes(0);
+        expect(global.fetch).toHaveBeenCalledTimes(4);
+      });
+
+      it('returns the token when navigator.onLine is false but the network works', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        expect(await session.getToken({ skipCache: true })).toEqual(mockJwt);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(false, 503, { errors: [{ code: 'service_unavailable', message: 'Service unavailable' }] });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds with a non-JSON body', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        // @ts-ignore
+        global.fetch = vi.fn(() =>
+          Promise.resolve({
+            status: 502,
+            statusText: 'Bad Gateway',
+            ok: false,
+            json: () => Promise.reject(new SyntaxError('Unexpected token < in JSON')),
+          }),
+        );
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+        expect(error.status).toBe(502);
       });
 
       it('does not emit token:update with an empty token when offline', async () => {
@@ -470,6 +648,92 @@ describe('Session', () => {
       expect(token3).toEqual(mockJwt);
     });
 
+    it('keeps waiting on a slow token request in a browser', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+      const respond = requestSpy.getMockImplementation()!;
+      requestSpy.mockImplementationOnce(
+        (...args: unknown[]) => new Promise(resolve => setTimeout(() => resolve(respond(...args)), 15_000)),
+      );
+
+      let token: string | null | undefined;
+      void session.getToken().then(t => (token = t));
+      await vi.advanceTimersByTimeAsync(15_000);
+
+      expect(token).toEqual(mockJwt);
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+    });
+
+    describe('without a document, as in React Native', () => {
+      beforeEach(() => {
+        setDocument(undefined);
+      });
+
+      it('aborts a stalled token request and mints the token on retry', async () => {
+        BaseResource.clerk = clerkMock();
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+        requestSpy.mockClear();
+        requestSpy.mockImplementationOnce(() => new Promise(() => {}));
+
+        let token: string | null | undefined;
+        void session.getToken().then(t => (token = t));
+        await vi.advanceTimersByTimeAsync(15_000);
+
+        expect(token).toEqual(mockJwt);
+        expect(requestSpy).toHaveBeenCalledTimes(2);
+        expect(requestSpy.mock.calls[0][0].signal.aborted).toBe(true);
+      });
+
+      it('reports token requests that keep stalling as a network error', async () => {
+        BaseResource.clerk = clerkMock();
+
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+        requestSpy.mockImplementation(() => new Promise(() => {}));
+
+        let error: unknown;
+        void session.getToken().catch(e => (error = e));
+        await vi.advanceTimersByTimeAsync(300_000);
+
+        expect(error).toMatchObject({ code: 'network_error' });
+      });
+    });
+
     it('deduplicates concurrent getToken calls with same template', async () => {
       BaseResource.clerk = clerkMock();
 
@@ -542,6 +806,10 @@ describe('Session', () => {
     });
 
     describe('timer-based proactive refresh', () => {
+      beforeEach(() => {
+        setDocumentHasFocus(true);
+      });
+
       it('triggers background refresh via timer before leeway period', async () => {
         BaseResource.clerk = clerkMock();
         const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
@@ -686,6 +954,11 @@ describe('Session', () => {
         const freshToken = await session.getToken();
         expect(freshToken).toEqual(newMockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
+        expect(cacheSetSpy).toHaveBeenLastCalledWith({
+          onRefresh: expect.any(Function),
+          tokenId: TokenId.build('session_1', undefined, null),
+          tokenResolver: expect.any(Promise),
+        });
       });
 
       it('does not emit token:update with an empty token when background refresh fires while offline', async () => {
@@ -803,6 +1076,137 @@ describe('Session', () => {
     });
   });
 
+  describe('verifyWithPasskey()', () => {
+    const mockPublicKeyCredential = {
+      id: 'credential_123',
+      rawId: new ArrayBuffer(32),
+      response: {
+        authenticatorData: new ArrayBuffer(37),
+        clientDataJSON: new ArrayBuffer(121),
+        signature: new ArrayBuffer(64),
+        userHandle: null,
+      },
+      type: 'public-key',
+    };
+
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    let originalFetch: typeof BaseResource._fetch;
+
+    beforeEach(() => {
+      originalFetch = BaseResource._fetch;
+      BaseResource.clerk = clerkMock({
+        __internal_isWebAuthnSupported: vi.fn().mockReturnValue(true),
+        __internal_getPublicCredentials: vi.fn().mockResolvedValue({
+          publicKeyCredential: mockPublicKeyCredential,
+          error: null,
+        }),
+      } as any);
+    });
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      BaseResource.clerk = null as any;
+    });
+
+    it('runs the first-factor verification flow by default', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            first_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey();
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('runs the second-factor verification flow when level is second_factor', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            second_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey({ level: 'second_factor' });
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('rejects invalid verification levels without calling the API', async () => {
+      const mockFetch = vi.fn();
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await expect(session.verifyWithPasskey({ level: 'third_factor' as any })).rejects.toThrow(
+        'not a valid verification level',
+      );
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
   describe('touch()', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
 
@@ -868,6 +1272,226 @@ describe('Session', () => {
           body: { active_organization_id: 'org_123', intent: 'focus' },
           method: 'POST',
           path: '/client/sessions/session_1/touch',
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
+  describe('reset password reverification', () => {
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    const verificationResponse = {
+      object: 'session_verification',
+      id: 'sessver_1',
+      status: 'needs_first_factor',
+      level: 'first_factor',
+      session: sessionJSON,
+      first_factor_verification: null,
+      second_factor_verification: null,
+      supported_first_factors: null,
+      supported_second_factors: null,
+    };
+
+    let requestSpy: Mock;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+      requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({ payload: { response: verificationResponse }, status: 200 });
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it.each([
+      [{ strategy: 'reset_password_email_code', emailAddressId: 'idn_1' }],
+      [{ strategy: 'reset_password_phone_code', phoneNumberId: 'idn_2' }],
+    ] as const)('prepares a first factor with %o', async factor => {
+      const session = new Session(sessionJSON);
+
+      await session.prepareFirstFactorVerification(factor);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: factor,
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('attempts a first factor with the code and the new password', async () => {
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'reset_password_email_code',
+        code: '123456',
+        password: 'a-much-better-password-123',
+        signOutOfOtherSessions: true,
+      } as const;
+
+      await session.attemptFirstFactorVerification(attempt);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
+  describe('trusted device reverification', () => {
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    const verificationResponse = (factor: 'first_factor_verification' | 'second_factor_verification') => ({
+      object: 'session_verification',
+      id: 'sessver_1',
+      status: factor === 'first_factor_verification' ? 'needs_first_factor' : 'needs_second_factor',
+      level: 'multi_factor',
+      session: sessionJSON,
+      first_factor_verification: null,
+      second_factor_verification: null,
+      supported_first_factors: null,
+      supported_second_factors: null,
+      [factor]: {
+        object: 'verification',
+        status: 'unverified',
+        strategy: 'trusted_device',
+        attempts: 0,
+        expire_at: 1666648310000,
+        trusted_device_challenge: {
+          object: 'trusted_device_challenge',
+          challenge: 'challenge',
+          challenge_id: 'tdch_1',
+          trusted_device_id: 'td_1',
+          client_data: 'client-data',
+          expires_at: 1666648310,
+          algorithm: 'ES256',
+        },
+      },
+    });
+
+    let requestSpy: Mock;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+      requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('prepares a first factor with the trusted device and parses its challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+
+      const verification = await session.prepareFirstFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+        }),
+        expect.anything(),
+      );
+      expect(verification.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge',
+        challengeId: 'tdch_1',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        expiresAt: new Date(1666648310 * 1000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts a first factor with the signed challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      await session.attemptFirstFactorVerification(attempt);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('prepares and attempts a second factor with the trusted device', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('second_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      const prepared = await session.prepareSecondFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+      await session.attemptSecondFactorVerification(attempt);
+
+      expect(prepared.secondFactorVerification.trustedDeviceChallenge?.clientData).toBe('client-data');
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+        }),
+        expect.anything(),
+      );
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
         }),
         expect.anything(),
       );
@@ -1843,6 +2467,72 @@ describe('Session', () => {
     });
   });
 
+  describe('sends tab_state in /tokens request body', () => {
+    const createSession = () =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+    beforeEach(() => {
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+      mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it.each([
+      ['focused', true, 'hidden'],
+      ['visible', false, 'visible'],
+      ['hidden', false, 'hidden'],
+    ])('serializes tab_state=%s', async (tabState, hasFocus, visibilityState) => {
+      setDocumentHasFocus(hasFocus);
+      setDocumentVisibilityState(visibilityState as DocumentVisibilityState);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe(`organization_id=&tab_state=${tabState}`);
+    });
+
+    it('omits tab_state when document is undefined', async () => {
+      setDocument(undefined);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus is not a function', async () => {
+      setDocumentHasFocusValue(undefined);
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+
+    it('omits tab_state when document.hasFocus throws', async () => {
+      setDocumentHasFocusValue(() => {
+        throw new Error('focus unavailable');
+      });
+
+      await createSession().getToken({ skipCache: true });
+
+      const [, request] = (global.fetch as Mock).mock.calls[0];
+      expect(request.body).toBe('organization_id=');
+    });
+  });
+
   describe('origin outage mode fallback', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
     let fetchSpy: ReturnType<typeof vi.spyOn>;
@@ -1900,6 +2590,48 @@ describe('Session', () => {
         method: 'POST',
         body: { organizationId: null },
         search: { expired_token: mockJwt },
+      });
+    });
+
+    describe('without a document, as in React Native', () => {
+      beforeEach(() => {
+        setDocument(undefined);
+      });
+
+      it('gives the expired_token retry a time limit of its own', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          last_active_token: { object: 'token', jwt: mockJwt },
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        SessionTokenCache.clear();
+
+        const errorResponse = new ClerkAPIResponseError('Missing expired token', {
+          data: [
+            { code: 'missing_expired_token', message: 'Missing expired token', long_message: 'Missing expired token' },
+          ],
+          status: 422,
+        });
+        fetchSpy.mockImplementationOnce(
+          () => new Promise((_, reject) => setTimeout(() => reject(errorResponse), 6_000)),
+        );
+        fetchSpy.mockImplementationOnce(
+          () => new Promise(resolve => setTimeout(() => resolve({ object: 'token', jwt: mockJwt }), 6_000)),
+        );
+
+        let token: string | null | undefined;
+        void session.getToken().then(t => (token = t));
+        await vi.advanceTimersByTimeAsync(12_000);
+
+        expect(token).toEqual(mockJwt);
+        expect(fetchSpy).toHaveBeenCalledTimes(2);
       });
     });
 
@@ -2040,6 +2772,327 @@ describe('Session', () => {
       expect(session.actor).toEqual(actor);
       expect(session.agent).toEqual(actor);
       expect(session.agent?.type).toBe('agent');
+    });
+  });
+
+  describe('session-minter monotonic guard', () => {
+    const NOW = 1666648250;
+    const DEFAULT_SID = 'sess_minter';
+
+    // Mirrors tokenCache.test.ts:37 — header carries `oiat`, payload carries `sid`/`iat`/`exp`
+    // (+ optional `org_id`). Pass `undefined` for oiat to emit a pre-feature token (no header).
+    function createJwtWithOiat(
+      iatSeconds: number,
+      oiatSeconds: number | undefined,
+      opts: { sid?: string; org?: string | null } = {},
+    ): string {
+      const header: Record<string, unknown> = { alg: 'HS256', typ: 'JWT' };
+      if (typeof oiatSeconds === 'number') {
+        header.oiat = oiatSeconds;
+      }
+      const payload: Record<string, unknown> = {
+        sid: opts.sid ?? DEFAULT_SID,
+        iat: iatSeconds,
+        exp: iatSeconds + 60,
+      };
+      if (opts.org) {
+        payload.org_id = opts.org;
+      }
+      const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `${b64(header)}.${b64(payload)}.test-signature`;
+    }
+
+    function deferred<T = any>() {
+      let resolve!: (value: T) => void;
+      let reject!: (reason?: unknown) => void;
+      const promise = new Promise<T>((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    }
+
+    const makeSession = (overrides: Partial<SessionJSON> = {}) =>
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        ...overrides,
+      } as SessionJSON);
+
+    let dispatchSpy: ReturnType<typeof vi.spyOn>;
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      SessionTokenCache.clear();
+      dispatchSpy = vi.spyOn(eventBus, 'emit');
+      fetchSpy = vi.spyOn(BaseResource, '_fetch' as any);
+      BaseResource.clerk = clerkMock({
+        __internal_environment: {
+          authConfig: { sessionMinter: true },
+        },
+      }) as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      fetchSpy?.mockRestore();
+      Client.clearInstance();
+      BaseResource.clerk = null as any;
+      SessionTokenCache.clear();
+    });
+
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve high then low)', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ skipCache: true });
+      const pLow = session.getToken({ skipCache: true });
+
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+
+      // Each skipCache call returns its own mint (main parity): the low fetch resolves last and
+      // returns low, but it never regresses the cache entry or lastActiveToken.
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
+      expect(await session.getToken()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('concurrent skipCache mints return their own token; cache entry and lastActiveToken stay freshest (resolve low then high)', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dFirst = deferred();
+      const dSecond = deferred();
+      fetchSpy.mockReturnValueOnce(dFirst.promise as any).mockReturnValueOnce(dSecond.promise as any);
+
+      const pFirst = session.getToken({ skipCache: true });
+      const pSecond = session.getToken({ skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity).
+      dFirst.resolve({ object: 'token', jwt: low });
+      await expect(pFirst).resolves.toBe(low);
+
+      dSecond.resolve({ object: 'token', jwt: high });
+      await expect(pSecond).resolves.toBe(high);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
+      expect(await session.getToken()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('a stale fetch after a fresh one returns its own mint but never regresses lastActiveToken or the next /tokens token field', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: high })
+        .mockResolvedValueOnce({ object: 'token', jwt: low })
+        .mockResolvedValueOnce({ object: 'token', jwt: low });
+
+      expect(await session.getToken()).toBe(high);
+      // Each skipCache call returns its own mint (main parity), so the staler fetches return low.
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+      expect(await session.getToken({ skipCache: true })).toBe(low);
+
+      // The first stale fetch carried high as the previous token, and the next request still does,
+      // proving lastActiveToken never regressed to the stale token.
+      expect(fetchSpy.mock.calls[1][0].body.token).toBe(high);
+      expect(fetchSpy.mock.calls[2][0].body.token).toBe(high);
+
+      const tokenId = TokenId.build('session_1', undefined, null);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
+      expect(session.lastActiveToken?.getRawString()).toBe(high);
+    });
+
+    it('explicit organizationId does not write lastActiveToken but keeps its own cache monotonic', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30, { org: 'org_other' });
+      const low = createJwtWithOiat(NOW, NOW, { org: 'org_other' });
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ organizationId: 'org_other', skipCache: true });
+      const pLow = session.getToken({ organizationId: 'org_other', skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', undefined, 'org_other');
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
+      expect(session.lastActiveToken).toBeNull();
+    });
+
+    it('template tokens never write lastActiveToken and keep the template cache monotonic', async () => {
+      const session = makeSession();
+      const high = createJwtWithOiat(NOW, NOW + 30);
+      const low = createJwtWithOiat(NOW, NOW);
+
+      const dHigh = deferred();
+      const dLow = deferred();
+      fetchSpy.mockReturnValueOnce(dHigh.promise as any).mockReturnValueOnce(dLow.promise as any);
+
+      const pHigh = session.getToken({ template: 't', skipCache: true });
+      const pLow = session.getToken({ template: 't', skipCache: true });
+
+      // Each skipCache call returns its own mint (main parity); the cache entry still stays freshest.
+      dHigh.resolve({ object: 'token', jwt: high });
+      await expect(pHigh).resolves.toBe(high);
+      dLow.resolve({ object: 'token', jwt: low });
+      await expect(pLow).resolves.toBe(low);
+
+      const tokenId = TokenId.build('session_1', 't', null);
+      expect(SessionTokenCache.get({ tokenId })?.token?.getRawString()).toBe(high);
+      expect(session.lastActiveToken).toBeNull();
+    });
+
+    it("resolving one session's fetch never writes another session's lastActiveToken", async () => {
+      const sessionA = makeSession({ id: 'session_A' } as Partial<SessionJSON>);
+      const sessionB = makeSession({ id: 'session_B' } as Partial<SessionJSON>);
+      const tokenA = createJwtWithOiat(NOW, NOW + 30, { sid: 'sess_A' });
+
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: tokenA });
+
+      expect(await sessionA.getToken()).toBe(tokenA);
+
+      expect(sessionA.lastActiveToken?.getRawString()).toBe(tokenA);
+      expect(sessionB.lastActiveToken).toBeNull();
+    });
+
+    it('successive tokens without oiat keep writing lastActiveToken (equal rank, newest wins)', async () => {
+      const session = makeSession();
+      const first = createJwtWithOiat(NOW, undefined);
+      const second = createJwtWithOiat(NOW + 5, undefined);
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: first })
+        .mockResolvedValueOnce({ object: 'token', jwt: second });
+
+      expect(await session.getToken()).toBe(first);
+      expect(session.lastActiveToken?.getRawString()).toBe(first);
+
+      expect(await session.getToken({ skipCache: true })).toBe(second);
+      expect(session.lastActiveToken?.getRawString()).toBe(second);
+    });
+
+    it('an org-switch token minted with a lower oiat still replaces the previous org lastActiveToken', async () => {
+      const session = makeSession();
+      const personalHigh = createJwtWithOiat(NOW, NOW + 30);
+      const orgLow = createJwtWithOiat(NOW + 5, NOW, { org: 'org_next' });
+
+      fetchSpy
+        .mockResolvedValueOnce({ object: 'token', jwt: personalHigh })
+        .mockResolvedValueOnce({ object: 'token', jwt: orgLow });
+
+      expect(await session.getToken()).toBe(personalHigh);
+      expect(session.lastActiveToken?.getRawString()).toBe(personalHigh);
+
+      // setActive commits the new organization before its first token fetch.
+      session.lastActiveOrganizationId = 'org_next';
+
+      expect(await session.getToken()).toBe(orgLow);
+      // A cross-org lastActiveToken is not a freshness baseline: the new org's token
+      // wins even though a stale edge minted it with a lower oiat.
+      expect(session.lastActiveToken?.getRawString()).toBe(orgLow);
+    });
+
+    describe('fromJSON', () => {
+      const tokenJSON = (jwt: string) => ({ object: 'token' as const, id: 'tok_1', jwt });
+
+      const touchResponse = (lastActiveToken: ReturnType<typeof tokenJSON> | null) => ({
+        response: {
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+          last_active_token: lastActiveToken,
+        } as unknown as SessionJSON,
+      });
+
+      it('a stale touch response does not regress lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(low)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a fresher touch response replaces lastActiveToken', async () => {
+        const low = createJwtWithOiat(NOW, NOW);
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(low) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(tokenJSON(high)) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken?.getRawString()).toBe(high);
+      });
+
+      it('a touch response without a token still clears lastActiveToken', async () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const session = makeSession({ last_active_token: tokenJSON(high) } as Partial<SessionJSON>);
+
+        fetchSpy.mockResolvedValueOnce(touchResponse(null) as any);
+        await session.touch();
+
+        expect(session.lastActiveToken).toBeNull();
+      });
+
+      it('a stale piggybacked client payload does not regress the rebuilt session token', () => {
+        const high = createJwtWithOiat(NOW, NOW + 30);
+        const low = createJwtWithOiat(NOW, NOW);
+        const higher = createJwtWithOiat(NOW, NOW + 60);
+
+        const clientJSON = (lastActiveToken: ReturnType<typeof tokenJSON> | null) =>
+          ({
+            object: 'client',
+            id: 'client_1',
+            last_active_session_id: 'session_1',
+            sessions: [touchResponse(lastActiveToken).response],
+          }) as any;
+
+        const client = Client.getOrCreateInstance().fromJSON(clientJSON(tokenJSON(high)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(low)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(high);
+
+        client.fromJSON(clientJSON(tokenJSON(higher)));
+        expect(client.sessions[0]?.lastActiveToken?.getRawString()).toBe(higher);
+
+        client.fromJSON(clientJSON(null));
+        expect(client.sessions[0]?.lastActiveToken).toBeNull();
+      });
     });
   });
 });

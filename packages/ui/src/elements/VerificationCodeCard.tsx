@@ -21,6 +21,7 @@ export type VerificationCodeCardProps = {
   alternativeMethodsLabel?: LocalizationKey;
   profileImageUrl?: string;
   badgeText?: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
   onCodeEntryFinishedAction: (
     code: string,
     resolve: () => Promise<void>,
@@ -31,6 +32,7 @@ export type VerificationCodeCardProps = {
   onShowAlternativeMethodsClicked?: React.MouseEventHandler;
   onIdentityPreviewEditClicked?: React.MouseEventHandler;
   onBackLinkClicked?: React.MouseEventHandler;
+  onDifferentAccountClicked?: React.MouseEventHandler;
 };
 
 export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCardProps>) => {
@@ -64,6 +66,7 @@ export const VerificationCodeContent = (props: PropsWithChildren<VerificationCod
           identifier={props.safeIdentifier}
           avatarUrl={props.profileImageUrl}
           onClick={props.onIdentityPreviewEditClicked ? props.onIdentityPreviewEditClicked : undefined}
+          editButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
         />
       </Header.Root>
       <Card.Alert>{card.error}</Card.Alert>
@@ -113,6 +116,14 @@ export const VerificationCodeContent = (props: PropsWithChildren<VerificationCod
                   props.alternativeMethodsLabel ?? localizationKeys('footerActionLink__useAnotherMethod')
                 }
                 onClick={props.onShowAlternativeMethodsClicked}
+              />
+            </Card.Action>
+          )}
+          {props.onDifferentAccountClicked && (
+            <Card.Action elementId='signIn'>
+              <Card.ActionLink
+                localizationKey={localizationKeys('backButton')}
+                onClick={props.onDifferentAccountClicked}
               />
             </Card.Action>
           )}

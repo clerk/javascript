@@ -6,6 +6,7 @@ import type { ClerkResource } from './resource';
 import type {
   AttemptVerificationParams,
   PrepareVerificationParams,
+  ProtectCheckResource,
   SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
@@ -48,6 +49,14 @@ export interface SignUpResource extends ClerkResource {
   missingFields: SignUpField[];
   unverifiedFields: SignUpIdentificationField[];
   verifications: SignUpVerificationsResource;
+  /**
+   * The current protect check challenge, if one is pending. Mid-flow fraud-prevention gate
+   * issued by Clerk Protect. When non-null, the client must load the SDK at `sdkUrl`, run the
+   * challenge with `token`, and submit the resulting proof token via `submitProtectCheck`.
+   * Only populated when Protect mid-flow challenges are explicitly enabled for the instance;
+   * upgrading the SDK alone does not enable it.
+   */
+  protectCheck: ProtectCheckResource | null;
 
   username: string | null;
   firstName: string | null;
@@ -62,11 +71,16 @@ export interface SignUpResource extends ClerkResource {
   abandonAt: number | null;
   legalAcceptedAt: number | null;
   locale: string | null;
+  timezone: string | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
+  /**
+   * Updates the current sign-up if it exists, otherwise creates one.
+   * `timezone` only applies when a sign-up is created and is ignored when updating an existing one.
+   */
   upsert: (params: SignUpCreateParams | SignUpUpdateParams) => Promise<SignUpResource>;
 
   prepareVerification: (params: PrepareVerificationParams) => Promise<SignUpResource>;
@@ -104,6 +118,8 @@ export interface SignUpResource extends ClerkResource {
     },
   ) => Promise<SignUpResource>;
 
+  submitProtectCheck: (params: { proofToken: string }) => Promise<SignUpResource>;
+
   authenticateWithMetamask: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
@@ -128,4 +144,6 @@ export interface SignUpResource extends ClerkResource {
 export interface SignUpEnterpriseConnectionResource extends ClerkResource {
   id: string;
   name: string;
+  provider: string;
+  logoPublicUrl: string | null;
 }

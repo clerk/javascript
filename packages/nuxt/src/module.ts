@@ -41,7 +41,7 @@ export default defineNuxtModule<ModuleOptions>({
     version: PACKAGE_VERSION,
     configKey: 'clerk',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '>=4.0.0',
     },
   },
   setup(options, nuxt) {
@@ -101,7 +101,11 @@ export default defineNuxtModule<ModuleOptions>({
     // Optimize @clerk/vue to avoid missing injection Symbol key errors
     nuxt.options.vite.optimizeDeps = nuxt.options.vite.optimizeDeps || {};
     nuxt.options.vite.optimizeDeps.include = nuxt.options.vite.optimizeDeps.include || [];
-    nuxt.options.vite.optimizeDeps.include.push('@clerk/vue');
+    nuxt.options.vite.optimizeDeps.include.push(
+      '@clerk/nuxt > @clerk/vue',
+      '@clerk/nuxt > @clerk/vue/internal',
+      '@clerk/nuxt > @clerk/shared/loadClerkJsScript',
+    );
 
     // Add the `@clerk/vue` plugin
     addPlugin(resolver.resolve('./runtime/plugin'));
@@ -134,10 +138,6 @@ export default defineNuxtModule<ModuleOptions>({
     // Add auto-imports for Clerk components, composables and client utils
     addImportsDir(resolver.resolve('./runtime/composables'));
     addImports([
-      {
-        name: 'createRouteMatcher',
-        from: resolver.resolve('./runtime/client'),
-      },
       {
         name: 'updateClerkOptions',
         from: resolver.resolve('./runtime/client'),
@@ -196,23 +196,6 @@ export default defineNuxtModule<ModuleOptions>({
         name: component,
         export: component,
         filePath: '@clerk/vue',
-      });
-    });
-
-    /**
-     * Experimental components from `@clerk/vue/experimental`.
-     * @experimental These components and their prop types are unstable and may change in future releases.
-     */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const experimentalComponents: Array<keyof typeof import('@clerk/vue/experimental')> = [
-      // SSO
-      'ConfigureSSO',
-    ];
-    experimentalComponents.forEach(component => {
-      void addComponent({
-        name: component,
-        export: component,
-        filePath: '@clerk/vue/experimental',
       });
     });
   },

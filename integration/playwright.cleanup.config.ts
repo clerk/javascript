@@ -4,11 +4,12 @@ import * as path from 'path';
 
 import { common } from './playwright.config';
 
-config({ path: path.resolve(__dirname, '.env.local') });
+config({ path: path.resolve(import.meta.dirname, '.env.local') });
 
 export default defineConfig({
   ...common,
   testDir: './cleanup',
+  retries: 0,
   projects: [
     {
       name: 'setup',

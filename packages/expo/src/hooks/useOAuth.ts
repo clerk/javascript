@@ -62,7 +62,7 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     // Create a redirect url for the current platform and environment.
     //
     // This redirect URL needs to be whitelisted for your Clerk production instance via
-    // https://clerk.com/docs/reference/backend-api/tag/Redirect-URLs#operation/CreateRedirectURL
+    // https://clerk.com/docs/reference/backend-api/tag/redirect-urls/POST/redirect_urls
     //
     // For more information go to:
     // https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
@@ -76,9 +76,11 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
+    if (!externalVerificationRedirectURL) {
+      return errorThrower.throw('Missing external verification redirect URL for OAuth flow');
+    }
 
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
-      // @ts-ignore
       externalVerificationRedirectURL.toString(),
       oauthRedirectUrl,
     );

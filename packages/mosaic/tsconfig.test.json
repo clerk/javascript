@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsconfig-test",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig-test.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/__tests__/**/*.ts",
+    "src/**/__tests__/**/*.tsx",
+    "src/global.d.ts",
+    "src/primitives/test-utils/jest-dom.d.ts",
+    "src/primitives/test-utils/vitest-axe.d.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

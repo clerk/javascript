@@ -1,0 +1,115 @@
+import { contextBridge, ipcRenderer } from 'electron';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { OAUTH_TRANSPORT_CHANNELS, TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
+import { exposeClerkBridge } from '../index';
+
+vi.mock('electron', () => ({
+  contextBridge: {
+    exposeInMainWorld: vi.fn(),
+  },
+  ipcRenderer: {
+    invoke: vi.fn(),
+  },
+}));
+
+describe('exposeClerkBridge', () => {
+  const originalContextIsolated = process.contextIsolated;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Object.defineProperty(process, 'contextIsolated', { configurable: true, value: true });
+    vi.stubGlobal('window', {});
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  afterAll(() => {
+    Object.defineProperty(process, 'contextIsolated', { configurable: true, value: originalContextIsolated });
+  });
+
+  it('exposes the Clerk Electron bridge through contextBridge when context isolation is enabled', () => {
+    exposeClerkBridge();
+
+    expect(contextBridge.exposeInMainWorld).toHaveBeenCalledWith('__clerk_internal_electron', {
+      tokenCache: {
+        getToken: expect.any(Function),
+        saveToken: expect.any(Function),
+        clearToken: expect.any(Function),
+      },
+      oauthTransport: {
+        getRedirectUrl: expect.any(Function),
+        open: expect.any(Function),
+      },
+    });
+  });
+
+  it('exposes the Clerk Electron bridge on window when context isolation is disabled', () => {
+    Object.defineProperty(process, 'contextIsolated', { configurable: true, value: false });
+
+    exposeClerkBridge();
+
+    expect(window.__clerk_internal_electron?.tokenCache).toEqual({
+      getToken: expect.any(Function),
+      saveToken: expect.any(Function),
+      clearToken: expect.any(Function),
+    });
+    expect(window.__clerk_internal_electron?.oauthTransport).toEqual({
+      getRedirectUrl: expect.any(Function),
+      open: expect.any(Function),
+    });
+  });
+
+  it('does not expose the passkey bridge by default', () => {
+    exposeClerkBridge();
+
+    const exposedKeys = vi.mocked(contextBridge.exposeInMainWorld).mock.calls.map(([key]) => key);
+    expect(exposedKeys).not.toContain('__clerk_internal_electron_passkeys');
+  });
+
+  it('exposes the passkey bridge when passkeys is enabled', () => {
+    exposeClerkBridge({ passkeys: true });
+
+    expect(contextBridge.exposeInMainWorld).toHaveBeenCalledWith(
+      '__clerk_internal_electron_passkeys',
+      expect.objectContaining({
+        create: expect.any(Function),
+        get: expect.any(Function),
+        capabilities: expect.any(Function),
+      }),
+    );
+  });
+
+  it('forwards token cache calls over IPC', async () => {
+    exposeClerkBridge();
+
+    const bridge = vi.mocked(contextBridge.exposeInMainWorld).mock
+      .calls[0][1] as typeof window.__clerk_internal_electron;
+
+    await bridge?.tokenCache.getToken('token-key');
+    await bridge?.tokenCache.saveToken('token-key', 'jwt');
+    await bridge?.tokenCache.clearToken('token-key');
+
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken, 'token-key');
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken, 'token-key', 'jwt');
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken, 'token-key');
+  });
+
+  it('forwards OAuth transport calls over IPC', async () => {
+    exposeClerkBridge();
+
+    const bridge = vi.mocked(contextBridge.exposeInMainWorld).mock
+      .calls[0][1] as typeof window.__clerk_internal_electron;
+
+    await bridge?.oauthTransport.getRedirectUrl();
+    await bridge?.oauthTransport.open('https://accounts.example.com/oauth');
+
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+      OAUTH_TRANSPORT_CHANNELS.open,
+      'https://accounts.example.com/oauth',
+    );
+  });
+});

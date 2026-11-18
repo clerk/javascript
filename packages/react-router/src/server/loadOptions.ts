@@ -2,6 +2,7 @@ import { createClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
+import { patchRequest } from '@clerk/shared/patchRequest';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 import type { MiddlewareFunction } from 'react-router';
@@ -10,7 +11,6 @@ import { getPublicEnvVariables } from '../utils/env';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
 import { canUseKeyless } from '../utils/feature-flags';
 import type { ClerkMiddlewareOptions } from './types';
-import { patchRequest } from './utils';
 
 export type DataFunctionArgs = Parameters<MiddlewareFunction<Response>>[0];
 

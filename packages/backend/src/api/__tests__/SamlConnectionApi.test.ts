@@ -26,6 +26,12 @@ describe('SamlConnectionAPI', () => {
     idp_entity_id: 'entity_123',
     idp_sso_url: 'https://idp.example.com/sso',
     idp_certificate: 'cert_data',
+    idp_certificate_issued_at: 1672531200000,
+    idp_certificate_expires_at: 1704067200000,
+    idp_certificates: [
+      { certificate: 'cert_data', issued_at: 1672531200000, expires_at: 1704067200000 },
+      { certificate: 'next_cert_data', issued_at: null, expires_at: null },
+    ],
     idp_metadata_url: null,
     idp_metadata: null,
     attribute_mapping: {
@@ -70,6 +76,8 @@ describe('SamlConnectionAPI', () => {
       expect(response.data[0].id).toBe('samlc_123');
       expect(response.data[0].name).toBe('Test Connection');
       expect(response.data[0].organizationId).toBe('org_123');
+      expect(response.data[0].idpCertificateIssuedAt).toBe(1672531200000);
+      expect(response.data[0].idpCertificateExpiresAt).toBe(1704067200000);
       expect(response.totalCount).toBe(1);
     });
   });
@@ -86,6 +94,7 @@ describe('SamlConnectionAPI', () => {
               name: 'Test Connection',
               provider: 'saml_custom',
               domain: 'test.example.com',
+              idp_certificates: ['cert_data', 'next_cert_data'],
               attribute_mapping: {
                 user_id: 'userId',
                 email_address: 'email',
@@ -103,6 +112,7 @@ describe('SamlConnectionAPI', () => {
         name: 'Test Connection',
         provider: 'saml_custom',
         domain: 'test.example.com',
+        idpCertificates: ['cert_data', 'next_cert_data'],
         attributeMapping: {
           userId: 'userId',
           emailAddress: 'email',
@@ -114,6 +124,12 @@ describe('SamlConnectionAPI', () => {
       expect(response.id).toBe('samlc_123');
       expect(response.name).toBe('Test Connection');
       expect(response.organizationId).toBe('org_123');
+      expect(response.idpCertificateIssuedAt).toBe(1672531200000);
+      expect(response.idpCertificateExpiresAt).toBe(1704067200000);
+      expect(response.idpCertificates).toEqual([
+        { certificate: 'cert_data', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+        { certificate: 'next_cert_data', issuedAt: null, expiresAt: null },
+      ]);
     });
   });
 

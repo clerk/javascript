@@ -32,23 +32,31 @@
     "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": [
+    "E2E_KEYCLOAK_*",
     "AWS_SECRET_KEY",
     "GITHUB_TOKEN",
+    "INTEGRATION_TEST_RUN_KEY",
     "ACTIONS_RUNNER_DEBUG",
     "ACTIONS_STEP_DEBUG",
-    "VERCEL_AUTOMATION_BYPASS_SECRET"
+    "VERCEL_AUTOMATION_BYPASS_SECRET",
+    "PORT",
+    "UI_PORT"
   ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
+        "package.json",
         "*.d.ts",
         "bundlewatch.config.json",
         "src/**",
         "tsconfig.json",
         "tsconfig.build.json",
         "tsconfig.declarations.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
+        "vite.config.*",
         "subpaths.mjs",
         "!**/*.test.*",
         "!**/test/**",
@@ -74,6 +82,22 @@
     "dev": {
       "cache": false
     },
+    "@clerk/clerk-js#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build"]
+    },
+    "@clerk/ui#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build", "@clerk/localizations#build"]
+    },
+    "@clerk/shared#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/shared#build"]
+    },
+    "@clerk/localizations#dev": {
+      "cache": false,
+      "dependsOn": ["@clerk/localizations#build"]
+    },
     "dev:current": {
       "cache": false,
       "dependsOn": ["^build", "dev"],
@@ -92,6 +116,8 @@
         "tests/**",
         "tsconfig.json",
         "tsconfig.*.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
         "tsup.config.ts",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
@@ -111,6 +137,8 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/eslint.config.mjs",
+        "$TURBO_ROOT$/oxlint.config.mjs",
+        "$TURBO_ROOT$/scripts/oxlint-*.mjs",
         "**/*.js",
         "**/*.jsx",
         "**/*.ts",
@@ -203,37 +231,170 @@
     },
     "//#test:integration:ap-flows": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:express": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:fastify": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:hono": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:mosaic": {
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
@@ -245,12 +406,44 @@
         "INTEGRATION_STAGING_INSTANCE_KEYS",
         "VERCEL_AUTOMATION_BYPASS_SECRET"
       ],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:localhost": {
@@ -262,85 +455,352 @@
         "INTEGRATION_STAGING_INSTANCE_KEYS",
         "NODE_EXTRA_CA_CERTS"
       ],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions:staging": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:handshake:staging": {
       "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:expo-web": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
+    },
+    "//#test:integration:sso": {
+      "env": ["CI", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**", "packages/*/src/**"],
+      "outputs": []
     },
     "//#test:integration:tanstack-react-start": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:vue": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nuxt": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:react-router": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:billing": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:machine": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:cache-components": {
       "dependsOn": ["@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:chrome-extension": {
       "dependsOn": ["@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:electron": {
+      "dependsOn": ["@clerk/electron#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
+      "inputs": [
+        "integration/**",
+        "packages/*/package.json",
+        "packages/*/src/**",
+        "packages/*/tsconfig.json",
+        "packages/*/tsconfig.build.json",
+        "packages/*/tsconfig.declarations.json",
+        "packages/*/tsdown.config.*",
+        "packages/*/tsup.config.*",
+        "packages/*/rspack.config.*",
+        "packages/*/vite.config.*",
+        "!packages/*/src/**/*.test.*",
+        "!packages/*/src/**/__tests__/**",
+        "!packages/*/src/**/__mocks__/**",
+        "!packages/*/src/**/__snapshots__/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#typedoc:generate": {
       "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
-      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
-      "outputs": [".typedoc/**"],
+      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs", ".typedoc/**/*.mjs"],
+      "outputs": [".typedoc/docs/**"],
       "outputLogs": "new-only"
     },
     "//#test:typedoc": {

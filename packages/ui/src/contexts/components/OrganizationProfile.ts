@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
@@ -25,7 +25,11 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
   isAPIKeysPageRoot: boolean;
+  isSecurityPageRoot: boolean;
   shouldShowBilling: boolean;
+  shouldShowSelfServeSSO: boolean;
+  shouldShowSelfServeDirectorySync: boolean;
+  shouldShowSecurityPage: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -35,6 +39,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const { navigate } = useRouter();
   const environment = useEnvironment();
   const clerk = useClerk();
+  const organization = __internal_useOrganizationBase();
+  const { session } = useSession();
 
   if (!context || context.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
@@ -56,9 +62,27 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     // The C2 had a subscription in the past
     Boolean(statements.data.length > 0);
 
+  const shouldShowSelfServeSSO =
+    environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
+
+  const shouldShowSelfServeDirectorySync =
+    environment.userSettings.enterpriseSSO.self_serve_sso &&
+    environment.userSettings.enterpriseSSO.self_serve_directory_sync &&
+    !!organization?.selfServeDirectorySyncEnabled;
+
+  const canManageSSOBypass = Boolean(session?.checkAuthorization({ permission: 'org:sys_entconns_sso_bypass:manage' }));
+  const shouldShowSecurityPage = shouldShowSelfServeSSO || shouldShowSelfServeDirectorySync || canManageSSOBypass;
+
   const pages = useMemo(
-    () => createOrganizationProfileCustomPages(customPages || [], clerk, shouldShowBilling, environment),
-    [customPages, shouldShowBilling],
+    () =>
+      createOrganizationProfileCustomPages(
+        customPages || [],
+        clerk,
+        shouldShowBilling,
+        environment,
+        shouldShowSecurityPage,
+      ),
+    [customPages, shouldShowBilling, shouldShowSecurityPage],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -68,6 +92,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
   const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
   const isAPIKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
+  const isSecurityPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.SECURITY;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -81,6 +106,10 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isGeneralPageRoot,
     isBillingPageRoot,
     isAPIKeysPageRoot,
+    isSecurityPageRoot,
     shouldShowBilling,
+    shouldShowSelfServeSSO,
+    shouldShowSelfServeDirectorySync,
+    shouldShowSecurityPage,
   };
 };

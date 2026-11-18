@@ -1,0 +1,1596 @@
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createRef, Suspense, useDeferredValue, useState, useTransition } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { Popover } from '../popover/index';
+import { axe } from '../test-utils/axe';
+import { Autocomplete } from './index';
+
+afterEach(() => cleanup());
+
+const fruits = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+function FilteredAutocomplete(
+  props: {
+    onValueChange?: (value: string) => void;
+    onInputValueChange?: (value: string) => void;
+    defaultInputValue?: string;
+  } = {},
+) {
+  const [inputValue, setInputValue] = useState(props.defaultInputValue ?? '');
+  const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+  return (
+    <Autocomplete.Root
+      inputValue={inputValue}
+      onInputValueChange={v => {
+        setInputValue(v);
+        props.onInputValueChange?.(v);
+      }}
+      onValueChange={props.onValueChange}
+    >
+      <Autocomplete.Input placeholder='Search fruits...' />
+      <Autocomplete.Positioner data-testid='autocomplete-positioner'>
+        <Autocomplete.Popup data-testid='autocomplete-popup'>
+          {filtered.map(f => (
+            <Autocomplete.Option
+              key={f.value}
+              value={f.value}
+              label={f.label}
+              data-testid='autocomplete-option'
+            >
+              {f.label}
+            </Autocomplete.Option>
+          ))}
+        </Autocomplete.Popup>
+      </Autocomplete.Positioner>
+    </Autocomplete.Root>
+  );
+}
+
+function StaticAutocomplete(props: Partial<React.ComponentProps<typeof Autocomplete.Root>> = {}) {
+  return (
+    <Autocomplete.Root {...props}>
+      <Autocomplete.Input placeholder='Search fruits...' />
+      <Autocomplete.Positioner data-testid='autocomplete-positioner'>
+        <Autocomplete.Popup data-testid='autocomplete-popup'>
+          {fruits.map(f => (
+            <Autocomplete.Option
+              key={f.value}
+              value={f.value}
+              label={f.label}
+              data-testid='autocomplete-option'
+            >
+              {f.label}
+            </Autocomplete.Option>
+          ))}
+        </Autocomplete.Popup>
+      </Autocomplete.Positioner>
+    </Autocomplete.Root>
+  );
+}
+
+describe('Autocomplete', () => {
+  describe('open/close', () => {
+    it('opens when user types', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+
+      expect(document.querySelector('[data-testid="autocomplete-popup"]')).toBeInTheDocument();
+    });
+
+    it('closes when input is cleared', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+
+      expect(document.querySelector('[data-testid="autocomplete-popup"]')).toBeInTheDocument();
+
+      await user.clear(input);
+
+      expect(input).toHaveAttribute('data-closed', '');
+    });
+
+    it('closes on Escape', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+      await user.keyboard('{Escape}');
+
+      expect(input).toHaveAttribute('data-closed', '');
+    });
+
+    it('calls onOpenChange when toggled', async () => {
+      const onOpenChange = vi.fn();
+      const user = userEvent.setup();
+      render(<StaticAutocomplete onOpenChange={onOpenChange} />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+
+      expect(onOpenChange).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('filtering', () => {
+    it('filters options based on input', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'ch');
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(1);
+      expect(options[0]).toHaveTextContent('Cherry');
+    });
+
+    it('shows all matching options', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(1); // Only "Apple" starts with "a"
+    });
+  });
+
+  describe('selection', () => {
+    it('selects option on click', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete onValueChange={onValueChange} />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'b');
+      await user.click(screen.getByText('Banana'));
+
+      expect(onValueChange).toHaveBeenCalledWith('banana');
+    });
+
+    it('updates input value to label on selection', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
+      await user.type(input, 'b');
+      await user.click(screen.getByText('Banana'));
+
+      expect(input.value).toBe('Banana');
+    });
+
+    it('closes after selection', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'b');
+      await user.click(screen.getByText('Banana'));
+
+      expect(input).toHaveAttribute('data-closed', '');
+    });
+
+    it('returns focus to input after click selection', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'b');
+      await user.click(screen.getByText('Banana'));
+
+      expect(document.activeElement).toBe(input);
+    });
+  });
+
+  describe('keyboard navigation', () => {
+    it('navigates options with arrow keys', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(activeOption).toBeInTheDocument();
+    });
+
+    it('selects option on Enter', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete onValueChange={onValueChange} />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'b');
+      // activeIndex starts at 0 when typing opens the list
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).toHaveBeenCalledWith('banana');
+    });
+
+    it('updates input value on Enter selection', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...') as HTMLInputElement;
+      await user.type(input, 'b');
+      await user.keyboard('{Enter}');
+
+      expect(input.value).toBe('Banana');
+    });
+
+    it('focus stays on input during arrow navigation', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+      await user.keyboard('{ArrowDown}');
+
+      expect(document.activeElement).toBe(input);
+    });
+  });
+
+  describe('option state attributes', () => {
+    it('marks active option with data-active', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
+
+      // First option is active by default (activeIndex starts at 0)
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[0]).toHaveAttribute('data-active', '');
+    });
+
+    it('marks selected option with data-selected', () => {
+      render(
+        <StaticAutocomplete
+          defaultValue='banana'
+          defaultOpen
+        />,
+      );
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
+    });
+  });
+
+  describe('ARIA attributes', () => {
+    it('input has role=combobox', () => {
+      render(<StaticAutocomplete />);
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
+
+    it('input has aria-autocomplete=list', () => {
+      render(<StaticAutocomplete />);
+      const input = screen.getByRole('combobox');
+      expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    });
+
+    it('options have role=option', () => {
+      render(<StaticAutocomplete defaultOpen />);
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(4);
+    });
+
+    it('keeps aria-selected on the selected option while the highlight moves', async () => {
+      const user = userEvent.setup();
+      render(
+        <Autocomplete.Root
+          defaultOpen
+          defaultValue='apple'
+        >
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              {fruits.map(f => (
+                <Autocomplete.Option
+                  key={f.value}
+                  value={f.value}
+                  label={f.label}
+                >
+                  {f.label}
+                </Autocomplete.Option>
+              ))}
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      await user.click(screen.getByPlaceholderText('Search fruits...'));
+      await user.keyboard('{ArrowDown}{ArrowDown}');
+
+      const options = screen.getAllByRole('option', { hidden: true });
+      const active = options.find(option => option.hasAttribute('data-active'));
+      const selected = options.find(option => option.hasAttribute('data-selected'));
+      expect(active).toBeDefined();
+      expect(active).not.toBe(selected);
+      expect(selected).toHaveAttribute('aria-selected', 'true');
+      expect(active).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  describe('Arrow', () => {
+    it('forwards a ref to the arrow element', () => {
+      const ref = createRef<SVGSVGElement>();
+      render(
+        <Autocomplete.Root defaultOpen>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Arrow ref={ref} />
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      expect(ref.current).toBeInstanceOf(SVGSVGElement);
+    });
+  });
+
+  describe('animation lifecycle', () => {
+    it('holds options during exit and shows updated options when reopened', () => {
+      function Fixture({ open, label }: { open: boolean; label: string }) {
+        return (
+          <Autocomplete.Root open={open}>
+            <Autocomplete.Input aria-label='Fruit' />
+            <Autocomplete.Positioner>
+              <Autocomplete.Popup data-testid='frozen-popup'>
+                <Autocomplete.Option value={label}>{label}</Autocomplete.Option>
+              </Autocomplete.Popup>
+            </Autocomplete.Positioner>
+          </Autocomplete.Root>
+        );
+      }
+
+      const { rerender } = render(
+        <Fixture
+          open
+          label='Apple'
+        />,
+      );
+      const popup = screen.getByTestId('frozen-popup');
+      Object.defineProperty(popup, 'getAnimations', {
+        value: () => [{ finished: new Promise<void>(() => {}) }],
+      });
+
+      rerender(
+        <Fixture
+          open={false}
+          label='Banana'
+        />,
+      );
+
+      expect(popup).toHaveAttribute('data-closed', '');
+      expect(popup).toHaveTextContent('Apple');
+      expect(popup).not.toHaveTextContent('Banana');
+
+      rerender(
+        <Fixture
+          open
+          label='Banana'
+        />,
+      );
+
+      expect(popup).toHaveAttribute('data-open', '');
+      expect(popup).toHaveTextContent('Banana');
+      expect(popup).not.toHaveTextContent('Apple');
+    });
+
+    it('positioner is not rendered when closed', () => {
+      render(<StaticAutocomplete />);
+      expect(document.querySelector('[data-testid="autocomplete-positioner"]')).not.toBeInTheDocument();
+    });
+
+    it('applies data-open on popup when open', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
+
+      const popup = document.querySelector('[data-testid="autocomplete-popup"]');
+      expect(popup).toHaveAttribute('data-open', '');
+    });
+
+    it('positioner has data-side', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      await user.type(screen.getByPlaceholderText('Search fruits...'), 'a');
+
+      const positioner = document.querySelector('[data-testid="autocomplete-positioner"]');
+      expect(positioner).toHaveAttribute('data-side');
+    });
+  });
+
+  describe('disabled option', () => {
+    it('renders disabled option with data-disabled', () => {
+      render(
+        <Autocomplete.Root defaultOpen>
+          <Autocomplete.Input placeholder='Search...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+                data-testid='autocomplete-option'
+              >
+                Apple
+              </Autocomplete.Option>
+              <Autocomplete.Option
+                value='banana'
+                label='Banana'
+                disabled
+                data-testid='autocomplete-option'
+              >
+                Banana
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const disabledOption = screen.getByText('Banana').closest('[data-testid="autocomplete-option"]');
+      expect(disabledOption).toHaveAttribute('data-disabled', '');
+      expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('does not select disabled option on click', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <Autocomplete.Root
+          onValueChange={onValueChange}
+          defaultOpen
+        >
+          <Autocomplete.Input placeholder='Search...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+              >
+                Apple
+              </Autocomplete.Option>
+              <Autocomplete.Option
+                value='banana'
+                label='Banana'
+                disabled
+              >
+                Banana
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      await user.click(screen.getByText('Banana'));
+
+      expect(onValueChange).not.toHaveBeenCalledWith('banana');
+    });
+
+    it('does not select a disabled option via Enter', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <Autocomplete.Root onValueChange={onValueChange}>
+          <Autocomplete.Input placeholder='Search...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+                disabled
+                data-testid='autocomplete-option'
+              >
+                Apple
+              </Autocomplete.Option>
+              <Autocomplete.Option
+                value='banana'
+                label='Banana'
+                data-testid='autocomplete-option'
+              >
+                Banana
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const input = screen.getByPlaceholderText('Search...');
+      // Typing opens the list and highlights the first option (the disabled "Apple").
+      await user.type(input, 'a');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Apple');
+
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Autocomplete.List (inline mode)', () => {
+    function InlineAutocomplete(props: { value?: string; onValueChange?: (value: string) => void } = {}) {
+      const [inputValue, setInputValue] = useState('');
+      const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+      return (
+        <Autocomplete.Root
+          open
+          value={props.value}
+          inputValue={inputValue}
+          onInputValueChange={setInputValue}
+          onValueChange={props.onValueChange}
+        >
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.List data-testid='autocomplete-list'>
+            {filtered.map(f => (
+              <Autocomplete.Option
+                key={f.value}
+                value={f.value}
+                label={f.label}
+                data-testid='autocomplete-option'
+              >
+                {f.label}
+              </Autocomplete.Option>
+            ))}
+          </Autocomplete.List>
+        </Autocomplete.Root>
+      );
+    }
+
+    it('renders all options', () => {
+      render(<InlineAutocomplete />);
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(4);
+    });
+
+    it('renders list in inline mode', () => {
+      render(<InlineAutocomplete />);
+      expect(document.querySelector('[data-testid="autocomplete-list"]')).toBeInTheDocument();
+    });
+
+    it('marks selected option with data-selected via controlled value', () => {
+      render(<InlineAutocomplete value='banana' />);
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
+    });
+
+    it('selects option on click', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(<InlineAutocomplete onValueChange={onValueChange} />);
+
+      await user.click(screen.getByText('Banana'));
+
+      expect(onValueChange).toHaveBeenCalledWith('banana');
+    });
+
+    it('navigates options with arrow keys', async () => {
+      const user = userEvent.setup();
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.click(input);
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(activeOption).toBeInTheDocument();
+    });
+
+    it('links the input to the inline listbox with aria-controls', () => {
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByRole('combobox');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
+
+      expect(list).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
+    });
+
+    it('keeps the input/listbox aria-controls pairing intact when a custom id is passed to the list', () => {
+      render(
+        <Autocomplete.Root open>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.List
+            id='consumer-custom-id'
+            data-testid='autocomplete-list'
+          >
+            <Autocomplete.Option
+              value='apple'
+              label='Apple'
+              data-testid='autocomplete-option'
+            >
+              Apple
+            </Autocomplete.Option>
+          </Autocomplete.List>
+        </Autocomplete.Root>,
+      );
+
+      const input = screen.getByRole('combobox');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
+
+      // The listbox id is owned by floating-ui: a consumer-supplied id must not
+      // override it, or the input's aria-controls pairing would silently break.
+      expect(list).not.toHaveAttribute('id', 'consumer-custom-id');
+      expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
+    });
+
+    it('updates aria-activedescendant during keyboard navigation', async () => {
+      const user = userEvent.setup();
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(activeOption).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-activedescendant', activeOption?.getAttribute('id'));
+    });
+
+    it('selects option on Enter after arrow navigation', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(<InlineAutocomplete onValueChange={onValueChange} />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.click(input);
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      expect(onValueChange).toHaveBeenCalled();
+    });
+
+    it('filters options based on input', async () => {
+      const user = userEvent.setup();
+      render(<InlineAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'ch');
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(1);
+      expect(options[0]).toHaveTextContent('Cherry');
+    });
+
+    it('preserves selected state after unmount and remount', () => {
+      const { unmount } = render(<InlineAutocomplete value='cherry' />);
+
+      let options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[2]).toHaveAttribute('data-selected', '');
+
+      unmount();
+
+      render(<InlineAutocomplete value='cherry' />);
+
+      options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[2]).toHaveAttribute('data-selected', '');
+    });
+
+    it('shows selected state after selecting then remounting', async () => {
+      function TestHarness() {
+        const [mounted, setMounted] = useState(true);
+        const [value, setValue] = useState<string | undefined>();
+
+        return (
+          <>
+            <button
+              type='button'
+              data-testid='toggle'
+              onClick={() => setMounted(m => !m)}
+            />
+            {mounted && (
+              <InlineAutocomplete
+                value={value}
+                onValueChange={setValue}
+              />
+            )}
+          </>
+        );
+      }
+
+      const user = userEvent.setup();
+      render(<TestHarness />);
+
+      // Select banana
+      await user.click(screen.getByText('Banana'));
+
+      // Unmount (simulates popover close)
+      await user.click(screen.getByTestId('toggle'));
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
+
+      // Remount (simulates popover reopen)
+      await user.click(screen.getByTestId('toggle'));
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options[1]).toHaveAttribute('data-selected', '');
+    });
+  });
+
+  describe('Autocomplete.List inside Popover', () => {
+    function AutocompleteInPopover() {
+      const [popoverOpen, setPopoverOpen] = useState(false);
+      const [selectedValue, setSelectedValue] = useState<string | undefined>();
+      const [inputValue, setInputValue] = useState('');
+      const selectedLabel = fruits.find(f => f.value === selectedValue)?.label;
+      const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+      return (
+        <Popover.Root
+          initialFocus='first'
+          open={popoverOpen}
+          onOpenChange={open => {
+            setPopoverOpen(open);
+            if (open) {
+              setInputValue('');
+            }
+          }}
+        >
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Autocomplete.Root
+                open={popoverOpen}
+                value={selectedValue}
+                inputValue={inputValue}
+                onInputValueChange={setInputValue}
+                onValueChange={value => {
+                  setSelectedValue(value);
+                  setPopoverOpen(false);
+                }}
+              >
+                <Autocomplete.Input placeholder='Search...' />
+                <Autocomplete.List data-testid='autocomplete-list'>
+                  {filtered.map(f => (
+                    <Autocomplete.Option
+                      key={f.value}
+                      value={f.value}
+                      label={f.label}
+                      data-testid='autocomplete-option'
+                    >
+                      {f.label}
+                    </Autocomplete.Option>
+                  ))}
+                </Autocomplete.List>
+              </Autocomplete.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>
+      );
+    }
+
+    it('renders options when popover is open', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(4);
+    });
+
+    it('wires the popover autocomplete input to the inline listbox', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const input = screen.getByRole('combobox');
+      const list = document.querySelector('[data-testid="autocomplete-list"]');
+
+      expect(list).toHaveAttribute('id');
+      expect(input).toHaveAttribute('aria-controls', list?.getAttribute('id'));
+    });
+
+    it('navigates options with arrow keys inside popover', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      // Verify options rendered and input has focus
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options.length).toBeGreaterThan(0);
+
+      const input = screen.getByPlaceholderText('Search...');
+      expect(document.activeElement).toBe(input);
+
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(activeOption).toBeInTheDocument();
+    });
+
+    it('selects option on click and updates trigger', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      expect(screen.getByText('Banana')).toBeInTheDocument();
+      expect(screen.getByText('Banana').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
+    });
+
+    it('shows data-selected on previously selected option after reopen', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      // Open and select
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Cherry'));
+
+      // Reopen
+      await user.click(screen.getByText('Cherry'));
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      const cherryOption = Array.from(options).find(o => o.textContent === 'Cherry');
+      expect(cherryOption).toHaveAttribute('data-selected', '');
+    });
+
+    it('selects option with Enter after arrow navigation inside popover', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopover />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      // Should have selected the first option
+      expect(screen.getByText('Apple').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
+    });
+  });
+
+  describe('scrolling', () => {
+    const manyFruits = [
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' },
+      { value: 'date', label: 'Date' },
+      { value: 'elderberry', label: 'Elderberry' },
+      { value: 'fig', label: 'Fig' },
+      { value: 'grape', label: 'Grape' },
+      { value: 'honeydew', label: 'Honeydew' },
+    ];
+
+    function ScrollableAutocomplete({ defaultValue }: { defaultValue?: string }) {
+      const [popoverOpen, setPopoverOpen] = useState(false);
+      const [selectedValue, setSelectedValue] = useState<string | undefined>(defaultValue);
+      const [inputValue, setInputValue] = useState('');
+      const selectedLabel = manyFruits.find(f => f.value === selectedValue)?.label;
+      const filtered = manyFruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+      return (
+        <Popover.Root
+          initialFocus='first'
+          open={popoverOpen}
+          onOpenChange={open => {
+            setPopoverOpen(open);
+            if (open) {
+              setInputValue('');
+            }
+          }}
+        >
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Autocomplete.Root
+                open={popoverOpen}
+                value={selectedValue}
+                inputValue={inputValue}
+                onInputValueChange={setInputValue}
+                onValueChange={value => {
+                  setSelectedValue(value);
+                  setPopoverOpen(false);
+                }}
+              >
+                <Autocomplete.Input placeholder='Search...' />
+                <Autocomplete.List
+                  style={{ maxHeight: 80, overflowY: 'auto' }}
+                  data-testid='autocomplete-list'
+                >
+                  {filtered.map(f => (
+                    <Autocomplete.Option
+                      key={f.value}
+                      value={f.value}
+                      label={f.label}
+                      data-testid='autocomplete-option'
+                    >
+                      {f.label}
+                    </Autocomplete.Option>
+                  ))}
+                </Autocomplete.List>
+              </Autocomplete.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>
+      );
+    }
+
+    it('sets active index on arrow key navigation', async () => {
+      const user = userEvent.setup();
+      render(<ScrollableAutocomplete />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.keyboard('{ArrowDown}');
+
+      const activeOption = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(activeOption).toBeInTheDocument();
+    });
+
+    it('selected item has data-active on reopen', async () => {
+      const user = userEvent.setup();
+      render(<ScrollableAutocomplete />);
+
+      // Open and select "Grape" (6th item)
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Grape'));
+
+      // Reopen — trigger now shows "Grape"
+      await user.click(screen.getByText('Grape').closest('[data-testid="popover-trigger"]')!);
+
+      // The selected option should be active
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      const grapeOption = Array.from(options).find(o => o.textContent === 'Grape');
+      expect(grapeOption).toHaveAttribute('data-active', '');
+    });
+
+    it('selected item is active on open when defaultValue is set', async () => {
+      const user = userEvent.setup();
+      render(<ScrollableAutocomplete defaultValue='grape' />);
+
+      await user.click(screen.getByText('Grape'));
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      const grapeOption = Array.from(options).find(o => o.textContent === 'Grape');
+      expect(grapeOption).toHaveAttribute('data-active', '');
+    });
+  });
+
+  describe('Autocomplete.List inside Popover — edge cases', () => {
+    function AutocompleteInPopoverFull() {
+      const [popoverOpen, setPopoverOpen] = useState(false);
+      const [selectedValue, setSelectedValue] = useState<string | undefined>();
+      const [inputValue, setInputValue] = useState('');
+      const selectedLabel = fruits.find(f => f.value === selectedValue)?.label;
+      const filtered = fruits.filter(f => f.label.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+      return (
+        <Popover.Root
+          initialFocus='first'
+          open={popoverOpen}
+          onOpenChange={open => {
+            setPopoverOpen(open);
+            if (open) {
+              setInputValue('');
+            }
+          }}
+        >
+          <Popover.Trigger data-testid='popover-trigger'>{selectedLabel || 'Pick a fruit...'}</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Autocomplete.Root
+                open={popoverOpen}
+                value={selectedValue}
+                inputValue={inputValue}
+                onInputValueChange={setInputValue}
+                onValueChange={value => {
+                  setSelectedValue(value);
+                  setPopoverOpen(false);
+                }}
+              >
+                <Autocomplete.Input placeholder='Search...' />
+                <Autocomplete.List data-testid='autocomplete-list'>
+                  {filtered.map(f => (
+                    <Autocomplete.Option
+                      key={f.value}
+                      value={f.value}
+                      label={f.label}
+                      data-testid='autocomplete-option'
+                    >
+                      {f.label}
+                    </Autocomplete.Option>
+                  ))}
+                </Autocomplete.List>
+              </Autocomplete.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>
+      );
+    }
+
+    it('closes popover on Escape key', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      const trigger = screen.getByText('Pick a fruit...');
+      await user.click(trigger);
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]').length).toBeGreaterThan(0);
+
+      await user.keyboard('{Escape}');
+
+      // Popover should close — no options visible
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it('focuses the input on open with an empty value', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
+      expect(document.activeElement).toBe(input);
+      expect(input.value).toBe('');
+    });
+
+    it('keeps the input empty on open even when a selected item exists', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Cherry'));
+
+      await user.click(screen.getByText('Cherry'));
+
+      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
+      expect(document.activeElement).toBe(input);
+      expect(input.value).toBe('');
+    });
+
+    it('marks the previously selected item as active on reopen while focus stays on the input', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      await user.click(screen.getByText('Banana'));
+
+      const input = screen.getByPlaceholderText('Search...');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+
+      expect(document.activeElement).toBe(input);
+      expect(active).toHaveTextContent('Banana');
+      expect(input).toHaveAttribute('aria-activedescendant', active?.getAttribute('id'));
+    });
+
+    it('jumps to selected item on reopen even when it was filtered away before closing', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      // Select Banana
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      // Reopen
+      await user.click(screen.getByText('Banana'));
+
+      // Filter to only Banana (Banana is now at index 0)
+      const input = screen.getByPlaceholderText('Search...');
+      await user.type(input, 'b');
+
+      // Close with Escape (selectedIndex is 0 due to filtering)
+      await user.keyboard('{Escape}');
+
+      // Reopen — input is cleared, all 4 options visible
+      await user.click(screen.getByText('Banana'));
+
+      // Banana (index 1) should be active, not Apple (index 0)
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Banana');
+    });
+
+    it('clears input on reopen after Escape', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      const input = screen.getByPlaceholderText('Search...');
+      await user.type(input, 'ch');
+
+      // Should be filtered to Cherry only
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(1);
+
+      await user.keyboard('{Escape}');
+
+      // Reopen
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      // Input should be cleared, all options visible
+      const newInput = screen.getByPlaceholderText('Search...');
+      expect((newInput as HTMLInputElement).value).toBe('');
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(4);
+    });
+
+    it('navigates all options with repeated ArrowDown', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      await user.keyboard('{ArrowDown}');
+      let active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Apple');
+
+      await user.keyboard('{ArrowDown}');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Banana');
+
+      await user.keyboard('{ArrowDown}');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Cherry');
+
+      await user.keyboard('{ArrowDown}');
+      active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Date');
+    });
+
+    it('loops navigation with ArrowDown past last option', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      // Navigate past all 4 options to loop back
+      await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Apple');
+    });
+
+    it('navigates with ArrowUp', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      // ArrowUp from no active item should go to last item (loop)
+      await user.keyboard('{ArrowUp}');
+      const active = document.querySelector('[data-testid="autocomplete-option"][data-active]');
+      expect(active).toHaveTextContent('Date');
+    });
+
+    it('selects with Enter after filtering and navigating', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      const input = screen.getByPlaceholderText('Search...');
+      await user.type(input, 'b');
+
+      // Only Banana should be shown, activeIndex should be 0
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(1);
+
+      await user.keyboard('{Enter}');
+
+      // Popover should close and trigger should show Banana
+      expect(screen.getByText('Banana').closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
+    });
+
+    it('selects the highlighted item with Enter, closes the popover, and returns focus to the trigger', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      const trigger = screen.getByText('Pick a fruit...');
+      await user.click(trigger);
+      await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+      const updatedTrigger = screen.getByText('Banana');
+      expect(updatedTrigger.closest('[data-testid="popover-trigger"]')).toBeInTheDocument();
+      expect(document.querySelector('[data-testid="autocomplete-option"]')).not.toBeInTheDocument();
+      expect(document.activeElement).toBe(updatedTrigger);
+    });
+
+    it('keeps focus on input during keyboard navigation', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      const input = screen.getByPlaceholderText('Search...');
+
+      await user.keyboard('{ArrowDown}{ArrowDown}');
+
+      expect(document.activeElement).toBe(input);
+    });
+
+    it('can type to filter after arrow navigation', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+
+      // Navigate first
+      await user.keyboard('{ArrowDown}{ArrowDown}');
+
+      // Then type to filter
+      const input = screen.getByPlaceholderText('Search...');
+      await user.type(input, 'd');
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      expect(options).toHaveLength(1);
+      expect(options[0]).toHaveTextContent('Date');
+    });
+
+    it('reopen after selection shows all options with empty input', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      // Select Cherry
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Cherry'));
+
+      // Reopen
+      await user.click(screen.getByText('Cherry'));
+
+      // Input should be empty, all options should show
+      const input = screen.getByPlaceholderText('Search...');
+      expect((input as HTMLInputElement).value).toBe('');
+      expect(document.querySelectorAll('[data-testid="autocomplete-option"]')).toHaveLength(4);
+    });
+
+    it('selected option retains data-selected on reopen', async () => {
+      const user = userEvent.setup();
+      render(<AutocompleteInPopoverFull />);
+
+      await user.click(screen.getByText('Pick a fruit...'));
+      await user.click(screen.getByText('Banana'));
+
+      // Reopen
+      await user.click(screen.getByText('Banana'));
+
+      const options = document.querySelectorAll('[data-testid="autocomplete-option"]');
+      const bananaOption = Array.from(options).find(o => o.textContent === 'Banana');
+      expect(bananaOption).toHaveAttribute('data-selected', '');
+    });
+  });
+
+  describe('input state attributes', () => {
+    it('input has data-open when list is visible', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      await user.type(input, 'a');
+
+      expect(input).toHaveAttribute('data-open', '');
+    });
+
+    it('input has data-closed when list is hidden', () => {
+      render(<FilteredAutocomplete />);
+
+      const input = screen.getByPlaceholderText('Search fruits...');
+      expect(input).toHaveAttribute('data-closed', '');
+    });
+  });
+
+  describe('accessibility (axe)', () => {
+    it('has no violations when closed', async () => {
+      const { container } = render(<FilteredAutocomplete />);
+      expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('has no violations when open', async () => {
+      const user = userEvent.setup();
+      render(<FilteredAutocomplete />);
+
+      await user.click(screen.getByPlaceholderText('Search fruits...'));
+      await user.keyboard('a');
+
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+
+    it('has no violations for the inline listbox inside a popover', async () => {
+      const user = userEvent.setup();
+      render(
+        <Popover.Root defaultOpen>
+          <Popover.Trigger>Pick a fruit...</Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Title>Fruit picker</Popover.Title>
+              <Autocomplete.Root open>
+                <Autocomplete.Input placeholder='Search...' />
+                <Autocomplete.List>
+                  {fruits.map(f => (
+                    <Autocomplete.Option
+                      key={f.value}
+                      value={f.value}
+                      label={f.label}
+                    >
+                      {f.label}
+                    </Autocomplete.Option>
+                  ))}
+                </Autocomplete.List>
+              </Autocomplete.Root>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+  });
+
+  describe('option id protection', () => {
+    it('does not let a consumer id override the primitive-owned option id', () => {
+      render(
+        <Autocomplete.Root defaultOpen>
+          <Autocomplete.Input placeholder='Search fruits...' />
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup>
+              <Autocomplete.Option
+                value='apple'
+                label='Apple'
+                id='consumer-id'
+              >
+                Apple
+              </Autocomplete.Option>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Root>,
+      );
+
+      const option = screen.getByRole('option');
+      expect(option.id).not.toBe('consumer-id');
+      expect(option.id).not.toBe('');
+    });
+  });
+});
+
+describe('Autocomplete option renders', () => {
+  it('re-renders only the options whose highlight changes', async () => {
+    const user = userEvent.setup();
+    const renders: string[] = [];
+    render(
+      <Autocomplete.Root defaultOpen>
+        <Autocomplete.Input placeholder='Search fruits...' />
+        <Autocomplete.Positioner>
+          <Autocomplete.Popup>
+            {fruits.map(f => (
+              <Autocomplete.Option
+                key={f.value}
+                value={f.value}
+                label={f.label}
+                render={props => {
+                  renders.push(f.value);
+                  return <div {...props} />;
+                }}
+              >
+                {f.label}
+              </Autocomplete.Option>
+            ))}
+          </Autocomplete.Popup>
+        </Autocomplete.Positioner>
+      </Autocomplete.Root>,
+    );
+    await user.click(screen.getByPlaceholderText('Search fruits...'));
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('data-active');
+
+    renders.length = 0;
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['apple', 'banana']));
+
+    renders.length = 0;
+    await user.hover(screen.getByRole('option', { name: 'Date' }));
+    expect(screen.getByRole('option', { name: 'Date' })).toHaveAttribute('data-active');
+    expect(new Set(renders)).toEqual(new Set(['banana', 'date']));
+  });
+});
+
+describe('Autocomplete selection in a transition', () => {
+  const neverResolves = new Promise<never>(() => {});
+  function Suspends(): never {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Suspending is React's thrown-thenable protocol; `React.use()` needs React 19.
+    throw neverResolves;
+  }
+
+  type HoverRender = { option: string; hovered: string | null; active: boolean };
+  type OptionRender = { option: string; parentValue: string; selected: unknown };
+
+  function Fixture({
+    update = 'transition',
+    onRenderOption,
+    suspendSelected = false,
+    hoverInTransition = false,
+    onRenderHover,
+    suspendWhenActive,
+  }: {
+    update?: 'transition' | 'deferred';
+    onRenderOption?: (render: OptionRender) => void;
+    suspendSelected?: boolean;
+    hoverInTransition?: boolean;
+    onRenderHover?: (render: HoverRender) => void;
+    suspendWhenActive?: string;
+  }) {
+    const [value, setValue] = useState<string>('');
+    const deferredValue = useDeferredValue(value);
+    const [isPending, startTransition] = useTransition();
+    const [hovered, setHovered] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [isLoadingMore, startLoadingMore] = useTransition();
+    const parentValue = update === 'deferred' ? deferredValue : value;
+    return (
+      <>
+        <button
+          type='button'
+          onClick={() => startLoadingMore(() => setLoadingMore(true))}
+        >
+          Load more
+        </button>
+        <p>{isLoadingMore ? 'Loading more' : 'Loaded'}</p>
+        <Suspense fallback={<p>Loading more fallback</p>}>{loadingMore ? <Suspends /> : null}</Suspense>
+        <Suspense fallback={<p>Loading</p>}>
+          <p>{isPending || value !== deferredValue ? 'Pending' : 'Idle'}</p>
+          <Autocomplete.Root
+            open
+            value={parentValue}
+            onValueChange={next => (update === 'deferred' ? setValue(next) : startTransition(() => setValue(next)))}
+          >
+            <Autocomplete.Input placeholder='Search fruits...' />
+            <Autocomplete.Positioner>
+              <Autocomplete.Popup>
+                {fruits.map(option => (
+                  <Autocomplete.Option
+                    key={option.value}
+                    value={option.value}
+                    label={option.label}
+                    render={props => {
+                      onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                      const active = 'data-active' in props;
+                      onRenderHover?.({ option: option.value, hovered, active });
+                      return (
+                        <div
+                          {...props}
+                          onMouseMove={
+                            hoverInTransition
+                              ? event =>
+                                  startTransition(() => {
+                                    setHovered(option.value);
+                                    props.onMouseMove?.(event);
+                                  })
+                              : props.onMouseMove
+                          }
+                        >
+                          {props.children}
+                          {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
+                          {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                        </div>
+                      );
+                    }}
+                  >
+                    {option.label}
+                  </Autocomplete.Option>
+                ))}
+              </Autocomplete.Popup>
+            </Autocomplete.Positioner>
+          </Autocomplete.Root>
+        </Suspense>
+      </>
+    );
+  }
+
+  describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
+    it('renders each option with the selection its parent passed down', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+    });
+
+    it('renders the new selection in the same render as its parent, with no second pass', async () => {
+      const user = userEvent.setup();
+      const renders: OptionRender[] = [];
+      render(
+        <Fixture
+          update={update}
+          onRenderOption={entry => renders.push(entry)}
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
+      );
+      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { option: 'banana', parentValue: 'banana', selected: true },
+      ]);
+    });
+
+    it('keeps the current options on screen while a selection suspends', async () => {
+      const user = userEvent.setup();
+      render(
+        <Fixture
+          update={update}
+          suspendSelected
+        />,
+      );
+
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+      expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+    });
+  });
+
+  it('moves the highlight with arrow keys while an unrelated transition is pending', async () => {
+    const user = userEvent.setup();
+    render(<Fixture />);
+
+    await user.click(screen.getByText('Load more'));
+    await waitFor(() => expect(screen.getByText('Loading more')).toBeInTheDocument());
+
+    await user.click(screen.getByPlaceholderText('Search fruits...'));
+    await user.keyboard('{ArrowDown}');
+    await user.keyboard('{ArrowDown}');
+
+    const banana = screen.getByRole('option', { name: 'Banana' });
+    expect(banana).toHaveAttribute('data-active');
+    expect(screen.getByPlaceholderText('Search fruits...')).toHaveAttribute('aria-activedescendant', banana.id);
+    expect(screen.getByText('Loading more')).toBeInTheDocument();
+  });
+
+  it('renders the hovered option as active in the same render as a hover transition', async () => {
+    const user = userEvent.setup();
+    const renders: HoverRender[] = [];
+    render(
+      <Fixture
+        hoverInTransition
+        onRenderHover={entry => renders.push(entry)}
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
+    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+  });
+
+  it('keeps the current options on screen while a hover transition suspends', async () => {
+    const user = userEvent.setup();
+    render(
+      <Fixture
+        hoverInTransition
+        suspendWhenActive='banana'
+      />,
+    );
+
+    await user.hover(screen.getByRole('option', { name: 'Banana' }));
+
+    await waitFor(() => expect(screen.getByText('Pending')).toBeInTheDocument());
+    expect(screen.queryByText('Loading')).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Banana' })).not.toHaveAttribute('data-active');
+  });
+});

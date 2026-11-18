@@ -12,6 +12,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
+import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
@@ -33,7 +34,6 @@ export class Client extends BaseResource implements ClientResource {
   lastActiveSessionId: string | null = null;
   captchaBypass = false;
   cookieExpiresAt: Date | null = null;
-  /** Last authentication strategy used by this client; `null` when unknown/disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null = null;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
@@ -74,23 +74,15 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ fetchMaxTries }: { fetchMaxTries?: number } = {}): Promise<this> {
-    return this._baseGet({ fetchMaxTries });
+  fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
+    return this._baseGet({ fetchMaxTries, abortSignal });
   }
 
   async destroy(): Promise<void> {
     // TODO: Make it restful by introducing a DELETE /client/:id endpoint
     return this._baseDelete({ path: '/client' }).then(() => {
       SessionTokenCache.clear();
-      this.id = '';
-      this.sessions = [];
-      this.signUp = new SignUp(null);
-      this.signIn = new SignIn(null);
-      this.lastActiveSessionId = null;
-      this.lastAuthenticationStrategy = null;
-      this.cookieExpiresAt = null;
-      this.createdAt = null;
-      this.updatedAt = null;
+      this.resetClient();
     });
   }
 
@@ -101,6 +93,29 @@ export class Client extends BaseResource implements ClientResource {
       SessionTokenCache.clear();
       return e as unknown as ClientResource;
     });
+  }
+
+  async __internal_signOut({ redirectUrl }: { redirectUrl: string }): Promise<{ signOutUrl?: string }> {
+    const json = await BaseResource._fetch<ClientJSON>({
+      method: 'DELETE',
+      path: this.path() + '/sessions',
+      search: { sign_out_redirect_url: redirectUrl },
+    });
+    this.fromJSON((json?.response || json) as ClientJSON | null);
+    SessionTokenCache.clear();
+    return { signOutUrl: json?.sign_out_url };
+  }
+
+  private resetClient(): void {
+    this.id = '';
+    this.sessions = [];
+    this.signUp = new SignUp(null);
+    this.signIn = new SignIn(null);
+    this.lastActiveSessionId = null;
+    this.lastAuthenticationStrategy = null;
+    this.cookieExpiresAt = null;
+    this.createdAt = null;
+    this.updatedAt = null;
   }
 
   resetSignIn(): void {
@@ -142,7 +157,20 @@ export class Client extends BaseResource implements ClientResource {
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {
     if (data) {
       this.id = data.id;
-      this.sessions = (data.sessions || []).map(s => new Session(s));
+      // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
+      const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
+      this.sessions = (data.sessions || []).map(s => {
+        const session = new Session(s);
+        const previousToken = previousTokens.get(session.id);
+        if (
+          previousToken &&
+          session.lastActiveToken &&
+          shouldKeepExistingLastActiveToken(previousToken, session.lastActiveToken)
+        ) {
+          session.lastActiveToken = previousToken;
+        }
+        return session;
+      });
 
       if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
         this.signUp.__internal_updateFromJSON(data.sign_up);

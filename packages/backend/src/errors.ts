@@ -15,6 +15,7 @@ export const TokenVerificationErrorReason = {
   TokenInvalid: 'token-invalid',
   TokenInvalidAlgorithm: 'token-invalid-algorithm',
   TokenInvalidAuthorizedParties: 'token-invalid-authorized-parties',
+  TokenInvalidIssuer: 'token-invalid-issuer',
   TokenInvalidSignature: 'token-invalid-signature',
   TokenNotActiveYet: 'token-not-active-yet',
   TokenIatInTheFuture: 'token-iat-in-the-future',
@@ -114,5 +115,26 @@ export class MachineTokenVerificationError extends ClerkError {
 
   public getFullMessage() {
     return `${this.message} (code=${this.code}, status=${this.status || 'n/a'})`;
+  }
+}
+
+export class OAuthTokenExchangeError extends ClerkError {
+  static kind = 'OAuthTokenExchangeError';
+  readonly errorDescription?: string;
+  readonly status?: number;
+
+  constructor({ error, errorDescription, status }: { error: string; errorDescription?: string; status?: number }) {
+    super({ message: errorDescription ? `${error}: ${errorDescription}` : error, code: error });
+    Object.setPrototypeOf(this, OAuthTokenExchangeError.prototype);
+    this.errorDescription = errorDescription;
+    this.status = status;
+  }
+
+  get error() {
+    return this.code;
+  }
+
+  protected static override formatMessage(_name: string, msg: string, _code: string, _docsUrl: string | undefined) {
+    return msg;
   }
 }

@@ -14,7 +14,8 @@ import { localizationKeys, Text } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
-import { isResetPasswordStrategy } from './utils';
+import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { isResettingPassword } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   showClientTrustNotice?: boolean;
@@ -31,10 +32,6 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   resendButton?: LocalizationKey;
 };
 
-const isResettingPassword = (resource: SignInResource) =>
-  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-  resource.firstFactorVerification?.status === 'verified';
-
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const env = useEnvironment();
   const signIn = useCoreSignIn();
@@ -45,6 +42,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
+  const signInAsDifferentUser = () => navigate('../');
+
   // Only show the new device verification notice if the user is new
   // and no attributes are explicitly used for second factor.
   // Retained for backwards compatibility.
@@ -54,14 +53,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
     );
     return signIn.clientTrustState === 'new' && !anyAttributeUsedForSecondFactor;
   }, [signIn.clientTrustState, env.userSettings.attributes]);
-
-  React.useEffect(() => {
-    if (props.factorAlreadyPrepared) {
-      return;
-    }
-
-    void prepare?.();
-  }, []);
 
   const prepare = props.prepare
     ? () => {
@@ -84,6 +75,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       .attemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
+        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
+          return;
+        }
         switch (res.status) {
           case 'complete':
             if (isResettingPassword(res) && res.createdSessionId) {
@@ -111,6 +105,14 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       });
   };
 
+  React.useEffect(() => {
+    if (props.factorAlreadyPrepared) {
+      return;
+    }
+
+    void prepare?.();
+  }, []);
+
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
@@ -128,7 +130,9 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={signIn.userData.imageUrl}
+      identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      onDifferentAccountClicked={signInAsDifferentUser}
     >
       {isResettingPassword(signIn) && (
         <Text

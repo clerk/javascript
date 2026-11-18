@@ -12,8 +12,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
-      fakeUser = u.services.users.createFakeUser({
+      const u = await createTestUtils({ app });
+      fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
@@ -27,13 +27,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('can sign in and user button renders', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
       await u.po.signIn.waitForMounted();

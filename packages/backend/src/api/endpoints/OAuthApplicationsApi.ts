@@ -1,6 +1,9 @@
-import type { ClerkPaginationRequest } from '@clerk/shared/types';
+import type { Autocomplete, ClerkPaginationRequest } from '@clerk/shared/types';
 
+import { OAuthTokenExchangeError } from '../../errors';
+import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
+import { parsePublishableKey } from '../../util/shared';
 import type { DeletedObject } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OAuthApplication } from '../resources/OAuthApplication';
@@ -9,43 +12,250 @@ import type { WithSign } from './util-types';
 
 const basePath = '/oauth_applications';
 
-type CreateOAuthApplicationParams = {
+/** @generateWithEmptyComment */
+export type CreateOAuthApplicationParams = {
   /**
-   * The name of the new OAuth application.
-   *
-   * @remarks Max length: 256
+   * A descriptive name for the OAuth application (e.g., "My Web App", "My Mobile App"). Maximum length: 256 characters.
    */
   name: string;
-  /**
-   * An array of redirect URIs of the new OAuth application
-   */
+  /** An array of redirect URIs for the OAuth application. */
   redirectUris?: Array<string> | null | undefined;
-  /**
-   * Define the allowed scopes for the new OAuth applications that dictate the user payload of the OAuth user info endpoint. Available scopes are `profile`, `email`, `public_metadata`, `private_metadata`. Provide the requested scopes as a string, separated by spaces.
-   */
+  /** Scopes for the OAuth application that dictate the user payload of the OAuth user info endpoint. Available scopes are `profile`, `email`, `public_metadata`, `private_metadata`. Provide the requested scopes as a string, separated by spaces. */
   scopes?: string | null | undefined;
-  /**
-   * If true, this client is public and you can use the Proof Key of Code Exchange (PKCE) flow.
-   */
+  /** Whether the OAuth application is public. If `true`, the Proof Key of Code Exchange (PKCE) flow can be used. */
   public?: boolean | null | undefined;
 };
 
-type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
-  /**
-   * The ID of the OAuth application to update
-   */
+/** @generateWithEmptyComment */
+export type UpdateOAuthApplicationParams = CreateOAuthApplicationParams & {
+  /** The ID of the OAuth application to update. */
   oauthApplicationId: string;
 };
 
-type GetOAuthApplicationListParams = ClerkPaginationRequest<{
+/** @generateWithEmptyComment */
+export type RevokeOAuthApplicationTokenParams = {
+  /** The ID of the OAuth application for which to revoke the token. */
+  oauthApplicationId: string;
+  /** The opaque OAuth access token or refresh token to revoke. */
+  token: string;
+};
+
+/**
+ * A token type identifier as defined in [RFC 8693 section 3](https://www.rfc-editor.org/rfc/rfc8693#section-3).
+ */
+export type OAuthTokenTypeIdentifier = Autocomplete<
+  | 'urn:ietf:params:oauth:token-type:access_token'
+  | 'urn:ietf:params:oauth:token-type:refresh_token'
+  | 'urn:ietf:params:oauth:token-type:id_token'
+  | 'urn:ietf:params:oauth:token-type:jwt'
+>;
+
+/**
+ * The parameters for performing an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an OAuth application.
+ */
+export type ExchangeOAuthApplicationTokenParams = {
+  /** The publishable key of the instance, used to derive its token endpoint. */
+  publishableKey: string;
+  /** The absolute HTTPS URL of your Frontend API proxy. When set, the exchange is sent through the proxy instead of the Frontend API host in `publishableKey`. */
+  proxyUrl?: string;
+  /** The client ID of the OAuth application performing the exchange. */
+  clientId: string;
+  /** The client secret of the OAuth application, used to authenticate with the token endpoint. */
+  clientSecret: string;
+  /** The OAuth access token that represents the user on whose behalf the request is being made. */
+  subjectToken: string;
+  /** The absolute URI of the target resource where the issued token will be used. It must use `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`, and must not contain a fragment. It is sent exactly as given. */
+  resource: string;
+  /** The scopes requested for the issued token. Each element must be a single, non-empty [scope token](https://www.rfc-editor.org/rfc/rfc6749#section-3.3): printable ASCII without spaces, `"` or `\`. */
+  scope?: string[];
+};
+
+/**
+ * The result of a successful [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1).
+ */
+export type ExchangeOAuthApplicationTokenResult = {
+  /** The issued security token. */
+  accessToken: string;
+  /** The type of the issued token. */
+  issuedTokenType: OAuthTokenTypeIdentifier;
+  /** How the issued token is used, for example `Bearer`, as returned by the authorization server. Compare it case-insensitively ([RFC 6749 section 5.1](https://www.rfc-editor.org/rfc/rfc6749#section-5.1)), and only use the token if your code supports this type ([RFC 6749 section 7.1](https://www.rfc-editor.org/rfc/rfc6749#section-7.1)). */
+  tokenType: string;
+  /** The lifetime of the issued token in seconds, if provided by the authorization server. */
+  expiresIn?: number;
+  /** The scopes of the issued token, if provided by the authorization server. */
+  scope?: string[];
+  /** A refresh token, if issued by the authorization server. */
+  refreshToken?: string;
+};
+
+/** @generateWithEmptyComment */
+export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
   /**
-   * Sorts OAuth applications by name or created_at.
-   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   * Filters by a case-insensitive substring of the application name or an exact client ID.
+   */
+  nameQuery?: string;
+  /**
+   * Returns OAuth applications in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.
    */
   orderBy?: WithSign<'name' | 'created_at'>;
 }>;
 
+type TokenExchangeResponseJSON = {
+  access_token: string;
+  issued_token_type: string;
+  token_type: string;
+  expires_in?: number;
+  scope?: string;
+  refresh_token?: string;
+};
+
+const tokenExchangeGrantType = 'urn:ietf:params:oauth:grant-type:token-exchange';
+const accessTokenType = 'urn:ietf:params:oauth:token-type:access_token';
+
+function formUrlEncode(value: string) {
+  return new URLSearchParams({ v: value }).toString().slice(2);
+}
+
+function tokenExchangeRequestError(errorDescription: string) {
+  return new OAuthTokenExchangeError({ error: 'invalid_request', errorDescription });
+}
+
+function tokenExchangeResponseError(status: number) {
+  return new OAuthTokenExchangeError({ error: 'invalid_response', status });
+}
+
+const loopbackHostnames = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+function parseAbsoluteUrl(value: string) {
+  try {
+    return new URL(value);
+  } catch {
+    return undefined;
+  }
+}
+
+function isAllowedResourceUrl({ protocol, hostname }: URL) {
+  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
+}
+
+const rfc3986AbsoluteUriPattern =
+  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[A-Za-z0-9\-._~:/?@!$&'()*+,;=[\]]|%[0-9A-Fa-f]{2})*$/;
+
+function assertValidTokenExchangeResource(resource: string) {
+  if (resource.includes('#')) {
+    throw tokenExchangeRequestError('`resource` must not contain a fragment.');
+  }
+  const url = rfc3986AbsoluteUriPattern.test(resource) ? parseAbsoluteUrl(resource) : undefined;
+  if (!url) {
+    throw tokenExchangeRequestError('`resource` must be an absolute URI.');
+  }
+  if (!isAllowedResourceUrl(url)) {
+    throw tokenExchangeRequestError('`resource` must use https, or http on a loopback host.');
+  }
+}
+
+const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
+
+function assertValidTokenExchangeScope(scope: string[] | undefined) {
+  if (scope?.some(token => !scopeTokenPattern.test(token))) {
+    throw tokenExchangeRequestError(
+      'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
+    );
+  }
+}
+
+function assertValidTokenExchangeParams(params: ExchangeOAuthApplicationTokenParams) {
+  assertValidTokenExchangeResource(params.resource);
+  assertValidTokenExchangeScope(params.scope);
+}
+
+function tokenExchangeBody(params: ExchangeOAuthApplicationTokenParams) {
+  const body = new URLSearchParams({
+    grant_type: tokenExchangeGrantType,
+    subject_token: params.subjectToken,
+    subject_token_type: accessTokenType,
+    resource: params.resource,
+  });
+  if (params.scope?.length) {
+    body.set('scope', params.scope.join(' '));
+  }
+  return body;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isAbsentOr(value: Record<string, unknown>, key: string, check: (member: unknown) => boolean) {
+  return !(key in value) || check(value[key]);
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isTokenExchangeResponse(value: unknown): value is TokenExchangeResponseJSON {
+  return (
+    isRecord(value) &&
+    isString(value.access_token) &&
+    value.access_token.length > 0 &&
+    isString(value.issued_token_type) &&
+    isString(value.token_type) &&
+    isAbsentOr(value, 'scope', isString) &&
+    isAbsentOr(value, 'expires_in', isNonNegativeInteger) &&
+    isAbsentOr(value, 'refresh_token', isString)
+  );
+}
+
+function tokenExchangeResult(json: TokenExchangeResponseJSON): ExchangeOAuthApplicationTokenResult {
+  return {
+    accessToken: json.access_token,
+    issuedTokenType: json.issued_token_type,
+    tokenType: json.token_type,
+    expiresIn: json.expires_in,
+    scope: json.scope ? json.scope.split(' ').filter(Boolean) : undefined,
+    refreshToken: json.refresh_token,
+  };
+}
+
+function tokenExchangeError(json: unknown, status: number) {
+  if (!isRecord(json) || !isString(json.error)) {
+    return tokenExchangeResponseError(status);
+  }
+  return new OAuthTokenExchangeError({
+    error: json.error,
+    errorDescription: isString(json.error_description) ? json.error_description : undefined,
+    status,
+  });
+}
+
+function oauthTokenEndpoint({ publishableKey, proxyUrl }: ExchangeOAuthApplicationTokenParams) {
+  if (proxyUrl) {
+    const url = parseAbsoluteUrl(proxyUrl);
+    if (url?.protocol !== 'https:') {
+      throw new Error('`proxyUrl` must be an absolute HTTPS URL to perform an OAuth token exchange.');
+    }
+    if (/[?#]/.test(proxyUrl)) {
+      throw new Error('`proxyUrl` must not contain a query or fragment to perform an OAuth token exchange.');
+    }
+    url.pathname = `${url.pathname.replace(/\/+$/, '')}/oauth/token`;
+    return url.href;
+  }
+  const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
+  return `https://${frontendApi}/oauth/token`;
+}
+
+/** @generateWithEmptyComment */
 export class OAuthApplicationsApi extends AbstractAPI {
+  /**
+   * Gets a list of OAuth applications for the instance. By default, the list is returned in descending order by creation date (newest first).
+   * @param params - The parameters to get the OAuth applications with.
+   * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) objects and a `totalCount` property containing the total number of OAuth applications.
+   */
   public async list(params: GetOAuthApplicationListParams = {}) {
     return this.request<PaginatedResourceResponse<OAuthApplication[]>>({
       method: 'GET',
@@ -54,6 +264,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Gets the given OAuth application.
+   * @param oauthApplicationId - The ID of the OAuth application to get.
+   * @returns The [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) object.
+   */
   public async get(oauthApplicationId: string) {
     this.requireId(oauthApplicationId);
 
@@ -63,6 +278,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Creates a new OAuth application.
+   * @param params - The parameters to create the OAuth application with.
+   * @returns The created [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) object.
+   */
   public async create(params: CreateOAuthApplicationParams) {
     return this.request<OAuthApplication>({
       method: 'POST',
@@ -71,6 +291,10 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Updates the given OAuth application.
+   * @returns The updated [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) object.
+   */
   public async update(params: UpdateOAuthApplicationParams) {
     const { oauthApplicationId, ...bodyParams } = params;
 
@@ -83,6 +307,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Deletes the given OAuth application.
+   * @param oauthApplicationId - The ID of the OAuth application to delete.
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
+   */
   public async delete(oauthApplicationId: string) {
     this.requireId(oauthApplicationId);
 
@@ -92,6 +321,11 @@ export class OAuthApplicationsApi extends AbstractAPI {
     });
   }
 
+  /**
+   * Rotates the secret of the given OAuth application. When the client secret is rotated, ensure that you update it in your authorized OAuth clients.
+   * @param oauthApplicationId - The ID of the OAuth application to rotate the secret of.
+   * @returns The [`OAuthApplication`](https://clerk.com/docs/reference/backend/types/backend-oauth-application) object.
+   */
   public async rotateSecret(oauthApplicationId: string) {
     this.requireId(oauthApplicationId);
 
@@ -99,5 +333,81 @@ export class OAuthApplicationsApi extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, oauthApplicationId, 'rotate_secret'),
     });
+  }
+
+  /**
+   * Revokes both the [OAuth access token](!oauth-access-token) and refresh token for the associated grant for the given [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application). The request may specify either token.
+   */
+  public async revokeToken(params: RevokeOAuthApplicationTokenParams) {
+    const { oauthApplicationId, ...bodyParams } = params;
+
+    this.requireId(oauthApplicationId);
+
+    return this.request<void>({
+      method: 'POST',
+      path: joinPaths(basePath, oauthApplicationId, 'revoke_token'),
+      bodyParams,
+    });
+  }
+
+  /**
+   * @experimental This is an experimental API for OAuth 2.0 Token Exchange and is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version to avoid breaking changes.
+   *
+   * Performs an [OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) for an [`OAuthApplication`](/docs/reference/backend/types/backend-oauth-application), exchanging a user's OAuth access token for a new access token for the target resource. The request is sent to the instance's token endpoint, derived from `publishableKey`, or from `proxyUrl` when set, and authenticates with the application's client ID and client secret. The instance secret key is not required.
+   *
+   * @param params - The parameters for the token exchange.
+   * @returns The issued token and its metadata.
+   * @throws `OAuthTokenExchangeError` with code `invalid_request` and no `status` if `resource` or `scope` is invalid. No request is made.
+   * @throws `OAuthTokenExchangeError` with the OAuth error code, `errorDescription` and HTTP `status` if the token endpoint rejects the exchange ([RFC 6749 section 5.2](https://www.rfc-editor.org/rfc/rfc6749#section-5.2)).
+   * @throws `OAuthTokenExchangeError` with code `invalid_response` and the HTTP `status` if the token endpoint returns a redirect, a non-200 success status, an error without an OAuth error code, or a malformed token response.
+   * @throws `Error` if `clientId` is empty, `publishableKey` is missing or invalid, or `proxyUrl` is not an absolute HTTPS URL or contains a query or fragment.
+   * @throws Network failures from `fetch`, unwrapped and unchanged.
+   *
+   * @example
+   * ```ts
+   * const { accessToken } = await clerkClient.oauthApplications.__experimental_exchangeToken({
+   *   publishableKey: process.env.CLERK_PUBLISHABLE_KEY!,
+   *   clientId: process.env.OAUTH_CLIENT_ID!,
+   *   clientSecret: process.env.OAUTH_CLIENT_SECRET!,
+   *   subjectToken,
+   *   resource: 'https://api.example.com',
+   * });
+   * ```
+   */
+  public async __experimental_exchangeToken(
+    params: ExchangeOAuthApplicationTokenParams,
+  ): Promise<ExchangeOAuthApplicationTokenResult> {
+    assertValidTokenExchangeParams(params);
+
+    if (!params.clientId) {
+      throw new Error('A valid client ID is required.');
+    }
+
+    const tokenEndpoint = oauthTokenEndpoint(params);
+    const credentials = `${formUrlEncode(params.clientId)}:${formUrlEncode(params.clientSecret)}`;
+    const body = tokenExchangeBody(params);
+    const headers = {
+      Accept: 'application/json',
+      Authorization: `Basic ${btoa(credentials)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    const response = await runtime.fetch(tokenEndpoint, { method: 'POST', headers, body, redirect: 'manual' });
+
+    if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+      throw tokenExchangeResponseError(response.status);
+    }
+
+    const json = await response.json().catch(() => undefined);
+
+    if (!response.ok) {
+      throw tokenExchangeError(json, response.status);
+    }
+
+    if (response.status !== 200 || !isTokenExchangeResponse(json)) {
+      throw tokenExchangeResponseError(response.status);
+    }
+
+    return tokenExchangeResult(json);
   }
 }

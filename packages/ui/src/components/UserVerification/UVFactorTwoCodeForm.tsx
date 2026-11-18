@@ -23,20 +23,13 @@ type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
+  identityPreviewEditButtonAriaLabel: LocalizationKey;
 };
 
 export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const card = useCardState();
   const { session } = useSession();
   const { handleVerificationResponse } = useAfterVerification();
-
-  React.useEffect(() => {
-    if (props.factorAlreadyPrepared) {
-      return;
-    }
-
-    void prepare?.();
-  }, []);
 
   const prepare = props.prepare
     ? () =>
@@ -57,6 +50,14 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       .catch(reject);
   };
 
+  React.useEffect(() => {
+    if (props.factorAlreadyPrepared) {
+      return;
+    }
+
+    void prepare?.();
+  }, []);
+
   return (
     <VerificationCodeCard
       cardTitle={props.cardTitle}
@@ -67,6 +68,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
       profileImageUrl={session?.user?.imageUrl}
+      identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
     />

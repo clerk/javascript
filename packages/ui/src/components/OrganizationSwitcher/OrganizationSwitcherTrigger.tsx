@@ -41,8 +41,12 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         focusRing={false}
         sx={[
           t => ({
-            padding: `${t.space.$1} ${t.space.$2}`,
+            padding: `${t.space.$1} ${t.space.$2} ${t.space.$1} ${t.space.$1}`,
             position: 'relative',
+            '&[aria-expanded="true"]': {
+              backgroundColor: 'var(--alpha)',
+              color: 'var(--accentHover)',
+            },
           }),
           sx,
         ]}
@@ -58,6 +62,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             size='xs'
             organization={organization}
+            avatarSx={t => ({ borderRadius: t.radii.$sm })}
             sx={{ maxWidth: '30ch' }}
           />
         )}

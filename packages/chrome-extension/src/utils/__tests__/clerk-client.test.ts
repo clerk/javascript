@@ -4,9 +4,9 @@ const mockLoad = vi.fn().mockResolvedValue(undefined);
 const mockUi = { __brand: 'clerk-ui', ClerkUI: vi.fn() };
 
 vi.mock('@clerk/clerk-js/no-rhc', () => {
-  const Clerk = vi.fn(() => ({
-    load: mockLoad,
-  })) as ReturnType<typeof vi.fn> & { sdkMetadata: Record<string, string> };
+  const Clerk = vi.fn(function () {
+    return { load: mockLoad };
+  }) as ReturnType<typeof vi.fn> & { sdkMetadata: Record<string, string> };
   Clerk.sdkMetadata = {};
   return { Clerk };
 });

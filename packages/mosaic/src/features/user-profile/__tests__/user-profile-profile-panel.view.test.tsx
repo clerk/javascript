@@ -1,0 +1,160 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+
+import { useConfirmController } from '../../../blocks/confirm';
+import { MosaicProvider } from '../../../mosaic-provider';
+import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
+import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
+import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
+import type { UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
+import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
+
+function Web3Wallets({
+  wallets,
+  onRemove,
+}: {
+  wallets: UserProfileWeb3Wallet[];
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const controller = useUserProfileWeb3WalletsController({
+    wallets,
+    availableProviders: [],
+    connect: () => Promise.resolve(),
+    setPrimary: () => Promise.resolve(),
+    remove: onRemove,
+  });
+  return <UserProfileWeb3WalletsSectionView {...controller} />;
+}
+
+function DeleteAccount() {
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
+}
+
+function renderView(overrides: UserProfileProfilePanelViewProps = {}) {
+  return render(
+    <MosaicProvider>
+      <UserProfileProfilePanelView {...overrides} />
+    </MosaicProvider>,
+  );
+}
+
+describe('UserProfileProfilePanelView', () => {
+  it('titles the panel Account without profile navigation', () => {
+    renderView();
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab')).toBeNull();
+  });
+
+  it('keeps the final wallet confirmation mounted until removal settles, then focuses the title', async () => {
+    const user = userEvent.setup();
+    const removal = createDeferredPromise();
+    const onRemoveWeb3Wallet = vi.fn(async () => {
+      await removal.promise;
+    });
+    const { rerender } = renderView({
+      children: (
+        <Web3Wallets
+          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+          onRemove={onRemoveWeb3Wallet}
+        />
+      ),
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    rerender(
+      <MosaicProvider>
+        <UserProfileProfilePanelView>
+          <Web3Wallets
+            wallets={[]}
+            onRemove={onRemoveWeb3Wallet}
+          />
+        </UserProfileProfilePanelView>
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Account', level: 2 }).closest('.cl-panel-title')).toHaveFocus(),
+    );
+  });
+
+  it('renders the danger zone when provided', () => {
+    renderView({
+      children: <DeleteAccount />,
+    });
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label > *' })).toBeInTheDocument();
+    expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
+      'cl-section-description',
+    );
+  });
+
+  it('renders Web3 images inside icon frames', () => {
+    const { container } = renderView({
+      children: (
+        <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
+          wallets={[
+            { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
+          ]}
+        />
+      ),
+    });
+
+    const frames = container.querySelectorAll('.cl-icon-frame');
+    const images = container.querySelectorAll('img');
+    expect(frames).toHaveLength(1);
+    expect(screen.queryByRole('img', { name: 'MetaMask' })).not.toBeInTheDocument();
+    expect(frames[0]).toContainElement(images[0]);
+    frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
+  });
+
+  it('composes linked wallets and available providers', () => {
+    renderView({
+      children: (
+        <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
+          wallets={[
+            {
+              id: 'primary',
+              address: '0x1234567890abcdef1234567890abcdef12345678',
+              provider: 'MetaMask',
+              iconUrl: 'https://example.com/metamask.svg',
+              isPrimary: true,
+              isVerified: true,
+            },
+            {
+              id: 'secondary',
+              address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+              provider: 'Coinbase Wallet',
+              isVerified: true,
+            },
+          ]}
+          availableProviders={[{ id: 'disconnected', provider: 'Coinbase Wallet' }]}
+          onConnect={vi.fn()}
+          onSetPrimary={vi.fn()}
+        />
+      ),
+    });
+
+    expect(screen.getByRole('heading', { level: 3, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByText('MetaMask')).toBeInTheDocument();
+    expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
+    expect(within(screen.getByRole('group', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: 'Connect Coinbase Wallet' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manage Coinbase Wallet' })).toBeVisible();
+  });
+});

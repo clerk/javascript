@@ -1,0 +1,172 @@
+import * as TableStories from './table.stories';
+
+# Table
+
+Table renders tabular data in a bordered Mosaic shell. It styles the headless [Table primitive](/primitives/table), which owns selection, tree expansion, sort state and keyboard navigation. `Table.Root` renders the `<table>` inside a shell that scrolls horizontally when the columns outgrow the container.
+
+The table does not sort, filter or page the items. Sort them yourself or on the server, and render [Pagination](/components/pagination) below the table.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={TableStories}
+/>
+
+## Usage
+
+```tsx
+import { Table } from '@clerk/mosaic/components/table';
+
+<>
+  <Table.Toolbar>
+    <Table.Search
+      label='Search members'
+      clearLabel='Clear search'
+      value={search}
+      onValueChange={setSearch}
+    />
+  </Table.Toolbar>
+
+  <Table.Root aria-label='Members'>
+    <Table.Header>
+      <Table.Column rowHeader>Name</Table.Column>
+      <Table.Column width='9rem'>Joined</Table.Column>
+    </Table.Header>
+    <Table.Body
+      items={members}
+      itemToStringValue={member => member.id}
+    >
+      {member => (
+        <Table.Row>
+          <Table.Cell>{member.name}</Table.Cell>
+          <Table.Cell noWrap>{member.joined}</Table.Cell>
+        </Table.Row>
+      )}
+    </Table.Body>
+  </Table.Root>
+</>;
+```
+
+## Parts
+
+- `Table.Toolbar` wraps search and optional actions in a responsive row. Render it before `Table.Root`, outside the table.
+- `Table.Search` composes [InputGroup](/components/input-group), [Icon](/components/icon), and [Button](/components/button). Supply the controlled `value`, `onValueChange`, and localized `label` and `clearLabel`. Clearing returns focus to the input. Its `ref`, `xstyle`, and input props apply to the search input; `placeholder` defaults to `label`. The caller owns filtering and any debounce.
+- `Table.Root` renders the `<table>` and takes the primitive's selection, expanded and sort props. `xstyle`, `ref`, and any table props land on it; the scrolling shell around it is internal. `layout` defaults to `'auto'`, where columns size to their content; `'fixed'` sizes them from the column widths instead. `minWidth` sets the width below which the table scrolls.
+- `Table.Header` renders the `<thead>` and its row. Put the columns directly inside it.
+- `Table.Column` renders a `<th scope="col">`. Give it a `value` and `sortable` to sort by it: the header becomes the control and shows a direction icon. `rowHeader` renders the column's cells as row headers that name their rows. `width` takes any CSS length. `align` moves the content to `'center'` or `'end'`.
+- `Table.Body` renders a row per item from `items`, keyed by `itemToStringValue`. `itemToChildren` makes the table a tree. `renderEmptyState` renders when there are no items, in one cell that spans every column. Put an [EmptyState](/components/empty-state) inside it.
+- `Table.Row` renders a `<tr>`. Selected rows are tinted. `disabled` removes the row from navigation and selection. `onClick` or `href` gives the row an action: it gets a pointer cursor and a hover tint, and `Enter` runs it.
+- `Table.Cell` renders a `<td>`, or a `<th scope="row">` in a `rowHeader` column. It takes the same `align` prop. `noWrap` keeps dates and other short values on one line.
+- `Table.Column` and `Table.Cell` take `sticky` (`'start'` or `'end'`) to pin the cell to that edge while the table scrolls horizontally. Set it on every cell in the column. A pinned cell gets an opaque background that matches its row and a fade on its inner edge.
+- `Table.SelectionColumn` and `Table.SelectionCell` render a narrow header or body cell holding a [Checkbox](/components/checkbox) that selects all rows or its row. They render only when `Table.Root` has a `selectionMode`. Both need an `aria-label`; a row's checkbox is also named by the row headers, so `'Select'` reads as "Select Web app".
+- `Table.ExpandButton` toggles its row's children in a tree. It renders only when the row can expand, and needs an `aria-label`. Indent the cell content with the row's `--table-row-depth`.
+
+## Styling
+
+Each part carries a stable `.cl-*` class, and the parts with state reflect it as `data-*` attributes:
+
+| Class                     | Part                                           | Attributes                                                                                                     |
+| ------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `.cl-table-shell`         | The bordered wrapper around the table          |                                                                                                                |
+| `.cl-table-viewport`      | The horizontally scrolling viewport            |                                                                                                                |
+| `.cl-table`               | `Table.Root`                                   | `data-layout` (`auto` / `fixed`)                                                                               |
+| `.cl-table-toolbar`       | `Table.Toolbar`                                |                                                                                                                |
+| `.cl-table-search`        | `Table.Search` input group                     |                                                                                                                |
+| `.cl-table-header`        | `Table.Header`                                 |                                                                                                                |
+| `.cl-table-column`        | `Table.Column`                                 | `data-align`, `data-sticky`, `data-sortable` when sortable, `data-sort-direction` (`ascending` / `descending`) |
+| `.cl-table-body`          | `Table.Body`                                   |                                                                                                                |
+| `.cl-table-row`           | `Table.Row`                                    | `data-selected`, `data-disabled`, `data-expanded`, `data-actionable` when it has an action                     |
+| `.cl-table-cell`          | `Table.Cell`                                   | `data-align` (`start` / `center` / `end`), `data-sticky` (`start` / `end`), `data-no-wrap` when `noWrap`       |
+| `.cl-table-select-cell`   | `Table.SelectionColumn`, `Table.SelectionCell` |                                                                                                                |
+| `.cl-table-expand-button` | `Table.ExpandButton`                           | `data-expanded`, `data-collapsed`                                                                              |
+| `.cl-table-empty`         | The content wrapper around `renderEmptyState`  |                                                                                                                |
+
+```css
+.cl-table-row[data-selected] {
+  background: rgba(0, 0, 0, 0.06);
+}
+```
+
+---
+
+## Examples
+
+### Search
+
+The toolbar places the search field beside optional actions and wraps on narrow screens. This example filters locally; server-backed views can pass their controlled search value and change handler instead.
+
+<Story
+  name='Search'
+  storyModule={TableStories}
+/>
+
+### Sorting
+
+Activating a sortable column sorts by it ascending, then flips the direction. The story keeps the sort in state and sorts the items before rendering them.
+
+<Story
+  name='Sorting'
+  storyModule={TableStories}
+/>
+
+### Selection
+
+With `selectionMode='multiple'`, the selection columns appear and the table holds the selection. Select a row, then shift-click another to select every row in between. The disabled row can't be selected.
+
+<Story
+  name='Selection'
+  storyModule={TableStories}
+/>
+
+### Empty
+
+<Story
+  name='Empty'
+  storyModule={TableStories}
+/>
+
+### Tree rows
+
+`itemToChildren` makes the table a tree. `Table.ExpandButton` shows and hides a row's children, and `ArrowRight` / `ArrowLeft` expand and collapse the focused row.
+
+<Story
+  name='TreeRows'
+  storyModule={TableStories}
+/>
+
+### Overflow
+
+Wide tables scroll horizontally inside the shell instead of breaking the page layout. The viewport is the shared [Scroll Area](/styles/scroll-area) on its `inline` axis, so the left and right edges fade while there is more to reveal and the scrollbar matches the rest of Mosaic.
+
+<Story
+  name='Overflow'
+  storyModule={TableStories}
+/>
+
+### Sticky column
+
+`sticky` pins a column to the start or end edge of the scrolling viewport. Here the actions column stays at the end.
+
+<Story
+  name='StickyColumn'
+  storyModule={TableStories}
+/>
+
+### Column widths
+
+With `layout='fixed'`, the column `width`s decide the columns, so they keep their size when the rows change. The selection column has a fixed width of its own, and the name column takes the remaining space. A column without `width` can shrink to nothing in a narrow table, so give `Table.Root` a `minWidth`: below it, the table scrolls instead.
+
+<Story
+  name='ColumnWidths'
+  storyModule={TableStories}
+/>
+
+### Clickable rows
+
+Clicking anywhere on a row, or pressing `Enter` on it, opens the key's details. The row's `onClick` clicks the name's dialog trigger, so focus returns to it when the dialog closes. The row menu still opens on its own.
+
+<Story
+  name='ClickableRows'
+  storyModule={TableStories}
+/>

@@ -73,14 +73,15 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 external: ['node:async_hooks'],
               },
 
-              // We need this for top-level await
-              optimizeDeps: {
-                esbuildOptions: {
-                  target: 'es2022',
-                },
-              },
               build: {
                 target: 'es2022',
+                rollupOptions: {
+                  // Astro bundles this package for SSR (framework packages are
+                  // `ssr.noExternal` by default), so the literal dynamic import of
+                  // `cloudflare:workers` in get-safe-env.ts must be marked external
+                  // for builds outside the Cloudflare runtime to succeed.
+                  external: ['cloudflare:workers'],
+                },
               },
             },
             env: {

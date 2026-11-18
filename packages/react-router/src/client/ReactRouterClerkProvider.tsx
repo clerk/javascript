@@ -7,16 +7,17 @@ import {
   isSpaMode as _isSpaMode,
   warnForSsr,
 } from '../utils/assert';
+import { getPublicEnvVariables } from '../utils/env';
 import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
 import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
-
-export * from '@clerk/react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
+
+ReactClerkProvider.displayName = 'ReactClerkProvider';
 
 /**
  * React Router hydration errors should not stop Clerk navigation from working, as the components mount only after
@@ -41,7 +42,6 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
   }, [awaitableNavigate]);
 
   const { clerkState, ...restProps } = rest;
-  ReactClerkProvider.displayName = 'ReactClerkProvider';
 
   if (typeof isSpaMode !== 'undefined' && !isSpaMode) {
     assertValidClerkState(clerkState);
@@ -102,7 +102,9 @@ function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProv
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
-    unsafe_disableDevelopmentModeConsoleWarning: __unsafeDisableDevelopmentModeConsoleWarning,
+    unsafe_disableDevelopmentModeConsoleWarning:
+      __unsafeDisableDevelopmentModeConsoleWarning ??
+      getPublicEnvVariables(undefined).unsafeDisableDevelopmentModeConsoleWarning,
   };
 
   const keylessProps = __keylessClaimUrl

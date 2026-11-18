@@ -42,7 +42,7 @@ export const getEnvVariable = (name: string, context?: Record<string, any>): str
 
   // Cloudflare workers
   try {
-    return globalThis[name as keyof typeof globalThis];
+    return globalThis[name as keyof typeof globalThis] as string;
   } catch {
     // This will raise an error in Cloudflare Pages
   }

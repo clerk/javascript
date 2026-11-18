@@ -1,0 +1,107 @@
+import * as ItemStories from './item.stories';
+
+# Item
+
+Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Label`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
+
+Every row is bordered, so it reads as its own card. Rows have no fixed height: they size to their content with even padding.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ItemStories}
+/>
+
+### Interactive
+
+<Story
+  name='Interactive'
+  storyModule={ItemStories}
+/>
+
+### Group
+
+`Item.Group` stacks rows 8px apart. It's layout only; the rows carry their own semantics.
+
+<Story
+  name='Group'
+  storyModule={ItemStories}
+/>
+
+## Usage
+
+```tsx
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Item } from '@clerk/mosaic/components/item';
+
+<Item.Group>
+  <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
+    <Item.Media>
+      <Avatar.Root shape='square' size='fit'>
+        <Avatar.Image src={org.imageUrl} alt='' />
+        <Avatar.Fallback>{org.name[0]}</Avatar.Fallback>
+      </Avatar.Root>
+    </Item.Media>
+    <Item.Content>
+      <Item.Label>Test Organization</Item.Label>
+      <Item.Description>Member</Item.Description>
+    </Item.Content>
+    <Item.Actions>
+      <Button variant='outline' size='sm'>Manage</Button>
+    </Item.Actions>
+  </Item.Root>
+</Item.Group>;
+```
+
+Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='interactive'`:
+
+```tsx
+<Item.Root render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
+  <Item.Media>
+    <Icon glyph={LogOut} size='md' />
+  </Item.Media>
+  <Item.Content>
+    <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
+  </Item.Content>
+</Item.Root>;
+```
+
+## Parts
+
+| Part               | Class                 | Description                                                          |
+| ------------------ | --------------------- | -------------------------------------------------------------------- |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar.                       |
+| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions. |
+| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                         |
+| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.        |
+| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                 |
+| `Item.Group`       | `cl-item-group`       | Vertical stack of rows, spaced apart.                                |
+
+Every part accepts a `render` prop for element polymorphism and forwards a ref.
+
+## Styling
+
+The row carries the text color and, through `--_cl-icon-color`, the strength of any `Icon` inside it: faded at rest, full-strength while hovered. Only interactive rows promote — a static row isn't pointing at anything, so its icon holds its resting color. A `Button` in `Item.Actions` sets its own icon color and is unaffected.
+
+`Item.Label` chooses whether it joins that promotion. `variant='default'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='interactive'` sets none and inherits the row's, so it fades and brightens with the row:
+
+| Prop      | Attribute      | Values                     | Default   |
+| --------- | -------------- | -------------------------- | --------- |
+| `variant` | `data-variant` | `default` \| `interactive` | `default` |
+
+The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
+
+| Prop     | Attribute          | Values                              | Default |
+| -------- | ------------------ | ----------------------------------- | ------- |
+| `render` | `data-interactive` | present when a `render` is provided | —       |
+
+```css
+/* Re-theme interactive rows */
+.cl-item[data-interactive] {
+  background-color: var(--cl-color-surface);
+}
+```
+
+`Item.Media` is a square that centers its child. Give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an `Icon` — rather than a fixed pixel size. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).

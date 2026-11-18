@@ -2,7 +2,6 @@ import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/cons
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
@@ -13,6 +12,7 @@ import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
 import type { SignUpCtx } from '../../types';
+import { clerkWindowNavigate } from '../../utils/windowNavigate';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignUpContextType = Omit<SignUpCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
@@ -136,7 +136,7 @@ export const useSignUpContext = (): SignUpContextType => {
       // If decorateUrl modified the URL (Safari ITP fix), do a full page navigation
       // The touch endpoint URL will be an absolute URL starting with http:// or https://
       if (decoratedUrl !== redirectUrl && /^https?:\/\//.test(decoratedUrl)) {
-        windowNavigate(decoratedUrl);
+        clerkWindowNavigate(clerk, decoratedUrl);
         return;
       }
 

@@ -22,7 +22,6 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
 
   return cloneElement(validChildren, {
     //@ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onClick: async () => {
       await validChildren.props.onClick?.();
       open(value);

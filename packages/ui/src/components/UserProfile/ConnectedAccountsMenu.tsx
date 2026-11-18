@@ -1,5 +1,5 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { useReverification, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -12,31 +12,33 @@ import { useUserProfileContext } from '../../contexts';
 import { descriptors, localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
+import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
 
 const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => void }) => {
   const { strategy } = props;
   const card = useCardState();
+  const clerk = useClerk();
   const { user } = useUser();
   const { navigate } = useRouter();
   const { strategyToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
   const isModal = mode === 'modal';
 
-  const createExternalAccount = useReverification(() => {
+  const createExternalAccount = useReverification((redirectUrl: string) => {
     const socialProvider = strategy.replace('oauth_', '') as OAuthProvider;
-    const redirectUrl = isModal
-      ? appendModalState({ url: window.location.href, componentName, socialProvider: socialProvider })
-      : window.location.href;
+    const decoratedRedirectUrl = isModal
+      ? appendModalState({ url: redirectUrl, componentName, socialProvider })
+      : redirectUrl;
     const additionalScopes = additionalOAuthScopes ? additionalOAuthScopes[socialProvider] : [];
 
     return user?.createExternalAccount({
       strategy,
-      redirectUrl,
+      redirectUrl: decoratedRedirectUrl,
       additionalScopes,
     });
   });
 
-  const connect = () => {
+  const connect = async () => {
     if (!user) {
       return;
     }
@@ -44,17 +46,25 @@ const ConnectMenuButton = (props: { strategy: OAuthStrategy; onClick?: () => voi
     // TODO: Decide if we should keep using this strategy
     // If yes, refactor and cleanup:
     card.setLoading(strategy);
-    return createExternalAccount()
-      .then(res => {
-        if (res && res.verification?.externalVerificationRedirectURL) {
-          void sleep(2000).then(() => card.setIdle(strategy));
-          void navigate(res.verification.externalVerificationRedirectURL.href);
-        }
-      })
-      .catch(err => {
-        handleError(err, [], card.setError);
-        card.setIdle(strategy);
-      });
+    const transport = clerk.__internal_oauthTransport;
+    try {
+      if (transport) {
+        const res = await createExternalAccount(String(await transport.getRedirectUrl()));
+        const url = getExternalVerificationRedirectURL(res);
+        const { callbackUrl } = await transport.open(url);
+        await reloadUserAfterOAuthCallback(user, callbackUrl);
+        void sleep(2000).then(() => card.setIdle(strategy));
+        return;
+      }
+
+      const res = await createExternalAccount(window.location.href);
+      const url = getExternalVerificationRedirectURL(res);
+      void sleep(2000).then(() => card.setIdle(strategy));
+      void navigate(url.href);
+    } catch (err: any) {
+      handleError(err, [], card.setError);
+      card.setIdle(strategy);
+    }
   };
 
   return (

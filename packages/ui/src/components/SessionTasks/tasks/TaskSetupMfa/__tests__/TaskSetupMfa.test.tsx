@@ -44,6 +44,20 @@ describe('TaskSetupMFA', () => {
     });
   });
 
+  it('passes the final destination when signing out the last account', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        tasks: [{ key: 'setup-mfa' }],
+      });
+      f.withAuthenticatorApp({ enabled: true });
+      f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+    });
+    const { getByRole, userEvent } = render(<TaskSetupMFA />, { wrapper });
+    await userEvent.click(getByRole('link', { name: /sign out/i }));
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
+  });
+
   describe('main flow', () => {
     it('should render SMS code and TOTP items on the first screen if both are enabled', async () => {
       const { wrapper } = await createFixtures(f => {
@@ -466,7 +480,7 @@ describe('TaskSetupMFA', () => {
       await findByText(/add sms code verification/i);
       await findByText(/choose phone number you want to use/i);
       await findByText(/\+30 691 1111111/i);
-      expect(getByRole('menuitem', { name: /add phone number/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /add phone number/i })).toBeInTheDocument();
     });
 
     it('should show add phone screen when no existing phone numbers', async () => {
@@ -511,7 +525,7 @@ describe('TaskSetupMFA', () => {
       await findByText(/add sms code verification/i);
 
       await act(async () => {
-        await userEvent.click(getByRole('menuitem', { name: /add phone number/i }));
+        await userEvent.click(getByRole('button', { name: /add phone number/i }));
       });
 
       await findByText(/add phone number/i);

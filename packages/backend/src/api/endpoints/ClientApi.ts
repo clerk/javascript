@@ -12,7 +12,11 @@ type GetHandshakePayloadParams = {
   nonce: string;
 };
 
+/** @generateWithEmptyComment */
 export class ClientAPI extends AbstractAPI {
+  /**
+   * @deprecated This method is deprecated and will be removed in a future version.
+   */
   public async getClientList(params: ClerkPaginationRequest = {}) {
     return this.request<PaginatedResourceResponse<Client[]>>({
       method: 'GET',
@@ -21,6 +25,10 @@ export class ClientAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Gets the given [`Client`](https://clerk.com/docs/reference/backend/types/backend-client).
+   * @param clientId - The ID of the client to get.
+   */
   public async getClient(clientId: string) {
     this.requireId(clientId);
     return this.request<Client>({
@@ -29,6 +37,11 @@ export class ClientAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Verifies the client in the given token.
+   * @param token - The token to verify.
+   * @returns The verified [`Client`](https://clerk.com/docs/reference/backend/types/backend-client).
+   */
   public verifyClient(token: string) {
     return this.request<Client>({
       method: 'POST',
@@ -37,6 +50,12 @@ export class ClientAPI extends AbstractAPI {
     });
   }
 
+  /**
+   * Retrieves the handshake payload for a given nonce. Used internally by Clerk's SDKs to resolve
+   * session cookies during the handshake flow.
+   *
+   * @internal
+   */
   public async getHandshakePayload(queryParams: GetHandshakePayloadParams) {
     return this.request<HandshakePayload>({
       method: 'GET',

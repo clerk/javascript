@@ -1,0 +1,849 @@
+import { app, BrowserWindow, ipcMain, protocol, shell } from 'electron';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { OAUTH_TRANSPORT_CHANNELS, PASSKEY_CHANNELS, TOKEN_CACHE_CHANNELS } from '../../shared/ipc';
+import type { TokenStorage } from '../../shared/types';
+import { createClerkBridge } from '../create-clerk-bridge';
+
+vi.mock('electron', () => ({
+  app: {
+    hasSingleInstanceLock: vi.fn(() => false),
+    on: vi.fn(),
+    quit: vi.fn(),
+    releaseSingleInstanceLock: vi.fn(),
+    removeListener: vi.fn(),
+    requestSingleInstanceLock: vi.fn(() => true),
+    setAsDefaultProtocolClient: vi.fn(),
+    userAgentFallback:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  },
+  BrowserWindow: {
+    fromWebContents: vi.fn(),
+  },
+  ipcMain: {
+    handle: vi.fn(),
+    removeHandler: vi.fn(),
+  },
+  protocol: {
+    registerSchemesAsPrivileged: vi.fn(),
+  },
+  shell: {
+    openExternal: vi.fn(),
+  },
+}));
+
+vi.mock('@clerk/electron-passkeys', () => ({
+  default: {
+    isAvailable: () => true,
+    capabilities: () => ({ platformAuthenticator: true, securityKeys: true }),
+    createCredential: vi.fn(),
+    getCredential: vi.fn(),
+  },
+}));
+
+const originalPlatform = process.platform;
+const setPlatform = (platform: NodeJS.Platform) => {
+  Object.defineProperty(process, 'platform', { value: platform, configurable: true });
+};
+
+const createRendererWindow = () => ({
+  isDestroyed: vi.fn(() => false),
+  isMinimized: vi.fn(() => false),
+  restore: vi.fn(),
+  focus: vi.fn(),
+});
+
+const mainFrame = {};
+const windowSender = { mainFrame, getType: () => 'window' };
+const mainFrameEvent = { sender: windowSender, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
+const subframeEvent = { sender: windowSender, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
+
+function getAppListener<T extends (...args: never[]) => void>(event: string): T | undefined {
+  return (vi.mocked(app.on).mock.calls as unknown as Array<[string, T]>).find(
+    ([registered]) => registered === event,
+  )?.[1];
+}
+
+describe('createClerkBridge', () => {
+  const missingStorage = {} as Parameters<typeof createClerkBridge>[0];
+  const storage: TokenStorage = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // The single-instance lock is only used where `second-instance` delivers the callback.
+    setPlatform('linux');
+    vi.mocked(app.hasSingleInstanceLock).mockReturnValue(false);
+    vi.mocked(app.requestSingleInstanceLock).mockReturnValue(true);
+    vi.mocked(BrowserWindow.fromWebContents).mockReturnValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    app.userAgentFallback =
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  });
+
+  afterEach(() => {
+    setPlatform(originalPlatform);
+    vi.restoreAllMocks();
+  });
+
+  it('requires a storage adapter', () => {
+    expect(() => createClerkBridge(missingStorage)).toThrow('createClerkBridge requires a storage adapter');
+  });
+
+  it('sets up token persistence IPC handlers with the provided storage', () => {
+    createClerkBridge({ storage });
+
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).toEqual(expect.arrayContaining(Object.values(TOKEN_CACHE_CHANNELS)));
+  });
+
+  it('keeps the platform details when setting the app user-agent fallback', () => {
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Gecko/20100101 Acme Co/1.0.0');
+  });
+
+  it('falls back to the configured user-agent when the app fallback has no platform details', () => {
+    app.userAgentFallback = 'Electron default';
+
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
+  });
+
+  it('falls back to the configured user-agent when the app fallback has malformed platform details', () => {
+    app.userAgentFallback = 'Mozilla/5.0 ((((';
+
+    createClerkBridge({ storage, userAgent: 'Acme Co/1.0.0' });
+
+    expect(app.userAgentFallback).toBe('Acme Co/1.0.0');
+  });
+
+  it('registers the configured renderer scheme as privileged before app ready', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: true,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
+  it('merges custom renderer scheme privileges with Clerk defaults', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+        privileges: {
+          allowServiceWorkers: true,
+          bypassCSP: true,
+          codeCache: true,
+        },
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          allowServiceWorkers: true,
+          bypassCSP: true,
+          codeCache: true,
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: true,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
+  it('allows custom renderer scheme privileges to override Clerk defaults', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+        privileges: {
+          stream: false,
+        },
+      },
+    });
+
+    expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith([
+      {
+        scheme: 'my-app',
+        privileges: {
+          corsEnabled: true,
+          secure: true,
+          standard: true,
+          stream: false,
+          supportFetchAPI: true,
+        },
+      },
+    ]);
+  });
+
+  it('requires renderer.scheme to be a scheme name, not a URL', () => {
+    expect(() =>
+      createClerkBridge({
+        storage,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app://',
+        },
+      }),
+    ).toThrow('renderer.scheme must be a scheme name');
+  });
+
+  it('requires renderer.host to be a host name, not an origin', () => {
+    expect(() =>
+      createClerkBridge({
+        storage,
+        renderer: {
+          host: 'my-app://renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('renderer.host must be a host name');
+  });
+
+  it('returns a cleanup function for registered handlers', () => {
+    const clerk = createClerkBridge({ storage });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(5);
+  });
+
+  it('does not register passkey IPC handlers by default', () => {
+    createClerkBridge({ storage });
+
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.create);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.get);
+    expect(channels).not.toContain(PASSKEY_CHANNELS.capabilities);
+  });
+
+  it('registers passkey IPC handlers when passkeys are enabled', () => {
+    createClerkBridge({ storage, passkeys: true });
+
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).toContain(PASSKEY_CHANNELS.create);
+    expect(channels).toContain(PASSKEY_CHANNELS.get);
+    expect(channels).toContain(PASSKEY_CHANNELS.capabilities);
+  });
+
+  it('cleans up passkey handlers together with the token handlers', () => {
+    const clerk = createClerkBridge({ storage, passkeys: true });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(8);
+  });
+
+  it('registers OAuth transport handlers that throw a Clerk error when renderer is not configured', () => {
+    createClerkBridge({ storage });
+
+    const getHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    for (const channel of Object.values(OAUTH_TRANSPORT_CHANNELS)) {
+      const handler = getHandler(channel);
+      expect(handler).toBeDefined();
+      expect(() => handler?.(mainFrameEvent, 'https://accounts.example.com')).toThrow(
+        'Clerk: OAuth sign-in requires the renderer option',
+      );
+    }
+    expect(app.setAsDefaultProtocolClient).not.toHaveBeenCalled();
+  });
+
+  it('cleans up the missing-renderer OAuth transport handlers', () => {
+    const clerk = createClerkBridge({ storage });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open);
+  });
+
+  it('cleans up OAuth transport handlers when renderer origin is configured', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open);
+    expect(app.removeListener).toHaveBeenCalledWith('open-url', expect.any(Function));
+    expect(app.removeListener).toHaveBeenCalledWith('second-instance', expect.any(Function));
+  });
+
+  it('sets up OAuth transport IPC handlers when renderer origin is configured', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(app.requestSingleInstanceLock).toHaveBeenCalledOnce();
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, expect.any(Function));
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+    expect(app.setAsDefaultProtocolClient).toHaveBeenCalledWith('my-app');
+  });
+
+  it('quits a secondary instance before registering IPC handlers', () => {
+    vi.mocked(app.requestSingleInstanceLock).mockReturnValue(false);
+
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(clerk.isPrimaryInstance).toBe(false);
+    expect(app.quit).toHaveBeenCalledOnce();
+    expect(ipcMain.handle).not.toHaveBeenCalled();
+    expect(app.setAsDefaultProtocolClient).not.toHaveBeenCalled();
+  });
+
+  it('reports the primary instance when the bridge finishes setup', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    expect(clerk.isPrimaryInstance).toBe(true);
+  });
+
+  it('does not touch the single-instance lock on macOS', () => {
+    setPlatform('darwin');
+
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+    clerk.cleanup();
+
+    expect(clerk.isPrimaryInstance).toBe(true);
+    expect(app.hasSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+  });
+
+  it('does not warn about disabled lock management on macOS', () => {
+    setPlatform('darwin');
+
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      manageSingleInstanceLock: false,
+    });
+
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  it('reuses a single-instance lock acquired by the application', () => {
+    vi.mocked(app.hasSingleInstanceLock).mockReturnValue(true);
+
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+    clerk.cleanup();
+
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
+  });
+
+  it('does not manage the single-instance lock when disabled', () => {
+    vi.mocked(app.hasSingleInstanceLock).mockReturnValue(true);
+
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      manageSingleInstanceLock: false,
+    });
+    clerk.cleanup();
+
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(app.releaseSingleInstanceLock).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(ipcMain.handle).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open, expect.any(Function));
+  });
+
+  it('warns when lock management is disabled and the application holds no lock', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+      manageSingleInstanceLock: false,
+    });
+
+    expect(app.requestSingleInstanceLock).not.toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('manageSingleInstanceLock is false'));
+  });
+
+  it('releases the single-instance lock acquired by the bridge during cleanup', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+    clerk.cleanup();
+    clerk.cleanup();
+
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('releases the single-instance lock when initialization throws', () => {
+    vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
+      throw new Error('Scheme was already registered');
+    });
+
+    expect(() =>
+      createClerkBridge({
+        storage,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('Scheme was already registered');
+
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('tears down handlers registered before initialization throws', () => {
+    vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
+      throw new Error('Scheme was already registered');
+    });
+
+    expect(() =>
+      createClerkBridge({
+        storage,
+        passkeys: true,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('Scheme was already registered');
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(PASSKEY_CHANNELS.create);
+  });
+
+  it('surfaces the initialization error when a teardown also throws', () => {
+    vi.mocked(protocol.registerSchemesAsPrivileged).mockImplementationOnce(() => {
+      throw new Error('Scheme was already registered');
+    });
+    vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
+      throw new Error('Handler was already removed');
+    });
+
+    expect(() =>
+      createClerkBridge({
+        storage,
+        renderer: {
+          host: 'renderer',
+          scheme: 'my-app',
+        },
+      }),
+    ).toThrow('Scheme was already registered');
+
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('releases the single-instance lock when cleanup throws', () => {
+    const clerk = createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
+      throw new Error('Handler was already removed');
+    });
+
+    expect(() => clerk.cleanup()).toThrow('Handler was already removed');
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('runs the remaining teardowns when one throws during cleanup', () => {
+    const clerk = createClerkBridge({
+      storage,
+      passkeys: true,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    // Teardowns drain in reverse, so this aborts the OAuth transport cleanup first.
+    vi.mocked(ipcMain.removeHandler).mockImplementationOnce(() => {
+      throw new Error('Handler was already removed');
+    });
+
+    expect(() => clerk.cleanup()).toThrow('Handler was already removed');
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(PASSKEY_CHANNELS.create);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.getToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.saveToken);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(TOKEN_CACHE_CHANNELS.clearToken);
+    expect(app.releaseSingleInstanceLock).toHaveBeenCalledOnce();
+  });
+
+  it('derives the OAuth callback URL from the renderer origin', () => {
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const getRedirectUrlHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
+    })?.[1];
+
+    expect(getRedirectUrlHandler?.(mainFrameEvent)).toMatch(
+      /^my-app:\/\/renderer\/\?__clerk_oauth_attempt=[0-9a-f-]{36}$/,
+    );
+  });
+
+  it('rejects OAuth transport requests that do not originate from the main frame', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    expect(() => findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(subframeEvent)).toThrow('main frame');
+    await expect(
+      findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(subframeEvent, 'https://accounts.example.com/oauth'),
+    ).rejects.toThrow('main frame');
+    expect(shell.openExternal).not.toHaveBeenCalled();
+  });
+
+  it('rejects OAuth transport requests from a <webview> whose top frame mimics the main frame', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    const webviewEvent = {
+      sender: { mainFrame, getType: () => 'webview' },
+      senderFrame: mainFrame,
+    } as unknown as Electron.IpcMainInvokeEvent;
+
+    expect(() => findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(webviewEvent)).toThrow('main frame');
+    await expect(
+      findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(webviewEvent, 'https://accounts.example.com/oauth'),
+    ).rejects.toThrow('main frame');
+    expect(shell.openExternal).not.toHaveBeenCalled();
+  });
+
+  it('opens OAuth URLs externally and resolves with the matching deep-link callback URL', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+
+    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+    expect(shell.openExternal).toHaveBeenCalledWith('https://accounts.example.com/oauth');
+  });
+
+  it('resolves OAuth through a matching second-instance argument', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
+
+    secondInstanceListener?.({} as Electron.Event, [
+      '/opt/MyApp/my-app',
+      '--enable-features=UseOzonePlatform',
+      'my-app://renderer/?code=123',
+    ]);
+
+    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+  });
+
+  it('restores and focuses the initiating window when the callback resolves', async () => {
+    const rendererWindow = createRendererWindow();
+    rendererWindow.isMinimized.mockReturnValue(true);
+    vi.mocked(BrowserWindow.fromWebContents).mockReturnValue(rendererWindow as unknown as Electron.BrowserWindow);
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
+
+    secondInstanceListener?.({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
+
+    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+    expect(rendererWindow.restore).toHaveBeenCalledOnce();
+    expect(rendererWindow.focus).toHaveBeenCalledOnce();
+  });
+
+  it('does not focus a window that was destroyed during the flow', async () => {
+    const rendererWindow = createRendererWindow();
+    vi.mocked(BrowserWindow.fromWebContents).mockReturnValue(rendererWindow as unknown as Electron.BrowserWindow);
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
+
+    rendererWindow.isDestroyed.mockReturnValue(true);
+    secondInstanceListener?.({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
+
+    await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+    expect(rendererWindow.focus).not.toHaveBeenCalled();
+  });
+
+  it('replaces a pending OAuth flow when a new one starts without settling the replaced one', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const firstSettled = vi.fn();
+    openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1').then(firstSettled, firstSettled);
+    const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+    expect(firstSettled).not.toHaveBeenCalled();
+  });
+
+  it('ignores a callback from a replaced attempt', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+    const getRedirectUrl = () => String(findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(mainFrameEvent));
+    const open = (url: string) => findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(mainFrameEvent, url);
+
+    const firstRedirectUrl = getRedirectUrl();
+    void open('https://accounts.example.com/oauth?attempt=1');
+    const secondRedirectUrl = getRedirectUrl();
+    const secondPromise = open('https://accounts.example.com/oauth?attempt=2');
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+
+    const secondSettled = vi.fn();
+    secondPromise?.then(secondSettled, secondSettled);
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, `${firstRedirectUrl}&code=first`);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(secondSettled).not.toHaveBeenCalled();
+
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, `${secondRedirectUrl}&code=second`);
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: `${secondRedirectUrl}&code=second` });
+  });
+
+  it('keeps a pending OAuth flow when a new request has an unsupported URL', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const pendingPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
+
+    await expect(openHandler?.(mainFrameEvent, 'file:///etc/passwd')).rejects.toThrow('unsupported OAuth URL protocol');
+
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    await expect(pendingPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+  });
+
+  it("does not let a replaced flow's launch failure reject the new flow", async () => {
+    let rejectFirstLaunch: (error: Error) => void = () => {};
+    vi.mocked(shell.openExternal)
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectFirstLaunch = reject;
+          }),
+      )
+      .mockResolvedValueOnce(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
+
+    rejectFirstLaunch(new Error('launch failed'));
+
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+  });
+
+  it('does not leave an unhandled rejection when a flow is replaced while its browser is launching', async () => {
+    let resolveFirstLaunch: () => void = () => {};
+    vi.mocked(shell.openExternal)
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>(resolve => {
+            resolveFirstLaunch = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    resolveFirstLaunch();
+
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+  });
+});

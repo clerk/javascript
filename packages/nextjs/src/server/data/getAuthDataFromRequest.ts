@@ -89,6 +89,10 @@ export const getSessionAuthDataFromRequest = (
   } else {
     assertTokenSignature(authToken as string, options.secretKey, authSignature);
 
+    if (isMachineToken(authToken as string)) {
+      return signedOutAuthObject(options);
+    }
+
     const jwt = decodeJwt(authToken as string);
 
     opts.logger?.debug('jwt', jwt.raw);

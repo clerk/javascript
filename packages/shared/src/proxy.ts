@@ -1,4 +1,5 @@
 import { isProductionFromPublishableKey } from './keys';
+import { isTruthy } from './underscore';
 
 /**
  *
@@ -55,6 +56,10 @@ function getDefaultEnvironment(): NodeJS.ProcessEnv {
   return typeof process !== 'undefined' && process.env ? process.env : {};
 }
 
+export function isAutoProxyDisabledFromEnvironment(environment = getDefaultEnvironment()): boolean {
+  return isTruthy(environment.CLERK_DISABLE_AUTO_PROXY);
+}
+
 function normalizeHostname(hostnameOrUrl: string): string {
   if (hostnameOrUrl.startsWith('http://') || hostnameOrUrl.startsWith('https://')) {
     try {
@@ -87,6 +92,10 @@ export function getAutoProxyUrlFromEnvironment({
   environment = getDefaultEnvironment(),
 }: GetAutoProxyUrlFromEnvironmentOptions): string {
   if (hasProxyUrl || hasDomain || !isProductionFromPublishableKey(publishableKey)) {
+    return '';
+  }
+
+  if (isAutoProxyDisabledFromEnvironment(environment)) {
     return '';
   }
 

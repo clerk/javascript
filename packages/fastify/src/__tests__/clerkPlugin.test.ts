@@ -49,13 +49,14 @@ describe('clerkPlugin()', () => {
     },
   );
 
-  test('adds auth decorator', () => {
+  test('adds request decorators', () => {
     const doneFn = vi.fn();
     const fastify = createFastifyInstanceMock();
 
     clerkPlugin(fastify, {}, doneFn);
 
     expect(fastify.decorateRequest).toHaveBeenCalledWith('auth', null);
+    expect(fastify.decorateRequest).toHaveBeenCalledWith('clerk', null);
     expect(doneFn).toHaveBeenCalled();
   });
 });

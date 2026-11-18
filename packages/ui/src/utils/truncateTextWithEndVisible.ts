@@ -15,12 +15,8 @@ export function truncateWithEndVisible(str: string, maxLength = 20, endChars = 5
   const ELLIPSIS = '...';
   const ELLIPSIS_LENGTH = ELLIPSIS.length;
 
-  if (!str || str.length <= maxLength) {
+  if (!str) {
     return str;
-  }
-
-  if (maxLength <= endChars + ELLIPSIS_LENGTH) {
-    return ELLIPSIS + str.slice(-endChars);
   }
 
   const chars = Array.from(str);
@@ -28,6 +24,10 @@ export function truncateWithEndVisible(str: string, maxLength = 20, endChars = 5
 
   if (totalChars <= maxLength) {
     return str;
+  }
+
+  if (maxLength <= endChars + ELLIPSIS_LENGTH) {
+    return ELLIPSIS + chars.slice(-endChars).join('');
   }
 
   const beginLength = maxLength - endChars - ELLIPSIS_LENGTH;

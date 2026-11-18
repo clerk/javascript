@@ -90,7 +90,9 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
         $csrState.setKey('organization', payload.organization);
       });
     })
-    .catch(() => {});
+    .catch((err: Error) => {
+      console.error(err.stack || err.message || err);
+    });
 }
 
 function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOptions<TUi>) {
@@ -119,9 +121,9 @@ async function getClerkJsEntryChunk<TUi extends Ui = Ui>(options?: AstroClerkCre
  * Returns early if window.__internal_ClerkUICtor already exists.
  * Returns undefined when prefetchUI={false} (no UI needed).
  */
-async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
+function getClerkUIEntryChunk<TUi extends Ui = Ui>(
   options?: AstroClerkCreateInstanceParams<TUi>,
-): Promise<ClerkUIConstructor | undefined> {
+): ClerkUIConstructor | Promise<ClerkUIConstructor> | undefined {
   // Support bundled UI via ui.ClerkUI prop
   if (options?.ui?.ClerkUI) {
     return options.ui.ClerkUI;
@@ -132,6 +134,12 @@ async function getClerkUIEntryChunk<TUi extends Ui = Ui>(
     return undefined;
   }
 
+  return loadClerkUIEntryChunk(options);
+}
+
+async function loadClerkUIEntryChunk<TUi extends Ui = Ui>(
+  options?: AstroClerkCreateInstanceParams<TUi>,
+): Promise<ClerkUIConstructor> {
   await loadClerkUIScript(options as any);
 
   if (!window.__internal_ClerkUICtor) {

@@ -7,6 +7,7 @@ import { Home } from './routes/Home';
 import { SignIn } from './routes/SignIn';
 import { SignUp } from './routes/SignUp';
 import { Protected } from './routes/Protected';
+import { SSOCallback } from './routes/SSOCallback';
 import { Waitlist } from './routes/Waitlist';
 
 createRoot(document.getElementById('root')!).render(
@@ -43,6 +44,10 @@ createRoot(document.getElementById('root')!).render(
               <Route
                 path='/protected'
                 element={<Protected />}
+              />
+              <Route
+                path='/sso-callback'
+                element={<SSOCallback />}
               />
             </Routes>
           </BrowserRouter>

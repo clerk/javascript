@@ -1,0 +1,164 @@
+import type { Ref } from 'react';
+
+import { AuthEnterpriseConnections, AuthWallets } from '../../../blocks/auth';
+import { VerificationMethodPicker } from '../../../blocks/verification';
+import type { IconComponent } from '../../../icons/glyph';
+import { Envelope } from '../../../icons/glyphs/envelope';
+import { Key } from '../../../icons/glyphs/key';
+import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../../icons/glyphs/security-phone';
+import { useMessages } from '../../../localization';
+import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
+import { choiceCopy, factorLabel } from '../sign-in.utils';
+import { SignInAccounts } from './sign-in-accounts';
+import { SignInAlternativeMethods } from './sign-in-alternative-methods';
+
+const factorIcon = {
+  password: SecurityLockSquare,
+  passkey: SecurityPasskey,
+  email_code: Envelope,
+  email_link: Envelope,
+  phone_code: SecurityPhone,
+  totp: SecurityLockSquare,
+  backup_code: Key,
+  reset_password_email_code: Envelope,
+  reset_password_phone_code: SecurityPhone,
+} as const satisfies Record<SignInFactor['strategy'], IconComponent>;
+
+interface ChoiceStepProps {
+  step: Extract<SignInStep, { kind: 'choice' }>;
+  pendingFactorId?: string;
+  onSelectFactor: (id: string) => void;
+  onShowHelp: () => void;
+  onBack: () => void;
+  logo?: { src: string; alt: string };
+  globalErrorMessage?: string;
+  socialProviders: readonly SignInProvider[];
+  pendingProviderId?: string;
+  onSelectProvider: (id: string) => void;
+  onCancel?: () => void;
+  pendingAccountId?: string;
+  isDisabled: boolean;
+  onSelectAccount: (id: string) => void;
+  onAddAccount?: () => void;
+  onSignOutAll?: () => void;
+  focusRef?: Ref<HTMLElement>;
+}
+
+export function ChoiceStep({
+  step,
+  pendingFactorId,
+  onSelectFactor,
+  onShowHelp,
+  onBack,
+  logo,
+  globalErrorMessage,
+  socialProviders,
+  pendingProviderId,
+  onSelectProvider,
+  onCancel,
+  pendingAccountId,
+  isDisabled,
+  onSelectAccount,
+  onAddAccount,
+  onSignOutAll,
+  focusRef,
+}: ChoiceStepProps) {
+  const m = useMessages('signIn');
+
+  if (step.purpose === 'wallets') {
+    return (
+      <AuthWallets
+        focusRef={focusRef}
+        messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
+        wallets={step.options}
+        loading={step.loading}
+        globalErrorMessage={globalErrorMessage}
+        pendingWalletId={pendingProviderId}
+        isDisabled={isDisabled}
+        onSelectWallet={onSelectProvider}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (step.purpose === 'accounts') {
+    return (
+      <SignInAccounts
+        focusRef={focusRef}
+        accounts={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingAccountId={pendingAccountId}
+        isDisabled={isDisabled}
+        onSelectAccount={onSelectAccount}
+        onAddAccount={onAddAccount}
+        onSignOutAll={onSignOutAll}
+      />
+    );
+  }
+
+  if (step.purpose === 'enterprise-connections') {
+    return (
+      <AuthEnterpriseConnections
+        focusRef={focusRef}
+        messages={{
+          title: m.enterpriseConnections.title,
+          description: m.enterpriseConnections.description,
+          pendingLabel: m.enterpriseSso.pending,
+          secondaryActionLabel: m.enterpriseSso.bypass,
+        }}
+        logo={logo}
+        connections={step.options}
+        globalErrorMessage={globalErrorMessage}
+        pendingConnectionId={pendingProviderId}
+        onSelectConnection={onSelectProvider}
+        onCancel={onCancel}
+      />
+    );
+  }
+
+  const copy = choiceCopy(step, m);
+  const methods = step.options.map(factor => ({
+    id: factor.id,
+    label: factorLabel(factor, m),
+    icon: factorIcon[factor.strategy],
+  }));
+
+  if (step.purpose === 'methods') {
+    return (
+      <SignInAlternativeMethods
+        focusRef={focusRef}
+        title={copy.title}
+        description={copy.description}
+        methods={methods}
+        pendingMethodId={pendingFactorId}
+        onSelectMethod={onSelectFactor}
+        socialProviders={socialProviders}
+        pendingProviderId={pendingProviderId}
+        onSelectProvider={onSelectProvider}
+        isDisabled={isDisabled}
+        globalErrorMessage={globalErrorMessage}
+        onBack={step.canGoBack === false ? undefined : onBack}
+        onShowHelp={onShowHelp}
+      />
+    );
+  }
+
+  return (
+    <VerificationMethodPicker
+      focusRef={focusRef}
+      messages={{
+        ...copy,
+        backButton: m.back,
+        helpText: m.alternativeMethods.helpPrompt,
+        helpButton: m.alternativeMethods.helpLink,
+      }}
+      methods={methods}
+      pendingMethodId={pendingFactorId}
+      onSelect={onSelectFactor}
+      onHelp={onShowHelp}
+      onBack={onBack}
+    />
+  );
+}

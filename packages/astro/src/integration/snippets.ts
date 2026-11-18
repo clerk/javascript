@@ -1,5 +1,21 @@
 import type { ClerkOptions } from '@clerk/shared/types';
 
+function buildInternalParamsExpression(internalParams: ClerkOptions) {
+  const serializedParams = JSON.stringify(internalParams);
+
+  if (!internalParams.ui) {
+    return {
+      imports: '',
+      params: serializedParams,
+    };
+  }
+
+  return {
+    imports: 'import { ui as __internal_clerkAstroUi } from "@clerk/ui";',
+    params: `{ ...${serializedParams}, ui: __internal_clerkAstroUi }`,
+  };
+}
+
 /**
  * Creates a snippet that initializes Clerk before client-side framework hydration occurs.
  *
@@ -24,10 +40,13 @@ export function buildBeforeHydrationSnippet({
   buildImportPath: string;
   internalParams: ClerkOptions;
 }) {
+  const { imports, params } = buildInternalParamsExpression(internalParams);
+
   return `
   ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: before-hydration")` : ''}
+  ${imports}
   import { runInjectionScript } from "${buildImportPath}";
-  await runInjectionScript(${JSON.stringify(internalParams)});`;
+  await runInjectionScript(${params});`;
 }
 
 /**
@@ -59,8 +78,11 @@ export function buildPageLoadSnippet({
   buildImportPath: string;
   internalParams: ClerkOptions;
 }) {
+  const { imports, params } = buildInternalParamsExpression(internalParams);
+
   return `
   ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
+  ${imports}
   import { runInjectionScript, swapDocument } from "${buildImportPath}";
 
   // Taken from https://github.com/withastro/astro/blob/e10b03e88c22592fbb42d7245b65c4f486ab736d/packages/astro/src/transitions/router.ts#L39.
@@ -71,30 +93,42 @@ export function buildPageLoadSnippet({
   }
 
   if (transitionEnabledOnThisPage()) {
-    // We must do the dynamic imports within the event listeners because otherwise we may race and miss initial astro:page-load
-    document.addEventListener('astro:before-swap', async (e) => {
-      const { swapFunctions } = await import('astro:transitions/client');
+    // Start loading eagerly without awaiting so both listeners share one module load.
+    // Listeners are registered synchronously here, which avoids the race where awaiting
+    // before addEventListener would cause us to miss the initial astro:page-load event.
+    const transitionClient = import('astro:transitions/client');
 
-      const clerkComponents = document.querySelector('#clerk-components');
-      // Keep the div element added by Clerk
-      if (clerkComponents) {
-        const clonedEl = clerkComponents.cloneNode(true);
-        e.newDocument.body.appendChild(clonedEl);
+    document.addEventListener('astro:before-swap', async (e) => {
+      const nextDocument = e.newDocument;
+      const nextHead = nextDocument?.head;
+      if (!nextDocument || !nextHead) {
+        return;
       }
 
-      e.swap = () => swapDocument(swapFunctions, e.newDocument);
+      const { swapFunctions } = await transitionClient;
+
+      e.swap = () => {
+        const clerkComponents = document.querySelector('#clerk-components');
+        // Move (not clone) the element so Clerk's React root stays bound to its host node
+        // across the body swap. Cloning produces a detached copy with no React associated,
+        // which breaks style injection on subsequent navigations.
+        if (clerkComponents) {
+          nextDocument.body.appendChild(clerkComponents);
+        }
+        swapDocument(swapFunctions, nextDocument);
+      };
     });
 
     document.addEventListener('astro:page-load', async (e) => {
-      const { navigate } = await import('astro:transitions/client');
+      const { navigate } = await transitionClient;
 
       await runInjectionScript({
-        ...${JSON.stringify(internalParams)},
+        ...${params},
         routerPush: navigate,
         routerReplace: (url) => navigate(url, { history: 'replace' }),
       });
-    })
+    });
   } else {
-    await runInjectionScript(${JSON.stringify(internalParams)});
+    await runInjectionScript(${params});
   }`;
 }

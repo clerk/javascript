@@ -18,7 +18,7 @@ export type ConfigureParams = {
   iosClientId?: string;
 
   /**
-   * Optional hosted domain to restrict sign-in to a specific domain.
+   * The hosted domain to restrict sign-in to a specific domain.
    */
   hostedDomain?: string;
 
@@ -41,11 +41,28 @@ export type SignInParams = {
   nonce?: string;
 
   /**
-   * Whether to filter credentials to only show accounts that have been
-   * previously authorized for this app.
+   * Android only. Whether to filter credentials to only show accounts that have
+   * previously authorized this app.
+   *
+   * No-op on iOS.
+   *
+   * @platform Android
    * @default true
    */
   filterByAuthorizedAccounts?: boolean;
+
+  /**
+   * iOS only. Hint passed to Google Sign-In, such as a user ID or email
+   * address.
+   *
+   * This may prefill or prioritize an account when possible, but does not
+   * restrict the account picker.
+   *
+   * No-op on Android.
+   *
+   * @platform iOS
+   */
+  hint?: string;
 };
 
 /**
@@ -151,7 +168,7 @@ export type OneTapResponse = OneTapSuccessResponse | CancelledResponse | NoSaved
  * - `SIGN_IN_CANCELLED`: User cancelled the sign-in flow
  * - `NO_SAVED_CREDENTIAL_FOUND`: No saved credentials available for One Tap
  * - `NOT_CONFIGURED`: Module not configured before use
- * - `GOOGLE_SIGN_IN_ERROR`: Generic Google Sign-In error
+ * - `GOOGLE_SIGN_IN_ERROR`: Generic Google Sign-In error, including Android provider failures such as an unregistered OAuth client
  * - `E_ACTIVITY_UNAVAILABLE`: Android activity unavailable (GoogleSignInActivityUnavailableException)
  */
 export type GoogleSignInErrorCode =

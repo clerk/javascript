@@ -97,6 +97,10 @@ export const Avatar = (props: AvatarProps) => {
         title={title}
         alt={`${title}'s logo`}
         src={imageUrl || ''}
+        // Decode the (typically cached) avatar bytes before presenting so a freshly-mounted
+        // <img> paints on its first frame instead of flashing the avatar background for a tick.
+        // Safe for avatar-sized images: decode is off-thread/sub-ms and only affects already-fetched bytes.
+        decoding='sync'
         sx={{
           objectFit: 'cover',
           width: '100%',

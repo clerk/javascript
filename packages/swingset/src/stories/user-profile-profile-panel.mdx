@@ -1,0 +1,48 @@
+import * as UserProfileProfilePanelStories from './user-profile-profile-panel.stories';
+
+# UserProfileProfilePanel
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserProfileProfilePanelStories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+`UserProfileProfilePanel` renders the Account title and every account section. Each section shows itself only when the signed-in user and the instance settings call for it.
+
+```tsx
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+
+<UserProfileProfilePanel />;
+```
+
+Pass sections as children to choose which ones render and in what order.
+
+```tsx
+import { UserProfileEmailSection } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section';
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section';
+
+<UserProfileProfilePanel>
+  <UserProfileProfileSection />
+  <UserProfileEmailSection />
+</UserProfileProfilePanel>;
+```
+
+Wrap the panel in `UserProfileProvider` to set `additionalOAuthScopes` for connected accounts, or `mode='modal'` when the panel renders inside a modal.
+
+```tsx
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProvider } from '@clerk/mosaic/features/user-profile/user-profile.provider';
+
+<UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+  <UserProfileProfilePanel />
+</UserProfileProvider>;
+```

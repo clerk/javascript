@@ -1,8 +1,8 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
-import { errorThrower } from 'src/util/shared';
 import { Webhook } from 'standardwebhooks';
 
 import type { WebhookEvent } from './api/resources/Webhooks';
+import { errorThrower } from './util/shared';
 
 /**
  * @inline
@@ -135,6 +135,8 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
       object: 'event',
       data: payload.data,
       event_attributes: payload.event_attributes,
+      timestamp: payload.timestamp,
+      instance_id: payload.instance_id,
     } as WebhookEvent;
   } catch (e) {
     return errorThrower.throw(`Unable to verify incoming webhook: ${e instanceof Error ? e.message : 'Unknown error'}`);

@@ -12,6 +12,7 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertIssuerClaim,
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
@@ -28,7 +29,12 @@ export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Pro
   try {
     const cryptoKey = await importKey(key, algorithm, 'verify');
 
-    const verified = await runtime.crypto.subtle.verify(algorithm.name, cryptoKey, signature, data);
+    const verified = await runtime.crypto.subtle.verify(
+      algorithm.name,
+      cryptoKey,
+      signature as Uint8Array<ArrayBuffer>,
+      data,
+    );
     return { data: verified };
   } catch (error) {
     return {
@@ -74,10 +80,21 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
   // encode - and _.
 
   // More info at https://stackoverflow.com/questions/54062583/how-to-verify-a-signed-jwt-with-subtlecrypto-of-the-web-crypto-API
-  const header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
-  const payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
-
-  const signature = base64url.parse(rawSignature, { loose: true });
+  let header, payload, signature;
+  try {
+    header = JSON.parse(decoder.decode(base64url.parse(rawHeader, { loose: true })));
+    payload = JSON.parse(decoder.decode(base64url.parse(rawPayload, { loose: true })));
+    signature = base64url.parse(rawSignature, { loose: true });
+  } catch {
+    return {
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: `Invalid JWT form. The header, payload, or signature could not be decoded.`,
+        }),
+      ],
+    };
+  }
 
   const data = {
     header,
@@ -116,6 +133,12 @@ export type VerifyJwtOptions = {
    */
   clockSkewInMs?: number;
   /**
+   * A string or list of allowed issuers. If passed, the token's `iss` claim must match one exactly. If omitted, the issuer is not checked.
+   *
+   * `verifyMachineAuthToken()` accepts this option for compatibility but ignores it when verifying machine tokens.
+   */
+  issuer?: string | string[];
+  /**
    * @internal
    */
   key: JsonWebKey | string;
@@ -130,7 +153,7 @@ export async function verifyJwt(
   token: string,
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
-  const { audience, authorizedParties, clockSkewInMs, key, headerType } = options;
+  const { audience, authorizedParties, clockSkewInMs, issuer, key, headerType } = options;
   const clockSkew =
     typeof clockSkewInMs === 'number' && Number.isFinite(clockSkewInMs) ? clockSkewInMs : DEFAULT_CLOCK_SKEW_IN_MS;
 
@@ -178,11 +201,12 @@ export async function verifyJwt(
 
   // Payload verifications (only after signature is confirmed valid)
   try {
-    const { azp, sub, aud, iat, exp, nbf } = payload;
+    const { azp, sub, aud, iss, iat, exp, nbf } = payload;
 
     assertSubClaim(sub);
-    assertAudienceClaim([aud], [audience]);
+    assertAudienceClaim(aud, audience);
     assertAuthorizedPartiesClaim(azp, authorizedParties);
+    assertIssuerClaim(iss, issuer);
     assertExpirationClaim(exp, clockSkew);
     assertActivationClaim(nbf, clockSkew);
     assertIssuedAtClaim(iat, clockSkew);

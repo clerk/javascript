@@ -51,15 +51,15 @@ test.describe('handshake flow @handshake', () => {
         },
       });
 
-      const u = createTestUtils({ app, useTestingToken: false });
+      const u = await createTestUtils({ app, useTestingToken: false });
       // AND an existing user in the instance
-      fakeUser = u.services.users.createFakeUser({ withEmail: true }) as FakeUserWithEmail;
+      fakeUser = u.services.users.createFakeUser(test, { withEmail: true }) as FakeUserWithEmail;
       await u.services.users.createBapiUser(fakeUser);
     });
 
     test('when the client uat cookies are deleted', async ({ context }) => {
       const page = await context.newPage();
-      const u = createTestUtils({ app, page, context, useTestingToken: false });
+      const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
       // GIVEN the user is signed into the app on the app homepage
       await u.page.goto(`https://${host}`);

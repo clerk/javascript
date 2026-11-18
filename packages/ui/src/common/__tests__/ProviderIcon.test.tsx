@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
 
-import { ProviderIcon } from '../ProviderIcon';
+import { ProviderIcon, SUPPORTS_MASK_IMAGE } from '../ProviderIcon';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -43,73 +43,29 @@ describe('ProviderIcon', () => {
       expect(icon).toBeInTheDocument();
     });
 
-    it('applies mask-image styles for supported providers (apple)', async () => {
+    it('has providers to cover, so the mask-image cases below are not vacuous', () => {
+      expect(SUPPORTS_MASK_IMAGE.length).toBeGreaterThan(0);
+    });
+
+    it.each(SUPPORTS_MASK_IMAGE)('tints supported provider %s with the foreground color via mask-image', async id => {
       const { wrapper } = await createFixtures();
+      const iconUrl = `https://example.com/${id}-icon.svg`;
 
       render(
         <ProviderIcon
-          id='apple'
-          iconUrl='https://example.com/apple-icon.svg'
-          name='Apple'
+          id={id}
+          iconUrl={iconUrl}
+          name={id}
         />,
         { wrapper },
       );
 
-      const icon = screen.getByLabelText('Apple icon');
+      const icon = screen.getByLabelText(`${id} icon`);
+      expect(icon).toBeInTheDocument();
+
       const styles = window.getComputedStyle(icon);
-
-      // Check that mask-image is applied (via inline styles)
-      expect(icon).toHaveStyle({
-        display: 'inline-block',
-      });
-    });
-
-    it('applies mask-image styles for supported providers (github)', async () => {
-      const { wrapper } = await createFixtures();
-
-      render(
-        <ProviderIcon
-          id='github'
-          iconUrl='https://example.com/github-icon.svg'
-          name='GitHub'
-        />,
-        { wrapper },
-      );
-
-      const icon = screen.getByLabelText('GitHub icon');
-      expect(icon).toBeInTheDocument();
-    });
-
-    it('applies mask-image styles for supported providers (okx_wallet)', async () => {
-      const { wrapper } = await createFixtures();
-
-      render(
-        <ProviderIcon
-          id='okx_wallet'
-          iconUrl='https://example.com/okx-icon.svg'
-          name='OKX Wallet'
-        />,
-        { wrapper },
-      );
-
-      const icon = screen.getByLabelText('OKX Wallet icon');
-      expect(icon).toBeInTheDocument();
-    });
-
-    it('applies mask-image styles for supported providers (vercel)', async () => {
-      const { wrapper } = await createFixtures();
-
-      render(
-        <ProviderIcon
-          id='vercel'
-          iconUrl='https://example.com/vercel-icon.svg'
-          name='Vercel'
-        />,
-        { wrapper },
-      );
-
-      const icon = screen.getByLabelText('Vercel icon');
-      expect(icon).toBeInTheDocument();
+      expect(styles.maskImage).toContain(iconUrl);
+      expect(styles.backgroundImage).not.toContain(iconUrl);
     });
 
     it('applies background-image styles for non-mask-image providers', async () => {
@@ -126,6 +82,10 @@ describe('ProviderIcon', () => {
 
       const icon = screen.getByLabelText('Google icon');
       expect(icon).toBeInTheDocument();
+
+      const styles = window.getComputedStyle(icon);
+      expect(styles.backgroundImage).toContain('https://example.com/google-icon.svg');
+      expect(styles.maskImage).not.toContain('https://example.com/google-icon.svg');
     });
   });
 
@@ -203,7 +163,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -220,7 +180,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl={null}
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );
@@ -239,7 +199,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isLoading={true}
+          isLoading
         />,
         { wrapper },
       );
@@ -257,7 +217,7 @@ describe('ProviderIcon', () => {
           id='google'
           iconUrl='https://example.com/google-icon.svg'
           name='Google'
-          isDisabled={true}
+          isDisabled
         />,
         { wrapper },
       );

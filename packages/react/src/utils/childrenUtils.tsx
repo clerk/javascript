@@ -13,11 +13,18 @@ export const assertSingleChild =
       | 'SignInWithMetamaskButton'
       | 'CheckoutButton'
       | 'SubscriptionDetailsButton'
-      | 'PlanDetailsButton',
+      | 'PlanDetailsButton'
+      | 'InviteMembersButton',
   ) => {
     try {
       return React.Children.only(children);
     } catch {
+      const childArray = React.Children.toArray(children);
+
+      if (childArray.length === 1 && React.isValidElement(childArray[0])) {
+        return childArray[0];
+      }
+
       return errorThrower.throw(multipleChildrenInButtonComponent(name));
     }
   };

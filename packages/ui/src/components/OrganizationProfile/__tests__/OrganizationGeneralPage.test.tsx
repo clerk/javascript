@@ -145,8 +145,8 @@ describe('OrganizationSettings', () => {
     });
     fixtures.clerk.organization?.getDomains.mockReturnValue(
       Promise.resolve({
-        data: [],
-        total_count: 0,
+        data: [createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.com' })],
+        total_count: 1,
       }),
     );
     const { queryByText } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
@@ -157,7 +157,30 @@ describe('OrganizationSettings', () => {
     expect(fixtures.clerk.organization?.getDomains).toBeCalled();
   });
 
-  it('shows domains and shows the Add domain button when `org:sys_domains:manage` exists', async () => {
+  it('hides domains when the list is empty and the user cannot manage domains', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationDomains();
+      f.withUser({
+        email_addresses: ['test@clerk.dev'],
+        organization_memberships: [{ name: 'Org1', permissions: ['org:sys_domains:read'] }],
+      });
+    });
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
+    const { queryByText } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
+
+    await waitFor(() => {
+      expect(queryByText('Verified domains')).not.toBeInTheDocument();
+      expect(queryByText('Add domain')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows domains and shows the Add domain button when `org:sys_domains:manage` exists even with an empty list', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withOrganizationDomains();

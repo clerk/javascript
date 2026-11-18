@@ -8,12 +8,13 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { hasMultipleEnterpriseConnections } from './shared';
+import { getSSOBypassFactor, hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -23,6 +24,7 @@ import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
+import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
@@ -62,10 +64,23 @@ function determineAlternativeMethodsMode(
   return 'forgot';
 }
 
+function removeSignInResetPasswordIntentParam(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const url = new URL(window.location.href);
+  if (url.searchParams.has(SIGN_IN_RESET_PASSWORD_INTENT_PARAM)) {
+    url.searchParams.delete(SIGN_IN_RESET_PASSWORD_INTENT_PARAM);
+    window.history.replaceState(window.history.state, '', url);
+  }
+}
+
 function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const webAuthnSupported = useIsWebAuthnSupported();
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
@@ -76,7 +91,12 @@ function SignInFactorOneInternal(): JSX.Element {
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => {
-    const factor = determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy);
+    const factor = determineStartingSignInFactor(
+      availableFactors,
+      signIn.identifier,
+      preferredSignInStrategy,
+      webAuthnSupported,
+    );
     if (
       factor?.strategy === 'phone_code' &&
       !!firstFactorVerification.channel &&
@@ -97,13 +117,21 @@ function SignInFactorOneInternal(): JSX.Element {
     supportedFirstFactors,
   });
 
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
-    () => !currentFactor || !factorHasLocalStrategy(currentFactor),
-  );
+  // Frozen on mount: client-piggybacking may drop the field, which would otherwise unmount the
+  // fallback screens mid-flow.
+  const ssoBypassFactor = React.useRef(getSSOBypassFactor(signIn)).current;
 
   const resetPasswordFactor = useResetPasswordFactor();
+  const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
 
-  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(() => {
+    const defaultShow = !currentFactor || !factorHasLocalStrategy(currentFactor);
+    return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
+  });
+
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
+    () => resetPasswordIntent && !!resetPasswordFactor,
+  );
 
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
@@ -146,6 +174,10 @@ function SignInFactorOneInternal(): JSX.Element {
     }));
   };
 
+  if (ssoBypassFactor) {
+    return <SignInFactorOneSSOBypass bypassFactor={ssoBypassFactor} />;
+  }
+
   /**
    * Prompt to choose between a list of enterprise connections as supported first factors
    * @experimental
@@ -159,10 +191,17 @@ function SignInFactorOneInternal(): JSX.Element {
     const canGoBack = factorHasLocalStrategy(currentFactor) && !passwordErrorCode;
 
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
-    const backHandler = () => {
+    const leaveAlternativeMethods = () => {
+      // This search param only exists if the user clicked "Forgot password?" on the
+      // start page, it's a way to go directly to the password reset screen.
+      // If it does exist, we want to remove it on exit so refresh works correctly after.
+      removeSignInResetPasswordIntentParam();
+      toggle?.();
+    };
+    const backHandler: React.MouseEventHandler<Element> = () => {
       card.setError(undefined);
       setPasswordErrorCode(null);
-      toggle?.();
+      leaveAlternativeMethods();
     };
 
     const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode);
@@ -173,7 +212,7 @@ function SignInFactorOneInternal(): JSX.Element {
         onBackLinkClick={canGoBack ? backHandler : undefined}
         onFactorSelected={f => {
           selectFactor(f);
-          toggle?.();
+          leaveAlternativeMethods();
         }}
         currentFactor={currentFactor}
       />

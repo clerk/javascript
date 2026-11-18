@@ -4,6 +4,8 @@ import {
   __experimental_usePlans,
   __experimental_useStatements,
   __experimental_useSubscription,
+  __internal_useCreditBalanceQuery,
+  __internal_useCreditHistoryQuery,
   __internal_useOrganizationBase,
   useClerk,
   useSession,
@@ -24,13 +26,6 @@ import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
-
-/**
- * Only remove decimal places if they are '00', to match previous behavior.
- */
-export function normalizeFormatted(formatted: string) {
-  return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
-}
 
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
@@ -93,13 +88,27 @@ export const usePlans = (params?: { mode: 'cache' }) => {
   });
 };
 
+export const useCreditBalance = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditBalanceQuery(params);
+};
+
+export const useCreditHistory = () => {
+  const params = useBillingHookParams();
+  return __internal_useCreditHistoryQuery(params);
+};
+
 type HandleSelectPlanProps = {
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
+  seatsQuantity?: number;
+  priceId?: string;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
+  portalRoot?: HTMLElement | null;
   appearance?: Appearance;
   newSubscriptionRedirectUrl?: string;
+  onSubscriptionComplete?: () => void;
 };
 
 export const usePlansContext = () => {
@@ -332,22 +341,38 @@ export const usePlansContext = () => {
     [clerk, subscriberType, revalidateAll],
   );
 
+  const sessionId = session?.id;
+
   // handle the selection of a plan, either by opening the subscription details or checkout
   const handleSelectPlan = useCallback(
-    ({ plan, planPeriod, mode = 'mounted', event, appearance, newSubscriptionRedirectUrl }: HandleSelectPlanProps) => {
-      const portalRoot = getClosestProfileScrollBox(mode, event);
+    ({
+      plan,
+      planPeriod,
+      seatsQuantity,
+      priceId,
+      mode = 'mounted',
+      event,
+      portalRoot: providedPortalRoot,
+      appearance,
+      newSubscriptionRedirectUrl,
+      onSubscriptionComplete,
+    }: HandleSelectPlanProps) => {
+      const portalRoot = providedPortalRoot ?? getClosestProfileScrollBox(mode, event);
 
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
         planPeriod: determinePlanPeriod(plan, planPeriod),
         for: subscriberType,
+        seatsQuantity,
+        priceId,
         onSubscriptionComplete: () => {
           revalidateAll();
+          onSubscriptionComplete?.();
         },
         onClose: () => {
-          if (session?.id) {
-            void clerk.setActive({ session: session.id });
+          if (sessionId) {
+            void clerk.setActive({ session: sessionId });
           }
         },
         appearance,
@@ -355,7 +380,7 @@ export const usePlansContext = () => {
         newSubscriptionRedirectUrl,
       });
     },
-    [clerk, revalidateAll, subscriberType, session?.id],
+    [clerk, revalidateAll, subscriberType, sessionId],
   );
 
   const defaultFreePlan = useMemo(() => {

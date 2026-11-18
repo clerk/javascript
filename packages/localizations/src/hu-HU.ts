@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Új kulcs hozzáadása',
     action__search: 'Kulcsok keresése',
@@ -51,13 +56,19 @@ export const huHU: LocalizationResource = {
       formButtonPrimary__revoke: 'Kulcs visszavonása',
       formHint: 'Biztosan törölni szeretnéd ezt a titkos kulcsot?',
       formTitle: 'Visszavonod az "{{apiKeyName}}" titkos kulcsot?',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: 'Vissza',
   badge__activePlan: 'Aktív',
+  badge__banned: undefined,
   badge__canceledEndsAt: "Lemondva • Lejár: {{ date | shortDate('hu-HU') }}",
   badge__currentPlan: 'Jelenlegi csomag',
   badge__default: 'Alapértelmezett',
+  badge__deprovisioned: undefined,
   badge__endsAt: "Lejár: {{ date | shortDate('hu-HU') }}",
   badge__expired: 'Lejárt',
   badge__freeTrial: 'Ingyenes próbaverzió',
@@ -75,13 +86,15 @@ export const huHU: LocalizationResource = {
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
   billing: {
+    accountCredit: 'Fiók egyenleg jóváírás',
     addPaymentMethod__label: 'Fizetési mód hozzáadása',
     alwaysFree: 'Mindig ingyenes',
     annually: 'Éves',
     availableFeatures: 'Elérhető funkciók',
     billedAnnually: 'Éves számlázás',
-    billedMonthlyOnly: 'Csak havi számlázás',
     billedAnnuallyOnly: 'Csak éves számlázás',
+    billedMonthly: undefined,
+    billedMonthlyOnly: 'Csak havi számlázás',
     cancelFreeTrial: 'Próbaverzió lemondása',
     cancelFreeTrialAccessUntil:
       "A próbaverziód {{ date | longDate('hu-HU') }}-ig marad aktív. Ezután elveszíted a próbaverziós funkciókat. Nem számítunk fel díjat.",
@@ -98,8 +111,11 @@ export const huHU: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Nem tudsz előfizetni erre a csomagra. A jelenlegi előfizetésed drágább, mint ez a csomag.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'A fizetés sikeres volt.',
       description__subscriptionSuccessful: 'Az új előfizetésed beállítva.',
+      discount: undefined,
       downgradeNotice:
         'A jelenlegi előfizetésed és funkciói a számlázási ciklus végéig megmaradnak, ezután átváltunk erre az előfizetésre.',
       emailForm: {
@@ -115,20 +131,24 @@ export const huHU: LocalizationResource = {
       },
       pastDueNotice: 'Az előző előfizetésed lejárt, fizetés nélkül.',
       perMonth: 'havonta',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Pénztár',
       title__paymentSuccessful: 'Sikeres fizetés!',
       title__subscriptionSuccessful: 'Sikeres!',
       title__trialSuccess: 'Próbaverzió sikeresen elindítva!',
       totalDueAfterTrial: 'Fizetendő összeg a próbaverzió lejárta után ({{days}} nap)',
+      totalDuePerPeriod: undefined,
     },
     credit: 'Jóváírás',
-    prorationCredit: 'Arányosított jóváírás',
-    accountCredit: 'Fiók egyenleg jóváírás',
     creditRemainder: 'Jóváírás a jelenlegi előfizetésed hátralévő idejére.',
-    payerCreditRemainder: 'Jóváírás a fiók egyenlegből.',
     defaultFreePlanActive: 'Jelenleg az Ingyenes csomagot használod',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Ingyenes',
     getStarted: 'Kezdés',
+    highlightedPlanBadge: 'Népszerű',
     keepFreeTrial: 'Próbaverzió megtartása',
     keepSubscription: 'Előfizetés megtartása',
     manage: 'Kezelés',
@@ -137,8 +157,10 @@ export const huHU: LocalizationResource = {
     monthAbbreviation: 'hó',
     monthPerUnit: 'Hónap / {{unitName}}',
     monthly: 'Havi',
+    months: undefined,
     pastDue: 'Lejárt',
     pay: '{{amount}} fizetése',
+    payerCreditRemainder: 'Jóváírás a fiók egyenlegből.',
     paymentMethod: {
       applePayDescription: {
         annual: 'Éves fizetés',
@@ -154,26 +176,32 @@ export const huHU: LocalizationResource = {
       },
     },
     paymentMethods__label: 'Fizetési módok',
-    popular: 'Népszerű',
     pricingTable: {
       billingCycle: 'Számlázási ciklus',
       included: 'Tartalmazza',
       seatCost: {
-        freeUpToSeats: '{{endsAfterBlock}} helyig ingyenes',
-        upToSeats: '{{endsAfterBlock}} helyig',
-        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} helyenként',
-        includedSeats: '{{includedSeats}} hely tartalmazza',
         additionalSeats: '({{additionalTierFeePerBlockAmount}}/{{periodAbbreviation}} további helyekért)',
-        unlimitedSeats: 'Korlátlan helyek',
+        freeUpToSeats: '{{endsAfterBlock}} helyig ingyenes',
+        includedSeats: '{{includedSeats}} hely tartalmazza',
+        perSeat: '{{feePerBlockAmount}}/{{periodAbbreviation}} helyenként',
         tooltip: {
-          freeForUpToSeats: '{{endsAfterBlock}} helyig ingyenes.',
           additionalSeatsEach: 'További helyek {{feePerBlockAmount}}/{{period}} egyenként.',
           firstSeatsIncludedInPlan: 'Az első {{endsAfterBlock}} hely a csomag része.',
+          freeForUpToSeats: '{{endsAfterBlock}} helyig ingyenes.',
         },
+        unlimitedSeats: 'Korlátlan helyek',
+        upToSeats: '{{endsAfterBlock}} helyig',
       },
     },
+    proratedDiscount: undefined,
+    prorationCredit: 'Arányosított jóváírás',
     reSubscribe: 'Újra előfizetés',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
     seats: 'Helyek',
+    seatsWithLimit: undefined,
     seeAllFeatures: 'Összes funkció megtekintése',
     startFreeTrial: 'Próbaverzió indítása',
     startFreeTrial__days: '{{days}} napos próbaverzió indítása',
@@ -194,22 +222,800 @@ export const huHU: LocalizationResource = {
       trialStartedOn: 'Próbaverzió kezdete',
     },
     subtotal: 'Részösszeg',
+    subtotalRenewal: undefined,
     switchPlan: 'Váltás erre a csomagra',
     switchToAnnual: 'Váltás éves fizetésre',
-    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{currency}}{{price}} / év',
+    switchToAnnualWithAnnualPrice: 'Váltás éves fizetésre: {{price}} / év',
     switchToMonthly: 'Váltás havi fizetésre',
-    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{currency}}{{price}} / hó',
+    switchToMonthlyWithPrice: 'Váltás havi fizetésre: {{price}} / hó',
     totalDue: 'Fizetendő összeg',
+    totalDuePerPeriod: undefined,
     totalDueToday: 'Mai fizetendő összeg',
     viewFeatures: 'Funkciók megtekintése',
     viewPayment: 'Fizetés megtekintése',
     year: 'Év',
     yearAbbreviation: 'év',
     yearPerUnit: 'Év / {{unitName}}',
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__replaceKey: undefined,
+      actionLabel__retry: undefined,
+      actionLabel__uploadKey: undefined,
+      badge__credentialsConfigured: undefined,
+      badge__credentialsMissing: undefined,
+      domainsLabel: undefined,
+      error__invalidKeyFile: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldHint__subjectEmail: undefined,
+      formFieldInputPlaceholder__subjectEmail: undefined,
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__serviceAccountKey: undefined,
+      formFieldLabel__subjectEmail: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        google: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      roles: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      actionLabel__syncNow: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      description__pull: undefined,
+      empty__noUsersProvisioned: undefined,
+      empty__waitingForFirstSync: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__lastSyncFailed: undefined,
+      error__loadUsers: undefined,
+      error__syncFailed: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      syncRow: {
+        neverSynced: undefined,
+        title: undefined,
+      },
+      syncStatus__cancelled: undefined,
+      syncStatus__failed: undefined,
+      syncStatus__running: undefined,
+      syncStatus__succeeded: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
+    },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: 'Vegye fel a kapcsolatot szervezete adminisztrátorával a jogosultságai bővítéséhez.',
+      title: 'Nincs jogosultsága az egyszeri bejelentkezés (SSO) kezelésére',
+    },
     navbar: {
       title: 'Egyszeri bejelentkezés (SSO) beállítása',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__claimed: undefined,
+        badge__expired: undefined,
+        badge__unverified: 'Nincs igazolva',
+        badge__verified: 'Igazolva',
+        checkboxLabel: undefined,
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: 'Gazda / Név',
+          instructions:
+            'Adja hozzá ezt a TXT-rekordot a DNS-szolgáltatójához. Automatikusan igazoljuk, amint a rekord aktívvá válik.',
+          typeLabel: 'Típus',
+          valueLabel: 'Érték',
+        },
+        verifiedAtLabel: "Igazolva: {{ date | shortDate('hu-HU') }}",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: '{{domain}} hozzáadása',
+        messageLabel: 'Az e-mail-címe a következőt használja: {{domain}}. Szeretné hozzáadni?',
+      },
+      formButtonPrimary__add: 'Hozzáadás',
+      formFieldInputPlaceholder__domain: 'Tartomány hozzáadása',
+      formFieldLabel__domain: 'Tartomány',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle:
+        'Adja hozzá és igazolja azon tartományok tulajdonjogát, amelyeket szervezete a bejelentkezéshez használ.',
+      title: 'SSO-tartományok hozzáadása',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
+      saml: {
+        customSaml: 'Egyéni SAML szolgáltató',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: 'Válassza ki azt a szolgáltatót, amelyhez beállítja az SSO-t.',
+      title: 'Szolgáltató kiválasztása',
+      warning: 'Miután kiválasztotta a szolgáltatót, nem módosíthatja, amíg a konfiguráció be nem fejeződik',
+    },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -236,6 +1042,8 @@ export const huHU: LocalizationResource = {
   formButtonPrimary: 'Tovább',
   formButtonPrimary__verify: 'Ellenőrzés',
   formFieldAction__forgotPassword: 'Elfelejtetted a jelszavad?',
+  formFieldAction__hidePassword: 'Jelszó elrejtése',
+  formFieldAction__showPassword: 'Jelszó megjelenítése',
   formFieldError__matchingPasswords: 'A jelszavak megegyeznek',
   formFieldError__notMatchingPasswords: 'A jelszavak nem egyeznek',
   formFieldError__verificationLinkExpired: 'A megerősítő link lejárt. Kérlek kérj egy újat.',
@@ -256,8 +1064,8 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__organizationName: 'Szervezet neve',
   formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: 'Add meg a jelszavad',
-  formFieldInputPlaceholder__signUpPassword: 'Hozz létre egy jelszót',
   formFieldInputPlaceholder__phoneNumber: 'Add meg a telefonszámod',
+  formFieldInputPlaceholder__signUpPassword: 'Hozz létre egy jelszót',
   formFieldInputPlaceholder__username: 'Add meg a felhasználóneved',
   formFieldInput__emailAddress_format: 'Példa formátum: nev@pelda.hu',
   formFieldLabel__apiKey: 'API kulcs',
@@ -288,6 +1096,9 @@ export const huHU: LocalizationResource = {
   formFieldLabel__role: 'Beosztás',
   formFieldLabel__signOutOfOtherSessions: 'Kijelentkeztetés minden más eszközökről',
   formFieldLabel__username: 'Felhasználónév',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: 'Kijelentkezés',
     title: 'Bejelntkezve mint {{identifier}}',
@@ -297,6 +1108,64 @@ export const huHU: LocalizationResource = {
   membershipRole__admin: 'Adminisztrátor',
   membershipRole__basicMember: 'Tag',
   membershipRole__guestMember: 'Vendég',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      privateMetadata: undefined,
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
+  },
   organizationList: {
     action__createOrganization: 'Szervezet létrehozása',
     action__invitationAccept: 'Csatlakozás',
@@ -314,9 +1183,19 @@ export const huHU: LocalizationResource = {
     },
     badge__automaticInvitation: 'Automatikus meghívások',
     badge__automaticSuggestion: 'Automatikus javaslatok',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: 'Nincs automatikus felvétel',
     badge__unverified: 'Nincs visszaigazolva',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nincs fizetési előzmény',
         notFound: 'A fizetési kísérlet nem található',
@@ -351,8 +1230,8 @@ export const huHU: LocalizationResource = {
       statementsSection: {
         empty: 'Nincsenek megjeleníthető kivonatok',
         itemCaption__paidForPlan: 'Fizetve a(z) {{plan}} {{period}} csomagért',
-        itemCaption__proratedCredit: 'Arányosított jóváírás az előző előfizetés részleges használatáért',
         itemCaption__payerCredit: 'Jóváírás a fiók egyenlegből',
+        itemCaption__proratedCredit: 'Arányosított jóváírás az előző előfizetés részleges használatáért',
         itemCaption__subscribedAndPaidForPlan: 'Előfizetve és fizetve a(z) {{plan}} {{period}} csomagért',
         notFound: 'Kivonat nem található',
         tableHeader__amount: 'Összeg',
@@ -364,6 +1243,11 @@ export const huHU: LocalizationResource = {
         actionLabel__manageSubscription: 'Kezelés',
         actionLabel__newSubscription: 'Előfizetés csomagra',
         actionLabel__switchPlan: 'Csomag váltása',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: 'Szerkesztés',
         tableHeader__plan: 'Csomag',
         tableHeader__startDate: 'Kezdő dátum',
@@ -386,6 +1270,7 @@ export const huHU: LocalizationResource = {
       detailsTitle__inviteFailed:
         'A meghívok küldése sikertelen. Már vannak függőben lévő meghívók a következő címekre: {{email_addresses}}',
       formButtonPrimary__continue: 'Meghívók küldése',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: 'Válassz beosztást',
       subtitle: 'Írj be vagy illessz be egy vagy több email címet, vesszővel, vagy szóközzel elválasztva.',
       successMessage: 'A meghívók sikeresen elküldve',
@@ -445,6 +1330,7 @@ export const huHU: LocalizationResource = {
       description: 'A szervezeted kezelése',
       general: 'Általános',
       members: 'Tagok',
+      security: undefined,
       title: 'Szervezet',
     },
     plansPage: {
@@ -491,6 +1377,165 @@ export const huHU: LocalizationResource = {
       messageLine2: 'Ez után a felhasználók nem tudnak automatikusan csatlakozni',
       successMessage: '{{domain}} törölve lett',
       title: 'Domain törlése',
+    },
+    securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__configure: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__continue: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
+        primaryButton__configure: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
     },
     start: {
       headerTitle__general: 'Általános',
@@ -595,10 +1640,23 @@ export const huHU: LocalizationResource = {
         'A passkey használata megerősíti a személyazonosságodat. Az eszközöd kérheti az ujjlenyomatodat, arcodat vagy a képernyőzáradat.',
       title: 'Passkey használata',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Másik módszer használata',
       subtitle: 'Add meg a jelenlegi jelszavadat a folytatáshoz',
       title: 'Ellenőrzés szükséges',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
@@ -612,11 +1670,30 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a telefonodra küldött kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
     },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
+    },
     totpMfa: {
       formTitle: 'Visszaigazoló kód',
       subtitle: 'Írd be a hitelesítő alkalmazás által generált kódot a folytatáshoz',
       title: 'Ellenőrzés szükséges',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -701,6 +1778,10 @@ export const huHU: LocalizationResource = {
         subtitleNewTab: 'Menj át az újonan megnyitott lapra a folytatáshoz',
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',
@@ -711,6 +1792,9 @@ export const huHU: LocalizationResource = {
     enterpriseConnections: {
       subtitle: 'Válaszd ki a vállalati fiókot, amellyel folytatni szeretnéd.',
       title: 'Válaszd ki a vállalati fiókodat',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: 'Jelszó visszaállító kód',
@@ -736,6 +1820,10 @@ export const huHU: LocalizationResource = {
       subtitle:
         'A Passkey-d használata megerősíti, hogy te vagy az. Az eszközöd kérheti az ujjlenyomatod, arcod vagy a képernyőzárad.',
       title: 'Használd a passkeydet',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Másik mód használata',
@@ -763,6 +1851,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'A folytatáshoz, kérlek írd be a visszaigazoló kódot, amit a telefonodra küldtünk.',
       title: 'Ellenőrizd a telefonod',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: 'Jelszó visszaállítása',
       requiredMessage: 'Biztonsági okokból, muszáj megváltoztatnod a jelszavadat.',
@@ -771,6 +1865,15 @@ export const huHU: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Vissza kell igazolnod az identitásod, mielőtt visszaállítod a jelszavad',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Regisztráció',
@@ -868,6 +1971,12 @@ export const huHU: LocalizationResource = {
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
       subtitle: 'Írd be a visszaigazoló kódot, amit a telefonodra kaptál',
       title: 'Erősítsd meg a telefonszámod',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: 'Bejelentkezés',
@@ -1017,6 +2126,7 @@ export const huHU: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} már tagja a szervezetnek.',
     api_key_name_already_exists: 'Ez az API kulcs név már létezik.',
     api_key_usage_exceeded: 'Elérted a használati korlátot. A korlát eltávolításához válts fizetős csomagra.',
@@ -1026,6 +2136,7 @@ export const huHU: LocalizationResource = {
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:
       'Bot érvényesítése miatt, a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked:
       'Az ideiglenes e-mail szolgáltatások nem támogatottak. Kérlek, használd a szokásos e-mail címedet a fiók létrehozásához.',
@@ -1048,6 +2159,7 @@ export const huHU: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: 'A jelszavad túl rövid. Legalább 8 karakter hosszúnak kell lennie.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_or_identifier_incorrect:
       'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
@@ -1064,8 +2176,11 @@ export const huHU: LocalizationResource = {
     form_username_invalid_length: 'A felhasználónévnek {{min_length}} és {{max_length}} karakter között kell lennie.',
     form_username_needs_non_number_char: 'A felhasználónévnek legalább egy nem numerikus karaktert kell tartalmaznia.',
     identification_deletion_failed: 'Nem törölheted ki az utolsó azonosítód.',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access:
       "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1091,7 +2206,23 @@ export const huHU: LocalizationResource = {
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: 'Már be vagy jelentkezve.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
+    sso_bypass_domain_not_served: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
+    too_many_requests: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nem található Web3 tárca bővítmény. Kérlek telepíts egyet a folytatáshoz.',
     web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',
     web3_solana_signature_generation_failed:
@@ -1144,6 +2275,9 @@ export const huHU: LocalizationResource = {
     action__openUserMenu: 'Felhasználói menü megnyitása',
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
+    label__accountActions: 'Fiókműveletek',
+    label__activeSessions: 'Aktív munkamenetek',
+    label__userButtonPopover: 'Fiókpanel',
   },
   userProfile: {
     apiKeysPage: {
@@ -1165,6 +2299,15 @@ export const huHU: LocalizationResource = {
       title__codelist: 'Tartalék kódok',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: 'Nincs fizetési előzmény',
         notFound: 'A fizetési kísérlet nem található',
@@ -1199,8 +2342,8 @@ export const huHU: LocalizationResource = {
       statementsSection: {
         empty: 'Nincsenek megjeleníthető kivonatok',
         itemCaption__paidForPlan: 'Fizetve a(z) {{plan}} {{period}} csomagért',
-        itemCaption__proratedCredit: 'Arányosított jóváírás az előző előfizetés részleges használatáért',
         itemCaption__payerCredit: 'Jóváírás a fiók egyenlegből',
+        itemCaption__proratedCredit: 'Arányosított jóváírás az előző előfizetés részleges használatáért',
         itemCaption__subscribedAndPaidForPlan: 'Előfizetve és fizetve a(z) {{plan}} {{period}} csomagért',
         notFound: 'Kivonat nem található',
         tableHeader__amount: 'Összeg',
@@ -1212,6 +2355,7 @@ export const huHU: LocalizationResource = {
         actionLabel__manageSubscription: 'Kezelés',
         actionLabel__newSubscription: 'Előfizetés csomagra',
         actionLabel__switchPlan: 'Csomag váltása',
+        overview: undefined,
         tableHeader__edit: 'Szerkesztés',
         tableHeader__plan: 'Csomag',
         tableHeader__startDate: 'Kezdő dátum',

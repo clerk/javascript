@@ -1,8 +1,6 @@
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { algs } from './algorithms';
 
-export type IssuerResolver = string | ((iss: string) => boolean);
-
 const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
 };
@@ -47,12 +45,37 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertHeaderType = (typ?: unknown, allowedTypes: string | string[] = 'JWT') => {
-  if (typeof typ === 'undefined') {
+export const assertOAuthAudienceClaim = (aud: unknown, audience?: string | string[]) => {
+  const audienceList = [audience].flat().filter(a => !!a);
+  if (audienceList.length === 0) {
     return;
   }
 
-  const allowed = Array.isArray(allowedTypes) ? allowedTypes : [allowedTypes];
+  const audFromToken = aud ? [aud].flat() : undefined;
+  if (!isArrayString(audFromToken) || audFromToken.some(a => a.length === 0)) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
+    });
+  }
+
+  if (!audFromToken.some(a => audienceList.includes(a))) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `OAuth audience mismatch. Verification expected audience ${JSON.stringify(
+        audienceList,
+      )}, but incoming token has aud ${JSON.stringify(aud)}.`,
+    });
+  }
+};
+
+export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
+  if (typeof typ === 'undefined' && typeof allowedTypes === 'undefined') {
+    return;
+  }
+
+  const expectedTypes = allowedTypes ?? 'JWT';
+  const allowed = Array.isArray(expectedTypes) ? expectedTypes : [expectedTypes];
   if (!allowed.includes(typ as string)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
@@ -83,14 +106,35 @@ export const assertSubClaim = (sub?: string) => {
 };
 
 export const assertAuthorizedPartiesClaim = (azp?: string, authorizedParties?: string[]) => {
-  if (!azp || !authorizedParties || authorizedParties.length === 0) {
+  // When no authorized parties are configured there is nothing to enforce, so
+  // an azp-less token is accepted (a warning is surfaced elsewhere).
+  if (!authorizedParties || authorizedParties.length === 0) {
     return;
   }
 
-  if (!authorizedParties.includes(azp)) {
+  // Once authorized parties are configured the azp claim must be present and
+  // match one of them. Returning early on a missing/empty azp would let any
+  // token bypass the authorized-parties check simply by omitting the claim,
+  // defeating the purpose of configuring them.
+  if (!azp || !authorizedParties.includes(azp)) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenInvalidAuthorizedParties,
       message: `Invalid JWT Authorized party claim (azp) ${JSON.stringify(azp)}. Expected "${authorizedParties}".`,
+    });
+  }
+};
+
+export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
+  const issuerList = [issuer].flat().filter(i => !!i);
+  if (issuerList.length === 0) {
+    return;
+  }
+
+  if (typeof iss !== 'string' || !issuerList.includes(iss)) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.EnsureClerkJWT,
+      reason: TokenVerificationErrorReason.TokenInvalidIssuer,
+      message: `Invalid JWT issuer claim (iss) ${JSON.stringify(iss)}. Expected "${issuerList}".`,
     });
   }
 };

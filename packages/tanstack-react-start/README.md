@@ -13,7 +13,7 @@
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
 [![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_tanstack_react_start)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/Clerk?style=social)](https://twitter.com/intent/follow?screen_name=Clerk)
+[![Follow on X](https://img.shields.io/twitter/follow/clerk?style=social)](https://x.com/intent/follow?screen_name=clerk)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/tanstack-react-start/CHANGELOG.md)
 ·
@@ -31,8 +31,8 @@
 
 ### Prerequisites
 
-- TanStack Start `^1.157.0` or later
-- TanStack Router `^1.157.0` or later
+- TanStack Start `^1.168.10` or later
+- TanStack Router `^1.170.7` or later
 - React 18 or later
 - Node.js `>=20.9.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_tanstack_react_start).
@@ -41,7 +41,7 @@
 
 The fastest way to get started with Clerk is by following the [TanStack React Start Quickstart](https://clerk.com/docs/quickstarts/tanstack-react-start?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
-You'll learn how to install `@clerk/tanstack-react-start`, set up your environment keys, configure `createClerkHandler` and protect your pages.
+You'll learn how to install `@clerk/tanstack-react-start`, set up your environment keys, configure `clerkMiddleware()` and protect your pages.
 
 ## Usage
 
@@ -49,10 +49,11 @@ For further information, guides, and examples visit the [TanStack React Start re
 
 ## Support
 
-You can get in touch with us in any of the following ways:
+For help, visit our [support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_tanstack_react_start).
 
-- Join our official community [Discord server](https://clerk.com/discord)
-- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_tanstack_react_start)
+## Community
+
+Join our [Discord community](https://clerk.com/discord) to connect with other developers.
 
 ## Contributing
 

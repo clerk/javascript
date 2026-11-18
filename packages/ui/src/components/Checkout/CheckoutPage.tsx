@@ -11,12 +11,12 @@ const Initiator = () => {
 
   useEffect(() => {
     void checkout.start();
-  }, []);
+  }, [checkout]);
   return null;
 };
 
 const Root = ({ children }: { children: React.ReactNode }) => {
-  const { planId, planPeriod, for: _for } = useCheckoutContext();
+  const { planId, planPeriod, for: _for, seatsQuantity, priceId } = useCheckoutContext();
 
   return (
     <CheckoutProvider
@@ -29,6 +29,8 @@ const Root = ({ children }: { children: React.ReactNode }) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         planPeriod!
       }
+      seatsQuantity={seatsQuantity}
+      priceId={priceId}
     >
       <Initiator />
       {children}

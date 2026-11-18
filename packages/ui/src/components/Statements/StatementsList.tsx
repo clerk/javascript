@@ -4,7 +4,7 @@ import { useStatements, useSubscriberTypeLocalizationRoot } from '@/contexts';
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { localizationKeys, Td, Text } from '../../customizables';
+import { localizationKeys, Td, Text, useLocalizations } from '../../customizables';
 import { useRouter } from '../../router';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 
@@ -46,6 +46,7 @@ const StatementsListRow = ({ statement }: { statement: BillingStatementResource 
     totals: { grandTotal },
   } = statement;
   const { navigate } = useRouter();
+  const { $ } = useLocalizations();
   const handleClick = () => {
     void navigate(`statement/${id}`);
   };
@@ -71,10 +72,7 @@ const StatementsListRow = ({ statement }: { statement: BillingStatementResource 
           cursor: 'pointer',
         }}
       >
-        <Text colorScheme='secondary'>
-          {grandTotal.currencySymbol}
-          {grandTotal.amountFormatted}
-        </Text>
+        <Text colorScheme='secondary'>{$(grandTotal)}</Text>
       </Td>
     </DataTableRow>
   );

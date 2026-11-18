@@ -303,6 +303,20 @@ describe('SubscriptionsList', () => {
       status: 'active' as const,
       isFreeTrial: false,
       pastDueAt: null,
+      appliedDiscount: {
+        id: 'redemption_active',
+        subscriptionItemId: 'sub_active',
+        discountId: 'discount_active',
+        name: 'Summer sale',
+        source: 'promo_code' as const,
+        effect: 'percentage' as const,
+        percentOff: 20,
+        cyclesRemaining: 2,
+        cyclesApplied: 1,
+        status: 'active' as const,
+        redeemedAt: new Date('2021-01-01'),
+        redeemedBy: null,
+      },
       cancel: vi.fn(),
       pathRoot: '',
       reload: vi.fn(),
@@ -327,6 +341,7 @@ describe('SubscriptionsList', () => {
       expect(getByText('Pro Plan')).toBeVisible();
       // Active subscription should show the Active badge
       expect(queryByText(/^Active$/)).toBeNull();
+      expect(getByText('Summer sale (20% off first 3 months)')).toBeVisible();
     });
   });
 

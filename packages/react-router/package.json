@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "3.2.2",
+  "version": "3.7.3",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -82,11 +82,13 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "dev:pub": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
@@ -100,17 +102,16 @@
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "cookie": "1.0.2",
-    "tslib": "catalog:repo"
+    "cookie": "1.0.2"
   },
   "devDependencies": {
-    "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "react-router": "7.14.2"
+    "react-router": "7.18.2",
+    "tslib": "catalog:repo"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react",
-    "react-router": "^7.9.0"
+    "react-router": "^7.9.0 || ^8.3.0"
   },
   "engines": {
     "node": ">=20.9.0"

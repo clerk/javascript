@@ -14,7 +14,7 @@ async function asyncSearchRHC(name, search, regex = false) {
   const flag = regex ? 'E' : 'F';
   const cmd = () =>
     targetType === 'directory'
-      ? $`grep -${flag}q --include=\\*.js --include=\\*.mjs ${search} ${target}`
+      ? $`grep -r${flag}q --include=\\*.js --include=\\*.mjs ${search} ${target}`
       : $`grep -${flag}q ${search} ${target}`;
 
   if ((await cmd().exitCode) === 0) {
@@ -29,6 +29,7 @@ await Promise.allSettled([
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
   asyncSearchRHC('clerk-ui Hotloading', '/npm/@clerk/ui'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
+  asyncSearchRHC('Protect loader', '[protect] loader'),
   asyncSearchRHC('Coinbase', 'coinbase.com'),
   asyncSearchRHC('Coinbase Wallet import', 'import\s*"@coinbase/wallet-sdk', true), // eslint-disable-line no-useless-escape
   asyncSearchRHC('Stripe', 'js.stripe.com'),

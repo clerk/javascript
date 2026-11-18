@@ -1,6 +1,12 @@
 ---
 import { OrganizationList } from '@clerk/astro/components';
 import Layout from '../layouts/Layout.astro';
+
+const { userId, redirectToSignIn } = Astro.locals.auth();
+
+if (!userId) {
+  return redirectToSignIn();
+}
 ---
 
 <Layout title='Welcome to Astro.'>

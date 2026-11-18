@@ -212,6 +212,24 @@ describe('AuthenticateContext', () => {
         expect(context.clientUat.toString()).toBe('0');
       });
     });
+
+    describe('malformed un-suffixed session token', () => {
+      it('falls back to suffixed cookies when the token has a non-string issuer', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __session: createJwt({ payload: { iss: 123 as unknown as string } }),
+            __client_uat_MqCvchyS: suffixedClientUat,
+            __session_MqCvchyS: suffixedSession,
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+
+        const context = await createAuthenticateContext(clerkRequest, { publishableKey: pkLive });
+
+        expect(context.usesSuffixedCookies()).toBe(true);
+        expect(context.sessionTokenInCookie).toBe(suffixedSession);
+      });
+    });
   });
 
   describe('relative proxyUrl resolution', () => {
@@ -294,6 +312,16 @@ describe('AuthenticateContext', () => {
     it('does NOT auto-derive proxyUrl when Vercel env vars are absent', async () => {
       delete process.env.VERCEL_TARGET_ENV;
       delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+      const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
+      const context = await createAuthenticateContext(clerkRequest, {
+        publishableKey: pkLive,
+      });
+
+      expect(context.proxyUrl).toBeUndefined();
+    });
+
+    it('does NOT auto-derive proxyUrl when auto-proxy is disabled', async () => {
+      process.env.CLERK_DISABLE_AUTO_PROXY = 'true';
       const clerkRequest = createClerkRequest(new Request('https://myapp-abc123.vercel.app/dashboard'));
       const context = await createAuthenticateContext(clerkRequest, {
         publishableKey: pkLive,

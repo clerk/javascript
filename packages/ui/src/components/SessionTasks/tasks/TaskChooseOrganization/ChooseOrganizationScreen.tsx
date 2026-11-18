@@ -62,7 +62,7 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
       <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$8}` })}>{card.error}</Card.Alert>
       <Col elementDescriptor={descriptors.main}>
         <OrganizationPreviewListItems elementDescriptor={descriptors.taskChooseOrganizationPreviewItems}>
-          <Actions role='menu'>
+          <Actions>
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {
                 return (

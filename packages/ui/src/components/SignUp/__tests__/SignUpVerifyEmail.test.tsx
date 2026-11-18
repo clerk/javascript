@@ -57,6 +57,42 @@ describe('SignUpVerifyEmail', () => {
     );
   });
 
+  it('does not prepare a new email code when the persisted email verification is pending', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_code'] });
+      f.startSignUpWithEmailAddress({
+        emailAddress: 'pending-code@clerk.com',
+        supportEmailLink: false,
+        supportEmailCode: true,
+      });
+    });
+    fixtures.signUp.prepareEmailAddressVerification.mockResolvedValue(fixtures.signUp);
+
+    const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
+    await waitFor(async () => expect(await findByText(/Verify your email/i)).toBeInTheDocument());
+
+    expect(fixtures.signUp.prepareEmailAddressVerification).not.toHaveBeenCalled();
+  });
+
+  it('prepares a new email code when the persisted email verification is expired', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress({ required: true, verifications: ['email_code'] });
+      f.startSignUpWithEmailAddress({
+        emailAddress: 'expired-code@clerk.com',
+        supportEmailLink: false,
+        supportEmailCode: true,
+        emailVerificationStatus: 'expired',
+      });
+    });
+    fixtures.signUp.prepareEmailAddressVerification.mockRejectedValue(null);
+
+    render(<SignUpVerifyEmail />, { wrapper });
+
+    await waitFor(() =>
+      expect(fixtures.signUp.prepareEmailAddressVerification).toHaveBeenCalledWith({ strategy: 'email_code' }),
+    );
+  });
+
   it('clicking on the edit icon navigates to the previous route', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });

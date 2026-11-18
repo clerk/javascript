@@ -17,7 +17,7 @@ export const ActiveDevicesSection = () => {
   const { user } = useUser();
   const { session } = useSession();
 
-  const { data: sessions, isLoading } = useFetch(user?.getSessions, 'user-sessions');
+  const { data: sessions, isLoading } = useFetch(user?.getSessions, { userId: user?.id }, undefined, 'user-sessions');
 
   return (
     <ProfileSection.Root

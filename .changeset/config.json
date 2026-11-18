@@ -8,7 +8,15 @@
   ],
   "commit": false,
   "ignore": [],
-  "fixed": [],
+  "fixed": [
+    [
+      "@clerk/electron-passkeys",
+      "@clerk/electron-passkeys-darwin-arm64",
+      "@clerk/electron-passkeys-darwin-x64",
+      "@clerk/electron-passkeys-win32-arm64-msvc",
+      "@clerk/electron-passkeys-win32-x64-msvc"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "origin/main",

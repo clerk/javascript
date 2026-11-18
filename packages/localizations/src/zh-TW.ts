@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: '新增金鑰',
     action__search: '搜尋金鑰',
@@ -51,13 +56,19 @@ export const zhTW: LocalizationResource = {
       formButtonPrimary__revoke: '撤銷金鑰',
       formHint: '您確定要刪除此 API 金鑰嗎？',
       formTitle: '撤銷 "{{apiKeyName}}" API 金鑰？',
+      inputLabel: undefined,
     },
+    tableHeader__actions: undefined,
+    tableHeader__lastUsed: undefined,
+    tableHeader__name: undefined,
   },
   backButton: '返回',
   badge__activePlan: '啟用中',
+  badge__banned: undefined,
   badge__canceledEndsAt: "已取消 • 將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__currentPlan: '目前計劃',
   badge__default: '預設',
+  badge__deprovisioned: undefined,
   badge__endsAt: "將於 {{ date | shortDate('zh-TW') }} 到期",
   badge__expired: '已過期',
   badge__freeTrial: '免費試用',
@@ -75,11 +86,14 @@ export const zhTW: LocalizationResource = {
   badge__userDevice: '用戶設備',
   badge__you: '您',
   billing: {
+    accountCredit: '帳戶餘額',
     addPaymentMethod__label: '新增付款方式',
     alwaysFree: '永遠免費',
     annually: '每年',
     availableFeatures: '可使用功能',
     billedAnnually: '每年',
+    billedAnnuallyOnly: undefined,
+    billedMonthly: undefined,
     billedMonthlyOnly: '每月',
     cancelFreeTrial: '取消免費試用',
     cancelFreeTrialAccessUntil:
@@ -94,8 +108,11 @@ export const zhTW: LocalizationResource = {
     cannotSubscribeMonthly: '您無法每月支付訂閱此計劃。要訂閱此計劃，您需要選擇每年支付。',
     cannotSubscribeUnrecoverable: '您無法訂閱此計劃。您的現有訂閱比此計劃更昂貴。',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: '您的付款已成功。',
       description__subscriptionSuccessful: '您的訂閱已成功設定。',
+      discount: undefined,
       downgradeNotice: '您將保留目前的訂閱及其功能直到本計費週期結束，然後您將被切換到此訂閱。',
       emailForm: {
         subtitle: '在您可以完成購買之前，您必須新增一個電子郵件地址，以便發送收據。',
@@ -110,28 +127,36 @@ export const zhTW: LocalizationResource = {
       },
       pastDueNotice: '您的上一個訂閱已逾期，未付款。',
       perMonth: '每月',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: '結帳',
       title__paymentSuccessful: '付款成功！',
       title__subscriptionSuccessful: '成功！',
       title__trialSuccess: '試用已成功開始！',
       totalDueAfterTrial: '試用期結束後 {{days}} 天內需要支付的金額',
+      totalDuePerPeriod: undefined,
     },
     credit: '餘額',
-    prorationCredit: '按比例折抵',
-    accountCredit: '帳戶餘額',
     creditRemainder: '您目前訂閱的剩餘期間的餘額。',
-    payerCreditRemainder: '來自帳戶餘額的折抵。',
     defaultFreePlanActive: '您目前正在免費計劃中',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: '免費',
     getStarted: '開始',
+    highlightedPlanBadge: '熱門',
     keepFreeTrial: '保留免費試用',
     keepSubscription: '保留訂閱',
     manage: '管理',
     manageSubscription: '管理訂閱',
     month: '月',
+    monthAbbreviation: undefined,
+    monthPerUnit: undefined,
     monthly: '每月',
+    months: undefined,
     pastDue: '逾期',
     pay: '支付 {{amount}}',
+    payerCreditRemainder: '來自帳戶餘額的折抵。',
     paymentMethod: {
       applePayDescription: {
         annual: '每年',
@@ -147,12 +172,32 @@ export const zhTW: LocalizationResource = {
       },
     },
     paymentMethods__label: '付款方式',
-    popular: '熱門',
     pricingTable: {
       billingCycle: '計費週期',
       included: '包含',
+      seatCost: {
+        additionalSeats: undefined,
+        freeUpToSeats: undefined,
+        includedSeats: undefined,
+        perSeat: undefined,
+        tooltip: {
+          additionalSeatsEach: undefined,
+          firstSeatsIncludedInPlan: undefined,
+          freeForUpToSeats: undefined,
+        },
+        unlimitedSeats: undefined,
+        upToSeats: undefined,
+      },
     },
+    proratedDiscount: undefined,
+    prorationCredit: '按比例折抵',
     reSubscribe: '重新訂閱',
+    seatBreakdownIncludedPlural: undefined,
+    seatBreakdownIncludedSingular: undefined,
+    seatBreakdownPlural: undefined,
+    seatBreakdownSingular: undefined,
+    seats: undefined,
+    seatsWithLimit: undefined,
     seeAllFeatures: '查看所有功能',
     startFreeTrial: '開始免費試用',
     startFreeTrial__days: '開始 {{days}} 天免費試用',
@@ -173,20 +218,798 @@ export const zhTW: LocalizationResource = {
       trialStartedOn: '試用期開始日期',
     },
     subtotal: '小計',
+    subtotalRenewal: undefined,
     switchPlan: '切換到此方案',
     switchToAnnual: '切換到每年',
-    switchToAnnualWithAnnualPrice: '切換到每年 {{currency}}{{price}} / 年',
+    switchToAnnualWithAnnualPrice: '切換到每年 {{price}} / 年',
     switchToMonthly: '切換到每月',
-    switchToMonthlyWithPrice: '切換到每月 {{currency}}{{price}} / 月',
+    switchToMonthlyWithPrice: '切換到每月 {{price}} / 月',
     totalDue: '總逾期金額',
+    totalDuePerPeriod: undefined,
     totalDueToday: '總逾期金額',
     viewFeatures: '查看功能',
     viewPayment: '查看付款',
     year: '年',
+    yearAbbreviation: undefined,
+    yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__replaceKey: undefined,
+      actionLabel__retry: undefined,
+      actionLabel__uploadKey: undefined,
+      badge__credentialsConfigured: undefined,
+      badge__credentialsMissing: undefined,
+      domainsLabel: undefined,
+      error__invalidKeyFile: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldHint__subjectEmail: undefined,
+      formFieldInputPlaceholder__subjectEmail: undefined,
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__serviceAccountKey: undefined,
+      formFieldLabel__subjectEmail: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        google: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      roles: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      actionLabel__syncNow: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      description__pull: undefined,
+      empty__noUsersProvisioned: undefined,
+      empty__waitingForFirstSync: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__lastSyncFailed: undefined,
+      error__loadUsers: undefined,
+      error__syncFailed: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      syncRow: {
+        neverSynced: undefined,
+        title: undefined,
+      },
+      syncStatus__cancelled: undefined,
+      syncStatus__failed: undefined,
+      syncStatus__running: undefined,
+      syncStatus__succeeded: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
+    activate: {
+      activateButton: undefined,
+      activeSubtitle: undefined,
+      activeTitle: undefined,
+      doneButton: undefined,
+      skipButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    changeProviderDialog: {
+      cancelButton: undefined,
+      confirmButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      activeConnectionWarning: {
+        dismiss: undefined,
+        title: undefined,
+      },
+      attributeMappingTable: {
+        badges: {
+          optional: undefined,
+          required: undefined,
+        },
+      },
+      oidcCustom: {
+        credentialsStep: {
+          clientId: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          clientSecret: {
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        endpointsStep: {
+          discoveryUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          headerSubtitle: undefined,
+          manual: {
+            authUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            description: undefined,
+            tokenUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            userInfoUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+          },
+          modes: {
+            ariaLabel: undefined,
+            discoveryUrl: undefined,
+            manual: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        redirectUriStep: {
+          claims: {
+            description: undefined,
+            table: {
+              columns: {
+                attribute: undefined,
+                claim: undefined,
+              },
+              rows: {
+                email: {
+                  attribute: undefined,
+                },
+                firstName: {
+                  attribute: undefined,
+                },
+                lastName: {
+                  attribute: undefined,
+                },
+                subject: {
+                  attribute: undefined,
+                },
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          redirectUri: {
+            label: undefined,
+          },
+        },
+      },
+      samlCustom: {
+        assignUsersStep: {
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attributeName: undefined,
+              userAttribute: undefined,
+            },
+            rows: {
+              email: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              firstName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+              lastName: {
+                attributeName: undefined,
+                userAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            paragraph: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      samlGoogle: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              appAttribute: undefined,
+              googleAttribute: undefined,
+            },
+            rows: {
+              email: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              firstName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+              lastName: {
+                appAttribute: undefined,
+                googleAttribute: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        configureUserAccess: {
+          assignUsersInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        createAppStep: {
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataFile: {
+            description: undefined,
+            fileUploaded: undefined,
+            label: undefined,
+            removeFile: undefined,
+            replaceFile: undefined,
+            uploadFile: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataFile: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          nameIdInstructions: {
+            step1: undefined,
+            step2: undefined,
+          },
+          paragraph: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          title: undefined,
+        },
+      },
+      samlMicrosoft: {
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              attribute: undefined,
+              claimName: undefined,
+              value: undefined,
+            },
+            copyClaimName: undefined,
+            copyClaimNameCopied: undefined,
+            rows: {
+              email: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              firstName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+              lastName: {
+                attribute: undefined,
+                claimName: undefined,
+                value: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          step1: undefined,
+          step2: undefined,
+          title: undefined,
+        },
+        createAppStep: {
+          assignUsersInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: {
+              label: undefined,
+              subSteps: {
+                appName: undefined,
+                create: undefined,
+                nonGallery: undefined,
+              },
+            },
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+        serviceProviderStep: {
+          headerSubtitle: undefined,
+          serviceProviderFields: {
+            acsUrl: {
+              label: undefined,
+            },
+            spEntityId: {
+              label: undefined,
+            },
+          },
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+          step6: undefined,
+          title: undefined,
+        },
+      },
+      samlOkta: {
+        assignUsersStep: {
+          assignUsersInstructions: {
+            paragraph: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            step5: undefined,
+          },
+          headerSubtitle: undefined,
+        },
+        attributeMappingStep: {
+          attributeMappingTable: {
+            columns: {
+              expression: undefined,
+              name: undefined,
+            },
+            rows: {
+              email: {
+                expression: undefined,
+                name: undefined,
+              },
+              firstName: {
+                expression: undefined,
+                name: undefined,
+              },
+              lastName: {
+                expression: undefined,
+                name: undefined,
+              },
+            },
+          },
+          headerSubtitle: undefined,
+          paragraph: undefined,
+          step1: undefined,
+          step2: undefined,
+        },
+        createAppStep: {
+          completeSamlIntegrationInstructions: {
+            step1: undefined,
+            step2: undefined,
+            title: undefined,
+          },
+          createAppInstructions: {
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+            step4: undefined,
+            title: undefined,
+          },
+          headerSubtitle: undefined,
+          serviceProviderInstructions: {
+            paragraph1: undefined,
+            paragraph2: undefined,
+            serviceProviderFields: {
+              acsUrl: {
+                label: undefined,
+              },
+              spEntityId: {
+                label: undefined,
+              },
+            },
+            title: undefined,
+          },
+        },
+        identityProviderMetadataStep: {
+          headerSubtitle: undefined,
+          manual: {
+            description: undefined,
+            issuer: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signOnUrl: {
+              label: undefined,
+              placeholder: undefined,
+            },
+            signingCertificate: {
+              fileUploaded: undefined,
+              label: undefined,
+              removeFile: undefined,
+              replaceFile: undefined,
+              uploadFile: undefined,
+            },
+          },
+          metadataUrl: {
+            description: undefined,
+            label: undefined,
+            placeholder: undefined,
+          },
+          modes: {
+            ariaLabel: undefined,
+            manual: undefined,
+            metadataUrl: undefined,
+          },
+        },
+        mainHeaderTitle: undefined,
+      },
+      unsupportedProvider: {
+        description: undefined,
+        title: undefined,
+      },
+    },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
+    missingManageEnterpriseConnectionsPermission: {
+      subtitle: '請聯絡您的組織管理員以升級您的權限。',
+      title: '您沒有管理單一登入 (SSO) 的權限',
+    },
     navbar: {
       title: '設定單一登入 (SSO)',
+    },
+    organizationDomainsStep: {
+      domainCard: {
+        badge__claimed: undefined,
+        badge__expired: undefined,
+        badge__unverified: '未驗證',
+        badge__verified: '已驗證',
+        checkboxLabel: undefined,
+        expiredAtLabel: undefined,
+        expiredLabel: undefined,
+        removeButtonTooltip__lastVerifiedDomain: undefined,
+        removeButtonTooltip__lastVerifiedDomainActive: undefined,
+        txtRecord: {
+          hostLabel: '主機 / 名稱',
+          instructions: '請將此 TXT 記錄新增至您的 DNS 供應商。記錄生效後，我們將自動進行驗證。',
+          typeLabel: '類型',
+          valueLabel: '值',
+        },
+        verifiedAtLabel: "驗證於 {{ date | shortDate('zh-TW') }}",
+        verifyAgainButton: undefined,
+      },
+      domainSuggestion: {
+        formButtonPrimary__add: '新增 {{domain}}',
+        messageLabel: '您的電子郵件使用了 {{domain}}。是否要新增它？',
+      },
+      formButtonPrimary__add: '新增',
+      formFieldInputPlaceholder__domain: '新增網域',
+      formFieldLabel__domain: '網域',
+      removeDomainDialog: {
+        cancelButton: undefined,
+        removeButton: undefined,
+        subtitle__active: undefined,
+        subtitle__inactive: undefined,
+        title: undefined,
+      },
+      subtitle: '新增並驗證貴組織用於登入的網域的所有權。',
+      title: '新增 SSO 網域',
+    },
+    resetConnectionDialog: {
+      cancelButton: undefined,
+      confirmationFieldLabel: undefined,
+      confirmationFieldPlaceholder: undefined,
+      resetButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    selectProviderStep: {
+      oidc: {
+        groupLabel: undefined,
+        oidcProvider: undefined,
+      },
+      saml: {
+        customSaml: '自訂 SAML 提供者',
+        google: undefined,
+        groupLabel: 'SAML',
+        microsoft: undefined,
+        okta: 'Okta Workforce',
+      },
+      subtitle: '選擇您要為其設定 SSO 的提供者。',
+      title: '選擇提供者',
+      warning: '選擇提供者後,在設定完成之前無法再次變更',
+    },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
+    testConfigurationStep: {
+      error__noSuccessfulTestRun: undefined,
+      subtitle: undefined,
+      testResults: {
+        actionLabel__refresh: undefined,
+        empty: {
+          subtitle: undefined,
+          title: undefined,
+        },
+        polling: undefined,
+        status__failed: undefined,
+        status__pending: undefined,
+        status__success: undefined,
+        title: undefined,
+      },
+      testRunDetails: {
+        howToFix: {
+          actionLabel__viewDocumentation: undefined,
+          oauth_access_denied: {
+            description: undefined,
+          },
+          oauth_fetch_user_error: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+          },
+          oauth_token_exchange_error: {
+            description: undefined,
+          },
+          saml_email_address_domain_mismatch: {
+            description: undefined,
+          },
+          saml_response_relaystate_missing: {
+            description: undefined,
+          },
+          saml_user_attribute_missing: {
+            intro: undefined,
+            step1: undefined,
+            step2: undefined,
+            step3: undefined,
+          },
+          sectionTitle: undefined,
+        },
+        parsedUserInfo: {
+          email: undefined,
+          firstName: undefined,
+          sectionTitle: undefined,
+        },
+        runDetails: {
+          actionLabel__copied: undefined,
+          actionLabel__copy: undefined,
+          errorCode: undefined,
+          fullMessage: undefined,
+          sectionTitle: undefined,
+          status: undefined,
+          timestamp: undefined,
+        },
+        title: undefined,
+      },
+      testUrl: {
+        actionLabel__open: undefined,
+      },
+      title: undefined,
     },
   },
   createOrganization: {
@@ -213,6 +1036,8 @@ export const zhTW: LocalizationResource = {
   formButtonPrimary: '繼續',
   formButtonPrimary__verify: '驗證',
   formFieldAction__forgotPassword: '忘記密碼？',
+  formFieldAction__hidePassword: '隱藏密碼',
+  formFieldAction__showPassword: '顯示密碼',
   formFieldError__matchingPasswords: '密碼匹配。',
   formFieldError__notMatchingPasswords: '密碼不匹配。',
   formFieldError__verificationLinkExpired: '驗證連結已過期，請請求新的連結。',
@@ -234,6 +1059,7 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: '組織簡稱',
   formFieldInputPlaceholder__password: '輸入您的密碼',
   formFieldInputPlaceholder__phoneNumber: '輸入您的電話號碼',
+  formFieldInputPlaceholder__signUpPassword: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: '範例格式：name@example.com',
   formFieldLabel__apiKey: 'API 金鑰',
@@ -263,6 +1089,9 @@ export const zhTW: LocalizationResource = {
   formFieldLabel__role: '角色',
   formFieldLabel__signOutOfOtherSessions: '登出所有其他裝置',
   formFieldLabel__username: '使用者名稱',
+  identityPreviewEditButton__emailAddress: undefined,
+  identityPreviewEditButton__identifier: undefined,
+  identityPreviewEditButton__phoneNumber: undefined,
   impersonationFab: {
     action__signOut: '登出',
     title: '以 {{identifier}} 身份登入',
@@ -272,6 +1101,64 @@ export const zhTW: LocalizationResource = {
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',
   membershipRole__guestMember: '訪客',
+  oauthConsent: {
+    action__allow: undefined,
+    action__deny: undefined,
+    offlineAccessNotice: undefined,
+    redirectNotice: undefined,
+    redirectUriModal: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    scopeList: {
+      privateMetadata: undefined,
+      title: undefined,
+    },
+    subtitle: undefined,
+    viewFullUrl: undefined,
+    warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
+  },
   organizationList: {
     action__createOrganization: '建立組織',
     action__invitationAccept: '加入',
@@ -289,9 +1176,19 @@ export const zhTW: LocalizationResource = {
     },
     badge__automaticInvitation: '自動邀請',
     badge__automaticSuggestion: '自動建議',
+    badge__enterpriseSso: undefined,
     badge__manualInvitation: '未啟用自動註冊',
     badge__unverified: '未驗證',
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '沒有付款歷史',
         notFound: '找不到這筆付款紀錄',
@@ -325,8 +1222,8 @@ export const zhTW: LocalizationResource = {
       statementsSection: {
         empty: '沒有帳單要顯示',
         itemCaption__paidForPlan: '支付 {{plan}} {{period}} 方案',
-        itemCaption__proratedCredit: '部分使用前一個訂閱的剩餘期間的餘額',
         itemCaption__payerCredit: '來自帳戶餘額的折抵',
+        itemCaption__proratedCredit: '部分使用前一個訂閱的剩餘期間的餘額',
         itemCaption__subscribedAndPaidForPlan: '訂閱並支付 {{plan}} {{period}} 方案',
         notFound: '找不到這筆帳單',
         tableHeader__amount: '金額',
@@ -338,6 +1235,11 @@ export const zhTW: LocalizationResource = {
         actionLabel__manageSubscription: '管理',
         actionLabel__newSubscription: '訂閱一個方案',
         actionLabel__switchPlan: '切換方案',
+        includedSeatsUsage: undefined,
+        overview: undefined,
+        paidSeatsUsage: undefined,
+        seatLimit: undefined,
+        seatLimitAndIncludedSeats: undefined,
         tableHeader__edit: '編輯',
         tableHeader__plan: '方案',
         tableHeader__startDate: '開始日期',
@@ -358,6 +1260,7 @@ export const zhTW: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: '邀請無法傳送。請修正以下問題後再試一次：',
       formButtonPrimary__continue: '傳送邀請',
+      formButtonPrimary__purchaseSeats: undefined,
       selectDropdown__role: '選取角色',
       subtitle: '邀請新成員加入此組織',
       successMessage: '邀請已成功傳送',
@@ -416,11 +1319,13 @@ export const zhTW: LocalizationResource = {
       description: '管理您的組織設定。',
       general: '一般',
       members: '成員',
+      security: undefined,
       title: '組織',
     },
     plansPage: {
       alerts: {
         noPermissionsToManageBilling: '您沒有管理此組織結帳的權限。',
+        planMembershipLimitExceeded: undefined,
       },
       title: '方案',
     },
@@ -459,9 +1364,169 @@ export const zhTW: LocalizationResource = {
       successMessage: '網域 {{domain}} 已被移除。',
       title: '移除網域',
     },
+    securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__configure: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
+      removeDialog: {
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
+      ssoSection: {
+        badge__active: undefined,
+        badge__inProgress: undefined,
+        badge__inactive: undefined,
+        badge__unconfigured: undefined,
+        descriptionLine1: undefined,
+        domainLabel: undefined,
+        menuAction__activate: undefined,
+        menuAction__continue: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
+        primaryButton__configure: undefined,
+        primaryButton__continueConfiguration: undefined,
+        primaryButton__startConfiguration: undefined,
+        title: undefined,
+        tooltip: undefined,
+        tooltipLabel: undefined,
+        tooltip__noRole: undefined,
+      },
+      title: undefined,
+    },
     start: {
       headerTitle__general: '一般',
       headerTitle__members: '成員',
+      membershipSeatUsageLabel: undefined,
       profileSection: {
         primaryButton: '更新組織資料',
         title: '組織設定',
@@ -556,10 +1621,23 @@ export const zhTW: LocalizationResource = {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '使用其他方式',
       subtitle: '請輸入您的密碼以繼續',
       title: '需要驗證您的身分',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: '驗證碼',
@@ -573,11 +1651,30 @@ export const zhTW: LocalizationResource = {
       subtitle: '請輸入已寄至您手機的驗證碼以繼續',
       title: '需要驗證您的身分',
     },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
+    },
     totpMfa: {
       formTitle: '驗證碼',
       subtitle: '請輸入您在設定兩步驟驗證時收到的驗證碼以繼續',
       title: '輸入驗證碼',
     },
+  },
+  searchInput: {
+    action__clear: undefined,
   },
   signIn: {
     accountSwitcher: {
@@ -660,6 +1757,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回新開啟的分頁以繼續',
         titleNewTab: '已在其他分頁登入',
       },
+      verifiedTransferable: {
+        subtitle: undefined,
+        title: undefined,
+      },
     },
     emailLinkMfa: {
       formSubtitle: '使用發送到您電子郵件的驗證連結',
@@ -670,6 +1771,9 @@ export const zhTW: LocalizationResource = {
     enterpriseConnections: {
       subtitle: '請選擇您想要繼續使用的企業帳戶。',
       title: '選擇一個企業帳戶',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
     },
     forgotPassword: {
       formTitle: '重設密碼代碼',
@@ -693,6 +1797,10 @@ export const zhTW: LocalizationResource = {
     passkey: {
       subtitle: '使用您的金鑰確認您的身分。您的裝置可能會要求您的指紋、臉部或螢幕鎖。',
       title: '使用您的金鑰',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: '使用其他方式',
@@ -720,6 +1828,12 @@ export const zhTW: LocalizationResource = {
       subtitle: '請輸入已寄至您手機的驗證碼以繼續',
       title: '檢查手機簡訊',
     },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     resetPassword: {
       formButtonPrimary: '重設密碼',
       requiredMessage: '基於安全考量，您必須重設密碼。',
@@ -728,6 +1842,15 @@ export const zhTW: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: '我們需要驗證您的身份才能重設您的密碼。',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: '註冊',
@@ -824,6 +1947,12 @@ export const zhTW: LocalizationResource = {
       resendButton: '重新傳送驗證碼',
       subtitle: '以繼續前往 {{applicationName}}',
       title: '驗證您的電話號碼',
+    },
+    protectCheck: {
+      loading: undefined,
+      retryButton: undefined,
+      subtitle: undefined,
+      title: undefined,
     },
     restrictedAccess: {
       actionLink: '登入',
@@ -963,11 +2092,15 @@ export const zhTW: LocalizationResource = {
     },
   },
   unstable__errors: {
+    action_blocked: undefined,
     already_a_member_in_organization: '{{email}} 已經是組織的成員。',
+    api_key_name_already_exists: undefined,
+    api_key_usage_exceeded: undefined,
     avatar_file_size_exceeded: '檔案大小超過10MB的上限。請選擇較小的檔案。',
     avatar_file_type_invalid: '不支援的檔案類型。請上傳 JPG、PNG、GIF 或 WEBP 格式的圖片。',
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
+    external_account_not_found: undefined,
     form_code_incorrect: undefined,
     form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
@@ -989,6 +2122,7 @@ export const zhTW: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: undefined,
     form_password_length_too_short: '您的密碼太短。長度必須至少為 8 個字元。',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試或使用其他方法。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',
@@ -1001,7 +2135,10 @@ export const zhTW: LocalizationResource = {
     form_username_invalid_length: '您的使用者名稱長度必須介於 {{min_length}} 與 {{max_length}} 個字元之間。',
     form_username_needs_non_number_char: '您的使用者名稱必須包含至少一個非數字字元。',
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
+    insufficient_seats_change_plan: undefined,
+    insufficient_seats_contact_support: undefined,
     not_allowed_access: undefined,
+    oauth_access_denied: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,
@@ -1025,7 +2162,23 @@ export const zhTW: LocalizationResource = {
       sentencePrefix: '您的密碼必須包含：',
     },
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
+    protect_check_aborted: undefined,
+    protect_check_already_resolved: undefined,
+    protect_check_execution_failed: undefined,
+    protect_check_invalid_script: undefined,
+    protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
+    protect_check_script_load_failed: undefined,
+    protect_check_timed_out: undefined,
+    protect_check_unsupported_environment: undefined,
     session_exists: '您已經登錄。',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
+    sso_bypass_domain_not_served: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
+    too_many_requests: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: '找不到 Web3 錢包擴充功能。請安裝以繼續。',
     web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
     web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',
@@ -1076,6 +2229,9 @@ export const zhTW: LocalizationResource = {
     action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
+    label__accountActions: '帳戶操作',
+    label__activeSessions: '活躍工作階段',
+    label__userButtonPopover: '帳戶面板',
   },
   userProfile: {
     apiKeysPage: {
@@ -1095,6 +2251,15 @@ export const zhTW: LocalizationResource = {
       title__codelist: '備用碼',
     },
     billingPage: {
+      accountCreditsSection: {
+        title: undefined,
+        viewHistory: undefined,
+      },
+      creditHistoryPage: {
+        tableHeader__amount: undefined,
+        tableHeader__date: undefined,
+        title: undefined,
+      },
       paymentHistorySection: {
         empty: '沒有付款紀錄',
         notFound: '找不到付款紀錄',
@@ -1128,8 +2293,8 @@ export const zhTW: LocalizationResource = {
       statementsSection: {
         empty: '沒有帳單可顯示',
         itemCaption__paidForPlan: '已支付 {{plan}} {{period}} 方案',
-        itemCaption__proratedCredit: '部分使用前一個訂閱的折抵金額',
         itemCaption__payerCredit: '來自帳戶餘額的折抵',
+        itemCaption__proratedCredit: '部分使用前一個訂閱的折抵金額',
         itemCaption__subscribedAndPaidForPlan: '已訂閱並支付 {{plan}} {{period}} 方案',
         notFound: '找不到帳單',
         tableHeader__amount: '金額',
@@ -1141,6 +2306,7 @@ export const zhTW: LocalizationResource = {
         actionLabel__manageSubscription: '管理',
         actionLabel__newSubscription: '訂閱一個方案',
         actionLabel__switchPlan: '切換方案',
+        overview: undefined,
         tableHeader__edit: '編輯',
         tableHeader__plan: '方案',
         tableHeader__startDate: '開始日期',

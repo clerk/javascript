@@ -1,18 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { TokenVerificationError } from '../../errors';
 import {
   createJwt,
   mockJwks,
   mockJwt,
   mockJwtHeader,
   mockJwtPayload,
+  mockM2MJwtPayload,
   mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
+  pemEncodedSignKey,
   publicJwks,
   signedJwt,
   someOtherPublicKey,
 } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
+import { signJwt } from '../signJwt';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
 const invalidTokenError = {
@@ -82,6 +86,18 @@ describe('decodeJwt(jwt)', () => {
     const { errors: [error] = [] } = decodeJwt('42');
     expect(error).toMatchObject(invalidTokenError);
   });
+
+  it('returns an error if the token segments are not valid base64url', () => {
+    const { errors: [error] = [] } = decodeJwt('aaa.bbb.ccc');
+    expect(error).toBeInstanceOf(TokenVerificationError);
+    expect(error).toMatchObject({ reason: 'token-invalid' });
+  });
+
+  it('returns an error if the token segments do not decode to JSON', () => {
+    const { errors: [error] = [] } = decodeJwt('YWJj.YWJj.YWJj');
+    expect(error).toBeInstanceOf(TokenVerificationError);
+    expect(error).toMatchObject({ reason: 'token-invalid' });
+  });
 });
 
 describe('verifyJwt(jwt, options)', () => {
@@ -103,13 +119,41 @@ describe('verifyJwt(jwt, options)', () => {
     expect(data).toEqual(mockJwtPayload);
   });
 
-  it('returns the valid JWT payload if valid key & issuer method & azp is given', async () => {
+  it('returns the valid JWT payload if valid key & issuer list & azp is given', async () => {
     const inputVerifyJwtOptions = {
       key: mockJwks.keys[0],
-      issuer: (iss: string) => iss.startsWith('https://clerk'),
+      issuer: ['https://clerk.other-app.com', mockJwtPayload.iss],
       authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
     };
     const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
+    expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('returns an error if the issuer string does not match the iss claim', async () => {
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      issuer: 'https://clerk.another-app.com',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(error?.reason).toBe('token-invalid-issuer');
+    expect(error?.message).toContain('Invalid JWT issuer claim (iss)');
+  });
+
+  it('returns an error if no issuer in the list matches the iss claim', async () => {
+    const { errors: [error] = [] } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      issuer: ['https://clerk.another-app.com', 'https://clerk.other-app.com'],
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(error?.reason).toBe('token-invalid-issuer');
+  });
+
+  it('does not validate the iss claim when no issuer is provided', async () => {
+    const { data, errors } = await verifyJwt(mockJwt, {
+      key: mockJwks.keys[0],
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+    });
+    expect(errors).toBeUndefined();
     expect(data).toEqual(mockJwtPayload);
   });
 
@@ -189,6 +233,22 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error?.message).toContain('Expected "at+jwt"');
   });
 
+  it('rejects JWT with missing type when headerType is configured', async () => {
+    const jwtWithoutTyp = createJwt({
+      header: { typ: undefined },
+    });
+    const inputVerifyJwtOptions = {
+      key: mockJwks.keys[0],
+      issuer: mockJwtPayload.iss,
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      headerType: 'at+jwt',
+    };
+    const { errors: [error] = [] } = await verifyJwt(jwtWithoutTyp, inputVerifyJwtOptions);
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT type undefined');
+    expect(error?.message).toContain('Expected "at+jwt"');
+  });
+
   it('rejects OAuth JWT when headerType does not match', async () => {
     const inputVerifyJwtOptions = {
       key: mockJwks.keys[0],
@@ -216,6 +276,50 @@ describe('verifyJwt(jwt, options)', () => {
     expect(error).toBeDefined();
     expect(error?.message).toContain('Invalid JWT type');
     expect(error?.message).toContain('Expected "at+jwt, application/at+jwt"');
+  });
+
+  it('verifies JWT when array aud includes the configured audience', async () => {
+    const audience = 'https://my-resource.example.com';
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://other-resource.example.com', audience],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { data } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience,
+    });
+
+    expect(data?.aud).toEqual(['https://other-resource.example.com', audience]);
+  });
+
+  it('rejects JWT when array aud does not include the configured audience', async () => {
+    const { data: jwtWithArrayAud } = await signJwt(
+      {
+        ...mockM2MJwtPayload,
+        aud: ['https://attacker.example.com'],
+      },
+      pemEncodedSignKey,
+      {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      },
+    );
+
+    const { errors: [error] = [] } = await verifyJwt(jwtWithArrayAud || '', {
+      key: pemEncodedPublicKey,
+      audience: 'https://my-resource.example.com',
+    });
+
+    expect(error).toBeDefined();
+    expect(error?.message).toContain('Invalid JWT audience claim array');
   });
 
   it('rejects an expired JWT when clockSkewInMs is explicitly 0', async () => {

@@ -3,11 +3,14 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
+import { SignInFactorTwoPasskeyCard } from './SignInFactorTwoPasskeyCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
+import { isOfferableSecondFactor } from './utils';
 
 function SignInClientTrustInternal(): JSX.Element {
   const signIn = useCoreSignIn();
@@ -19,6 +22,11 @@ function SignInClientTrustInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const webAuthnSupported = useIsWebAuthnSupported();
+  const onShowAlternativeMethodsClicked =
+    (signIn.supportedSecondFactors?.filter(f => isOfferableSecondFactor(f, webAuthnSupported)).length ?? 0) > 1
+      ? toggleAllStrategies
+      : undefined;
 
   if (!currentFactor) {
     return <LoadingCard />;
@@ -41,7 +49,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_code':
@@ -51,7 +59,7 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
     case 'email_link':
@@ -61,9 +69,11 @@ function SignInClientTrustInternal(): JSX.Element {
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
         />
       );
+    case 'passkey':
+      return <SignInFactorTwoPasskeyCard onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked} />;
     default:
       return <LoadingCard />;
   }

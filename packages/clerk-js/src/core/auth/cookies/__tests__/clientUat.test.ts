@@ -20,8 +20,8 @@ describe('createClientUatCookie', () => {
   const mockExpires = new Date('2024-12-31');
   const mockDomain = 'test.domain';
   const defaultOptions = { usePartitionedCookies: () => false };
-  const mockSet = vi.fn();
-  const mockRemove = vi.fn();
+  const mockSet = vi.fn<(name: string, value: string, attributes?: object) => void>();
+  const mockRemove = vi.fn<(name: string, attributes?: object) => void>();
   const mockGet = vi.fn();
 
   beforeEach(() => {
@@ -32,9 +32,13 @@ describe('createClientUatCookie', () => {
     (requiresSameSiteNone as ReturnType<typeof vi.fn>).mockReturnValue(false);
     (getCookieDomain as ReturnType<typeof vi.fn>).mockReturnValue(mockDomain);
     (getSecureAttribute as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation(() => ({
-      set: mockSet,
-      remove: mockRemove,
+    (createCookieHandler as ReturnType<typeof vi.fn>).mockImplementation((name: string) => ({
+      set: (value: string, attributes?: object) => {
+        mockSet(name, value, attributes);
+      },
+      remove: (attributes?: object) => {
+        mockRemove(name, attributes);
+      },
       get: mockGet,
     }));
   });
@@ -55,13 +59,14 @@ describe('createClientUatCookie', () => {
     });
 
     expect(mockSet).toHaveBeenCalledTimes(2);
-    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '1704067200', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'Strict',
       secure: true,
       partitioned: false,
     });
+    expect(mockSet).toHaveBeenCalledWith('__client_uat', '1704067200', expect.any(Object));
   });
 
   it('should set cookies with None sameSite in cross-origin context', () => {
@@ -73,7 +78,7 @@ describe('createClientUatCookie', () => {
       signedInSessions: ['session1'],
     });
 
-    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '1704067200', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'None',
@@ -86,7 +91,7 @@ describe('createClientUatCookie', () => {
     const cookieHandler = createClientUatCookie(mockCookieSuffix, defaultOptions);
     cookieHandler.set(undefined);
 
-    expect(mockSet).toHaveBeenCalledWith('0', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '0', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'Strict',
@@ -103,7 +108,7 @@ describe('createClientUatCookie', () => {
       signedInSessions: [],
     });
 
-    expect(mockSet).toHaveBeenCalledWith('0', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '0', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'Strict',
@@ -139,7 +144,7 @@ describe('createClientUatCookie', () => {
       signedInSessions: ['session1'],
     });
 
-    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '1704067200', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'None',
@@ -156,12 +161,73 @@ describe('createClientUatCookie', () => {
       signedInSessions: ['session1'],
     });
 
-    expect(mockSet).toHaveBeenCalledWith('1704067200', {
+    expect(mockSet).toHaveBeenCalledWith('__client_uat_test-suffix', '1704067200', {
       domain: mockDomain,
       expires: mockExpires,
       sameSite: 'None',
       secure: true,
       partitioned: true,
     });
+  });
+
+  it('clears non-partitioned domain variants before writing partitioned cookies', () => {
+    let usePartitionedCookies = false;
+    const cookieHandler = createClientUatCookie(mockCookieSuffix, {
+      usePartitionedCookies: () => usePartitionedCookies,
+    });
+    const client = {
+      id: 'test-client',
+      updatedAt: new Date('2024-01-01'),
+      signedInSessions: ['session1'],
+    };
+
+    cookieHandler.set(client);
+    usePartitionedCookies = true;
+    mockSet.mockClear();
+    mockRemove.mockClear();
+    cookieHandler.set(client);
+
+    expect(mockRemove.mock.calls).toEqual([
+      ['__client_uat_test-suffix', undefined],
+      ['__client_uat', undefined],
+      ['__client_uat_test-suffix', { domain: mockDomain, sameSite: 'Strict', secure: true, partitioned: false }],
+      ['__client_uat', { domain: mockDomain, sameSite: 'Strict', secure: true, partitioned: false }],
+      ['__client_uat_test-suffix', { domain: mockDomain, sameSite: 'None', secure: true, partitioned: false }],
+      ['__client_uat', { domain: mockDomain, sameSite: 'None', secure: true, partitioned: false }],
+    ]);
+    expect(mockSet.mock.calls).toEqual([
+      [
+        '__client_uat_test-suffix',
+        '1704067200',
+        {
+          domain: mockDomain,
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+      [
+        '__client_uat',
+        '1704067200',
+        {
+          domain: mockDomain,
+          expires: mockExpires,
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      ],
+    ]);
+    const firstInvocationOrder = mockRemove.mock.invocationCallOrder[0];
+    expect(mockRemove.mock.invocationCallOrder).toEqual([
+      firstInvocationOrder,
+      firstInvocationOrder + 1,
+      firstInvocationOrder + 4,
+      firstInvocationOrder + 5,
+      firstInvocationOrder + 6,
+      firstInvocationOrder + 7,
+    ]);
+    expect(mockSet.mock.invocationCallOrder).toEqual([firstInvocationOrder + 8, firstInvocationOrder + 9]);
   });
 });

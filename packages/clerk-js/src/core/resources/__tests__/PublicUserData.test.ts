@@ -14,6 +14,7 @@ describe('PublicUserData', () => {
       identifier: 'john-doe',
       user_id: '123',
       username: 'johndoe',
+      deprovisioned: true,
     });
 
     expect(pud).toMatchObject({
@@ -24,6 +25,7 @@ describe('PublicUserData', () => {
       identifier: 'john-doe',
       userId: '123',
       username: 'johndoe',
+      deprovisioned: true,
     });
   });
 });

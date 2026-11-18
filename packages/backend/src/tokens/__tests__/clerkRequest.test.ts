@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import { createClerkRequest } from '../clerkRequest';
 
+// Some test runtimes (e.g. Cloudflare/miniflare) gate `new ReadableStream()`
+// behind a feature flag and throw when it is constructed directly.
+const supportsStreamConstruction = (() => {
+  try {
+    new ReadableStream({
+      start(controller) {
+        controller.close();
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
 describe('createClerkRequest', () => {
   describe('instantiating a request', () => {
     it('retains the headers', () => {
@@ -17,11 +32,34 @@ describe('createClerkRequest', () => {
       expect(req.method).toBe(oldReq.method);
     });
 
-    it('retains the body', async () => {
-      const data = { a: '1' };
-      const oldReq = new Request('http://localhost:3000', { method: 'POST', body: JSON.stringify(data) });
+    // The hazard only exists on undici-style runtimes (Node, edge) where the
+    // request body is a single-use stream. Cloudflare/miniflare buffers bodies
+    // (so the body survives anyway) and cannot construct a streaming body, so
+    // this regression is skipped there.
+    it.skipIf(!supportsStreamConstruction)('does not consume the original request body (issue #8305)', async () => {
+      // Clerk only needs the method, headers, cookies, and URL. Forwarding the
+      // body made the clone share the original's single-use stream, so reading
+      // either side left the other "unusable" for downstream handlers (e.g. a
+      // Hono POST route calling `c.req.json()`).
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode(JSON.stringify({ a: '1' })));
+          controller.close();
+        },
+      });
+      const oldReq = new Request('http://localhost:3000', {
+        method: 'POST',
+        body: stream,
+        // `duplex` is required when streaming a body; not yet in all lib typings.
+        duplex: 'half',
+      } as RequestInit);
+
       const req = createClerkRequest(oldReq);
-      expect((await req.json())['a']).toBe(data.a);
+
+      // The clone carries no body, so it can never lock the original's stream...
+      expect(req.body).toBeNull();
+      // ...and the original stream stays readable for downstream consumers.
+      expect(((await oldReq.json()) as { a: string }).a).toBe('1');
     });
 
     it('retains the url', () => {
@@ -51,12 +89,46 @@ describe('createClerkRequest', () => {
       expect(req.cookies.get('foo')).toBe('bar');
     });
 
-    it('should parse and return cookies with special characters', () => {
+    it('should percent-decode cookie values', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=hello%20world' }) }),
+      );
+      expect(req.cookies.get('foo')).toBe('hello world');
+    });
+
+    it('should not treat encoded delimiters inside a value as cookie separators', () => {
       const req = createClerkRequest(
         new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%20bar%3B%20baz%3Dqux' }) }),
       );
-      expect(req.cookies.get('foo')).toBe('bar');
-      expect(req.cookies.get('baz')).toBe('qux');
+      expect(req.cookies.get('foo')).toBe(' bar; baz=qux');
+      expect(req.cookies.get('baz')).toBeUndefined();
+    });
+
+    it('should not let an encoded value forge a session cookie', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', {
+          headers: new Headers({ cookie: 'sid=x%3B__session%3Dforged%3B__client_uat%3D1700000000' }),
+        }),
+      );
+      expect(req.cookies.get('sid')).toBe('x;__session=forged;__client_uat=1700000000');
+      expect(req.cookies.get('__session')).toBeUndefined();
+      expect(req.cookies.get('__client_uat')).toBeUndefined();
+    });
+
+    it('should keep the first value when a cookie name is repeated', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: '__session=first; __session=second' }) }),
+      );
+      expect(req.cookies.get('__session')).toBe('first');
+    });
+
+    it('should not throw on malformed percent-sequences', () => {
+      const req = createClerkRequest(
+        new Request('http://localhost:3000', { headers: new Headers({ cookie: 'foo=%C0; bar=100%D0; baz=ok' }) }),
+      );
+      expect(req.cookies.get('foo')).toBe('%C0');
+      expect(req.cookies.get('bar')).toBe('100%D0');
+      expect(req.cookies.get('baz')).toBe('ok');
     });
 
     it('should parse and return cookies even if no cookie header exists', () => {

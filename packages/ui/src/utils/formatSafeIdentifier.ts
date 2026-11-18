@@ -8,7 +8,7 @@ export const isMaskedIdentifier = (str: string | undefined | null) => str && str
  * Refer to the tests for examples.
  */
 export const formatSafeIdentifier = (str: string | undefined | null) => {
-  if (!str || str.includes('@') || isMaskedIdentifier(str) || str.match(/[a-zA-Z]/)) {
+  if (!str || str.includes('@') || isMaskedIdentifier(str) || str.match(/[a-zA-Z]/) || !str.startsWith('+')) {
     return str;
   }
   return stringToFormattedPhoneString(str);

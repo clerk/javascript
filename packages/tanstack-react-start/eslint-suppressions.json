@@ -1,0 +1,7 @@
+{
+  "src/client/uiComponents.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  }
+}

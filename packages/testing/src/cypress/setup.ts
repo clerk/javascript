@@ -1,4 +1,4 @@
-/// <reference types="cypress" />
+/// <reference types="cypress" preserve="true" />
 import type { ClerkSetupOptions } from '../common';
 import { fetchEnvVars } from '../common';
 

@@ -22,7 +22,6 @@ Clerk JavaScript SDK Monorepo
 
 - `packages/` - All publishable packages (@clerk/\*)
 - `integration/` - Framework integration templates and E2E tests
-- `playground/` - Development and testing applications
 - `scripts/` - Build automation and utilities
 - `.cursor/rules/` - Additional rule files for specific domains
 
@@ -38,7 +37,6 @@ Clerk JavaScript SDK Monorepo
 5. Development Workflow
 
 - Make changes in relevant package under packages/
-- Use playground apps for testing changes
 - Follow established testing and documentation requirements
 - Use Changesets for version management and releases
 - If you are provided a commit SHA, always read the commit message and description for extra context.

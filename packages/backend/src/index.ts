@@ -67,8 +67,10 @@ export type {
   EmailJSON,
   EmailAddressJSON,
   EnterpriseConnectionJSON,
+  EnterpriseConnectionCustomAttributeJSON,
   EnterpriseConnectionOauthConfigJSON,
   EnterpriseConnectionSamlConnectionJSON,
+  EnterpriseConnectionSamlConnectionLoginHintJSON,
   ExternalAccountJSON,
   IdentificationLinkJSON,
   InstanceJSON,
@@ -101,6 +103,10 @@ export type {
   SMSMessageJSON,
   UserJSON,
   UserDeletedJSON,
+  UserMergedJSON,
+  DirectoryGroupWebhookEventJSON,
+  DirectoryGroupMembershipWebhookEventJSON,
+  DeletedDirectoryGroupMembershipWebhookEventJSON,
   VerificationJSON,
   WaitlistEntryJSON,
   Web3WalletJSON,
@@ -111,6 +117,7 @@ export type {
   BillingPlanJSON,
   BillingSubscriptionJSON,
   BillingSubscriptionItemJSON,
+  BillingSubscriptionItemStatus,
 } from './api/resources/JSON';
 
 /**
@@ -128,8 +135,10 @@ export type {
   Domain,
   EmailAddress,
   EnterpriseConnection,
+  EnterpriseConnectionCustomAttribute,
   EnterpriseConnectionOauthConfig,
   EnterpriseConnectionSamlConnection,
+  EnterpriseConnectionSamlConnectionLoginHint,
   ExternalAccount,
   Feature,
   Instance,
@@ -168,6 +177,8 @@ export type {
  */
 export type {
   EmailWebhookEvent,
+  EmailBounceType,
+  EmailDeliveryWebhookEvent,
   OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
   OrganizationInvitationAcceptedWebhookEvent,
@@ -177,6 +188,8 @@ export type {
   PermissionWebhookEvent,
   SessionWebhookEvent,
   SMSWebhookEvent,
+  DirectoryGroupWebhookEvent,
+  DirectoryGroupMembershipWebhookEvent,
   UserWebhookEvent,
   WaitlistEntryWebhookEvent,
   WebhookEvent,

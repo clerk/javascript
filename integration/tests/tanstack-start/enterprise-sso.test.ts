@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import type { EnterpriseConnection } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
@@ -11,10 +13,9 @@ const FAKE_IDP_CERTIFICATE =
 /**
  * Helper to create and activate a SAML enterprise connection.
  * The Clerk API requires creating the connection first (inactive), then activating via update.
- * The `provider` field is required by the API but missing from the SDK types, so we cast.
  */
 async function createActiveEnterpriseConnection(
-  clerk: ReturnType<typeof createTestUtils>['services']['clerk'],
+  clerk: Awaited<ReturnType<typeof createTestUtils>>['services']['clerk'],
   opts: { name: string; domain: string; idpEntityId: string; idpSsoUrl: string },
 ): Promise<EnterpriseConnection> {
   const conn = await clerk.enterpriseConnections.createEnterpriseConnection({
@@ -26,7 +27,7 @@ async function createActiveEnterpriseConnection(
       idpSsoUrl: opts.idpSsoUrl,
       idpCertificate: FAKE_IDP_CERTIFICATE,
     },
-  } as Parameters<typeof clerk.enterpriseConnections.createEnterpriseConnection>[0]);
+  });
 
   return clerk.enterpriseConnections.updateEnterpriseConnection(conn.id, { active: true });
 }
@@ -36,14 +37,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
-    const testDomain = 'e2e-enterprise-test.dev';
+    // Per-run suffix so a failed afterAll on a previous run can't brick the shared
+    // long-running instance with a duplicate-domain 422 on the next run.
+    const runId = randomBytes(4).toString('hex');
+    const testDomain = `e2e-enterprise-test-${runId}.dev`;
     const fakeIdpHost = `fake-idp.${testDomain}`;
-    let enterpriseConnection: EnterpriseConnection;
+    let enterpriseConnection: EnterpriseConnection | undefined;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       enterpriseConnection = await createActiveEnterpriseConnection(u.services.clerk, {
-        name: 'E2E Test SAML Connection',
+        name: `E2E Test SAML Connection ${runId}`,
         domain: testDomain,
         idpEntityId: `https://${fakeIdpHost}`,
         idpSsoUrl: `https://${fakeIdpHost}/sso`,
@@ -51,13 +55,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
-      await u.services.clerk.enterpriseConnections.deleteEnterpriseConnection(enterpriseConnection.id);
+      const u = await createTestUtils({ app });
+      // Guard against a failed beforeAll: without this, the TypeError here masks
+      // the real error from beforeAll in the Playwright report.
+      if (enterpriseConnection) {
+        await u.services.clerk.enterpriseConnections.deleteEnterpriseConnection(enterpriseConnection.id);
+      }
       await app.teardown();
     });
 
     test('sign-in with enterprise domain email initiates SSO redirect', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Capture the redirect to the fake IdP (proves enterprise SSO kicked in)
       const idpRequestPromise = page.waitForRequest(req => req.url().includes(fakeIdpHost));
@@ -72,7 +80,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     });
 
     test('non-managed domain email does not trigger SSO redirect', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier('testuser@regular-domain.com');

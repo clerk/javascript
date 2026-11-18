@@ -1,0 +1,626 @@
+import { describe, expectTypeOf, test } from 'vitest';
+
+import { assign } from './assign';
+import { createActor, mockActor } from './create-actor';
+import { createMachine } from './create-machine';
+import { setup } from './setup';
+import type { Snapshot, StateMachine } from './types';
+import { useActor, useMachine, useSelector } from './use-machine';
+
+// ─── Shared fixture ──────────────────────────────────────────────────────────
+
+type TestContext = { count: number; label: string };
+
+type TestEvent = { type: 'SIMPLE' } | { type: 'WITH_PAYLOAD'; value: string } | { type: 'OPTIONAL'; count?: number };
+
+const machine = setup<TestContext, TestEvent>().createMachine({
+  initial: 'idle',
+  context: { count: 0, label: '' },
+  states: {
+    idle: {
+      on: {
+        SIMPLE: 'idle',
+        WITH_PAYLOAD: 'idle',
+        OPTIONAL: 'idle',
+      },
+    },
+  },
+});
+
+const actor = createActor(machine);
+
+// ─── actor.send — accepted events ────────────────────────────────────────────
+
+describe('actor.send — accepts every member of the event union', () => {
+  test('event with no payload', () => {
+    actor.send({ type: 'SIMPLE' });
+  });
+
+  test('event with required payload', () => {
+    actor.send({ type: 'WITH_PAYLOAD', value: 'hello' });
+  });
+
+  test('event with optional payload omitted', () => {
+    actor.send({ type: 'OPTIONAL' });
+  });
+
+  test('event with optional payload provided', () => {
+    actor.send({ type: 'OPTIONAL', count: 3 });
+  });
+});
+
+// ─── actor.send — rejected events ────────────────────────────────────────────
+
+describe('actor.send — rejects events outside the union', () => {
+  test('unknown event type', () => {
+    // @ts-expect-error — 'UNKNOWN' is not in TestEvent
+    actor.send({ type: 'UNKNOWN' });
+  });
+
+  test('missing required payload field', () => {
+    // @ts-expect-error — WITH_PAYLOAD requires `value: string`
+    actor.send({ type: 'WITH_PAYLOAD' });
+  });
+
+  test('wrong payload field type', () => {
+    // @ts-expect-error — `value` must be string, not number
+    actor.send({ type: 'WITH_PAYLOAD', value: 123 });
+  });
+
+  test('empty object', () => {
+    // @ts-expect-error — missing `type`
+    actor.send({});
+  });
+});
+
+// ─── actor.can — accepted / rejected ─────────────────────────────────────────
+
+describe('actor.can — mirrors send type safety', () => {
+  test('accepts a valid event', () => {
+    const result = actor.can({ type: 'SIMPLE' });
+    expectTypeOf(result).toEqualTypeOf<boolean>();
+  });
+
+  test('accepts event with payload', () => {
+    actor.can({ type: 'WITH_PAYLOAD', value: 'x' });
+  });
+
+  test('rejects unknown event type', () => {
+    // @ts-expect-error — 'NOPE' is not in TestEvent
+    actor.can({ type: 'NOPE' });
+  });
+
+  test('rejects missing required payload', () => {
+    // @ts-expect-error — WITH_PAYLOAD requires `value`
+    actor.can({ type: 'WITH_PAYLOAD' });
+  });
+});
+
+// ─── snapshot types ───────────────────────────────────────────────────────────
+
+describe('snapshot — context and value are correctly typed', () => {
+  test('context matches TContext', () => {
+    const snap = actor.getSnapshot();
+    expectTypeOf(snap.context).toEqualTypeOf<TestContext>();
+  });
+
+  test('value is the union of state names', () => {
+    const snap = actor.getSnapshot();
+    expectTypeOf(snap.value).toEqualTypeOf<'idle'>();
+  });
+
+  test('full snapshot matches Snapshot<TContext, TStates>', () => {
+    const snap = actor.getSnapshot();
+    expectTypeOf(snap).toEqualTypeOf<Snapshot<TestContext, 'idle'>>();
+  });
+
+  test('value is the union of state names for a machine built through setup', () => {
+    const m = setup<TestContext, TestEvent>().createMachine({ initial: 'a', states: { a: {}, b: {} } });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('value is the union of state names for a machine built without type arguments', () => {
+    const m = createMachine({ initial: 'a', states: { a: { on: { NEXT: 'b' } }, b: {} } });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<'a' | 'b'>();
+  });
+
+  test('value stays string when createMachine is given only context and event types', () => {
+    const m = createMachine<TestContext, TestEvent>({
+      initial: 'a',
+      context: { count: 0, label: '' },
+      states: { a: {} },
+    });
+    expectTypeOf(createActor(m).getSnapshot().value).toEqualTypeOf<string>();
+  });
+
+  test('useMachine, useActor and useSelector keep the union of state names', () => {
+    expectTypeOf(useMachine(machine)[0].value).toEqualTypeOf<'idle'>();
+    expectTypeOf(useActor(actor)[0].value).toEqualTypeOf<'idle'>();
+    expectTypeOf(useSelector(actor, snap => snap.value)).toEqualTypeOf<'idle'>();
+  });
+
+  test('createActor rejects a snapshot value that is not a state', () => {
+    // @ts-expect-error — 'missing' is not a state
+    createActor(machine, { snapshot: { value: 'missing' } });
+  });
+
+  test('mockActor rejects a value that is not a state', () => {
+    // @ts-expect-error — 'missing' is not a state
+    mockActor(machine, { value: 'missing' });
+  });
+});
+
+// ─── assign — updater types ───────────────────────────────────────────────────
+
+describe('assign — updater receives typed context and event', () => {
+  test('context parameter is TContext', () => {
+    assign<TestContext, TestEvent>(ctx => {
+      expectTypeOf(ctx).toEqualTypeOf<TestContext>();
+      return {};
+    });
+  });
+
+  test('event parameter is TEvent', () => {
+    assign<TestContext, TestEvent>((_, event) => {
+      expectTypeOf(event).toEqualTypeOf<TestEvent>();
+      return {};
+    });
+  });
+
+  test('return must be Partial<TContext> — rejects unknown keys', () => {
+    // @ts-expect-error — 'unknown_key' is not in TestContext
+    assign<TestContext, TestEvent>(() => ({ unknown_key: true }));
+  });
+});
+
+// ─── Actor.send signature ─────────────────────────────────────────────────────
+
+describe('Actor.send — signature is (event: TEvent) => void, not AnyEventObject', () => {
+  test('send is typed to TEvent', () => {
+    expectTypeOf(actor.send).toEqualTypeOf<(event: TestEvent) => void>();
+  });
+
+  test('send does not widen to Record<string, unknown>', () => {
+    expectTypeOf(actor.send).not.toExtend<(event: Record<string, unknown>) => void>();
+  });
+});
+
+// ─── createMachine — on key and target type safety ───────────────────────────
+
+describe('createMachine — on keys are constrained to TEvent types', () => {
+  test('valid event type in on compiles', () => {
+    createMachine<TestContext, TestEvent>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'idle' } } },
+    });
+  });
+
+  test('unknown event type in on is rejected', () => {
+    createMachine<TestContext, TestEvent>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        // @ts-expect-error — 'UNKNOWN_EVENT' is not in TestEvent['type']
+        idle: { on: { UNKNOWN_EVENT: 'idle' } },
+      },
+    });
+  });
+});
+
+describe('createMachine — TStates constrains initial and transition targets', () => {
+  type S = 'idle' | 'active';
+
+  test('valid initial compiles', () => {
+    createMachine<TestContext, TestEvent, S>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'active' } }, active: {} },
+    });
+  });
+
+  test('invalid initial is rejected', () => {
+    createMachine<TestContext, TestEvent, S>({
+      // @ts-expect-error — 'missing' is not in 'idle' | 'active'
+      initial: 'missing',
+      context: { count: 0, label: '' },
+      states: { idle: {}, active: {} },
+    });
+  });
+
+  test('invalid transition target is rejected', () => {
+    createMachine<TestContext, TestEvent, S>({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not in 'idle' | 'active'
+          on: { SIMPLE: 'nonexistent' },
+        },
+        active: {},
+      },
+    });
+  });
+});
+
+// ─── setup — pre-binds TContext and TEvent ───────────────────────────────────
+
+describe('setup — eliminates repetitive generic params', () => {
+  const { createMachine: make, assign: a } = setup<TestContext, TestEvent>();
+
+  test('createMachine compiles without explicit type parameters', () => {
+    const m = make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: { idle: { on: { SIMPLE: 'idle' } } },
+    });
+    expectTypeOf(m).toExtend<StateMachine<TestContext, TestEvent>>();
+  });
+
+  test('assign in on handler infers the narrowed event type — no Extract<> needed', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            WITH_PAYLOAD: {
+              // e should be { type: 'WITH_PAYLOAD'; value: string }, not the full union
+              actions: a((_, e) => {
+                expectTypeOf(e).toEqualTypeOf<{ type: 'WITH_PAYLOAD'; value: string }>();
+                return { label: e.value };
+              }),
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('assign context return type is enforced — rejects unknown keys', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            SIMPLE: {
+              // @ts-expect-error — 'unknown_key' is not in TestContext
+              actions: a(() => ({ unknown_key: true })),
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('invalid initial is rejected', () => {
+    make({
+      // @ts-expect-error — 'missing' is not a state
+      initial: 'missing',
+      context: { count: 0, label: '' },
+      states: { idle: {}, active: {} },
+    });
+  });
+
+  test('invalid transition target is rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not a state
+          on: { SIMPLE: 'nonexistent' },
+        },
+        active: {},
+      },
+    });
+  });
+
+  test('invalid target in a long-form transition is rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          // @ts-expect-error — 'nonexistent' is not a state
+          always: { target: 'nonexistent' },
+        },
+      },
+    });
+  });
+
+  test('on key constraint still holds — unknown event types are rejected', () => {
+    make({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        // @ts-expect-error — 'UNKNOWN_EVENT' is not in TestEvent['type']
+        idle: { on: { UNKNOWN_EVENT: 'idle' } },
+      },
+    });
+  });
+});
+
+// ─── setup.fromPromise — typed invoke output ──────────────────────────────────
+
+type FetchContext = { url: string; data: string | null; error: string | null };
+type FetchEvent = { type: 'FETCH' } | { type: 'RESET' };
+
+interface FetchResult {
+  body: string;
+  status: number;
+}
+
+describe('setup.fromPromise — e.output is typed from src return type', () => {
+  const { createMachine: make2, assign: a2, fromPromise } = setup<FetchContext, FetchEvent>();
+
+  // Typed async function — fromPromise infers TOutput = FetchResult from its return type.
+  const fakeFetch = (ctx: FetchContext): Promise<FetchResult> => Promise.resolve({ body: ctx.url, status: 200 });
+
+  test('e.output in onDone is typed to TOutput, not unknown or any', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              actions: a2((_, e) => {
+                // e.output should be FetchResult, not unknown or any
+                expectTypeOf(e.output).toEqualTypeOf<FetchResult>();
+                return { data: e.output.body };
+              }),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('e.output allows accessing known fields without a cast', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              // Accessing .body and .status directly — no cast needed
+              actions: a2((_, e) => ({ data: e.output.body + e.output.status })),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('assign context return type still enforced inside fromPromise onDone', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: {
+              target: 'idle',
+              // @ts-expect-error — 'unknown_key' is not in FetchContext
+              actions: a2(() => ({ unknown_key: true })),
+            },
+          }),
+        },
+      },
+    });
+  });
+
+  test('a machine using fromPromise still rejects unknown state names', () => {
+    make2({
+      // @ts-expect-error — 'nope' is not a state
+      initial: 'nope',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        loading: { invoke: fromPromise(fakeFetch, { onDone: 'idle' }) },
+      },
+    });
+
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        // @ts-expect-error — 'nope' is not a state
+        idle: { on: { FETCH: 'nope' } },
+        loading: { invoke: fromPromise(fakeFetch, { onDone: 'idle' }) },
+      },
+    });
+  });
+
+  test('fromPromise rejects unknown targets and accepts known ones', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        // @ts-expect-error — 'nope' is not a state
+        done: { invoke: fromPromise(fakeFetch, { onDone: 'nope' }) },
+        // @ts-expect-error — 'nope' is not a state
+        failed: { invoke: fromPromise(fakeFetch, { onError: { target: 'nope' } }) },
+        // @ts-expect-error — 'nope' is not a state
+        guarded: { invoke: fromPromise(fakeFetch, { onDone: [{ target: 'idle' }, { target: 'nope' }] }) },
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: [{ target: 'done' }, { target: 'idle' }],
+            onError: 'failed',
+          }),
+        },
+      },
+    });
+  });
+
+  test('a transition without a target does not widen the state names', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        loading: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: 'idle',
+            onError: { actions: a2(() => ({ error: 'failed' })) },
+          }),
+        },
+      },
+    });
+  });
+
+  test('a shared fromPromise state is checked against the machine it joins', () => {
+    const known = { invoke: fromPromise(fakeFetch, { onDone: { target: 'idle' } }) };
+    const unknownTarget = { invoke: fromPromise(fakeFetch, { onDone: { target: 'nope' } }) };
+
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        known,
+        // @ts-expect-error — 'nope' is not a state
+        unknownTarget,
+      },
+    });
+  });
+
+  test('a function transition is checked against the machine it joins', () => {
+    const known = { invoke: fromPromise(fakeFetch, { onDone: () => ({ target: 'idle' }) }) };
+    const stays = { invoke: fromPromise(fakeFetch, { onError: () => ({ context: { error: 'failed' } }) }) };
+    const unhandled = { invoke: fromPromise(fakeFetch, { onDone: () => undefined }) };
+    const unknownTarget = { invoke: fromPromise(fakeFetch, { onDone: () => ({ target: 'nope' }) }) };
+
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        known,
+        stays,
+        unhandled,
+        // @ts-expect-error — 'nope' is not a state
+        unknownTarget,
+      },
+    });
+  });
+
+  test('an inline function transition sees the typed output', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {
+          invoke: fromPromise(fakeFetch, {
+            onDone: ({ event }) => {
+              expectTypeOf(event.output).toEqualTypeOf<FetchResult>();
+              return { target: 'done' };
+            },
+          }),
+        },
+        done: {},
+      },
+    });
+  });
+
+  test('the machine keeps its state names as a union', () => {
+    const fetching = make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: {},
+        loading: { invoke: fromPromise(fakeFetch, { onDone: 'idle' }) },
+      },
+    });
+
+    expectTypeOf(createActor(fetching).getSnapshot().value).toEqualTypeOf<'idle' | 'loading'>();
+  });
+
+  test('a raw src function still works — e.output is any', () => {
+    make2({
+      initial: 'idle',
+      context: { url: '', data: null, error: null },
+      states: {
+        idle: { on: { FETCH: 'loading' } },
+        loading: {
+          invoke: {
+            // Raw function: output type is not carried through
+            src: async (ctx: FetchContext) => Promise.resolve(ctx.url),
+            onDone: {
+              target: 'idle',
+              actions: a2((_, e) => {
+                // any — document that fromPromise is required for typed output
+                expectTypeOf(e.output).toBeAny();
+                return {};
+              }),
+            },
+          },
+        },
+      },
+    });
+  });
+});
+
+// ─── TransitionFn — inline function form ─────────────────────────────────────
+
+describe('TransitionFn — accepted in on and always', () => {
+  const { createMachine: make3 } = setup<TestContext, TestEvent>();
+
+  test('function form accepted in on[K] — no type error', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            WITH_PAYLOAD: ({ context, event }) => {
+              // context is TContext
+              expectTypeOf(context).toEqualTypeOf<TestContext>();
+              // event is narrowed to the specific member
+              expectTypeOf(event).toEqualTypeOf<{ type: 'WITH_PAYLOAD'; value: string }>();
+              return { target: 'idle' as const };
+            },
+          },
+        },
+      },
+    });
+  });
+
+  test('function form accepted in always — no type error', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          always: ({ context }) => {
+            expectTypeOf(context).toEqualTypeOf<TestContext>();
+            return undefined;
+          },
+        },
+      },
+    });
+  });
+
+  test('returning undefined from TransitionFn is allowed', () => {
+    make3({
+      initial: 'idle',
+      context: { count: 0, label: '' },
+      states: {
+        idle: {
+          on: {
+            SIMPLE: (): undefined => undefined,
+          },
+        },
+      },
+    });
+  });
+});

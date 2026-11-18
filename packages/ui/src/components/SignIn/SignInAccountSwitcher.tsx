@@ -8,7 +8,7 @@ import { UserPreview } from '@/ui/elements/UserPreview';
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { Add, SwitchArrowRight } from '../../icons';
+import { Add, ArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
@@ -16,10 +16,11 @@ const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
-  const { navigateAfterSignOut } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterSignOut } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       taskUrl,
+      afterSignOutUrl,
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
       userProfileUrl,
@@ -45,7 +46,7 @@ const SignInAccountSwitcherInternal = () => {
               borderTopColor: t.colors.$borderAlpha100,
             })}
           >
-            <Actions role='menu'>
+            <Actions>
               {signedInSessions.map(s => (
                 <PreviewButton
                   key={s.id}
@@ -55,7 +56,7 @@ const SignInAccountSwitcherInternal = () => {
                     justifyContent: 'flex-start',
                     borderRadius: 0,
                   })}
-                  icon={SwitchArrowRight}
+                  icon={ArrowRight}
                 >
                   <UserPreview
                     user={s.user}

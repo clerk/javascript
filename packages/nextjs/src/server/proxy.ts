@@ -52,6 +52,7 @@ export async function clerkFrontendApiProxy(
     proxyPath: options?.proxyPath || DEFAULT_PROXY_PATH,
     publishableKey: options?.publishableKey || PUBLISHABLE_KEY,
     secretKey: options?.secretKey || SECRET_KEY,
+    fapiUrl: options?.fapiUrl,
   });
 }
 

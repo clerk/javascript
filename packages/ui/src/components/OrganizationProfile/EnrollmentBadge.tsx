@@ -7,6 +7,7 @@ const badgeLabelsMap: Record<OrganizationDomainResource['enrollmentMode'], Local
   manual_invitation: localizationKeys('organizationProfile.badge__manualInvitation'),
   automatic_invitation: localizationKeys('organizationProfile.badge__automaticInvitation'),
   automatic_suggestion: localizationKeys('organizationProfile.badge__automaticSuggestion'),
+  enterprise_sso: localizationKeys('organizationProfile.badge__enterpriseSso'),
 };
 
 export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainResource | null }) => {
@@ -15,7 +16,11 @@ export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainR
     return null;
   }
 
-  if (!(organizationDomain.verification && organizationDomain.verification.status === 'verified')) {
+  const isVerified =
+    organizationDomain.ownershipVerification?.status === 'verified' ||
+    organizationDomain.verification?.status === 'verified';
+
+  if (!isVerified) {
     return (
       <Badge
         localizationKey={localizationKeys('organizationProfile.badge__unverified')}

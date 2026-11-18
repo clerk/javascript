@@ -1,0 +1,72 @@
+import * as UserAvatarStories from './user-avatar.stories';
+
+# UserAvatar
+
+The signed-in user's profile image on its own. It reads the user from Clerk and takes no data.
+Assistive technology reads it as an image named for the user, by their full name or, without one,
+their username, email, or phone number.
+
+It renders `fallback` while Clerk loads, and nothing when nobody is signed in.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserAvatarStories}
+  composition={[{ name: 'Avatar', href: '/components/avatar', layer: 'Components' }]}
+/>
+
+## Usage
+
+```tsx
+import { UserAvatar } from '@clerk/mosaic';
+
+<UserAvatar />;
+```
+
+## Props
+
+| Prop       | Type                                    | Default    | Description                                     |
+| ---------- | --------------------------------------- | ---------- | ----------------------------------------------- |
+| `shape`    | `'circle' \| 'square'`                  | `'circle'` | The outline of the avatar.                      |
+| `size`     | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'fit'` | `'sm'`     | The size of the avatar. `fit` fills its parent. |
+| `fallback` | `ReactNode`                             | —          | Rendered while Clerk loads.                     |
+
+## Without an image
+
+Until the image loads, or when it fails, a blank placeholder holds its place. The user's initials sit
+inside it, hidden; see [Styling](#styling) to paint them.
+
+<Story
+  name='NoImage'
+  storyModule={UserAvatarStories}
+/>
+
+## Shapes
+
+<Story
+  name='Shapes'
+  storyModule={UserAvatarStories}
+/>
+
+## Sizes
+
+<Story
+  name='Sizes'
+  storyModule={UserAvatarStories}
+/>
+
+## Styling
+
+| Slot              | Attributes                                 |
+| ----------------- | ------------------------------------------ |
+| `.cl-user-avatar` | `data-shape`, `data-size`, `data-bordered` |
+
+The avatar also carries the `.cl-avatar` slot and its parts, so anything that styles `Avatar` applies
+here too. `.cl-user-avatar` targets this one alone.
+
+```css
+.cl-user-avatar .cl-avatar-fallback-content {
+  visibility: visible;
+}
+```

@@ -87,4 +87,20 @@ export const constants = {
    */
   INTEGRATION_INSTANCE_KEYS: process.env.INTEGRATION_INSTANCE_KEYS,
   INTEGRATION_STAGING_INSTANCE_KEYS: process.env.INTEGRATION_STAGING_INSTANCE_KEYS,
+  INTEGRATION_TEST_RUN_KEY: process.env.INTEGRATION_TEST_RUN_KEY,
+  E2E_CLEANUP_STALE_APPLICATIONS: process.env.E2E_CLEANUP_STALE_APPLICATIONS === '1',
+  CLERK_PLATFORM_API_KEY: process.env.CLERK_PLATFORM_API_KEY,
 } as const;
+
+/**
+ * Floor versions of transitive deps that carry pnpm "trustedPublisher" evidence.
+ * Injected as `pnpm.overrides` into every fixture's tmp `package.json` so that
+ * isolated installs satisfy pnpm 10's trust-downgrade check. Sourced from the
+ * 2026-05-11 npm supply-chain incident response (mini Shai-Hulud worm).
+ * Update when upstream packages publish newer versions via OIDC trusted publisher.
+ */
+export const TRUSTED_OVERRIDES: Record<string, string> = {
+  'semver@<7.7.3': '7.7.4',
+  'chokidar@<5.0.0': '5.0.0',
+  'undici-types@<7.16.0': '7.24.8',
+};

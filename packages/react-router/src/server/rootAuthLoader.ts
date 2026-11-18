@@ -4,10 +4,10 @@ import type { LoaderFunctionArgs } from 'react-router';
 import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authFnContext, requestStateContext } from './clerkMiddleware';
 import type {
+  AdditionalStateOptions,
   LoaderFunctionArgsWithAuth,
   LoaderFunctionReturn,
   RootAuthLoaderCallback,
-  RootAuthLoaderOptions,
 } from './types';
 import {
   getResponseClerkState,
@@ -19,7 +19,7 @@ import {
 } from './utils';
 
 interface RootAuthLoader {
-  <Options extends RootAuthLoaderOptions, Callback extends RootAuthLoaderCallback<Options>>(
+  <Callback extends RootAuthLoaderCallback>(
     /**
      * Arguments passed to the loader function.
      */
@@ -28,10 +28,9 @@ interface RootAuthLoader {
      * A loader function with authentication state made available to it. Allows you to fetch route data based on the user's authentication state.
      */
     callback: Callback,
-    options?: Options,
   ): Promise<ReturnType<Callback>>;
 
-  (args: LoaderFunctionArgs, options?: RootAuthLoaderOptions): Promise<LoaderFunctionReturn>;
+  (args: LoaderFunctionArgs): Promise<LoaderFunctionReturn>;
 }
 
 /**
@@ -40,14 +39,15 @@ interface RootAuthLoader {
 async function processRootAuthLoader(
   args: LoaderFunctionArgs,
   requestState: RequestState,
-  handler?: RootAuthLoaderCallback<any>,
+  additionalState: AdditionalStateOptions,
+  handler?: RootAuthLoaderCallback,
 ): Promise<LoaderFunctionReturn> {
   const hasMiddleware = IsOptIntoMiddleware(args.context) && !!args.context.get(authFnContext);
   const includeClerkHeaders = !hasMiddleware;
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
-    const { clerkState } = getResponseClerkState(requestState, args.context);
+    const { clerkState } = getResponseClerkState(requestState, args.context, additionalState);
     return {
       ...clerkState,
     };
@@ -57,7 +57,7 @@ async function processRootAuthLoader(
   const argsWithAuth = {
     ...args,
     request: Object.assign(args.request, { auth: requestState.toAuth() }),
-  } as LoaderFunctionArgsWithAuth<any>;
+  } as LoaderFunctionArgsWithAuth;
 
   const handlerResult = await handler(argsWithAuth);
 
@@ -69,7 +69,13 @@ async function processRootAuthLoader(
       }
       // clone and try to inject requestState into all json-like responses
       // if this fails, the user probably didn't return a json object or a valid json string
-      return injectRequestStateIntoResponse(handlerResult, requestState, args.context, includeClerkHeaders);
+      return injectRequestStateIntoResponse(
+        handlerResult,
+        requestState,
+        args.context,
+        additionalState,
+        includeClerkHeaders,
+      );
     } catch {
       throw new Error(invalidRootLoaderCallbackReturn);
     }
@@ -83,6 +89,7 @@ async function processRootAuthLoader(
         new Response(JSON.stringify(handlerResult.data), handlerResult.init ?? undefined),
         requestState,
         args.context,
+        additionalState,
         includeClerkHeaders,
       );
     } catch {
@@ -91,7 +98,7 @@ async function processRootAuthLoader(
   }
 
   // If the return value of the user's handler is null or a plain object, return plain object with streaming support
-  const { clerkState } = getResponseClerkState(requestState, args.context);
+  const { clerkState } = getResponseClerkState(requestState, args.context, additionalState);
 
   return {
     ...(handlerResult ?? {}),
@@ -106,18 +113,19 @@ async function processRootAuthLoader(
  */
 export const rootAuthLoader: RootAuthLoader = async (
   args: LoaderFunctionArgs,
-  handlerOrOptions: any,
+  callback?: unknown,
 ): Promise<LoaderFunctionReturn> => {
-  const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined;
+  const handler = typeof callback === 'function' ? (callback as RootAuthLoaderCallback) : undefined;
 
   const hasMiddlewareFlag = IsOptIntoMiddleware(args.context);
-  const requestState = hasMiddlewareFlag && args.context.get(requestStateContext);
+  const contextValue = hasMiddlewareFlag && args.context.get(requestStateContext);
 
-  if (!requestState) {
+  if (!contextValue) {
     throw new Error(
       'Clerk: clerkMiddleware() not detected. Make sure you have installed the clerkMiddleware in your root route.',
     );
   }
 
-  return processRootAuthLoader(args, requestState, handler);
+  const { requestState, additionalState } = contextValue;
+  return processRootAuthLoader(args, requestState, additionalState, handler);
 };

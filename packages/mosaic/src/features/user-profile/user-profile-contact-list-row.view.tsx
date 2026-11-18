@@ -1,0 +1,143 @@
+import * as stylex from '@stylexjs/stylex';
+import type { ReactNode, Ref } from 'react';
+
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
+import { Badge } from '../../components/badge';
+import { Button } from '../../components/button';
+import { Icon } from '../../components/icon';
+import { Section } from '../../components/section';
+import { Plus } from '../../icons/glyphs/plus';
+import { fill, useMessages } from '../../localization';
+import { truncationStyles } from '../../styles/typography.styles';
+import type { UserProfileContact, UserProfileContactRow } from './user-profile-contact.types';
+import { styles } from './user-profile-profile-panel.styles';
+
+export interface UserProfileContactListRowViewProps {
+  rowRef?: Ref<HTMLDivElement>;
+  triggerRef?: (id: string) => Ref<HTMLButtonElement>;
+  addAction?: ReactNode;
+  kind: 'email' | 'phone';
+  label: string;
+  items: UserProfileContactRow[];
+  onAdd?: () => void;
+  onVerify?: (id: string) => void;
+  isDisabled?: boolean;
+  onSetPrimary?: (id: string) => void;
+  onRemove?: (item: UserProfileContact) => void;
+  children?: ReactNode;
+}
+
+export function UserProfileContactListRowView({
+  kind,
+  label,
+  items,
+  onAdd,
+  onVerify,
+  isDisabled = false,
+  onSetPrimary,
+  onRemove,
+  addAction,
+  rowRef,
+  triggerRef,
+  children,
+}: UserProfileContactListRowViewProps) {
+  const messages = useMessages('userProfile');
+  const m = messages.contact;
+  const nouns = messages[kind];
+
+  return (
+    <Section.Group
+      ref={rowRef}
+      tabIndex={-1}
+    >
+      <Section.Header>
+        <Section.Content>
+          <Section.Title>{label}</Section.Title>
+        </Section.Content>
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
+          <Section.Actions>
+            <Button
+              aria-label={nouns.add}
+              color='neutral'
+              size='sm'
+              variant='outline'
+              onClick={onAdd}
+              disabled={isDisabled}
+            >
+              <Icon
+                glyph={Plus}
+                placement='inline-start'
+                size='md'
+              />
+              {m.add}
+            </Button>
+          </Section.Actions>
+        ) : null}
+      </Section.Header>
+      <Section.Body>
+        <Section.Items>
+          {items.length === 0 ? (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{nouns.empty}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          ) : (
+            items.map(item => {
+              const actions: ActionMenuAction[] = [];
+
+              if (!item.isVerified && onVerify) {
+                actions.push({
+                  label: item.isDefault ? m.completeVerification : nouns.verify,
+                  onClick: () => onVerify(item.id),
+                  status: item.isVerifyPending ? 'pending' : 'idle',
+                });
+              } else if (item.isVerified && !item.isDefault && onSetPrimary) {
+                actions.push({
+                  label: m.setPrimary,
+                  onClick: () => onSetPrimary(item.id),
+                  status: item.isPrimaryPending ? 'pending' : 'idle',
+                });
+              }
+
+              if (onRemove) {
+                actions.push({
+                  label: nouns.remove,
+                  color: 'negative',
+                  onClick: () => onRemove(item),
+                });
+              }
+
+              return (
+                <Section.Item key={item.id}>
+                  <Section.Content>
+                    <Section.Description xstyle={styles.contactValue}>
+                      <span {...stylex.props(truncationStyles.singleLine, styles.contactText)}>{item.value}</span>
+                      {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
+                      {item.isVerified ? null : <Badge color='warning'>{m.unverified}</Badge>}
+                    </Section.Description>
+                  </Section.Content>
+                  {actions.length > 0 ? (
+                    <Section.Actions>
+                      <ActionMenu
+                        triggerRef={triggerRef?.(item.id)}
+                        actions={actions}
+                        disabled={isDisabled}
+                        focusableWhenDisabled
+                        label={fill(m.manageValue, { value: item.value })}
+                      />
+                    </Section.Actions>
+                  ) : null}
+                </Section.Item>
+              );
+            })
+          )}
+        </Section.Items>
+        {children}
+      </Section.Body>
+    </Section.Group>
+  );
+}

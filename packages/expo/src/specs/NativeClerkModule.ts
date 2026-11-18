@@ -1,14 +1,16 @@
-import type { TurboModule } from 'react-native';
-import { TurboModuleRegistry } from 'react-native';
-import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypesNamespace';
+import { requireOptionalNativeModule } from 'expo';
 
-export interface Spec extends TurboModule {
-  configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  presentAuth(options: UnsafeObject): Promise<UnsafeObject>;
-  presentUserProfile(options: UnsafeObject): Promise<UnsafeObject | null>;
-  getSession(): Promise<UnsafeObject | null>;
-  getClientToken(): Promise<string | null>;
-  signOut(): Promise<void>;
+import type {
+  NativeAuthFlowModule,
+  NativeClientSyncModule,
+  NativeUpdateRequiredViewModule,
+} from './NativeClerkModule.types';
+
+export interface Spec
+  extends NativeAuthFlowModule, Partial<NativeClientSyncModule>, Partial<NativeUpdateRequiredViewModule> {
+  // Exposed by Expo Modules EventEmitter for the internal `clerkNativeClientInvalidated` event.
+  // This is not part of the public @clerk/expo API.
+  addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
 }
 
-export default TurboModuleRegistry.get<Spec>('ClerkExpo');
+export default requireOptionalNativeModule<Spec>('ClerkExpo');

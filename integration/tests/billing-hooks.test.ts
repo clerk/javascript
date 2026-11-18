@@ -10,8 +10,8 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    const u = await createTestUtils({ app });
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 
@@ -22,7 +22,7 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
 
   test.describe('when signed out', () => {
     test('renders billing hooks with plans, but no statements and no subscription', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/hooks');
 
       await u.po.page.waitForClerkJsLoaded();
@@ -36,8 +36,9 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
 
   test.describe('when signed in', () => {
     test.describe.configure({ mode: 'serial' });
+
     test('subscribes to a plan', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/pricing-table');
@@ -51,7 +52,7 @@ testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
     });
 
     test('renders billing hooks with plans, statements and subscription', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/hooks');

@@ -70,7 +70,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g., `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */
@@ -87,6 +87,10 @@ export type __internal_LocalizationResource = {
   /** Label for the “Last used” badge on authentication strategies. */
   lastAuthenticationStrategy: LocalizationValue;
   dividerText: LocalizationValue;
+  /** Shared strings for search inputs across the components. */
+  searchInput: {
+    action__clear: LocalizationValue;
+  };
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
   formFieldLabel__phoneNumber: LocalizationValue;
@@ -137,6 +141,8 @@ export type __internal_LocalizationResource = {
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
+  formFieldAction__hidePassword: LocalizationValue;
+  formFieldAction__showPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -154,6 +160,7 @@ export type __internal_LocalizationResource = {
   badge__requiresAction: LocalizationValue;
   badge__you: LocalizationValue;
   badge__banned: LocalizationValue;
+  badge__deprovisioned: LocalizationValue;
   badge__freeTrial: LocalizationValue;
   badge__currentPlan: LocalizationValue;
   badge__upcomingPlan: LocalizationValue;
@@ -171,6 +178,9 @@ export type __internal_LocalizationResource = {
   footerPageLink__terms: LocalizationValue;
   paginationButton__previous: LocalizationValue;
   paginationButton__next: LocalizationValue;
+  identityPreviewEditButton__emailAddress: LocalizationValue;
+  identityPreviewEditButton__phoneNumber: LocalizationValue;
+  identityPreviewEditButton__identifier: LocalizationValue;
   paginationRowText__displaying: LocalizationValue;
   paginationRowText__of: LocalizationValue;
   membershipRole__admin: LocalizationValue;
@@ -178,9 +188,11 @@ export type __internal_LocalizationResource = {
   membershipRole__guestMember: LocalizationValue;
   billing: {
     month: LocalizationValue;
+    months: LocalizationValue;
     monthAbbreviation: LocalizationValue;
     monthPerUnit: LocalizationValue<'unitName'>;
     year: LocalizationValue;
+    years: LocalizationValue;
     yearAbbreviation: LocalizationValue;
     yearPerUnit: LocalizationValue<'unitName'>;
     free: LocalizationValue;
@@ -191,15 +203,21 @@ export type __internal_LocalizationResource = {
     keepSubscription: LocalizationValue;
     reSubscribe: LocalizationValue;
     seats: LocalizationValue;
+    seatsWithLimit: LocalizationValue<'limit'>;
+    seatBreakdownSingular: LocalizationValue<'rate'>;
+    seatBreakdownPlural: LocalizationValue<'chargeable' | 'rate'>;
+    seatBreakdownIncludedSingular: LocalizationValue<'totalSeats' | 'included' | 'rate'>;
+    seatBreakdownIncludedPlural: LocalizationValue<'totalSeats' | 'included' | 'chargeable' | 'rate'>;
     subscribe: LocalizationValue;
     startFreeTrial: LocalizationValue;
     startFreeTrial__days: LocalizationValue<'days'>;
     switchPlan: LocalizationValue;
     switchToMonthly: LocalizationValue;
     switchToAnnual: LocalizationValue;
-    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
-    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
+    switchToMonthlyWithPrice: LocalizationValue<'price'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price'>;
     billedAnnually: LocalizationValue;
+    billedMonthly: LocalizationValue;
     billedMonthlyOnly: LocalizationValue;
     billedAnnuallyOnly: LocalizationValue;
     cancelFreeTrial: LocalizationValue<'plan'>;
@@ -209,25 +227,31 @@ export type __internal_LocalizationResource = {
     alwaysFree: LocalizationValue;
     accountFunds: LocalizationValue;
     defaultFreePlanActive: LocalizationValue;
+    discountAmount: LocalizationValue<'amount'>;
+    discountCyclesRemaining: LocalizationValue<'cycles' | 'period'>;
+    discountDuration: LocalizationValue<'amount' | 'cycles' | 'period'>;
     viewFeatures: LocalizationValue;
     seeAllFeatures: LocalizationValue;
     viewPayment: LocalizationValue;
     availableFeatures: LocalizationValue;
     subtotal: LocalizationValue;
+    subtotalRenewal: LocalizationValue;
     credit: LocalizationValue;
     prorationCredit: LocalizationValue;
     accountCredit: LocalizationValue;
     creditRemainder: LocalizationValue;
     payerCreditRemainder: LocalizationValue;
+    proratedDiscount: LocalizationValue;
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
+    totalDuePerPeriod: LocalizationValue;
     pastDue: LocalizationValue;
     pay: LocalizationValue<'amount'>;
     cancelSubscriptionTitle: LocalizationValue<'plan'>;
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     cancelSubscriptionPastDue: LocalizationValue;
-    popular: LocalizationValue;
+    highlightedPlanBadge: LocalizationValue;
     paymentMethods__label: LocalizationValue;
     addPaymentMethod__label: LocalizationValue;
     paymentMethod: {
@@ -281,6 +305,11 @@ export type __internal_LocalizationResource = {
       };
     };
     checkout: {
+      addPromoCode: LocalizationValue;
+      applyPromoCode: LocalizationValue;
+      discount: LocalizationValue;
+      promoCodePlaceholder: LocalizationValue;
+      removePromoCode: LocalizationValue;
       title: LocalizationValue;
       title__paymentSuccessful: LocalizationValue;
       title__subscriptionSuccessful: LocalizationValue;
@@ -301,6 +330,7 @@ export type __internal_LocalizationResource = {
       downgradeNotice: LocalizationValue;
       pastDueNotice: LocalizationValue;
       totalDueAfterTrial: LocalizationValue<'days'>;
+      totalDuePerPeriod: LocalizationValue;
       perMonth: LocalizationValue;
     };
   };
@@ -399,6 +429,12 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       noAvailableWallets: LocalizationValue;
     };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -487,6 +523,14 @@ export type __internal_LocalizationResource = {
         titleNewTab: LocalizationValue;
         subtitleNewTab: LocalizationValue;
       };
+      /**
+       * Shown when the verified email has no matching user and the flow transfers to sign-up
+       * (`signUpIfMissing`), in whichever tab is not the one carrying that transfer.
+       */
+      verifiedTransferable: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
       loading: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
@@ -544,6 +588,10 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    passkeyMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -577,9 +625,27 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    enterpriseSSO: {
+      formButtonPrimary: LocalizationValue;
+    };
+    ssoBypass: {
+      actionLink: LocalizationValue;
+      notice: LocalizationValue;
+      code: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        resendButton: LocalizationValue;
+      };
+    };
     web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+    };
+    protectCheck: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      loading: LocalizationValue;
+      retryButton: LocalizationValue;
     };
   };
   reverification: {
@@ -620,6 +686,11 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       blockButton__passkey: LocalizationValue;
     };
+    passkeyMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
+    };
     alternativeMethods: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -641,6 +712,30 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       message: LocalizationValue;
+    };
+    passwordPwned: {
+      title: LocalizationValue;
+      subtitle__saveNewPassword: LocalizationValue;
+    };
+    passwordCompromised: {
+      title: LocalizationValue;
+      subtitle__saveNewPassword: LocalizationValue;
+    };
+    resetPassword: {
+      title: LocalizationValue;
+      formButtonPrimary: LocalizationValue;
+    };
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: LocalizationValue;
+      label__alternativeMethods: LocalizationValue;
+    };
+    resetPasswordCode: {
+      title__saveNewPassword_email: LocalizationValue;
+      title__saveNewPassword_phone: LocalizationValue;
+      subtitle__saveNewPassword_email: LocalizationValue;
+      subtitle__saveNewPassword_phone: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
     };
   };
   userProfile: {
@@ -925,6 +1020,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -954,6 +1058,7 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        overview: LocalizationValue;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -997,6 +1102,9 @@ export type __internal_LocalizationResource = {
     action__addAccount: LocalizationValue;
     action__openUserMenu: LocalizationValue;
     action__closeUserMenu: LocalizationValue;
+    label__userButtonPopover?: LocalizationValue;
+    label__accountActions?: LocalizationValue;
+    label__activeSessions?: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
@@ -1021,11 +1129,13 @@ export type __internal_LocalizationResource = {
       members: LocalizationValue;
       billing: LocalizationValue;
       apiKeys: LocalizationValue;
+      security: LocalizationValue;
     };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
+    badge__enterpriseSso: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
       membershipSeatUsageLabel: LocalizationValue<'count' | 'limit'>;
@@ -1109,6 +1219,7 @@ export type __internal_LocalizationResource = {
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue<'email_addresses'>;
       formButtonPrimary__continue: LocalizationValue;
+      formButtonPrimary__purchaseSeats: LocalizationValue;
       selectDropdown__role: LocalizationValue;
     };
     removeDomainPage: {
@@ -1116,6 +1227,168 @@ export type __internal_LocalizationResource = {
       messageLine1: LocalizationValue<'domain'>;
       messageLine2: LocalizationValue;
       successMessage: LocalizationValue;
+    };
+    securityPage: {
+      title: LocalizationValue;
+      removeDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue<'name'>;
+        confirmButton: LocalizationValue;
+      };
+      ssoBypassSection: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+        allowlistLabel: LocalizationValue;
+        allowlistCount: LocalizationValue<'count'>;
+        allowlistCount__one: LocalizationValue;
+        menuAction__manage: LocalizationValue;
+        error__load: LocalizationValue;
+      };
+      ssoBypassPage: {
+        title: LocalizationValue;
+        action__search: LocalizationValue;
+        action__add: LocalizationValue;
+        addForm: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
+          submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
+          error__allAlreadyAdded: LocalizationValue;
+        };
+        table: {
+          header__user: LocalizationValue;
+          header__actions: LocalizationValue;
+          emptyState: LocalizationValue;
+          emptyState__search: LocalizationValue;
+          menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          addedMember: LocalizationValue;
+          domainNotServed: LocalizationValue<'count'>;
+          domainNotServed__one: LocalizationValue;
+          notMember: LocalizationValue<'count'>;
+          notMember__one: LocalizationValue;
+          unknown: LocalizationValue<'count'>;
+          unknown__one: LocalizationValue;
+        };
+      };
+      ssoSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__inProgress: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        descriptionLine1: LocalizationValue;
+        /**
+         * @deprecated Use `primaryButton__configure` instead.
+         */
+        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
+        primaryButton__continueConfiguration: LocalizationValue;
+        primaryButton__addConnection: LocalizationValue;
+        domainLabel: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__continue: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        tooltip: LocalizationValue<'role'>;
+        tooltip__noRole: LocalizationValue;
+        tooltipLabel: LocalizationValue;
+      };
+      connectionPage: {
+        actions: {
+          activate: LocalizationValue;
+          continueSetup: LocalizationValue;
+        };
+        dangerZone: {
+          title: LocalizationValue;
+          deactivateButton: LocalizationValue;
+          removeButton: LocalizationValue;
+        };
+        name: {
+          title: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+        };
+        domains: {
+          title: LocalizationValue;
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          acsUrl: LocalizationValue;
+          entityId: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          redirectUri: LocalizationValue;
+        };
+        identityProvider: {
+          title: LocalizationValue;
+          certificateExpires: LocalizationValue;
+          certificates: LocalizationValue;
+          certificatesCount: LocalizationValue<'count'>;
+          certificatesSummary: LocalizationValue<'count' | 'date'>;
+          certificatesSummaryExpired: LocalizationValue<'count' | 'date'>;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+          clientSecret: {
+            placeholder: LocalizationValue;
+          };
+        };
+        settings: {
+          title: LocalizationValue;
+          syncUserAttributes: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowAdditionalIdentifiers: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowSubdomains: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowIdpInitiated: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          forceAuthn: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+        };
+      };
+      directorySyncSection: {
+        title: LocalizationValue;
+        badge__ssoRequired: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        description: LocalizationValue;
+        error__load: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        removeDialog: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          confirmButton: LocalizationValue;
+        };
+      };
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -1165,6 +1438,15 @@ export type __internal_LocalizationResource = {
     };
     billingPage: {
       title: LocalizationValue;
+      accountCreditsSection: {
+        title: LocalizationValue;
+        viewHistory: LocalizationValue;
+      };
+      creditHistoryPage: {
+        title: LocalizationValue;
+        tableHeader__amount: LocalizationValue;
+        tableHeader__date: LocalizationValue;
+      };
       start: {
         headerTitle__payments: LocalizationValue;
         headerTitle__plans: LocalizationValue;
@@ -1194,6 +1476,11 @@ export type __internal_LocalizationResource = {
         actionLabel__newSubscription: LocalizationValue;
         actionLabel__manageSubscription: LocalizationValue;
         actionLabel__switchPlan: LocalizationValue;
+        includedSeatsUsage: LocalizationValue<'includedSeats'>;
+        overview: LocalizationValue;
+        paidSeatsUsage: LocalizationValue<'seatsQuantity' | 'amount'>;
+        seatLimit: LocalizationValue<'seatLimit'>;
+        seatLimitAndIncludedSeats: LocalizationValue<'seatLimit' | 'includedSeats'>;
       };
       paymentHistorySection: {
         empty: LocalizationValue;
@@ -1256,6 +1543,7 @@ export type __internal_LocalizationResource = {
   oauthConsent: {
     subtitle: LocalizationValue<'applicationName' | 'identifier'>;
     scopeList: {
+      privateMetadata: LocalizationValue<'applicationName'>;
       title: LocalizationValue<'applicationName'>;
     };
     action__deny: LocalizationValue;
@@ -1268,6 +1556,47 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue<'applicationName'>;
     };
+  };
+  oauthDeviceVerification: {
+    start: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      userCodeLabel: LocalizationValue;
+      action__continue: LocalizationValue;
+    };
+    confirmation: {
+      title: LocalizationValue<'applicationName'>;
+      subtitle: LocalizationValue<'identifier'>;
+      scopeListTitle: LocalizationValue<'applicationName'>;
+      warning: LocalizationValue;
+      action__deny: LocalizationValue;
+      action__approve: LocalizationValue;
+    };
+    status: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      alreadyApprovedTitle: LocalizationValue;
+      alreadyApprovedSubtitle: LocalizationValue;
+      alreadyDecidedTitle: LocalizationValue;
+      alreadyDecidedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
+      alreadyDeniedTitle: LocalizationValue;
+      alreadyDeniedSubtitle: LocalizationValue;
+      consumedTitle: LocalizationValue;
+      consumedSubtitle: LocalizationValue;
+    };
+    error: {
+      invalidCode: LocalizationValue;
+      unknownCode: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+      rateLimitedTitle: LocalizationValue;
+      rateLimitedSubtitle: LocalizationValue;
+      genericTitle: LocalizationValue;
+      genericSubtitle: LocalizationValue;
+    };
+    action__tryAnotherCode: LocalizationValue;
   };
   unstable__errors: UnstableErrors;
   dates: {
@@ -1292,10 +1621,751 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
-  configureSSO: {
+  configureDirectorySync: {
     navbar: {
       title: LocalizationValue;
     };
+    stepper: {
+      configure: LocalizationValue;
+      attributes: LocalizationValue;
+      test: LocalizationValue;
+      roles: LocalizationValue;
+    };
+    providers: {
+      okta: LocalizationValue;
+      entra: LocalizationValue;
+      google: LocalizationValue;
+      custom: LocalizationValue;
+    };
+    configureStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      error__ssoRequired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      warning__ssoInactive: LocalizationValue;
+      formFieldLabel__serviceAccountKey: LocalizationValue;
+      formFieldLabel__subjectEmail: LocalizationValue;
+      formFieldInputPlaceholder__subjectEmail: LocalizationValue;
+      formFieldHint__subjectEmail: LocalizationValue;
+      actionLabel__uploadKey: LocalizationValue;
+      actionLabel__replaceKey: LocalizationValue;
+      badge__credentialsConfigured: LocalizationValue;
+      badge__credentialsMissing: LocalizationValue;
+      error__invalidKeyFile: LocalizationValue;
+      domainsLabel: LocalizationValue;
+      instructions: {
+        actionLabel__toggle: LocalizationValue;
+        okta: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        entra: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        custom: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        google: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+        };
+      };
+      formFieldLabel__endpointUrl: LocalizationValue;
+      formFieldLabel__token: LocalizationValue;
+      formFieldInputPlaceholder__token: LocalizationValue;
+      actionLabel__generateToken: LocalizationValue;
+      notice__tokenShownOnce: LocalizationValue;
+      actionLabel__retry: LocalizationValue;
+    };
+    attributeMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      columns: {
+        directoryAttribute: LocalizationValue;
+        clerkAttribute: LocalizationValue;
+      };
+    };
+    testStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'provider'>;
+      description: LocalizationValue;
+      description__pull: LocalizationValue;
+      noteLabel: LocalizationValue;
+      note: LocalizationValue;
+      empty__waitingForFirstUser: LocalizationValue;
+      empty__waitingForFirstSync: LocalizationValue;
+      empty__noUsersProvisioned: LocalizationValue;
+      actionLabel__syncNow: LocalizationValue;
+      error__lastSyncFailed: LocalizationValue;
+      error__syncFailed: LocalizationValue;
+      syncStatus__running: LocalizationValue;
+      syncStatus__succeeded: LocalizationValue;
+      syncStatus__failed: LocalizationValue;
+      syncStatus__cancelled: LocalizationValue;
+      syncRow: {
+        title: LocalizationValue;
+        neverSynced: LocalizationValue;
+      };
+      badge__active: LocalizationValue;
+      badge__deprovisioned: LocalizationValue;
+      error__loadUsers: LocalizationValue;
+      actionLabel__complete: LocalizationValue;
+    };
+    roleMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formFieldLabel__syncRoles: LocalizationValue;
+      columns: {
+        priority: LocalizationValue;
+        directoryGroup: LocalizationValue;
+        role: LocalizationValue;
+      };
+      roleOption__unassigned: LocalizationValue;
+      everyoneElse: LocalizationValue;
+      actionLabel__reorder: LocalizationValue<'group'>;
+      actionHint__reorder: LocalizationValue;
+      empty__noGroups: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue<'provider'>;
+      };
+      error__loadMappings: LocalizationValue;
+      alert__missingManageMembersPermission: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      enableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      disableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+    };
+  };
+  configureSSO: {
+    connectionScopeBanner: {
+      title__editing: LocalizationValue<'name'>;
+      subtitle__editing: LocalizationValue<'count'>;
+      title__adding: LocalizationValue;
+      subtitle__adding: LocalizationValue<'count'>;
+    };
+    missingManageEnterpriseConnectionsPermission: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    navbar: {
+      title: LocalizationValue;
+    };
+    resetConnectionDialog: {
+      cancelButton: LocalizationValue;
+      confirmationFieldLabel: LocalizationValue<'name'>;
+      confirmationFieldPlaceholder: LocalizationValue<'name'>;
+      resetButton: LocalizationValue;
+      subtitle: LocalizationValue<'name'>;
+      title: LocalizationValue;
+    };
+    selectProviderStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      saml: {
+        groupLabel: LocalizationValue;
+        okta: LocalizationValue;
+        customSaml: LocalizationValue;
+        google: LocalizationValue;
+        microsoft: LocalizationValue;
+      };
+      oidc: {
+        groupLabel: LocalizationValue;
+        oidcProvider: LocalizationValue;
+      };
+      warning: LocalizationValue;
+    };
+    changeProviderDialog: {
+      title: LocalizationValue<'provider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider' | 'name'>;
+      cancelButton: LocalizationValue;
+      confirmButton: LocalizationValue;
+    };
+    organizationDomainsStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formFieldLabel__domain: LocalizationValue;
+      formFieldInputPlaceholder__domain: LocalizationValue;
+      formButtonPrimary__add: LocalizationValue;
+      domainSuggestion: {
+        messageLabel: LocalizationValue<'domain'>;
+        formButtonPrimary__add: LocalizationValue<'domain'>;
+      };
+      domainCard: {
+        badge__verified: LocalizationValue;
+        badge__unverified: LocalizationValue;
+        badge__expired: LocalizationValue;
+        badge__claimed: LocalizationValue;
+        checkboxLabel: LocalizationValue<'domain'>;
+        verifiedAtLabel: LocalizationValue<'date'>;
+        expiredAtLabel: LocalizationValue<'date'>;
+        expiredLabel: LocalizationValue;
+        verifyAgainButton: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomain: LocalizationValue;
+        removeButtonTooltip__lastVerifiedDomainActive: LocalizationValue;
+        txtRecord: {
+          instructions: LocalizationValue;
+          typeLabel: LocalizationValue;
+          hostLabel: LocalizationValue;
+          valueLabel: LocalizationValue;
+        };
+      };
+      removeDomainDialog: {
+        title: LocalizationValue;
+        subtitle__active: LocalizationValue<'domain'>;
+        subtitle__inactive: LocalizationValue<'domain'>;
+        cancelButton: LocalizationValue;
+        removeButton: LocalizationValue;
+      };
+    };
+    testConfigurationStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      error__noSuccessfulTestRun: LocalizationValue;
+      testUrl: {
+        actionLabel__open: LocalizationValue;
+      };
+      testResults: {
+        title: LocalizationValue;
+        actionLabel__refresh: LocalizationValue;
+        polling: LocalizationValue;
+        status__success: LocalizationValue;
+        status__failed: LocalizationValue;
+        status__pending: LocalizationValue;
+        empty: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
+      };
+      testRunDetails: {
+        title: LocalizationValue;
+        runDetails: {
+          sectionTitle: LocalizationValue;
+          timestamp: LocalizationValue;
+          status: LocalizationValue;
+          errorCode: LocalizationValue;
+          fullMessage: LocalizationValue;
+          actionLabel__copy: LocalizationValue;
+          actionLabel__copied: LocalizationValue;
+        };
+        parsedUserInfo: {
+          sectionTitle: LocalizationValue;
+          email: LocalizationValue;
+          firstName: LocalizationValue;
+        };
+        howToFix: {
+          sectionTitle: LocalizationValue;
+          actionLabel__viewDocumentation: LocalizationValue;
+          saml_user_attribute_missing: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+          };
+          saml_response_relaystate_missing: {
+            description: LocalizationValue;
+          };
+          saml_email_address_domain_mismatch: {
+            description: LocalizationValue;
+          };
+          oauth_access_denied: {
+            description: LocalizationValue;
+          };
+          oauth_token_exchange_error: {
+            description: LocalizationValue;
+          };
+          oauth_fetch_user_error: {
+            intro: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
+        };
+      };
+    };
+    configureStep: {
+      attributeMappingTable: {
+        badges: {
+          required: LocalizationValue;
+          optional: LocalizationValue;
+        };
+      };
+      activeConnectionWarning: {
+        title: LocalizationValue;
+        dismiss: LocalizationValue;
+      };
+      oidcCustom: {
+        mainHeaderTitle: LocalizationValue;
+        redirectUriStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          claims: {
+            description: LocalizationValue;
+            table: {
+              columns: {
+                attribute: LocalizationValue;
+                claim: LocalizationValue;
+              };
+              rows: {
+                email: { attribute: LocalizationValue };
+                firstName: { attribute: LocalizationValue };
+                lastName: { attribute: LocalizationValue };
+                subject: { attribute: LocalizationValue };
+              };
+            };
+          };
+          redirectUri: {
+            label: LocalizationValue;
+          };
+        };
+        endpointsStep: {
+          headerSubtitle: LocalizationValue;
+          discoveryUrl: {
+            description: LocalizationValue;
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          manual: {
+            authUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            description: LocalizationValue;
+            tokenUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            userInfoUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+          };
+          modes: {
+            ariaLabel: LocalizationValue;
+            discoveryUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+        };
+        credentialsStep: {
+          headerSubtitle: LocalizationValue;
+          clientId: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          clientSecret: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+          };
+          paragraph: LocalizationValue;
+        };
+      };
+      unsupportedProvider: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+      };
+      samlOkta: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
+          headerSubtitle: LocalizationValue;
+          createAppInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+          };
+          serviceProviderInstructions: {
+            title: LocalizationValue;
+            paragraph1: LocalizationValue;
+            paragraph2: LocalizationValue;
+            serviceProviderFields: {
+              acsUrl: {
+                label: LocalizationValue;
+              };
+              spEntityId: {
+                label: LocalizationValue;
+              };
+            };
+          };
+          completeSamlIntegrationInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
+        };
+        attributeMappingStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          attributeMappingTable: {
+            columns: {
+              name: LocalizationValue;
+              expression: LocalizationValue;
+            };
+            rows: {
+              email: { name: LocalizationValue; expression: LocalizationValue };
+              firstName: { name: LocalizationValue; expression: LocalizationValue };
+              lastName: { name: LocalizationValue; expression: LocalizationValue };
+            };
+          };
+        };
+        assignUsersStep: {
+          headerSubtitle: LocalizationValue;
+          assignUsersInstructions: {
+            paragraph: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+            step5: LocalizationValue;
+          };
+        };
+        identityProviderMetadataStep: {
+          headerSubtitle: LocalizationValue;
+          modes: {
+            ariaLabel: LocalizationValue;
+            metadataUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+            description: LocalizationValue;
+          };
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
+          };
+        };
+      };
+      samlCustom: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
+          headerSubtitle: LocalizationValue;
+          createAppInstructions: {
+            paragraph: LocalizationValue;
+          };
+          serviceProviderFields: {
+            acsUrl: {
+              label: LocalizationValue;
+            };
+            spEntityId: {
+              label: LocalizationValue;
+            };
+          };
+        };
+        attributeMappingStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          attributeMappingTable: {
+            title: LocalizationValue;
+            columns: {
+              attributeName: LocalizationValue;
+              userAttribute: LocalizationValue;
+            };
+            rows: {
+              email: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              firstName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+              lastName: { attributeName: LocalizationValue; userAttribute: LocalizationValue };
+            };
+          };
+        };
+        assignUsersStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+        };
+        identityProviderMetadataStep: {
+          headerSubtitle: LocalizationValue;
+          modes: {
+            ariaLabel: LocalizationValue;
+            metadataUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+            description: LocalizationValue;
+          };
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
+          };
+        };
+      };
+      samlGoogle: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
+          headerSubtitle: LocalizationValue;
+          createAppInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+          };
+        };
+        identityProviderMetadataStep: {
+          headerSubtitle: LocalizationValue;
+          modes: {
+            ariaLabel: LocalizationValue;
+            metadataFile: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataFile: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+            uploadFile: LocalizationValue;
+            replaceFile: LocalizationValue;
+            removeFile: LocalizationValue;
+            fileUploaded: LocalizationValue;
+          };
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
+          };
+        };
+        serviceProviderStep: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          paragraph: LocalizationValue;
+          serviceProviderFields: {
+            acsUrl: {
+              label: LocalizationValue;
+            };
+            spEntityId: {
+              label: LocalizationValue;
+            };
+          };
+          nameIdInstructions: {
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+          };
+        };
+        attributeMappingStep: {
+          headerSubtitle: LocalizationValue;
+          paragraph: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          attributeMappingTable: {
+            columns: {
+              googleAttribute: LocalizationValue;
+              appAttribute: LocalizationValue;
+            };
+            rows: {
+              email: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
+              firstName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
+              lastName: { googleAttribute: LocalizationValue; appAttribute: LocalizationValue };
+            };
+          };
+        };
+        configureUserAccess: {
+          headerSubtitle: LocalizationValue;
+          assignUsersInstructions: {
+            paragraph1: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            paragraph2: LocalizationValue;
+          };
+        };
+      };
+      samlMicrosoft: {
+        mainHeaderTitle: LocalizationValue;
+        createAppStep: {
+          headerSubtitle: LocalizationValue;
+          createAppInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: {
+              label: LocalizationValue;
+              subSteps: {
+                appName: LocalizationValue;
+                nonGallery: LocalizationValue;
+                create: LocalizationValue;
+              };
+            };
+          };
+          assignUsersInstructions: {
+            title: LocalizationValue;
+            step1: LocalizationValue;
+            step2: LocalizationValue;
+            step3: LocalizationValue;
+            step4: LocalizationValue;
+            step5: LocalizationValue;
+          };
+        };
+        serviceProviderStep: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+          step6: LocalizationValue;
+          serviceProviderFields: {
+            spEntityId: {
+              label: LocalizationValue;
+            };
+            acsUrl: {
+              label: LocalizationValue;
+            };
+          };
+        };
+        identityProviderMetadataStep: {
+          headerSubtitle: LocalizationValue;
+          modes: {
+            ariaLabel: LocalizationValue;
+            metadataUrl: LocalizationValue;
+            manual: LocalizationValue;
+          };
+          metadataUrl: {
+            label: LocalizationValue;
+            placeholder: LocalizationValue;
+            description: LocalizationValue;
+          };
+          manual: {
+            description: LocalizationValue;
+            signOnUrl: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            issuer: {
+              label: LocalizationValue;
+              placeholder: LocalizationValue;
+            };
+            signingCertificate: {
+              label: LocalizationValue;
+              uploadFile: LocalizationValue;
+              replaceFile: LocalizationValue;
+              removeFile: LocalizationValue;
+              fileUploaded: LocalizationValue;
+            };
+          };
+        };
+        attributeMappingStep: {
+          headerSubtitle: LocalizationValue;
+          title: LocalizationValue;
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          attributeMappingTable: {
+            columns: {
+              attribute: LocalizationValue;
+              claimName: LocalizationValue;
+              value: LocalizationValue;
+            };
+            copyClaimName: LocalizationValue;
+            copyClaimNameCopied: LocalizationValue;
+            rows: {
+              email: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+              firstName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+              lastName: { attribute: LocalizationValue; claimName: LocalizationValue; value: LocalizationValue };
+            };
+          };
+        };
+      };
+    };
+    signingCertificates: {
+      addCertificate: LocalizationValue;
+      expired: LocalizationValue<'date'>;
+      expires: LocalizationValue<'date'>;
+      expiryAfterSave: LocalizationValue;
+      fileUnreadable: LocalizationValue;
+      notACertificate: LocalizationValue;
+      primary: LocalizationValue;
+      primaryTooltip: LocalizationValue;
+      removeCertificate: LocalizationValue;
+    };
+    activate: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'domain'>;
+      activateButton: LocalizationValue;
+      skipButton: LocalizationValue;
+      activeTitle: LocalizationValue;
+      activeSubtitle: LocalizationValue<'domain'>;
+      doneButton: LocalizationValue;
+    };
+  };
+  /**
+   * The screen shown when a request is blocked and there is no way for the end
+   * user to retry. These are the fallbacks: an application can supply its own
+   * title and description, and when it does they are used instead.
+   */
+  actionBlocked: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    /**
+     * Labels the short reference the end user can quote when contacting
+     * support.
+     */
+    traceIdLabel: LocalizationValue;
   };
   apiKeys: {
     formTitle: LocalizationValue;
@@ -1456,11 +2526,21 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  action_blocked: LocalizationValue;
   avatar_file_type_invalid: LocalizationValue;
   avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
+  protect_check_aborted: LocalizationValue;
+  protect_check_already_resolved: LocalizationValue;
+  protect_check_execution_failed: LocalizationValue;
+  protect_check_invalid_script: LocalizationValue;
+  protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_required: LocalizationValue;
+  protect_check_script_load_failed: LocalizationValue;
+  protect_check_timed_out: LocalizationValue;
+  protect_check_unsupported_environment: LocalizationValue;
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
@@ -1469,12 +2549,15 @@ type UnstableErrors = WithParamName<{
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
+  too_many_requests: LocalizationValue;
+  too_many_unverified_identifications: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
   web3_solana_signature_generation_failed: LocalizationValue;
   web3_signature_request_rejected: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_new_password_matches_current: LocalizationValue;
+  form_password_matches_identifier: LocalizationValue;
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;
@@ -1494,6 +2577,7 @@ type UnstableErrors = WithParamName<{
   form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
+  oauth_access_denied: LocalizationValue;
   form_identifier_exists: LocalizationValue;
   form_identifier_exists__email_address: LocalizationValue;
   form_identifier_exists__username: LocalizationValue;
@@ -1511,6 +2595,11 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  signup_rate_limit_exceeded: LocalizationValue;
+  something_went_wrong: LocalizationValue;
+  sso_bypass_domain_not_served: LocalizationValue;
+  ticket_expired_code: LocalizationValue;
+  ticket_invalid_code: LocalizationValue;
   zxcvbn: {
     notEnough: LocalizationValue;
     couldBeStronger: LocalizationValue;
@@ -1561,4 +2650,6 @@ type UnstableErrors = WithParamName<{
   organization_membership_quota_exceeded: LocalizationValue;
   organization_not_found_or_unauthorized: LocalizationValue;
   organization_not_found_or_unauthorized_with_create_organization_disabled: LocalizationValue;
+  insufficient_seats_contact_support: LocalizationValue;
+  insufficient_seats_change_plan: LocalizationValue;
 }>;

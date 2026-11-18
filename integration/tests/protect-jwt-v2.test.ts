@@ -16,18 +16,18 @@ testAgainstRunningApps({
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const m = createTestUtils({ app });
-    fakeAdmin = m.services.users.createFakeUser();
+    const m = await createTestUtils({ app });
+    fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-    fakeReader = m.services.users.createFakeUser();
+    fakeReader = m.services.users.createFakeUser(test);
     const reader = await m.services.users.createBapiUser(fakeReader);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
       role: 'org:impersonation_reader' as OrganizationMembershipRole,
       userId: reader.id,
     });
-    fakeManager = m.services.users.createFakeUser();
+    fakeManager = m.services.users.createFakeUser(test);
     const manager = await m.services.users.createBapiUser(fakeManager);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
@@ -45,7 +45,7 @@ testAgainstRunningApps({
   });
 
   test('`has()` in RSCs and RCCs as `admin`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -96,7 +96,7 @@ testAgainstRunningApps({
   });
 
   test('`has()` in RSCs and RCCs as `manager`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -142,7 +142,7 @@ testAgainstRunningApps({
   });
 
   test('`has()` in RSCs and RCCs as `impersonation_reader`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
