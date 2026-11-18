@@ -9,6 +9,11 @@ import type { SSOBypassAddResult, SSOBypassAllowlistData, SSOBypassEntry, SSOByp
 import { skipReason } from './sso-bypass.utils';
 
 const MEMBER_LOOKUP_PAGE_SIZE = 10;
+const NONE_ADDED_CODES = {
+  domainNotServed: 'sso_bypass_none_added_domain_not_served',
+  notMember: 'sso_bypass_none_added_not_member',
+  unknown: 'sso_bypass_none_added',
+} as const;
 const ROLE_MEMBERS_PAGE_SIZE = 100;
 
 export interface SSOBypassModel extends SSOBypassAllowlistData {
@@ -56,6 +61,7 @@ export function useSSOBypassModel({
         memberCount: countsQuery.data?.[role.key],
       })),
       isLoading: rolesQuery.isLoading,
+      isError: Boolean(rolesQuery.error),
     },
     retry: () => void allowlist.revalidate(),
     remove: async userId => {
@@ -96,7 +102,7 @@ export function useSSOBypassModel({
         const added = response?.data.length ?? 0;
         if (added === 0) {
           throw new ClerkRuntimeError('None of these members could be added.', {
-            code: `sso_bypass_none_added__${reason}`,
+            code: NONE_ADDED_CODES[reason],
           });
         }
         result = { mode: 'role', added, skipped: skipped.length, skipReason: reason };

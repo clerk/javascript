@@ -27,6 +27,7 @@ export interface SSOBypassRole {
 export interface SSOBypassRoles {
   roles: SSOBypassRole[];
   isLoading: boolean;
+  isError: boolean;
 }
 
 export interface SSOBypassAllowlistData {

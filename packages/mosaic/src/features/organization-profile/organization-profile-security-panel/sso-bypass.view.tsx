@@ -8,6 +8,7 @@ import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
 import { Entity } from '../../../components/entity';
+import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { Table } from '../../../components/table';
 import { Text } from '../../../components/text';
@@ -36,10 +37,12 @@ export function SSOBypassPageView({
   onRemove,
   registerTrigger,
   tableRef,
+  addButtonRef,
   onAdd,
   addDialog,
 }: SSOBypassPageViewProps) {
   const m = useMessages('organizationProfile').security.ssoBypassPage;
+  const searchRef = useFlowAutoFocus<HTMLInputElement>();
 
   return (
     <>
@@ -51,12 +54,16 @@ export function SSOBypassPageView({
         <Text color='foreground-secondary'>{m.description}</Text>
         <Table.Toolbar>
           <Table.Search
+            ref={searchRef}
             label={m.search}
             clearLabel={m.clearSearch}
             value={search}
             onValueChange={onSearchChange}
           />
-          <Button onClick={onAdd}>
+          <Button
+            ref={addButtonRef}
+            onClick={onAdd}
+          >
             <Icon glyph={Plus} />
             {m.add}
           </Button>
@@ -162,12 +169,12 @@ function SSOBypassRowView({
         <ActionMenu
           label={fill(m.manageLabel, { name: row.name })}
           triggerRef={triggerRef}
-          disabled={isDisabled && !row.isPending}
+          disabled={isDisabled}
+          focusableWhenDisabled
           actions={[
             {
               label: m.remove,
               color: 'negative',
-              status: row.isPending ? 'pending' : 'idle',
               onClick: onRemove,
             },
           ]}

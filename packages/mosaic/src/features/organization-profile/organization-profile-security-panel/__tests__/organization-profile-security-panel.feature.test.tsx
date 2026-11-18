@@ -3,7 +3,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiSSOBypassUser } from '../../../../__tests__/feature/fake-fapi/organization-security';
 import {
   fapiClient,
@@ -212,6 +212,30 @@ describe('Managing the SSO bypass allow list', () => {
     expect(fapi.ssoBypass.users.map(entry => entry.user_id)).toEqual(['user_3']);
   });
 
+  it('moves focus to the next row after a removal', async () => {
+    serve({ allowlisted: [bob, carol] });
+    const user = await openAllowlist();
+
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+
+    await waitFor(() => expect(screen.queryByText('Bob')).toBeNull());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Carol' })).toHaveFocus());
+  });
+
+  it('shows why a removal failed and keeps the row', async () => {
+    serve({ allowlisted: [bob] });
+    const user = await openAllowlist();
+    const remove = holdRequests('post', '/v1/organizations/:organizationId/sso_bypass_allowlist_users/:userId');
+
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    remove.fail('resource_not_found', 'That member is not on the allow list.');
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('That member is not on the allow list.'));
+    expect(screen.getByText('Bob')).toBeVisible();
+  });
+
   it('returns to the overview', async () => {
     serve();
     const user = await openAllowlist();
@@ -290,6 +314,52 @@ describe('Adding members to the SSO bypass allow list', () => {
       ),
     ).toBeVisible();
     expect(fapi.ssoBypass.users.map(entry => entry.user_id).sort()).toEqual(['user_2', 'user_3']);
+  });
+
+  it('says when the server skips everyone with the role', async () => {
+    serve({
+      allowlisted: [],
+      ssoBypass: {
+        rejections: {
+          user_2: 'sso_bypass_domain_not_served',
+          user_3: 'sso_bypass_domain_not_served',
+          user_4: 'sso_bypass_domain_not_served',
+        },
+      },
+    });
+    const user = await openAllowlist();
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.click(within(dialog).getByRole('radio', { name: 'Role' }));
+    await user.click(await within(dialog).findByRole('combobox', { name: /^Role/ }));
+    await user.click(await screen.findByRole('option', { name: 'Member (3)' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
+
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent(
+        'No members could be added because their email addresses are not served by a connection.',
+      ),
+    );
+  });
+
+  it('clears a failed attempt when the dialog is reopened', async () => {
+    serve({ allowlisted: [] });
+    const user = await openAllowlist();
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    let dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByRole('textbox', { name: 'Email address' }), 'zed@acme.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Add members' }));
+    await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('No member'));
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+    dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveValue('');
+    expect(within(dialog).getByRole('textbox', { name: 'Email address' })).toHaveFocus();
+    expect(within(dialog).queryByText(/No member/)).toBeNull();
   });
 
   it('says when everyone with the role is already on the list', async () => {

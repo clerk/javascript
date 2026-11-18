@@ -1,4 +1,4 @@
-import type { MouseEvent, Ref } from 'react';
+import type { Ref } from 'react';
 import { useRef, useState } from 'react';
 
 import type { DialogFocusTarget } from '../../../components/dialog';
@@ -33,6 +33,7 @@ export interface SSOBypassAddDialogController {
   onModeChange: (mode: SSOBypassAddMode) => void;
   roles: SelectItem[];
   isRolesLoading: boolean;
+  isRolesError: boolean;
   result: SSOBypassAddResult | undefined;
 }
 
@@ -48,7 +49,8 @@ export interface SSOBypassPageController {
   onRemove: (userId: string) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   tableRef: Ref<HTMLDivElement>;
-  onAdd: (event: MouseEvent<HTMLButtonElement>) => void;
+  addButtonRef: Ref<HTMLButtonElement>;
+  onAdd: () => void;
   addDialog: SSOBypassAddDialogController;
 }
 
@@ -61,8 +63,9 @@ export function useSSOBypassPageController(model: SSOBypassModel): SSOBypassPage
   const addTrigger = useRef<HTMLButtonElement | null>(null);
   const tableRef = useRef<HTMLDivElement>(null);
   const actions = usePendingAction({ errorFallback: m.errorFallback });
+  const visible = filterEntries(model.entries, search);
   const removalFocus = useListRemovalFocus({
-    ids: model.entries.map(entry => entry.userId),
+    ids: visible.map(entry => entry.userId),
     onRemove: model.remove,
     fallback: () => addTrigger.current ?? tableRef.current,
   });
@@ -88,7 +91,7 @@ export function useSSOBypassPageController(model: SSOBypassModel): SSOBypassPage
   };
 
   return {
-    rows: filterEntries(model.entries, search).map(entry => ({
+    rows: visible.map(entry => ({
       ...entry,
       isPending: actions.pendingKey === entry.userId,
     })),
@@ -109,10 +112,8 @@ export function useSSOBypassPageController(model: SSOBypassModel): SSOBypassPage
         }),
     registerTrigger: removalFocus.registerTrigger,
     tableRef,
-    onAdd: event => {
-      addTrigger.current = event.currentTarget;
-      onOpenChange(true);
-    },
+    addButtonRef: addTrigger,
+    onAdd: () => onOpenChange(true),
     addDialog: {
       open,
       onOpenChange,
@@ -131,6 +132,7 @@ export function useSSOBypassPageController(model: SSOBypassModel): SSOBypassPage
         };
       }),
       isRolesLoading: model.roles.isLoading,
+      isRolesError: model.roles.isError,
       result,
     },
   };

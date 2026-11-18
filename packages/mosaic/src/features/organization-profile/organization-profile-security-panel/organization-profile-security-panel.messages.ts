@@ -39,6 +39,7 @@ export const organizationProfileSecurityPanelMessages = {
       roleLabel: 'Role',
       rolePlaceholder: 'Select a role',
       roleOption: '{role} ({count})',
+      rolesError: 'Could not load the organization’s roles.',
       roleWarning: 'This list does not sync, members are managed manually.',
       submit: 'Add members',
       cancel: 'Cancel',

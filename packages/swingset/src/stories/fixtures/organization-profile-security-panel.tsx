@@ -106,6 +106,7 @@ export function useSSOBypassFixture({
         memberCount: members.filter(member => member.role === role.key).length,
       })),
       isLoading: false,
+      isError: false,
     },
     retry: () => undefined,
     remove: async userId => {

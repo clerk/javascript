@@ -1,9 +1,12 @@
+import type { MutableRefObject } from 'react';
+import { useRef } from 'react';
+
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import { Flow } from '../../../components/flow';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { SegmentedControl } from '../../../components/segmented-control';
 import { Select } from '../../../components/select';
@@ -15,12 +18,16 @@ import type { SSOBypassAddMode, SSOBypassAddResult } from './sso-bypass.types';
 export type SSOBypassAddDialogProps = SSOBypassAddDialogController;
 
 export function SSOBypassAddDialog({ open, onOpenChange, finalFocus, ...current }: SSOBypassAddDialogProps) {
+  const emailInput = useRef<HTMLInputElement>(null);
   return (
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Popup finalFocus={finalFocus}>
+      <Dialog.Popup
+        initialFocus={emailInput}
+        finalFocus={finalFocus}
+      >
         <Card.Root
           elevation='overlay'
           size='lg'
@@ -34,7 +41,10 @@ export function SSOBypassAddDialog({ open, onOpenChange, finalFocus, ...current 
             {state => (
               <>
                 <Flow.Step ids={['form']}>
-                  <SSOBypassAddFormStep {...state} />
+                  <SSOBypassAddFormStep
+                    {...state}
+                    emailInputRef={emailInput}
+                  />
                 </Flow.Step>
                 <Flow.Step ids={['result']}>
                   <SSOBypassAddResultStep result={state.result} />
@@ -53,9 +63,14 @@ function SSOBypassAddFormStep({
   onModeChange,
   roles,
   isRolesLoading,
-}: Omit<SSOBypassAddDialogProps, 'open' | 'onOpenChange' | 'finalFocus'>) {
+  isRolesError,
+  emailInputRef,
+}: Omit<SSOBypassAddDialogProps, 'open' | 'onOpenChange' | 'finalFocus'> & {
+  emailInputRef: MutableRefObject<HTMLInputElement | null>;
+}) {
   const m = useMessages('organizationProfile').security.ssoBypassPage.addDialog;
   const mode = form.values.mode;
+  const emailField = form.register('emailAddress');
 
   return (
     <>
@@ -94,7 +109,11 @@ function SSOBypassAddFormStep({
           >
             <Field.Label>{m.emailLabel}</Field.Label>
             <Input
-              {...form.register('emailAddress')}
+              {...emailField}
+              ref={element => {
+                emailField.ref(element);
+                emailInputRef.current = element;
+              }}
               type='email'
               autoComplete='off'
               data-1p-ignore
@@ -124,6 +143,14 @@ function SSOBypassAddFormStep({
                 <Field.Error>{form.fields.role.feedback?.message}</Field.Error>
               </Field.Message>
             </Field.Root>
+            {isRolesError ? (
+              <Banner.Root
+                color='negative'
+                role='alert'
+              >
+                <Banner.Label>{m.rolesError}</Banner.Label>
+              </Banner.Root>
+            ) : null}
             <Banner.Root
               color='warning'
               role='status'
@@ -161,6 +188,7 @@ function SSOBypassAddFormStep({
 function SSOBypassAddResultStep({ result }: { result: SSOBypassAddResult | undefined }) {
   const m = useMessages('organizationProfile').security.ssoBypassPage.addDialog;
   const locale = useLocale();
+  const doneRef = useFlowAutoFocus<HTMLButtonElement>();
   if (!result) {
     return null;
   }
@@ -183,7 +211,7 @@ function SSOBypassAddResultStep({ result }: { result: SSOBypassAddResult | undef
         </Card.Content>
       ) : null}
       <Card.Footer>
-        <Dialog.Close render={<Button>{m.done}</Button>} />
+        <Dialog.Close render={<Button ref={doneRef}>{m.done}</Button>} />
       </Card.Footer>
     </>
   );

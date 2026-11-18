@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
+import { useFlowAutoFocus } from '../../../components/flow';
 import { Section } from '../../../components/section';
 import { plural, useLocale, useMessages } from '../../../localization';
 import { styles } from './organization-profile-security-panel.styles';
@@ -15,6 +16,7 @@ export interface SSOBypassSectionViewProps {
 export function SSOBypassSectionView({ count, isError, onManage }: SSOBypassSectionViewProps) {
   const m = useMessages('organizationProfile').security.ssoBypass;
   const locale = useLocale();
+  const manageRef = useFlowAutoFocus<HTMLButtonElement>();
   return (
     <Section.Root>
       <Section.Group>
@@ -37,6 +39,7 @@ export function SSOBypassSectionView({ count, isError, onManage }: SSOBypassSect
               </Section.Content>
               <Section.Actions>
                 <ActionMenu
+                  triggerRef={manageRef}
                   label={m.manageLabel}
                   actions={[{ label: m.manage, onClick: onManage }]}
                 />
