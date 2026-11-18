@@ -65,10 +65,12 @@ export default function ClerkLayout({ children }: { children: ReactNode }) {
     <ClerkProvider
       publishableKey={publishableKey}
       signInUrl='/sign-in'
-      signUpUrl='/sign-up'
+      signUpUrl='/live/authentication/sign-up'
+      waitlistUrl='/live/misc/waitlist'
       signInFallbackRedirectUrl='/live'
       signUpFallbackRedirectUrl='/live'
       afterSignOutUrl='/live'
+      taskUrls={{ 'setup-mfa': '/live/misc/task-setup-mfa' }}
     >
       <LiveChrome userButton={<LiveSwitcher />}>{children}</LiveChrome>
     </ClerkProvider>
