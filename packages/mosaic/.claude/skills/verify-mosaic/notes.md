@@ -26,7 +26,7 @@ Prove it looks right in every state you touched.
 
 Prove it works the way a user would test it: do the task end to end and check the result on the page.
 
-- Pages are under the flow's group: `/user-button/...`, `/user-profile/...`, `/organization-profile/...`, `/misc/...`, `/blocks/...`. A section page such as `/user-profile/user-profile-email-section` has the default story first, then error and pending stories below it.
+- Pages are under the flow's group: `/switcher/...`, `/user-profile/...`, `/organization-profile/...`, `/misc/...`, `/blocks/...`. A section page such as `/user-profile/user-profile-email-section` has the default story first, then error and pending stories below it.
 - The data is fixtures, and they keep state on the page. On the email section, `Add email` → type an address → `Continue` → type `424242` adds `Manage <address>` to the list.
 - Drive the default story through the change, then the error story for the failure path. Prove the end state with a snapshot, not a screenshot alone.
 - Turn on Chaos to check long and multi-script data.

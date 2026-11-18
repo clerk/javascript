@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -166,18 +168,12 @@ const Group = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(func
   });
 });
 
-/**
- * Mosaic `Item` — a row for lists of accounts, organizations, and settings.
- * Composed via dot syntax: `Item.Root`, `Item.Media`, `Item.Content`,
- * `Item.Label`, `Item.Description`, `Item.Actions`, `Item.Group`. Every part
- * takes a `render` prop and forwards a ref.
- */
-export const Item = {
-  Root,
-  Media,
-  Content,
-  Label,
-  Description,
-  Actions,
-  Group,
+export {
+  Root as ItemRoot,
+  Media as ItemMedia,
+  Content as ItemContent,
+  Label as ItemLabel,
+  Description as ItemDescription,
+  Actions as ItemActions,
+  Group as ItemGroup,
 };

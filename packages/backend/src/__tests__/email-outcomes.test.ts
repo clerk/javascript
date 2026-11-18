@@ -28,7 +28,10 @@ describe('transactional email outcome webhooks', () => {
     type Suppressed = Extract<EmailDeliveryWebhookEvent, { type: 'email.suppressed' }>;
     type Policy = Extract<Suppressed['data']['suppressed'], { type: 'ClerkPolicy' }>;
     expectTypeOf<Policy['reason']>().toEqualTypeOf<
-      'unverified_email_dns' | 'provider_domain_restriction' | 'application_communication_lock'
+      | 'unverified_email_dns'
+      | 'provider_domain_restriction'
+      | 'application_communication_lock'
+      | 'transactional_email_blocked'
     >();
     type Failed = Extract<EmailDeliveryWebhookEvent, { type: 'email.failed' }>;
     expectTypeOf<Failed['data']['failed']['reason']>().toEqualTypeOf<

@@ -43,6 +43,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Move a legacy component's logic or styles into Mosaic → [Migration](docs/migration.md)
 - Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
+- Add or change a `*.doc.ts` or `src/docs-schema.ts` → [Agent docs](docs/agent-docs.md)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
 - Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
 - Review a Mosaic change → [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the lines for what the change touches
@@ -56,6 +57,7 @@ Before you change a file that matches a pattern below, read its guide, even for 
 - `src/**/*.model.ts(x)` → [Models](docs/models.md)
 - `src/**/*.controller.ts(x)` → [Controllers](docs/controllers.md)
 - `src/**/*.view.tsx` → [Views](docs/views.md)
+- `src/**/*.doc.ts`, `src/docs-schema.ts` → [Agent docs](docs/agent-docs.md)
 - `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
 
 ## Layers in one paragraph
