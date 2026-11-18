@@ -342,7 +342,7 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
-  it('returns to the form with the address kept when the user edits it', async () => {
+  it('returns to the form with the address and password kept when the user edits it', async () => {
     const { user } = await renderSignUp();
 
     await submitStart(user);
@@ -351,6 +351,7 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(emailField()).toHaveValue(EMAIL);
+    expect(passwordField()).toHaveValue(PASSWORD);
   });
 
   it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
@@ -443,6 +444,29 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     hold.release();
     await codeSent();
+    expect(fapi.signUp.preparations).toEqual(['email_code']);
+  });
+
+  it('sends no second code when a verify route is reopened with a code out', async () => {
+    const fapi = serveFapi({ environment: environment() });
+    const { navigate } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+
+    await submitStart(user);
+    await codeSent();
+    await user.click(screen.getByRole('button', { name: 'Edit email address' }));
+    await screen.findByRole('heading', { name: 'Create your account' });
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+    await user.click(await screen.findByRole('textbox', { name: 'Verification code' }));
+    await user.keyboard(VERIFICATION_CODE);
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
