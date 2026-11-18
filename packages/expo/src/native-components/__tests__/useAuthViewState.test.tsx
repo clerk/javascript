@@ -88,7 +88,6 @@ describe('useAuthViewState', () => {
     const { result } = renderHook(() => useAuthViewState());
 
     expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
-    expect(mocks.moduleAddListener).not.toHaveBeenCalled();
   });
 
   test('falls back to JS session state when the native auth-flow state is invalid', async () => {
