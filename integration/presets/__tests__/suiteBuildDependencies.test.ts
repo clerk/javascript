@@ -34,6 +34,11 @@ const scopedSuites = Object.entries<{ dependsOn?: string[]; inputs: string[] }>(
   .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.some(i => i.startsWith('packages/')))
   .map(([id, task]) => ({ suite: id.replace('//#test:integration:', ''), dependsOn: task.dependsOn ?? [] }));
 
+const integrationTasks = Object.entries<{ env?: string[] }>(turbo.tasks).filter(([id]) =>
+  id.startsWith('//#test:integration:'),
+);
+const clerkEnv = (env: string[] = []) => env.filter(name => name.includes('CLERK')).sort();
+
 const listTestFiles = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name);
@@ -102,5 +107,11 @@ describe('scoped integration suites declare the builds they load', () => {
         .sort();
       expect([...dependsOn].sort()).toEqual(expected);
     });
+  });
+});
+
+describe('integration suites hash the same Clerk variables', () => {
+  it.each(integrationTasks)('%s', (_id, task) => {
+    expect(clerkEnv(task.env)).toEqual(clerkEnv(turbo.tasks['//#test:integration:express'].env));
   });
 });
