@@ -1,6 +1,15 @@
 ---
-'@clerk/mosaic': patch
+'@clerk/mosaic': minor
 ---
+
+**Breaking:** Two helpers move onto their component's namespace. Behavior is unchanged; TypeScript flags the old imports.
+
+| Before                                                           | After                   |
+| ---------------------------------------------------------------- | ----------------------- |
+| `usePanelTitle` from `@clerk/mosaic/components/panel`            | `Panel.usePanelTitle`   |
+| `sectionCompactStyles` from `@clerk/mosaic/components/section`   | `Section.compactStyles` |
+
+Find usages with `git grep -nE "usePanelTitle|sectionCompactStyles"`.
 
 Every component, primitive and hook on the Mosaic docs site now imports from its docs path:
 
@@ -8,7 +17,4 @@ Every component, primitive and hook on the Mosaic docs site now imports from its
 - Headless primitives from `@clerk/mosaic/primitives/<name>`
 - Hooks from `@clerk/mosaic/hooks/<name>`, such as `useForm` (with `FormSubmitError`) from `@clerk/mosaic/hooks/use-form` and `useToastManager` from `@clerk/mosaic/hooks/use-toast-manager`
 
-Components and compound primitives export one namespace plus their types, and helpers live on the namespace. If you import these from `@clerk/mosaic/components/panel` or `@clerk/mosaic/components/section`, update them:
-
-- `usePanelTitle` is now `Panel.usePanelTitle`
-- `sectionCompactStyles` is now `Section.compactStyles`
+Components and compound primitives export one namespace plus their types, and helpers live on the namespace.
