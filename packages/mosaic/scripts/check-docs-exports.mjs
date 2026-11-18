@@ -5,7 +5,6 @@ import { pathToFileURL } from 'node:url';
 const packageDir = resolve(import.meta.dirname, '..');
 const packageJson = JSON.parse(readFileSync(resolve(packageDir, 'package.json'), 'utf8'));
 const unpublished = new Set([
-  'components/action-menu',
   'components/branding',
   'components/captcha',
   'components/clerk-logo',
@@ -15,7 +14,6 @@ const unpublished = new Set([
   'hooks/use-mosaic-router',
   'hooks/use-mosaic-support-email',
 ]);
-const exportedBeforeDocs = new Set(['components/action-menu']);
 const docPath = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
 
 const failures = [];
@@ -33,7 +31,7 @@ for (const file of docFiles) {
   const { default: doc } = await import(pathToFileURL(resolve(packageDir, file)).href);
   const unit = 'parts' in doc ? folder : `hooks/${kebab(doc.name)}`;
   if (unpublished.has(folder)) {
-    if (!exportedBeforeDocs.has(folder) && packageJson.exports[`./${unit}`]) {
+    if (packageJson.exports[`./${unit}`]) {
       failures.push(`${unit} is not on the docs site but is exported`);
     }
     continue;
