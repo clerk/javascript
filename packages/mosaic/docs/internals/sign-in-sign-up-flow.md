@@ -4,7 +4,7 @@ How sign-in and sign-up decide which screen to show, from the step FAPI says com
 
 ## The model
 
-A step is a step of the auth flow, not a screen. FAPI owns the step, the order of steps, and whether a code is already sent. Mosaic owns the routes, the layout and copy, and when to send a code.
+FAPI tracks which requirements are outstanding and whether a code has been sent. When several sign-up requirements are outstanding, the shared client picks which one comes next. Mosaic maps the step to a screen and owns the routes, layout, copy, and when to send a code.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
