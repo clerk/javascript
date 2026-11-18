@@ -1,25 +1,23 @@
-import { useUser } from '@clerk/shared/react';
-import React from 'react';
+import type React from 'react';
 
-import { UserProfileSurface } from './user-profile';
+import { ModalProfile } from '../profile/profile.modal-content';
+import { useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import type { UserProfileModalContentProps } from './user-profile.modal.types';
 
-export default function UserProfileModalContent({ options, close }: UserProfileModalContentProps): React.ReactElement {
-  const { isLoaded, user } = useUser();
-  const signedOut = isLoaded && !user;
-
-  React.useEffect(() => {
-    if (signedOut) {
-      close();
-    }
-  }, [signedOut, close]);
-
-  const { page, ...props } = options ?? {};
+export default function UserProfileModalContent({
+  options,
+  close,
+  path,
+}: UserProfileModalContentProps): React.ReactElement {
+  const profile = useMosaicProfile();
+  // An opening the routing state caused on its own, a deep link or a return, carries no options;
+  // it gets the provider's, the same ones every handle-driven open spreads in.
   return (
-    <UserProfileSurface
-      {...props}
-      presentation='modal'
-      defaultPage={page}
+    <ModalProfile
+      options={options ?? userProfileModalOptions(profile)}
+      close={close}
+      path={path}
+      combined={false}
     />
   );
 }

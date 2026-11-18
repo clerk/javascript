@@ -29,19 +29,15 @@ const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function Mosa
   const field = useOptionalFieldContext();
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
-  const [groupElement, setGroupElement] = React.useState<HTMLDivElement | null>(null);
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);
   const inputRef = React.useCallback((node: HTMLInputElement | null) => {
     inputElementRef.current = node;
   }, []);
-  const context = React.useMemo(
-    () => ({ element: groupElement, disabled, invalid, inputRef, size }),
-    [groupElement, disabled, invalid, inputRef, size],
-  );
+  const context = React.useMemo(() => ({ disabled, invalid, inputRef, size }), [disabled, invalid, inputRef, size]);
   const element = useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, setGroupElement],
+    ref,
     props: {
       ...mergeStyleProps(
         themeProps('input-group', { size, disabled, invalid }),
@@ -128,4 +124,4 @@ const End = React.forwardRef<HTMLSpanElement, InputGroupAddonProps>(function Mos
   return useAddon('end', props, ref);
 });
 
-export const InputGroup = { Root, Input, Start, End };
+export { Root as InputGroupRoot, Input as InputGroupInput, Start as InputGroupStart, End as InputGroupEnd };

@@ -13,6 +13,8 @@ export type { BrandingProps } from '../components/branding';
 export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '../components/banner';
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
+export { Captcha } from '../components/captcha';
+export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';
@@ -36,9 +38,12 @@ export type {
 } from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
+  ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
@@ -56,6 +61,7 @@ export type {
   DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
+export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Flow, useFlowAutoFocus } from '../components/flow';
@@ -70,6 +76,8 @@ export { InputGroup } from '../components/input-group';
 export type { InputGroupAddonProps, InputGroupRootProps } from '../components/input-group';
 export { Pagination } from '../components/pagination';
 export type { PaginationProps } from '../components/pagination';
+export { PasswordInput } from '../components/password-input';
+export type { PasswordInputProps } from '../components/password-input';
 export { PhoneInput } from '../components/phone-input';
 export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
@@ -182,9 +190,13 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+// Aliased: `Switcher` below is the feature.
+export { Switcher as SwitcherParts } from '../components/switcher';
+export { OAuthConsent } from '../features/oauth-consent/oauth-consent';
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { Switcher } from '../features/switcher/switcher';
 export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
 export { TaskSetupMFA } from '../features/task-setup-mfa/task-setup-mfa';
 export { UserButton } from '../features/user-button/user-button';

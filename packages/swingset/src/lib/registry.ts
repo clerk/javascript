@@ -36,6 +36,7 @@ import {
   meta as bannerMeta,
 } from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
+import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
 import {
   Default as CheckboxDefault,
@@ -123,6 +124,7 @@ import {
   Sizes as IconFrameSizes,
   Treatments as IconFrameTreatments,
 } from '../stories/icon-frame.stories';
+import { meta as imageCropperMeta } from '../stories/image-cropper.stories';
 import {
   Default,
   Disabled as InputDisabled,
@@ -239,6 +241,13 @@ import {
 } from '../stories/pagination.stories';
 import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
+  Default as PasswordInputDefault,
+  Disabled as PasswordInputDisabled,
+  Invalid as PasswordInputInvalid,
+  meta as passwordInputMeta,
+  Sizes as PasswordInputSizes,
+} from '../stories/password-input.stories';
+import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
   Invalid as PhoneInputInvalid,
@@ -260,7 +269,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
-import { meta as profilePermutationsMeta } from '../stories/profile-permutations.stories';
+import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -336,22 +345,63 @@ import {
   meta as separatorMeta,
 } from '../stories/separator.stories';
 import {
-  BackupCode as SignInBackupCode,
+  ChoiceEnterpriseConnections as SignInChoiceEnterpriseConnections,
+  ChoiceMethods as SignInChoiceMethods,
+  ChoiceResetMethods as SignInChoiceResetMethods,
+  CodeAlternativePhoneChannel as SignInCodeAlternativePhoneChannel,
+  CodeAuthenticatorApp as SignInCodeAuthenticatorApp,
+  CodeClientTrust as SignInCodeClientTrust,
+  CodeEmail as SignInCodeEmail,
+  CodePhone as SignInCodePhone,
+  CodeResetPassword as SignInCodeResetPassword,
+  CodeResetPasswordPhone as SignInCodeResetPasswordPhone,
+  CodeSecondFactorEmail as SignInCodeSecondFactorEmail,
+  CodeSecondFactorPhone as SignInCodeSecondFactorPhone,
+  CodeSsoBypass as SignInCodeSsoBypass,
+  CodeVerifyEmail as SignInCodeVerifyEmail,
+  CodeVerifyPhone as SignInCodeVerifyPhone,
+  CredentialBackupCode as SignInCredentialBackupCode,
+  CredentialPasskey as SignInCredentialPasskey,
+  CredentialPassword as SignInCredentialPassword,
+  CredentialPasswordError as SignInCredentialPasswordError,
+  CredentialPasswordPending as SignInCredentialPasswordPending,
   Default as SignInDefault,
-  EmailCode as SignInEmailCode,
+  IdentifierBannerError as SignInIdentifierBannerError,
+  IdentifierDefault as SignInIdentifierDefault,
+  IdentifierError as SignInIdentifierError,
+  IdentifierLocked as SignInIdentifierLocked,
+  IdentifierManyProviders as SignInIdentifierManyProviders,
+  IdentifierProviderPending as SignInIdentifierProviderPending,
+  IdentifierSignInOnly as SignInIdentifierSignInOnly,
   meta as signInMeta,
-  MethodPicker as SignInMethodPicker,
-  Password as SignInPassword,
-  PasswordError as SignInPasswordError,
-  PasswordPending as SignInPasswordPending,
-  SignUp as SignInSignUp,
-  Start as SignInStart,
-  StartError as SignInStartError,
-  StartManyProviders as SignInStartManyProviders,
-  StartProviderPending as SignInStartProviderPending,
-  StartSignInOnly as SignInStartSignInOnly,
-  Totp as SignInTotp,
-  VerifyEmail as SignInVerifyEmail,
+  NewPasswordRequired as SignInNewPasswordRequired,
+  NewPasswordReset as SignInNewPasswordReset,
+  NoticeActionBlocked as SignInNoticeActionBlocked,
+  NoticeEmailLinkClientMismatch as SignInNoticeEmailLinkClientMismatch,
+  NoticeEmailLinkExpired as SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid as SignInNoticeEmailLinkInvalid,
+  NoticeEmailLinkSent as SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedIn as SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkSignedInOtherTab as SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkSigningIn as SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkVerified as SignInNoticeEmailLinkVerified,
+  NoticeEnterpriseSso as SignInNoticeEnterpriseSso,
+  NoticeForgotPassword as SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending as SignInNoticeForgotPasswordPending,
+  NoticeHelp as SignInNoticeHelp,
+  NoticeNoMethods as SignInNoticeNoMethods,
+  NoticePasswordCompromised as SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
+  NoticeStartOver as SignInNoticeStartOver,
+  SignUpDetails as SignInSignUpDetails,
+  SignUpEmailLinkSignedUp as SignInSignUpEmailLinkSignedUp,
+  SignUpEmailOrPhone as SignInSignUpEmailOrPhone,
+  SignUpLegalConsent as SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly as SignInSignUpLegalConsentOnly,
+  SignUpOptionalFields as SignInSignUpOptionalFields,
+  SignUpPasswordRequirements as SignInSignUpPasswordRequirements,
+  SignUpSettingsFields as SignInSignUpSettingsFields,
+  SignUpVerifyEmailLink as SignInSignUpVerifyEmailLink,
 } from '../stories/sign-in.stories';
 import {
   CustomElement as SignInButtonCustomElement,
@@ -371,6 +421,32 @@ import {
   meta as signOutButtonMeta,
   Pending as SignOutButtonPending,
 } from '../stories/sign-out-button.stories';
+import {
+  ActionBlocked as SignUpActionBlocked,
+  AlternativePhone as SignUpAlternativePhone,
+  Continue as SignUpContinue,
+  ContinueLegalConsentOnly as SignUpContinueLegalConsentOnly,
+  Default as SignUpDefault,
+  EmailLinkSignedUp as SignUpEmailLinkSignedUp,
+  EnterpriseConnections as SignUpEnterpriseConnections,
+  Loading as SignUpLoading,
+  meta as signUpMeta,
+  ProtectCheck as SignUpProtectCheck,
+  Restricted as SignUpRestricted,
+  StartCaptcha as SignUpStartCaptcha,
+  StartEmailOrPhone as SignUpStartEmailOrPhone,
+  StartFormOnly as SignUpStartFormOnly,
+  StartInvitation as SignUpStartInvitation,
+  StartLegalConsent as SignUpStartLegalConsent,
+  StartProviderPending as SignUpStartProviderPending,
+  StartSocialOnly as SignUpStartSocialOnly,
+  VerifyEmail as SignUpVerifyEmail,
+  VerifyEmailLink as SignUpVerifyEmailLink,
+  VerifyPhone as SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel as SignUpVerifyPhoneAlternativeChannel,
+  Waitlist as SignUpWaitlist,
+  Wallets as SignUpWallets,
+} from '../stories/sign-up.stories';
 import {
   CustomElement as SignUpButtonCustomElement,
   Default as SignUpButtonDefault,
@@ -399,6 +475,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { Combined as SwitcherCombined, meta as switcherMeta } from '../stories/switcher.stories';
 import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
@@ -459,11 +536,7 @@ import {
   Shapes as UserAvatarShapes,
   Sizes as UserAvatarSizes,
 } from '../stories/user-avatar.stories';
-import {
-  Combined as UserButtonCombined,
-  meta as userButtonMeta,
-  User as UserButtonUser,
-} from '../stories/user-button.stories';
+import { Default as UserButtonDefault, meta as userButtonMeta } from '../stories/user-button.stories';
 import {
   Default as UserProfileDefault,
   meta as userProfileMeta,
@@ -759,6 +832,13 @@ const stepperModule: StoryModule = {
   Clickable: StepperClickable,
 };
 
+const passwordInputModule: StoryModule = {
+  meta: passwordInputMeta,
+  Default: PasswordInputDefault,
+  Sizes: PasswordInputSizes,
+  Disabled: PasswordInputDisabled,
+  Invalid: PasswordInputInvalid,
+};
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -812,10 +892,14 @@ const itemModule: StoryModule = {
   Group: ItemGroup,
 };
 
+const switcherModule: StoryModule = {
+  meta: switcherMeta,
+  Combined: SwitcherCombined,
+};
+
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
-  Combined: UserButtonCombined,
-  User: UserButtonUser,
+  Default: UserButtonDefault,
 };
 
 const taskSetupMfaModule: StoryModule = {
@@ -959,6 +1043,11 @@ const fieldModule: StoryModule = {
   VisuallyHiddenLabel: FieldVisuallyHiddenLabel,
 };
 
+const captchaModule: StoryModule = {
+  meta: captchaMeta,
+  Default: CaptchaDefault,
+};
+
 const visuallyHiddenModule: StoryModule = {
   meta: visuallyHiddenMeta,
   Default: VisuallyHiddenDefault,
@@ -998,6 +1087,7 @@ const dialogModule: StoryModule = { meta: dialogMeta };
 const drawerModule: StoryModule = { meta: drawerMeta };
 const fileUploadModule: StoryModule = { meta: fileUploadMeta };
 const flowModule: StoryModule = { meta: flowMeta };
+const imageCropperModule: StoryModule = { meta: imageCropperMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
@@ -1075,6 +1165,11 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
+const profileFeatureModule: StoryModule = {
+  meta: profileFeatureMeta,
+  Default: ProfileFeatureDefault,
+};
+
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -1246,23 +1341,91 @@ const reverificationModule: StoryModule = {
   Help: ReverificationHelp,
 };
 
+const signUpModule: StoryModule = {
+  meta: signUpMeta,
+  Default: SignUpDefault,
+  StartSocialOnly: SignUpStartSocialOnly,
+  StartFormOnly: SignUpStartFormOnly,
+  StartInvitation: SignUpStartInvitation,
+  StartEmailOrPhone: SignUpStartEmailOrPhone,
+  StartLegalConsent: SignUpStartLegalConsent,
+  StartCaptcha: SignUpStartCaptcha,
+  StartProviderPending: SignUpStartProviderPending,
+  Continue: SignUpContinue,
+  ContinueLegalConsentOnly: SignUpContinueLegalConsentOnly,
+  Restricted: SignUpRestricted,
+  Waitlist: SignUpWaitlist,
+  AlternativePhone: SignUpAlternativePhone,
+  VerifyEmail: SignUpVerifyEmail,
+  VerifyPhone: SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel: SignUpVerifyPhoneAlternativeChannel,
+  VerifyEmailLink: SignUpVerifyEmailLink,
+  EmailLinkSignedUp: SignUpEmailLinkSignedUp,
+  EnterpriseConnections: SignUpEnterpriseConnections,
+  Wallets: SignUpWallets,
+  Loading: SignUpLoading,
+  ProtectCheck: SignUpProtectCheck,
+  ActionBlocked: SignUpActionBlocked,
+};
+
 const signInModule: StoryModule = {
   meta: signInMeta,
   Default: SignInDefault,
-  Start: SignInStart,
-  StartSignInOnly: SignInStartSignInOnly,
-  StartManyProviders: SignInStartManyProviders,
-  StartProviderPending: SignInStartProviderPending,
-  StartError: SignInStartError,
-  Password: SignInPassword,
-  PasswordPending: SignInPasswordPending,
-  PasswordError: SignInPasswordError,
-  EmailCode: SignInEmailCode,
-  Totp: SignInTotp,
-  BackupCode: SignInBackupCode,
-  MethodPicker: SignInMethodPicker,
-  SignUp: SignInSignUp,
-  VerifyEmail: SignInVerifyEmail,
+  IdentifierDefault: SignInIdentifierDefault,
+  IdentifierSignInOnly: SignInIdentifierSignInOnly,
+  IdentifierManyProviders: SignInIdentifierManyProviders,
+  IdentifierProviderPending: SignInIdentifierProviderPending,
+  IdentifierError: SignInIdentifierError,
+  IdentifierBannerError: SignInIdentifierBannerError,
+  IdentifierLocked: SignInIdentifierLocked,
+  CredentialPassword: SignInCredentialPassword,
+  CredentialPasswordPending: SignInCredentialPasswordPending,
+  CredentialPasswordError: SignInCredentialPasswordError,
+  CredentialBackupCode: SignInCredentialBackupCode,
+  CredentialPasskey: SignInCredentialPasskey,
+  CodeEmail: SignInCodeEmail,
+  CodeAuthenticatorApp: SignInCodeAuthenticatorApp,
+  CodeClientTrust: SignInCodeClientTrust,
+  CodeVerifyPhone: SignInCodeVerifyPhone,
+  NoticeEnterpriseSso: SignInNoticeEnterpriseSso,
+  CodePhone: SignInCodePhone,
+  CodeAlternativePhoneChannel: SignInCodeAlternativePhoneChannel,
+  CodeSecondFactorPhone: SignInCodeSecondFactorPhone,
+  CodeSecondFactorEmail: SignInCodeSecondFactorEmail,
+  CodeSsoBypass: SignInCodeSsoBypass,
+  CodeResetPassword: SignInCodeResetPassword,
+  CodeResetPasswordPhone: SignInCodeResetPasswordPhone,
+  CodeVerifyEmail: SignInCodeVerifyEmail,
+  ChoiceMethods: SignInChoiceMethods,
+  ChoiceEnterpriseConnections: SignInChoiceEnterpriseConnections,
+  ChoiceResetMethods: SignInChoiceResetMethods,
+  NoticeHelp: SignInNoticeHelp,
+  NoticeForgotPassword: SignInNoticeForgotPassword,
+  NoticeForgotPasswordPending: SignInNoticeForgotPasswordPending,
+  NoticeNoMethods: SignInNoticeNoMethods,
+  NoticeActionBlocked: SignInNoticeActionBlocked,
+  NoticePasswordCompromised: SignInNoticePasswordCompromised,
+  NoticePasswordCompromisedPending: SignInNoticePasswordCompromisedPending,
+  NoticeEmailLinkSent: SignInNoticeEmailLinkSent,
+  NoticeEmailLinkSignedInOtherTab: SignInNoticeEmailLinkSignedInOtherTab,
+  NoticeEmailLinkVerified: SignInNoticeEmailLinkVerified,
+  NoticeEmailLinkSigningIn: SignInNoticeEmailLinkSigningIn,
+  NoticeEmailLinkSignedIn: SignInNoticeEmailLinkSignedIn,
+  NoticeEmailLinkExpired: SignInNoticeEmailLinkExpired,
+  NoticeEmailLinkInvalid: SignInNoticeEmailLinkInvalid,
+  NoticeEmailLinkClientMismatch: SignInNoticeEmailLinkClientMismatch,
+  NoticeStartOver: SignInNoticeStartOver,
+  NewPasswordReset: SignInNewPasswordReset,
+  NewPasswordRequired: SignInNewPasswordRequired,
+  SignUpDetails: SignInSignUpDetails,
+  SignUpSettingsFields: SignInSignUpSettingsFields,
+  SignUpOptionalFields: SignInSignUpOptionalFields,
+  SignUpEmailOrPhone: SignInSignUpEmailOrPhone,
+  SignUpLegalConsent: SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly: SignInSignUpLegalConsentOnly,
+  SignUpPasswordRequirements: SignInSignUpPasswordRequirements,
+  SignUpVerifyEmailLink: SignInSignUpVerifyEmailLink,
+  SignUpEmailLinkSignedUp: SignInSignUpEmailLinkSignedUp,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
@@ -1278,9 +1441,10 @@ const organizationProfileMembersPanelModule: StoryModule = {
 };
 
 export const registry: StoryModule[] = [
-  // User Button
-  userButtonModule,
-  { meta: profilePermutationsMeta },
+  // Switcher
+  switcherModule,
+  // Profile
+  profileFeatureModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1314,6 +1478,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   { meta: mosaicProviderMeta },
+  userButtonModule,
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
@@ -1331,6 +1496,7 @@ export const registry: StoryModule[] = [
   signOutButtonModule,
   // Authentication
   signInModule,
+  signUpModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
@@ -1350,6 +1516,7 @@ export const registry: StoryModule[] = [
   flowComponentModule,
   inputModule,
   inputGroupModule,
+  passwordInputModule,
   phoneInputModule,
   dataListModule,
   itemModule,
@@ -1381,6 +1548,7 @@ export const registry: StoryModule[] = [
   toastModule,
   tooltipComponentModule,
   fieldModule,
+  captchaModule,
   visuallyHiddenModule,
   // Primitives
   accordionModule,
@@ -1391,6 +1559,7 @@ export const registry: StoryModule[] = [
   drawerModule,
   fileUploadModule,
   flowModule,
+  imageCropperModule,
   menuModule,
   otpModule,
   popoverModule,

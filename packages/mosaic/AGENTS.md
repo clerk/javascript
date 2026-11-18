@@ -43,6 +43,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Move a legacy component's logic or styles into Mosaic → [Migration](docs/migration.md)
 - Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
+- Add or change a `*.doc.ts` or `src/docs-schema.ts` → [Agent docs](docs/agent-docs.md)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
 - Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
 - Review a Mosaic change → [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the lines for what the change touches
@@ -56,6 +57,7 @@ Before you change a file that matches a pattern below, read its guide, even for 
 - `src/**/*.model.ts(x)` → [Models](docs/models.md)
 - `src/**/*.controller.ts(x)` → [Controllers](docs/controllers.md)
 - `src/**/*.view.tsx` → [Views](docs/views.md)
+- `src/**/*.doc.ts`, `src/docs-schema.ts` → [Agent docs](docs/agent-docs.md)
 - `src/**/__tests__/**`, `src/**/*.test.ts(x)`, `src/**/*.test-d.ts` → [Testing](docs/testing.md)
 
 ## Layers in one paragraph
@@ -74,6 +76,8 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - A delete that needs the user to type a phrase → `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)
 - An action that may need step-up verification → `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`
 - A direct action that needs step-up verification → `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view
+- A step that verifies a factor (a code, password, backup code or passkey, the method picker, help) → the steps in `src/blocks/verification/`, such as `VerificationCode`
+- A screen sign-in and sign-up both show (an email link and its status, a loading or protect-check notice, a blocked request, the wallet or enterprise connection picker, the alternative phone channel, the identity line, the captcha) → the steps in `src/blocks/auth/`, such as `AuthEmailLink`
 - Showing any error to the user → One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`
 - Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
 - A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)
@@ -84,8 +88,10 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An inline message row; height is undefined until measured → `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts`
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
-- An avatar or logo row: picker, drop target, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
+- The Resend link on a code or email link step, with its countdown → `verificationResend` (`src/blocks/verification/`), passed to the step as `resend`
+- An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
+- Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper` and `cropImage` (`src/primitives/image-cropper/`), see its `README.md`
 - An inline notice inside content: info, warning, error or success → `Banner` (`src/components/banner/`); a form-level error on a card uses `Card.Banner`
 - Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
 - An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)
@@ -130,6 +136,7 @@ A bug in a feature is often a gap in a shared helper. These rules apply to `fix`
 - **A changed shared signature is a new pattern.** A new parameter, a return type that goes from `void` to a promise, or a returned field whose meaning changes all go through "When nothing fits: ask first".
 - **One source of truth for busy.** When a machine, `usePendingAction` or `useForm` already knows an action is running, derive the flag from it: `isDisabled: actions.isPending || remove.isPending`. Do not mirror it into a second lock, or turn machine state into a promise to feed one.
 - **Handle staleness through lifecycle.** A new identity remounts through a React `key`. A busy action keeps running when its surface closes (Controllers → Rules). Do not thread run ids or `AbortSignal`s through the model, controller and machine.
+- **Ship a shared change on its own.** A change to `src/styles/`, `src/components/`, `src/blocks/` or `src/hooks/` made for one feature goes in its own PR, unless the user asks for it in the feature's PR. Its values come from Mosaic tokens; another Clerk app's design shows the intent, not the values.
 - **Extend a contract with an options object.** Make a field required when every caller has it: `connect(strategy, { walletName, onTarget })`, not `connect(strategy, walletName?, onTarget?)`.
 - **Pass shared results through whole.** The view gets `form`, not an object that renames `form.id`, `form.isSubmitting` and `form.handleSubmit`.
 - **Keep controller state off model types.** Pending and error flags the controller sets go on a row type the controller builds, not as optional fields on the type the model returns.

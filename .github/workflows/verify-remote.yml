@@ -86,7 +86,7 @@ jobs:
         with:
           ref: ${{ needs.plan.outputs.sha || github.sha }}
           persist-credentials: false
-      - uses: pnpm/action-setup@v4.3.0
+      - uses: pnpm/action-setup@v6.1.0
         if: needs.plan.outputs.device != ''
       - uses: actions/setup-node@v4.4.0
         with:

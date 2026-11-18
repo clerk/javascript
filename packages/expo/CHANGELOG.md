@@ -1,5 +1,127 @@
 # Change Log
 
+## 4.17.0
+
+### Minor Changes
+
+- Introduce the `useAuthenticatedWebView()` hook for showing a page of your web app in a WebView with the native app's user already signed in. ([#10767](https://github.com/clerk/javascript/pull/10767)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```tsx
+  import { useAuthenticatedWebView } from '@clerk/expo/native-to-web';
+  import { Redirect } from 'expo-router';
+  import { ActivityIndicator, Button, StyleSheet, View } from 'react-native';
+  import { WebView } from 'react-native-webview';
+
+  export default function AccountScreen() {
+    // Prepares a one-time sign-in link for this page
+    const web = useAuthenticatedWebView({ destination: 'https://app.example.com/account' });
+
+    if (web.status === 'signed-out') return <Redirect href='/sign-in' />;
+    if (web.status === 'error')
+      return (
+        <Button
+          title='Try again'
+          onPress={web.retry}
+        />
+      );
+
+    return (
+      <View style={{ flex: 1 }}>
+        {/* Render the WebView as soon as it has props. It loads the link to sign the user in. */}
+        {web.webViewProps && (
+          <WebView
+            {...web.webViewProps}
+            style={{ flex: 1 }}
+          />
+        )}
+        {/* Cover Clerk's sign-in page until the destination has loaded */}
+        {web.status !== 'ready' && <ActivityIndicator style={StyleSheet.absoluteFill} />}
+      </View>
+    );
+  }
+  ```
+
+  Pass your own WebView callbacks, such as `onShouldStartLoadWithRequest`, to the hook. Setting them on `<WebView>` replaces the hook's own handlers.
+
+  For more advanced cases, such as opening the link in a WebView or browser you manage yourself, create it with `prepareSessionTransfer()`:
+
+  ```ts
+  import { prepareSessionTransfer } from '@clerk/expo/native-to-web';
+
+  const { url } = await prepareSessionTransfer({
+    destination: 'https://app.example.com/reports',
+    // 'webview' for a WebView you render, 'browser' for a browser
+    presentation: 'webview',
+  });
+
+  // Open the link once, within 60 seconds, and never log or store it
+  ```
+
+  On Android, a browser only accepts the link when the intent that opens it names your app as the referrer.
+
+- Introduce `openInBrowser()` for opening a page of your web app in the default browser with the native app's user already signed in. ([#10825](https://github.com/clerk/javascript/pull/10825)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```tsx
+  import { isSessionTransferError, openInBrowser } from '@clerk/expo/native-to-web';
+  import { router } from 'expo-router';
+
+  try {
+    // Opens Safari on iOS or the default browser on Android, signed in as the current user
+    await openInBrowser({ destination: 'https://app.example.com/settings' });
+  } catch (error) {
+    // The app has no signed-in user
+    if (isSessionTransferError(error) && error.code === 'signed_out') router.replace('/sign-in');
+  }
+  ```
+
+  It resolves once the browser has the link, not once the web page has signed the user in. A double tap opens one tab, because a second call for the same destination joins the one in progress.
+
+  On Android it needs two more packages:
+
+  ```sh
+  npx expo install expo-intent-launcher expo-application
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+  - @clerk/clerk-js@6.45.0
+  - @clerk/react@6.19.0
+
+## 4.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+  - @clerk/clerk-js@6.44.0
+  - @clerk/react@6.18.9
+
+## 4.16.1
+
+### Patch Changes
+
+- `getToken` from `useAuth()` now keeps the same identity across renders. Effects and callbacks that list it as a dependency no longer re-run on every render, which could refetch tokens in a loop. ([#10804](https://github.com/clerk/javascript/pull/10804)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+  - @clerk/clerk-js@6.43.1
+  - @clerk/react@6.18.8
+
+## 4.16.0
+
+### Minor Changes
+
+- Add a `preferImmediatelyAvailableCredentials` option to `signIn.authenticateWithPasskey()` and `signIn.passkey()`. With `@clerk/expo-passkeys` on iOS 16+ and Android, it limits sign-in to passkeys already on the device, and the request fails without showing the "use a passkey from another device" sheet when there are none. This lets an app prompt for a passkey automatically when its sign-in screen opens. Browsers ignore it. ([#10776](https://github.com/clerk/javascript/pull/10776)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`12ef401`](https://github.com/clerk/javascript/commit/12ef401940fc71bd45a6c635f8e670cc5d556d35), [`57b4e0b`](https://github.com/clerk/javascript/commit/57b4e0bfef0dcddc9428efab949547f15600a0f6), [`6bb6ecb`](https://github.com/clerk/javascript/commit/6bb6ecb2b159e98fbebe768f898bdb64cecb007c), [`85afdd1`](https://github.com/clerk/javascript/commit/85afdd1ae903adbf04ec9529de4496423f77343d)]:
+  - @clerk/clerk-js@6.43.0
+  - @clerk/shared@4.45.0
+  - @clerk/react@6.18.7
+
 ## 4.15.1
 
 ### Patch Changes

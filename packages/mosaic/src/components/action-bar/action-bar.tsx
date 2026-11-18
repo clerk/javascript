@@ -1,3 +1,5 @@
+'use client';
+
 import {
   autoUpdate,
   FloatingFocusManager,
@@ -343,4 +345,10 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
   );
 });
 
-export const ActionBar = { Root, Action, Count, Separator, Dismiss };
+export {
+  Root as ActionBarRoot,
+  Action as ActionBarAction,
+  Count as ActionBarCount,
+  Separator as ActionBarSeparator,
+  Dismiss as ActionBarDismiss,
+};

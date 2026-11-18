@@ -223,6 +223,34 @@ describe('createClerkInstance', () => {
     expect(get).toHaveBeenNthCalledWith(2, { publicKeyOptions: sessionSecondFactorOptions });
   });
 
+  test('forwards preferImmediatelyAvailableCredentials to the native passkey adapter', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const get = vi.fn().mockResolvedValue({ publicKeyCredential: null, error: null });
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      __experimental_passkeys: {
+        get,
+        create: vi.fn(),
+        isSupported: vi.fn(() => true),
+        isAutoFillSupported: vi.fn(() => Promise.resolve(false)),
+      },
+    }) as unknown as MockClerk & {
+      __internal_getPublicCredentials: (params: {
+        publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+        preferImmediatelyAvailableCredentials?: boolean;
+      }) => Promise<unknown>;
+    };
+    const publicKeyOptions = {
+      challenge: new Uint8Array([1]).buffer,
+      rpId: 'example.com',
+    } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+
+    await clerk.__internal_getPublicCredentials({ publicKeyOptions, preferImmediatelyAvailableCredentials: true });
+
+    expect(get).toHaveBeenCalledWith({ publicKeyOptions, preferImmediatelyAvailableCredentials: true });
+  });
+
   test('recreates the singleton when proxyUrl changes', async () => {
     const createClerkInstance = await loadCreateClerkInstance();
     const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);

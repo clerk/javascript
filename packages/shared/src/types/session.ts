@@ -10,6 +10,9 @@ import type {
   PhoneCodeAttempt,
   PhoneCodeConfig,
   PhoneCodeSecondFactorConfig,
+  ResetPasswordEmailCodeFactorConfig,
+  ResetPasswordPhoneCodeFactorConfig,
+  SessionVerifyResetPasswordAttempt,
   TOTPAttempt,
   TrustedDeviceAttempt,
   TrustedDeviceConfig,
@@ -291,6 +294,7 @@ export interface SessionResource extends ClerkResource {
   getToken: GetToken;
   /**
    * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   *
    * @skipParametersSection
    */
   checkAuthorization: CheckAuthorization;
@@ -308,12 +312,15 @@ export interface SessionResource extends ClerkResource {
   updatedAt: Date;
   /**
    * Initiates the reverification flow.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareFirstFactorVerification: (
@@ -321,7 +328,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [first factor verification](!first-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptFirstFactorVerification: (
@@ -329,7 +338,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [second factor verification](!second-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareSecondFactorVerification: (
@@ -337,7 +348,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [second factor verification](!second-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptSecondFactorVerification: (
@@ -351,6 +364,7 @@ export interface SessionResource extends ClerkResource {
    * in-progress multi-factor reverification instead. Any other `level`
    * value is rejected. Throws a `ClerkWebAuthnError` when WebAuthn is
    * unsupported or the passkey ceremony fails.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   verifyWithPasskey: (params?: SessionVerifyWithPasskeyParams) => Promise<SessionVerificationResource>;
@@ -537,6 +551,8 @@ export type SessionVerifyPrepareFirstFactorParams =
   | EmailCodeConfig
   | PhoneCodeConfig
   | PassKeyConfig
+  | ResetPasswordEmailCodeFactorConfig
+  | ResetPasswordPhoneCodeFactorConfig
   /**
    * @experimental
    */
@@ -551,6 +567,7 @@ export type SessionVerifyAttemptFirstFactorParams =
   | PhoneCodeAttempt
   | PasswordAttempt
   | PasskeyAttempt
+  | SessionVerifyResetPasswordAttempt
   /**
    * @experimental
    */

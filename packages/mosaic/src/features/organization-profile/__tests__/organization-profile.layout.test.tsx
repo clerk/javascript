@@ -17,6 +17,16 @@ describe('resolveOrganizationProfilePages', () => {
   });
 });
 
+describe('resolveOrganizationProfilePages custom paths', () => {
+  it("accepts a path that is only a built-in segment in the user profile's combined view", () => {
+    const keys: CustomOrganizationProfilePage = { label: 'Keys', path: 'organization/api-keys', content: null };
+    expect(resolveOrganizationProfilePages(['general'], [keys])).toEqual([
+      { id: 'general' },
+      { id: 'organization/api-keys', custom: keys },
+    ]);
+  });
+});
+
 describe('getAvailableOrganizationProfilePages', () => {
   it('lists api keys given content', () => {
     expect(getAvailableOrganizationProfilePages({ general, apiKeys: <p>API keys</p> })).toEqual(['general', 'apiKeys']);

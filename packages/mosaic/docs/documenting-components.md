@@ -2,7 +2,7 @@
 
 Read this when you add or change a Swingset page for a Mosaic component, block, hook or style: a `<name>.stories.tsx` or `<name>.mdx` in `packages/swingset/src/stories/`. It covers what to write once the page is wired; how the app works is in `packages/swingset/CLAUDE.md`, and the registry, `docModules` and redirect wiring is in `packages/swingset/README.md`.
 
-Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `popover.component.mdx` (A, compound), `accordion.mdx` (B), `user-button.mdx` (C).
+Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `popover.component.mdx` (A, compound), `accordion.mdx` (B), `switcher.mdx` (C).
 
 ## Rules
 
@@ -19,10 +19,12 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 
 | Group                  | What lives here                                                                                                                      | Archetype   |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `User Button`          | Composed flow UI (e.g. `UserButton`)                                                                                                 | C           |
+| `Switcher`             | Composed flow UI (e.g. `Switcher`)                                                                                                   | C           |
+| `Profile`              | Composed flow UI (`Profile`)                                                                                                         | C           |
 | `User Profile`         | Composed flow UI (e.g. `UserProfileProfilePanel`)                                                                                    | C           |
 | `Organization Profile` | Composed flow UI (e.g. `OrganizationProfileGeneralPanel`)                                                                            | C           |
 | `Misc`                 | Standalone composed components (e.g. `OrganizationSwitcher`, `Waitlist`)                                                             | C           |
+| `Authentication`       | Flow views built from steps (e.g. `SignIn`)                                                                                          | C · flow    |
 | `Blocks`               | Flows assembled from components, wired by the caller's machine (e.g. `Confirmation`, `Destructive`)                                  | C           |
 | `Components`           | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A           |
 | `Primitives`           | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`)                                                           | B           |
@@ -30,7 +32,7 @@ Worked examples: `button.stories.tsx` and `button.mdx` (archetype A, simple), `p
 | `Hooks`                | Headless hooks (`useForm`)                                                                                                           | B (adapted) |
 | `Localization`         | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers                                    | B (adapted) |
 
-`User Button` / `User Profile` / `Organization Profile` / `Misc` / `Blocks` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
+`Switcher` / `Profile` / `User Profile` / `Organization Profile` / `Misc` / `Blocks` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
 `Styles` and `Hooks` are the non-component layers: there is no element to knob, so they follow
 archetype B's shape (Example → Usage → Parts → Styling) with `Props` replaced by whatever the export
@@ -204,14 +206,14 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 
 Every props table has a **Default** column, and the `Type` stays a plain union, never with the default inlined. The auto `<PropTable>` fills it from `meta.styles._defaultVariants`; hand-written tables (`Prop | Type | Default | Description`) fill it by hand. Name the default member (`'bottom-start'`), use `—` when there is none and append `(required)` for a required prop, and state a behavioral default in words (`inherits Root`).
 
-## Archetype C — composed layer (`User Button`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`)
+## Archetype C — composed layer (`Switcher`, `Profile`, `User Profile`, `Organization Profile`, `Misc`, `Blocks`, `Authentication`)
 
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as SwitcherStories from './user-button.stories';
+import * as SwitcherStories from './switcher.stories';
 
-# UserButton
+# Switcher
 
 <!-- One paragraph: what state this owns and which lower-layer pieces it wires together. -->
 
@@ -229,6 +231,49 @@ import * as SwitcherStories from './user-button.stories';
 
 - The `composition` array names each lower-layer component this one builds on, with a link to that component's page and its `layer`. List every direct dependency so the layering is navigable.
 - The story is `meta` plus a single `Default` export that renders the composed UI with no knobs.
+
+### C · flow — a view built from steps (`Authentication`)
+
+A flow view shows one step at a time, so a single `Default` cannot show every screen. The page adds `Usage` and one section per step component after the composition. Required MDX section order:
+
+```mdx
+import * as Stories from './sign-in.stories';
+
+# SignIn
+
+<!-- One paragraph: what the working example does and which inputs reach which branches. -->
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]}
+/>
+
+## Usage
+
+<!-- What the view owns, how `step` picks the screen, and a code fence rendering the view. -->
+
+## Steps
+
+<!-- One sentence on how the sections map to step components, and that a red box marks a planned view. -->
+
+### Identifier step
+
+<!-- One line naming the step file and the step values it draws. -->
+
+#### Default
+
+<Story
+  name='IdentifierDefault'
+  storyModule={Stories}
+/>
+```
+
+- `Default` is a working example: plain props driven by a stand-in for the controller, so the whole flow can be clicked through.
+- Under `## Steps`, each `###` is one component in the feature's `steps/` folder, and each `####` is one step value it draws. Each example is one story export, named for the step and the example (`IdentifierDefault`, `CredentialPasswordError`).
+- A view the legacy component has and Mosaic does not yet gets its `####` and a `<Story>` naming the export it will have. Swingset renders a red "not found" box for a story the file does not export, which marks the gap on the page. Exporting the story turns the box into the example, with no MDX change.
 
 ## Writing the prose
 
@@ -261,4 +306,5 @@ Which surface the dialog holds, and the geometry that comes with it.
 - [ ] MDX sections match the archetype's required order exactly.
 - [ ] Every props-table row states its default in the **Default** column.
 - [ ] Wiring done per `packages/swingset/README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/(explorer)/page.tsx` redirect if this is now the first component.
+- [ ] Every story added, renamed or removed is changed in `registry.ts` too. It imports each story by name, so an import of a story that no longer exists fails the whole page.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

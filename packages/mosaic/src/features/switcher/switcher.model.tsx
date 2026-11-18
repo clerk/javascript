@@ -18,8 +18,9 @@ import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { ORGANIZATION_PERMISSIONS } from '../../utils/permissions';
 import { organizationProfileModal } from '../organization-profile/organization-profile.modal';
+import { profileModal } from '../profile/profile.modal';
 import type { MosaicProfile } from '../profile-pages/use-mosaic-profile';
-import { userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
+import { profileModalOptions, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { ORGANIZATION_PAGE_PREFIX } from '../user-profile/user-profile.layout';
 import { userProfileModal } from '../user-profile/user-profile.modal';
 import type {
@@ -70,8 +71,9 @@ type CreateOrganizationMode =
       createOrganizationMode?: 'modal';
     };
 
-export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
-  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions & UserSwitcherModelOptions;
+
+export type UserSwitcherModelOptions = Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
 
 export type OrganizationSwitcherModelOptions = CreateOrganizationMode &
   Pick<
@@ -91,7 +93,10 @@ export interface SwitcherProfileContext {
     userProfile: CustomPage[] | undefined;
     organizationProfile: CustomPage[] | undefined;
   };
-  /** Which switchers the opening menu carries. Only a menu with both has one Settings row for two targets. */
+  /**
+   * Which switchers the opening menu carries. Only a menu with both has one Settings row for two
+   * targets, and only it can open a combined profile.
+   */
   menuMode: SwitcherMode;
 }
 
@@ -142,6 +147,10 @@ function toMembership(organization: OrganizationResource): SwitcherMembership {
   };
 }
 
+function opensCombinedProfile(menuMode: SwitcherMode, { combined = true }: MosaicProfile): boolean {
+  return menuMode === 'combined' && combined;
+}
+
 function toSession(sessionId: string, user: UserResource): SwitcherSession {
   return {
     sessionId,
@@ -164,21 +173,20 @@ export function useSwitcherModel(
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
-  const { isLoaded: isOrgLoaded, organization } = useOrganization({
+  const {
+    isLoaded: isOrgLoaded,
+    organization,
+    membership,
+  } = useOrganization({
     __internal_skipAttemptToEnableOrganizations: true,
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
   const userProfile = useModal(userProfileModal);
+  const combinedProfile = useModal(profileModal);
   const organizationProfile = useModal(organizationProfileModal);
   const { newProfiles } = useMosaicExperimental();
-  const {
-    combined = true,
-    userProfileProps,
-    organizationProfileProps,
-    userProfileUrl,
-    organizationProfileUrl,
-  } = profile;
+  const { userProfileProps, organizationProfileProps, userProfileUrl, organizationProfileUrl } = profile;
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -190,13 +198,15 @@ export function useSwitcherModel(
     enabled: Boolean(environment?.organizationSettings.enabled),
   });
 
-  const mosaicUserProfile = userProfileModalOptions(profile);
+  const profileCombined = opensCombinedProfile(menuMode, profile);
 
   const manageAccount = openOrNavigate({
     url: userProfileUrl,
     openModal: () =>
       newProfiles
-        ? userProfile.open(mosaicUserProfile, getContainer?.())
+        ? profileCombined
+          ? combinedProfile.open(profileModalOptions(profile), getContainer?.())
+          : userProfile.open(userProfileModalOptions(profile), getContainer?.())
         : clerk.openUserProfile({
             getContainer,
             customPages: bridgedCustomPages.userProfile,
@@ -217,10 +227,10 @@ export function useSwitcherModel(
           afterLeaveOrganizationUrl: organizationProfileProps?.afterLeaveOrganizationUrl,
           apiKeysProps: organizationProfileProps?.apiKeysProps,
         });
-      } else if (combined) {
-        userProfile.open(
+      } else if (profileCombined) {
+        combinedProfile.open(
           {
-            ...mosaicUserProfile,
+            ...profileModalOptions(profile),
             page: `${ORGANIZATION_PAGE_PREFIX}${organizationProfileProps?.pageOrder?.[0] ?? 'general'}`,
           },
           getContainer?.(),
@@ -233,8 +243,7 @@ export function useSwitcherModel(
     navigate: router.navigate,
   });
 
-  const managesBothInOneProfile =
-    newProfiles && menuMode === 'combined' && combined && !userProfileUrl && !organizationProfileUrl;
+  const managesBothInOneProfile = newProfiles && profileCombined && !userProfileUrl && !organizationProfileUrl;
 
   const createOrganization = openOrNavigate({
     url: options.createOrganizationUrl,
@@ -323,7 +332,7 @@ export function useSwitcherModel(
     organizationsEnabled,
     renderBranding: displayConfig.branded,
     activeSession: toSession(session.id, user),
-    activeOrganization: organization ? toMembership(organization) : null,
+    activeOrganization: organization ? { ...toMembership(organization), roleName: membership?.roleName } : null,
     // The user resource settles this before the paginated list answers; the count covers a stale resource.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
     hidePersonal: forceOrganizationSelection || (options.hidePersonal ?? false),

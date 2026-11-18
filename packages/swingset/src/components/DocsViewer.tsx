@@ -9,9 +9,11 @@ import { PlaygroundProvider } from './PlaygroundContext';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  'user-button': {
-    'user-button': dynamic(() => import('../stories/user-button.mdx')),
-    'profile-permutations': dynamic(() => import('../stories/profile-permutations.mdx')),
+  switcher: {
+    switcher: dynamic(() => import('../stories/switcher.mdx')),
+  },
+  profile: {
+    profile: dynamic(() => import('../stories/profile.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -54,6 +56,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   misc: {
     'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
+    'user-button': dynamic(() => import('../stories/user-button.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
@@ -72,6 +75,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   authentication: {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
+    'sign-up': dynamic(() => import('../stories/sign-up.mdx')),
   },
   blocks: {
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
@@ -94,6 +98,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
     pagination: dynamic(() => import('../stories/pagination.mdx')),
+    'password-input': dynamic(() => import('../stories/password-input.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     stepper: dynamic(() => import('../stories/stepper.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
@@ -124,6 +129,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
+    captcha: dynamic(() => import('../stories/captcha.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
   },
   primitives: {
@@ -136,6 +142,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     drawer: dynamic(() => import('../stories/drawer.mdx')),
     'file-upload': dynamic(() => import('../stories/file-upload.mdx')),
     flow: dynamic(() => import('../stories/flow.mdx')),
+    'image-cropper': dynamic(() => import('../stories/image-cropper.mdx')),
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),

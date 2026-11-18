@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
 import { organizationProfileModal } from './features/organization-profile/organization-profile.modal';
+import { profileModal } from './features/profile/profile.modal';
 import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile';
 import { MosaicProfileProvider } from './features/profile-pages/use-mosaic-profile';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
@@ -17,6 +18,7 @@ import type { ModalSurfaces } from './modals/modal.types';
 import { ModalHost } from './modals/modal-host';
 import type { TextDirection } from './primitives/direction-provider';
 import { DirectionProvider } from './primitives/direction-provider';
+import { VirtualStoreProvider } from './routing/virtual-store';
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
@@ -57,10 +59,12 @@ export function MosaicProvider({
             <MosaicExperimentalProvider value={experimentalValue}>
               <MosaicProfileProvider value={profile}>
                 <ToastProvider>
-                  <ModalHost surfaces={modalSurfaces}>
-                    <UserProfileModalReturn />
-                    {children}
-                  </ModalHost>
+                  <VirtualStoreProvider>
+                    <ModalHost surfaces={modalSurfaces}>
+                      <UserProfileModalReturn />
+                      {children}
+                    </ModalHost>
+                  </VirtualStoreProvider>
                 </ToastProvider>
               </MosaicProfileProvider>
             </MosaicExperimentalProvider>
@@ -72,4 +76,4 @@ export function MosaicProvider({
 }
 
 const defaultProfile: MosaicProfile = {};
-const modalSurfaces: ModalSurfaces = [userProfileModal, organizationProfileModal];
+const modalSurfaces: ModalSurfaces = [profileModal, userProfileModal, organizationProfileModal];

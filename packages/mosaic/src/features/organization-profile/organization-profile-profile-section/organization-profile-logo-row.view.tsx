@@ -80,6 +80,10 @@ export function OrganizationProfileLogoRowView({
         />
       </AvatarUpload.Dropzone>
       <Section.Error>{error}</Section.Error>
+      <AvatarUpload.Crop
+        labels={m.logo.crop}
+        shape='square'
+      />
     </AvatarUpload.Root>
   );
 }

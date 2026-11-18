@@ -1,6 +1,6 @@
 import { Show, SignInButton } from '@clerk/nextjs';
 
-import { MosaicUserButton } from './mosaic-user-button';
+import { MosaicSwitcher } from './mosaic-switcher';
 
 export default function Home() {
   return (
@@ -12,7 +12,7 @@ export default function Home() {
       <Show when='signed-in'>
         <p>signed-in-state</p>
       </Show>
-      <MosaicUserButton />
+      <MosaicSwitcher />
     </header>
   );
 }

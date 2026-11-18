@@ -17,16 +17,25 @@ Use `List` inside an existing popover. Set `inline` and bind the root's open sta
 so closing resets the search, not the selection.
 
 ```tsx
-<Combobox.Root inline open={open} onOpenChange={setOpen} value={country} onValueChange={setCountry}>
-  <InputGroup.Root>
+<Combobox.Root
+  inline
+  open={open}
+  onOpenChange={setOpen}
+  value={country}
+  onValueChange={setCountry}
+  items={countries}
+  itemToStringLabel={country => country.name}
+>
+  <Combobox.InputGroup>
     <InputGroup.Start>
       <Icon glyph={MagnifyingGlass} />
     </InputGroup.Start>
     <Combobox.Input aria-label='Search countries' />
-  </InputGroup.Root>
+  </Combobox.InputGroup>
+  <Combobox.Empty>No countries found</Combobox.Empty>
   <Combobox.List>
-    <Combobox.Collection items={countries} itemToStringLabel={country => country.name}>
-      {country => (
+    <Combobox.Collection>
+      {(country: Country) => (
         <Combobox.Option key={country.iso} value={country.iso} label={country.name}>
           {country.name}
         </Combobox.Option>
@@ -43,16 +52,31 @@ so closing resets the search, not the selection.
   storyModule={ComboboxStories}
 />
 
+## Option parts
+
+Compose an option from `Media`, `Label` and `Detail` so every row lines up. The label truncates to
+one line; the detail stays whole.
+
+<Story
+  name='OptionParts'
+  storyModule={ComboboxStories}
+/>
+
 ## Parts
 
-| Part                  | Description                                                                 |
-| --------------------- | --------------------------------------------------------------------------- |
-| `Combobox.Root`       | Owns input, selection, open state, and keyboard navigation.                 |
-| `Combobox.Input`      | Search input; renders Mosaic `Input` unless composed through another input. |
-| `Combobox.Trigger`    | Opens and closes the option list while keeping focus on the input.          |
-| `Combobox.Clear`      | Empties the input and selection; shown only while there is a value.         |
-| `Combobox.Popup`      | Portals, positions, surfaces, and scrolls a floating option list.           |
-| `Combobox.List`       | Scrollable inline listbox.                                                  |
-| `Combobox.Collection` | Filters items and renders each option, with an optional empty state.        |
-| `Combobox.Option`     | Selectable option with active, selected, and disabled states.               |
-| `Combobox.Empty`      | Empty result message.                                                       |
+| Part                       | Description                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `Combobox.Root`            | Owns input, selection, open state, and keyboard navigation.                 |
+| `Combobox.InputGroup`      | Mosaic `InputGroup` that anchors the popup and keeps it open when pressed.  |
+| `Combobox.Input`           | Search input; renders Mosaic `Input` unless composed through another input. |
+| `Combobox.Trigger`         | Opens and closes the option list while keeping focus on the input.          |
+| `Combobox.Clear`           | Empties the input and selection; shown only while there is a value.         |
+| `Combobox.Popup`           | Portals, positions, surfaces, and scrolls a floating option list.           |
+| `Combobox.List`            | Scrollable inline listbox.                                                  |
+| `Combobox.Collection`      | Renders an option for each of the root's `items` that match the search.     |
+| `Combobox.Option`          | Selectable option with active, selected, and disabled states.               |
+| `Combobox.Media`           | Square leading column for an icon, flag, or avatar.                         |
+| `Combobox.Label`           | The option's name; truncates to one line.                                   |
+| `Combobox.Detail`          | Secondary trailing text, such as a code; never truncates.                   |
+| `Combobox.OptionIndicator` | Check shown on the selected option.                                         |
+| `Combobox.Empty`           | Announced message shown when none of the root's `items` match the search.   |

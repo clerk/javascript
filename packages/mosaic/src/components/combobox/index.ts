@@ -1,10 +1,14 @@
+export * as Combobox from './combobox.parts';
 export {
-  Combobox,
   ComboboxClear,
   ComboboxCollection,
+  ComboboxDetail,
   ComboboxEmpty,
   ComboboxInput,
+  ComboboxInputGroup,
+  ComboboxLabel,
   ComboboxList,
+  ComboboxMedia,
   ComboboxOption,
   ComboboxOptionIndicator,
   ComboboxPopup,
@@ -13,9 +17,13 @@ export {
 } from './combobox';
 export type {
   ComboboxClearProps,
+  ComboboxDetailProps,
   ComboboxEmptyProps,
+  ComboboxInputGroupProps,
   ComboboxInputProps,
+  ComboboxLabelProps,
   ComboboxListProps,
+  ComboboxMediaProps,
   ComboboxOptionProps,
   ComboboxOptionIndicatorProps,
   ComboboxPopupProps,

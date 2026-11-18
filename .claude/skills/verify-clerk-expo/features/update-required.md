@@ -27,12 +27,12 @@ Preconditions:
 
 ## States a spec cannot reach
 
-| State                                        | Where the app decides                                                           | What it takes                                                                                                               |
-| -------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `Can't update? Get help`                     | `UpdateRequiredView.tsx`, from `getUpdateRequiredDisplay`                       | A support email on the instance. The Platform API config has no leaf for it, so a spec cannot set one                       |
-| The screen with no store button              | `UpdateRequiredView.tsx`, when `status.updateUrl` is empty                      | A minimum with no update URL. Clerk requires one (`validateNativeAppMinimum` in clerk_go), so only a local patch reaches it |
-| An app's own screen instead of Clerk's       | `ClerkProvider.tsx`, `updateRequiredViewEnabled`                                | That prop set to `false` in the test app, and a screen that reads `useAppVersionSupport()`                                  |
-| The native clerk-ios or clerk-android screen | `@clerk/expo` falls back to it when the app does not install `expo-application` | A build of the test app without `expo-application`, which this spec no longer uses                                          |
+| State                                                                | Where the app decides                                                           | What it takes                                                                                                               |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `Can't update? Get Help` on iOS, `Can't update? Get help` on Android | `UpdateRequiredView.tsx`, from `getUpdateRequiredDisplay`                       | A support email on the instance. The Platform API config has no leaf for it, so a spec cannot set one                       |
+| The screen with no store button                                      | `UpdateRequiredView.tsx`, when `status.updateUrl` is empty                      | A minimum with no update URL. Clerk requires one (`validateNativeAppMinimum` in clerk_go), so only a local patch reaches it |
+| An app's own screen instead of Clerk's                               | `ClerkProvider.tsx`, `updateRequiredViewEnabled`                                | That prop set to `false` in the test app, and a screen that reads `useAppVersionSupport()`                                  |
+| The native clerk-ios or clerk-android screen                         | `@clerk/expo` falls back to it when the app does not install `expo-application` | A build of the test app without `expo-application`, which this spec no longer uses                                          |
 
 ## Gotchas
 

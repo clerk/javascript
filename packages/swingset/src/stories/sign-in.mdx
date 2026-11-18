@@ -2,7 +2,7 @@ import * as Stories from './sign-in.stories';
 
 # SignIn
 
-The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error.
+The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to return to the start with the lockout in the banner.
 
 ## Example
 
@@ -14,7 +14,8 @@ The example pauses briefly in each pending state. An email containing `new` take
     { name: 'Flow', href: '/components/flow', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
-    { name: 'Input Group', href: '/components/input-group', layer: 'Components' },
+    { name: 'PasswordInput', href: '/components/password-input', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
     { name: 'OTP', href: '/components/otp', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },
     { name: 'Button', href: '/components/button', layer: 'Components' },
@@ -24,80 +25,425 @@ The example pauses briefly in each pending state. An email containing `new` take
 
 ## Usage
 
-The view renders one step at a time inside a `Card.Root` and reports every interaction through plain callbacks. `combined` switches the start card to the sign-in-or-up copy and hides the sign-up link. The code, backup code, method picker, and help steps are the reverification feature's step views.
+The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps. `form` is one `useForm` holding every step's fields (`SignInValues`), and each step's form submits through `onSubmit`; a completed code goes to `onCodeComplete` with the code. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field and shows under it; `globalErrorMessage` is an error about the whole step and shows in the card's banner. The new-password step is the last save, so its errors come from `form` instead. Everything else reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. `onCancel` is the step's secondary action, "Use another method" or "Back to sign in", and leaving it out hides the button. Leaving out `onResend` hides the resend link, as on the authenticator app step, and `canResend` is false while a resend is waiting or another action runs. `combined` switches the start card to the sign-in-or-up copy; leave out `onSignUp` there to hide the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
 
 ```tsx
-import { Card } from '@clerk/mosaic/components/card';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 
-<Card.Root align='center'>
-  <SignInView
-    step={step}
-    combined
-    applicationName='Acme'
-    applicationLogoUrl={logoUrl}
-    socialProviders={providers}
-    {...callbacks}
-  />
-</Card.Root>;
+<SignInView
+  step={{ kind: 'code', purpose: 'second-factor', channel: 'totp' }}
+  combined
+  applicationName='Acme'
+  applicationLogoUrl={logoUrl}
+  socialProviders={providers}
+  form={form}
+  onSubmit={onSubmit}
+  onCodeComplete={onCodeComplete}
+  isPending={isPending}
+  {...callbacks}
+/>;
 ```
 
-## Panels
+## Steps
 
-These examples isolate each step and its visual states.
+Each section is one component in `features/sign-in/steps/`, or in `blocks/auth/` for the screens sign-in and sign-up share, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
 
-### Start
+### Identifier step
 
-<Story name='Start' storyModule={Stories} />
+`identifier-step.tsx` draws `{ kind: 'identifier' }`: social providers, the identifier field and, outside the combined flow, the sign-up link. `field` picks the email, username, email-or-username or phone input, and `nextField` adds the link that switches to it through `onSwitchField`.
+
+#### Default
+
+<Story name='IdentifierDefault' storyModule={Stories} />
 
 #### Sign in only
 
-<Story name='StartSignInOnly' storyModule={Stories} />
+<Story name='IdentifierSignInOnly' storyModule={Stories} />
 
 #### Many providers
 
-<Story name='StartManyProviders' storyModule={Stories} />
+<Story name='IdentifierManyProviders' storyModule={Stories} />
 
 #### Provider pending
 
-<Story name='StartProviderPending' storyModule={Stories} />
+<Story name='IdentifierProviderPending' storyModule={Stories} />
 
 #### Error
 
-<Story name='StartError' storyModule={Stories} />
+<Story name='IdentifierError' storyModule={Stories} />
 
-### Password
+#### Banner error
 
-<Story name='Password' storyModule={Stories} />
+<Story name='IdentifierBannerError' storyModule={Stories} />
 
-#### Pending
+#### Locked
 
-<Story name='PasswordPending' storyModule={Stories} />
+<Story name='IdentifierLocked' storyModule={Stories} />
 
-#### Error
+#### Phone
 
-<Story name='PasswordError' storyModule={Stories} />
+<Story name='IdentifierPhone' storyModule={Stories} />
 
-### Email code
+#### Username
 
-<Story name='EmailCode' storyModule={Stories} />
+<Story name='IdentifierUsername' storyModule={Stories} />
 
-### Authenticator app
+#### Email or username
 
-<Story name='Totp' storyModule={Stories} />
+<Story name='IdentifierEmailOrUsername' storyModule={Stories} />
 
-### Backup code
+#### Passkey
 
-<Story name='BackupCode' storyModule={Stories} />
+<Story name='IdentifierPasskey' storyModule={Stories} />
 
-### Method picker
+#### Social only
 
-<Story name='MethodPicker' storyModule={Stories} />
+<Story name='IdentifierSocialOnly' storyModule={Stories} />
 
-### Sign up
+#### Password shown
 
-<Story name='SignUp' storyModule={Stories} />
+The password field appears on the start screen once it has a value, as when the browser autofills it.
 
-### Verify email
+<Story name='IdentifierPassword' storyModule={Stories} />
 
-<Story name='VerifyEmail' storyModule={Stories} />
+#### Web3 wallets
+
+<Story name='IdentifierWeb3' storyModule={Stories} />
+
+#### Alternative phone channel
+
+<Story name='IdentifierAlternativePhoneChannel' storyModule={Stories} />
+
+#### Last used
+
+<Story name='IdentifierLastUsed' storyModule={Stories} />
+
+#### Last used identifier
+
+<Story name='IdentifierLastUsedField' storyModule={Stories} />
+
+#### Captcha
+
+<Story name='IdentifierCaptcha' storyModule={Stories} />
+
+#### Join waitlist
+
+<Story name='IdentifierWaitlist' storyModule={Stories} />
+
+### Credential step
+
+`credential-step.tsx` draws `{ kind: 'credential' }`: the password (with identity preview and forgot password), a passkey prompt (with identity preview) or a backup code (`VerificationBackupCode`).
+
+#### Password
+
+<Story name='CredentialPassword' storyModule={Stories} />
+
+#### Password pending
+
+<Story name='CredentialPasswordPending' storyModule={Stories} />
+
+#### Password error
+
+<Story name='CredentialPasswordError' storyModule={Stories} />
+
+#### Backup code
+
+<Story name='CredentialBackupCode' storyModule={Stories} />
+
+#### Passkey
+
+<Story name='CredentialPasskey' storyModule={Stories} />
+
+#### Password with no other method
+
+When the password is the only method, the secondary action is "Get help".
+
+<Story name='CredentialPasswordOnly' storyModule={Stories} />
+
+#### Passkey as a second factor
+
+<Story name='CredentialPasskeySecondFactor' storyModule={Stories} />
+
+#### Backup code while resetting a password
+
+<Story name='CredentialBackupCodeResetting' storyModule={Stories} />
+
+### Code step
+
+The view draws every `{ kind: 'code' }` with the `VerificationCode` block. The purpose sets the copy and the second button; the channel decides whether Resend shows.
+
+#### Email code
+
+<Story name='CodeEmail' storyModule={Stories} />
+
+#### Authenticator app
+
+<Story name='CodeAuthenticatorApp' storyModule={Stories} />
+
+#### Phone code
+
+<Story name='CodePhone' storyModule={Stories} />
+
+#### Alternative phone channel
+
+<Story name='CodeAlternativePhoneChannel' storyModule={Stories} />
+
+#### Second factor phone code
+
+<Story name='CodeSecondFactorPhone' storyModule={Stories} />
+
+#### Second factor email code
+
+<Story name='CodeSecondFactorEmail' storyModule={Stories} />
+
+#### New device
+
+<Story name='CodeClientTrust' storyModule={Stories} />
+
+#### Reset password
+
+<Story name='CodeResetPassword' storyModule={Stories} />
+
+#### Reset password by phone
+
+<Story name='CodeResetPasswordPhone' storyModule={Stories} />
+
+#### SSO bypass
+
+<Story name='CodeSsoBypass' storyModule={Stories} />
+
+#### Verify email
+
+<Story name='CodeVerifyEmail' storyModule={Stories} />
+
+#### Verify phone
+
+<Story name='CodeVerifyPhone' storyModule={Stories} />
+
+#### Second factor while resetting a password
+
+<Story name='CodeSecondFactorResetting' storyModule={Stories} />
+
+### Choice step
+
+`choice-step.tsx` draws `{ kind: 'choice' }`. Other sign-in methods are full-width buttons under the social providers, as in legacy; where to send a password reset code uses `VerificationMethodPicker`. Enterprise connections, accounts and wallets each have their own screen.
+
+#### Methods
+
+<Story name='ChoiceMethods' storyModule={Stories} />
+
+#### Reset methods
+
+<Story name='ChoiceResetMethods' storyModule={Stories} />
+
+#### Methods with passkey and providers
+
+<Story name='ChoiceMethodsWithProviders' storyModule={Stories} />
+
+#### Enterprise connections
+
+<Story name='ChoiceEnterpriseConnections' storyModule={Stories} />
+
+#### Accounts
+
+<Story name='ChoiceAccounts' storyModule={Stories} />
+
+#### Methods with an email link
+
+<Story name='ChoiceMethodsEmailLink' storyModule={Stories} />
+
+#### Methods as the first screen
+
+When every first factor is a social or SSO option, the list is the first screen and has no Back.
+
+<Story name='ChoiceMethodsEntry' storyModule={Stories} />
+
+#### Second-factor methods
+
+<Story name='ChoiceMethodsSecondFactor' storyModule={Stories} />
+
+#### Wallets
+
+<Story name='ChoiceWallets' storyModule={Stories} />
+
+#### No wallets installed
+
+<Story name='ChoiceWalletsNone' storyModule={Stories} />
+
+#### A single wallet
+
+<Story name='ChoiceWalletsSingle' storyModule={Stories} />
+
+#### Wallets loading
+
+<Story name='ChoiceWalletsLoading' storyModule={Stories} />
+
+### Notice step
+
+`notice-step.tsx` draws `{ kind: 'notice' }`: screens with a message and actions but no field, such as help and no available methods (`VerificationHelp`), forgot password, action blocked, a compromised password, a sent email link, the outcome of opening one, and starting over when the sign-in is in a state the flow does not know.
+
+#### Help
+
+<Story name='NoticeHelp' storyModule={Stories} />
+
+#### Forgot password
+
+<Story name='NoticeForgotPassword' storyModule={Stories} />
+
+#### Forgot password pending
+
+<Story name='NoticeForgotPasswordPending' storyModule={Stories} />
+
+#### No available methods
+
+<Story name='NoticeNoMethods' storyModule={Stories} />
+
+#### Action blocked
+
+<Story name='NoticeActionBlocked' storyModule={Stories} />
+
+#### Password compromised
+
+<Story name='NoticePasswordCompromised' storyModule={Stories} />
+
+#### Password compromised pending
+
+<Story name='NoticePasswordCompromisedPending' storyModule={Stories} />
+
+#### Enterprise SSO
+
+<Story name='NoticeEnterpriseSso' storyModule={Stories} />
+
+#### Email link sent
+
+<Story name='NoticeEmailLinkSent' storyModule={Stories} />
+
+#### Email link on a new device
+
+<Story name='NoticeEmailLinkNewDevice' storyModule={Stories} />
+
+#### Signed in on other tab
+
+<Story name='NoticeEmailLinkSignedInOtherTab' storyModule={Stories} />
+
+#### Email verified
+
+<Story name='NoticeEmailLinkVerified' storyModule={Stories} />
+
+#### Signing in from email link
+
+<Story name='NoticeEmailLinkSigningIn' storyModule={Stories} />
+
+#### Signed in from email link
+
+<Story name='NoticeEmailLinkSignedIn' storyModule={Stories} />
+
+#### Email link expired
+
+<Story name='NoticeEmailLinkExpired' storyModule={Stories} />
+
+#### Email link invalid
+
+<Story name='NoticeEmailLinkInvalid' storyModule={Stories} />
+
+#### Email link for another device
+
+<Story name='NoticeEmailLinkClientMismatch' storyModule={Stories} />
+
+#### Start over
+
+<Story name='NoticeStartOver' storyModule={Stories} />
+
+#### Loading
+
+<Story name='NoticeLoading' storyModule={Stories} />
+
+#### Loading with an error
+
+<Story name='NoticeLoadingError' storyModule={Stories} />
+
+#### Protect check
+
+<Story name='NoticeProtectCheck' storyModule={Stories} />
+
+#### Protect check challenge
+
+Protect's challenge is Cloudflare Turnstile, drawn by a script Clerk serves for each check. The story draws Turnstile itself with its always-challenge test key, since that script cannot load here.
+
+<Story name='NoticeProtectCheckChallenge' storyModule={Stories} />
+
+#### Protect check failed
+
+<Story name='NoticeProtectCheckError' storyModule={Stories} />
+
+### New password step
+
+`new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices. A reset the instance requires says why and has no sign-out option.
+
+#### Set new password
+
+<Story name='NewPasswordReset' storyModule={Stories} />
+
+#### Required reset
+
+<Story name='NewPasswordRequired' storyModule={Stories} />
+
+### Sign-up step
+
+`sign-up-details.tsx`, in `features/sign-up`, draws `{ kind: 'sign-up' }` in the combined flow, with the fields the step lists. Verifying the new email by link is a notice step, and the email link outcomes take the sign-up wording with `flow: 'sign-up'`.
+
+#### Details
+
+<Story name='SignUpDetails' storyModule={Stories} />
+
+#### Fields from instance settings
+
+<Story name='SignUpSettingsFields' storyModule={Stories} />
+
+#### Optional fields
+
+<Story name='SignUpOptionalFields' storyModule={Stories} />
+
+#### Email or phone
+
+<Story name='SignUpEmailOrPhone' storyModule={Stories} />
+
+#### Legal consent
+
+<Story name='SignUpLegalConsent' storyModule={Stories} />
+
+#### Legal consent only
+
+<Story name='SignUpLegalConsentOnly' storyModule={Stories} />
+
+#### Continue, missing fields
+
+With `purpose: 'continue'` the step is titled "Fill in missing fields" and has no sign-in prompt.
+
+<Story name='SignUpContinue' storyModule={Stories} />
+
+#### Sign-up by alternative phone channel
+
+`flow: 'sign-up'` on the alternative channel step gives it the sign-up wording, and `legalConsent` adds the checkbox.
+
+<Story name='SignUpAlternativePhone' storyModule={Stories} />
+
+#### Access restricted
+
+<Story name='SignUpRestricted' storyModule={Stories} />
+
+#### Access restricted, waitlist
+
+<Story name='SignUpWaitlist' storyModule={Stories} />
+
+#### Password requirements
+
+<Story name='SignUpPasswordRequirements' storyModule={Stories} />
+
+#### Verify by email link
+
+<Story name='SignUpVerifyEmailLink' storyModule={Stories} />
+
+#### Signed up from email link
+
+<Story name='SignUpEmailLinkSignedUp' storyModule={Stories} />

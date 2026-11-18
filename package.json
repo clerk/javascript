@@ -13,6 +13,7 @@
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/expo-native-components --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
     "dev:fe-libs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/clerk-js --filter=@clerk/ui --filter=@clerk/shared",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
+    "dev:mosaic-docs": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/mosaic-docs",
     "dev:sandbox": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:sandbox:serve",
     "dev:swingset": "pnpm --filter @clerk/shared build && TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/swingset --filter=@clerk/shared",
     "format": "turbo format && node scripts/format-non-workspace.mjs",
@@ -62,6 +63,8 @@
     "test:integration:react-router": "E2E_APP_ID=react-router.* pnpm test:integration:base --grep @react-router",
     "test:integration:sessions": "DISABLE_WEB_SECURITY=true E2E_SESSIONS_APP_1_ENV_KEY=sessions-prod-1 E2E_SESSIONS_APP_2_ENV_KEY=sessions-prod-2 E2E_SESSIONS_APP_1_HOST=multiple-apps-e2e.clerk.app pnpm test:integration:base --grep @sessions",
     "test:integration:sessions:staging": "DISABLE_WEB_SECURITY=true E2E_SESSIONS_APP_1_ENV_KEY=clerkstage-sessions-prod-1 E2E_SESSIONS_APP_2_ENV_KEY=clerkstage-sessions-prod-2 E2E_SESSIONS_APP_1_HOST=clerkstage-sessions-prod-1-e2e.clerk.app pnpm test:integration:base --grep @sessions",
+    "test:integration:sso": "node integration/scripts/runSso.mjs",
+    "test:integration:sso:cleanup": "node integration/scripts/runSso.mjs --cleanup",
     "test:integration:tanstack-react-start": "E2E_APP_ID=tanstack.react-start* pnpm test:integration:base --grep @tanstack-react-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
@@ -98,7 +101,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "6.2.1",
     "@vitest/browser-playwright": "5.0.0",
     "@vitest/coverage-v8": "5.0.0",
     "chalk": "4.1.2",
@@ -160,15 +163,9 @@
     "vitest": "5.0.0",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@10.34.5+sha512.a4ee05f2f73658255bd6a89859c065a45c28a57daefae2c893a168ee2b73168c37b91e83e57ea67654ad03f03031746430e8bce38e362e042605fb8abc80192e",
+  "packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3",
   "engines": {
     "node": ">=24.15.0",
-    "pnpm": ">=10.34.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "cypress",
-      "msw"
-    ]
+    "pnpm": ">=12.18.0"
   }
 }

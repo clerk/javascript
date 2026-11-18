@@ -478,6 +478,38 @@ describe('SignInStart', () => {
           flow: 'discoverable',
         });
       });
+
+      it('resumes the existing session when passkey sign-in returns session_exists', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            show_sign_in_button: true,
+          });
+        });
+        fixtures.clerk.client.lastActiveSessionId = 'sess_123';
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [
+              {
+                code: 'session_exists',
+                long_message: "You're already signed in.",
+                message: 'Session exists',
+              },
+            ],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInStart />, { wrapper });
+        await userEvent.click(screen.getByText('Use passkey instead'));
+        await waitFor(() => {
+          expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+            session: 'sess_123',
+            navigate: expect.any(Function),
+          });
+        });
+        expect(screen.queryByText("You're already signed in.")).not.toBeInTheDocument();
+      });
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {

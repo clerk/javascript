@@ -16,7 +16,6 @@ internal class ClerkUserProfileCustomPageState(
   private var navigateBackAction: (() -> Unit)? = null
   private var popToRootAction: (() -> Unit)? = null
   private var pushAction: ((String) -> Unit)? = null
-  private var hasObservedUserId = false
   private var observedUserId: String? = null
   private var navigationTransitionGeneration = 0
 
@@ -54,14 +53,9 @@ internal class ClerkUserProfileCustomPageState(
   }
 
   fun userDidChange(userId: String?) {
-    if (!hasObservedUserId) {
-      observedUserId = userId
-      hasObservedUserId = true
-      return
-    }
-
-    if (observedUserId == userId) return
+    val previousUserId = observedUserId
     observedUserId = userId
+    if (previousUserId == null || previousUserId == userId) return
     invalidateNavigation()
   }
 

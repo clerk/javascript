@@ -43,4 +43,36 @@ describe('SignInTokenAPI', () => {
 
     expect(response.id).toBe('sign_in_token_123');
   });
+
+  it('sends the second factor verification as second_factor_verification', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/sign_in_tokens',
+        validateHeaders(async ({ request }) => {
+          const body = await request.json();
+          expect(body).toEqual({
+            user_id: 'user_123',
+            second_factor_verification: 'stale',
+          });
+
+          return HttpResponse.json({
+            id: 'sign_in_token_123',
+            user_id: 'user_123',
+            token: 'token_123',
+            status: 'pending',
+            url: 'https://accounts.example.com/tickets/token_123',
+            created_at: 1,
+            updated_at: 1,
+          });
+        }),
+      ),
+    );
+
+    const response = await apiClient.signInTokens.createSignInToken({
+      userId: 'user_123',
+      secondFactorVerification: 'stale',
+    });
+
+    expect(response.id).toBe('sign_in_token_123');
+  });
 });

@@ -1,7 +1,8 @@
-import stylex from '@stylexjs/unplugin/vite';
-import { playwright } from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
+
+import stylex from '@stylexjs/unplugin/vite';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
 import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';

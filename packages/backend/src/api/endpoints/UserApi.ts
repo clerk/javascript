@@ -10,9 +10,10 @@ import type {
   OrganizationInvitation,
   OrganizationMembership,
   PhoneNumber,
-  User,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
+import type { UserMergedJSON } from '../resources/JSON';
+import { User } from '../resources/User';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
 
@@ -38,6 +39,11 @@ export type UserCountParams = {
 
 /** @generateWithEmptyComment */
 export type UserListParams = ClerkPaginationRequest<{
+  /**
+   * The ID of the last user on the previous page. Only valid when `orderBy` is omitted, `created_at`, `+created_at`,
+   * or `-created_at`, and `offset` is omitted or `0`.
+   */
+  startingAfter?: string;
   /** Filters users with the specified email addresses. Accepts up to 100 email addresses. */
   emailAddress?: string[];
   /** Filters users with the specified phone numbers. Accepts up to 100 phone numbers. */
@@ -420,6 +426,22 @@ export type SetPasswordCompromisedParams = {
   revokeAllSessions?: boolean;
 };
 
+/** @generateWithEmptyComment */
+export type MergeUserParams = {
+  /** The ID of the user to merge into the other user. This user is deleted. */
+  fromUserId: string;
+  /** Whether to return the result of the merge without changing anything. Defaults to `false`. */
+  dryRun?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type UserMergeResult = {
+  /** The user that remains, as it is after the merge. */
+  user: User;
+  /** The merged user as it was before it was deleted. */
+  deletedUser: User;
+};
+
 type ReplaceUserEmailAddressParams = {
   /** The new email address. Must adhere to the RFC 5322 specification for email address format. */
   emailAddress: string;
@@ -434,6 +456,36 @@ type UserID = {
   userId: string;
 };
 
+// The API replaces a limit outside this range with its default instead of
+// rejecting it, so a page can only be compared against a limit inside it.
+const MIN_LIST_LIMIT = 1;
+const MAX_LIST_LIMIT = 500;
+
+/**
+ * Returns the total number of users when a list page already shows it, so the
+ * caller need not wait for the count request, which can be slow or fail for a
+ * search over many users.
+ * A page with fewer users than its limit is the last one, and the total is the
+ * users before it plus the users on it.
+ */
+function totalCountFromLastPage(
+  pageLength: number,
+  { limit, offset = 0, startingAfter }: Pick<UserListParams, 'limit' | 'offset' | 'startingAfter'>,
+): number | undefined {
+  // After a cursor, the number of users before the page is unknown.
+  if (startingAfter || !Number.isInteger(offset) || offset < 0) {
+    return undefined;
+  }
+  // No users at offset 0 means there are none, whatever the limit.
+  if (pageLength === 0) {
+    return offset === 0 ? 0 : undefined;
+  }
+  if (limit === undefined || !Number.isInteger(limit) || limit < MIN_LIST_LIMIT || limit > MAX_LIST_LIMIT) {
+    return undefined;
+  }
+  return pageLength < limit ? offset + pageLength : undefined;
+}
+
 /** @generateWithEmptyComment */
 export class UserAPI extends AbstractAPI {
   /**
@@ -441,18 +493,19 @@ export class UserAPI extends AbstractAPI {
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
   public async getUserList(params: UserListParams = {}) {
-    const { limit, offset, orderBy, ...userCountParams } = params;
+    const { limit, offset, orderBy, startingAfter, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
     // In some edge cases the data.length != totalCount due to a creation of a user between the 2 api responses
-    const [data, totalCount] = await Promise.all([
-      this.request<User[]>({
-        method: 'GET',
-        path: basePath,
-        queryParams: params,
-      }),
-      this.getCount(userCountParams),
-    ]);
+    const countRequest = this.getCount(userCountParams);
+    // The count is not awaited when the page shows the total, so a failure must not go unhandled.
+    countRequest.catch(() => {});
+    const data = await this.request<User[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: params,
+    });
+    const totalCount = totalCountFromLastPage(data.length, { limit, offset, startingAfter }) ?? (await countRequest);
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
 
@@ -924,5 +977,23 @@ export class UserAPI extends AbstractAPI {
       method: 'POST',
       path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
+  }
+
+  /**
+   * Merges the `fromUserId` user into the given user: moves its identifications, connected accounts, second factors, organization memberships, and metadata onto the given user, then deletes the `fromUserId` user. Where both users have a value, the given user keeps its own.
+   *
+   * A merge cannot be undone. Use `dryRun` to preview one.
+   * @param userId - The ID of the user that remains after the merge.
+   * @param params - The parameters for the merge.
+   * @returns The remaining [`User`](https://clerk.com/docs/reference/backend/types/backend-user) after the merge, and the deleted user as it was before the merge.
+   */
+  public async mergeUser(userId: string, params: MergeUserParams): Promise<UserMergeResult> {
+    this.requireId(userId);
+    const result = await this.request<UserMergedJSON>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'merge'),
+      bodyParams: params,
+    });
+    return { user: User.fromJSON(result.user), deletedUser: User.fromJSON(result.deleted_user) };
   }
 }

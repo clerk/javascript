@@ -1141,6 +1141,10 @@ export const enUS: LocalizationResource = {
   oauthConsent: {
     action__allow: 'Allow',
     action__deny: 'Deny',
+    clientIdentity: {
+      dynamic: 'Unverified app: it registered itself, so its name and logo are not verified.',
+      metadataDocument: 'App details published by {{metadataHost}}',
+    },
     offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
     redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
     redirectUriModal: {
@@ -1686,6 +1690,16 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword:
+        "Your current password can't be used anymore. Confirm it's you to save your new password.",
+      title: 'Password compromised',
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword:
+        "Your current password was found in a data breach. Confirm it's you to save your new password.",
+      title: 'Password compromised',
+    },
     phoneCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
@@ -1697,6 +1711,22 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your phone to continue',
       title: 'Verification required',
+    },
+    resetPassword: {
+      formButtonPrimary: 'Continue',
+      title: 'Set new password',
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: 'Reset your password',
+      label__alternativeMethods: 'Or, verify with another method',
+    },
+    resetPasswordCode: {
+      formTitle: 'Reset password code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle__saveNewPassword_email: 'Enter the code sent to your email address to save your new password',
+      subtitle__saveNewPassword_phone: 'Enter the code sent to your phone to save your new password',
+      title__saveNewPassword_email: 'Check your email',
+      title__saveNewPassword_phone: 'Check your phone',
     },
     totpMfa: {
       formTitle: 'Verification code',
@@ -2143,6 +2173,7 @@ export const enUS: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    external_account_not_found: 'Account not found. Please sign up or try signing in to a different account.',
     form_code_incorrect: undefined,
     form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
@@ -2224,11 +2255,14 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    signup_rate_limit_exceeded: 'Too many requests. Please try again in a bit.',
+    something_went_wrong: 'Something went wrong. Please try again.',
     sso_bypass_domain_not_served:
       'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_requests: 'Too many requests. Please try again in a bit.',
     too_many_unverified_identifications:
       'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',

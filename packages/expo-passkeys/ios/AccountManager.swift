@@ -23,6 +23,7 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         
         let registrationRequest = publicKeyCredentialProvider.createCredentialRegistrationRequest(challenge: challenge,
                                                                                                   name: displayName, userID: userId)
+        registrationRequest.userVerificationPreference = .required
         if #available(iOS 17.4, *) {
             registrationRequest.excludedCredentials = excludeCredentialIdsBase64.compactMap { id in
                 dataFromBase64URL(base64urlString: id).map { ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: $0) }
@@ -58,17 +59,23 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     }
     
     
-    func getPasskey(challengeBase64URL: String, rpId: String,  promise: Promise) {
+    func getPasskey(challengeBase64URL: String, rpId: String, preferImmediatelyAvailableCredentials: Bool, userVerification: String?, promise: Promise) {
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
         
         let challenge = dataFromBase64URL(base64urlString: challengeBase64URL)!
         let assertionRequest = publicKeyCredentialProvider.createCredentialAssertionRequest(challenge: challenge)
-        
+        if let userVerification {
+            assertionRequest.userVerificationPreference = ASAuthorizationPublicKeyCredentialUserVerificationPreference(rawValue: userVerification)
+        }
         
         let authController = ASAuthorizationController(authorizationRequests: [ assertionRequest ] )
         authController.delegate = self
         authController.presentationContextProvider = self
-        authController.performRequests()
+        if preferImmediatelyAvailableCredentials, #available(iOS 16.0, *) {
+            authController.performRequests(options: .preferImmediatelyAvailableCredentials)
+        } else {
+            authController.performRequests()
+        }
         
         self.authCallback = { result,error in
             if (error != nil) {

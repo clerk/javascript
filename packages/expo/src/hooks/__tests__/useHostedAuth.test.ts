@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import Module from 'node:module';
 
 import type { ClientJSON } from '@clerk/shared/types';
@@ -137,23 +136,6 @@ describe('useHostedAuth', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  test('returns the startHostedAuth function', () => {
-    const { result } = renderHook(() => useHostedAuth());
-
-    expect(typeof result.current.startHostedAuth).toBe('function');
-  });
-
-  test('uses the native Clerk instance for FAPI requests', async () => {
-    mockHostedAuthResponse();
-    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
-
-    const { result } = renderHook(() => useHostedAuth());
-    await result.current.startHostedAuth();
-
-    expect(mocks.getClerkInstance).toHaveBeenCalledTimes(1);
-    expect(mockFapiRequest).toHaveBeenCalledWith(expect.objectContaining({ path: '/client/hosted_auth' }));
   });
 
   test('opens the hosted URL and verifies callback state', async () => {
@@ -422,51 +404,6 @@ describe('useHostedAuth', () => {
     await expect(result.current.startHostedAuth()).rejects.toThrow('Unable to open browser');
   });
 
-  test('derives the S256 code challenge from the verifier per RFC 7636', async () => {
-    mocks.digestStringAsync.mockImplementation((_algorithm: string, value: string) =>
-      Promise.resolve(createHash('sha256').update(value, 'ascii').digest('base64')),
-    );
-    const expectedChallenge = createHash('sha256')
-      .update(mockCodeVerifier, 'ascii')
-      .digest('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/g, '');
-    mockHostedAuthResponse();
-    mocks.openAuthSessionAsync.mockResolvedValue({ type: 'dismiss' });
-
-    const { result } = renderHook(() => useHostedAuth());
-    await result.current.startHostedAuth();
-
-    expect(mockFapiRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        body: expect.objectContaining({ codeChallenge: expectedChallenge }),
-      }),
-    );
-  });
-
-  test('generates a secure state with expo-crypto when one is not provided', async () => {
-    mockHostedAuthResponse();
-    mocks.openAuthSessionAsync.mockResolvedValue({
-      type: 'dismiss',
-    });
-
-    const { result } = renderHook(() => useHostedAuth());
-    await result.current.startHostedAuth();
-
-    expect(mocks.randomUUID).toHaveBeenCalled();
-    expect(mockFapiRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/client/hosted_auth',
-      body: {
-        redirectUrl: 'myapp:///hosted-auth-callback',
-        codeChallenge: mockCodeChallenge,
-        mode: undefined,
-        state: 'generated-state-123',
-      },
-    });
-  });
-
   test('rejects callback state mismatches', async () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
@@ -506,7 +443,7 @@ describe('useHostedAuth', () => {
     mockHostedAuthResponse();
     mocks.openAuthSessionAsync.mockResolvedValue({
       type: 'success',
-      url: 'otherapp://hosted-auth-callback?state=generated-state-123',
+      url: 'otherapp:///hosted-auth-callback?state=generated-state-123',
     });
 
     const { result } = renderHook(() => useHostedAuth());

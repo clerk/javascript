@@ -665,7 +665,7 @@ export class SignIn extends BaseResource implements SignInResource {
    * @returns The updated `SignIn` resource.
    */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -699,6 +699,7 @@ export class SignIn extends BaseResource implements SignInResource {
       const { publicKeyCredential, error } = await webAuthnGetCredential({
         publicKeyOptions: secondFactorPublicKeyOptions,
         conditionalUI: false,
+        preferImmediatelyAvailableCredentials,
       });
       if (!publicKeyCredential) {
         throw error;
@@ -748,6 +749,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions,
       conditionalUI: canUseConditionalUI,
+      preferImmediatelyAvailableCredentials,
     });
 
     if (!publicKeyCredential) {
@@ -857,6 +859,7 @@ export class SignIn extends BaseResource implements SignInResource {
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
       timezone: this.timezone,
+      client_trust_state: this.clientTrustState,
       protect_check: this.protectCheck
         ? {
             status: this.protectCheck.status,
@@ -1002,6 +1005,10 @@ class SignInFuture implements SignInFutureResource {
 
   get secondFactorVerification() {
     return this.#resource.secondFactorVerification;
+  }
+
+  get clientTrustState(): ClientTrustState | undefined {
+    return this.#resource.clientTrustState ?? (this.#resource.status === 'needs_client_trust' ? 'new' : undefined);
   }
 
   get protectCheck() {
@@ -1578,7 +1585,7 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
-    const { flow } = params || {};
+    const { flow, preferImmediatelyAvailableCredentials } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -1633,6 +1640,7 @@ class SignInFuture implements SignInFutureResource {
       const { publicKeyCredential, error } = await webAuthnGetCredential({
         publicKeyOptions,
         conditionalUI: canUseConditionalUI,
+        preferImmediatelyAvailableCredentials,
       });
 
       if (!publicKeyCredential) {

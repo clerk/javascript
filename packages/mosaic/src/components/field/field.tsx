@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -139,6 +141,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
       htmlFor,
       onClick: handleClick,
     },
+  });
+});
+
+/** Props for the row that puts a field's label at the start and an action, such as a link, at the end. */
+export type FieldHeaderProps = MosaicComponentProps<'div'>;
+
+const Header = React.forwardRef<HTMLDivElement, FieldHeaderProps>(function MosaicFieldHeader(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-header'), stylex.props(reset.base, styles.header, xstyle), rest),
   });
 });
 
@@ -323,15 +340,15 @@ const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function M
   );
 });
 
-/** Styled parts for composing an automatically associated single-control field. */
-export const Field = {
-  Root,
-  Label,
-  Content,
-  Description,
-  Message,
-  Feedback,
-  Error: FieldError,
-  Success: FieldSuccess,
-  Hint: FieldHint,
+export {
+  Root as FieldRoot,
+  Header as FieldHeader,
+  Label as FieldLabel,
+  Content as FieldContent,
+  Description as FieldDescription,
+  Message as FieldMessage,
+  Feedback as FieldFeedback,
+  FieldError,
+  FieldSuccess,
+  FieldHint,
 };
