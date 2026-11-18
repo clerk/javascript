@@ -1,10 +1,10 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 
-import { noRenderClock } from './no-render-clock.ts';
+import plugin from '../plugin.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { parserOptions: { lang: 'tsx' } } });
 
-ruleTester.run('no-render-clock', noRenderClock, {
+ruleTester.run('no-render-clock', plugin.rules['no-render-clock'], {
   valid: [
     `
       import { useEffect } from 'react';

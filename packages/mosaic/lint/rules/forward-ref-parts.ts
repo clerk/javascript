@@ -20,6 +20,7 @@ export const forwardRefParts = defineRule({
   },
   createOnce(context) {
     let renderCalls: ESTree.CallExpression[] = [];
+    let callsByFunction = new Map<ESTree.Node, ESTree.CallExpression[]>();
     const isComponentName = (name: string) => /^[A-Z]/.test(name);
 
     const check = (reportNode: ESTree.Node, init: ESTree.Node) => {
@@ -30,7 +31,7 @@ export const forwardRefParts = defineRule({
       if (!isFunction(fn)) {
         return;
       }
-      const calls = renderCalls.filter(call => isInside(call, fn));
+      const calls = callsByFunction.get(fn) ?? [];
       if (calls.length === 0) {
         return;
       }
@@ -67,6 +68,7 @@ export const forwardRefParts = defineRule({
         if (renderCalls.length === 0) {
           return;
         }
+        callsByFunction = groupByEnclosingFunction(renderCalls);
         const program = context.sourceCode.ast;
         const candidates = new Map<string, Candidate>();
         for (const statement of program.body) {
@@ -149,13 +151,21 @@ function isFunction(node: ESTree.Node | undefined): node is FunctionNode {
   );
 }
 
-function isInside(node: ESTree.Node, ancestor: ESTree.Node): boolean {
-  for (let current: ESTree.Node | null = node.parent; current; current = current.parent) {
-    if (current === ancestor) {
-      return true;
+function groupByEnclosingFunction(calls: ESTree.CallExpression[]): Map<ESTree.Node, ESTree.CallExpression[]> {
+  const groups = new Map<ESTree.Node, ESTree.CallExpression[]>();
+  for (const call of calls) {
+    for (let current: ESTree.Node | null = call.parent; current; current = current.parent) {
+      if (isFunction(current)) {
+        const group = groups.get(current);
+        if (group) {
+          group.push(call);
+        } else {
+          groups.set(current, [call]);
+        }
+      }
     }
   }
-  return false;
+  return groups;
 }
 
 function includesRef(value: ESTree.Node | null | undefined, refName: string | undefined, scope: Scope): boolean {

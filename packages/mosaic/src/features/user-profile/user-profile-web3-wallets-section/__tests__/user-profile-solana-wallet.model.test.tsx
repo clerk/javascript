@@ -7,6 +7,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileSolanaWalletsModel } from '../user-profile-solana-wallet.model';
 
+vi.mock('@wallet-standard/core', async importOriginal => {
+  const actual = await importOriginal<typeof import('@wallet-standard/core')>();
+  return { ...actual, getWallets: vi.fn(actual.getWallets) };
+});
+
 const unregisters: Array<() => void> = [];
 
 function register(...wallets: Wallet[]) {
@@ -45,15 +50,16 @@ function watchedWallet(name: string) {
 describe('useUserProfileSolanaWalletsModel', () => {
   afterEach(() => {
     unregisters.splice(0).forEach(unregister => unregister());
+    vi.mocked(getWallets).mockClear();
   });
 
-  it('renders a loading server snapshot', () => {
-    register(wallet('Phantom'));
+  it('renders a loading server snapshot without touching the registry', () => {
     function WalletNames() {
       return createElement('div', null, useUserProfileSolanaWalletsModel().status);
     }
 
     expect(renderToString(createElement(WalletNames))).toBe('<div>loading</div>');
+    expect(getWallets).not.toHaveBeenCalled();
   });
 
   it('starts loading and projects only eligible wallet names and icons after loading the registry', async () => {
@@ -103,19 +109,28 @@ describe('useUserProfileSolanaWalletsModel', () => {
     act(() => unregisterBackpack());
     expect(result.current).toEqual({ status: 'ready', wallets: [] });
 
+    const watched = watchedWallet('Watched');
+    let unregisterOther = () => {};
+    act(() => {
+      register(watched.wallet);
+      unregisterOther = register(wallet('Other'));
+    });
     unmount();
-    const watched = watchedWallet('Late');
-    register(watched.wallet);
-    expect(watched.reads()).toBe(0);
+    const readsAtUnmount = watched.reads();
+
+    unregisterOther();
+    register(wallet('Late'));
+    expect(watched.reads()).toBe(readsAtUnmount);
   });
 
-  it('does not subscribe when unmounted before the module loads', async () => {
+  it('does not touch the registry when unmounted before the module loads', async () => {
     const { unmount } = renderHook(useUserProfileSolanaWalletsModel);
     unmount();
     await act(async () => {
       await vi.dynamicImportSettled();
     });
 
+    expect(getWallets).not.toHaveBeenCalled();
     const watched = watchedWallet('Late');
     register(watched.wallet);
     expect(watched.reads()).toBe(0);

@@ -1,10 +1,10 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 
-import { noRawInvoke } from './no-raw-invoke.ts';
+import plugin from '../plugin.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { parserOptions: { lang: 'tsx' } } });
 
-ruleTester.run('no-raw-invoke', noRawInvoke, {
+ruleTester.run('no-raw-invoke', plugin.rules['no-raw-invoke'], {
   valid: [
     `
       declare const fromPromise: (run: () => Promise<number>) => object;

@@ -1,10 +1,10 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 
-import { forwardRefParts } from './forward-ref-parts.ts';
+import plugin from '../plugin.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { parserOptions: { lang: 'tsx' } } });
 
-ruleTester.run('forward-ref-parts', forwardRefParts, {
+ruleTester.run('forward-ref-parts', plugin.rules['forward-ref-parts'], {
   valid: [
     `
       import React from 'react';

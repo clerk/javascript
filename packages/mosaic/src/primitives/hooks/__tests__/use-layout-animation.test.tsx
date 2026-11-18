@@ -1,9 +1,11 @@
-import { render } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { useRef } from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { LAYOUT_ITEM_SELECTOR } from '../../utils/layout-animator';
 import { useLayoutAnimation } from '../use-layout-animation';
+
+afterEach(cleanup);
 
 function List() {
   const ref = useRef<HTMLDivElement>(null);

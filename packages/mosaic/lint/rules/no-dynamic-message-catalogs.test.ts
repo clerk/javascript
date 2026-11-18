@@ -1,10 +1,10 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 
-import { noDynamicMessageCatalogs } from './no-dynamic-message-catalogs.ts';
+import plugin from '../plugin.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { parserOptions: { lang: 'tsx' } } });
 
-ruleTester.run('no-dynamic-message-catalogs', noDynamicMessageCatalogs, {
+ruleTester.run('no-dynamic-message-catalogs', plugin.rules['no-dynamic-message-catalogs'], {
   valid: [
     "import('./reverification.controller');",
     'import(`./reverification.model`);',

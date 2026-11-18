@@ -1,10 +1,10 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 
-import { noModelReactState } from './no-model-react-state.ts';
+import plugin from '../plugin.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { parserOptions: { lang: 'tsx' } } });
 
-ruleTester.run('no-model-react-state', noModelReactState, {
+ruleTester.run('no-model-react-state', plugin.rules['no-model-react-state'], {
   valid: [
     "import React from 'react'; React.useMemo(() => 0, []);",
     "import React from 'react'; export type Node = React.ReactNode;",

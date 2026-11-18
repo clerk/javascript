@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -254,6 +254,20 @@ describe('Mosaic TagInput', () => {
     for (const tag of screen.getAllByRole('listitem')) {
       expect(tag).toHaveAttribute('data-layout-item', '');
     }
+  });
+
+  it('pins an exiting tag inside the root', async () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const tag = screen.getAllByRole('listitem')[0];
+    tag.setAttribute('data-ending-style', '');
+
+    await waitFor(() => expect(tag).toHaveAttribute('data-layout-popped'));
   });
 
   it('merges xstyle atoms onto the root', () => {
