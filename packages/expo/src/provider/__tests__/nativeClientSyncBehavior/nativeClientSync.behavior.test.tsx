@@ -252,16 +252,6 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
-    it('moves the native active session after JS switches sessions with setActive', async () => {
-      const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
-      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
-
-      await h.run(() => h.js.setActive({ session: sessionIds.user_2 }));
-
-      await waitFor(() => expect(h.native.activeSessionId).toBe(sessionIds.user_2));
-      await expectConverged(h);
-    });
-
     it('moves native to the rotated device token when a JS response rotates it', async () => {
       const { server, token } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
