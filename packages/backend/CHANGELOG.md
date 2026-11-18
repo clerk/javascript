@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.31.0
+
+### Minor Changes
+
+- Add `transactional_email_blocked` to the `ClerkPolicy` reasons of the `email.suppressed` webhook event type. Clerk sends this reason when a queued transactional email is suppressed because sending was blocked for the instance. ([#10849](https://github.com/clerk/javascript/pull/10849)) by [@jescalan](https://github.com/jescalan)
+
+- Add an optional `secondFactorVerification` parameter (`'fresh' | 'stale'`) to `createSignInToken()`, which lets a user with a second factor enabled complete the sign-in without being prompted for it. `expiresInSeconds` is now optional. ([#10265](https://github.com/clerk/javascript/pull/10265)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- `users.getUserList()` no longer waits for the user count when the page it lists already shows the total: a page with fewer users than its `limit`, or no users at all. The count can be slow for a search over many users, and before this change `getUserList()` failed whenever the count did. Both requests are still sent together, so a page that fills its `limit` takes as long as before. ([#10803](https://github.com/clerk/javascript/pull/10803)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
+## 3.30.0
+
+### Minor Changes
+
+- Add an experimental `clerkClient.oauthApplications.__experimental_exchangeToken()` method for performing an OAuth 2.0 Token Exchange (RFC 8693) on behalf of an OAuth application. Pass your publishable key, the application's client ID and client secret, a user's OAuth access token, and the target `resource` to receive a new access token for that resource, for example to call a downstream API on a user's behalf. The request goes to your instance's token endpoint, derived from the publishable key (or from `proxyUrl` when set), so it does not require a secret key. A `proxyUrl` must be an absolute HTTPS URL without a query or fragment, including for loopback hosts. Token exchange requests do not follow redirects, so credentials and tokens are never forwarded to another endpoint; a redirect response throws an `OAuthTokenExchangeError` with code `invalid_response`. ([#10762](https://github.com/clerk/javascript/pull/10762)) by [@wyattjoh](https://github.com/wyattjoh)
+
+  The method checks its inputs before making any request: `resource` must be an absolute URI without a fragment that uses `https` (or `http` on `localhost`, `127.0.0.1` or `[::1]`), and each `scope` element must be a single scope token, without spaces, `"`, `\` or non-ASCII characters. Invalid input throws an `OAuthTokenExchangeError` with code `invalid_request` and no `status`. Only a `200` response with a well-formed token response counts as success; any other success status, or a response with missing or mistyped members, throws an `OAuthTokenExchangeError` with code `invalid_response`. If the token endpoint rejects the exchange, the error carries the OAuth error code in `code` (also available as `error`), `errorDescription`, and HTTP `status`. `OAuthTokenExchangeError` is exported from `@clerk/backend/errors`. Network failures from `fetch` are not wrapped.
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
 ## 3.29.0
 
 ### Minor Changes

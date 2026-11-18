@@ -7,7 +7,14 @@ export type OAuthConsentMessages = MosaicMessages['oauthConsent'];
 
 export type OAuthConsentScopeRecord = Pick<OAuthConsentScope, 'scope' | 'description'>;
 
-export interface OAuthConsentKnownData {
+export interface OAuthConsentOrganization extends SelectItem {
+  imageUrl?: string;
+}
+
+export interface OAuthConsentData {
+  oauthApplicationName: string;
+  scopes: OAuthConsentScopeRecord[];
+  hasOfflineAccess: boolean;
   applicationName: string;
   identifier: string;
   redirectUrl: string;
@@ -15,20 +22,15 @@ export interface OAuthConsentKnownData {
   actionUrl: string;
   forwardedParams: [string, string][];
   renderBranding: boolean;
-  organizations: SelectItem[];
+  organizations: OAuthConsentOrganization[];
   defaultOrganizationId: string | null;
-}
-
-export interface OAuthConsentData extends OAuthConsentKnownData {
-  oauthApplicationName: string;
-  scopes: OAuthConsentScopeRecord[];
-  hasOfflineAccess: boolean;
 }
 
 export type OAuthConsentReadyModel = OAuthConsentData & { status: 'ready' };
 
 export type OAuthConsentModel =
-  | { status: 'loading'; known?: OAuthConsentKnownData }
+  | { status: 'loading' }
+  | { status: 'fetching'; renderBranding: boolean }
   | { status: 'hidden' }
   | { status: 'error'; error: ErrorDescription }
   | OAuthConsentReadyModel;
@@ -62,7 +64,7 @@ export interface OAuthConsentViewProps {
   scopes: OAuthConsentScopeItem[];
   scopeSelection?: OAuthConsentScopeSelection;
   hasOfflineAccess: boolean;
-  organizations: SelectItem[];
+  organizations: OAuthConsentOrganization[];
   organizationId: string | null;
   onOrganizationChange: (organizationId: string) => void;
   organizationSelection?: OAuthConsentOrganizationSelection;

@@ -51,7 +51,10 @@ export function Default() {
         <SegmentedControl.Item value='ready'>Consent</SegmentedControl.Item>
         <SegmentedControl.Item value='error'>Error</SegmentedControl.Item>
       </SegmentedControl.Root>
-      <Card.Root align='center'>
+      <Card.Root
+        align='center'
+        renderBranding
+      >
         <Flow.Root
           value={status}
           state={props}
@@ -59,20 +62,7 @@ export function Default() {
           {state => (
             <>
               <Flow.Step ids={['loading']}>
-                <OAuthConsentSkeleton
-                  known={{
-                    applicationName: state.applicationName,
-                    identifier: state.identifier,
-                    redirectUrl: state.redirectUrl,
-                    redirectDomain: state.redirectDomain,
-                    actionUrl: state.actionUrl,
-                    forwardedParams: state.forwardedParams,
-                    renderBranding: false,
-                    organizations: state.organizations,
-                    defaultOrganizationId: state.organizationId,
-                  }}
-                  messages={state.messages}
-                />
+                <OAuthConsentSkeleton messages={state.messages} />
               </Flow.Step>
               <Flow.Step ids={['ready']}>
                 <OAuthConsentView {...state} />

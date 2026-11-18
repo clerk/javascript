@@ -1,0 +1,17 @@
+import * as Stories from './profile.stories';
+
+# Profile
+
+The signed-in user's profile. In `combined` mode, the default, it lists the account's pages and then
+the active organization's. `mode='user'` shows the account's pages alone, as `UserProfile` does, and
+`mode='organization'` shows the organization's alone, as `OrganizationProfile` does. Without a
+`mode`, `MosaicProvider`'s `profile.combined: false` shows the account's pages alone.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'UserProfile', href: '/user-profile/user-profile', layer: 'User Profile' },
+    { name: 'OrganizationProfile', href: '/organization-profile/organization-profile', layer: 'Organization Profile' },
+  ]}
+/>

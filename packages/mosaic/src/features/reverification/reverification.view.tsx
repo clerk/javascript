@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import type { JSX, Ref } from 'react';
 
 import {
@@ -8,6 +7,7 @@ import {
   VerificationMethodPicker,
   VerificationPasskey,
   VerificationPassword,
+  verificationResend,
 } from '../../blocks/verification';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
@@ -19,8 +19,7 @@ import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
 import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
 import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
-import { fill, rich, useMessages } from '../../localization';
-import { tabularNumbersStyle } from '../../styles/typography.styles';
+import { fill, useMessages } from '../../localization';
 import { styles } from './reverification.styles';
 import type {
   ReverificationErrorReason,
@@ -158,22 +157,7 @@ export function ReverificationView({
   const resendCopy = otpChannel === 'phone' ? m.phoneCode : m.emailCode;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
-      ? {
-          text: resendCopy.resendText,
-          label: resendRemainingSeconds ? (
-            <span>
-              {rich(resendCopy.resendCountdown, {
-                values: {
-                  seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
-                },
-              })}
-            </span>
-          ) : (
-            resendCopy.resend
-          ),
-          disabled: !canResend || isPending,
-          onClick: onResend,
-        }
+      ? verificationResend(resendCopy, { onResend, canResend, remainingSeconds: resendRemainingSeconds })
       : undefined;
 
   return (

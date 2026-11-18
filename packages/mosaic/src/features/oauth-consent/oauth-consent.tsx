@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
@@ -12,13 +12,20 @@ import { OAuthConsentSkeleton } from './oauth-consent.skeleton';
 import type { OAuthConsentMessages, OAuthConsentReadyModel } from './oauth-consent.types';
 import { OAuthConsentError, OAuthConsentView } from './oauth-consent.view';
 
-export type OAuthConsentProps = OAuthConsentModelOptions;
+/** Everything `<OAuthConsent />` takes: which OAuth request to answer, and what to show while Clerk loads. */
+export type OAuthConsentProps = OAuthConsentModelOptions & {
+  /**
+   * The element to render while Clerk loads.
+   */
+  fallback?: ReactNode;
+};
 
 /**
  * Asks the signed-in user whether an OAuth application may access their account. It reads the client,
  * scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props
- * set them, and posts the answer to Clerk with every URL parameter forwarded. It shows a skeleton of
- * the consent card until the consent details load, and nothing at all when nobody is signed in.
+ * set them, and posts the answer to Clerk with every URL parameter forwarded. It renders `fallback`
+ * until Clerk loads, a skeleton of the consent card until the consent details load, and nothing at all
+ * when nobody is signed in.
  *
  * @example
  * ```tsx
@@ -36,22 +43,21 @@ export type OAuthConsentProps = OAuthConsentModelOptions;
  * />
  * ```
  */
-export function OAuthConsent(options: OAuthConsentProps): ReactElement | null {
+export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): ReactElement | null {
   const messages = useMessages('oauthConsent');
   const errorText = useErrorText();
   const model = useOAuthConsentModel(options);
 
+  if (model.status === 'loading') {
+    return <>{fallback}</>;
+  }
   if (model.status === 'hidden') {
     return null;
   }
   return (
     <Card.Root
       align='center'
-      renderBranding={
-        model.status === 'loading'
-          ? model.known?.renderBranding === true
-          : model.status === 'ready' && model.renderBranding
-      }
+      renderBranding={model.status !== 'error' && model.renderBranding}
     >
       <Flow.Root
         value={model.status}
@@ -59,11 +65,8 @@ export function OAuthConsent(options: OAuthConsentProps): ReactElement | null {
       >
         {current => (
           <>
-            <Flow.Step ids={['loading']}>
-              <OAuthConsentSkeleton
-                known={current.status === 'loading' ? current.known : undefined}
-                messages={messages}
-              />
+            <Flow.Step ids={['fetching']}>
+              <OAuthConsentSkeleton messages={messages} />
             </Flow.Step>
             <Flow.Step ids={['ready']}>
               {current.status === 'ready' ? (

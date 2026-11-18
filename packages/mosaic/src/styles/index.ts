@@ -61,6 +61,7 @@ export type {
   DialogVariant,
   DialogTriggerProps,
 } from '../components/dialog';
+export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
 export { Flow, useFlowAutoFocus } from '../components/flow';
@@ -189,9 +190,13 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+// Aliased: `Switcher` below is the feature.
+export { Switcher as SwitcherParts } from '../components/switcher';
+export { OAuthConsent } from '../features/oauth-consent/oauth-consent';
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';
 export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
+export { Switcher } from '../features/switcher/switcher';
 export { TaskChooseOrganization } from '../features/task-choose-organization/task-choose-organization';
 export { TaskSetupMFA } from '../features/task-setup-mfa/task-setup-mfa';
 export { UserButton } from '../features/user-button/user-button';

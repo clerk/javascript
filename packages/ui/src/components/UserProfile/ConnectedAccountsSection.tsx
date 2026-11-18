@@ -18,7 +18,11 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
-import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
+import {
+  getExternalVerificationRedirectURL,
+  openOAuthTransportWithClerkErrors,
+  reloadUserAfterOAuthCallback,
+} from './oauthTransport';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -145,7 +149,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
 
       const url = getExternalVerificationRedirectURL(response);
       if (transport) {
-        const { callbackUrl } = await transport.open(url);
+        const { callbackUrl } = await openOAuthTransportWithClerkErrors(transport, url);
         await reloadUserAfterOAuthCallback(user, callbackUrl);
         return;
       }

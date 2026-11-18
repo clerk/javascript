@@ -1,5 +1,90 @@
 # @clerk/mosaic
 
+## 0.7.0
+
+### Minor Changes
+
+- **Breaking:** Add a `Profile` component that shows the account's pages, the active organization's pages, or both. `<UserProfile />` now shows only the account's pages, and `<OrganizationProfile />` only the organization's. To keep both in one profile, render `<Profile />`. ([#10758](https://github.com/clerk/javascript/pull/10758)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  <Profile />
+  <Profile mode='user' />
+  <Profile mode='organization' afterLeaveOrganizationUrl='/organizations' />
+  ```
+
+  `mode` defaults to `'combined'`. Without a `mode`, `Profile` follows `MosaicProvider`'s `profile.combined`, so `false` shows only the account's pages.
+
+  With `experimental.newProfiles`, the profile a menu opens now matches the menu. `<UserButton />` and `<Switcher mode='user' />` open the account's pages, a lone `<OrganizationSwitcher />` opens the organization's pages, and only a combined `<Switcher />` opens one profile with both. `profile.combined: false` still splits a combined menu's profile in two.
+
+  | Before                                           | After                                          |
+  | ------------------------------------------------ | ---------------------------------------------- |
+  | `<UserProfile />`                                | `<Profile />`                                  |
+  | `<UserProfile combined />`                       | `<Profile />`                                  |
+  | `<UserProfile combined={false} />`               | `<UserProfile />` or `<Profile mode='user' />` |
+  | `<UserProfile organizationProfileProps={...} />` | `<Profile organizationProfileProps={...} />`   |
+
+  To find the code to update, run:
+
+  ```sh
+  git grep -n '<UserProfile'
+  ```
+
+  New exported type: `ProfileProps`.
+
+- **Breaking:** Add `Switcher`, the account and organization menu, and make `UserButton` list accounts only. `Switcher` takes `mode`: `'combined'` (the default) lists accounts and organizations, `'user'` lists accounts only, and `'organization'` lists organizations. `<UserButton />` is now `<Switcher mode='user' />` and `<OrganizationSwitcher />` is `<Switcher mode='organization' />`. Each mode takes only its own props, so TypeScript flags organization options on `UserButton` and `triggerVariant` outside `combined`. A `mode` chosen at runtime takes only the props every mode shares. ([#10752](https://github.com/clerk/javascript/pull/10752)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                                                                          | After                                                    |
+  | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+  | `<UserButton />` (accounts and organizations)                                                                   | `<Switcher />`                                           |
+  | `<UserButton combined={false} />`                                                                               | `<UserButton />` or `<Switcher mode='user' />`           |
+  | `<UserButton triggerVariant='condensed' />`                                                                     | `<Switcher triggerVariant='condensed' />`                |
+  | Organization props on `UserButton` (`hidePersonal`, `afterSelectOrganizationUrl`, `createOrganizationUrl`, ...) | The same props on `Switcher`                             |
+  | `UserButtonProps` (combined menu)                                                                               | `SwitcherProps`                                          |
+  | `UserButtonProps` (user-only menu)                                                                              | `UserButtonProps`, which now takes account options only  |
+  | `.cl-user-button-*` classes on the combined menu                                                                | `.cl-switcher-*`; `UserButton` keeps `.cl-user-button-*` |
+
+  Find usages with `git grep -n -e "UserButton" -e "cl-user-button-"`.
+
+- **Breaking:** Rename `Consent` to `OAuthConsent`. Behavior is unchanged; TypeScript flags the old names. ([#10870](https://github.com/clerk/javascript/pull/10870)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                            | After                                                         |
+  | ------------------------------------------------- | ------------------------------------------------------------- |
+  | `Consent`                                         | `OAuthConsent`                                                |
+  | `ConsentProps`                                    | `OAuthConsentProps`                                           |
+  | `consent.*` localization keys                     | `oauthConsent.*`                                              |
+  | `consent_missing_client_id` error code            | `oauth_consent_missing_client_id`                             |
+  | `consent_missing_redirect_uri` error code         | `oauth_consent_missing_redirect_uri`                          |
+  | `.cl-consent-scopes` / `.cl-consent-redirect-url` | `.cl-oauth-consent-scopes` / `.cl-oauth-consent-redirect-url` |
+
+  Find usages with `git grep -nE "(^|[^[:alnum:]_])(Consent(Props)?([^[:alnum:]_]|$)|consent[\"']?[[:space:]]*(\.[[:alpha:]]|:)|consent_missing_)|cl-consent-"`.
+
+### Patch Changes
+
+- Add component entry points: ([#10854](https://github.com/clerk/javascript/pull/10854)) by [@maxyinger](https://github.com/maxyinger)
+  - `Card` from `@clerk/mosaic/components/card` and `Field` from `@clerk/mosaic/components/field`
+  - `Popover` from `@clerk/mosaic/components/popover`
+  - `ProviderButton` and `ProviderButtonGroup` from `@clerk/mosaic/components/provider-button`
+  - `Switcher` from `@clerk/mosaic/components/switcher`: `Switcher.Root`, `Switcher.Trigger` and `Switcher.Popup`, and the content parts `Switcher.Header`, `Switcher.Separator`, `Switcher.Group`, `Switcher.Item` (with `ItemMedia`, `ItemContent`, `ItemLabel`, `ItemDescription` and `ItemTrailing`), `Switcher.Avatar` and `Switcher.BadgedAvatar`. `UserButton` and `OrganizationSwitcher` are built from them
+  - The `Building`, `Checkmark`, `ChevronDown`, `ChevronRight`, `Cog6Teeth`, `EllipsisHorizontal`, `Key`, `SecurityLockSquare`, `SecurityPhone`, `SignOut`, `SwitchAccount` and `UsersAddRight` glyphs from `@clerk/mosaic/icons/glyphs/<name>`
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
+## 0.6.0
+
+### Minor Changes
+
+- Export the `<Consent />` component. ([#10848](https://github.com/clerk/javascript/pull/10848)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Export `Avatar`, `Badge`, `Banner`, `Button`, `DataList`, `EmptyState`, `Entity`, `Heading`, `Icon`, `Input`, `Item`, `Skeleton`, `Table` and `Text` from `@clerk/mosaic/components/<name>`, and the `External` glyph from `@clerk/mosaic/icons/glyphs/external`, the import paths Swingset documents. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Export `ActionMenu`, `Panel`, `Profile`, `Radio`, `Section` and `SegmentedControl` from `@clerk/mosaic/components/<name>`, and the `ArrowUpRight`, `Code`, `Plus`, `ShieldCheck` and `UserCircle` glyphs from `@clerk/mosaic/icons/glyphs/<name>`. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
 ## 0.5.0
 
 ### Minor Changes

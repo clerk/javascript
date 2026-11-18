@@ -1,5 +1,23 @@
 # @clerk/electron
 
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+  - @clerk/clerk-js@6.45.0
+  - @clerk/react@6.19.0
+
+## 0.1.13
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+  - @clerk/clerk-js@6.44.0
+  - @clerk/react@6.18.9
+
 ## 0.1.12
 
 ### Patch Changes

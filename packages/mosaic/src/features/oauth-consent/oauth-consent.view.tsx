@@ -12,7 +12,8 @@ import { Input } from '../../components/input';
 import { Radio } from '../../components/radio';
 import { Reveal } from '../../components/reveal';
 import { scrollAreaViewport } from '../../components/scroll-area';
-import { Select, type SelectItem } from '../../components/select';
+import { Select } from '../../components/select';
+import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -21,9 +22,9 @@ import { fill, plural, rich, useLocale } from '../../localization';
 import { Form } from '../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { RowAvatar } from '../switcher/switcher-avatar.view';
 import { styles } from './oauth-consent.styles';
 import type {
+  OAuthConsentOrganization,
   OAuthConsentOrganizationSelection,
   OAuthConsentScopeItem,
   OAuthConsentScopeSelection,
@@ -50,7 +51,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
         <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
         <Card.Description>
           {rich(m.subtitle, {
-            values: { oauthApplicationName, domain: props.redirectDomain },
+            values: { oauthApplicationName, domain },
             components: { nowrap: renderNowrap },
           })}
         </Card.Description>
@@ -251,7 +252,7 @@ function OrganizationAccess({
   disabled,
 }: {
   messages: OAuthConsentViewProps['messages'];
-  organizations: SelectItem[];
+  organizations: OAuthConsentOrganization[];
   selection: OAuthConsentOrganizationSelection;
   disabled: boolean;
 }) {
@@ -322,7 +323,7 @@ function OrganizationAccess({
   );
 }
 
-function OrganizationPopup({ organizations }: { organizations: SelectItem[] }) {
+function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrganization[] }) {
   return (
     <Select.Popup>
       {organizations.map(organization => (
@@ -334,6 +335,7 @@ function OrganizationPopup({ organizations }: { organizations: SelectItem[] }) {
           <Select.Media>
             <RowAvatar
               name={organization.label}
+              imageUrl={organization.imageUrl}
               shape='square'
               size='fit'
             />
