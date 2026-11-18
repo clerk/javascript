@@ -57,6 +57,8 @@ export function SSOBypassPageView({
           />
           <Button
             ref={addButtonRef}
+            disabled={isDisabled}
+            focusableWhenDisabled
             onClick={onAdd}
           >
             <Icon glyph={Plus} />

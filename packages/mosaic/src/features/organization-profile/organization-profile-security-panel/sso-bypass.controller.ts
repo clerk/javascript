@@ -120,7 +120,11 @@ export function useSSOBypassPageController(model: SSOBypassModel): SSOBypassPage
       finalFocus: addTrigger,
       step: result ? 'result' : 'form',
       form,
-      onModeChange: mode => form.reset({ ...form.values, mode }),
+      onModeChange: mode => {
+        if (!form.isSubmitting) {
+          form.reset({ ...form.values, mode });
+        }
+      },
       roles: model.roles.roles.map(role => {
         const label = roleNames[role.key] ?? role.name;
         return {

@@ -143,6 +143,11 @@ export function useSSOBypassFixture({
           });
         }
         const added = candidates.filter(member => !member.outsideConnection);
+        if (added.length === 0) {
+          throw new ClerkRuntimeError('None of these members could be added.', {
+            code: 'sso_bypass_none_added_domain_not_served',
+          });
+        }
         setUserIds(current => [...current, ...added.map(member => member.userId)]);
         result = {
           mode: 'role',
