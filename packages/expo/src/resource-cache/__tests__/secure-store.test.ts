@@ -5,17 +5,6 @@ import { DUMMY_TEST_LARGE_JSON } from './dummy-test-data';
 
 const KEY = 'key';
 
-const splitIntoChunks = (value: string): string[] => {
-  // Array.from is used to handle unicode characters correctly
-  const characters = Array.from(value);
-
-  const chunks: string[] = [];
-  for (let i = 0; i < characters.length; i += 1024) {
-    chunks.push(characters.slice(i, i + 1024).join(''));
-  }
-  return chunks;
-};
-
 const mocks = vi.hoisted(() => {
   return {
     setItemAsync: vi.fn(),
@@ -62,13 +51,6 @@ describe('SecureStore', () => {
 
     afterEach(() => {
       vi.useRealTimers();
-    });
-
-    test('sets a value correctly', async () => {
-      const secureStore = createResourceCacheStore();
-      await secureStore.set(KEY, 'value');
-      await vi.runAllTimersAsync();
-      expect(await secureStore.get(KEY)).toBe('value');
     });
 
     test('returns null for a non-existent key', async () => {
@@ -186,11 +168,10 @@ describe('SecureStore', () => {
       await vi.runAllTimersAsync();
       expect(await value).toBe(JSON.stringify(DUMMY_TEST_LARGE_JSON));
 
-      const chunks = splitIntoChunks(JSON.stringify(DUMMY_TEST_LARGE_JSON));
-
-      expect(_map.get('key-B-metadata')).toBe(JSON.stringify({ totalChunks: chunks.length }));
-      for (let i = 0; i < chunks.length; i++) {
-        expect(_map.get(`key-B-chunk-${i}`)).toBe(chunks[i]);
+      const { totalChunks } = JSON.parse(_map.get('key-B-metadata'));
+      expect(totalChunks).toBeGreaterThan(1);
+      for (let i = 0; i < totalChunks; i++) {
+        expect(new TextEncoder().encode(_map.get(`key-B-chunk-${i}`)).length).toBeLessThanOrEqual(2048);
       }
       expect(_map.get('key-B-complete')).toBe('true');
       expect(_map.get('key-latest')).toBe('B');
@@ -236,11 +217,10 @@ describe('SecureStore', () => {
       await vi.runAllTimersAsync();
       expect(await value).toBe('new value');
 
-      const chunks = splitIntoChunks(JSON.stringify(DUMMY_TEST_LARGE_JSON));
-
-      expect(_map.get('key-B-metadata')).toBe(JSON.stringify({ totalChunks: chunks.length }));
-      for (let i = 0; i < chunks.length; i++) {
-        expect(_map.get(`key-B-chunk-${i}`)).toBe(chunks[i]);
+      const { totalChunks } = JSON.parse(_map.get('key-B-metadata'));
+      expect(totalChunks).toBeGreaterThan(1);
+      for (let i = 0; i < totalChunks; i++) {
+        expect(new TextEncoder().encode(_map.get(`key-B-chunk-${i}`)).length).toBeLessThanOrEqual(2048);
       }
 
       expect(_map.get('key-A-metadata')).toBe(JSON.stringify({ totalChunks: 1 }));

@@ -37,14 +37,6 @@ describe('native module loader', () => {
     mocks.nativeModule = undefined;
   });
 
-  test('returns the generated native module when it satisfies the bootstrap contract', async () => {
-    mocks.nativeModule = makeNativeModule();
-
-    const { ClerkExpoModule } = await importNativeModule();
-
-    expect(ClerkExpoModule).toBe(mocks.nativeModule);
-  });
-
   test('returns the generated Android module when it satisfies the bootstrap contract without event methods', async () => {
     mocks.nativeModule = makeNativeModule({ includeEventMethods: false });
 

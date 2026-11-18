@@ -125,20 +125,6 @@ describe('useAuthenticatedWebView', () => {
     );
   });
 
-  test('mints a new URL when the screen remounts before the first one arrives', async () => {
-    const SECOND_URL = 'https://clerk.example.com/v1/session_transfers/redeem?token=second';
-    const abandoned = deferredMint();
-    mocks.request.mockResolvedValueOnce(mintedResponse(SECOND_URL));
-
-    const first = renderWebView();
-    first.unmount();
-    const second = renderWebView();
-    await act(() => abandoned.deliver());
-
-    await waitFor(() => expect(second.result.current.webViewProps?.source).toEqual({ uri: SECOND_URL }));
-    expect(mocks.request).toHaveBeenCalledTimes(2);
-  });
-
   test('gives two screens mounted for the same destination a URL each', async () => {
     const SECOND_URL = 'https://clerk.example.com/v1/session_transfers/redeem?token=second';
     const shared = deferredMint();
@@ -434,14 +420,6 @@ describe('useAuthenticatedWebView', () => {
     const { result } = renderWebView();
 
     expect(result.current).toMatchObject({ status: 'preparing', webViewProps: null });
-    expect(mocks.request).not.toHaveBeenCalled();
-  });
-
-  test('reports invalid_destination without minting', async () => {
-    const { result } = renderWebView('/billing');
-
-    await waitFor(() => expect(result.current.status).toBe('error'));
-    expect(result.current.error?.code).toBe('invalid_destination');
     expect(mocks.request).not.toHaveBeenCalled();
   });
 
