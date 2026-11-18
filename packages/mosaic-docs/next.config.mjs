@@ -5,6 +5,9 @@ import createMDX from '@next/mdx';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'mdx'],
+  headers() {
+    return [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex' }] }];
+  },
   redirects() {
     return [
       { source: '/docs', destination: '/docs/setup', permanent: true },
