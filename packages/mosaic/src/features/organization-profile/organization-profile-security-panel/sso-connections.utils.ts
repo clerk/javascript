@@ -36,8 +36,8 @@ export function providerKey(provider: string): SSOProviderKey {
   return isOidcProvider(provider) ? 'oidc' : (PROVIDER_KEYS[provider] ?? 'customSaml');
 }
 
-export function providerIconUrl(connection: EnterpriseConnectionResource): string | undefined {
-  return iconImageUrl(PROVIDER_ICON_IDS[providerKey(connection.provider)]) || connection.logoPublicUrl || undefined;
+export function providerIconUrl(connection: EnterpriseConnectionResource): string {
+  return iconImageUrl(PROVIDER_ICON_IDS[providerKey(connection.provider)]);
 }
 
 export function isConnectionConfigured(connection: EnterpriseConnectionResource): boolean {

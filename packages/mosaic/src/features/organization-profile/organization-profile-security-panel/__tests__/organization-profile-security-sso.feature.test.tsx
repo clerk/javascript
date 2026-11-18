@@ -210,13 +210,25 @@ describe('Managing a connection', () => {
     expect(within(dialog).getByText('Okta Workforce')).toBeVisible();
   });
 
+  it('returns focus to the row menu when the dialog closes', async () => {
+    serve();
+    const user = userEvent.setup();
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+    await openManage(user, 'Acme Okta');
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Manage Acme Okta' })).toHaveFocus();
+  });
+
   it('renames the connection', async () => {
     const fapi = serve();
     const user = userEvent.setup();
     await renderWithClerk(<OrganizationProfileSecurityPanel />);
     const dialog = await openManage(user, 'Acme Okta');
 
-    await user.click(within(dialog).getByRole('button', { name: 'Rename connection' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Edit name' }));
     const rename = await screen.findByRole('dialog', { name: 'Rename connection' });
     const field = within(rename).getByLabelText('Name');
     await user.clear(field);

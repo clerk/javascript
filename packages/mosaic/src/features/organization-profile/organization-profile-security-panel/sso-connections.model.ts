@@ -69,7 +69,7 @@ export function useSSOConnectionsModel({ enabled }: { enabled: boolean }): SSOCo
     organizationName: organization?.name ?? '',
     connections,
     isLoading: source.isLoading,
-    isError: Boolean(source.error),
+    isError: Boolean(source.error) && !source.data,
     enrollmentRole: roleKey ? { key: roleKey, name: roles.find(role => role.key === roleKey)?.name } : undefined,
     retry: () => void source.revalidate(),
     rename: (id, name) => save(() => update(id, { name: name.trim() }), ['name']),

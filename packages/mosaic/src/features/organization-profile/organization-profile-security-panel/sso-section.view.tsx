@@ -99,23 +99,25 @@ export function SSOSectionView({
                 isDisabled={isDisabled}
                 onManage={onManage}
                 onSetActive={onSetActive}
-                onRemove={() => remove.open(row)}
+                onRemove={remove ? () => remove.open(row) : undefined}
                 triggerRef={registerTrigger(row.id)}
               />
             ))
           )}
         </Section.Body>
       </Section.Group>
-      <Destructive
-        controller={remove}
-        finalFocus={removalFinalFocus}
-        title={m.removeDialog.title}
-        description={connection => fill(m.removeDialog.description, { name: connection.name })}
-        fieldLabel={fill(m.removeDialog.fieldLabel, { phrase: organizationName })}
-        confirmationValue={organizationName}
-        actionLabel={m.removeDialog.action}
-        cancelLabel={m.removeDialog.cancel}
-      />
+      {remove ? (
+        <Destructive
+          controller={remove}
+          finalFocus={removalFinalFocus}
+          title={m.removeDialog.title}
+          description={connection => fill(m.removeDialog.description, { name: connection.name })}
+          fieldLabel={fill(m.removeDialog.fieldLabel, { phrase: organizationName })}
+          confirmationValue={organizationName}
+          actionLabel={m.removeDialog.action}
+          cancelLabel={m.removeDialog.cancel}
+        />
+      ) : null}
     </Section.Root>
   );
 }
@@ -132,7 +134,7 @@ function SSOConnectionRowView({
   isDisabled: boolean;
   onManage: (id: string) => void;
   onSetActive: (id: string, active: boolean) => void;
-  onRemove: () => void;
+  onRemove: (() => void) | undefined;
   triggerRef: Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('organizationProfile').security.sso;
@@ -188,7 +190,9 @@ function SSOConnectionRowView({
                         },
                       ]
                     : []),
-                { label: m.remove, color: 'negative' as const, onClick: onRemove },
+                ...(onRemove && !row.isPending
+                  ? [{ label: m.remove, color: 'negative' as const, onClick: onRemove }]
+                  : []),
               ]}
             />
           </span>

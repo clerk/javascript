@@ -270,6 +270,7 @@ function CertificateList({
                   key={entry.certificate}
                   entry={entry}
                   isPrimary={index === 0}
+                  position={index + 1}
                   canRemove={controller.canRemoveCertificate && !controller.form.isSubmitting}
                   onRemove={() => controller.onRemoveCertificate(entry.certificate)}
                 />
@@ -286,11 +287,13 @@ function CertificateList({
 function CertificateItem({
   entry,
   isPrimary,
+  position,
   canRemove,
   onRemove,
 }: {
   entry: SSOCertificate;
   isPrimary: boolean;
+  position: number;
   canRemove: boolean;
   onRemove: () => void;
 }) {
@@ -333,7 +336,7 @@ function CertificateItem({
           variant='ghost'
           color='neutral'
           shape='square'
-          aria-label={d.removeCertificate}
+          aria-label={fill(d.removeCertificate, { position: String(position) })}
           disabled={!canRemove}
           onClick={onRemove}
         >

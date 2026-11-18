@@ -48,7 +48,9 @@ function useEditDialog<TValues extends object>({
         return;
       }
       form.reset(initialValues);
-      onOpen?.();
+      if (open) {
+        onOpen?.();
+      }
       setIsOpen(open);
     },
   };

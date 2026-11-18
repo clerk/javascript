@@ -69,6 +69,7 @@ export function SSORenameDialog({ isOpen, onOpenChange, form, trigger }: SSORena
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
+              disabled={form.isSubmitting}
               render={
                 <Button
                   variant='outline'

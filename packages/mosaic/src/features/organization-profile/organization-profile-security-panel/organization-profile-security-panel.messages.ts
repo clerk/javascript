@@ -37,11 +37,10 @@ export const organizationProfileSecurityPanelMessages = {
     },
   },
   ssoConnection: {
-    close: 'Close',
     name: {
       title: 'Name',
       edit: 'Edit',
-      editLabel: 'Rename connection',
+      editLabel: 'Edit name',
       dialogTitle: 'Rename connection',
       fieldLabel: 'Name',
       cancel: 'Cancel',
@@ -101,7 +100,7 @@ export const organizationProfileSecurityPanelMessages = {
       signingCertificates: 'Signing certificates',
       uploadCertificate: 'Upload file',
       addCertificate: 'Add certificate',
-      removeCertificate: 'Remove certificate',
+      removeCertificate: 'Remove certificate {position}',
       primary: 'Primary',
       primaryDescription: 'Checked first when verifying a sign-in. Every certificate in this list is trusted.',
       expires: 'Expires {date}',

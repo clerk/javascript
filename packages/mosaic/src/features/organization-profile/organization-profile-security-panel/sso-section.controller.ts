@@ -24,7 +24,7 @@ export interface SSOSectionController {
   enrollmentRoleName: string | undefined;
   onManage: (id: string) => void;
   onSetActive: (id: string, active: boolean) => void;
-  remove: ConfirmController<SSOConnectionRow>;
+  remove: ConfirmController<SSOConnectionRow> | undefined;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   removalFinalFocus: DialogFocusTarget;
   sectionRef: Ref<HTMLElement>;
@@ -37,6 +37,7 @@ export function useSSOSectionController(model: SSOConnectionsModel): SSOSectionC
   const m = useMessages('organizationProfile').security;
   const roleNames = useMessages('roles');
   const [managedId, setManagedId] = useState<string>();
+  const lastManagedId = useRef<string>();
   const sectionRef = useRef<HTMLElement>(null);
   const actions = usePendingAction({ errorFallback: m.errorFallback });
   const removalFocus = useListRemovalFocus({
@@ -61,9 +62,12 @@ export function useSSOSectionController(model: SSOConnectionsModel): SSOSectionC
     isError: model.isError,
     onRetry: model.retry,
     enrollmentRoleName: role ? (roleNames[role.key] ?? role.name ?? humanizeRoleKey(role.key)) : undefined,
-    onManage: setManagedId,
+    onManage: id => {
+      lastManagedId.current = id;
+      setManagedId(id);
+    },
     onSetActive: (id, active) => void actions.run(id, () => model.setActive(id, active)),
-    remove,
+    remove: model.organizationName ? remove : undefined,
     registerTrigger: removalFocus.registerTrigger,
     removalFinalFocus: () => removalFocus.finalFocus(),
     sectionRef,
@@ -73,7 +77,7 @@ export function useSSOSectionController(model: SSOConnectionsModel): SSOSectionC
         setManagedId(undefined);
       }
     },
-    managedFinalFocus: () => (managedId ? removalFocus.trigger(managedId) : null),
+    managedFinalFocus: () => (lastManagedId.current ? removalFocus.trigger(lastManagedId.current) : null),
   };
 }
 
