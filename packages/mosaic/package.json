@@ -552,7 +552,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm typecheck",
+    "build": "pnpm build:js && pnpm build:css && pnpm check:bundle && pnpm check:docs-exports && pnpm typecheck",
     "build:css": "tsdown --config tsdown.css.config.mts",
     "build:js": "tsdown --config tsdown.config.mts",
     "bundlewatch": "node ./scripts/bundle-for-size.mjs && FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
