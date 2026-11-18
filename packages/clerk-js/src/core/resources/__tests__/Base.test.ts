@@ -196,6 +196,26 @@ describe('BaseResource', () => {
       }
     });
 
+    it('applies the replayed response after its own captcha challenge', async () => {
+      const fraudProtection = FraudProtection.getInstance() as any;
+      vi.spyOn(fraudProtection, 'managedChallenge').mockResolvedValueOnce({});
+      vi.spyOn(Client.getOrCreateInstance(), '__internal_sendCaptchaToken').mockImplementationOnce(() =>
+        Promise.resolve(Client.getOrCreateInstance().fromJSON(clientJSON('client_verified') as any)),
+      );
+      request
+        .mockResolvedValueOnce({
+          payload: {
+            errors: [{ code: 'requires_captcha', long_message: 'Captcha' }],
+            meta: { client: clientJSON('client_challenge') },
+          },
+          status: 401,
+        })
+        .mockResolvedValueOnce({ payload, status: 200 });
+
+      expect(await touch()).toBe(payload);
+      expect(Client.getOrCreateInstance().id).toBe('client_response');
+    });
+
     it('drops the response when the active organization changes in flight', async () => {
       respondAfter(() => {
         (BaseResource.clerk.session as any).lastActiveOrganizationId = 'org_b';

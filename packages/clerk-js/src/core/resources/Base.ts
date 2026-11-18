@@ -89,15 +89,15 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    const stateAtSend = opts.supersedable ? BaseResource.clientState() : undefined;
-    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts, stateAtSend));
+    const authAtBuild = opts.supersedable ? BaseResource.activeAuth() : undefined;
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts, authAtBuild));
   }
 
   // TODO @userland-errors:
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
-    stateAtSend = opts.supersedable ? BaseResource.clientState() : undefined,
+    authAtBuild = opts.supersedable ? BaseResource.activeAuth() : undefined,
   ): Promise<FapiResponseJSON<J> | null> {
     if (!BaseResource.fapiClient) {
       clerkMissingFapiClientInResources();
@@ -113,6 +113,7 @@ export abstract class BaseResource {
       fapiRequestInit = { ...requestInit, search };
     }
 
+    const revisionAtSend = getClientRevision();
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(fapiRequestInit, { fetchMaxTries });
     } catch (e) {
@@ -138,7 +139,9 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
-    const superseded = stateAtSend !== undefined && stateAtSend !== BaseResource.clientState();
+    const superseded =
+      authAtBuild !== undefined &&
+      (authAtBuild !== BaseResource.activeAuth() || revisionAtSend !== getClientRevision());
 
     if (headers) {
       const country = headers.get('x-country');
@@ -298,9 +301,9 @@ export abstract class BaseResource {
   }
 
   // Any new local-only change to the active session or organization must be part of this key, or a stale focus response can overwrite it.
-  private static clientState(): string {
+  private static activeAuth(): string {
     const session = BaseResource.clerk?.session;
-    return `${getClientRevision()}:${session?.id}:${session?.lastActiveOrganizationId}`;
+    return `${session?.id}:${session?.lastActiveOrganizationId}`;
   }
 
   private static shouldRethrowOfflineNetworkErrors(): boolean {
