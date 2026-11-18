@@ -47,6 +47,8 @@
       "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/scripts/rspack-common.js",
+        "$TURBO_ROOT$/scripts/utils.ts",
         "!**/*.test.*",
         "!**/*.spec.*",
         "!**/test/**",
