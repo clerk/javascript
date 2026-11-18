@@ -1,5 +1,17 @@
 # @clerk/astro
 
+## 4.1.26
+
+### Patch Changes
+
+- Fix `$billingStore` so it emits the billing namespace only after Clerk has loaded. Before, it could emit while `clerk.load()` was still running, so a call like `getPlans()` in a subscriber could fail with a `dev_browser_unauthenticated` error on development instances. ([#10894](https://github.com/clerk/javascript/pull/10894)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `clerkMiddleware` so it inserts Clerk's tags only before the document's real `</head>` tag. It no longer matches `</head>` inside attribute values, comments, or the text of elements like `script`, `style`, `textarea`, `title`, and `noscript`, and it now finds a `</head>` tag that is split across streamed chunks. The server data now goes in `<meta>` tags, and clerk-js is preloaded with a `<link>` tag and loaded by the integration's page script. by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`189c71a`](https://github.com/clerk/javascript/commit/189c71af29979ac1ad8f6dd66cde17763d713b9b), [`dc25c3b`](https://github.com/clerk/javascript/commit/dc25c3b43b534544ae4ec3bcdd062f65277595ab), [`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443), [`2855616`](https://github.com/clerk/javascript/commit/28556161d941e6dab17fd9bd7ac921e491860c5a)]:
+  - @clerk/backend@3.31.0
+  - @clerk/shared@4.47.0
+
 ## 4.1.25
 
 ### Patch Changes

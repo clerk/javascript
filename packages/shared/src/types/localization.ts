@@ -1556,6 +1556,10 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue<'applicationName'>;
     };
+    clientIdentity: {
+      dynamic: LocalizationValue;
+      metadataDocument: LocalizationValue<'metadataHost'>;
+    };
   };
   oauthDeviceVerification: {
     start: {

@@ -98,13 +98,7 @@ export const item = stylex.create({
         ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
-    color: {
-      default: colorVars['--cl-color-foreground-secondary'],
-      ':is([data-active])': colorVars['--cl-color-foreground'],
-      '@media (hover: hover)': {
-        ':hover:not(:disabled, [data-disabled], [aria-disabled="true"])': colorVars['--cl-color-foreground'],
-      },
-    },
+    color: colorVars['--cl-color-foreground'],
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
     // The viewport is a height-capped flex column: without this the rows squash to fit the cap
@@ -167,6 +161,7 @@ export const label = stylex.create({
 
 export const indicator = stylex.create({
   base: {
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     alignItems: 'center',
     aspectRatio: '1/1',
     display: 'flex',
