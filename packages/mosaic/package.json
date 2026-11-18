@@ -366,6 +366,121 @@
       "import": "./dist/icons/glyphs/users-add-right.js",
       "default": "./dist/icons/glyphs/users-add-right.js"
     },
+    "./primitives/accordion": {
+      "types": "./dist/primitives/accordion.d.ts",
+      "import": "./dist/primitives/accordion.js",
+      "default": "./dist/primitives/accordion.js"
+    },
+    "./primitives/autocomplete": {
+      "types": "./dist/primitives/autocomplete.d.ts",
+      "import": "./dist/primitives/autocomplete.js",
+      "default": "./dist/primitives/autocomplete.js"
+    },
+    "./primitives/button": {
+      "types": "./dist/primitives/button.d.ts",
+      "import": "./dist/primitives/button.js",
+      "default": "./dist/primitives/button.js"
+    },
+    "./primitives/collapsible": {
+      "types": "./dist/primitives/collapsible.d.ts",
+      "import": "./dist/primitives/collapsible.js",
+      "default": "./dist/primitives/collapsible.js"
+    },
+    "./primitives/combobox": {
+      "types": "./dist/primitives/combobox.d.ts",
+      "import": "./dist/primitives/combobox.js",
+      "default": "./dist/primitives/combobox.js"
+    },
+    "./primitives/dialog": {
+      "types": "./dist/primitives/dialog.d.ts",
+      "import": "./dist/primitives/dialog.js",
+      "default": "./dist/primitives/dialog.js"
+    },
+    "./primitives/direction-provider": {
+      "types": "./dist/primitives/direction-provider.d.ts",
+      "import": "./dist/primitives/direction-provider.js",
+      "default": "./dist/primitives/direction-provider.js"
+    },
+    "./primitives/drawer": {
+      "types": "./dist/primitives/drawer.d.ts",
+      "import": "./dist/primitives/drawer.js",
+      "default": "./dist/primitives/drawer.js"
+    },
+    "./primitives/file-upload": {
+      "types": "./dist/primitives/file-upload.d.ts",
+      "import": "./dist/primitives/file-upload.js",
+      "default": "./dist/primitives/file-upload.js"
+    },
+    "./primitives/flow": {
+      "types": "./dist/primitives/flow.d.ts",
+      "import": "./dist/primitives/flow.js",
+      "default": "./dist/primitives/flow.js"
+    },
+    "./primitives/form": {
+      "types": "./dist/primitives/form.d.ts",
+      "import": "./dist/primitives/form.js",
+      "default": "./dist/primitives/form.js"
+    },
+    "./primitives/image-cropper": {
+      "types": "./dist/primitives/image-cropper.d.ts",
+      "import": "./dist/primitives/image-cropper.js",
+      "default": "./dist/primitives/image-cropper.js"
+    },
+    "./primitives/menu": {
+      "types": "./dist/primitives/menu.d.ts",
+      "import": "./dist/primitives/menu.js",
+      "default": "./dist/primitives/menu.js"
+    },
+    "./primitives/otp": {
+      "types": "./dist/primitives/otp.d.ts",
+      "import": "./dist/primitives/otp.js",
+      "default": "./dist/primitives/otp.js"
+    },
+    "./primitives/popover": {
+      "types": "./dist/primitives/popover.d.ts",
+      "import": "./dist/primitives/popover.js",
+      "default": "./dist/primitives/popover.js"
+    },
+    "./primitives/portal": {
+      "types": "./dist/primitives/portal.d.ts",
+      "import": "./dist/primitives/portal.js",
+      "default": "./dist/primitives/portal.js"
+    },
+    "./primitives/segmented-control": {
+      "types": "./dist/primitives/segmented-control.d.ts",
+      "import": "./dist/primitives/segmented-control.js",
+      "default": "./dist/primitives/segmented-control.js"
+    },
+    "./primitives/select": {
+      "types": "./dist/primitives/select.d.ts",
+      "import": "./dist/primitives/select.js",
+      "default": "./dist/primitives/select.js"
+    },
+    "./primitives/table": {
+      "types": "./dist/primitives/table.d.ts",
+      "import": "./dist/primitives/table.js",
+      "default": "./dist/primitives/table.js"
+    },
+    "./primitives/tabs": {
+      "types": "./dist/primitives/tabs.d.ts",
+      "import": "./dist/primitives/tabs.js",
+      "default": "./dist/primitives/tabs.js"
+    },
+    "./primitives/tag-input": {
+      "types": "./dist/primitives/tag-input.d.ts",
+      "import": "./dist/primitives/tag-input.js",
+      "default": "./dist/primitives/tag-input.js"
+    },
+    "./primitives/toast": {
+      "types": "./dist/primitives/toast.d.ts",
+      "import": "./dist/primitives/toast.js",
+      "default": "./dist/primitives/toast.js"
+    },
+    "./primitives/tooltip": {
+      "types": "./dist/primitives/tooltip.d.ts",
+      "import": "./dist/primitives/tooltip.js",
+      "default": "./dist/primitives/tooltip.js"
+    },
     "./styles.css": {
       "types": "./styles.css.d.ts",
       "default": "./dist/styles.css"

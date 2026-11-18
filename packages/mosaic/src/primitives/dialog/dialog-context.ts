@@ -1,3 +1,5 @@
+'use client';
+
 import type { ExtendedRefs, FloatingContext, ReferenceType, UseInteractionsReturn } from '@floating-ui/react';
 import { createContext, useContext } from 'react';
 

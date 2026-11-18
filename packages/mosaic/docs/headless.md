@@ -7,7 +7,7 @@ Worked example: `src/primitives/select/` (`select-trigger.tsx` is the reference 
 ## Rules
 
 - A primitive emits no styles. Positioning, list navigation, focus, dismiss and ARIA come from `@floating-ui/react`, and roving-tabindex groups use `useComposite` with `useCompositeItem` (`src/primitives/hooks/use-composite.ts`). Appearance is applied from outside through `data-*` selectors and classes.
-- Import primitives by relative path inside Mosaic; there is no subpath export.
+- Import primitives by relative path inside Mosaic. Consumers import each one from `@clerk/mosaic/primitives/<name>`, whose `index.ts` exports only the namespace and its types; a helper a caller needs is a member of the namespace, such as `Flow.useFlowAutoFocus`.
 - Every part that renders a DOM element calls `useRender` (`src/primitives/utils/use-render.tsx`) instead of returning JSX, is a `React.forwardRef`, and passes its `ref` to `useRender` (`mosaic/forward-ref-parts` enforces this).
 - Type authored defaults with `ownProps satisfies DefaultProps<Tag>`, not `as`.
 - `mergeProps(internal, consumer)`: internal first. Handlers chain (internal, then consumer), `style` shallow-merges, `className` concatenates, and the consumer overwrites anything else, ARIA included.

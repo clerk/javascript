@@ -2,7 +2,7 @@
 
 Headless UI primitives for `@clerk/mosaic`. These are unstyled, accessible React components built on [Floating UI](https://floating-ui.com/) that handle positioning, keyboard navigation, focus management, and ARIA attributes.
 
-This is an internal folder (`src/primitives/`) inside `@clerk/mosaic`, not a separate package. Mosaic's styled `src/components/*` import these primitives via relative paths (`../../primitives/<name>`); there is no public subpath export for them, so nothing outside `@clerk/mosaic` can import a primitive today.
+This is an internal folder (`src/primitives/`) inside `@clerk/mosaic`, not a separate package. Mosaic's styled `src/components/*` import these primitives via relative paths (`../../primitives/<name>`). Outside Mosaic, each primitive imports from `@clerk/mosaic/primitives/<name>`.
 
 ## Primitives
 
