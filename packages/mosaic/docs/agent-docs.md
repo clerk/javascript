@@ -35,5 +35,5 @@ Each documented unit is a subpath export that renders from a React Server Compon
 
 - Add `./<kind>/<slug>` to `exports` in `package.json` (`types`, `import` and `default` under `./dist/<kind>/<slug>`) and the matching entry in `tsdown.config.mts`, beside `components/avatar`.
 - `index.ts` has no `'use client'`. A compound re-exports its namespace from a directive-free parts module (`src/components/avatar/avatar.parts.ts`, or `parts.ts` in a primitive); a single component re-exports it from its leaf (`src/components/badge/`). A helper a caller needs is a member of the namespace, such as `Panel.usePanelTitle`, and is listed in the doc's `exports`.
-- Every module that imports React starts with `'use client'`, so each part stays a client component when the index is imported on the server.
+- A module the entry reaches before any `'use client'` module imports only relative modules. If it imports React or any other package, it starts with `'use client'`, so each part stays a client component when the index is imported on the server. A context or hook module that only `'use client'` modules import needs no directive.
 - A unit left off the docs site gets no export. It is listed in `unpublished` in `scripts/check-docs-exports.mjs`.
