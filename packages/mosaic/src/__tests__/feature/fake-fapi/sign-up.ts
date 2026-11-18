@@ -89,7 +89,7 @@ export function signUpHandlers(
   const settings = () => state.environment.user_settings;
   const current = (id: unknown) => (state.client.sign_up?.id === id ? state.client.sign_up : undefined);
   const store = (signUp: SignUpJSON) => {
-    state.client = { ...state.client, sign_up: signUp };
+    state.client = { ...state.client, sign_up: signUp.status === 'complete' ? null : signUp };
     return envelope(signUp, state.client);
   };
 
