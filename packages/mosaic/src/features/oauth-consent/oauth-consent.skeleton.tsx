@@ -7,64 +7,63 @@ import { Select } from '../../components/select';
 import { Skeleton } from '../../components/skeleton';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { styles } from './oauth-consent.styles';
-import type { OAuthConsentKnownData, OAuthConsentMessages } from './oauth-consent.types';
+import type { OAuthConsentMessages } from './oauth-consent.types';
 
-const PLACEHOLDER_OAUTH_APPLICATION_NAME = 'App';
-const PLACEHOLDER_SCOPES = ['Read your name and profile image', 'Read your email address', 'Verify your identity'];
-const PLACEHOLDER_KNOWN: OAuthConsentKnownData = {
-  applicationName: 'Application',
-  identifier: 'name@example.com',
-  redirectUrl: 'https://example.com/oauth/callback',
-  redirectDomain: 'example.com',
-  actionUrl: '',
-  forwardedParams: [],
-  renderBranding: false,
-  organizations: [],
-  defaultOrganizationId: null,
-};
+const PLACEHOLDER_TITLE = ['Application would like to access', 'your Application account'];
+const PLACEHOLDER_SUBTITLE = 'Only continue if you trust Application (example.com).';
+const PLACEHOLDER_ORGANIZATIONS = [{ value: 'org', label: 'Organization' }];
+const PLACEHOLDER_SCOPE_TITLE = 'This will allow Application access to:';
+const PLACEHOLDER_SCOPES = [
+  'Verify your identity',
+  'Your basic profile information',
+  'Your email address',
+  'Your organization membership information',
+];
+const PLACEHOLDER_NOTICE = [
+  'If you allow access, this app will redirect you to example.com.',
+  "You'll stay signed in until you sign out or revoke access.",
+];
+const PLACEHOLDER_FOOTER = 'Signed in as name@example.com';
 
-export function OAuthConsentSkeleton({
-  known,
-  messages: m,
-}: {
-  known: OAuthConsentKnownData | undefined;
-  messages: OAuthConsentMessages;
-}) {
-  const { applicationName, identifier, redirectDomain, organizations, defaultOrganizationId } =
-    known ?? PLACEHOLDER_KNOWN;
-  const awaitingClerk = known === undefined;
-
+export function OAuthConsentSkeleton({ messages: m }: { messages: OAuthConsentMessages }) {
   return (
     <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
       <Card.Header>
         <Card.Title>
-          <Skeleton>
-            {fill(m.title, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, applicationName })}
-          </Skeleton>
+          {PLACEHOLDER_TITLE.map(line => (
+            <Skeleton
+              key={line}
+              xstyle={styles.skeletonCentered}
+            >
+              {line}
+            </Skeleton>
+          ))}
         </Card.Title>
         <Card.Description>
-          <Skeleton>
-            {fill(m.subtitle, { oauthApplicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME, domain: redirectDomain })}
-          </Skeleton>
+          <Skeleton xstyle={styles.skeletonCentered}>{PLACEHOLDER_SUBTITLE}</Skeleton>
         </Card.Description>
       </Card.Header>
       <Card.Content>
-        {organizations.length > 0 ? (
-          <Field.Root disabled>
-            <Field.Label>{m.organizationLabel}</Field.Label>
+        <Field.Root
+          disabled
+          aria-hidden
+        >
+          <Field.Label>
+            <Skeleton>{m.organizationLabel}</Skeleton>
+          </Field.Label>
+          <Skeleton xstyle={styles.skeletonFill}>
             <Select.Root
-              items={organizations}
-              value={defaultOrganizationId}
+              items={PLACEHOLDER_ORGANIZATIONS}
+              value='org'
             >
               <Select.Trigger />
             </Select.Root>
-          </Field.Root>
-        ) : null}
+          </Skeleton>
+        </Field.Root>
         <div
           aria-hidden
           {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}
@@ -73,7 +72,7 @@ export function OAuthConsentSkeleton({
             size='sm'
             xstyle={styles.scopesTitle}
           >
-            <Skeleton>{fill(m.scopeListTitle, { applicationName: PLACEHOLDER_OAUTH_APPLICATION_NAME })}</Skeleton>
+            <Skeleton>{PLACEHOLDER_SCOPE_TITLE}</Skeleton>
           </Text>
           <ul {...stylex.props(reset.base, styles.scopeList)}>
             {PLACEHOLDER_SCOPES.map(label => (
@@ -112,7 +111,14 @@ export function OAuthConsentSkeleton({
           color='foreground-secondary'
           xstyle={styles.centered}
         >
-          <Skeleton xstyle={styles.skeletonCentered}>{fill(m.redirectNotice, { domain: redirectDomain })}</Skeleton>
+          {PLACEHOLDER_NOTICE.map(line => (
+            <Skeleton
+              key={line}
+              xstyle={styles.skeletonCentered}
+            >
+              {line}
+            </Skeleton>
+          ))}
         </Text>
       </Card.Content>
       <Card.Footer xstyle={styles.centered}>
@@ -120,12 +126,7 @@ export function OAuthConsentSkeleton({
           size='xs'
           color='foreground-secondary'
         >
-          <Skeleton
-            show={awaitingClerk}
-            xstyle={styles.skeletonCentered}
-          >
-            {fill(m.signedInAs, { identifier })}
-          </Skeleton>
+          <Skeleton xstyle={styles.skeletonCentered}>{PLACEHOLDER_FOOTER}</Skeleton>
         </Text>
       </Card.Footer>
     </>

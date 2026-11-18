@@ -1,12 +1,18 @@
 import type { Ref } from 'react';
 
+import {
+  AuthActionBlocked,
+  AuthEmailLink,
+  AuthEmailLinkStatus,
+  AuthLoading,
+  AuthProtectCheck,
+} from '../../../blocks/auth';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
+import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
-import { SignInActionBlocked } from './sign-in-action-blocked';
-import { SignInEmailLink } from './sign-in-email-link';
-import { SignInEmailLinkStatus } from './sign-in-email-link-status';
+import { emailLinkStatusMessages } from '../sign-in.utils';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
@@ -23,9 +29,12 @@ interface NoticeStepProps {
   onEmailSupport: () => void;
   onBack: () => void;
   onStartOver: () => void;
+  onRetry?: () => void;
+  protectCheckRef?: Ref<HTMLDivElement>;
   onEditIdentifier: () => void;
   onForgotPassword?: () => void;
   onCancel?: () => void;
+  onJoinWaitlist?: () => void;
   focusRef?: Ref<HTMLElement>;
 }
 
@@ -40,15 +49,22 @@ export function NoticeStep({
   onEmailSupport,
   onBack,
   onStartOver,
+  onRetry,
+  protectCheckRef,
   onEditIdentifier,
   onForgotPassword,
   onCancel,
+  onJoinWaitlist,
   focusRef,
 }: NoticeStepProps) {
   const m = useMessages('signIn');
   const help = {
     backButton: m.back,
     supportButton: m.alternativeMethods.getHelp.emailSupport,
+  };
+  const emailLink = {
+    editIdentifier: m.editIdentifier,
+    secondaryActionLabel: m.useAnotherMethod,
   };
 
   switch (step.purpose) {
@@ -84,7 +100,12 @@ export function NoticeStep({
         />
       );
     case 'action-blocked':
-      return <SignInActionBlocked details={step.details} />;
+      return (
+        <AuthActionBlocked
+          messages={m.actionBlocked}
+          details={step.details}
+        />
+      );
     case 'password-compromised':
       return (
         <SignInPasswordCompromised
@@ -109,8 +130,10 @@ export function NoticeStep({
       );
     case 'email-link':
       return (
-        <SignInEmailLink
+        <AuthEmailLink
           focusRef={focusRef}
+          messages={{ title: m.emailLink.title, description: m.emailLink.description, ...emailLink }}
+          notice={step.newDevice ? m.clientTrust.notice : undefined}
           identifier={step.identifier}
           onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
@@ -119,11 +142,56 @@ export function NoticeStep({
           onCancel={onCancel}
         />
       );
+    case 'verify-email-link':
+      return (
+        <AuthEmailLink
+          focusRef={focusRef}
+          messages={{ ...m.verifyEmailLink, ...emailLink }}
+          identifier={step.identifier}
+          onEditIdentifier={onEditIdentifier}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          resend={resend}
+        />
+      );
+    case 'restricted':
+    case 'waitlist':
+      return (
+        <SignUpRestricted
+          focusRef={focusRef}
+          waitlist={step.purpose === 'waitlist'}
+          logo={logo}
+          globalErrorMessage={globalErrorMessage}
+          onEmailSupport={onEmailSupport}
+          onJoinWaitlist={onJoinWaitlist}
+          onSignIn={onEditIdentifier}
+        />
+      );
+    case 'loading':
+      return (
+        <AuthLoading
+          messages={{ loading: m.loading }}
+          globalErrorMessage={globalErrorMessage}
+        />
+      );
+    case 'protect-check':
+      return (
+        <AuthProtectCheck
+          messages={{ ...m.protectCheck, loading: m.loading }}
+          challenge={step.challenge}
+          logo={logo}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          containerRef={protectCheckRef}
+          onRetry={onRetry}
+        />
+      );
     case 'start-over':
       return <SignInStartOver onStartOver={onStartOver} />;
     case 'email-link-status':
       return (
-        <SignInEmailLinkStatus
+        <AuthEmailLinkStatus
+          messages={emailLinkStatusMessages(step.flow, m)}
           status={step.status}
           globalErrorMessage={globalErrorMessage}
         />

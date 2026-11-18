@@ -1,15 +1,15 @@
 import type { Ref } from 'react';
 
-import type { VerificationBackupCodeMessages } from '../../../blocks/verification';
-import { VerificationBackupCode } from '../../../blocks/verification';
+import { AuthIdentityPreview } from '../../../blocks/auth';
+import { VerificationBackupCode, VerificationPasskey } from '../../../blocks/verification';
 import type { UseFormResult } from '../../../components/form';
+import { useMessages } from '../../../localization';
 import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
-import { SignInPasskey } from './sign-in-passkey';
+import { backupCodeDescription } from '../sign-in.utils';
 import { SignInPassword } from './sign-in-password';
 
 interface CredentialStepProps {
   step: Extract<SignInStep, { kind: 'credential' }>;
-  messages: VerificationBackupCodeMessages;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -24,7 +24,6 @@ interface CredentialStepProps {
 
 export function CredentialStep({
   step,
-  messages,
   form,
   errorMessage,
   globalErrorMessage,
@@ -36,6 +35,13 @@ export function CredentialStep({
   onShowHelp,
   focusRef,
 }: CredentialStepProps) {
+  const m = useMessages('signIn');
+  const actions = {
+    secondaryActionLabel: m.useAnotherMethod,
+    primaryActionLabel: m.continue,
+    pendingLabel: m.verifying,
+  };
+
   if (step.credential === 'password') {
     return (
       <SignInPassword
@@ -49,21 +55,35 @@ export function CredentialStep({
         onSubmit={onSubmit}
         onForgotPassword={onForgotPassword}
         onCancel={onCancel}
+        onShowHelp={onShowHelp}
       />
     );
   }
 
   if (step.credential === 'passkey') {
     return (
-      <SignInPasskey
+      <VerificationPasskey
         focusRef={focusRef}
-        identifier={step.identifier}
-        onEditIdentifier={onEditIdentifier}
-        globalErrorMessage={globalErrorMessage}
+        messages={{
+          title: m.passkey.title,
+          description: m.passkey.description,
+          ...actions,
+          secondaryActionLabel: onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink,
+        }}
+        identity={
+          step.identifier ? (
+            <AuthIdentityPreview
+              identifier={step.identifier}
+              editLabel={m.editIdentifier}
+              disabled={isPending}
+              onEdit={onEditIdentifier}
+            />
+          ) : undefined
+        }
+        errorMessage={globalErrorMessage}
         isPending={isPending}
         onSubmit={() => onSubmit()}
-        onCancel={onCancel}
-        onShowHelp={onShowHelp}
+        onCancel={onCancel ?? onShowHelp}
       />
     );
   }
@@ -73,7 +93,12 @@ export function CredentialStep({
   return (
     <VerificationBackupCode
       focusRef={focusRef}
-      messages={messages}
+      messages={{
+        title: m.backupCodeMfa.title,
+        description: backupCodeDescription(step, m),
+        fieldLabel: m.backupCodeMfa.label,
+        ...actions,
+      }}
       value={value}
       errorMessage={errorMessage}
       globalErrorMessage={globalErrorMessage}

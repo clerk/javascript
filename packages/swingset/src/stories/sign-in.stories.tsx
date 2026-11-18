@@ -1,5 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { FieldsConfig } from '@clerk/mosaic/components/form';
+import type { FieldFeedback, FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
   SignInAccount,
@@ -11,6 +11,7 @@ import type {
   SignInValues,
 } from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
+import type { SignUpFields } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
@@ -54,6 +55,15 @@ const resetFactors: SignInFactor[] = [
   { id: 'reset_phone', stage: 'first', strategy: 'reset_password_phone_code', identifier: PHONE },
 ];
 
+const signUpDetailFields: SignUpFields = {
+  firstName: { required: true },
+  lastName: { required: true },
+  emailAddress: { required: true },
+  password: { required: true },
+};
+
+const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'https://acme.com/privacy' };
+
 const emptyValues: SignInValues = {
   identifier: '',
   phoneNumber: '',
@@ -62,9 +72,11 @@ const emptyValues: SignInValues = {
   backupCode: '',
   firstName: '',
   lastName: '',
+  username: '',
   newPassword: '',
   confirmPassword: '',
   signOutOfOtherSessions: true,
+  legalAccepted: false,
 };
 
 const newPasswordFields: FieldsConfig<SignInValues> = {
@@ -92,6 +104,8 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
       return { kind: 'code', purpose: 'second-factor', channel: 'totp' };
     case 'email_code':
       return { kind: 'code', purpose: 'first-factor', channel: 'email', identifier: factor.identifier };
+    case 'email_link':
+      return { kind: 'notice', purpose: 'email-link', identifier: factor.identifier };
     case 'phone_code':
       return {
         kind: 'code',
@@ -107,7 +121,10 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
 }
 
 function offersResend(step: SignInStep): boolean {
-  return (step.kind === 'code' && step.channel !== 'totp') || (step.kind === 'notice' && step.purpose === 'email-link');
+  return (
+    (step.kind === 'code' && step.channel !== 'totp') ||
+    (step.kind === 'notice' && (step.purpose === 'email-link' || step.purpose === 'verify-email-link'))
+  );
 }
 
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
@@ -170,7 +187,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (identifier.toLowerCase().includes('new')) {
-        navigate({ kind: 'sign-up' }, 1);
+        navigate({ kind: 'sign-up', fields: signUpDetailFields, legalConsent }, 1);
         return;
       }
       setStage('first');
@@ -252,6 +269,10 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       }
       if (values.password.length < 8) {
         setGlobalErrorMessage('Your password must contain 8 or more characters.');
+        return;
+      }
+      if (!values.legalAccepted) {
+        setGlobalErrorMessage('Accept the Terms of Service and Privacy Policy to continue.');
         return;
       }
       navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
@@ -474,6 +495,9 @@ function StepPanel({
   onCancel,
   lastUsedProviderId,
   onJoinWaitlist,
+  passwordFeedback,
+  onRetry,
+  password,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -490,6 +514,9 @@ function StepPanel({
   onCancel?: () => void;
   lastUsedProviderId?: string;
   onJoinWaitlist?: () => void;
+  passwordFeedback?: FieldFeedback;
+  onRetry?: () => void;
+  password?: string;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -497,7 +524,7 @@ function StepPanel({
       ...emptyValues,
       identifier:
         identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
-      password: attempted,
+      password: password ?? attempted,
       backupCode: attempted,
     },
     onSubmit: () => Promise.resolve(),
@@ -522,6 +549,7 @@ function StepPanel({
       isDisabled={isPending || Boolean(pendingProviderId)}
       errorMessage={errorMessage}
       globalErrorMessage={globalErrorMessage}
+      newPasswordFeedback={passwordFeedback}
       onEditIdentifier={() => undefined}
       onSignUp={combined ? undefined : () => undefined}
       onJoinWaitlist={onJoinWaitlist}
@@ -536,6 +564,7 @@ function StepPanel({
       onShowHelp={() => undefined}
       onBack={() => undefined}
       onStartOver={() => undefined}
+      onRetry={onRetry}
       onEmailSupport={() => undefined}
       onSelectFactor={() => undefined}
       onResend={offersResend(step) ? () => undefined : undefined}
@@ -619,6 +648,45 @@ export function IdentifierPhone() {
 
 export function IdentifierUsername() {
   return <SwitchingIdentifier fields={['username']} />;
+}
+
+export function IdentifierWeb3() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      providers={[
+        { id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
+        { id: 'web3_metamask_signature', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+        {
+          id: 'web3_coinbase_wallet_signature',
+          name: 'Coinbase Wallet',
+          iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
+        },
+      ]}
+    />
+  );
+}
+
+export function IdentifierSocialOnly() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier' }}
+    />
+  );
+}
+
+export function IdentifierPassword() {
+  return (
+    <StepPanel
+      combined={false}
+      providers={[]}
+      identifier={IDENTIFIER}
+      password='correct-horse-9'
+      step={{ kind: 'identifier', field: 'email', password: true }}
+    />
+  );
 }
 
 export function IdentifierPasskey() {
@@ -860,6 +928,47 @@ const wallets: SignInProvider[] = [
   { id: 'metamask', name: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
 ];
 
+export function ChoiceMethodsEmailLink() {
+  return (
+    <StepPanel
+      providers={[{ id: 'oauth_google', name: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' }]}
+      step={{
+        kind: 'choice',
+        purpose: 'methods',
+        options: [
+          { id: 'email_link', stage: 'first', strategy: 'email_link', emailAddressId: 'idn_1', identifier: IDENTIFIER },
+          { id: 'email_code', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: IDENTIFIER },
+        ],
+      }}
+    />
+  );
+}
+
+export function ChoiceMethodsEntry() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'methods', canGoBack: false, options: [] }} />;
+}
+
+export function ChoiceMethodsSecondFactor() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{ kind: 'choice', purpose: 'methods', options: secondFactors }}
+    />
+  );
+}
+
+export function ChoiceWalletsSingle() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets.slice(0, 1) }} />;
+}
+
+export function ChoiceWalletsNone() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: [] }} />;
+}
+
+export function ChoiceWalletsLoading() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: [], loading: true }} />;
+}
+
 export function ChoiceWallets() {
   return <StepPanel step={{ kind: 'choice', purpose: 'wallets', options: wallets }} />;
 }
@@ -921,31 +1030,68 @@ export function NoticeEmailLinkSent() {
 }
 
 export function NoticeEmailLinkSignedInOtherTab() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in-other-tab' }} />;
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in-other-tab', flow: 'sign-in' }}
+    />
+  );
 }
 
 export function NoticeEmailLinkVerified() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'transferable' }} />;
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'transferable', flow: 'sign-in' }} />;
 }
 
 export function NoticeEmailLinkSigningIn() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'loading' }} />;
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'loading', flow: 'sign-in' }} />;
 }
 
 export function NoticeEmailLinkSignedIn() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in' }} />;
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in', flow: 'sign-in' }} />;
 }
 
 export function NoticeEmailLinkExpired() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'expired' }} />;
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'expired', flow: 'sign-in' }} />;
 }
 
 export function NoticeEmailLinkInvalid() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'failed' }} />;
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'failed', flow: 'sign-in' }} />;
 }
 
 export function NoticeEmailLinkClientMismatch() {
-  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'client-mismatch' }} />;
+  return (
+    <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'client-mismatch', flow: 'sign-in' }} />
+  );
+}
+
+export function CredentialPasswordOnly() {
+  return (
+    <StepPanel
+      step={passwordStep}
+      otherMethods={false}
+    />
+  );
+}
+
+export function CredentialPasskeySecondFactor() {
+  return <StepPanel step={{ kind: 'credential', credential: 'passkey' }} />;
+}
+
+export function CredentialBackupCodeResetting() {
+  return (
+    <StepPanel step={{ kind: 'credential', credential: 'backup-code', identifier: IDENTIFIER, resetting: true }} />
+  );
+}
+
+export function CodeSecondFactorResetting() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: PHONE, resetting: true }}
+    />
+  );
+}
+
+export function NoticeEmailLinkNewDevice() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link', identifier: IDENTIFIER, newDevice: true }} />;
 }
 
 export function CredentialPasskey() {
@@ -954,6 +1100,51 @@ export function CredentialPasskey() {
 
 export function NoticeStartOver() {
   return <StepPanel step={{ kind: 'notice', purpose: 'start-over' }} />;
+}
+
+export function NoticeLoading() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'loading' }} />;
+}
+
+export function NoticeLoadingError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'loading' }}
+      globalErrorMessage='Unable to complete action at this time. If the problem persists please contact support.'
+    />
+  );
+}
+
+export function NoticeProtectCheck() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      isPending
+    />
+  );
+}
+
+export function NoticeProtectCheckChallenge() {
+  const ref = useRef<HTMLDivElement>(null);
+  const status = useTestTurnstile(() => ref.current?.querySelector<HTMLElement>('#clerk-protect-check'));
+  return (
+    <div ref={ref}>
+      <StepPanel
+        step={{ kind: 'notice', purpose: 'protect-check', challenge: status === 'Interactive challenge shown' }}
+        isPending
+      />
+    </div>
+  );
+}
+
+export function NoticeProtectCheckError() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'protect-check', challenge: false }}
+      globalErrorMessage='Verification couldn’t start. Please contact support.'
+      onRetry={() => undefined}
+    />
+  );
 }
 
 export function NewPasswordReset() {
@@ -965,5 +1156,126 @@ export function NewPasswordRequired() {
 }
 
 export function SignUpDetails() {
-  return <StepPanel step={{ kind: 'sign-up' }} />;
+  return <StepPanel step={{ kind: 'sign-up', fields: signUpDetailFields }} />;
+}
+
+export function SignUpSettingsFields() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: {
+          username: { required: true },
+          phoneNumber: { required: true },
+          password: { required: true },
+        },
+      }}
+    />
+  );
+}
+
+export function SignUpOptionalFields() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: {
+          firstName: { required: false },
+          lastName: { required: false },
+          emailAddress: { required: true },
+          password: { required: true },
+        },
+      }}
+    />
+  );
+}
+
+export function SignUpEmailOrPhone() {
+  const [active, setActive] = useState<'emailAddress' | 'phoneNumber'>('emailAddress');
+
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: { [active]: { required: true }, password: { required: true } },
+        nextField: active === 'emailAddress' ? 'phoneNumber' : 'emailAddress',
+      }}
+      onSwitchField={() => setActive(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress'))}
+    />
+  );
+}
+
+export function SignUpLegalConsent() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        fields: { emailAddress: { required: true }, password: { required: true } },
+        legalConsent,
+      }}
+    />
+  );
+}
+
+export function SignUpLegalConsentOnly() {
+  return <StepPanel step={{ kind: 'sign-up', fields: {}, legalConsent }} />;
+}
+
+export function SignUpContinue() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{
+        kind: 'sign-up',
+        purpose: 'continue',
+        fields: { username: { required: true }, emailAddress: { required: true }, password: { required: true } },
+        nextField: 'phoneNumber',
+      }}
+      onSwitchField={() => undefined}
+    />
+  );
+}
+
+export function SignUpAlternativePhone() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'phone', channel: whatsApp, flow: 'sign-up', legalConsent }}
+      onCancel={() => undefined}
+    />
+  );
+}
+
+export function SignUpRestricted() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'restricted' }} />;
+}
+
+export function SignUpWaitlist() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'waitlist' }}
+      onJoinWaitlist={() => undefined}
+    />
+  );
+}
+
+export function SignUpPasswordRequirements() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{ kind: 'sign-up', fields: { emailAddress: { required: true }, password: { required: true } } }}
+      passwordFeedback={{ type: 'info', message: 'Your password must contain 8 or more characters.' }}
+    />
+  );
+}
+
+export function SignUpVerifyEmailLink() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'verify-email-link', identifier: 'new@acme.com' }} />;
+}
+
+export function SignUpEmailLinkSignedUp() {
+  return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in', flow: 'sign-up' }} />;
 }

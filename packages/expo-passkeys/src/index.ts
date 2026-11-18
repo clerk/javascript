@@ -130,14 +130,20 @@ export async function get({
     challenge: arrayBufferToBase64Url(publicKeyOptions.challenge),
   };
 
-  const callGet = (...args: unknown[]) =>
-    preferImmediatelyAvailableCredentials && ClerkExpoPasskeys.getWithOptions
-      ? ClerkExpoPasskeys.getWithOptions(...args, { preferImmediatelyAvailableCredentials: true })
-      : ClerkExpoPasskeys.get(...args);
-
   const getPasskeyModule = Platform.select({
-    android: async () => callGet(JSON.stringify(serializedPublicCredential)),
-    ios: async () => callGet(serializedPublicCredential.challenge, serializedPublicCredential.rpId),
+    android: async () =>
+      preferImmediatelyAvailableCredentials && ClerkExpoPasskeys.getWithOptions
+        ? ClerkExpoPasskeys.getWithOptions(JSON.stringify(serializedPublicCredential), {
+            preferImmediatelyAvailableCredentials: true,
+          })
+        : ClerkExpoPasskeys.get(JSON.stringify(serializedPublicCredential)),
+    ios: async () =>
+      ClerkExpoPasskeys.getWithOptions
+        ? ClerkExpoPasskeys.getWithOptions(serializedPublicCredential.challenge, serializedPublicCredential.rpId, {
+            preferImmediatelyAvailableCredentials: !!preferImmediatelyAvailableCredentials,
+            userVerification: serializedPublicCredential.userVerification,
+          })
+        : ClerkExpoPasskeys.get(serializedPublicCredential.challenge, serializedPublicCredential.rpId),
     default: null,
   });
 

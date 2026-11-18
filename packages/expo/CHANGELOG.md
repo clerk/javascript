@@ -1,5 +1,25 @@
 # Change Log
 
+## 4.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+  - @clerk/clerk-js@6.44.0
+  - @clerk/react@6.18.9
+
+## 4.16.1
+
+### Patch Changes
+
+- `getToken` from `useAuth()` now keeps the same identity across renders. Effects and callbacks that list it as a dependency no longer re-run on every render, which could refetch tokens in a loop. ([#10804](https://github.com/clerk/javascript/pull/10804)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+  - @clerk/clerk-js@6.43.1
+  - @clerk/react@6.18.8
+
 ## 4.16.0
 
 ### Minor Changes

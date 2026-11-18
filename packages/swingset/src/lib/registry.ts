@@ -269,6 +269,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
 import {
   Default as ProviderButtonDefault,
   Many as ProviderButtonMany,
@@ -393,6 +394,14 @@ import {
   NoticePasswordCompromisedPending as SignInNoticePasswordCompromisedPending,
   NoticeStartOver as SignInNoticeStartOver,
   SignUpDetails as SignInSignUpDetails,
+  SignUpEmailLinkSignedUp as SignInSignUpEmailLinkSignedUp,
+  SignUpEmailOrPhone as SignInSignUpEmailOrPhone,
+  SignUpLegalConsent as SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly as SignInSignUpLegalConsentOnly,
+  SignUpOptionalFields as SignInSignUpOptionalFields,
+  SignUpPasswordRequirements as SignInSignUpPasswordRequirements,
+  SignUpSettingsFields as SignInSignUpSettingsFields,
+  SignUpVerifyEmailLink as SignInSignUpVerifyEmailLink,
 } from '../stories/sign-in.stories';
 import {
   CustomElement as SignInButtonCustomElement,
@@ -412,6 +421,32 @@ import {
   meta as signOutButtonMeta,
   Pending as SignOutButtonPending,
 } from '../stories/sign-out-button.stories';
+import {
+  ActionBlocked as SignUpActionBlocked,
+  AlternativePhone as SignUpAlternativePhone,
+  Continue as SignUpContinue,
+  ContinueLegalConsentOnly as SignUpContinueLegalConsentOnly,
+  Default as SignUpDefault,
+  EmailLinkSignedUp as SignUpEmailLinkSignedUp,
+  EnterpriseConnections as SignUpEnterpriseConnections,
+  Loading as SignUpLoading,
+  meta as signUpMeta,
+  ProtectCheck as SignUpProtectCheck,
+  Restricted as SignUpRestricted,
+  StartCaptcha as SignUpStartCaptcha,
+  StartEmailOrPhone as SignUpStartEmailOrPhone,
+  StartFormOnly as SignUpStartFormOnly,
+  StartInvitation as SignUpStartInvitation,
+  StartLegalConsent as SignUpStartLegalConsent,
+  StartProviderPending as SignUpStartProviderPending,
+  StartSocialOnly as SignUpStartSocialOnly,
+  VerifyEmail as SignUpVerifyEmail,
+  VerifyEmailLink as SignUpVerifyEmailLink,
+  VerifyPhone as SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel as SignUpVerifyPhoneAlternativeChannel,
+  Waitlist as SignUpWaitlist,
+  Wallets as SignUpWallets,
+} from '../stories/sign-up.stories';
 import {
   CustomElement as SignUpButtonCustomElement,
   Default as SignUpButtonDefault,
@@ -440,6 +475,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { Combined as SwitcherCombined, meta as switcherMeta } from '../stories/switcher.stories';
 import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
@@ -500,11 +536,7 @@ import {
   Shapes as UserAvatarShapes,
   Sizes as UserAvatarSizes,
 } from '../stories/user-avatar.stories';
-import {
-  Combined as UserButtonCombined,
-  meta as userButtonMeta,
-  User as UserButtonUser,
-} from '../stories/user-button.stories';
+import { Default as UserButtonDefault, meta as userButtonMeta } from '../stories/user-button.stories';
 import {
   Default as UserProfileDefault,
   meta as userProfileMeta,
@@ -860,10 +892,14 @@ const itemModule: StoryModule = {
   Group: ItemGroup,
 };
 
+const switcherModule: StoryModule = {
+  meta: switcherMeta,
+  Combined: SwitcherCombined,
+};
+
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
-  Combined: UserButtonCombined,
-  User: UserButtonUser,
+  Default: UserButtonDefault,
 };
 
 const taskSetupMfaModule: StoryModule = {
@@ -1129,6 +1165,11 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
+const profileFeatureModule: StoryModule = {
+  meta: profileFeatureMeta,
+  Default: ProfileFeatureDefault,
+};
+
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -1300,6 +1341,33 @@ const reverificationModule: StoryModule = {
   Help: ReverificationHelp,
 };
 
+const signUpModule: StoryModule = {
+  meta: signUpMeta,
+  Default: SignUpDefault,
+  StartSocialOnly: SignUpStartSocialOnly,
+  StartFormOnly: SignUpStartFormOnly,
+  StartInvitation: SignUpStartInvitation,
+  StartEmailOrPhone: SignUpStartEmailOrPhone,
+  StartLegalConsent: SignUpStartLegalConsent,
+  StartCaptcha: SignUpStartCaptcha,
+  StartProviderPending: SignUpStartProviderPending,
+  Continue: SignUpContinue,
+  ContinueLegalConsentOnly: SignUpContinueLegalConsentOnly,
+  Restricted: SignUpRestricted,
+  Waitlist: SignUpWaitlist,
+  AlternativePhone: SignUpAlternativePhone,
+  VerifyEmail: SignUpVerifyEmail,
+  VerifyPhone: SignUpVerifyPhone,
+  VerifyPhoneAlternativeChannel: SignUpVerifyPhoneAlternativeChannel,
+  VerifyEmailLink: SignUpVerifyEmailLink,
+  EmailLinkSignedUp: SignUpEmailLinkSignedUp,
+  EnterpriseConnections: SignUpEnterpriseConnections,
+  Wallets: SignUpWallets,
+  Loading: SignUpLoading,
+  ProtectCheck: SignUpProtectCheck,
+  ActionBlocked: SignUpActionBlocked,
+};
+
 const signInModule: StoryModule = {
   meta: signInMeta,
   Default: SignInDefault,
@@ -1350,6 +1418,14 @@ const signInModule: StoryModule = {
   NewPasswordReset: SignInNewPasswordReset,
   NewPasswordRequired: SignInNewPasswordRequired,
   SignUpDetails: SignInSignUpDetails,
+  SignUpSettingsFields: SignInSignUpSettingsFields,
+  SignUpOptionalFields: SignInSignUpOptionalFields,
+  SignUpEmailOrPhone: SignInSignUpEmailOrPhone,
+  SignUpLegalConsent: SignInSignUpLegalConsent,
+  SignUpLegalConsentOnly: SignInSignUpLegalConsentOnly,
+  SignUpPasswordRequirements: SignInSignUpPasswordRequirements,
+  SignUpVerifyEmailLink: SignInSignUpVerifyEmailLink,
+  SignUpEmailLinkSignedUp: SignInSignUpEmailLinkSignedUp,
 };
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
@@ -1365,8 +1441,10 @@ const organizationProfileMembersPanelModule: StoryModule = {
 };
 
 export const registry: StoryModule[] = [
-  // User Button
-  userButtonModule,
+  // Switcher
+  switcherModule,
+  // Profile
+  profileFeatureModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1400,6 +1478,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // Misc
   { meta: mosaicProviderMeta },
+  userButtonModule,
   organizationSwitcherModule,
   createOrganizationModule,
   organizationListModule,
@@ -1417,6 +1496,7 @@ export const registry: StoryModule[] = [
   signOutButtonModule,
   // Authentication
   signInModule,
+  signUpModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,

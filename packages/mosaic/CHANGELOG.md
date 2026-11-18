@@ -1,5 +1,33 @@
 # @clerk/mosaic
 
+## 0.6.0
+
+### Minor Changes
+
+- Export the `<Consent />` component. ([#10848](https://github.com/clerk/javascript/pull/10848)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Export `Avatar`, `Badge`, `Banner`, `Button`, `DataList`, `EmptyState`, `Entity`, `Heading`, `Icon`, `Input`, `Item`, `Skeleton`, `Table` and `Text` from `@clerk/mosaic/components/<name>`, and the `External` glyph from `@clerk/mosaic/icons/glyphs/external`, the import paths Swingset documents. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Export `ActionMenu`, `Panel`, `Profile`, `Radio`, `Section` and `SegmentedControl` from `@clerk/mosaic/components/<name>`, and the `ArrowUpRight`, `Code`, `Plus`, `ShieldCheck` and `UserCircle` glyphs from `@clerk/mosaic/icons/glyphs/<name>`. Style them with `@clerk/mosaic/styles.css`. ([#10754](https://github.com/clerk/javascript/pull/10754)) by [@djgould](https://github.com/djgould)
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
+## 0.5.0
+
+### Minor Changes
+
+- Picking a profile picture in `UserProfile`, or a logo in `OrganizationProfile` or `CreateOrganization`, now opens a dialog to crop it to a square before it uploads. Animated images upload as picked. ([#10784](https://github.com/clerk/javascript/pull/10784)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Let the avatar and logo cropper zoom out until the whole image fits, so a wide logo or a tall photo can be uploaded without cutting it off. A JPEG zoomed out this way is saved as a PNG, so the area around it stays transparent. ([#10809](https://github.com/clerk/javascript/pull/10809)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
 ## 0.4.0
 
 ### Minor Changes

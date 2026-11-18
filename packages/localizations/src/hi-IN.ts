@@ -1647,6 +1647,14 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जारी रखने के लिए अपना वर्तमान पासवर्ड दर्ज करें',
       title: 'सत्यापन आवश्यक है',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -1658,6 +1666,22 @@ export const hiIN: LocalizationResource = {
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
       subtitle: 'जारी रखने के लिए अपने फोन पर भेजे गए कोड को दर्ज करें',
       title: 'सत्यापन आवश्यक है',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'सत्यापन कोड',
@@ -2189,6 +2213,7 @@ export const hiIN: LocalizationResource = {
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
     signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,

@@ -1,5 +1,23 @@
 # Change Log
 
+## 4.25.0
+
+### Minor Changes
+
+- Add localization keys for resetting a breached or compromised password from the reverification modal: `reverification.passwordPwned`, `reverification.passwordCompromised`, `reverification.resetPassword`, `reverification.resetPasswordAlternativeMethods` and `reverification.resetPasswordCode`. ([#10440](https://github.com/clerk/javascript/pull/10440)) by [@brunol95](https://github.com/brunol95)
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
+## 4.24.8
+
+### Patch Changes
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
 ## 4.24.7
 
 ### Patch Changes

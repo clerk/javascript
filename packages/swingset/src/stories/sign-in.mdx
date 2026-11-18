@@ -46,7 +46,7 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
 
 ## Steps
 
-Each section is one component in `features/sign-in/steps/`, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
+Each section is one component in `features/sign-in/steps/`, or in `blocks/auth/` for the screens sign-in and sign-up share, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
 
 ### Identifier step
 
@@ -96,6 +96,16 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='IdentifierPasskey' storyModule={Stories} />
 
+#### Social only
+
+<Story name='IdentifierSocialOnly' storyModule={Stories} />
+
+#### Password shown
+
+The password field appears on the start screen once it has a value, as when the browser autofills it.
+
+<Story name='IdentifierPassword' storyModule={Stories} />
+
 #### Web3 wallets
 
 <Story name='IdentifierWeb3' storyModule={Stories} />
@@ -144,9 +154,23 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CredentialPasskey' storyModule={Stories} />
 
+#### Password with no other method
+
+When the password is the only method, the secondary action is "Get help".
+
+<Story name='CredentialPasswordOnly' storyModule={Stories} />
+
+#### Passkey as a second factor
+
+<Story name='CredentialPasskeySecondFactor' storyModule={Stories} />
+
+#### Backup code while resetting a password
+
+<Story name='CredentialBackupCodeResetting' storyModule={Stories} />
+
 ### Code step
 
-`code-step.tsx` draws every `{ kind: 'code' }` with `VerificationCode`. The purpose sets the copy and the second button; the channel decides whether Resend shows.
+The view draws every `{ kind: 'code' }` with the `VerificationCode` block. The purpose sets the copy and the second button; the channel decides whether Resend shows.
 
 #### Email code
 
@@ -196,6 +220,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='CodeVerifyPhone' storyModule={Stories} />
 
+#### Second factor while resetting a password
+
+<Story name='CodeSecondFactorResetting' storyModule={Stories} />
+
 ### Choice step
 
 `choice-step.tsx` draws `{ kind: 'choice' }`. Other sign-in methods are full-width buttons under the social providers, as in legacy; where to send a password reset code uses `VerificationMethodPicker`. Enterprise connections, accounts and wallets each have their own screen.
@@ -220,9 +248,35 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='ChoiceAccounts' storyModule={Stories} />
 
+#### Methods with an email link
+
+<Story name='ChoiceMethodsEmailLink' storyModule={Stories} />
+
+#### Methods as the first screen
+
+When every first factor is a social or SSO option, the list is the first screen and has no Back.
+
+<Story name='ChoiceMethodsEntry' storyModule={Stories} />
+
+#### Second-factor methods
+
+<Story name='ChoiceMethodsSecondFactor' storyModule={Stories} />
+
 #### Wallets
 
 <Story name='ChoiceWallets' storyModule={Stories} />
+
+#### No wallets installed
+
+<Story name='ChoiceWalletsNone' storyModule={Stories} />
+
+#### A single wallet
+
+<Story name='ChoiceWalletsSingle' storyModule={Stories} />
+
+#### Wallets loading
+
+<Story name='ChoiceWalletsLoading' storyModule={Stories} />
 
 ### Notice step
 
@@ -264,6 +318,10 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeEmailLinkSent' storyModule={Stories} />
 
+#### Email link on a new device
+
+<Story name='NoticeEmailLinkNewDevice' storyModule={Stories} />
+
 #### Signed in on other tab
 
 <Story name='NoticeEmailLinkSignedInOtherTab' storyModule={Stories} />
@@ -296,6 +354,28 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='NoticeStartOver' storyModule={Stories} />
 
+#### Loading
+
+<Story name='NoticeLoading' storyModule={Stories} />
+
+#### Loading with an error
+
+<Story name='NoticeLoadingError' storyModule={Stories} />
+
+#### Protect check
+
+<Story name='NoticeProtectCheck' storyModule={Stories} />
+
+#### Protect check challenge
+
+Protect's challenge is Cloudflare Turnstile, drawn by a script Clerk serves for each check. The story draws Turnstile itself with its always-challenge test key, since that script cannot load here.
+
+<Story name='NoticeProtectCheckChallenge' storyModule={Stories} />
+
+#### Protect check failed
+
+<Story name='NoticeProtectCheckError' storyModule={Stories} />
+
 ### New password step
 
 `new-password-step.tsx` draws `{ kind: 'new-password' }`: a new password with confirmation, and the option to sign out of other devices. A reset the instance requires says why and has no sign-out option.
@@ -310,7 +390,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 ### Sign-up step
 
-`sign-up-details.tsx` draws `{ kind: 'sign-up' }` in the combined flow.
+`sign-up-details.tsx`, in `features/sign-up`, draws `{ kind: 'sign-up' }` in the combined flow, with the fields the step lists. Verifying the new email by link is a notice step, and the email link outcomes take the sign-up wording with `flow: 'sign-up'`.
 
 #### Details
 
@@ -320,6 +400,42 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 
 <Story name='SignUpSettingsFields' storyModule={Stories} />
 
+#### Optional fields
+
+<Story name='SignUpOptionalFields' storyModule={Stories} />
+
+#### Email or phone
+
+<Story name='SignUpEmailOrPhone' storyModule={Stories} />
+
+#### Legal consent
+
+<Story name='SignUpLegalConsent' storyModule={Stories} />
+
+#### Legal consent only
+
+<Story name='SignUpLegalConsentOnly' storyModule={Stories} />
+
+#### Continue, missing fields
+
+With `purpose: 'continue'` the step is titled "Fill in missing fields" and has no sign-in prompt.
+
+<Story name='SignUpContinue' storyModule={Stories} />
+
+#### Sign-up by alternative phone channel
+
+`flow: 'sign-up'` on the alternative channel step gives it the sign-up wording, and `legalConsent` adds the checkbox.
+
+<Story name='SignUpAlternativePhone' storyModule={Stories} />
+
+#### Access restricted
+
+<Story name='SignUpRestricted' storyModule={Stories} />
+
+#### Access restricted, waitlist
+
+<Story name='SignUpWaitlist' storyModule={Stories} />
+
 #### Password requirements
 
 <Story name='SignUpPasswordRequirements' storyModule={Stories} />
@@ -327,3 +443,7 @@ Each section is one component in `features/sign-in/steps/`, and each example und
 #### Verify by email link
 
 <Story name='SignUpVerifyEmailLink' storyModule={Stories} />
+
+#### Signed up from email link
+
+<Story name='SignUpEmailLinkSignedUp' storyModule={Stories} />

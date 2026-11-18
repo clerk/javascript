@@ -1,15 +1,16 @@
-import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
+import type { ResetPasswordCodeFactor, SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useUserVerification } from '../../contexts';
 import { useIsWebAuthnSupported } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
-import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
+import type { PasswordErrorCode } from '../SignIn/SignInFactorOnePasswordCard';
+import { determineStartingSignInFactor, factorHasLocalStrategy, isResetPasswordStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
@@ -18,6 +19,8 @@ import { sortByPrimaryFactor } from './utils';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
+import { UVFactorOneResetPasswordCodeCard } from './UVFactorOneResetPasswordCodeCard';
+import { UVResetPasswordCard } from './UVResetPasswordCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
@@ -40,14 +43,37 @@ const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
   'passkey',
 ] as const;
 
+// Resetting a breached or compromised password: choose to reset, set the new
+// password, then enter the code, which is sent together with the new password.
+type ResetPasswordStep =
+  | { step: 'none' }
+  | { step: 'methods'; reason: PasswordErrorCode }
+  | { step: 'newPassword'; reason: PasswordErrorCode; error?: Error }
+  | { step: 'code'; reason: PasswordErrorCode };
+
 export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
   const card = useCardState();
   const { navigate } = useRouter();
 
-  const lastPreparedFactorKeyRef = React.useRef('');
+  const [lastPreparedFactorKey, setLastPreparedFactorKey] = React.useState('');
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const sessionVerification = data!;
+
+  // A caller that already has the new password (UserProfile's change password)
+  // passes it, so the user isn't asked for it again.
+  const { resetPassword } = useUserVerification();
+  const resetPasswordFactor = useMemo(
+    () =>
+      sessionVerification.supportedFirstFactors?.find(f => isResetPasswordStrategy(f.strategy)) as
+        | ResetPasswordCodeFactor
+        | undefined,
+    [sessionVerification.supportedFirstFactors],
+  );
+  const [resetStep, setResetStep] = React.useState<ResetPasswordStep>({ step: 'none' });
+  const [newPassword, setNewPassword] = React.useState(
+    () => resetPassword ?? { password: '', signOutOfOtherSessions: true },
+  );
 
   const availableFactors = useMemo(() => {
     return (
@@ -84,7 +110,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     : undefined;
 
   const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+    setLastPreparedFactorKey(factorKey(currentFactor));
   };
 
   const selectFactor = (factor: SignInFactor) => {
@@ -107,6 +133,64 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
         cardSubtitle={localizationKeys('reverification.noAvailableMethods.subtitle')}
         message={localizationKeys('reverification.noAvailableMethods.message')}
         shouldNavigateBack={false}
+      />
+    );
+  }
+
+  if (resetPasswordFactor && resetStep.step === 'methods') {
+    const { reason } = resetStep;
+    // As in sign-in, no way back: re-entering the rejected password can't succeed.
+    return (
+      <AlternativeMethods
+        mode={reason === 'pwned' ? 'pwned' : 'passwordCompromised'}
+        resetPassword={{
+          factor: resetPasswordFactor,
+          hasNewPassword: !!resetPassword,
+          onClick: () => setResetStep(resetPassword ? { step: 'code', reason } : { step: 'newPassword', reason }),
+        }}
+        currentFactor={currentFactor}
+        onBackLinkClick={undefined}
+        onFactorSelected={f => {
+          selectFactor(f);
+          setResetStep({ step: 'none' });
+        }}
+      />
+    );
+  }
+
+  if (resetPasswordFactor && resetStep.step === 'newPassword') {
+    const { reason, error } = resetStep;
+    return (
+      <UVResetPasswordCard
+        initialPassword={newPassword.password}
+        initialSignOutOfOtherSessions={newPassword.signOutOfOtherSessions}
+        // The change password form already asked; its choice stands, and its success page reports it.
+        showSignOutOfOtherSessions={!resetPassword}
+        initialError={error}
+        onSubmit={values => {
+          setNewPassword(values);
+          setResetStep({ step: 'code', reason });
+        }}
+        onBackLinkClick={() => setResetStep({ step: 'methods', reason })}
+      />
+    );
+  }
+
+  if (resetPasswordFactor && resetStep.step === 'code') {
+    const { reason } = resetStep;
+    return (
+      <UVFactorOneResetPasswordCodeCard
+        factor={resetPasswordFactor}
+        factorAlreadyPrepared={lastPreparedFactorKey === factorKey(resetPasswordFactor)}
+        onFactorPrepare={() => setLastPreparedFactorKey(factorKey(resetPasswordFactor))}
+        newPassword={newPassword.password}
+        signOutOfOtherSessions={newPassword.signOutOfOtherSessions}
+        hasNewPassword={!!resetPassword}
+        onNewPasswordRejected={error => setResetStep({ step: 'newPassword', reason, error })}
+        onBackLinkClicked={() => {
+          card.setError(undefined);
+          setResetStep(resetPassword ? { step: 'methods', reason } : { step: 'newPassword', reason });
+        }}
       />
     );
   }
@@ -134,11 +218,27 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
 
   switch (currentFactor?.strategy) {
     case 'password':
-      return <UserVerificationFactorOnePasswordCard onShowAlternativeMethodsClick={toggleAllStrategies} />;
+      return (
+        <UserVerificationFactorOnePasswordCard
+          onShowAlternativeMethodsClick={toggleAllStrategies}
+          onPasswordError={
+            resetPasswordFactor
+              ? reason => {
+                  // The sign-in error asks the user to reset their password; with a
+                  // new password already chosen, the screen's subtitle explains instead.
+                  if (resetPassword) {
+                    card.setError(undefined);
+                  }
+                  setResetStep({ step: 'methods', reason });
+                }
+              : undefined
+          }
+        />
+      );
     case 'email_code':
       return (
         <UVFactorOneEmailCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKey === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
@@ -148,7 +248,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     case 'phone_code':
       return (
         <UVFactorOnePhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKey === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}

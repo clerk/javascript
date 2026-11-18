@@ -1,5 +1,11 @@
 # @clerk/expo-native-components
 
+## 0.4.5
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.7.1` to `1.7.2`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.7.2. ([#10819](https://github.com/clerk/javascript/pull/10819)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 0.4.4
 
 ### Patch Changes

@@ -19,7 +19,7 @@ export interface PasswordInputProps extends Omit<MosaicElementProps<'input'>, 't
 
 /**
  * A password input with a button that shows or hides what was typed. Field props, the ref and input
- * attributes such as `autoComplete` go to the input.
+ * attributes such as `autoComplete` go to the input. `tabIndex` goes to the input and the toggle.
  *
  * @example
  * ```tsx
@@ -41,6 +41,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     xstyle,
     disabled: disabledProp,
     'aria-invalid': ariaInvalidProp,
+    tabIndex,
     ...inputProps
   },
   ref,
@@ -63,6 +64,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
         ref={ref}
         {...inputProps}
         disabled={disabledProp}
+        tabIndex={tabIndex}
         aria-invalid={ariaInvalidProp}
         type={visible ? 'text' : 'password'}
       />
@@ -71,6 +73,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           type='button'
           {...themeProps('password-input-toggle')}
           aria-label={visible ? hidePasswordLabel : showPasswordLabel}
+          tabIndex={tabIndex}
           onClick={() => setVisible(current => !current)}
         >
           <Icon glyph={visible ? EyeSlash : Eye} />

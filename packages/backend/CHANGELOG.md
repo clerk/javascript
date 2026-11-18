@@ -1,5 +1,37 @@
 # Change Log
 
+## 3.30.0
+
+### Minor Changes
+
+- Add an experimental `clerkClient.oauthApplications.__experimental_exchangeToken()` method for performing an OAuth 2.0 Token Exchange (RFC 8693) on behalf of an OAuth application. Pass your publishable key, the application's client ID and client secret, a user's OAuth access token, and the target `resource` to receive a new access token for that resource, for example to call a downstream API on a user's behalf. The request goes to your instance's token endpoint, derived from the publishable key (or from `proxyUrl` when set), so it does not require a secret key. A `proxyUrl` must be an absolute HTTPS URL without a query or fragment, including for loopback hosts. Token exchange requests do not follow redirects, so credentials and tokens are never forwarded to another endpoint; a redirect response throws an `OAuthTokenExchangeError` with code `invalid_response`. ([#10762](https://github.com/clerk/javascript/pull/10762)) by [@wyattjoh](https://github.com/wyattjoh)
+
+  The method checks its inputs before making any request: `resource` must be an absolute URI without a fragment that uses `https` (or `http` on `localhost`, `127.0.0.1` or `[::1]`), and each `scope` element must be a single scope token, without spaces, `"`, `\` or non-ASCII characters. Invalid input throws an `OAuthTokenExchangeError` with code `invalid_request` and no `status`. Only a `200` response with a well-formed token response counts as success; any other success status, or a response with missing or mistyped members, throws an `OAuthTokenExchangeError` with code `invalid_response`. If the token endpoint rejects the exchange, the error carries the OAuth error code in `code` (also available as `error`), `errorDescription`, and HTTP `status`. `OAuthTokenExchangeError` is exported from `@clerk/backend/errors`. Network failures from `fetch` are not wrapped.
+
+### Patch Changes
+
+- Updated dependencies [[`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca), [`23ac615`](https://github.com/clerk/javascript/commit/23ac615a5f566c03685fb99dcef9b3ff58deadca)]:
+  - @clerk/shared@4.46.0
+
+## 3.29.0
+
+### Minor Changes
+
+- Fetch the Poppy JSON artifact with the Clerk-defined `clerkClient.artifacts.getPoppyJson()` method. ([#10810](https://github.com/clerk/javascript/pull/10810)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Add support for Personal Agent Protocol signed-in browser sessions. Enable the Clerk-defined `poppy: true` option on `clerkMiddleware()` to publish Poppy and OAuth protected resource discovery on the application domain. ([#10702](https://github.com/clerk/javascript/pull/10702)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Expose `agent` on the auth object when an agent session is active.
+
+- Add `sessions.updateSession()` to change when a single session expires, and `users.mergeUser()` to merge one user into another. The `user.merged` webhook event is now part of `UserWebhookEvent`, with a payload typed as `UserMergedJSON`. ([#10793](https://github.com/clerk/javascript/pull/10793)) by [@dmoerner](https://github.com/dmoerner)
+
+### Patch Changes
+
+- Add `selfServeSsoEnabled` and `selfServeDirectorySyncEnabled` to the parameters accepted by `updateOrganization()`. ([#10094](https://github.com/clerk/javascript/pull/10094)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35), [`eb24fb0`](https://github.com/clerk/javascript/commit/eb24fb0a4bf55d25e8d7b19fc1d16bc4089cac35)]:
+  - @clerk/shared@4.45.1
+
 ## 3.28.0
 
 ### Minor Changes

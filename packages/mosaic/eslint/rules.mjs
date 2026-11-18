@@ -57,7 +57,8 @@ export const noDynamicMessageCatalogs = {
     type: 'problem',
     schema: [],
     messages: {
-      useMessages: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
+      useMessages:
+        "Read copy with `useMessages('<namespace>')` from src/localization, so the customer's locale and overrides apply. Do not import a `*.messages.ts` value.",
     },
   },
   create(context) {
