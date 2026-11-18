@@ -1,6 +1,7 @@
 {
   "files": [
     { "path": "./dist/.bundlewatch/index.js", "maxSize": "95KB" },
+    { "path": "./dist/.bundlewatch/profile-*.js", "maxSize": "280KB" },
     { "path": "./dist/styles.css", "maxSize": "18KB" }
   ]
 }
