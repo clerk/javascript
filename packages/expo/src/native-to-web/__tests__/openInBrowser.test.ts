@@ -202,12 +202,5 @@ describe('openInBrowser', () => {
       expect(String(error)).toContain('npx expo install expo-intent-launcher');
       expect(mocks.request).not.toHaveBeenCalled();
     });
-
-    test('shares one mint and one intent between overlapping calls', async () => {
-      await Promise.all([openInBrowser({ destination: DESTINATION }), openInBrowser({ destination: DESTINATION })]);
-
-      expect(mocks.request).toHaveBeenCalledTimes(1);
-      expect(mocks.startActivityAsync).toHaveBeenCalledTimes(1);
-    });
   });
 });

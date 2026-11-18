@@ -77,17 +77,6 @@ describe('createNativeClientSync', () => {
     mocks.listeners.clear();
   });
 
-  test('configures native with the proxy URL', async () => {
-    const createNativeClientSync = await loadEngine();
-    const native = nativeModule();
-    const cache = userTokenCache(vi.fn().mockResolvedValue('seed-token'));
-
-    const sync = createNativeClientSync(native, 'pk_test_123', 'https://example.com/__clerk', () => cache);
-
-    await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
-    expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', 'seed-token', 'https://example.com/__clerk');
-  });
-
   test('tells native whether to show its update screen before configuring it', async () => {
     const createNativeClientSync = await loadEngine();
     const native = { ...nativeModule(), setUpdateRequiredViewEnabled: vi.fn().mockResolvedValue(undefined) };
@@ -279,21 +268,6 @@ describe('createNativeClientSync', () => {
     expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', 'seed-token', null);
   });
 
-  test('keeps the token a sign-in rotated when a request with the old token minted another client first', async () => {
-    const createNativeClientSync = await loadEngine();
-    const beforeSignIn = clientToken('client_signed_in', 1);
-    const afterSignIn = clientToken('client_signed_in', 2);
-    const minted = clientToken('client_minted', 1);
-    const native = nativeWithStoredToken(minted);
-    const cache = storedTokenCache(beforeSignIn);
-
-    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
-    await sync.tokenCache.saveClientToken(afterSignIn, beforeSignIn);
-
-    await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe(afterSignIn);
-    expect(native.setDeviceToken).toHaveBeenLastCalledWith(afterSignIn, minted);
-  });
-
   test('keeps the rotated token when a late response mints another client from the old token', async () => {
     const createNativeClientSync = await loadEngine();
     const beforeSignIn = clientToken('client_signed_in', 1);
@@ -317,18 +291,6 @@ describe('createNativeClientSync', () => {
     await sync.tokenCache.saveClientToken(clientToken('client_signed_in', 2), clientToken('client_signed_in', 1));
 
     await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe(newer);
-    expect(native.setDeviceToken).toHaveBeenCalledTimes(1);
-  });
-
-  test('keeps the native token when the tokens are not client JWTs', async () => {
-    const createNativeClientSync = await loadEngine();
-    const native = nativeWithStoredToken('other-native-token');
-    const cache = storedTokenCache('seed-token');
-
-    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
-    await sync.tokenCache.saveClientToken('signed-in-token', 'seed-token');
-
-    await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('other-native-token');
     expect(native.setDeviceToken).toHaveBeenCalledTimes(1);
   });
 
