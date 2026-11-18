@@ -24,4 +24,4 @@ Preconditions:
 ## Gotchas
 
 - Type only an address that `host.newEmail` returned, so the run finds the identity it created.
-- The test app's password field has the one-time-code content type (`textContentType='oneTimeCode'` in `screens/CustomSignUp.tsx`). Without it, iOS covers the keyboard with a `Use Strong Password?` sheet as soon as the field has focus. With it, a spec that only focuses the field sees the keyboard and no sheet. The specs that type the password pass with it.
+- The test app's password field has the one-time-code content type (`textContentType='oneTimeCode'` in `integration/templates/expo-native/screens/CustomSignUp.tsx`). Without it, iOS covers the keyboard with a `Use Strong Password?` sheet as soon as the field has focus. With it, a spec that only focuses the field sees the keyboard and no sheet. The specs that type the password pass with it.

@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -147,8 +149,8 @@ export type MenuLabelProps = MosaicComponentProps<'span'>;
 
 /**
  * The item's text. Takes the space between the media and whatever trails it, and truncates to one
- * line rather than pushing the menu wide. `Menu.Item` wraps its own `label` in this, so only a row
- * built from the parts has to write it.
+ * line rather than pushing the menu wide. `Menu.Item` does not render its `label`, so every item
+ * needs its text in this.
  */
 export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(function MosaicMenuLabel(
   { render, xstyle, ...rest },
@@ -200,8 +202,9 @@ export interface MenuItemProps extends Omit<PrimitiveMenuItemProps, 'className' 
 }
 
 /**
- * A single menu action. `label` names it for typeahead and for assistive technology; what the row
- * shows is whatever `Menu.Media` and `Menu.Label` are composed into it.
+ * A single menu action. `label` is the text typeahead matches on and is neither rendered nor the
+ * accessible name; what the row shows and announces is whatever `Menu.Media` and `Menu.Label` are
+ * composed into it.
  */
 export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(function MosaicMenuItem(
   { color = 'neutral', label, xstyle, children, ...rest },
@@ -243,15 +246,7 @@ export const MenuSeparator = React.forwardRef<HTMLDivElement, MenuSeparatorProps
   );
 });
 
-export const Menu = {
-  // Renders no element of its own; re-exported unchanged so the state provider sits
-  // alongside the styled parts.
-  Root: Primitive.Root,
-  Trigger: MenuTrigger,
-  Popup: MenuPopup,
-  Item: MenuItem,
-  Media: MenuMedia,
-  Label: MenuLabel,
-  Indicator: MenuIndicator,
-  Separator: MenuSeparator,
-};
+// Renders no element of its own; re-exported unchanged so the state provider sits
+// alongside the styled parts.
+const MenuRoot = Primitive.Root;
+export { MenuRoot };

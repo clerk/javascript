@@ -14,8 +14,8 @@ import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
 import { Panel, usePanelTitle } from '../panel';
 import { Section } from '../section';
+import { Profile } from '.';
 import type { ProfileRootProps } from './profile';
-import { Profile } from './profile';
 
 const pageTitles: Record<string, string> = { account: 'Account', security: 'Security' };
 
@@ -369,13 +369,13 @@ describe('Profile', () => {
           observe = width => {
             Object.defineProperty(target, 'offsetWidth', { configurable: true, value: width });
             Object.defineProperty(target, 'offsetHeight', { configurable: true, value: 600 });
-            this.callback([], this as unknown as ResizeObserver);
+            this.callback([], this);
           };
         }
         disconnect() {}
         unobserve() {}
       }
-      globalThis.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+      globalThis.ResizeObserver = FakeResizeObserver;
     });
 
     afterEach(() => {

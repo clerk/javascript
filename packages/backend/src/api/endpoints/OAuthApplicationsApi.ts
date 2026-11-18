@@ -66,7 +66,7 @@ export type ExchangeOAuthApplicationTokenParams = {
   subjectToken: string;
   /** The absolute URI of the target resource where the issued token will be used. It must use `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`, and must not contain a fragment. It is sent exactly as given. */
   resource: string;
-  /** The scopes requested for the issued token. Each element must be a single, non-empty [scope token](https://www.rfc-editor.org/rfc/rfc6749#section-3.3): printable ASCII without spaces, `"` or `\`. */
+  /** The scopes requested for the issued token. Each element must be a single, non-empty [scope token](https://www.rfc-editor.org/rfc/rfc6749#section-3.3): printable ASCII without spaces, double quotes, or backslashes. */
   scope?: string[];
 };
 

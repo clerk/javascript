@@ -1,5 +1,5 @@
+export * as Select from './select.parts';
 export {
-  Select,
   SelectContent,
   SelectDescription,
   SelectLabel,

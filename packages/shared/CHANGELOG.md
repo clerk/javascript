@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.47.0
+
+### Minor Changes
+
+- Add `clientTrustState` to `SignInFuture`, so custom sign-in flows can read whether Clerk trusts the user's device (`'new'`, `'known'`, or `'pending'`). With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, and it's `undefined` before then. Without that update, Clerk returns it on every response. It's `undefined` when Device Trust is off. ([#10775](https://github.com/clerk/javascript/pull/10775)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Add ChatGPT as a supported OAuth provider strategy for instances where Sign in with ChatGPT is enabled. ([#10107](https://github.com/clerk/javascript/pull/10107)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.46.0
 
 ### Minor Changes

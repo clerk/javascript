@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -98,12 +100,4 @@ const Value = React.forwardRef<HTMLElement, MosaicComponentProps<'dd'>>(function
   });
 });
 
-/**
- * Mosaic `DataList` — label/value pairs for read-only detail, such as the fields describing a
- * device or a payment method. Composed via dot syntax: `DataList.Root`, `DataList.Item`,
- * `DataList.Label`, `DataList.Value`. Every part takes a `render` prop and forwards a ref.
- *
- * Semantics come free: the parts render `dl`/`dt`/`dd`, so assistive technology reads each value
- * with the label it belongs to.
- */
-export const DataList = { Root, Item, Label, Value };
+export { Root as DataListRoot, Item as DataListItem, Label as DataListLabel, Value as DataListValue };
