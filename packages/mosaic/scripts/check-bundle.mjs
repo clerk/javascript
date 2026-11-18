@@ -13,7 +13,10 @@ const unitEntryFiles = Object.entries(packageJson.exports)
 const hookEntryFiles = Object.entries(packageJson.exports)
   .filter(([subpath]) => subpath.startsWith('./hooks/'))
   .map(([, target]) => entryFile(target));
-const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...hookEntryFiles];
+const glyphEntryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => subpath.startsWith('./icons/glyphs/'))
+  .map(([, target]) => entryFile(target));
+const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...hookEntryFiles, ...glyphEntryFiles];
 
 const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
 const importsOf = source =>
@@ -44,6 +47,11 @@ for (const file of entryFiles) {
   if (isClientModule(source) && unitEntryFiles.includes(file)) {
     throw new Error(
       `Published Mosaic JS entry ${relative(distDir, file)} starts with 'use client'; put the boundary on the modules it re-exports instead.`,
+    );
+  }
+  if (!isClientModule(source) && glyphEntryFiles.includes(file)) {
+    throw new Error(
+      `Published Mosaic glyph ${relative(distDir, file)} does not start with 'use client'; a Server Component cannot pass it to Icon otherwise.`,
     );
   }
   await checkServerGraph(file, file);

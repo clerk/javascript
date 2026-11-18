@@ -12,6 +12,8 @@ const validDist = {
   'components/thing.js': `import { thing_parts_exports } from "./thing/thing.parts.js";\nexport { thing_parts_exports as Thing };\n`,
   'components/thing/thing.parts.js': `import { Root } from "./thing.js";\nexport { Root };\n`,
   'components/thing/thing.js': `'use client';\nimport React from "react";\nfunction Root() {}\nexport { Root };\n`,
+  'icons/glyphs/thing.js': `'use client';\nimport { glyph } from "../glyph.js";\nconst Thing = glyph("thing");\nexport { Thing };\n`,
+  'icons/glyph.js': `import * as React from "react";\nfunction glyph() {}\nexport { glyph };\n`,
 };
 
 function checkBundle(dist) {
@@ -22,6 +24,7 @@ function checkBundle(dist) {
       exports: {
         '.': { types: './dist/index.d.ts', import: './dist/index.js' },
         './components/thing': { types: './dist/components/thing.d.ts', import: './dist/components/thing.js' },
+        './icons/glyphs/thing': { types: './dist/icons/glyphs/thing.d.ts', import: './dist/icons/glyphs/thing.js' },
       },
     }),
   );
@@ -64,5 +67,14 @@ describe('check-bundle', () => {
     });
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain('components/thing/thing.parts.js');
+  });
+
+  it('fails when a glyph entry does not start with use client', () => {
+    const result = checkBundle({
+      ...validDist,
+      'icons/glyphs/thing.js': validDist['icons/glyphs/thing.js'].replace("'use client';\n", ''),
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('icons/glyphs/thing.js');
   });
 });
