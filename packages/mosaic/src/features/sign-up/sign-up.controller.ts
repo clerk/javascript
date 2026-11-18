@@ -297,7 +297,6 @@ export function useSignUpController(
   const verify = {
     isPending: isFinishing,
     globalErrorMessage: finishError,
-    onVerified: next,
     onEditIdentifier: () => go(detailsRouteFor(route)),
   };
 
@@ -313,14 +312,14 @@ export function useSignUpController(
       identifier: model.emailAddress ?? '',
       needsCode: step.type === 'verify_email' && !step.sent,
       sendCode: model.sendEmailCode,
-      verifyCode: model.verifyEmailCode,
+      verifyCode: async (code: string) => next(await model.verifyEmailCode(code)),
     },
     verifyPhone: {
       ...verify,
       identifier: model.phoneNumber ?? '',
       needsCode: step.type === 'verify_phone' && !step.sent,
       sendCode: model.sendPhoneCode,
-      verifyCode: model.verifyPhoneCode,
+      verifyCode: async (code: string) => next(await model.verifyPhoneCode(code)),
     },
     restricted: {
       globalErrorMessage,
@@ -340,14 +339,13 @@ export function useSignUpController(
 
 type SignUpVerifyOptions = Pick<
   SignUpVerifyScreen,
-  'needsCode' | 'sendCode' | 'verifyCode' | 'onVerified' | 'isPending' | 'globalErrorMessage'
+  'needsCode' | 'sendCode' | 'verifyCode' | 'isPending' | 'globalErrorMessage'
 >;
 
 export function useSignUpVerifyController({
   needsCode,
   sendCode,
   verifyCode,
-  onVerified,
   isPending: isFlowPending,
   globalErrorMessage,
 }: SignUpVerifyOptions) {
@@ -366,7 +364,7 @@ export function useSignUpVerifyController({
   /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   const isPending = actions.isPending || isFlowPending;
-  const submit = (submitted: string) => void actions.run('code', async () => onVerified(await verifyCode(submitted)));
+  const submit = (submitted: string) => void actions.run('code', () => verifyCode(submitted));
 
   return {
     value,
