@@ -39,6 +39,24 @@ export type UserCountParams = {
   userId?: string[];
   /** Counts users with the specified external IDs. Accepts up to 100 external IDs. */
   externalId?: string[];
+  /**
+   * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
+   */
+  last_active_at_since?: number;
+  /** Filters users who were last active before the given date (with millisecond precision). */
+  lastActiveAtBefore?: number;
+  /** Filters users who were last active after the given date (with millisecond precision). */
+  lastActiveAtAfter?: number;
+  /** Filters users who were created before the given date (with millisecond precision). */
+  createdAtBefore?: number;
+  /** Filters users who were created after the given date (with millisecond precision). */
+  createdAtAfter?: number;
+  /** Filters users who were last signed in after the given date (with millisecond precision). */
+  lastSignInAtAfter?: number;
+  /** Filters users who were last signed in before the given date (with millisecond precision). */
+  lastSignInAtBefore?: number;
+  /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
+  organizationId?: string[];
   emailAddressQuery?: string;
   phoneNumberQuery?: string;
   usernameQuery?: string;
@@ -98,7 +116,7 @@ export type UserListParams = ClerkPaginationRequest<{
   lastSignInAtBefore?: number;
   /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
   organizationId?: string[];
-}>;
+} & ExternalAccountFilter>;
 
 /** @inline */
 export type UserMetadataParams = {
