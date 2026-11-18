@@ -226,7 +226,11 @@ import {
   Default as OrganizationProfileSecurityPanelDefault,
   EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
   Loading as OrganizationProfileSecurityPanelLoading,
+  ManageOIDCConnection as OrganizationProfileSecurityPanelManageOIDCConnection,
+  ManageSAMLConnection as OrganizationProfileSecurityPanelManageSAMLConnection,
   meta as organizationProfileSecurityPanelMeta,
+  NoSSOConnections as OrganizationProfileSecurityPanelNoSSOConnections,
+  SSOLoadError as OrganizationProfileSecurityPanelSSOLoadError,
 } from '../stories/organization-profile-security-panel.stories';
 import {
   Default as OrganizationSwitcherDefault,
@@ -1454,6 +1458,10 @@ const organizationProfileSecurityPanelModule: StoryModule = {
   meta: organizationProfileSecurityPanelMeta,
   Default: OrganizationProfileSecurityPanelDefault,
   Loading: OrganizationProfileSecurityPanelLoading,
+  NoSSOConnections: OrganizationProfileSecurityPanelNoSSOConnections,
+  SSOLoadError: OrganizationProfileSecurityPanelSSOLoadError,
+  ManageSAMLConnection: OrganizationProfileSecurityPanelManageSAMLConnection,
+  ManageOIDCConnection: OrganizationProfileSecurityPanelManageOIDCConnection,
   AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
   AllowList: OrganizationProfileSecurityPanelAllowList,
   EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,

@@ -9,6 +9,7 @@ import { useSecurityPanelAccessModel } from './organization-profile-security-pan
 import { SSOBypassSectionSkeleton } from './sso-bypass.skeleton';
 import { SSOBypassPage } from './sso-bypass-page';
 import { SSOBypassSectionView } from './sso-bypass-section.view';
+import { SSOSection } from './sso-section';
 
 export interface OrganizationProfileSecurityPanelProps {
   fallback?: ReactNode;
@@ -40,16 +41,19 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
     <OrganizationProfileSecurityPanelView
       {...controller}
       overview={
-        model.isLoading || ssoBypass?.isLoading ? (
-          <SSOBypassSectionSkeleton />
-        ) : ssoBypass && controller.onManageSSOBypass ? (
-          <SSOBypassSectionView
-            count={ssoBypass.count}
-            isError={ssoBypass.isError}
-            onManage={controller.onManageSSOBypass}
-            manageRef={controller.manageSSOBypassRef}
-          />
-        ) : null
+        <>
+          {capabilities.canConfigureSso ? <SSOSection /> : null}
+          {model.isLoading || ssoBypass?.isLoading ? (
+            <SSOBypassSectionSkeleton />
+          ) : ssoBypass && controller.onManageSSOBypass ? (
+            <SSOBypassSectionView
+              count={ssoBypass.count}
+              isError={ssoBypass.isError}
+              onManage={controller.onManageSSOBypass}
+              manageRef={controller.manageSSOBypassRef}
+            />
+          ) : null}
+        </>
       }
       ssoBypass={<SSOBypassPage />}
     />

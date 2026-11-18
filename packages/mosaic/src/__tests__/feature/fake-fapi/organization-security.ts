@@ -1,4 +1,8 @@
-import type { OrganizationMembershipJSON, SSOBypassAllowlistUserJSON } from '@clerk/shared/types';
+import type {
+  EnterpriseConnectionJSON,
+  OrganizationMembershipJSON,
+  SSOBypassAllowlistUserJSON,
+} from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
@@ -54,6 +58,30 @@ export function organizationSecurityHandlers(state: FakeFapiState, fapiUrl: (pat
         null,
       ),
     ),
+    http.post(
+      fapiUrl('/v1/organizations/:organizationId/enterprise_connections/:connectionId'),
+      async ({ params, request }) => {
+        const connection = state.enterpriseConnections.find(
+          item => item.id === params.connectionId && item.organization_id === params.organizationId,
+        );
+        if (!connection) {
+          return missing();
+        }
+        const method = new URL(request.url).searchParams.get('_method');
+        if (method === 'DELETE') {
+          state.enterpriseConnections = state.enterpriseConnections.filter(item => item.id !== connection.id);
+          return envelope({ object: 'enterprise_connection', id: connection.id, deleted: true }, null);
+        }
+        if (method !== 'PATCH') {
+          return undefined;
+        }
+        const updated = patchConnection(connection, new URLSearchParams(await request.text()));
+        state.enterpriseConnections = state.enterpriseConnections.map(item =>
+          item.id === connection.id ? updated : item,
+        );
+        return envelope(updated, null);
+      },
+    ),
     http.get(fapiUrl('/v1/organizations/:organizationId/sso_bypass_allowlist_users'), () =>
       state.ssoBypass.enabled ? envelope(state.ssoBypass.users, null) : notEnabled(),
     ),
@@ -95,4 +123,47 @@ export function organizationSecurityHandlers(state: FakeFapiState, fapiUrl: (pat
       },
     ),
   ];
+}
+
+function patchConnection(connection: EnterpriseConnectionJSON, body: URLSearchParams): EnterpriseConnectionJSON {
+  const flag = (key: string, current: boolean) => (body.has(key) ? body.get(key) === 'true' : current);
+  const text = (key: string, current: string) => body.get(key) ?? current;
+  const saml = connection.saml_connection;
+  const oauth = connection.oauth_config;
+  const certificates = body.getAll('saml_idp_certificates');
+  return {
+    ...connection,
+    name: text('name', connection.name),
+    active: flag('active', connection.active),
+    sync_user_attributes: flag('sync_user_attributes', connection.sync_user_attributes),
+    disable_additional_identifications: flag(
+      'disable_additional_identifications',
+      connection.disable_additional_identifications,
+    ),
+    saml_connection: saml
+      ? {
+          ...saml,
+          idp_sso_url: text('saml_idp_sso_url', saml.idp_sso_url),
+          idp_entity_id: text('saml_idp_entity_id', saml.idp_entity_id),
+          idp_metadata_url: text('saml_idp_metadata_url', saml.idp_metadata_url),
+          idp_certificates:
+            certificates.length > 0
+              ? certificates.map(certificate => ({ certificate, issued_at: null, expires_at: null }))
+              : saml.idp_certificates,
+          allow_subdomains: flag('saml_allow_subdomains', saml.allow_subdomains),
+          allow_idp_initiated: flag('saml_allow_idp_initiated', saml.allow_idp_initiated),
+          force_authn: flag('saml_force_authn', saml.force_authn),
+        }
+      : saml,
+    oauth_config: oauth
+      ? {
+          ...oauth,
+          client_id: text('oidc_client_id', oauth.client_id),
+          discovery_url: body.get('oidc_discovery_url') ?? oauth.discovery_url,
+          auth_url: body.get('oidc_auth_url') ?? oauth.auth_url,
+          token_url: body.get('oidc_token_url') ?? oauth.token_url,
+          user_info_url: body.get('oidc_user_info_url') ?? oauth.user_info_url,
+        }
+      : oauth,
+  };
 }

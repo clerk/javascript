@@ -17,6 +17,9 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosName, chaosRows } from '@/lib/chaos';
 
+import type { useSSOConnectionsFixture } from './organization-profile-security-sso';
+import { SSOSectionExample } from './organization-profile-security-sso';
+
 interface FixtureMember extends SSOBypassEntry {
   role: 'org:admin' | 'org:member';
   outsideConnection?: boolean;
@@ -169,8 +172,12 @@ function SSOBypassPageExample({ model }: { model: SSOBypassModel }) {
 export function SecurityPanelExample({
   isLoading = false,
   sectionError = false,
+  sso,
   ...fixture
-}: Parameters<typeof useSSOBypassFixture>[0] & { sectionError?: boolean } = {}) {
+}: Parameters<typeof useSSOBypassFixture>[0] & {
+  sectionError?: boolean;
+  sso?: Parameters<typeof useSSOConnectionsFixture>[0];
+} = {}) {
   const bypass = useSSOBypassFixture(fixture);
   const ssoBypass = { count: bypass.entries.length, isLoading: false, isError: sectionError };
   const controller = useSecurityPanelController({ isLoading, ssoBypass });
@@ -179,16 +186,19 @@ export function SecurityPanelExample({
     <OrganizationProfileSecurityPanelView
       {...controller}
       overview={
-        isLoading ? (
-          <SSOBypassSectionSkeleton />
-        ) : controller.onManageSSOBypass ? (
-          <SSOBypassSectionView
-            count={ssoBypass.count}
-            isError={sectionError}
-            onManage={controller.onManageSSOBypass}
-            manageRef={controller.manageSSOBypassRef}
-          />
-        ) : null
+        <>
+          <SSOSectionExample {...sso} />
+          {isLoading ? (
+            <SSOBypassSectionSkeleton />
+          ) : controller.onManageSSOBypass ? (
+            <SSOBypassSectionView
+              count={ssoBypass.count}
+              isError={sectionError}
+              onManage={controller.onManageSSOBypass}
+              manageRef={controller.manageSSOBypassRef}
+            />
+          ) : null}
+        </>
       }
       ssoBypass={<SSOBypassPageExample model={bypass} />}
     />
