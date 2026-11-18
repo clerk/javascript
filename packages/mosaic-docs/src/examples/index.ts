@@ -8,11 +8,16 @@ import CardExample from './components/card';
 import DataListExample from './components/data-list';
 import EmptyStateExample from './components/empty-state';
 import EntityExample from './components/entity';
+import FieldExample from './components/field';
 import HeadingExample from './components/heading';
 import IconExample from './components/icon';
+import InputExample from './components/input';
 import ItemExample from './components/item';
 import PanelExample from './components/panel';
+import ProviderButtonExample from './components/provider-button';
+import RadioExample from './components/radio';
 import SectionExample from './components/section';
+import SegmentedControlExample from './components/segmented-control';
 import SkeletonExample from './components/skeleton';
 import TableExample from './components/table';
 import TextExample from './components/text';
@@ -26,11 +31,16 @@ export const examples: Partial<Record<string, ComponentType>> = {
   'components/data-list': DataListExample,
   'components/empty-state': EmptyStateExample,
   'components/entity': EntityExample,
+  'components/field': FieldExample,
   'components/heading': HeadingExample,
   'components/icon': IconExample,
+  'components/input': InputExample,
   'components/item': ItemExample,
   'components/panel': PanelExample,
+  'components/provider-button': ProviderButtonExample,
+  'components/radio': RadioExample,
   'components/section': SectionExample,
+  'components/segmented-control': SegmentedControlExample,
   'components/skeleton': SkeletonExample,
   'components/table': TableExample,
   'components/text': TextExample,
