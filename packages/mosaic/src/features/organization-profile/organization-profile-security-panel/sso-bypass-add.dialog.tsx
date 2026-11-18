@@ -12,6 +12,7 @@ import { SegmentedControl } from '../../../components/segmented-control';
 import { Select } from '../../../components/select';
 import { plural, useLocale, useMessages } from '../../../localization';
 import { Form } from '../../../primitives/form';
+import { styles } from './organization-profile-security-panel.styles';
 import type { SSOBypassAddDialogController } from './sso-bypass.controller';
 import type { SSOBypassAddMode, SSOBypassAddResult } from './sso-bypass.types';
 
@@ -94,6 +95,7 @@ function SSOBypassAddFormStep({
       >
         <SegmentedControl.Root<SSOBypassAddMode>
           aria-label={m.modeLabel}
+          xstyle={styles.mode}
           value={mode}
           onValueChange={onModeChange}
           disabled={form.isSubmitting}
