@@ -56,12 +56,12 @@ To order Mosaic against your other layers, declare the order first. Later layers
 
 ### With Tailwind
 
-Put Mosaic’s layer before Tailwind’s so utility classes on a Mosaic component win:
+List Tailwind’s layers with Mosaic’s between `base` and `components`, so Tailwind’s reset can’t strip Mosaic’s styles and utility classes on a Mosaic component still win:
 
 ```css
-@layer clerk;
-@import '@clerk/mosaic/styles.css' layer(clerk);
+@layer theme, base, clerk, components, utilities;
 @import 'tailwindcss';
+@import '@clerk/mosaic/styles.css' layer(clerk);
 ```
 
 Without a layer, Mosaic’s rules are unlayered and beat Tailwind’s utilities.
