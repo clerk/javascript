@@ -1,10 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-const MosaicNowContext = createContext<Date | null>(null);
-
-export const MosaicNowProvider = MosaicNowContext.Provider;
+import { MosaicNowContext } from './now-context';
 
 export function useNow({ updateInterval, until }: { updateInterval?: number; until?: number } = {}): Date {
   const providerNow = useContext(MosaicNowContext);

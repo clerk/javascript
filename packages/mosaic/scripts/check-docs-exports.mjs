@@ -36,7 +36,7 @@ for (const file of docFiles) {
     }
     continue;
   }
-  failures.push(...(await checkUnit(unit, doc)));
+  failures.push(...(await checkUnit(unit, doc, readFileSync(resolve(packageDir, file), 'utf8'))));
 }
 
 if (failures.length > 0) {
@@ -45,7 +45,7 @@ if (failures.length > 0) {
 
 console.log(`✅ Every documented Mosaic unit imports from @clerk/mosaic/<kind>/<slug>`);
 
-async function checkUnit(unit, doc) {
+async function checkUnit(unit, doc, docSource) {
   const target = packageJson.exports[`./${unit}`];
   if (!target) {
     return [`${unit} has no "./${unit}" export`];
@@ -55,7 +55,14 @@ async function checkUnit(unit, doc) {
   }
   const module = await import(`@clerk/mosaic/${unit}`);
   const names = 'parts' in doc ? Object.keys(doc.parts) : [doc.name];
-  return names.filter(name => resolveName(module, name) === undefined).map(name => `${unit} does not export ${name}`);
+  const mentioned = [...docSource.matchAll(/`([A-Za-z_]\w*)/g)].map(([, name]) => name);
+  const documented = new Set([...names.map(name => name.split('.')[0]), ...mentioned]);
+  return [
+    ...names.filter(name => resolveName(module, name) === undefined).map(name => `${unit} does not export ${name}`),
+    ...Object.keys(module)
+      .filter(name => !documented.has(name))
+      .map(name => `${unit} exports ${name}, which its docs do not list`),
+  ];
 }
 
 function resolveName(module, name) {
