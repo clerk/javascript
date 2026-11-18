@@ -2,7 +2,7 @@ import { existsSync, globSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const packageDir = resolve(import.meta.dirname, '..');
+const packageDir = resolve(process.argv[2] ?? resolve(import.meta.dirname, '..'));
 const packageJson = JSON.parse(readFileSync(resolve(packageDir, 'package.json'), 'utf8'));
 const unpublished = new Set([
   'components/branding',
@@ -17,6 +17,7 @@ const unpublished = new Set([
 const docPath = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
 
 const failures = [];
+const documentedUnits = new Set();
 const docFiles = globSync('src/{components,primitives,hooks}/**/*.doc.ts', { cwd: packageDir })
   .map(file => file.replaceAll('\\', '/'))
   .sort();
@@ -30,6 +31,7 @@ for (const file of docFiles) {
   const folder = `${match[1] ?? match[3]}/${match[2] ?? match[4]}`;
   const { default: doc } = await import(pathToFileURL(resolve(packageDir, file)).href);
   const unit = 'parts' in doc ? folder : `hooks/${kebab(doc.name)}`;
+  documentedUnits.add(unit);
   if (unpublished.has(folder)) {
     if (packageJson.exports[`./${unit}`]) {
       failures.push(`${unit} is not on the docs site but is exported`);
@@ -37,6 +39,13 @@ for (const file of docFiles) {
     continue;
   }
   failures.push(...(await checkUnit(unit, doc, readFileSync(resolve(packageDir, file), 'utf8'))));
+}
+
+for (const subpath of Object.keys(packageJson.exports)) {
+  const unit = subpath.slice(2);
+  if (/^(components|primitives|hooks)\//.test(unit) && !documentedUnits.has(unit)) {
+    failures.push(`${unit} is exported but has no doc`);
+  }
 }
 
 if (failures.length > 0) {
@@ -53,7 +62,7 @@ async function checkUnit(unit, doc, docSource) {
   if (!existsSync(resolve(packageDir, target.types))) {
     return [`${unit} has no types at ${target.types}`];
   }
-  const module = await import(`@clerk/mosaic/${unit}`);
+  const module = await import(pathToFileURL(resolve(packageDir, target.import)).href);
   const names = 'parts' in doc ? Object.keys(doc.parts) : [doc.name];
   const mentioned = [...docSource.matchAll(/`([A-Za-z_]\w*)/g)].map(([, name]) => name);
   const documented = new Set([...names.map(name => name.split('.')[0]), ...mentioned]);
