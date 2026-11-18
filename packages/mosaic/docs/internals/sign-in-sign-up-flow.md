@@ -8,7 +8,7 @@ FAPI tracks which requirements are outstanding and whether a code has been sent.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
-There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param.
+There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param, or whether a sign-up verify screen was reached from `continue`.
 
 ## Pick the screen
 
@@ -20,10 +20,20 @@ const { route } = useRouterScope(signInRoutes, { routing, path, root: 'start' })
 const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step) ? route : routeFor(step);
 ```
 
-- `routeFor(step)` returns the step's route, from the lists below.
+- `routeFor(step)` returns the step's route, from the lists below. Sign-up's also takes the current route, so a verify step reached from `continue` stays under it.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
 - The component that owns the route table computes `screen` during render, with no effect.
 - This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
+
+## Mount the screen
+
+Sign-up renders one component per screen, so the route decides what is mounted (`SignUpView` in `mosaic/src/features/sign-up/sign-up.view.tsx`). Sign-in has no controller yet.
+
+- `useSignUpController` sits above the screens and holds what outlives one: the route, the details form, the chosen identifier and Start over. `start` and `continue` render that one form, so a password typed on `start` is still there after Back from a verify screen. The password lives nowhere else.
+- A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way.
+- `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
+- A screen another feature owns arrives as a slot. The wrapper passes `TaskChooseOrganizationContent`, the task without its card, and the view mounts it on the task route.
+- A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`, `protectCheck`) shows `startOver`.
 
 ## Move on after a submit
 
@@ -39,7 +49,7 @@ submitPassword: async (password: string) => {
 },
 ```
 
-- `complete`: the model's `finalize()`, then leave the flow. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
+- `complete`: the model's `finalize()`, then leave the flow. Creating the session clears the sign-up, so the live step drops back to `start`. Sign-up renders the model it left from until the navigation takes the flow away, or, when `finalize()` answers that a task continues in the flow, until that task's data has loaded, so the task replaces the screen with no skeleton between them. It keeps the action pending throughout, the way the switcher holds its `frozenModel` ([Controllers → Wrapping actions](../controllers.md#wrapping-actions)). In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
 - `transfer` from sign-in: the model's `transfer()` calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
 - `transfer` from sign-up, when the identifier already has an account: the model's `transfer()` calls `signIn.create({ transfer: true })`, then `next` with the sign-in's step.
 - `unknown`: nothing. The screen already shows "Start over".
@@ -64,9 +74,16 @@ Sign-up:
 - `start` → `start`
 - `protect` → `protectCheck`
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
-- `verify_email` (`target`, `sent`) → `verifyEmail`
-- `verify_phone` (`target`, `sent`) → `verifyPhone`
+- `verify_email` (`target`, `sent`) → `verifyEmail`, or `continueVerifyEmail` when reached from `continue`
+- `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`
 - `fields` (`fields`) → `continue`
+
+Sign-up's model adds two steps of its own to the ones `getSignUpNextStep` returns, for when there is no sign-up in progress:
+
+- `task` (`key`) → `taskChooseOrganization`: the session has a pending task that sign-up shows in its own card. Only the task route is allowed, so a visit to `start` with the task pending moves to it. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is not a `task` step: the flow leaves for its URL.
+- `leaving`: a session is active or being activated. It has no route and allows any, so the screen that started the navigation stays up.
+
+Back from a sign-up verify screen goes to the details route above it: `continue` for the two nested routes, `start` for the others (`detailsRouteFor`).
 
 `identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
 
@@ -76,7 +93,7 @@ With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSig
 
 - FAPI's state changes only on submit. A route the step doesn't allow is replaced with the step's route.
 - Back to `start` shows the identifier form; submitting it creates a new sign-in. Forward to `factorOne` still works.
-- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`).
+- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`). Reload on a sign-up verify route sends a code only when `sent` is false.
 - Virtual routing has no history: a remount starts at `start`, and FAPI's state is kept.
 
 ## Entry actions
