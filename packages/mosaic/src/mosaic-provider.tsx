@@ -7,9 +7,9 @@ import type { MosaicProfile } from './features/profile-pages/use-mosaic-profile'
 import { MosaicProfileProvider } from './features/profile-pages/use-mosaic-profile';
 import { userProfileModal } from './features/user-profile/user-profile.modal';
 import { UserProfileModalReturn } from './features/user-profile/user-profile.modal-return';
-import { MosaicNowProvider } from './hooks/now-context';
 import type { MosaicExperimental } from './hooks/use-mosaic-experimental';
 import { MosaicExperimentalProvider } from './hooks/use-mosaic-experimental';
+import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';

@@ -16,7 +16,7 @@ import {
 import { fapiClient, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import { MosaicNowProvider } from '../../../../hooks/now-context';
+import { MosaicNowProvider } from '../../../../hooks/use-now';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../../localization';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
 import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section';

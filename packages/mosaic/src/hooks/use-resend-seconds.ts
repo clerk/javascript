@@ -1,5 +1,3 @@
-'use client';
-
 import { useNow } from './use-now';
 
 export function useResendSeconds(resendAvailableAt: number | undefined, maxSeconds: number): number {

@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
-import { MosaicNowProvider } from '../now-context';
-import { useNow } from '../use-now';
+import { MosaicNowProvider, useNow } from '../use-now';
 
 describe('useNow', () => {
   beforeEach(() => {

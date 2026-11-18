@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useRef, useState } from 'react';
 
 interface IntersectionOptions extends IntersectionObserverInit {

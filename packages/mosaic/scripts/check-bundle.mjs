@@ -10,13 +10,10 @@ const entryFile = target => resolve(packageDir, typeof target === 'string' ? tar
 const unitEntryFiles = Object.entries(packageJson.exports)
   .filter(([subpath]) => /^\.\/(components|primitives)\//.test(subpath))
   .map(([, target]) => entryFile(target));
-const hookEntryFiles = Object.entries(packageJson.exports)
-  .filter(([subpath]) => subpath.startsWith('./hooks/'))
-  .map(([, target]) => entryFile(target));
 const glyphEntryFiles = Object.entries(packageJson.exports)
   .filter(([subpath]) => subpath.startsWith('./icons/glyphs/'))
   .map(([, target]) => entryFile(target));
-const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...hookEntryFiles, ...glyphEntryFiles];
+const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...glyphEntryFiles];
 
 const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
 const importsOf = source =>

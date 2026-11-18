@@ -276,61 +276,6 @@
       "import": "./dist/components/visually-hidden.js",
       "default": "./dist/components/visually-hidden.js"
     },
-    "./hooks/use-accessible-description-warning": {
-      "types": "./dist/hooks/use-accessible-description-warning.d.ts",
-      "import": "./dist/hooks/use-accessible-description-warning.js",
-      "default": "./dist/hooks/use-accessible-description-warning.js"
-    },
-    "./hooks/use-accessible-name-warning": {
-      "types": "./dist/hooks/use-accessible-name-warning.d.ts",
-      "import": "./dist/hooks/use-accessible-name-warning.js",
-      "default": "./dist/hooks/use-accessible-name-warning.js"
-    },
-    "./hooks/use-debounced-async": {
-      "types": "./dist/hooks/use-debounced-async.d.ts",
-      "import": "./dist/hooks/use-debounced-async.js",
-      "default": "./dist/hooks/use-debounced-async.js"
-    },
-    "./hooks/use-form": {
-      "types": "./dist/hooks/use-form.d.ts",
-      "import": "./dist/hooks/use-form.js",
-      "default": "./dist/hooks/use-form.js"
-    },
-    "./hooks/use-in-view": {
-      "types": "./dist/hooks/use-in-view.d.ts",
-      "import": "./dist/hooks/use-in-view.js",
-      "default": "./dist/hooks/use-in-view.js"
-    },
-    "./hooks/use-list-removal-focus": {
-      "types": "./dist/hooks/use-list-removal-focus.d.ts",
-      "import": "./dist/hooks/use-list-removal-focus.js",
-      "default": "./dist/hooks/use-list-removal-focus.js"
-    },
-    "./hooks/use-now": {
-      "types": "./dist/hooks/use-now.d.ts",
-      "import": "./dist/hooks/use-now.js",
-      "default": "./dist/hooks/use-now.js"
-    },
-    "./hooks/use-pending-action": {
-      "types": "./dist/hooks/use-pending-action.d.ts",
-      "import": "./dist/hooks/use-pending-action.js",
-      "default": "./dist/hooks/use-pending-action.js"
-    },
-    "./hooks/use-resend-seconds": {
-      "types": "./dist/hooks/use-resend-seconds.d.ts",
-      "import": "./dist/hooks/use-resend-seconds.js",
-      "default": "./dist/hooks/use-resend-seconds.js"
-    },
-    "./hooks/use-spin-delay": {
-      "types": "./dist/hooks/use-spin-delay.d.ts",
-      "import": "./dist/hooks/use-spin-delay.js",
-      "default": "./dist/hooks/use-spin-delay.js"
-    },
-    "./hooks/use-toast-manager": {
-      "types": "./dist/hooks/use-toast-manager.d.ts",
-      "import": "./dist/hooks/use-toast-manager.js",
-      "default": "./dist/hooks/use-toast-manager.js"
-    },
     "./icons/glyphs/arrow-up-right": {
       "types": "./dist/icons/glyphs/arrow-up-right.d.ts",
       "import": "./dist/icons/glyphs/arrow-up-right.js",

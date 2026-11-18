@@ -9,16 +9,12 @@ const unpublished = new Set([
   'components/captcha',
   'components/clerk-logo',
   'components/scroll-area',
-  'hooks/use-mosaic-environment',
-  'hooks/use-mosaic-experimental',
-  'hooks/use-mosaic-router',
-  'hooks/use-mosaic-support-email',
 ]);
-const docPath = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
+const docPath = /^src\/(components|primitives)\/([a-z0-9-]+)\/\2\.doc\.ts$/;
 
 const failures = [];
 const documentedUnits = new Set();
-const docFiles = globSync('src/{components,primitives,hooks}/**/*.doc.ts', { cwd: packageDir })
+const docFiles = globSync('src/{components,primitives}/**/*.doc.ts', { cwd: packageDir })
   .map(file => file.replaceAll('\\', '/'))
   .sort();
 
@@ -28,11 +24,13 @@ for (const file of docFiles) {
     failures.push(`${file} is not at a documented location`);
     continue;
   }
-  const folder = `${match[1] ?? match[3]}/${match[2] ?? match[4]}`;
+  const unit = `${match[1]}/${match[2]}`;
   const { default: doc } = await import(pathToFileURL(resolve(packageDir, file)).href);
-  const unit = 'parts' in doc ? folder : `hooks/${kebab(doc.name)}`;
+  if (!('parts' in doc)) {
+    continue;
+  }
   documentedUnits.add(unit);
-  if (unpublished.has(folder)) {
+  if (unpublished.has(unit)) {
     if (packageJson.exports[`./${unit}`]) {
       failures.push(`${unit} is not on the docs site but is exported`);
     }
@@ -43,7 +41,7 @@ for (const file of docFiles) {
 
 for (const subpath of Object.keys(packageJson.exports)) {
   const unit = subpath.slice(2);
-  if (/^(components|primitives|hooks)\//.test(unit) && !documentedUnits.has(unit)) {
+  if (/^(components|primitives)\//.test(unit) && !documentedUnits.has(unit)) {
     failures.push(`${unit} is exported but has no doc`);
   }
 }
@@ -63,10 +61,7 @@ async function checkUnit(unit, doc) {
     return [`${unit} has no types at ${target.types}`];
   }
   const module = await import(pathToFileURL(resolve(packageDir, target.import)).href);
-  const listed = new Set([
-    ...('parts' in doc ? Object.keys(doc.parts) : [doc.name]),
-    ...Object.keys(doc.exports ?? {}),
-  ]);
+  const listed = new Set([...Object.keys(doc.parts), ...Object.keys(doc.exports ?? {})]);
   const exported = Object.entries(module).flatMap(([name, value]) =>
     isNamespace(value) ? Object.keys(value).map(member => `${name}.${member}`) : [name],
   );
@@ -78,8 +73,4 @@ async function checkUnit(unit, doc) {
 
 function isNamespace(value) {
   return Object.prototype.toString.call(value) === '[object Module]';
-}
-
-function kebab(name) {
-  return name.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
 }

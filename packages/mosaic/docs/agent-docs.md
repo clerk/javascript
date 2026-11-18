@@ -10,7 +10,7 @@ Worked examples: `src/components/avatar/avatar.doc.ts` (a compound component), `
 - **Type it against the real props.** End the default export with `satisfies ComponentDoc<{ 'Part.Name': PartProps }>` or `satisfies HookDoc<Options, Result>`, using the types the unit exports. A renamed or removed prop then fails `pnpm typecheck`. Never widen with `Record<string, …>` or a cast.
 - **Import types only.** A doc uses `import type` and no runtime imports, so plain Node loads it without JSX or StyleX. Docs never ship: the build entry is `src/index.ts` and nothing imports a doc.
 - **Every part is exported.** A part named `Avatar.Root` needs `Avatar` exported as a value from the unit's `index.ts`; a hook doc needs its `name` exported.
-- **A doc publishes its unit.** A documented unit imports from `@clerk/mosaic/<kind>/<slug>` ([Publishing a unit](#publishing-a-unit)), and its `index.ts` exports only the names its doc lists, plus types: each part in `parts` (or the hook's `name`), and each helper in `exports`, such as `'Panel.usePanelTitle': { description }`.
+- **A doc publishes its unit.** A documented component or primitive imports from `@clerk/mosaic/<kind>/<slug>` ([Publishing a unit](#publishing-a-unit)), and its `index.ts` exports only the names its doc lists, plus types: each part in `parts`, and each helper in `exports`, such as `'Panel.usePanelTitle': { description }`.
 - **Say what the types cannot.** Write `useFor` as the needs an agent would search for, such as "a confirm step before an action". Props get a one-line `doc` and the `default` as code. Practices hold the rules a caller breaks, each with the fix.
 - **Write each prop's `type` as the reader should see it.** Use `'sm' | 'md'`, `(open: boolean) => void`, or a name the component's source file already uses, such as `ReactNode` or `DialogFocusTarget`. Never name the props type it is checked against, such as `ButtonProps['size']`. Leave out `| undefined` for optional props. `pnpm typecheck` checks prop names, not this text, so copy it from the source.
 - **Generic props keep the source's type parameter.** Write `(item: Item) => React.ReactNode`, not `(item: unknown) => …`, using the name the props type declares, such as `Item`, `Value` or `Payload`.
@@ -31,7 +31,7 @@ Worked examples: `src/components/avatar/avatar.doc.ts` (a compound component), `
 
 ## Publishing a unit
 
-Each documented unit is a subpath export that renders from a React Server Component. `pnpm build` runs `scripts/check-docs-exports.mjs` and `scripts/check-bundle.mjs`, which fail on a unit that breaks these rules.
+Each documented component and primitive is a subpath export that renders from a React Server Component. Hooks are not published. `pnpm build` runs `scripts/check-docs-exports.mjs` and `scripts/check-bundle.mjs`, which fail on a unit that breaks these rules.
 
 - Add `./<kind>/<slug>` to `exports` in `package.json` (`types`, `import` and `default` under `./dist/<kind>/<slug>`) and the matching entry in `tsdown.config.mts`, beside `components/avatar`.
 - `index.ts` has no `'use client'`. A compound re-exports its namespace from a directive-free parts module (`src/components/avatar/avatar.parts.ts`, or `parts.ts` in a primitive); a single component re-exports it from its leaf (`src/components/badge/`). A helper a caller needs is a member of the namespace, such as `Panel.usePanelTitle`, and is listed in the doc's `exports`.
