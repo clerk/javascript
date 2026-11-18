@@ -1,9 +1,9 @@
 import { AuthIdentityPreview } from '../../../blocks/auth';
 import { VerificationCode, verificationResend } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
-import { useSignUpVerifyController } from '../sign-up.controller';
 import type { SignUpCode, SignUpVerifyScreen } from '../sign-up.types';
 import { signUpCodeCopy, signUpCodeIdentity, signUpCodeSecondaryAction } from '../sign-up.utils';
+import { useSignUpVerifyController } from '../sign-up-verify.controller';
 
 interface SignUpVerifyProps extends SignUpVerifyScreen {
   channel: 'email' | 'phone';
