@@ -10,6 +10,7 @@ import {
   Flow,
   localizationKeys,
   Spinner,
+  Text,
   useLocalizations,
 } from '../../customizables';
 import { useSpinDelay } from '../../hooks';
@@ -36,7 +37,9 @@ type ProtectCheckCardProps = {
 };
 
 export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
-  const { containerRef, isRunning, isWidgetVisible, error, retry } = runner;
+  const { containerRef, isRunning, isWidgetVisible, error, errorCode, referenceId, retry } = runner;
+  // What the user quotes to support: the attempt id identifies the attempt, the code the failure.
+  const reference = [referenceId, errorCode].filter(Boolean).join(' · ');
   const { t } = useLocalizations();
   const keys = localizationKeysByFlow[flow];
 
@@ -83,6 +86,33 @@ export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
                 onClick={retry}
                 localizationKey={keys.retryButton}
               />
+            ) : null}
+            {error && reference ? (
+              <Col
+                elementDescriptor={descriptors.protectCheckReferenceBox}
+                gap={1}
+                sx={{ alignItems: 'center' }}
+              >
+                <Text
+                  elementDescriptor={descriptors.protectCheckReferenceLabel}
+                  variant='caption'
+                  colorScheme='secondary'
+                  localizationKey={localizationKeys('actionBlocked.traceIdLabel')}
+                />
+                <Text
+                  elementDescriptor={descriptors.protectCheckReference}
+                  variant='caption'
+                  colorScheme='secondary'
+                  sx={theme => ({
+                    fontFamily: theme.fonts.$buttons,
+                    userSelect: 'all',
+                    wordBreak: 'break-all',
+                    textAlign: 'center',
+                  })}
+                >
+                  {reference}
+                </Text>
+              </Col>
             ) : null}
           </Col>
         </Card.Content>

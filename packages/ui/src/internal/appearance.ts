@@ -285,6 +285,9 @@ export type ElementsConfig = {
   actionBlockedTraceIdBox: WithOptions;
   actionBlockedTraceIdLabel: WithOptions;
   actionBlockedTraceId: WithOptions;
+  protectCheckReferenceBox: WithOptions;
+  protectCheckReferenceLabel: WithOptions;
+  protectCheckReference: WithOptions;
   verificationLinkStatusBox: WithOptions;
   verificationLinkStatusIconBox: WithOptions;
   verificationLinkStatusIcon: WithOptions;

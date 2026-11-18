@@ -629,6 +629,61 @@ describe('SignInProtectCheck', () => {
     });
   });
 
+  describe('when the challenge expires', () => {
+    const expiredFixture = () =>
+      createFixtures(f => {
+        f.startSignInWithProtectCheck({ expiresAt: Date.now() - 60_000 });
+      });
+
+    it('shows a reference the user can quote to support', async () => {
+      const { wrapper, fixtures } = await expiredFixture();
+      (fixtures.signIn as any).reload = vi.fn().mockResolvedValue(fixtures.signIn);
+
+      const { findByText } = render(<SignInProtectCheck />, { wrapper });
+
+      expect(await findByText('sia_2HseAXFGN12eqlwARPMxyyUa9o9 · protect_check_timed_out')).toBeInTheDocument();
+      expect(await findByText('Reference')).toBeInTheDocument();
+    });
+
+    it('starts the attempt over on retry, because reloading returns the same expired challenge', async () => {
+      const { wrapper, fixtures } = await expiredFixture();
+      const reloadMock = vi.fn().mockResolvedValue(fixtures.signIn);
+      (fixtures.signIn as any).reload = reloadMock;
+      fixtures.router.currentPath = '/sign-in/protect-check';
+      fixtures.router.indexPath = '/sign-in';
+
+      const { findByRole } = render(<SignInProtectCheck />, { wrapper });
+
+      fireEvent.click(await findByRole('button', { name: /try again/i }));
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-in'));
+      expect(reloadMock).toHaveBeenCalledTimes(1);
+      expect(mockExecute).not.toHaveBeenCalled();
+    });
+
+    it('retries any other failure in place and shows its code', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute
+        .mockRejectedValueOnce(
+          new ClerkRuntimeError('Protect check script failed to load', { code: 'protect_check_script_load_failed' }),
+        )
+        .mockReturnValue(new Promise(() => {}));
+      fixtures.router.indexPath = '/sign-in';
+
+      const { findByRole, findByText } = render(<SignInProtectCheck />, { wrapper });
+
+      expect(
+        await findByText('sia_2HseAXFGN12eqlwARPMxyyUa9o9 · protect_check_script_load_failed'),
+      ).toBeInTheDocument();
+      fireEvent.click(await findByRole('button', { name: /try again/i }));
+
+      await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(2));
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('/sign-in');
+    });
+  });
+
   describe('a sign-in that is pending an OAuth account transfer', () => {
     // An OAuth sign-in for an identity with no account yet comes back as `needs_identifier`
     // with a transferable first-factor verification: the server has recorded the transfer and
