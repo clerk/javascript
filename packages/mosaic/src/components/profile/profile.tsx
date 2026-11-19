@@ -253,7 +253,6 @@ function BackButton() {
       >
         <Icon
           glyph={ArrowLeft}
-          size='md'
           xstyle={rtl.mirror}
         />
       </span>
@@ -532,7 +531,6 @@ function PageTitle({ title }: { title: React.ReactNode }) {
       {label}
       <Icon
         glyph={ChevronDown}
-        size='md'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
     </>

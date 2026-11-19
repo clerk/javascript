@@ -213,10 +213,7 @@ function SuccessStep({
               pendingLabel={m.copy}
               onClick={onCopy}
             >
-              <Icon
-                glyph={copied ? Checkmark : Clipboard}
-                placement='inline-start'
-              />
+              <Icon glyph={copied ? Checkmark : Clipboard} />
               {copied ? m.copied : m.copy}
             </SubmitButton>
             <Button
@@ -227,10 +224,7 @@ function SuccessStep({
               disabled={pendingAction !== undefined}
               onClick={onDownload}
             >
-              <Icon
-                glyph={Download}
-                placement='inline-start'
-              />
+              <Icon glyph={Download} />
               {m.download}
             </Button>
             <Button

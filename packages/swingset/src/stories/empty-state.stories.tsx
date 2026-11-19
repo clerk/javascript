@@ -25,10 +25,7 @@ export function Default() {
       <EmptyState.Description>Create a key to start making requests from your application.</EmptyState.Description>
       <EmptyState.Actions>
         <Button size='sm'>
-          <Icon
-            glyph={Plus}
-            placement='inline-start'
-          />
+          <Icon glyph={Plus} />
           Create key
         </Button>
       </EmptyState.Actions>

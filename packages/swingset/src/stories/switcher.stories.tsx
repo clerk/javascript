@@ -209,12 +209,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
         {
           id: 'app-settings',
           label: 'App settings',
-          icon: (
-            <Icon
-              glyph={Cog6Teeth}
-              size='md'
-            />
-          ),
+          icon: <Icon glyph={Cog6Teeth} />,
           onClick: () => {},
         },
         // `icon` takes any node, so an app brings its own glyph rather than picking from Mosaic's set.

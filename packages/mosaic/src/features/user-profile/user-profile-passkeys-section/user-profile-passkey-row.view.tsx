@@ -58,7 +58,6 @@ export function UserProfilePasskeyRowView({
           >
             <Icon
               glyph={SecurityPasskey}
-              size='md'
               xstyle={styles.icon}
             />
           </IconFrame>

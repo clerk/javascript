@@ -110,7 +110,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
         rest,
       )}
     >
-      {withTruncatableLabel(children)}
+      {withTruncatableLabel(children, { slot: 'button-label' })}
     </HeadlessButton>
   );
 });

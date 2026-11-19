@@ -240,10 +240,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 >
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
-                <Icon
-                  glyph={ChevronDown}
-                  size='md'
-                />
+                <Icon glyph={ChevronDown} />
               </span>
             </Popover.Trigger>
           </InputGroup.Start>
@@ -274,10 +271,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   )}
                 >
                   <span {...stylex.props(reset.base, styles.countrySearchIcon)}>
-                    <Icon
-                      glyph={MagnifyingGlass}
-                      size='md'
-                    />
+                    <Icon glyph={MagnifyingGlass} />
                   </span>
                   <HeadlessCombobox.Input
                     aria-label={countrySearchLabel}

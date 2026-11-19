@@ -78,14 +78,7 @@ export function Accounts() {
               </Avatar.Root>
             </Menu.Media>
             <Menu.Label>{account.identifier}</Menu.Label>
-            <Menu.Indicator>
-              {account.active ? (
-                <Icon
-                  glyph={Checkmark}
-                  size='md'
-                />
-              ) : null}
-            </Menu.Indicator>
+            <Menu.Indicator>{account.active ? <Icon glyph={Checkmark} /> : null}</Menu.Indicator>
           </Menu.Item>
         ))}
       </Menu.Popup>

@@ -119,10 +119,7 @@ export function UserProfileBackupCodesView({
               pendingLabel={m.downloading}
               onClick={onDownload}
             >
-              <Icon
-                glyph={Download}
-                placement='inline-start'
-              />
+              <Icon glyph={Download} />
               {m.download}
             </SubmitButton>
           </>
@@ -146,12 +143,7 @@ export function UserProfileBackupCodesView({
           pendingLabel={m.copying}
           onClick={showSaveActions ? onCopy : onRetry}
         >
-          {showSaveActions ? (
-            <Icon
-              glyph={Clipboard}
-              placement='inline-start'
-            />
-          ) : null}
+          {showSaveActions ? <Icon glyph={Clipboard} /> : null}
           {showSaveActions ? m.copyAndClose : m.retry}
         </SubmitButton>
       </Card.Footer>

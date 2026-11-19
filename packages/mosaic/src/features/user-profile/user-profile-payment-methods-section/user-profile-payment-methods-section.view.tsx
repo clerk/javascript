@@ -45,11 +45,7 @@ export function UserProfilePaymentMethodsSectionView({
                 variant='outline'
                 onClick={onAdd}
               >
-                <Icon
-                  glyph={Plus}
-                  placement='inline-start'
-                  size='md'
-                />
+                <Icon glyph={Plus} />
                 Add
               </Button>
             </Section.Actions>
