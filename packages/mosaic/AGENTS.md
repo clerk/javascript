@@ -44,6 +44,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Check that a migration kept every legacy behavior → [Parity audit](docs/parity-audit.md)
 - Add or change a component's Swingset page → [Documenting components](docs/documenting-components.md)
 - Add or change a `*.doc.ts` or `src/docs-schema.ts` → [Agent docs](docs/agent-docs.md)
+- Publish a unit at `@clerk/mosaic/<kind>/<slug>`, or decide where `'use client'` goes → [Agent docs → Publishing a unit](docs/agent-docs.md#publishing-a-unit)
 - Prove a change in a browser → [verify-mosaic](.claude/skills/verify-mosaic/SKILL.md)
 - Remove or rename a public export, prop, `--cl-*` token or styling hook, or change a public type or default → [Breaking changes](docs/breaking-changes.md)
 - Review a Mosaic change → [Reuse before you write](#reuse-before-you-write), [Shaping a fix](#shaping-a-fix), and the lines for what the change touches
@@ -91,7 +92,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - The Resend link on a code or email link step, with its countdown → `verificationResend` (`src/blocks/verification/`), passed to the step as `resend`
 - An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
-- Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper` and `cropImage` (`src/primitives/image-cropper/`), see its `README.md`
+- Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper`, with `ImageCropper.cropImage` (`src/primitives/image-cropper/`), see its `README.md`
 - An inline notice inside content: info, warning, error or success → `Banner` (`src/components/banner/`); a form-level error on a card uses `Card.Banner`
 - Siblings that slide when an item is added or removed → `useLayoutAnimation` (`src/primitives/hooks/`)
 - An input that reformats as the user types without moving the caret → `useFormattedInput` (`src/primitives/hooks/`)

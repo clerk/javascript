@@ -4,9 +4,9 @@ import type { Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
 import { ProviderButton, ProviderButtonGroup } from '../../components/provider-button';
 import { Text } from '../../components/text';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 import type { AuthProvider } from './auth.types';
 

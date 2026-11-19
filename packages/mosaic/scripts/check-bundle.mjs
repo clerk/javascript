@@ -1,18 +1,61 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 
-const distDir = resolve(import.meta.dirname, '../dist');
+const packageDir = resolve(process.argv[2] ?? resolve(import.meta.dirname, '..'));
+const distDir = resolve(packageDir, 'dist');
 const jsFiles = (await readdir(distDir, { recursive: true })).filter(file => file.endsWith('.js'));
 const sources = await Promise.all(jsFiles.map(file => readFile(resolve(distDir, file), 'utf8')));
-const componentEntries = (await readdir(resolve(distDir, 'components')))
-  .filter(file => file.endsWith('.js'))
-  .map(file => `components/${file}`);
+const packageJson = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8'));
+const entryFile = target => resolve(packageDir, typeof target === 'string' ? target : target.import);
+const unitEntryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => /^\.\/(components|primitives)\//.test(subpath))
+  .map(([, target]) => entryFile(target));
+const glyphEntryFiles = Object.entries(packageJson.exports)
+  .filter(([subpath]) => subpath.startsWith('./icons/glyphs/'))
+  .map(([, target]) => entryFile(target));
+const entryFiles = [entryFile(packageJson.exports['.']), ...unitEntryFiles, ...glyphEntryFiles];
 
-for (const entryFile of ['index.js', ...componentEntries]) {
-  const entry = await readFile(resolve(distDir, entryFile), 'utf8');
-  if (!entry.startsWith("'use client';") && !entry.startsWith('"use client";')) {
-    throw new Error(`Published Mosaic JS entry ${entryFile} is missing a top-level 'use client' boundary.`);
+const isClientModule = source => source.startsWith("'use client';") || source.startsWith('"use client";');
+const importsOf = source =>
+  [...source.matchAll(/^(?:import|export)\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["'];?$/gm)].map(m => m[1]);
+
+const visited = new Set();
+const checkServerGraph = async (file, entry) => {
+  if (visited.has(file)) {
+    return;
   }
+  visited.add(file);
+  const source = await readFile(file, 'utf8');
+  if (isClientModule(source)) {
+    return;
+  }
+  for (const specifier of importsOf(source)) {
+    if (!specifier.startsWith('.')) {
+      throw new Error(
+        `${relative(distDir, file)} is reached from ${relative(distDir, entry)} without a 'use client' module in between, and imports ${specifier}. Start it with 'use client', or move the import into a 'use client' module.`,
+      );
+    }
+    await checkServerGraph(resolve(dirname(file), specifier), entry);
+  }
+};
+
+for (const file of entryFiles) {
+  const source = await readFile(file, 'utf8');
+  if (isClientModule(source) && unitEntryFiles.includes(file)) {
+    throw new Error(
+      `Published Mosaic JS entry ${relative(distDir, file)} starts with 'use client'; put the boundary on the modules it re-exports instead.`,
+    );
+  }
+  await checkServerGraph(file, file);
+}
+
+const nodeModulesPaths = (await readdir(distDir, { recursive: true })).filter(file =>
+  file.split(/[\\/]/).includes('node_modules'),
+);
+if (nodeModulesPaths.length > 0) {
+  throw new Error(
+    `Published Mosaic output has files under a node_modules path, which consumers cannot resolve: ${nodeModulesPaths.join(', ')}`,
+  );
 }
 
 const forbidden = [

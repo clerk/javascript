@@ -13,7 +13,7 @@ import type { DrawerViewportProps } from './drawer-viewport';
 export default {
   name: 'Drawer',
   description:
-    'Headless, unstyled bottom sheet with drag to dismiss, optional snap points, virtual keyboard handling and nesting. Shares the dialog behavior: portal, focus trap, scroll lock, dismissal and transitions. Ships no CSS: it writes `--cl-drawer-*` custom properties and `data-*` attributes for a styled layer to compose. `createDrawerHandle()` connects a root to a trigger rendered outside it.',
+    'Headless, unstyled bottom sheet with drag to dismiss, optional snap points, virtual keyboard handling and nesting. Shares the dialog behavior: portal, focus trap, scroll lock, dismissal and transitions. Ships no CSS: it writes `--cl-drawer-*` custom properties and `data-*` attributes for a styled layer to compose. `Drawer.createDrawerHandle()` connects a root to a trigger rendered outside it.',
   useFor: [
     'the base for a styled bottom sheet',
     'a sheet the user swipes down to dismiss',
@@ -27,7 +27,7 @@ export default {
     },
     {
       do: true,
-      text: 'Call `registerDrawerCssVars()` once in the styled layer so the drag custom properties do not inherit.',
+      text: 'Call `Drawer.registerDrawerCssVars()` once in the styled layer so the drag custom properties do not inherit.',
     },
     {
       do: true,
@@ -60,7 +60,7 @@ export default {
         modal: { type: 'boolean', doc: 'Traps focus and blocks the rest of the page.', default: 'true' },
         handle: {
           type: 'DrawerHandle',
-          doc: 'Connects a trigger rendered outside the root. From `createDrawerHandle()`.',
+          doc: 'Connects a trigger rendered outside the root. From `Drawer.createDrawerHandle()`.',
         },
         dismissible: {
           type: 'boolean',
@@ -153,6 +153,14 @@ export default {
     },
   ],
   related: ['Dialog'],
+  exports: {
+    'Drawer.createDrawerHandle': {
+      description: 'Creates a handle that connects a `Drawer.Root` to a trigger rendered outside it.',
+    },
+    'Drawer.registerDrawerCssVars': {
+      description: 'Registers the drag custom properties as non-inheriting. Call it once in the styled layer.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Drawer.Root': DrawerProps;
   'Drawer.Trigger': DrawerTriggerProps;

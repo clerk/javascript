@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { INITIAL_CROP } from '../../primitives/image-cropper';
+import { INITIAL_CROP } from '../../primitives/image-cropper/crop';
 import { AVATAR_UPLOAD, cropAvatar } from '../avatar-upload';
 
 async function noise(side: number, type: string, quality?: number, height = side): Promise<string> {

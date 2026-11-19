@@ -1,7 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Icon } from '../../components/icon';
-import { Section, sectionCompactStyles } from '../../components/section';
+import { Section } from '../../components/section';
+import { sectionCompactStyles } from '../../components/section/section.styles';
 import { Lock } from '../../icons/glyphs/lock';
 
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */

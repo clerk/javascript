@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * A tinted strip that annotates the surface it sits on with a status message. Composed through
  * `Banner.Root`, `Banner.Label`, and `Banner.Description`; every part accepts the Mosaic `render`

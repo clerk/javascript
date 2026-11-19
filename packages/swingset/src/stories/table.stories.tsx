@@ -502,7 +502,7 @@ export function ColumnWidths() {
   );
 }
 
-const keyDetails = Dialog.createHandle<ApiKey>();
+const keyDetails = Dialog.createDialogHandle<ApiKey>();
 
 export function ClickableRows() {
   return (

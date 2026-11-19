@@ -55,7 +55,7 @@ const [open, setOpen] = useState(false);
 A trigger rendered **outside** `Drawer.Root` can drive it through a shared handle:
 
 ```tsx
-const handle = createDrawerHandle();
+const handle = Drawer.createDrawerHandle();
 
 <>
   <Drawer.Trigger handle={handle}>Open from anywhere</Drawer.Trigger>
@@ -161,7 +161,7 @@ Other parts accept standard HTML attributes plus the `render` prop.
 
 The headless parts emit raw inputs only — the styled layer composes them. The high-frequency vars
 (`swipe-movement-y`, `snap-point-offset`, `swipe-progress`) are registered as non-inheriting custom
-properties via `registerDrawerCssVars()` (a no-op where `CSS.registerProperty` is unavailable).
+properties via `Drawer.registerDrawerCssVars()` (a no-op where `CSS.registerProperty` is unavailable).
 
 ### CSS custom properties (on `Drawer.Popup`, mirrored onto `Drawer.Backdrop`)
 
@@ -252,7 +252,7 @@ Lifecycle of the driving signals (all handled by the headless layer):
 - Full iOS keyboard hardening (the pre-focus `translateY` trick and a `focus` override) plus
   snap-point-aware keyboard offsets and flick-focus suppression.
 - Resize-driven recomputation of snap offsets.
-- Per-trigger payloads on detached handles (`createDrawerHandle<T>()` + a render-prop `Drawer.Root`).
+- Per-trigger payloads on detached handles (`Drawer.createDrawerHandle<T>()` + a render-prop `Drawer.Root`).
 - `onActiveSnapPointChange` event details (the change `reason`, e.g. close-press vs. drag).
 - The mosaic styled layer and a playground.
 

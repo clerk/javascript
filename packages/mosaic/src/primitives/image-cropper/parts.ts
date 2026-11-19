@@ -11,3 +11,5 @@ export {
 } from './image-cropper-zoom-step';
 export { type ImageCropperRotateProps, ImageCropperRotate as Rotate } from './image-cropper-rotate';
 export { type ImageCropperResetProps, ImageCropperReset as Reset } from './image-cropper-reset';
+export { INITIAL_CROP, ZOOM_STEP } from './crop';
+export { cropImage } from './crop-image';

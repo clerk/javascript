@@ -6,9 +6,10 @@ import { useId } from 'react';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
-import { Flow, type FlowDirection, useFlowAutoFocus } from '../../../components/flow';
+import { Flow, type FlowDirection } from '../../../components/flow';
 import { Select } from '../../../components/select';
 import { useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 

@@ -2,13 +2,13 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { Skeleton } from '../../../components/skeleton';
 import { Text } from '../../../components/text';
 import { Clipboard } from '../../../icons/glyphs/clipboard';
 import { Download } from '../../../icons/glyphs/download';
 import { useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';

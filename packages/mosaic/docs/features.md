@@ -10,7 +10,7 @@ Worked example: `src/features/reverification/` (model, controller, view, types, 
 - Only a `*.model.ts(x)`, or a shared Clerk-reading hook in `src/hooks/` (`useMosaicEnvironment`, `useMosaicRouter`, `useMosaicSupportEmail`), imports Clerk hooks or calls Clerk resource methods.
 - What crosses each boundary is plain data: no Clerk resource reaches the controller, and no machine snapshot reaches the view.
 - A feature's machine lives in its `*.controller.ts(x)`, not in `src/machine/` and not in a `*.machine.ts`.
-- Import from source paths inside `packages/mosaic`; there are no published subpath barrels.
+- Import from source paths inside `packages/mosaic`, never from the published `@clerk/mosaic/<kind>/<name>` subpaths.
 - A flow is tested as a whole, not per layer ([Testing](testing.md)).
 
 ## The layers

@@ -12,7 +12,8 @@ import type {
   DialogProps as HeadlessDialogProps,
   DialogRole,
 } from '../../primitives/dialog';
-import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import { Dialog as Primitive } from '../../primitives/dialog';
+import { useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog/dialog-context';
 import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -111,7 +112,7 @@ export function isInDialog(dialog: DialogContextValue | null): dialog is DialogC
 export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button'> & {
   /**
    * Connects this trigger to a root rendered elsewhere in the tree. Create with
-   * `Dialog.createHandle()` and pass the same handle to the `Dialog.Root`.
+   * `Dialog.createDialogHandle()` and pass the same handle to the `Dialog.Root`.
    */
   handle?: DialogHandle<Payload>;
   /**
@@ -488,7 +489,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 });
 
 /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
-const createDialogHandle = Primitive.createHandle;
+const createDialogHandle = Primitive.createDialogHandle;
 export {
   Root as DialogRoot,
   Trigger as DialogTrigger,

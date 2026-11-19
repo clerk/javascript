@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import { Flow, type FlowDirection, useFlowAutoFocus } from '../../components/flow';
+import { Flow, type FlowDirection } from '../../components/flow';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
@@ -14,6 +14,7 @@ import { Download } from '../../icons/glyphs/download';
 import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
 import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import { fill, useMessages } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import type { ReverificationController } from '../reverification';

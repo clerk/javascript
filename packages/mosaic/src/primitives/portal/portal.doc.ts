@@ -50,6 +50,12 @@ const host = useRef<HTMLDivElement>(null);
     },
   ],
   related: ['Popover', 'Menu', 'Tooltip', 'Toast'],
+  exports: {
+    useGetPortalContainer: {
+      description:
+        'Returns a function that resolves the container set by the nearest `PortalProvider`, or `undefined` without one.',
+    },
+  },
 } satisfies ComponentDoc<{
   Portal: PortalProps;
   PortalProvider: PortalProviderProps;

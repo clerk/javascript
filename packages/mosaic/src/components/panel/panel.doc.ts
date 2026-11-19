@@ -4,11 +4,11 @@ import type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from './pane
 export default {
   name: 'Panel',
   description:
-    'A page of content with a title and its sections. `Panel.Sections` sit one heading level below `Panel.Title`. `usePanelTitle` returns a getter for the title element, to move focus to it.',
+    'A page of content with a title and its sections. `Panel.Sections` sit one heading level below `Panel.Title`. `Panel.usePanelTitle` returns a getter for the title element, to move focus to it.',
   useFor: [
     'a page of settings with a title and sections',
     'a page inside a `Profile`',
-    'focusing the page title after navigation, with `usePanelTitle`',
+    'focusing the page title after navigation, with `Panel.usePanelTitle`',
   ],
   keywords: ['panel', 'page', 'page title', 'sections', 'settings page'],
   practices: [
@@ -20,7 +20,7 @@ export default {
   ],
   parts: {
     'Panel.Root': {
-      description: 'A `div` that holds the title ref for `usePanelTitle`.',
+      description: 'A `div` that holds the title ref for `Panel.usePanelTitle`.',
       slot: 'cl-panel',
     },
     'Panel.Title': {
@@ -46,6 +46,9 @@ export default {
     },
   ],
   related: ['Profile', 'Section', 'Heading'],
+  exports: {
+    'Panel.usePanelTitle': { description: 'Returns a getter for the `Panel.Title` element, to move focus to it.' },
+  },
 } satisfies ComponentDoc<{
   'Panel.Root': PanelRootProps;
   'Panel.Title': PanelTitleProps;

@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import { useConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
-import { usePanelTitle } from '../../../components/panel';
+import { usePanelTitle } from '../../../components/panel/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';

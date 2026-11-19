@@ -112,7 +112,7 @@ export function useConfirmController<Payload = void>({
   reverification,
   errorFallback,
 }: ConfirmControllerOptions<Payload>): ConfirmController<Payload> {
-  const handle = useMemo(() => Dialog.createHandle<Payload>(), []);
+  const handle = useMemo(() => Dialog.createDialogHandle<Payload>(), []);
   const [snapshot, send] = useMachine(confirmMachine);
   const errorText = useErrorText();
   const { error } = snapshot.context;

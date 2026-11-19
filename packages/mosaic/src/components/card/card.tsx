@@ -4,7 +4,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { X } from '../../icons/glyphs/x';
-import { useFlowStepActive } from '../../primitives/flow';
+import { useFlowStepActive } from '../../primitives/flow/flow-step-context';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -17,7 +17,8 @@ import { Branding } from '../branding';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
 import type { DialogContextValue } from '../dialog';
-import { Dialog, DialogContext, isInDialog } from '../dialog';
+import { Dialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
 import { Icon } from '../icon';
 import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 import * as slots from './card.styles';

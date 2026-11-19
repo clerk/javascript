@@ -1,3 +1,5 @@
+'use client';
+
 import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
