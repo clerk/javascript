@@ -17,7 +17,7 @@ describe('ConnectApi', () => {
           return HttpResponse.json({
             object: 'connector',
             id: 'cnr_1',
-            key: 'acme',
+            slug: 'acme',
             display_name: 'Acme',
             configuration: { type: 'oauth', authorization_params: { tenantId: 'acme', access_type: 'offline' } },
           });
@@ -26,7 +26,7 @@ describe('ConnectApi', () => {
     );
 
     const connector = await apiClient.connect.connectors.create({
-      key: 'acme',
+      slug: 'acme',
       provider: { type: 'custom' },
       displayName: 'Acme',
       configuration: {
@@ -38,7 +38,7 @@ describe('ConnectApi', () => {
     });
 
     expect(body).toEqual({
-      key: 'acme',
+      slug: 'acme',
       provider: { type: 'custom' },
       display_name: 'Acme',
       configuration: {
@@ -77,10 +77,10 @@ describe('ConnectApi', () => {
 
     const credential = await apiClient.connect.connections.getCredential({
       userId: 'user_1',
-      key: 'acme',
+      slug: 'acme',
       scopes: ['read'],
     });
-    expect(body).toMatchObject({ key: 'acme', scopes: ['read'] });
+    expect(body).toMatchObject({ slug: 'acme', scopes: ['read'] });
     expect(credential).toMatchObject({ connectionId: 'con_1', accessToken: 'token', grantedScopes: ['read'] });
   });
 

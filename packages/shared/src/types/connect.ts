@@ -7,7 +7,7 @@ export type ConnectionStatus = 'active' | 'needs_attention' | 'disconnected';
  */
 export interface AvailableConnector {
   id: string;
-  key: string;
+  slug: string;
   displayName: string;
   provider: string | { type: 'custom' };
   scopes: string[];
@@ -21,7 +21,7 @@ export interface AvailableConnector {
 export interface CurrentUserConnection {
   id: string;
   connector: string;
-  key: string;
+  slug: string;
   scopes: string[];
   status: ConnectionStatus;
   providerAccount: { id: string; label: string | null } | null;
@@ -38,7 +38,7 @@ export type ListAvailableConnectorsParams = { limit?: number; offset?: number };
 
 export type ListCurrentUserConnectionsParams = {
   connector?: string;
-  key?: string;
+  slug?: string;
   status?: ConnectionStatus;
   limit?: number;
   offset?: number;
@@ -46,11 +46,11 @@ export type ListCurrentUserConnectionsParams = {
 
 export type CurrentUserConnectParams = {
   connector: string;
-  key?: string;
+  slug?: string;
   scopes?: string[];
   returnUrl: string;
   /**
-   * Connects another account to a connector the user already uses. Clerk picks the key.
+   * Connects another account to a connector the user already uses. Clerk picks the slug.
    */
   additionalAccount?: boolean;
 };

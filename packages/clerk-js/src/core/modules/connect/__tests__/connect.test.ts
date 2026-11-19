@@ -30,7 +30,7 @@ describe('Connect', () => {
         connection: {
           id: 'con_1',
           connector: 'github',
-          key: 'github',
+          slug: 'github',
           scopes: ['read:user'],
           status: 'active',
           provider_account: null,

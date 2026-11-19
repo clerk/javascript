@@ -15,7 +15,7 @@ import { BaseResource } from '../../resources/internal';
 
 type ConnectorJSON = {
   id: string;
-  key: string;
+  slug: string;
   display_name: string;
   provider: string | { type: 'custom' };
   scopes: string[];
@@ -26,7 +26,7 @@ type ConnectorJSON = {
 type ConnectionJSON = {
   id: string;
   connector: string;
-  key: string;
+  slug: string;
   scopes: string[];
   status: CurrentUserConnection['status'];
   provider_account: { id: string; label: string | null } | null;
@@ -45,7 +45,7 @@ type ListJSON<T> = { data: T[]; total_count: number };
 
 const toConnector = (json: ConnectorJSON): AvailableConnector => ({
   id: json.id,
-  key: json.key,
+  slug: json.slug,
   displayName: json.display_name,
   provider: json.provider,
   scopes: json.scopes,
@@ -56,7 +56,7 @@ const toConnector = (json: ConnectorJSON): AvailableConnector => ({
 const toConnection = (json: ConnectionJSON): CurrentUserConnection => ({
   id: json.id,
   connector: json.connector,
-  key: json.key,
+  slug: json.slug,
   scopes: json.scopes,
   status: json.status,
   providerAccount: json.provider_account,

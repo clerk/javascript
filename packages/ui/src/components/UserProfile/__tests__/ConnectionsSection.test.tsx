@@ -12,10 +12,10 @@ const withUser = createFixtures.config(f => {
   f.withUser({});
 });
 
-const connector = { id: 'cnr_1', key: 'acme', displayName: 'Acme Tasks', scopeLabels: { 'tasks.read': 'Read tasks' } };
+const connector = { id: 'cnr_1', slug: 'acme', displayName: 'Acme Tasks', scopeLabels: { 'tasks.read': 'Read tasks' } };
 const connection = {
   id: 'cnn_1',
-  key: 'acme',
+  slug: 'acme',
   connector: 'acme',
   status: 'active',
   scopes: ['tasks.read', 'tasks.write'],
@@ -76,7 +76,7 @@ describe('ConnectionsSection', () => {
     const second = {
       ...connection,
       id: 'cnn_2',
-      key: 'acme-2',
+      slug: 'acme-2',
       providerAccount: { id: '2', label: 'second@acme.example' },
     };
     api.connections.list

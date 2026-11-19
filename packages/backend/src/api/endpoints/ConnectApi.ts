@@ -29,7 +29,7 @@ export type ConnectConnection = {
   id: string;
   userId: string;
   connector: string;
-  key: string;
+  slug: string;
   scopes: string[];
   status: 'active' | 'needs_attention' | 'disconnected';
   providerAccount: { id: string; label: string | null } | null;
@@ -55,11 +55,11 @@ export type ConnectResult =
 export type ConnectUserParams = {
   userId: string;
   connector: string;
-  key?: string;
+  slug?: string;
   scopes?: string[];
   returnUrl: string;
   /**
-   * Connect another account through the same connector, under the next free key such as `github-2`.
+   * Connect another account through the same connector, under the next free slug such as `github-2`.
    */
   additionalAccount?: boolean;
 };
@@ -77,15 +77,15 @@ export type GetConnectionCredentialParams = {
   scopes?: string[];
   expiresIn?: number;
   /**
-   * The connector key or ID the connection must belong to. A connection of another connector is not found.
+   * The connector slug or ID the connection must belong to. A connection of another connector is not found.
    */
   connector?: string;
-} & ({ key: string; connectionId?: never } | { connectionId: string; key?: never });
+} & ({ slug: string; connectionId?: never } | { connectionId: string; slug?: never });
 
 export type ListConnectionsParams = {
   userId?: string;
   connector?: string;
-  key?: string;
+  slug?: string;
   status?: ConnectConnection['status'];
   limit?: number;
   offset?: number;
@@ -117,7 +117,7 @@ export type ConnectConnectorConfigurationParams = {
 };
 
 export type CreateConnectorParams = {
-  key: string;
+  slug: string;
   provider: string | { type: 'custom' };
   displayName?: string;
   scopes?: string[];
@@ -125,7 +125,7 @@ export type CreateConnectorParams = {
   configuration: ConnectConnectorConfigurationParams;
 };
 
-export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'key' | 'provider' | 'target'>> & {
+export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'slug' | 'provider' | 'target'>> & {
   status?: 'active' | 'disabled';
   target?: CreateConnectorParams['target'] | null;
 };
@@ -133,7 +133,7 @@ export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'key' | 
 export type ConnectConnector = {
   object: 'connector';
   id: string;
-  key: string;
+  slug: string;
   displayName: string;
   provider: string | { type: 'custom' };
   scopes: string[];
@@ -165,15 +165,15 @@ export class ConnectConnectorsAPI extends AbstractAPI {
     );
   }
 
-  async get(connectorIdOrKey: string) {
-    this.requireId(connectorIdOrKey);
+  async get(connectorIdOrSlug: string) {
+    this.requireId(connectorIdOrSlug);
     return camelize<ConnectConnector>(
-      await this.request({ method: 'GET', path: joinPaths('/connectors', connectorIdOrKey) }),
+      await this.request({ method: 'GET', path: joinPaths('/connectors', connectorIdOrSlug) }),
     );
   }
 
-  async update(connectorIdOrKey: string, params: UpdateConnectorParams) {
-    this.requireId(connectorIdOrKey);
+  async update(connectorIdOrSlug: string, params: UpdateConnectorParams) {
+    this.requireId(connectorIdOrSlug);
     return camelize<{
       object: 'connector_update';
       connector: ConnectConnector;
@@ -181,16 +181,16 @@ export class ConnectConnectorsAPI extends AbstractAPI {
     }>(
       await this.request({
         method: 'PATCH',
-        path: joinPaths('/connectors', connectorIdOrKey),
+        path: joinPaths('/connectors', connectorIdOrSlug),
         bodyParams: snakeize(params),
       }),
     );
   }
 
-  async delete(connectorIdOrKey: string) {
-    this.requireId(connectorIdOrKey);
+  async delete(connectorIdOrSlug: string) {
+    this.requireId(connectorIdOrSlug);
     return camelize<{ object: 'connector'; id: string; deleted: boolean }>(
-      await this.request({ method: 'DELETE', path: joinPaths('/connectors', connectorIdOrKey) }),
+      await this.request({ method: 'DELETE', path: joinPaths('/connectors', connectorIdOrSlug) }),
     );
   }
 }

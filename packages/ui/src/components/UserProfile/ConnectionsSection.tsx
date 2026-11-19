@@ -85,10 +85,10 @@ export const ConnectionsSection = withCardStateProvider(() => {
   const allConnectors = connectors.data ?? [];
   const allConnections = (connections.data ?? []).filter(
     connection =>
-      connection.status !== 'disconnected' || allConnectors.some(connector => connector.key === connection.connector),
+      connection.status !== 'disconnected' || allConnectors.some(connector => connector.slug === connection.connector),
   );
   const hasConnection = (connector: AvailableConnector) =>
-    allConnections.some(connection => connection.connector === connector.key);
+    allConnections.some(connection => connection.connector === connector.slug);
 
   if (!loadFailed && allConnectors.length === 0 && allConnections.length === 0) {
     return null;
@@ -120,9 +120,9 @@ export const ConnectionsSection = withCardStateProvider(() => {
   };
 
   const connect = (connector: AvailableConnector) =>
-    startFlow(connector.key, () =>
+    startFlow(connector.slug, () =>
       clerk.connect.connections.create({
-        connector: connector.key,
+        connector: connector.slug,
         returnUrl: returnUrl(),
         additionalAccount: hasConnection(connector),
       }),
@@ -157,11 +157,13 @@ export const ConnectionsSection = withCardStateProvider(() => {
             <ConnectionItem
               key={connection.id}
               connection={connection}
-              displayName={allConnectors.find(c => c.key === connection.connector)?.displayName ?? connection.connector}
-              scopeLabels={allConnectors.find(c => c.key === connection.connector)?.scopeLabels ?? {}}
+              displayName={
+                allConnectors.find(c => c.slug === connection.connector)?.displayName ?? connection.connector
+              }
+              scopeLabels={allConnectors.find(c => c.slug === connection.connector)?.scopeLabels ?? {}}
               isLoading={card.isLoading}
               isReconnecting={card.loadingMetadata === connection.id}
-              canReconnect={allConnectors.some(c => c.key === connection.connector)}
+              canReconnect={allConnectors.some(c => c.slug === connection.connector)}
               onReconnect={() => void reconnect(connection)}
               onDisconnected={() => connections.revalidate()}
             />
@@ -176,13 +178,13 @@ export const ConnectionsSection = withCardStateProvider(() => {
           {allConnectors.map(connector => (
             <ProfileSection.ActionMenuItem
               key={connector.id}
-              id={connector.key}
+              id={connector.slug}
               variant='ghost'
               focusRing={false}
               closeAfterClick={false}
-              data-connector={connector.key}
+              data-connector={connector.slug}
               isDisabled={card.isLoading}
-              isLoading={card.loadingMetadata === connector.key}
+              isLoading={card.loadingMetadata === connector.slug}
               localizationKey={
                 hasConnection(connector)
                   ? localizationKeys('userProfile.start.connectionsSection.actionLabel__additionalAccount', {
@@ -257,7 +259,7 @@ const ConnectionItem = (props: {
     <>
       <ProfileSection.Item
         id='connections'
-        data-connection-key={connection.key}
+        data-connection-slug={connection.slug}
         data-connection-status={connection.status}
       >
         <Flex
