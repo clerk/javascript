@@ -2404,6 +2404,9 @@ export const teIN: LocalizationResource = {
         successMessage: 'ఇమెయిల్ {{identifier}} మీ ఖాతాకు జోడించబడింది.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'ధృవీకరణ లింక్‌తో ఈమెయిల్ ఈ ఇమెయిల్ చిరునామాకు పంపబడుతుంది.',
         formSubtitle: '{{identifier}}కి పంపిన ఇమెయిల్‌లోని ధృవీకరణ లింక్‌పై క్లిక్ చేయండి',
         formTitle: 'ధృవీకరణ లింక్',

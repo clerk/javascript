@@ -2380,6 +2380,9 @@ export const skSK: LocalizationResource = {
         successMessage: 'E-mailová adresa {{identifier}} bola pridaná k vášmu účtu.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Na túto e-mailovú adresu bude odoslaný overovací odkaz.',
         formSubtitle: 'Kliknite na overovací odkaz v e-maile zaslanom na adresu {{identifier}}',
         formTitle: 'Overovací odkaz',

@@ -2412,6 +2412,9 @@ export const taIN: LocalizationResource = {
         successMessage: 'மின்னஞ்சல் {{identifier}} உங்கள் கணக்கில் சேர்க்கப்பட்டது.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'இந்த மின்னஞ்சல் முகவரிக்கு ஒரு சரிபார்ப்பு இணைப்பு கொண்ட மின்னஞ்சல் அனுப்பப்படும்.',
         formSubtitle: '{{identifier}} க்கு அனுப்பப்பட்ட மின்னஞ்சலில் உள்ள சரிபார்ப்பு இணைப்பைக் கிளிக் செய்யவும்',
         formTitle: 'சரிபார்ப்பு இணைப்பு',

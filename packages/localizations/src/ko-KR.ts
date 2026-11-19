@@ -2366,6 +2366,9 @@ export const koKR: LocalizationResource = {
         successMessage: '{{identifier}} 이메일이 계정에 추가됐어요.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: '인증 링크가 포함된 이메일이 이 이메일 주소로 전송돼요.',
         formSubtitle: '{{identifier}}에게 전송된 이메일의 링크를 클릭해 주세요.',
         formTitle: '인증 링크',

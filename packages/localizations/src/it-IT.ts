@@ -2383,6 +2383,9 @@ export const itIT: LocalizationResource = {
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Una email contenente un link di verifica sarà inviata a questo indirizzo email.',
         formSubtitle: 'Clicca sul link di verifica nella email inviata a {{identifier}}',
         formTitle: 'Link di verifica',

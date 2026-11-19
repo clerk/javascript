@@ -2359,6 +2359,9 @@ export const kkKZ: LocalizationResource = {
         successMessage: '{{identifier}} электрондық поштасы есептік жазбаңызға қосылды.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Растау сілтемесі осы электрондық пошта мекенжайына жіберіледі.',
         formSubtitle: '{{identifier}} жіберілген электрондық хаттағы растау сілтемесін басыңыз',
         formTitle: 'Растау сілтемесі',

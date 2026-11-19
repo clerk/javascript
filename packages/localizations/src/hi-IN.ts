@@ -2400,6 +2400,9 @@ export const hiIN: LocalizationResource = {
         successMessage: 'ईमेल {{identifier}} को आपके खाते में जोड़ दिया गया है।',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'इस ईमेल पते पर एक सत्यापन लिंक वाला ईमेल भेजा जाएगा।',
         formSubtitle: '{{identifier}} पर भेजे गए ईमेल में सत्यापन लिंक पर क्लिक करें',
         formTitle: 'सत्यापन लिंक',

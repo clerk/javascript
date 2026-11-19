@@ -2369,6 +2369,9 @@ export const thTH: LocalizationResource = {
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มไปยังบัญชีของคุณแล้ว',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'อีเมลที่มีลิงก์ยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'คลิกที่ลิงก์ยืนยันในอีเมลที่ส่งไปยัง {{identifier}}',
         formTitle: 'ลิงก์ยืนยัน',

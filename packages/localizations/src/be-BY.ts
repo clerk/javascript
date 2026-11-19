@@ -2381,6 +2381,9 @@ export const beBY: LocalizationResource = {
         successMessage: 'Адрас электроннай пошты {{identifier}} быў дададзены ў ваш уліковы запіс.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'На гэты адрас электроннай пошты будзе адпраўлена верифікацыйная спасылка.',
         formSubtitle: 'Націсніце на верифікацыйную спасылку ў лісьце, адпраўленым на {{identifier}}',
         formTitle: 'Верифікацыйная спасылка',

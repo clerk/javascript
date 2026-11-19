@@ -2367,6 +2367,9 @@ export const arSA: LocalizationResource = {
         successMessage: 'البريد الإلكتروني {{identifier}} تمت إضافته إلى حسابك',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'سيتم إرسال بريد إلكتروني يحتوي على رمز التحقق لهذا البريد الإلكتروني',
         formSubtitle: 'أنقر على رابط التحقق المرسل إلى البريد الألكتروني {{identifier}}',
         formTitle: 'رابط التحقق',

@@ -2407,6 +2407,9 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungslink gesendet.',
         formSubtitle: 'Klicken Sie auf den Bestätigungslink in der an {{identifier}} gesendeten E-Mail',
         formTitle: 'Bestätigungslink',

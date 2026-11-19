@@ -2397,6 +2397,9 @@ export const frFR: LocalizationResource = {
         successMessage: "L'e-mail {{identifier}} a été vérifié et ajouté à votre compte.",
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Un e-mail contenant un lien de vérification sera envoyé à cette adresse e-mail.',
         formSubtitle: "Cliquez sur le lien de vérification dans l'e-mail envoyé à {{identifier}}",
         formTitle: 'lien de vérification',

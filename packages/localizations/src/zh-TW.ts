@@ -2353,6 +2353,9 @@ export const zhTW: LocalizationResource = {
         successMessage: '電子郵件 {{identifier}} 已新增至您的帳戶。',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: '系統將會傳送一封包含驗證連結的郵件至此電子郵件地址。',
         formSubtitle: '請點擊傳送至 {{identifier}} 的郵件中的驗證連結',
         formTitle: '驗證連結',

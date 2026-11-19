@@ -2370,6 +2370,9 @@ export const daDK: LocalizationResource = {
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'En e-mail indeholdende et bekræftelseslink vil blive sendt til denne e-mailadresse.',
         formSubtitle: 'Klik på bekræftelseslinket i e-mailen sendt til {{identifier}}',
         formTitle: 'Bekræftelseslink',

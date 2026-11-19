@@ -2404,6 +2404,9 @@ export const hrHR: LocalizationResource = {
         successMessage: 'E-pošta {{identifier}} je dodana vašem računu.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Poruka s verifikacijskom poveznicom bit će poslana na ovu adresu e-pošte.',
         formSubtitle: 'Kliknite na verifikacijsku poveznicu u e-pošti poslanoj na {{identifier}}',
         formTitle: 'Verifikacijska poveznica',

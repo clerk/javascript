@@ -2392,6 +2392,9 @@ export const ruRU: LocalizationResource = {
         successMessage: 'Адрес электронной почты {{identifier}} был добавлен в вашу учетную запись.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'На этот адрес электронной почты будет отправлена верификационная ссылка.',
         formSubtitle: 'Нажмите на верификационную ссылку в письме, отправленном на {{identifier}}',
         formTitle: 'Верификационная ссылка',

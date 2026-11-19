@@ -2389,6 +2389,9 @@ export const caES: LocalizationResource = {
         successMessage: "El correu electrònic {{identifier}} s'ha afegit al teu compte.",
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint:
           "S'enviarà un correu electrònic que conté un enllaç de verificació a aquesta adreça de correu electrònic.",
         formSubtitle: "Fes clic a l'enllaç de verificació al correu enviat a {{identifier}}",

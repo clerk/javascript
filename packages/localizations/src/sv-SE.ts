@@ -2376,6 +2376,9 @@ export const svSE: LocalizationResource = {
         successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Ett e-postmeddelande med en verifieringslänk kommer att skickas till denna e-postadress.',
         formSubtitle: 'Klicka på verifieringslänken i e-postmeddelandet som skickats till {{identifier}}',
         formTitle: 'Verifieringslänk',

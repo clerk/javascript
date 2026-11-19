@@ -2384,6 +2384,9 @@ export const faIR: LocalizationResource = {
         successMessage: 'ایمیل {{identifier}} به حساب شما اضافه شد.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'ایمیلی حاوی لینک تأیید به این آدرس ایمیل ارسال خواهد شد.',
         formSubtitle: 'روی لینک تأیید در ایمیل ارسال شده به {{identifier}} کلیک کنید',
         formTitle: 'لینک تأیید',

@@ -2371,6 +2371,9 @@ export const srRS: LocalizationResource = {
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',
         formTitle: 'Verifikacioni link',

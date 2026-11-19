@@ -2376,6 +2376,9 @@ export const mnMN: LocalizationResource = {
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Баталгаажуулах холбоос бүхий имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}}руу илгээсэн имэйл дэх баталгаажуулах холбоос дээр дарна уу.',
         formTitle: 'Баталгаажуулах холбоос',

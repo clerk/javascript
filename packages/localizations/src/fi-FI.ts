@@ -2402,6 +2402,9 @@ export const fiFI: LocalizationResource = {
         successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Vahvistuslinkki lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
         formTitle: 'Vahvistuslinkki',

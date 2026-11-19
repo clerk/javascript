@@ -2383,6 +2383,9 @@ export const idID: LocalizationResource = {
         successMessage: 'Email {{identifier}} telah ditambahkan ke akun Anda.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Email berisi tautan verifikasi akan dikirim ke alamat email ini.',
         formSubtitle: 'Klik tautan verifikasi di email yang dikirim ke {{identifier}}',
         formTitle: 'Tautan verifikasi',

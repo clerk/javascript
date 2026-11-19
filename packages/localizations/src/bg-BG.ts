@@ -2373,6 +2373,9 @@ export const bgBG: LocalizationResource = {
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'На този имейл адрес ще бъде изпратен имейл с линк за потвърждение.',
         formSubtitle: 'Кликнете върху линка за потвърждение в имейла, изпратен на {{identifier}}',
         formTitle: 'Линк за потвърждение',

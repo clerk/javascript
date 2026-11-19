@@ -886,6 +886,9 @@ export type __internal_LocalizationResource = {
         formSubtitle: LocalizationValue<'identifier'>;
         resendButton: LocalizationValue;
         successMessage: LocalizationValue;
+        clientMismatch: {
+          subtitle: LocalizationValue;
+        };
       };
       enterpriseSSOLink: {
         formSubtitle: LocalizationValue<'identifier'>;

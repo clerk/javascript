@@ -2393,6 +2393,9 @@ export const roRO: LocalizationResource = {
         successMessage: 'Adresa {{identifier}} a fost adăugată la contul tău.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Un email cu un link de verificare va fi trimis la această adresă.',
         formSubtitle: 'Apasă pe linkul de verificare din emailul trimis la {{identifier}}',
         formTitle: 'Link de verificare',

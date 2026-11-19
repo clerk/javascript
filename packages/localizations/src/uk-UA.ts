@@ -2371,6 +2371,9 @@ export const ukUA: LocalizationResource = {
         successMessage: 'Адресу електронної пошти {{identifier}} було додано до вашого облікового запису.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'На цю адресу електронної пошти буде надіслано верифікаційне посилання.',
         formSubtitle: 'Натисніть на верифікаційне посилання в листі, відправленому на {{identifier}}',
         formTitle: 'Верифікаційне посилання',

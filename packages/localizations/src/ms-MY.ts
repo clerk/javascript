@@ -2409,6 +2409,9 @@ export const msMY: LocalizationResource = {
         successMessage: 'E-mel {{identifier}} telah ditambah ke akaun anda.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'E-mel yang mengandungi pautan pengesahan akan dihantar ke alamat e-mel ini.',
         formSubtitle: 'Klik pada pautan pengesahan dalam e-mel yang dihantar ke {{identifier}}',
         formTitle: 'Pautan pengesahan',

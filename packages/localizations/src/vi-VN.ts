@@ -2394,6 +2394,9 @@ export const viVN: LocalizationResource = {
         successMessage: 'Email {{identifier}} đã được thêm vào tài khoản của bạn.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'Một email chứa liên kết xác thực sẽ được gửi đến địa chỉ email này.',
         formSubtitle: 'Nhấp vào liên kết xác thực trong email được gửi đến {{identifier}}',
         formTitle: 'Liên kết xác thực',

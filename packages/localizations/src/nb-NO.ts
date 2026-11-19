@@ -2402,6 +2402,9 @@ export const nbNO: LocalizationResource = {
         successMessage: 'E-posten {{identifier}} har blitt lagt til kontoen din.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: undefined,
+        },
         formHint: 'En e-post med en verifiseringslenke vil bli sendt til denne e-postadressen.',
         formSubtitle: 'Klikk på verifiseringslenken i e-posten sendt til {{identifier}}',
         formTitle: 'Verifiseringslenke',
