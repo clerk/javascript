@@ -37,13 +37,17 @@ export default {
         'The surface. Draws the card treatment only when it is the outermost card in its dialog and not `flush`. Appends the branding when `renderBranding`.',
       slot: 'cl-card-root',
       props: {
-        elevation: { type: 'CardElevation', doc: '`card`, `flush` or `overlay`.', default: "'card'" },
+        elevation: { type: "'card' | 'flush' | 'overlay'", doc: '`card`, `flush` or `overlay`.', default: "'card'" },
         size: {
-          type: 'CardSize',
+          type: "'md' | 'lg'",
           doc: 'Width. `lg` is for forms that need the room, like a tag input.',
           default: "'md'",
         },
-        align: { type: 'CardAlign', doc: 'Aligns every `Card.Header`: `start` or `center`.', default: "'start'" },
+        align: {
+          type: "'start' | 'center'",
+          doc: 'Aligns every `Card.Header`: `start` or `center`.',
+          default: "'start'",
+        },
         renderBranding: {
           type: 'boolean',
           doc: 'Signs the foot of the card with "Secured by Clerk".',
@@ -75,6 +79,27 @@ export default {
     'Card.Footer': {
       description: 'The actions row. Buttons inside default to `fullWidth`. Carries `data-elevation`.',
       slot: 'cl-card-footer',
+    },
+  },
+  playground: {
+    part: 'Card.Root',
+    defaults: {
+      children: [
+        {
+          __element: 'Card.Header',
+          children: [
+            { __element: 'Card.Title', children: 'Delete project' },
+            { __element: 'Card.Description', children: 'This removes the project and its data.' },
+          ],
+        },
+        {
+          __element: 'Card.Footer',
+          children: [
+            { __element: 'Button', props: { variant: 'outline' }, children: 'Cancel' },
+            { __element: 'Button', children: 'Delete' },
+          ],
+        },
+      ],
     },
   },
   examples: [

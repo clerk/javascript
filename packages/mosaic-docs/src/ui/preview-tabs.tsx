@@ -7,7 +7,17 @@ import { CopyButton } from './copy-button';
 const tabs = ['Preview', 'Code'] as const;
 type Tab = (typeof tabs)[number];
 
-export function PreviewTabs({ code, preview, source }: { code: string; preview: ReactNode; source: ReactNode }) {
+export function PreviewTabs({
+  code,
+  preview,
+  source,
+  actions,
+}: {
+  code: string;
+  preview: ReactNode;
+  source: ReactNode;
+  actions?: ReactNode;
+}) {
   const [selected, setSelected] = useState<Tab>('Preview');
   const id = useId();
   const refs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
@@ -25,7 +35,7 @@ export function PreviewTabs({ code, preview, source }: { code: string; preview: 
 
   return (
     <figure className='code-block'>
-      <div className='not-prose border-border flex h-11 items-center gap-4 border-b pl-2.5 pr-3'>
+      <div className='not-prose border-border flex h-11 items-center gap-4 border-b pl-2.5 pr-1.5'>
         <div
           role='tablist'
           aria-label='Example'
@@ -53,7 +63,10 @@ export function PreviewTabs({ code, preview, source }: { code: string; preview: 
             </button>
           ))}
         </div>
-        {selected === 'Code' ? <CopyButton text={code} /> : null}
+        <div className='flex items-center gap-1'>
+          {actions}
+          {selected === 'Code' ? <CopyButton text={code} /> : null}
+        </div>
       </div>
       {tabs.map(tab => (
         <div

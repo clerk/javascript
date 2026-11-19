@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { Preview } from '@/components/preview';
-import { docHeadings } from '@/core/doc-sections';
+import { docTabs, overviewHeadings, overviewSections } from '@/core/doc-sections';
 import { docEntries, docHref, findDoc, relatedHref } from '@/lib/docs';
 import { DocContent } from '@/ui/doc-content';
+import { DocTabList } from '@/ui/doc-tabs';
 import { DocsPage } from '@/ui/docs-page';
 
 export const dynamicParams = false;
@@ -32,14 +33,27 @@ export default async function DocPage({ params }: PageProps<'/docs/[kind]/[slug]
     notFound();
   }
 
+  const path = `${kind}/${slug}`;
+  const href = docHref(entry);
   return (
     <DocsPage
-      headings={docHeadings(entry.doc)}
-      markdownHref={`${docHref(entry)}.md`}
+      headings={overviewHeadings(entry.doc)}
+      markdownHref={`${href}.md`}
     >
       <DocContent
         doc={entry.doc}
-        preview={<Preview path={`${kind}/${slug}`} />}
+        sections={overviewSections(entry.doc)}
+        intro={
+          <>
+            {docTabs(entry.doc) ? (
+              <DocTabList
+                href={href}
+                selected='overview'
+              />
+            ) : null}
+            <Preview path={path} />
+          </>
+        }
         hrefFor={relatedHref}
       />
     </DocsPage>

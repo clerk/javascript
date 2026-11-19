@@ -37,14 +37,9 @@ void test('renders a component doc with parts, practices, examples and related l
 
 A clickable action.
 
-## Use for
+## Usage
 
 - an action that finishes at once
-
-## Practices
-
-- Do: Use \`SubmitButton\` for async work.
-- Don't: Render a spinner by hand.
 
 ## API reference
 
@@ -58,6 +53,11 @@ Slot: \`cl-button\`
 | --- | --- | --- | --- |
 | \`color\` | \`'primary' \\| 'neutral'\` | \`'primary'\` | The color. |
 | \`fullWidth\` | \`boolean\` |  | Stretches to the container. |
+
+## Best practices
+
+- Do: Use \`SubmitButton\` for async work.
+- Don't: Render a spinner by hand.
 
 ## Examples
 
@@ -95,7 +95,7 @@ void test('renders a hook doc with options and returns', () => {
     markdown,
     /## Returns\n\n\| Prop \| Type \| Default \| Description \|\n.*\n\| `isPending` \| `boolean` \| {2}\| Whether a run is in flight\. \|/,
   );
-  assert.doesNotMatch(markdown, /## Practices|## Examples|## Related/);
+  assert.doesNotMatch(markdown, /## Best practices|## Examples|## Related/);
 });
 
 void test('leaves out empty hook options and returns', () => {

@@ -2,6 +2,7 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { ThemeProvider } from 'next-themes';
 import type { ReactNode } from 'react';
 
 import { SiteBanner } from '@/components/site-banner';
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang='en'
       className={inter.variable}
+      suppressHydrationWarning
     >
       <body className='bg-background text-foreground flex min-h-dvh flex-col font-sans antialiased'>
         <a
@@ -34,9 +36,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Skip to content
         </a>
-        <SiteBanner />
-        <SiteHeader navigation={navigation} />
-        {children}
+        <ThemeProvider
+          attribute='data-theme'
+          disableTransitionOnChange
+        >
+          <SiteBanner />
+          <SiteHeader navigation={navigation} />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
