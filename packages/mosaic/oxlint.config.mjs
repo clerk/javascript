@@ -15,6 +15,8 @@ const CLERK_FREE_SHARED = [
   '@clerk/shared/phone',
   '@clerk/shared/underscore',
 ];
+const CLERK_FREE_MESSAGE =
+  'Mosaic outside src/features and src/queries runs without Clerk. Read Clerk in a feature model and pass plain data or callbacks down.';
 const CLERK_BASELINE = [
   'src/blocks/confirm/confirm-shell.tsx',
   'src/blocks/confirm/confirm.controller.ts',
@@ -388,8 +390,7 @@ export default defineConfig({
               {
                 from: { element: { type: CLERK_FREE } },
                 disallow: { dependency: { source: '@clerk/**', kind: 'value' } },
-                message:
-                  'Mosaic outside src/features and src/queries runs without Clerk. Read Clerk in a feature model and pass plain data or callbacks down.',
+                message: CLERK_FREE_MESSAGE,
               },
               {
                 from: { element: { type: CLERK_FREE } },
@@ -397,6 +398,13 @@ export default defineConfig({
                   { dependency: { source: CLERK_FREE_SHARED } },
                   { dependency: { source: '@clerk/shared/react', specifiers: ['useSafeLayoutEffect'] } },
                 ],
+              },
+              {
+                from: { element: { type: CLERK_FREE } },
+                disallow: {
+                  dependency: { source: '@clerk/shared/react', specifiers: ['!(useSafeLayoutEffect)'], kind: 'value' },
+                },
+                message: CLERK_FREE_MESSAGE,
               },
               { from: { file: { categories: 'clerk-baseline' } }, allow: { dependency: { source: '@clerk/**' } } },
               {

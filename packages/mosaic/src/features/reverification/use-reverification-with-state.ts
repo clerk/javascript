@@ -129,7 +129,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
       const invocation = Promise.resolve()
         .then(() => wrapped(...args))
         .catch((cause: unknown) => {
-          throw isReverificationCancelledError(cause) ? new CancelledError() : cause;
+          throw cause != null && isReverificationCancelledError(cause) ? new CancelledError() : cause;
         });
       runtimeRef.current.operation = { status: 'requesting', promise: invocation };
       void invocation

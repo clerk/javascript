@@ -248,6 +248,21 @@ describe('OrganizationList', () => {
       expect(activeOrganizationId(fapi)).toBe(fapi.memberships.at(-1)?.organization.id);
     });
 
+    it('returns to the list when going to afterCreateOrganizationUrl fails', async () => {
+      const { navigate } = await renderOrganizationList(signedIn(), { skipInvitationScreen: true });
+      navigate.mockImplementation(to =>
+        to === '/dashboard' ? Promise.reject(new Error('Navigation failed')) : Promise.resolve(),
+      );
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Create organization' }));
+      await user.type(await screen.findByRole('textbox', { name: 'Name' }), 'Initech');
+      await user.click(screen.getByRole('button', { name: 'Create organization' }));
+
+      expect(await screen.findByRole('heading', { name: 'Choose an account' })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Initech' })).toBeVisible();
+    });
+
     it('starts on the create form, with no way back, when there is nothing to list', async () => {
       await renderOrganizationList(signedIn({ memberships: [], invitations: [], suggestions: [] }), {
         hidePersonal: true,

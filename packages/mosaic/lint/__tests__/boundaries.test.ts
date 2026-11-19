@@ -495,6 +495,7 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
     ...[
       ['src/primitives/sample.tsx', "import { useClerk } from '@clerk/shared/react';"],
       ['src/components/sample.tsx', "import { useUser } from '@clerk/shared/react';"],
+      ['src/components/sample.tsx', "import { useSafeLayoutEffect, useUser } from '@clerk/shared/react';"],
       ['src/hooks/sample.ts', "import { isReverificationCancelledError } from '@clerk/shared/error';"],
       ['src/utils/sample.ts', "import { buildEmailAddress } from '@clerk/shared/internal/clerk-js/email';"],
       ['src/blocks/sample.tsx', "import { useClerk } from '@clerk/react';"],

@@ -36,10 +36,11 @@ export function useCreateOrganizationController(
   const m = useMessages('createOrganization');
   const [step, setStep] = useState<CreateOrganizationStep>({ step: 'create' });
 
-  const finish = async (organizationId: string) => {
-    await model.onComplete(organizationId);
-    onRestart?.();
-  };
+  const finish = (organizationId: string) =>
+    model.onComplete(organizationId).then(
+      () => onRestart?.(),
+      (cause: unknown) => console.error('[Clerk] Could not finish creating the organization', cause),
+    );
 
   const form = useForm<CreateOrganizationValues, CreatedOrganization>({
     initialValues: { name: initialValues?.name ?? '', slug: initialValues?.slug ?? '', logo: null },

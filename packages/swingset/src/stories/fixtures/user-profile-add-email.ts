@@ -4,6 +4,7 @@ import type {
   UserProfileEmailVerifier,
 } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import type { ReadyEmailSectionModel } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.types';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 
 interface FixtureOptions {
   method?: UserProfileEmailVerification['method'];
@@ -24,7 +25,7 @@ export function createUserProfileAddEmailFixture({
     let cancelled = false;
     const verified = delay(fail === 'verify' ? 2000 : 4000).then(() => {
       if (fail === 'verify') {
-        throw new Error('This link has expired. Send a new one.');
+        throw new MosaicError([{ code: 'fixture_error', message: 'This link has expired. Send a new one.' }]);
       }
       if (!cancelled) {
         onVerified?.(id);
@@ -39,7 +40,7 @@ export function createUserProfileAddEmailFixture({
       callClerk(async () => {
         await delay(1200);
         if (fail === 'verify') {
-          throw new Error('Unable to connect. Try again.');
+          throw new MosaicError([{ code: 'fixture_error', message: 'Unable to connect. Try again.' }]);
         }
         onVerified?.(id);
       }),
@@ -59,7 +60,7 @@ export function createUserProfileAddEmailFixture({
       callClerk(async () => {
         await delay(700);
         if (fail === 'verify' || code === '000000') {
-          throw new Error('That code is incorrect. Try again.');
+          throw new MosaicError([{ code: 'fixture_error', message: 'That code is incorrect. Try again.' }]);
         }
         onVerified?.(id);
       }),
@@ -70,7 +71,7 @@ export function createUserProfileAddEmailFixture({
       callClerk(async () => {
         await delay(700);
         if (fail === 'create') {
-          throw new Error('We couldn’t add this email. Try again.');
+          throw new MosaicError([{ code: 'fixture_error', message: 'We couldn’t add this email. Try again.' }]);
         }
         const id = `email_${Date.now()}`;
         onCreated?.(id, emailAddress);

@@ -249,6 +249,19 @@ describe('Reverification', () => {
       expect(screen.queryByText(TITLE)).toBeNull();
     });
 
+    it('rejects with what the action threw, even when that is not an error', async () => {
+      const action = vi.fn(() => {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error -- The case under test is a fetcher that throws a non-error.
+        throw null;
+      });
+      await renderReverification(action);
+
+      await startVerification();
+
+      await waitFor(() => expect(outcome()).toBe('rejected: unknown'));
+      expect(screen.queryByText(TITLE)).toBeNull();
+    });
+
     it('opens on the first factor when the hint asks for the first factor level', async () => {
       const { action } = await renderReverification(
         guardedAction({ level: 'first_factor', afterMinutes: 10 }),

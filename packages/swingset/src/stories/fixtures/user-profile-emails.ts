@@ -5,6 +5,7 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import { useUserProfileEmailSectionController } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.controller';
 import type { UserProfileEmailSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.types';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { idleReverification } from './reverification';
@@ -59,7 +60,9 @@ export function useUserProfileEmailsFixture({
         }
         if (removalState === 'error' && !removalFailed) {
           setRemovalFailed(true);
-          throw new Error('Unable to remove this email address. Try again.');
+          throw new MosaicError([
+            { code: 'fixture_error', message: 'Unable to remove this email address. Try again.' },
+          ]);
         }
         setEmails(current => current.filter(email => email.id !== id));
       }),

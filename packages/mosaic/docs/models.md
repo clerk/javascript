@@ -84,8 +84,8 @@ export type SsoModel =
       status: 'ready';
       connections: SsoConnection[];
       enrollmentMode: OrganizationEnrollmentMode;
-      onTestConnection: (connectionId: string) => Promise<EnterpriseConnectionTest>;
-      onSave: (values: SsoValues) => Promise<void>;
+      onTestConnection: (connectionId: string) => ClerkCall<EnterpriseConnectionTest>;
+      onSave: (values: SsoValues) => ClerkCall;
     };
 ```
 

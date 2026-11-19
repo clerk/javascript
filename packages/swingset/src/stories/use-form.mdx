@@ -84,7 +84,7 @@ const mergedRef = useMergeRefs([ref, initialFocusRef]);
 <InputGroup.Input ref={mergedRef} {...control} />;
 ```
 
-A failed save rejects `onSubmit` with a `MosaicError`. A model's `callClerk` makes one from Clerk errors. Each issue's copy is the `errors` catalog entry for its `code`, else its `message`. The first issue with no `field` lands on `form.error`, and the first issue for each field on that field's feedback. Issues that all name a field show only under those fields, with no banner. Any other rejection shows the localized generic message and is logged with `console.error`.
+A failed save rejects `onSubmit` with a `MosaicError`. A model's `callClerk` makes one from Clerk errors. Each issue's copy is the `errors` catalog entry for its `code`, else its `message`. The first issue with no `field` lands on `form.error`, and the first issue for each field on that field's feedback. Issues that all name a field show only under those fields, with no banner. A `CancelledError` is not a failure: the form returns to editing with its values and no message. Any other rejection shows the localized generic message and is logged with `console.error`.
 
 ```ts
 throw new MosaicError([
