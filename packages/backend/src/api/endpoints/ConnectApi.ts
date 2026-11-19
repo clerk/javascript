@@ -67,7 +67,10 @@ export type ReauthorizeConnectionParams = {
 
 export type GetConnectionCredentialParams = {
   userId: string;
-  scopes: string[];
+  /**
+   * Scopes the credential must cover. Omit it to accept whatever the connection was granted.
+   */
+  scopes?: string[];
   expiresIn?: number;
 } & ({ key: string; connectionId?: never } | { connectionId: string; key?: never });
 
