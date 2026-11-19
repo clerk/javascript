@@ -1662,6 +1662,10 @@ export const huHU: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
@@ -1839,6 +1843,9 @@ export const huHU: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Jelszó kompromitálódott',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: 'Nem megbízható jelszó',
@@ -2209,6 +2216,7 @@ export const huHU: LocalizationResource = {
       requireUppercase: 'egy nagybetű',
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

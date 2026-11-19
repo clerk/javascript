@@ -22,7 +22,7 @@ import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpris
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
-import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
+import { passwordErrorModes, SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -53,15 +53,7 @@ function determineAlternativeMethodsMode(
     return 'default';
   }
 
-  if (passwordErrorCode === 'pwned') {
-    return 'pwned';
-  }
-
-  if (passwordErrorCode === 'compromised') {
-    return 'passwordCompromised';
-  }
-
-  return 'forgot';
+  return passwordErrorCode ? passwordErrorModes[passwordErrorCode] : 'forgot';
 }
 
 function removeSignInResetPasswordIntentParam(): void {

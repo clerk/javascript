@@ -1644,6 +1644,10 @@ export const heIL: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'קוד אימות',
       resendButton: 'לא קיבלת קוד? שלח שוב',
@@ -1816,6 +1820,9 @@ export const heIL: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordResetRequired: {
       title: undefined,
     },
     passwordUntrusted: {
@@ -2167,6 +2174,7 @@ export const heIL: LocalizationResource = {
       requireUppercase: 'אות גדולה',
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -10,6 +10,7 @@ import { useIsWebAuthnSupported } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { PasswordErrorCode } from '../SignIn/SignInFactorOnePasswordCard';
+import { passwordErrorModes } from '../SignIn/SignInFactorOnePasswordCard';
 import { determineStartingSignInFactor, factorHasLocalStrategy, isResetPasswordStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
@@ -43,8 +44,8 @@ const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
   'passkey',
 ] as const;
 
-// Resetting a breached or compromised password: choose to reset, set the new
-// password, then enter the code, which is sent together with the new password.
+// Resetting a rejected password: choose to reset, set the new password, then
+// enter the code, which is sent together with the new password.
 type ResetPasswordStep =
   | { step: 'none' }
   | { step: 'methods'; reason: PasswordErrorCode }
@@ -142,7 +143,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     // As in sign-in, no way back: re-entering the rejected password can't succeed.
     return (
       <AlternativeMethods
-        mode={reason === 'pwned' ? 'pwned' : 'passwordCompromised'}
+        mode={passwordErrorModes[reason]}
         resetPassword={{
           factor: resetPasswordFactor,
           hasNewPassword: !!resetPassword,

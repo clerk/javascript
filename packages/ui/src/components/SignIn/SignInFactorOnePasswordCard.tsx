@@ -1,4 +1,9 @@
-import { isPasswordCompromisedError, isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
+import {
+  isPasswordCompromisedError,
+  isPasswordPwnedError,
+  isPasswordResetRequiredError,
+  isUserLockedError,
+} from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
@@ -19,7 +24,13 @@ import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
-export type PasswordErrorCode = 'compromised' | 'pwned';
+export type PasswordErrorCode = 'compromised' | 'pwned' | 'resetRequired';
+
+export const passwordErrorModes = {
+  pwned: 'pwned',
+  compromised: 'passwordCompromised',
+  resetRequired: 'passwordResetRequired',
+} as const satisfies Record<PasswordErrorCode, string>;
 
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
@@ -110,6 +121,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           if (isPasswordCompromisedError(err)) {
             card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
             onPasswordError('compromised');
+            return;
+          }
+
+          if (isPasswordResetRequiredError(err)) {
+            card.setError(err.errors[0]);
+            onPasswordError('resetRequired');
             return;
           }
         }

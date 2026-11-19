@@ -1660,6 +1660,10 @@ export const esES: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Introduce el código enviado a tu teléfono.',
       resendButton: 'Reenviar código',
@@ -1835,6 +1839,9 @@ export const esES: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2192,6 +2199,7 @@ export const esES: LocalizationResource = {
       requireUppercase: 'Al menos una letra mayúscula',
       sentencePrefix: 'Tu contraseña debe contener:',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, inténtelo con otro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

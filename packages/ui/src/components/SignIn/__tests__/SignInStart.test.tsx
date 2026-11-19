@@ -790,7 +790,12 @@ describe('SignInStart', () => {
   });
 
   describe('Submitting form via instant password autofill', () => {
-    const ERROR_CODES = ['strategy_for_user_invalid', 'form_password_incorrect', 'form_password_pwned'];
+    const ERROR_CODES = [
+      'strategy_for_user_invalid',
+      'form_password_incorrect',
+      'form_password_pwned',
+      'password_reset_required',
+    ];
     ERROR_CODES.forEach(code => {
       it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
         const { wrapper, fixtures } = await createFixtures(f => {

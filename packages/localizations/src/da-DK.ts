@@ -1649,6 +1649,10 @@ export const daDK: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1824,6 +1828,9 @@ export const daDK: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Sikkerhedsadvarsel',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2176,6 +2183,7 @@ export const daDK: LocalizationResource = {
       requireUppercase: 'et stort bogstav',
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1651,6 +1651,10 @@ export const bgBG: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Enter the verification code sent to your phone number.',
       resendButton: "Didn't receive the code? Resend it.",
@@ -1825,6 +1829,9 @@ export const bgBG: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordResetRequired: {
       title: undefined,
     },
     passwordUntrusted: {
@@ -2179,6 +2186,7 @@ export const bgBG: LocalizationResource = {
       requireUppercase: 'главна буква',
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

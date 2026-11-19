@@ -1662,6 +1662,10 @@ export const roRO: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Cod de verificare',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -1839,6 +1843,9 @@ export const roRO: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Parola este compromisă',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2199,6 +2206,7 @@ export const roRO: LocalizationResource = {
       requireUppercase: 'o literă mare',
       sentencePrefix: 'Parola ta trebuie să conțină',
     },
+    password_reset_required: undefined,
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

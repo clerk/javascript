@@ -1657,6 +1657,10 @@ export const csCZ: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Ověřovací kód',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -1834,6 +1838,9 @@ export const csCZ: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Heslo kompromitováno',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2191,6 +2198,7 @@ export const csCZ: LocalizationResource = {
       requireUppercase: 'velké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovat',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

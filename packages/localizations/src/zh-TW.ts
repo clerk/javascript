@@ -1643,6 +1643,10 @@ export const zhTW: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '驗證碼',
       resendButton: '沒收到代碼？重新傳送',
@@ -1816,6 +1820,9 @@ export const zhTW: LocalizationResource = {
     },
     passwordPwned: {
       title: '密碼可能已遭外洩',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: '密碼不受信任',
@@ -2165,6 +2172,7 @@ export const zhTW: LocalizationResource = {
       requireUppercase: '一個大寫字母',
       sentencePrefix: '您的密碼必須包含：',
     },
+    password_reset_required: undefined,
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

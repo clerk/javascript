@@ -1661,6 +1661,10 @@ export const fiFI: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
@@ -1837,6 +1841,9 @@ export const fiFI: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Salasana tietomurrossa',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: 'Salasana epäluotettava',
@@ -2206,6 +2213,7 @@ export const fiFI: LocalizationResource = {
       requireUppercase: 'iso kirjain',
       sentencePrefix: 'Salasanan on sisällettävä',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

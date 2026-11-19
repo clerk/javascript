@@ -1647,6 +1647,10 @@ export const arSA: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1822,6 +1826,9 @@ export const arSA: LocalizationResource = {
     },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2175,6 +2182,7 @@ export const arSA: LocalizationResource = {
       requireUppercase: 'حرف كبير',
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

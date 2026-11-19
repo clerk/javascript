@@ -1662,6 +1662,10 @@ export const nbNO: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifiseringskode',
       resendButton: 'Ikke mottatt kode? Send på nytt',
@@ -1838,6 +1842,9 @@ export const nbNO: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Passordet er kompromittert',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: 'Passordet er ikke pålitelig',
@@ -2207,6 +2214,7 @@ export const nbNO: LocalizationResource = {
       requireUppercase: 'en stor bokstav',
       sentencePrefix: 'Passordet ditt må inneholde',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
