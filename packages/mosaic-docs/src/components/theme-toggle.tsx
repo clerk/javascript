@@ -1,15 +1,21 @@
 'use client';
 
 import { useTheme } from 'next-themes';
+import { useSyncExternalStore } from 'react';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const dark = resolvedTheme === 'dark';
+  const hydrated = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const dark = hydrated && resolvedTheme === 'dark';
 
   return (
     <button
       type='button'
-      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={hydrated ? (dark ? 'Switch to light mode' : 'Switch to dark mode') : 'Toggle theme'}
       onClick={() => setTheme(dark ? 'light' : 'dark')}
       className='text-muted-foreground hover:bg-muted hover:text-foreground inline-flex size-9 shrink-0 items-center justify-center rounded-full transition-colors'
     >
@@ -44,4 +50,8 @@ export function ThemeToggle() {
       </svg>
     </button>
   );
+}
+
+function subscribe(): () => void {
+  return () => {};
 }

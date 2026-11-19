@@ -1,15 +1,15 @@
 :root {
   color-scheme: light dark;
-  --docs-background: light-dark(oklch(1 0 0), #1b1b1f);
-  --docs-foreground: light-dark(oklch(0.145 0 0), #f6f6f7);
-  --docs-muted: light-dark(oklch(0.965 0 0), #232328);
-  --docs-muted-foreground: light-dark(oklch(0.53 0 0), #adadb7);
-  --docs-border: light-dark(oklch(0.88 0.006 260 / 0.72), #33333e);
-  --docs-accent: light-dark(oklch(0.145 0 0), #f6f6f7);
-  --docs-accent-foreground: light-dark(oklch(1 0 0), #1b1b1f);
+  --docs-background: light-dark(oklch(1 0 0), oklch(0.1881 0.006 285.8));
+  --docs-foreground: light-dark(oklch(0.1881 0.006 285.8), oklch(1 0 0));
+  --docs-muted: light-dark(oklch(0.965 0 0), oklch(0.2582 0.0093 285.7));
+  --docs-muted-foreground: light-dark(oklch(0.49 0.0239 282.5), oklch(0.6699 0.0191 282.4));
+  --docs-border: light-dark(oklch(0.88 0.006 260 / 0.72), oklch(0.3256 0.0194 285.3));
+  --docs-accent: var(--docs-foreground);
+  --docs-accent-foreground: var(--docs-background);
   --docs-code-background: var(--docs-background);
-  --docs-positive: #15803d;
-  --docs-negative: #dc2626;
+  --docs-positive: oklch(0.5273 0.1371 150.1);
+  --docs-negative: oklch(0.5771 0.2152 27.3);
   --shiki-background: var(--docs-code-background);
   --shiki-foreground: light-dark(#131316, #ffffff);
   --shiki-token-keyword: light-dark(#6504ff, #bab1ff);
