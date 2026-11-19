@@ -226,6 +226,7 @@ import {
   EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
   Loading as OrganizationProfileSecurityPanelLoading,
   meta as organizationProfileSecurityPanelMeta,
+  NoSections as OrganizationProfileSecurityPanelNoSections,
   RemoveFails as OrganizationProfileSecurityPanelRemoveFails,
 } from '../stories/organization-profile-security-panel.stories';
 import {
@@ -1454,6 +1455,7 @@ const organizationProfileSecurityPanelModule: StoryModule = {
   meta: organizationProfileSecurityPanelMeta,
   Default: OrganizationProfileSecurityPanelDefault,
   Loading: OrganizationProfileSecurityPanelLoading,
+  NoSections: OrganizationProfileSecurityPanelNoSections,
   AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
   AllowList: OrganizationProfileSecurityPanelAllowList,
   EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,

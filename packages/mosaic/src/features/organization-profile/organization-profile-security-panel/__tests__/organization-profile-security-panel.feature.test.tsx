@@ -203,6 +203,53 @@ describe('Who sees the Security page', () => {
   });
 });
 
+describe('The Security page with no sections to show', () => {
+  const EMPTY = 'No security settings yet';
+
+  it.each([
+    {
+      name: 'a connection manager with self-serve SSO and no connection',
+      permissions: [CONNECTIONS],
+      selfServeSso: true,
+      connections: [],
+    },
+    {
+      name: 'a connection manager with self-serve SSO and a connection',
+      permissions: [CONNECTIONS],
+      selfServeSso: true,
+    },
+    {
+      name: 'a connection manager with self-serve Directory Sync',
+      permissions: [CONNECTIONS],
+      selfServeDirectorySync: true,
+      connections: [],
+    },
+    {
+      name: 'a member with both permissions, self-serve SSO and no connection',
+      permissions: [BYPASS, CONNECTIONS],
+      selfServeSso: true,
+      connections: [],
+    },
+  ])('shows an empty state to $name', async ({ name: _name, ...options }) => {
+    serve(options);
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+
+    expect(await screen.findByText(EMPTY)).toBeVisible();
+    expect(
+      screen.getByText('Single sign-on and directory sync settings for this organization will appear here.'),
+    ).toBeVisible();
+    expect(screen.queryByText('SSO bypass')).toBeNull();
+  });
+
+  it('does not show the empty state with the SSO bypass allow list', async () => {
+    serve({ permissions: [BYPASS, CONNECTIONS], selfServeSso: true });
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+
+    await screen.findByRole('list', { name: 'SSO bypass allow list' });
+    expect(screen.queryByText(EMPTY)).toBeNull();
+  });
+});
+
 describe('Managing the SSO bypass allow list', () => {
   it('lists members and marks the current user', async () => {
     serve({ allowlisted: [bob, carol, member('user_1', 'Alice', 'alice@acme.com', 'org:admin')] });

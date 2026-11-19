@@ -1,5 +1,9 @@
 export const organizationProfileSecurityPanelMessages = {
   errorFallback: 'Something went wrong. Please try again.',
+  empty: {
+    label: 'No security settings yet',
+    description: 'Single sign-on and directory sync settings for this organization will appear here.',
+  },
   ssoBypass: {
     title: 'SSO bypass',
     description: 'Members on this allow list can sign in with an email code when SSO is unavailable.',

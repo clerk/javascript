@@ -2,7 +2,10 @@ import { useOrganization } from '@clerk/shared/react';
 import type { ReactNode } from 'react';
 
 import { useSecurityPanelModel } from './organization-profile-security-panel.model';
-import { OrganizationProfileSecurityPanelView } from './organization-profile-security-panel.view';
+import {
+  OrganizationProfileSecurityPanelEmptyState,
+  OrganizationProfileSecurityPanelView,
+} from './organization-profile-security-panel.view';
 import type { SecurityCapabilities } from './organization-profile-security-panel-access.model';
 import { useSecurityPanelAccessModel } from './organization-profile-security-panel-access.model';
 import { SSOBypassSectionSkeleton } from './sso-bypass.skeleton';
@@ -33,7 +36,13 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
   const model = useSecurityPanelModel(capabilities);
   return (
     <OrganizationProfileSecurityPanelView>
-      {model.isLoading ? <SSOBypassSectionSkeleton /> : model.showSSOBypass ? <SSOBypassSection /> : null}
+      {model.isLoading ? (
+        <SSOBypassSectionSkeleton />
+      ) : model.showSSOBypass ? (
+        <SSOBypassSection />
+      ) : (
+        <OrganizationProfileSecurityPanelEmptyState />
+      )}
     </OrganizationProfileSecurityPanelView>
   );
 }
