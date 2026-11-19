@@ -18,7 +18,7 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
-import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
+import { SignUpLegalConsentField } from '../../sign-up/sign-up-details/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
   SignInIdentifierField,

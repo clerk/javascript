@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
-import { usePendingAction } from '../../hooks/use-pending-action';
-import { useResendSeconds } from '../../hooks/use-resend-seconds';
-import type { ErrorDescription } from '../../localization';
-import { useErrorText } from '../../localization';
-import { setup } from '../../machine/setup';
-import type { ErrorInvokeEvent } from '../../machine/types';
-import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/errors';
-import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
-import type { SignUpVerifyScreen } from './sign-up.types';
+import { usePendingAction } from '../../../hooks/use-pending-action';
+import { useResendSeconds } from '../../../hooks/use-resend-seconds';
+import type { ErrorDescription } from '../../../localization';
+import { useErrorText } from '../../../localization';
+import { setup } from '../../../machine/setup';
+import type { ErrorInvokeEvent } from '../../../machine/types';
+import { useMachine } from '../../../machine/use-machine';
+import { toLocalizableError } from '../../../utils/errors';
+import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
+import type { SignUpVerifyScreen } from '../sign-up.types';
 
 interface CodeContext {
   sendCode: () => Promise<void>;
@@ -60,18 +60,15 @@ const codeMachine = code.createMachine({
   },
 });
 
-type SignUpVerifyOptions = Pick<
-  SignUpVerifyScreen,
-  'needsCode' | 'sendCode' | 'verifyCode' | 'isPending' | 'globalErrorMessage'
->;
+type SignUpVerifyOptions = Pick<SignUpVerifyScreen, 'verification' | 'onNext' | 'isPending' | 'globalErrorMessage'>;
 
 export function useSignUpVerifyController({
-  needsCode,
-  sendCode,
-  verifyCode,
+  verification,
+  onNext,
   isPending: isFlowPending,
   globalErrorMessage,
 }: SignUpVerifyOptions) {
+  const { needsCode, send: sendCode } = verification;
   const [value, setValue] = useState('');
   const actions = usePendingAction<'code'>();
   const errorText = useErrorText();
@@ -87,7 +84,8 @@ export function useSignUpVerifyController({
   /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   const isPending = actions.isPending || isFlowPending;
-  const submit = (submitted: string) => void actions.run('code', () => verifyCode(submitted));
+  const submit = (submitted: string) =>
+    void actions.run('code', async () => onNext(await verification.verify(submitted)));
 
   return {
     value,

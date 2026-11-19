@@ -6,7 +6,7 @@ import { VerificationCode, verificationResend } from '../../blocks/verification'
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useMessages } from '../../localization';
-import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
+import { SignUpDetailsStep } from '../sign-up/sign-up-details/sign-up-details';
 import type { SignInStep, SignInViewProps } from './sign-in.types';
 import {
   codeCopy,

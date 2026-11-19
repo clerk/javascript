@@ -14,10 +14,10 @@ import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useMessages } from '../../localization';
 import type { SignUpViewProps } from './sign-up.types';
-import { SignUpDetailsStep } from './steps/sign-up-details';
-import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
-import { SignUpRestricted } from './steps/sign-up-restricted';
-import { SignUpVerify } from './steps/sign-up-verify';
+import { SignUpDetailsStep } from './sign-up-details/sign-up-details';
+import { SignUpLegalConsentField } from './sign-up-details/sign-up-legal-consent';
+import { SignUpRestricted } from './sign-up-restricted/sign-up-restricted';
+import { SignUpVerify } from './sign-up-verify/sign-up-verify';
 
 export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');

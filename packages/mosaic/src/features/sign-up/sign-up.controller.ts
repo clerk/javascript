@@ -1,30 +1,20 @@
-import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
-import type { FieldFeedback } from '../../components/form';
-import { useForm } from '../../components/form';
-import { useDebouncedAsync } from '../../hooks/use-debounced-async';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
-import { useErrorText, useMessages } from '../../localization';
+import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
-import type { SignUpData, SignUpDetailsValues, SignUpIdentifier, SignUpReadyModel } from './sign-up.model';
+import type { SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
-import type {
-  SignUpDetails,
-  SignUpFieldName,
-  SignUpFields,
-  SignUpScreen,
-  SignUpValues,
-  SignUpViewProps,
-} from './sign-up.types';
+import type { SignUpScreen, SignUpViewProps } from './sign-up.types';
+import { useSignUpDetailsController } from './sign-up-details/sign-up-details.controller';
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
@@ -54,7 +44,7 @@ const finishMachine = finish.createMachine({
       },
     },
     finishing: {
-      invoke: finish.fromPromise(context => context.frozenModel?.finalize() ?? Promise.resolve(), {
+      invoke: finish.fromPromise(context => context.frozenModel?.flow.finalize() ?? Promise.resolve(), {
         onDone: { target: 'handingOff' },
         onError: {
           target: 'idle',
@@ -75,65 +65,17 @@ const finishMachine = finish.createMachine({
   },
 });
 
-const emptyValues: SignUpValues = {
-  identifier: '',
-  emailAddress: '',
-  phoneNumber: '',
-  password: '',
-  code: '',
-  backupCode: '',
-  firstName: '',
-  lastName: '',
-  username: '',
-  newPassword: '',
-  confirmPassword: '',
-  signOutOfOtherSessions: false,
-  legalAccepted: false,
-};
-
-function screenFor(route: SignUpRoute | undefined, data: SignUpData): SignUpScreen {
+function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignUpScreen {
   if (route === undefined || route === 'enterpriseConnections' || route === 'protectCheck') {
     return 'startOver';
   }
   if (route !== 'start') {
     return route;
   }
-  if (data.actionBlocked) {
+  if (flow.actionBlocked) {
     return 'actionBlocked';
   }
-  return data.mode === 'public' ? 'start' : data.mode;
-}
-
-function otherIdentifier(identifier: SignUpIdentifier): 'emailAddress' | 'phoneNumber' {
-  return identifier === 'phoneNumber' ? 'emailAddress' : 'phoneNumber';
-}
-
-function detailsStep(
-  purpose: 'start' | 'continue',
-  fields: SignUpFields,
-  data: SignUpData,
-  identifier: SignUpIdentifier,
-): SignUpDetails {
-  const nextField = data.canSwitchIdentifier && identifier ? otherIdentifier(identifier) : undefined;
-  return {
-    purpose,
-    fields,
-    nextField,
-    legalConsent: purpose === 'continue' ? data.continueLegalConsent : data.legalConsent,
-  };
-}
-
-function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
-  const pick = (name: SignUpFieldName) => (fields[name] ? values[name] : undefined);
-  return {
-    emailAddress: pick('emailAddress'),
-    phoneNumber: pick('phoneNumber'),
-    username: pick('username')?.trim(),
-    password: pick('password'),
-    firstName: pick('firstName'),
-    lastName: pick('lastName'),
-    legalAccepted: values.legalAccepted || undefined,
-  };
+  return flow.mode === 'public' ? 'start' : flow.mode;
 }
 
 type SignUpControllerResult = Omit<
@@ -146,11 +88,9 @@ export function useSignUpController(
   options: MosaicLocationOptions,
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
-  const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
   const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
-  const genericError = useMessages('errors').generic;
-  const isLeaving = liveModel.step.type === 'leaving';
+  const isLeaving = liveModel.flow.step.type === 'leaving';
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
 
   // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
@@ -160,12 +100,10 @@ export function useSignUpController(
   }, [isLeaving, finishActor]);
 
   const model = finishSnapshot.context.frozenModel ?? liveModel;
+  const { flow, app, navigation, verification } = model;
   const isFinishing = finishSnapshot.value !== 'idle';
-
-  const { step } = model;
-  const identifier = chosenIdentifier ?? model.initialIdentifier;
-  const shown = shownRoute(route, step);
-  const screen = screenFor(shown, model);
+  const shown = shownRoute(route, flow.step);
+  const screen = screenFor(shown, flow);
 
   // A route the step does not allow is replaced with the screen that is shown, so the stored route, and the
   // address bar once the URL routing modes land (#10780), never keeps it. Replacing leaves no history entry.
@@ -190,51 +128,17 @@ export function useSignUpController(
     }
   };
 
-  const startFields = model.startFieldsFor(identifier);
-  const continueFields = model.continueFieldsFor(identifier);
-  const fields = screen === 'continue' ? continueFields : startFields;
-
-  const form = useForm<SignUpValues, SignUpNextStep | undefined>({
-    initialValues: { ...emptyValues, ...model.prefill },
-    onSubmit: values => {
-      const details = detailsValues(values, fields);
-      return screen === 'continue'
-        ? model.update(details)
-        : model.create({ ...details, ...model.startHiddenValuesFor(identifier) });
-    },
-    onSuccess: nextStep => {
-      if (nextStep) {
-        next(nextStep);
-      }
-    },
-  });
-
-  const { supportEmail } = model;
-  const password = form.values.password;
-  const strength = useDebouncedAsync(password, value => model.validatePassword(value), {
-    delayMs: DEBOUNCE_MS,
-    enabled: Boolean(fields.password) && (password !== '' || form.fields.password.touched),
-  });
-  const passwordFeedback: FieldFeedback | undefined = strength.isError
-    ? { type: 'error', message: genericError }
-    : strength.data;
-  const isPending = form.isSubmitting || actions.isPending || isFinishing;
   const finishError = finishSnapshot.context.error ? errorText(finishSnapshot.context.error) : undefined;
-  const globalErrorMessage = form.error ?? finishError ?? actions.error;
-
-  const details = {
-    socialProviders: [],
-    onSelectProvider: () => undefined,
-    form,
-    onSubmit: form.handleSubmit,
-    isPending,
-    isDisabled: isPending,
-    globalErrorMessage,
-    passwordFeedback,
-    onSwitchField: model.canSwitchIdentifier ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined,
-    onSignIn: model.goToSignIn,
-  };
+  const flowError = finishError ?? actions.error;
+  const details = useSignUpDetailsController(model.details, {
+    purpose: screen === 'continue' ? 'continue' : 'start',
+    isBusy: actions.isPending || isFinishing,
+    globalErrorMessage: flowError,
+    onNext: next,
+    onSignIn: navigation.goToSignIn,
+  });
   const verify = {
+    onNext: next,
     isPending: isFinishing,
     globalErrorMessage: finishError,
     onEditIdentifier: () => go(detailsRouteFor(route)),
@@ -242,34 +146,22 @@ export function useSignUpController(
 
   return {
     screen,
-    attempt: model.signUpId,
-    start: { ...details, step: detailsStep('start', startFields, model, identifier) },
-    continue: { ...details, step: detailsStep('continue', continueFields, model, identifier) },
-    verifyEmail: {
-      ...verify,
-      identifier: model.emailAddress ?? '',
-      needsCode: step.type === 'verify_email' && !step.sent,
-      sendCode: model.sendEmailCode,
-      verifyCode: async (code: string) => next(await model.verifyEmailCode(code)),
-    },
-    verifyPhone: {
-      ...verify,
-      identifier: model.phoneNumber ?? '',
-      needsCode: step.type === 'verify_phone' && !step.sent,
-      sendCode: model.sendPhoneCode,
-      verifyCode: async (code: string) => next(await model.verifyPhoneCode(code)),
-    },
+    attempt: flow.signUpId,
+    start: details.start,
+    continue: details.continue,
+    verifyEmail: { ...verify, verification: verification.email },
+    verifyPhone: { ...verify, verification: verification.phone },
     restricted: {
-      globalErrorMessage,
-      onEmailSupport: supportEmail ? () => window.location.assign(`mailto:${supportEmail}`) : undefined,
-      onJoinWaitlist: model.joinWaitlist,
-      onSignIn: model.goToSignIn,
+      globalErrorMessage: details.error ?? flowError,
+      onEmailSupport: app.supportEmail ? () => window.location.assign(`mailto:${app.supportEmail}`) : undefined,
+      onJoinWaitlist: navigation.joinWaitlist,
+      onSignIn: navigation.goToSignIn,
     },
-    actionBlocked: model.actionBlocked,
+    actionBlocked: flow.actionBlocked,
     onStartOver: () =>
       void actions.run('startOver', async () => {
-        await model.reset();
-        form.reset();
+        await flow.reset();
+        details.reset();
         go('start');
       }),
   };

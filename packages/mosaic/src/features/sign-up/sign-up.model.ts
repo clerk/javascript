@@ -53,42 +53,56 @@ export interface SignUpModelOptions {
   showOptionalFields?: boolean;
 }
 
-export interface SignUpData {
+export interface SignUpFlowModel {
   signUpId: string | undefined;
   step: SignUpFlowStep;
-  afterSignUpUrl: string;
   mode: 'public' | 'restricted' | 'waitlist';
-  initialIdentifier: SignUpIdentifier;
-  canSwitchIdentifier: boolean;
-  startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
-  continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
-  startHiddenValuesFor: (identifier: SignUpIdentifier) => Partial<SignUpPrefill>;
-  prefill: SignUpPrefill;
-  emailAddress: string | null;
-  phoneNumber: string | null;
-  legalConsent?: SignUpLegalConsent;
-  continueLegalConsent?: SignUpLegalConsent;
-  supportEmail?: string;
   actionBlocked?: AuthActionBlockedDetails;
-  applicationName: string;
-  applicationLogoUrl?: string;
-}
-
-export interface SignUpCallbacks {
-  create: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
-  update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
-  sendEmailCode: () => Promise<void>;
-  verifyEmailCode: (code: string) => Promise<SignUpNextStep>;
-  sendPhoneCode: () => Promise<void>;
-  verifyPhoneCode: (code: string) => Promise<SignUpNextStep>;
+  afterSignUpUrl: string;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
+}
+
+export interface SignUpAppModel {
+  applicationName: string;
+  applicationLogoUrl?: string;
+  supportEmail?: string;
+}
+
+export interface SignUpNavigationModel {
   goToSignIn: () => void;
-  validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
   joinWaitlist?: () => void;
 }
 
-export type SignUpReadyModel = SignUpData & SignUpCallbacks & { status: 'ready' };
+export interface SignUpDetailsModel {
+  initialIdentifier: SignUpIdentifier;
+  canSwitchIdentifier: boolean;
+  prefill: SignUpPrefill;
+  startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
+  continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
+  startHiddenValuesFor: (identifier: SignUpIdentifier) => Partial<SignUpPrefill>;
+  legalConsent?: SignUpLegalConsent;
+  continueLegalConsent?: SignUpLegalConsent;
+  validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
+  create: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
+  update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
+}
+
+export interface SignUpVerificationModel {
+  target: string;
+  needsCode: boolean;
+  send: () => Promise<void>;
+  verify: (code: string) => Promise<SignUpNextStep>;
+}
+
+export interface SignUpReadyModel {
+  status: 'ready';
+  flow: SignUpFlowModel;
+  app: SignUpAppModel;
+  navigation: SignUpNavigationModel;
+  details: SignUpDetailsModel;
+  verification: { email: SignUpVerificationModel; phone: SignUpVerificationModel };
+}
 
 export type SignUpModel = { status: 'loading' } | SignUpReadyModel;
 
@@ -238,106 +252,124 @@ export function useSignUpModel({
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
 
+  const step = flowStep();
+
   return {
     status: 'ready',
-    signUpId: signUp.id,
-    step: flowStep(),
-    afterSignUpUrl: clerk.buildAfterSignUpUrl(),
-    mode,
-    initialIdentifier:
-      getInitialActiveIdentifier(attributes, isProgressiveSignUp, {
-        emailAddress: initialValues.emailAddress ?? undefined,
-        phoneNumber: initialValues.phoneNumber ?? undefined,
-      }) ?? null,
-    canSwitchIdentifier,
-    startFieldsFor: identifier => toViewFields(activeFields(identifier), isShown),
-    continueFieldsFor: identifier => {
-      const fields = activeFields(identifier);
-      minimizeFieldsForExistingSignup(fields, signUp);
-      if (signUp.hasPassword) {
-        delete fields.password;
-      }
-      return toViewFields(fields, isShown);
+    flow: {
+      signUpId: signUp.id,
+      step,
+      mode,
+      actionBlocked: blocked
+        ? {
+            title: blocked.title,
+            description: blocked.description,
+            linkUrl: blocked.linkUrl,
+            linkText: blocked.linkText,
+            traceId: blocked.traceId,
+          }
+        : undefined,
+      afterSignUpUrl: clerk.buildAfterSignUpUrl(),
+      finalize: async () => {
+        await run(() =>
+          signUp.finalize({
+            navigate: async ({ session: created, decorateUrl }) => {
+              const task = created.currentTask;
+              if (taskInFlow(task)) {
+                return;
+              }
+              if (task) {
+                await router.navigate(
+                  clerk.__internal_getOption('taskUrls')?.[task.key] ??
+                    buildTaskUrl(task, { base: clerk.buildSignInUrl() }),
+                );
+                return;
+              }
+              const afterSignUpUrl = clerk.buildAfterSignUpUrl();
+              const decorated = decorateUrl(afterSignUpUrl);
+              if (decorated !== afterSignUpUrl && ABSOLUTE_URL.test(decorated)) {
+                router.windowNavigate(decorated);
+                return;
+              }
+              await router.navigate(afterSignUpUrl);
+            },
+          }),
+        );
+      },
+      reset: () => run(() => signUp.reset()),
     },
-    startHiddenValuesFor: identifier => {
-      const fields = activeFields(identifier);
-      const hidden: Partial<SignUpPrefill> = {};
-      for (const name of PREFILL_NAMES) {
-        const field = fields[name];
-        if (field && !isShown(name, field.required) && prefill[name]) {
-          hidden[name] = prefill[name];
+    app: {
+      applicationName: displayConfig.applicationName,
+      applicationLogoUrl: displayConfig.logoImageUrl || undefined,
+      supportEmail: mode === 'restricted' ? supportEmail : undefined,
+    },
+    navigation: {
+      goToSignIn: () => void router.navigate(clerk.buildSignInUrl()),
+      joinWaitlist: mode === 'waitlist' ? () => void router.navigate(clerk.buildWaitlistUrl()) : undefined,
+    },
+    details: {
+      initialIdentifier:
+        getInitialActiveIdentifier(attributes, isProgressiveSignUp, {
+          emailAddress: initialValues.emailAddress ?? undefined,
+          phoneNumber: initialValues.phoneNumber ?? undefined,
+        }) ?? null,
+      canSwitchIdentifier,
+      prefill,
+      startFieldsFor: identifier => toViewFields(activeFields(identifier), isShown),
+      continueFieldsFor: identifier => {
+        const fields = activeFields(identifier);
+        minimizeFieldsForExistingSignup(fields, signUp);
+        if (signUp.hasPassword) {
+          delete fields.password;
         }
-      }
-      return hidden;
-    },
-    prefill,
-    emailAddress: signUp.emailAddress,
-    phoneNumber: signUp.phoneNumber,
-    legalConsent,
-    continueLegalConsent: signUp.legalAcceptedAt === null ? legalConsent : undefined,
-    supportEmail: mode === 'restricted' ? supportEmail : undefined,
-    actionBlocked: blocked
-      ? {
-          title: blocked.title,
-          description: blocked.description,
-          linkUrl: blocked.linkUrl,
-          linkText: blocked.linkText,
-          traceId: blocked.traceId,
+        return toViewFields(fields, isShown);
+      },
+      startHiddenValuesFor: identifier => {
+        const fields = activeFields(identifier);
+        const hidden: Partial<SignUpPrefill> = {};
+        for (const name of PREFILL_NAMES) {
+          const field = fields[name];
+          if (field && !isShown(name, field.required) && prefill[name]) {
+            hidden[name] = prefill[name];
+          }
         }
-      : undefined,
-    applicationName: displayConfig.applicationName,
-    applicationLogoUrl: displayConfig.logoImageUrl || undefined,
-    create: async values => {
-      await save(
-        () => run(() => signUp.create({ ...details(values), password: values.password })),
-        DETAILS_FIELDS,
-        usernameBounds,
-      );
-      return next(signUp);
+        return hidden;
+      },
+      legalConsent,
+      continueLegalConsent: signUp.legalAcceptedAt === null ? legalConsent : undefined,
+      validatePassword,
+      create: async values => {
+        await save(
+          () => run(() => signUp.create({ ...details(values), password: values.password })),
+          DETAILS_FIELDS,
+          usernameBounds,
+        );
+        return next(signUp);
+      },
+      update: async values => {
+        await save(() => run(() => signUp.update(details(values))), DETAILS_FIELDS, usernameBounds);
+        return next(signUp);
+      },
     },
-    update: async values => {
-      await save(() => run(() => signUp.update(details(values))), DETAILS_FIELDS, usernameBounds);
-      return next(signUp);
+    verification: {
+      email: {
+        target: signUp.emailAddress ?? '',
+        needsCode: step.type === 'verify_email' && !step.sent,
+        send: () => run(() => signUp.verifications.sendEmailCode()),
+        verify: async code => {
+          await save(() => run(() => signUp.verifications.verifyEmailCode({ code })), ['code']);
+          return next(signUp);
+        },
+      },
+      phone: {
+        target: signUp.phoneNumber ?? '',
+        needsCode: step.type === 'verify_phone' && !step.sent,
+        send: () => run(() => signUp.verifications.sendPhoneCode()),
+        verify: async code => {
+          await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
+          return next(signUp);
+        },
+      },
     },
-    sendEmailCode: () => run(() => signUp.verifications.sendEmailCode()),
-    verifyEmailCode: async code => {
-      await save(() => run(() => signUp.verifications.verifyEmailCode({ code })), ['code']);
-      return next(signUp);
-    },
-    sendPhoneCode: () => run(() => signUp.verifications.sendPhoneCode()),
-    verifyPhoneCode: async code => {
-      await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
-      return next(signUp);
-    },
-    finalize: async () => {
-      await run(() =>
-        signUp.finalize({
-          navigate: async ({ session: created, decorateUrl }) => {
-            const task = created.currentTask;
-            if (taskInFlow(task)) {
-              return;
-            }
-            if (task) {
-              await router.navigate(
-                clerk.__internal_getOption('taskUrls')?.[task.key] ??
-                  buildTaskUrl(task, { base: clerk.buildSignInUrl() }),
-              );
-              return;
-            }
-            const afterSignUpUrl = clerk.buildAfterSignUpUrl();
-            const decorated = decorateUrl(afterSignUpUrl);
-            if (decorated !== afterSignUpUrl && ABSOLUTE_URL.test(decorated)) {
-              router.windowNavigate(decorated);
-              return;
-            }
-            await router.navigate(afterSignUpUrl);
-          },
-        }),
-      );
-    },
-    reset: () => run(() => signUp.reset()),
-    validatePassword,
-    goToSignIn: () => void router.navigate(clerk.buildSignInUrl()),
-    joinWaitlist: mode === 'waitlist' ? () => void router.navigate(clerk.buildWaitlistUrl()) : undefined,
   };
 }

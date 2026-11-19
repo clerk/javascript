@@ -71,12 +71,15 @@ const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'ht
 
 const noop = () => undefined;
 
-function verifyScreen(identifier: string): SignUpVerifyScreen {
+function verifyScreen(target: string): SignUpVerifyScreen {
   return {
-    identifier,
-    needsCode: false,
-    sendCode: () => Promise.resolve(),
-    verifyCode: () => Promise.resolve(),
+    verification: {
+      target,
+      needsCode: false,
+      send: () => Promise.resolve(),
+      verify: () => Promise.resolve({ type: 'unknown' }),
+    },
+    onNext: noop,
     isPending: false,
     onEditIdentifier: noop,
   };

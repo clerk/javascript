@@ -3,20 +3,13 @@ import { VerificationCode, verificationResend } from '../../../blocks/verificati
 import { useMessages } from '../../../localization';
 import type { SignUpCode, SignUpVerifyScreen } from '../sign-up.types';
 import { signUpCodeCopy, signUpCodeIdentity, signUpCodeSecondaryAction } from '../sign-up.utils';
-import { useSignUpVerifyController } from '../sign-up-verify.controller';
+import { useSignUpVerifyController } from './sign-up-verify.controller';
 
 interface SignUpVerifyProps extends SignUpVerifyScreen {
   channel: 'email' | 'phone';
 }
 
-export function SignUpVerify({
-  channel,
-  identifier,
-  provider,
-  onEditIdentifier,
-  onCancel,
-  ...options
-}: SignUpVerifyProps) {
+export function SignUpVerify({ channel, provider, onEditIdentifier, onCancel, ...options }: SignUpVerifyProps) {
   const m = useMessages('signUp');
   const {
     value,
@@ -30,7 +23,11 @@ export function SignUpVerify({
     canResend,
     resendRemainingSeconds,
   } = useSignUpVerifyController(options);
-  const step: SignUpCode = { purpose: channel === 'email' ? 'verify-email' : 'verify-phone', identifier, provider };
+  const step: SignUpCode = {
+    purpose: channel === 'email' ? 'verify-email' : 'verify-phone',
+    identifier: options.verification.target,
+    provider,
+  };
   const secondary = signUpCodeSecondaryAction(step, m, onCancel);
   const identity = signUpCodeIdentity(step, m);
 
