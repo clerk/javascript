@@ -98,7 +98,11 @@ function _OAuthConsent() {
   // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
   // the app-owner-set name, so a look-alike name cannot borrow the branding.
   const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
-  const clientIdentityNotice = getClientIdentityNotice(data?.clientRegistration, data?.clientMetadataHost);
+  const clientIdentityNotice = getClientIdentityNotice(
+    data?.clientRegistration,
+    data?.clientMetadataHost,
+    oauthApplicationName || applicationName,
+  );
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -258,14 +262,6 @@ function _OAuthConsent() {
                   identifier: primaryIdentifier || '',
                 })}
               />
-              {clientIdentityNotice && (
-                <Text
-                  elementDescriptor={descriptors.oauthConsentClientIdentity}
-                  colorScheme={clientIdentityNotice.colorScheme}
-                  variant='caption'
-                  localizationKey={clientIdentityNotice.localizationKey}
-                />
-              )}
             </Header.Root>
             {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
               <OrgSelect
@@ -308,6 +304,18 @@ function _OAuthConsent() {
                 colorScheme='warning'
                 variant='caption'
               >
+                {clientIdentityNotice && (
+                  <>
+                    <Text
+                      elementDescriptor={descriptors.oauthConsentClientIdentity}
+                      as='span'
+                      colorScheme='warning'
+                      variant='caption'
+                      sx={t => ({ fontWeight: t.fontWeights.$semibold })}
+                      localizationKey={clientIdentityNotice}
+                    />{' '}
+                  </>
+                )}
                 <InlineAction
                   text={t(
                     localizationKeys('oauthConsent.warning', {
