@@ -2,7 +2,7 @@ import { globSync, mkdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const DOC_PATH = /^src\/(?:(components|primitives)\/([a-z0-9-]+)\/\2|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
+const DOC_PATH = /^src\/(?:(components|primitives)\/[a-z0-9-]+\/([a-z0-9-]+)|(hooks)\/(use-[a-z0-9-]+))\.doc\.ts$/;
 const EXCLUDED = new Set([
   'components/branding',
   'components/captcha',

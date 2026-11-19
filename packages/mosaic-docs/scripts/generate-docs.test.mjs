@@ -18,6 +18,12 @@ test('maps doc paths to a kind and slug', () => {
   );
 });
 
+test('gives a second component in a folder its own slug', () => {
+  assert.deepEqual(toEntries(['src/components/button/submit-button.doc.ts']), [
+    { kind: 'components', slug: 'submit-button', path: 'src/components/button/submit-button.doc' },
+  ]);
+});
+
 test('leaves out docs the site does not publish', () => {
   assert.deepEqual(toEntries(['src/components/captcha/captcha.doc.ts', 'src/components/button/button.doc.ts']), [
     { kind: 'components', slug: 'button', path: 'src/components/button/button.doc' },

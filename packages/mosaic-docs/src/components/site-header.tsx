@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { ClerkLogo } from '@/components/clerk-logo';
 import { GitHubLink } from '@/components/github-link';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { site } from '@/lib/site';
 import type { NavGroup } from '@/ui/docs-nav';
 import { MobileNav } from '@/ui/mobile-nav';
@@ -53,6 +54,7 @@ export function SiteHeader({ navigation }: { navigation: NavGroup[] }) {
       </nav>
       <div className='flex-1 lg:hidden' />
       <div className='flex shrink-0 items-center gap-1 lg:col-start-3 lg:justify-self-end'>
+        <ThemeToggle />
         <GitHubLink iconClassName='size-4.5' />
       </div>
     </header>
