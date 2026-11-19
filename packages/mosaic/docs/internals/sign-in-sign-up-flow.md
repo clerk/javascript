@@ -32,7 +32,7 @@ The flow's `*.routes.ts` exports this rule as one function, so the controller an
 Sign-up renders one component per screen, so the route decides what is mounted (`SignUpView` in `mosaic/src/features/sign-up/sign-up.view.tsx`). Sign-in has no controller yet.
 
 - `useSignUpController` sits above the screens and holds what outlives one: the route, the details form, the chosen identifier and Start over. `start` and `continue` render that one form, so a password typed on `start` is still there after Back from a verify screen. The password lives nowhere else.
-- A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way.
+- A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way. A screen that runs a controller reaches the view as a slot the wrapper builds, so `SignUpView` renders plain props only.
 - `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
 - A screen another feature owns arrives as a slot. The wrapper passes `TaskChooseOrganizationContent`, the task without its card, and the view mounts it on the task route.
 - A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`, `protectCheck`) shows `startOver`.

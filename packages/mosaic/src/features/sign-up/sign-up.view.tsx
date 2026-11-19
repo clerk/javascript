@@ -17,7 +17,6 @@ import type { SignUpViewProps } from './sign-up.types';
 import { SignUpDetailsStep } from './sign-up-details/sign-up-details';
 import { SignUpLegalConsentField } from './sign-up-details/sign-up-legal-consent';
 import { SignUpRestricted } from './sign-up-restricted/sign-up-restricted';
-import { SignUpVerify } from './sign-up-verify/sign-up-verify';
 
 export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');
@@ -31,7 +30,6 @@ export function SignUpView(props: SignUpViewProps) {
         state={props}
       >
         {({
-          attempt,
           start,
           continue: continueDetails,
           verifyEmail,
@@ -65,22 +63,10 @@ export function SignUpView(props: SignUpViewProps) {
             </Flow.Step>
 
             {/* /verify-email-address, /continue/verify-email-address */}
-            <Flow.Step ids={['verifyEmail', 'continueVerifyEmail']}>
-              <SignUpVerify
-                key={attempt}
-                channel='email'
-                {...verifyEmail}
-              />
-            </Flow.Step>
+            <Flow.Step ids={['verifyEmail', 'continueVerifyEmail']}>{verifyEmail}</Flow.Step>
 
             {/* /verify-phone-number, /continue/verify-phone-number */}
-            <Flow.Step ids={['verifyPhone', 'continueVerifyPhone']}>
-              <SignUpVerify
-                key={attempt}
-                channel='phone'
-                {...verifyPhone}
-              />
-            </Flow.Step>
+            <Flow.Step ids={['verifyPhone', 'continueVerifyPhone']}>{verifyPhone}</Flow.Step>
 
             {/* / when sign-ups are restricted */}
             <Flow.Step ids={['restricted']}>

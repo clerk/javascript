@@ -14,7 +14,7 @@ import { toLocalizableError } from '../../utils/errors';
 import type { SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
-import type { SignUpScreen, SignUpViewProps } from './sign-up.types';
+import type { SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
 import { useSignUpDetailsController } from './sign-up-details/sign-up-details.controller';
 
 interface FinishContext {
@@ -81,8 +81,12 @@ function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignU
 
 type SignUpControllerResult = Omit<
   SignUpViewProps,
-  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization'
->;
+  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone'
+> & {
+  attempt?: string;
+  verifyEmail: SignUpVerifyScreen;
+  verifyPhone: SignUpVerifyScreen;
+};
 
 export function useSignUpController(
   liveModel: SignUpReadyModel,

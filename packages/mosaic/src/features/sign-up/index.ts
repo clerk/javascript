@@ -1,5 +1,6 @@
 export { SignUp } from './sign-up';
 export type { SignUpProps } from './sign-up';
+export { SignUpVerify } from './sign-up-verify/sign-up-verify';
 export { SignUpView } from './sign-up.view';
 export type {
   SignUpDetails,

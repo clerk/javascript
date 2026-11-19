@@ -25,18 +25,18 @@ The standalone sign-up view. It reuses the sign-up screens the sign-in view show
 
 ## Usage
 
-The view renders its own `Card.Root` and mounts one screen at a time inside it. `screen` says which one: a route of the sign-up, or a screen the flow shows on top of a route, such as `restricted` or `startOver`. Each screen takes its own props under its own name, so `start` and `continue` hold the details form and `verifyEmail` and `verifyPhone` each take a `verification` (the address, whether a code is still needed, and `send` and `verify`) and `onNext` for the step a correct code returns. `start` and `continue` share one `useForm`, so what the user typed is still there after a trip to a verify screen. A verify screen sends its code when it mounts with `verification.needsCode`, and `attempt` remounts it for a new sign-up. `taskChooseOrganization` is a slot for the session task shown on its route. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for a screen's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
+The view renders its own `Card.Root` and mounts one screen at a time inside it. `screen` says which one: a route of the sign-up, or a screen the flow shows on top of a route, such as `restricted` or `startOver`. Each screen takes its own props under its own name, so `start` and `continue` hold the details form. `verifyEmail` and `verifyPhone` are slots: pass a `SignUpVerify` for each, with its `channel`, a `verification` (the address, whether a code is still needed, and `send` and `verify`) and `onNext` for the step a correct code returns. `start` and `continue` share one `useForm`, so what the user typed is still there after a trip to a verify screen. A verify screen sends its code when it mounts with `verification.needsCode`; give it the sign-up's id as its `key`, so a new sign-up remounts it. `taskChooseOrganization` is a slot for the session task shown on its route. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for a screen's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
 
 ```tsx
-import { SignUpView } from '@clerk/mosaic/features/sign-up';
+import { SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
 
 <SignUpView
   screen='start'
   applicationName='Acme'
   start={{ ...details, step: { purpose: 'start', fields: { emailAddress: { required: true } } } }}
   continue={{ ...details, step: { purpose: 'continue', fields: {} } }}
-  verifyEmail={{ verification: emailVerification, onNext, onEditIdentifier }}
-  verifyPhone={{ verification: phoneVerification, onNext, onEditIdentifier }}
+  verifyEmail={<SignUpVerify key={signUpId} channel='email' verification={emailVerification} onNext={onNext} onEditIdentifier={onEditIdentifier} />}
+  verifyPhone={<SignUpVerify key={signUpId} channel='phone' verification={phoneVerification} onNext={onNext} onEditIdentifier={onEditIdentifier} />}
   restricted={{ onSignIn }}
   onStartOver={startOver}
 />;
