@@ -46,8 +46,7 @@ export function SignUp({
   );
 }
 
-// TODO: The combined sign-in and sign-up flow holds these routes under `create/`. That needs the nested scopes
-// from the routing work (#10780) before it can be built.
+// TODO: Explore a separate routing table for the combined sign-in and sign-up flow.
 function SignUpFlow({
   model,
   routing,
