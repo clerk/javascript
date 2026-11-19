@@ -33,6 +33,7 @@ interface BaseDoc {
 
 export interface ComponentDoc extends BaseDoc {
   parts: Record<string, PartDoc>;
+  playground?: { part: string; defaults?: Partial<Record<string, unknown>> };
 }
 
 export interface HookDoc extends BaseDoc {

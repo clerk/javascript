@@ -22,6 +22,21 @@ export interface PartDoc<Props> {
   props?: PropDocs<Props>;
 }
 
+export interface PlaygroundElement {
+  __element: string;
+  props?: Record<string, string | boolean>;
+  children?: PlaygroundChildren;
+}
+
+export type PlaygroundChildren = string | PlaygroundElement | (string | PlaygroundElement)[];
+
+export type Playground<Parts> = {
+  [Name in keyof Parts]: {
+    part: Name;
+    defaults?: { [Prop in keyof Parts[Name]]?: Prop extends 'children' ? PlaygroundChildren : Parts[Name][Prop] };
+  };
+}[keyof Parts];
+
 export interface ExportDoc {
   description: string;
 }
@@ -39,6 +54,7 @@ interface BaseDoc {
 
 export interface ComponentDoc<Parts extends Record<string, object>> extends BaseDoc {
   parts: { [Name in keyof Parts]: PartDoc<Parts[Name]> };
+  playground?: Playground<Parts>;
 }
 
 export interface HookDoc<Options, Result> extends BaseDoc {
