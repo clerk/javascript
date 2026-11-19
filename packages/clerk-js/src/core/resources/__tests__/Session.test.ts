@@ -1801,7 +1801,7 @@ describe('Session', () => {
       );
     });
 
-    it('asks for the client on the touch request', async () => {
+    it('does not ask for the client on the touch request', async () => {
       const session = new Session(mockSessionData);
       const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
 
@@ -1813,13 +1813,10 @@ describe('Session', () => {
       await session.__internal_touch();
 
       expect(requestSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'POST',
-          path: '/client/sessions/session_1/touch',
-          search: { include_client: 'true' },
-        }),
+        expect.objectContaining({ method: 'POST', path: '/client/sessions/session_1/touch' }),
         expect.anything(),
       );
+      expect(requestSpy.mock.calls[0][0].search).toBeUndefined();
     });
   });
 

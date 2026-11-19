@@ -123,7 +123,6 @@ export class Session extends BaseResource implements SessionResource {
       {
         method: 'POST',
         path: this.path('touch'),
-        search: { include_client: 'true' },
         // any is how we type the body in the BaseMutateParams as well
         body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },

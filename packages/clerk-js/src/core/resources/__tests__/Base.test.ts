@@ -61,7 +61,7 @@ describe('BaseResource', () => {
     expect(errResponse.retryAfter).toBe(undefined);
   });
 
-  describe('include_client', () => {
+  describe('_include_client', () => {
     const mockRequest = (response: unknown) => {
       const request = vi.fn().mockResolvedValue({ payload: { response }, status: 200 });
       BaseResource.clerk = {
@@ -88,7 +88,7 @@ describe('BaseResource', () => {
 
       await new TestResource().reload();
 
-      expect(searchOf(request).get('include_client')).toBe('true');
+      expect(searchOf(request).get('_include_client')).toBe('true');
     });
 
     it('keeps the rotating token nonce when asking for the client on reload()', async () => {
@@ -97,7 +97,7 @@ describe('BaseResource', () => {
       await new TestResource().reload({ rotatingTokenNonce: 'nonce_123' });
 
       expect(request.mock.calls[0][0].rotatingTokenNonce).toBe('nonce_123');
-      expect(searchOf(request).get('include_client')).toBe('true');
+      expect(searchOf(request).get('_include_client')).toBe('true');
     });
 
     it('asks for the client on Organization.reload()', async () => {
@@ -106,7 +106,7 @@ describe('BaseResource', () => {
       await organization().reload();
 
       expect(request.mock.calls[0][0].path).toBe('/organizations/org_123');
-      expect(searchOf(request).get('include_client')).toBe('true');
+      expect(searchOf(request).get('_include_client')).toBe('true');
     });
 
     it('does not ask for the client on other GET requests', async () => {
@@ -114,7 +114,7 @@ describe('BaseResource', () => {
 
       await organization().getRoles({ pageSize: 5 });
 
-      expect(searchOf(request).get('include_client')).toBeNull();
+      expect(searchOf(request).get('_include_client')).toBeNull();
       expect(searchOf(request).get('limit')).toBe('5');
     });
   });

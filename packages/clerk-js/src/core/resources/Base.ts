@@ -109,7 +109,7 @@ export abstract class BaseResource {
     let fapiRequestInit = requestInit;
     if (requestInit.method === 'GET' && opts.forceUpdateClient) {
       const search = new URLSearchParams(requestInit.search);
-      search.set('include_client', 'true');
+      search.set('_include_client', 'true');
       fapiRequestInit = { ...requestInit, search };
     }
 
