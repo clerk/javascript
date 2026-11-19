@@ -156,6 +156,35 @@ describe('SignInAccountSwitcher', () => {
     );
   });
 
+  it('shows sign-in instead of an empty chooser when the client only holds ended sessions', async () => {
+    // An earlier test auto-started ChatGPT for this URL, which suppresses a second auto-start.
+    window.sessionStorage.clear();
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withSocialProvider({ provider: 'chatgpt' });
+      f.withUser({ first_name: 'Nick', last_name: 'Kouk', email_addresses: ['test1@clerk.com'] });
+    });
+    for (const session of fixtures.clerk.client.sessions) {
+      (session as { status: string }).status = 'ended';
+    }
+    // With every session ended there is no active session or user either.
+    Object.assign(fixtures.clerk, { session: null, user: null });
+    fixtures.router.queryParams = {
+      target_flow: 'chatgpt_siwc',
+      redirect_url:
+        'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      __clerk_siwc_account_mismatch: 'true',
+    } as any;
+    fixtures.signIn.create.mockResolvedValueOnce({ status: 'needs_identifier' } as any);
+    fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+    const { queryByText } = render(<SignInAccountSwitcherForChatGPTSIWC />, { wrapper });
+
+    // SignInStart runs the ChatGPT preflight; the chooser would list the ended session instead.
+    await waitFor(() => expect(fixtures.signIn.create).toHaveBeenCalled());
+    expect(queryByText('Nick Kouk')).toBeNull();
+    expect(queryByText('Add account')).toBeNull();
+  });
+
   it('preserves the outer OAuth continuation when adding an account with path routing', async () => {
     const { wrapper, fixtures, props } = await createFixtures(initConfig);
     props.setProps({ routing: 'path', path: '/sign-in' } as any);

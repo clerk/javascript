@@ -478,12 +478,14 @@ export class SignIn extends BaseResource implements SignInResource {
       }
     }
 
-    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+    const hasProviderHint = slackTeamIdHint !== undefined || oidcLoginHint !== undefined;
+    if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && hasProviderHint)) {
       const prepareParams = {
         strategy,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        oidcLoginHint,
         slackTeamIdHint,
         enterpriseConnectionId,
       };
@@ -1421,8 +1423,8 @@ class SignInFuture implements SignInFutureResource {
       // abandoned attempt, including a retry of the same provider (SDK-75), so start
       // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
       // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
-      // without a pending redirect, an explicit `slackTeamIdHint` also triggers preparation
-      // so the hint is applied to the existing attempt.
+      // without a pending redirect, an explicit `slackTeamIdHint` or `oidcLoginHint` also
+      // triggers preparation so the hint is applied to the existing attempt.
       const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
@@ -1457,13 +1459,15 @@ class SignInFuture implements SignInFutureResource {
         }
       }
 
-      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && slackTeamIdHint !== undefined)) {
+      const hasProviderHint = slackTeamIdHint !== undefined || oidcLoginHint !== undefined;
+      if (strategy === 'enterprise_sso' || (!shouldCreateSignIn && hasProviderHint)) {
         const prepare = (options?: { resolveProtectCheck?: boolean }) =>
           this.#resource.__internal_basePost(
             {
               body: {
                 ...routes,
                 oidcPrompt,
+                oidcLoginHint,
                 slackTeamIdHint,
                 enterpriseConnectionId,
                 strategy,

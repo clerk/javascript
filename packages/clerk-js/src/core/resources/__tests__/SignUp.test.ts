@@ -2581,6 +2581,7 @@ describe('SignUp Slack workspace hint requests', () => {
       redirectUrl: 'https://example.com/callback',
       redirectUrlComplete: 'https://example.com/dashboard',
       slackTeamIdHint: 'T123ABC',
+      oidcLoginHint: 'user@example.com',
       continueSignUp,
     };
     if (popup) {
@@ -2590,6 +2591,7 @@ describe('SignUp Slack workspace hint requests', () => {
     }
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fields().get('slack_team_id_hint')).toBe('T123ABC');
+    expect(fields().get('oidc_login_hint')).toBe('user@example.com');
     expect(fetchMock.mock.calls[0][0].pathname).toBe(
       continueSignUp ? '/v1/client/sign_ups/signup_existing' : '/v1/client/sign_ups',
     );

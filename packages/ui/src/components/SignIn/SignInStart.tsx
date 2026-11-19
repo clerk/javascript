@@ -71,7 +71,7 @@ const isChatGPTHintPreflightFailure = (err: unknown) =>
 const isChatGPTLoginHintFormatFailure = (err: unknown) =>
   isClerkAPIResponseError(err) && err.errors.some(error => error.code === 'form_param_format_invalid');
 
-const useAutoFillPasskey = () => {
+const useAutoFillPasskey = ({ enabled }: { enabled: boolean }) => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
   const onSecondFactor = () => navigate('factor-two');
@@ -92,7 +92,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill && attributes.passkey?.enabled) {
+    if (enabled && passkeySettings.allow_autofill && attributes.passkey?.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -122,7 +122,9 @@ function SignInStartInternal(): JSX.Element {
   /**
    * Passkeys
    */
-  const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
+  // The ChatGPT preflight creates its own sign-in on mount. A pending autofill assertion would then
+  // complete against that newer attempt, so ChatGPT authorizations skip passkey autofill.
+  const { isWebAuthnAutofillSupported } = useAutoFillPasskey({ enabled: !isChatGPTSIWCFlow(ctx.queryParams) });
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const isWebSupported = useIsWebAuthnSupported();

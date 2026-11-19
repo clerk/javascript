@@ -177,7 +177,7 @@ const SignInAccountSwitcherInternal = () => {
 };
 export const SignInAccountSwitcherForChatGPTSIWC = withCardStateProvider(() => {
   const clerk = useClerk();
-  if (clerk.client.sessions.length === 0) {
+  if (clerk.client.signedInSessions.length === 0) {
     return <SignInStart />;
   }
   return <SignInAccountSwitcherInternal />;

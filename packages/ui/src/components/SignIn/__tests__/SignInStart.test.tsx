@@ -215,6 +215,34 @@ describe('SignInStart', () => {
         screen.getByText('Use passkey instead');
       });
 
+      it('ChatGPTSIWC_PasskeyAutofill_SkippedWhileChatGPTAuthorizationRuns', async () => {
+        window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({ allow_autofill: true, show_sign_in_button: false });
+          f.withSocialProvider({ provider: 'chatgpt' });
+        });
+        fixtures.router.queryParams = {
+          target_flow: 'chatgpt_siwc',
+          redirect_url:
+            'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        } as any;
+        fixtures.signIn.create.mockResolvedValueOnce({ status: 'needs_identifier' } as any);
+        fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+        render(<SignInStart />, { wrapper });
+
+        // The ChatGPT preflight owns the sign-in attempt, so no autofill assertion races it.
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+            expect.objectContaining({ strategy: 'oauth_chatgpt' }),
+          );
+        });
+        expect(fixtures.signIn.authenticateWithPasskey).not.toHaveBeenCalled();
+        window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      });
+
       it('skips autofill when the host reports no autofill support', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
