@@ -421,6 +421,17 @@ describe('isomorphicClerk', () => {
       expect(delegate).toHaveBeenCalledWith(firstParams);
     });
 
+    it('makes a new clerk-js call once the earlier one has finished', async () => {
+      const delegate = vi.fn().mockResolvedValue('done');
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = createClerkJS(delegate);
+
+      await expect(isomorphicClerk.handleRedirectCallback(firstParams)).resolves.toBe('done');
+      await expect(isomorphicClerk.handleRedirectCallback(secondParams)).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(2);
+      expect(delegate).toHaveBeenLastCalledWith(secondParams);
+    });
+
     it('makes a new clerk-js call once the earlier one has failed', async () => {
       const error = new Error('callback failed');
       const delegate = vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce('done');
