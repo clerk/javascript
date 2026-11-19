@@ -18,13 +18,7 @@ export function useOrganizationProfileModel(): OrganizationProfileModel {
   const apiKeysAccess = useAPIKeysAccess(organization?.id);
   const securityAccess = useSecurityPanelAccessModel();
 
-  if (
-    !isLoaded ||
-    !environment ||
-    membersAccess.status === 'loading' ||
-    securityAccess.status === 'loading' ||
-    !apiKeysAccess.isLoaded
-  ) {
+  if (!isLoaded || !environment || membersAccess.status === 'loading' || !apiKeysAccess.isLoaded) {
     return { status: 'loading' };
   }
   if (!organization) {
