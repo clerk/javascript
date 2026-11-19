@@ -133,17 +133,15 @@ export class Session extends BaseResource implements SessionResource {
       { skipUpdateClient: skipUpdateClient || isFocus },
     );
 
-    if (isFocus) {
-      if (
-        revision !== Client.getRevision() ||
-        activeSession !== BaseResource.clerk?.session ||
-        organizationId !== this.lastActiveOrganizationId
-      ) {
-        return null;
-      }
-      if (!skipUpdateClient) {
-        BaseResource._updateClient(json);
-      }
+    const changedInFlight =
+      revision !== Client.getRevision() ||
+      activeSession !== BaseResource.clerk?.session ||
+      organizationId !== this.lastActiveOrganizationId;
+    if (isFocus && changedInFlight) {
+      return null;
+    }
+    if (isFocus && !skipUpdateClient) {
+      BaseResource._updateClient(json);
     }
 
     // Update session in-place from response (same as BaseResource._baseMutate)

@@ -1318,10 +1318,10 @@ describe('Session', () => {
         Client.clearInstance();
       });
 
-      const respondAfterNewerWrite = (payload: Record<string, unknown>) => {
+      const respondAfterNewerWrite = (payload: Record<string, unknown>, status = 200) => {
         requestSpy.mockImplementation(() => {
           Client.getOrCreateInstance().fromJSON(clientJSON('client_newer', []) as any);
-          return Promise.resolve({ payload, status: 200 });
+          return Promise.resolve({ payload, status });
         });
       };
 
@@ -1443,16 +1443,13 @@ describe('Session', () => {
 
       it('throws a discarded focus touch error without applying its client', async () => {
         const session = new Session(sessionJSON('org_before'));
-        requestSpy.mockImplementation(() => {
-          Client.getOrCreateInstance().fromJSON(clientJSON('client_newer', []) as any);
-          return Promise.resolve({
-            payload: {
-              errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
-              meta: { client: clientJSON('client_error', []) },
-            },
-            status: 422,
-          });
-        });
+        respondAfterNewerWrite(
+          {
+            errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
+            meta: { client: clientJSON('client_error', []) },
+          },
+          422,
+        );
 
         await expect(session.touch({ intent: 'focus' })).rejects.toThrow('Invalid');
 

@@ -82,15 +82,7 @@ describe('BaseResource', () => {
         updated_at: 0,
       } as unknown as OrganizationJSON);
 
-    it('asks for the client on reload()', async () => {
-      const request = mockRequest({});
-
-      await new TestResource().reload();
-
-      expect(searchOf(request).get('_include_client')).toBe('true');
-    });
-
-    it('keeps the rotating token nonce when asking for the client on reload()', async () => {
+    it('asks for the client on reload() and keeps the rotating token nonce', async () => {
       const request = mockRequest({});
 
       await new TestResource().reload({ rotatingTokenNonce: 'nonce_123' });
