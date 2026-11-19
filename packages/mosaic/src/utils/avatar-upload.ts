@@ -1,7 +1,7 @@
 import type { LocalizableError } from '../localization';
 import type { FileRejectionReason } from '../primitives/file-upload';
 import { type Crop, cropImage } from '../primitives/image-cropper';
-import { SaveError } from './errors';
+import { MosaicError } from './errors';
 
 export const AVATAR_UPLOAD = {
   accept: 'image/png,image/jpeg,image/gif,image/webp',
@@ -29,7 +29,7 @@ export async function cropAvatar(src: string, crop: Crop, type: string): Promise
       return blob;
     }
     if (attempt === AVATAR_CROP.attempts) {
-      throw new SaveError({ global: AVATAR_REJECTION_ERRORS.size });
+      throw new MosaicError([AVATAR_REJECTION_ERRORS.size]);
     }
     scale *= Math.sqrt(AVATAR_UPLOAD.maxSize / blob.size) * 0.9;
   }

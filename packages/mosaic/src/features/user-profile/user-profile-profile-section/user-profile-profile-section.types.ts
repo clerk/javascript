@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import type { ClerkCall } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
@@ -46,13 +47,13 @@ export type UserProfileProfileSectionModel =
       nameManagedBy?: UserProfileManagedBy;
       imageUrl: string;
       hasImage: boolean;
-      onProfilePictureChange: (file: File) => Promise<void>;
-      onRemoveProfilePicture?: () => Promise<void>;
-      onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
+      onProfilePictureChange: (file: File) => ClerkCall;
+      onRemoveProfilePicture?: () => ClerkCall;
+      onSubmitName?: (value: UserProfileEditNameValue) => ClerkCall;
       showUsername: boolean;
       username: string;
       usernameRequired: boolean;
-      onSubmitUsername?: (username: string) => Promise<void>;
+      onSubmitUsername?: (username: string) => ClerkCall;
       usernameReverification: ReverificationController;
     };
 

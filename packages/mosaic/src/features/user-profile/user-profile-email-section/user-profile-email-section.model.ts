@@ -4,7 +4,7 @@ import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
-import { save } from '../../../utils/errors';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import { withUserProfileModalReturn } from '../user-profile.modal-return';
 import type { UserProfileOptions } from '../user-profile.provider';
@@ -47,7 +47,7 @@ function startEmailVerification(
         before the response lands, and an early click has nowhere to go.
       */
       connect: () =>
-        save(async () => {
+        callClerk(async () => {
           const prepared = await email.prepareVerification({
             strategy: 'enterprise_sso',
             redirectUrl: withUserProfileModalReturn(window.location.href, profile),
@@ -61,12 +61,19 @@ function startEmailVerification(
     };
   }
   if (linkRedirectUrl === undefined) {
-    return { method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) };
+    return {
+      method: 'code',
+      sent: callClerk(async () => {
+        await email.prepareVerification({ strategy: 'email_code' });
+      }),
+    };
   }
   const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
   return {
     method: 'link',
-    verified: save(() => startEmailLinkFlow({ redirectUrl: linkRedirectUrl })),
+    verified: callClerk(async () => {
+      await startEmailLinkFlow({ redirectUrl: linkRedirectUrl });
+    }),
     cancel: cancelEmailLinkFlow,
   };
 }
@@ -79,7 +86,13 @@ function toEmailVerifier(
 ): UserProfileEmailVerifier {
   return {
     start: () => startEmailVerification(email, linkRedirectUrl, router, profile),
-    verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
+    verifyCode: code =>
+      callClerk(
+        async () => {
+          await email.attemptVerification({ code });
+        },
+        { fields: ADD_EMAIL_FIELDS },
+      ),
   };
 }
 
@@ -124,11 +137,10 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     emails: toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress),
     username: user.username ?? undefined,
     onCreateEmail: access.canCreate
-      ? async emailAddress => {
-          const request = createEmail(currentUser, emailAddress);
-          await save(() => request, ADD_EMAIL_FIELDS);
-          return verifierFor(await request);
-        }
+      ? emailAddress =>
+          callClerk(async () => verifierFor(await createEmail(currentUser, emailAddress)), {
+            fields: ADD_EMAIL_FIELDS,
+          })
       : undefined,
     getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
     onSetPrimaryEmail: id => saveAsUser(current => setPrimaryEmail(current, id)),

@@ -1,7 +1,7 @@
 import type { MembersRoles } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/members-table-tab.types';
 import { useInviteMembersController } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.controller';
 import type { InviteMembersInput } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.model';
-import { SaveError } from '@clerk/mosaic/utils/errors';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosRole } from '@/lib/chaos';
@@ -21,7 +21,7 @@ async function invite({ emailAddresses, onRejected }: InviteMembersInput) {
   const rejected = emailAddresses.filter(email => existingMembers.includes(email));
   if (rejected.length > 0) {
     onRejected(rejected);
-    throw new SaveError({ global: { code: 'already_a_member_in_organization' } });
+    throw new MosaicError([{ code: 'already_a_member_in_organization' }]);
   }
 }
 

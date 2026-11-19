@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
+import { callClerk } from '../../../clerk/errors';
 import type { ReverificationController } from '../../../reverification';
 import { useUserProfileEmailSectionController } from '../user-profile-email-section.controller';
 import type { ReadyEmailSectionModel } from '../user-profile-email-section.types';
@@ -14,7 +14,7 @@ import { UserProfileEmailSectionView } from '../user-profile-email-section.view'
 
 const codeVerifier = {
   start: () => ({ method: 'code', sent: Promise.resolve() }) as const,
-  verifyCode: () => Promise.resolve(),
+  verifyCode: () => callClerk(() => Promise.resolve()),
 };
 
 type EmailSectionProps = Partial<Omit<ReadyEmailSectionModel, 'status' | 'userId'>>;
@@ -23,7 +23,7 @@ const idleReverification = { status: 'idle', visible: false } satisfies Reverifi
 function EmailSection({
   emails = [{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true }],
   getEmailVerifier = () => codeVerifier,
-  onSetPrimaryEmail = () => Promise.resolve(),
+  onSetPrimaryEmail = () => callClerk(() => Promise.resolve()),
   removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
   createReverification = idleReverification,
@@ -84,10 +84,10 @@ describe('email actions', () => {
           <EmailSection
             username='test'
             emails={emails}
-            onCreateEmail={() => Promise.resolve(codeVerifier)}
+            onCreateEmail={() => callClerk(() => Promise.resolve(codeVerifier))}
             onRemoveEmail={id => {
               setEmails(current => current.filter(email => email.id !== id));
-              return Promise.resolve();
+              return callClerk(() => Promise.resolve());
             }}
           />
         </MosaicProvider>
@@ -105,7 +105,9 @@ describe('email actions', () => {
 
   it('shows why the primary update failed, without opening a dialog', async () => {
     const user = userEvent.setup();
-    const onSetPrimaryEmail = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Not verified yet.' } }));
+    const onSetPrimaryEmail = vi
+      .fn()
+      .mockRejectedValue(new MosaicError([{ code: 'test_failure', message: 'Not verified yet.' }]));
     renderEmail({ onSetPrimaryEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
@@ -139,7 +141,7 @@ describe('email actions', () => {
     expect(within(dialog).getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
 
     await act(async () => {
-      removal.reject(clerkApiError('email_address_in_use', 'Unable to remove email.'));
+      removal.reject(new MosaicError([{ code: 'email_address_in_use', message: 'Unable to remove email.' }]));
       await removal.promise.catch(() => undefined);
     });
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove email.');
@@ -170,7 +172,7 @@ describe('email actions', () => {
   it('renders the emails as a group with an Add action', () => {
     renderEmail({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
-      onCreateEmail: () => Promise.resolve(codeVerifier),
+      onCreateEmail: () => callClerk(() => Promise.resolve(codeVerifier)),
     });
 
     const group = screen.getByRole('group', { name: 'Email' });

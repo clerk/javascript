@@ -4,12 +4,12 @@ import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useResendSeconds } from '../../../hooks/use-resend-seconds';
+import type { ErrorDescription } from '../../../localization';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
-import type { FormError } from '../../../utils/errors';
-import { toFormError } from '../../../utils/errors';
+import { describeError } from '../../../utils/errors';
 import { CODE_LENGTH, CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
 import type { ReverificationController } from '../../reverification';
 import type {
@@ -40,7 +40,7 @@ interface Context {
   emailAddress: string;
   verifier: UserProfileEmailVerifier | undefined;
   verification: UserProfileEmailVerification | undefined;
-  error: FormError | undefined;
+  error: ErrorDescription | undefined;
   resendAvailableAt: number | undefined;
   held: boolean;
 }
@@ -61,7 +61,7 @@ function missingDependency(): Promise<never> {
 
 const LINK_RESEND_SECONDS = 60;
 
-const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
+const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: describeError(event.error) }));
 const resend = {
   target: 'starting' as const,
   guard: (context: Context) => isResendUnlocked(context.resendAvailableAt),
@@ -216,7 +216,7 @@ export function useUserProfileAddEmailController({
   const step = isReverifying ? 'reverify' : toStep(state, verification);
   const form = state === 'email' ? emailForm : codeForm;
   const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
-  const machineError = error?.global ? errorText(error.global) : undefined;
+  const machineError = error ? errorText(error) : undefined;
 
   return {
     handle,

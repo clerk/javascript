@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../../components/button';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
 import { useUserProfileEditNameController } from '../user-profile-edit-name.controller';
 import type { UserProfileEditNameDialogProps, UserProfileEditNameValue } from '../user-profile-edit-name.dialog';
 import { UserProfileEditNameDialog } from '../user-profile-edit-name.dialog';
@@ -128,10 +128,10 @@ describe('UserProfileEditNameDialog', () => {
     renderView({
       onSubmit: () =>
         Promise.reject(
-          new SaveError({
-            global: { message: 'Your name could not be updated.' },
-            fields: { lastName: { message: 'Last name must be 64 characters or fewer.' } },
-          }),
+          new MosaicError([
+            { code: 'test_failure', message: 'Your name could not be updated.' },
+            { code: 'test_failure', message: 'Last name must be 64 characters or fewer.', field: 'lastName' },
+          ]),
         ),
     });
 
@@ -149,7 +149,10 @@ describe('UserProfileEditNameDialog', () => {
   it('leaves the banner empty when only a field is blamed', async () => {
     const user = userEvent.setup();
     renderView({
-      onSubmit: () => Promise.reject(new SaveError({ fields: { firstName: { message: 'First name is required.' } } })),
+      onSubmit: () =>
+        Promise.reject(
+          new MosaicError([{ code: 'test_failure', message: 'First name is required.', field: 'firstName' }]),
+        ),
     });
 
     await user.type(lastNameField(), 'x');

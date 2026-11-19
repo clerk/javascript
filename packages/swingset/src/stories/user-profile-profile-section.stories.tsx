@@ -1,5 +1,5 @@
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
-import type { FormError } from '@clerk/mosaic/utils/errors';
+import type { MosaicError } from '@clerk/mosaic/utils/errors';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -18,8 +18,8 @@ export const meta: StoryMeta = {
 };
 
 function ProfileSection(options: {
-  nameFailWith?: FormError;
-  usernameFailWith?: FormError;
+  nameFailWith?: MosaicError['issues'];
+  usernameFailWith?: MosaicError['issues'];
   nameManagedBy?: { name: string };
 }) {
   const profile = useUserProfileProfileFixture(options);
@@ -43,12 +43,14 @@ export function NameManagedByConnection() {
 export function EditNameFails() {
   return (
     <ProfileSection
-      nameFailWith={{
-        global: { code: 'internal_clerk_error', message: 'Your name could not be updated.' },
-        fields: {
-          lastName: { code: 'form_param_max_length_exceeded', message: 'Last name must be 64 characters or fewer.' },
+      nameFailWith={[
+        { code: 'internal_clerk_error', message: 'Your name could not be updated.' },
+        {
+          code: 'form_param_max_length_exceeded',
+          message: 'Last name must be 64 characters or fewer.',
+          field: 'lastName',
         },
-      }}
+      ]}
     />
   );
 }
@@ -56,10 +58,10 @@ export function EditNameFails() {
 export function EditUsernameFails() {
   return (
     <ProfileSection
-      usernameFailWith={{
-        global: { code: 'internal_clerk_error', message: 'Your username could not be updated.' },
-        fields: { username: { code: 'form_identifier_exists', message: 'That username is already taken.' } },
-      }}
+      usernameFailWith={[
+        { code: 'internal_clerk_error', message: 'Your username could not be updated.' },
+        { code: 'form_identifier_exists', message: 'That username is already taken.', field: 'username' },
+      ]}
     />
   );
 }

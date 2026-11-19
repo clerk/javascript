@@ -3,6 +3,8 @@ import { useOrganization, useOrganizationList, useSession, useUser } from '@cler
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import { useOrganizationProfileOptions } from '../organization-profile.provider';
 
 const organizationListParams = {
@@ -18,8 +20,8 @@ export type OrganizationProfileDangerSectionModel =
       organizationId: string;
       name: string;
       memberCount: number;
-      leaveOrganization: () => Promise<void>;
-      deleteOrganization?: () => Promise<void>;
+      leaveOrganization: () => ClerkCall;
+      deleteOrganization?: () => ClerkCall;
     };
 
 export function useOrganizationProfileDangerSectionModel(): OrganizationProfileDangerSectionModel {
@@ -58,15 +60,17 @@ export function useOrganizationProfileDangerSectionModel(): OrganizationProfileD
     organizationId: organization.id,
     name: organization.name,
     memberCount: organization.membersCount,
-    leaveOrganization: async () => {
-      await user.leaveOrganization(organization.id);
-      afterLeave();
-    },
+    leaveOrganization: () =>
+      callClerk(async () => {
+        await user.leaveOrganization(organization.id);
+        afterLeave();
+      }),
     deleteOrganization: canDelete
-      ? async () => {
-          await organization.destroy();
-          afterLeave();
-        }
+      ? () =>
+          callClerk(async () => {
+            await organization.destroy();
+            afterLeave();
+          })
       : undefined,
   };
 }

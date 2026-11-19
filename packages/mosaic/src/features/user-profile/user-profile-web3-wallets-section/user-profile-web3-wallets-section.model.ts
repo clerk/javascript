@@ -7,6 +7,7 @@ import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import { callClerk } from '../../clerk/errors';
 import { useReverificationFlow } from '../../reverification';
 import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
@@ -180,97 +181,103 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   return {
     ...projection,
     userId,
-    connect: async (strategy, walletName, onTarget) => {
-      requireCurrentUser();
-      const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === strategy);
-      const available = projection.availableProviders.some(candidate => candidate.id === strategy);
-      const manager = clerk.__internal_moduleManager;
-      if (!provider || !available || !manager) {
-        throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
-      }
-      const web3 = createWeb3(manager);
-      const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
-      if (!identifier) {
-        throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
-      }
-      const current = requireCurrentUser();
-      const canConnect =
-        Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
-        !environment.userSettings.attributes.web3_wallet?.immutable &&
-        allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
-        environment.userSettings.web3FirstFactors.includes(strategy);
-      if (!canConnect) {
-        throw walletUnavailable();
-      }
-      const normalizedIdentifier = normalizedWeb3Wallet(identifier);
-      const existing = current.web3Wallets.find(
-        wallet =>
-          wallet.verification.status !== 'verified' &&
-          (wallet.verification.strategy === provider.strategy || wallet.verification.strategy === null) &&
-          normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
-      );
-      if (!existing && current.web3Wallets.some(wallet => wallet.verification.strategy === strategy)) {
-        throw walletUnavailable();
-      }
-      onTarget?.(existing ? { kind: 'wallet', id: existing.id } : { kind: 'address', address: normalizedIdentifier });
-      const wallet = existing ?? (await createWallet(current, identifier));
-      requireCurrentUser();
-      if (!wallet) {
-        throw new ClerkRuntimeError('The wallet could not be created.', { code: 'web3_wallet_creation_failed' });
-      }
-      onTarget?.({ kind: 'wallet', id: wallet.id });
-      await attemptVerification({ wallet, provider, identifier, walletName, web3 });
-    },
-    verify: async (walletId, walletName) => {
-      const current = requireCurrentUser();
-      const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
-      const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === wallet?.verification.strategy);
-      const canVerify =
-        Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
-        !environment.userSettings.attributes.web3_wallet?.immutable &&
-        allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
-        environment.userSettings.web3FirstFactors.some(strategy => strategy === wallet?.verification.strategy);
-      const manager = clerk.__internal_moduleManager;
-      if (!wallet || !provider || wallet.verification.status === 'verified' || !canVerify || !manager) {
-        throw walletUnavailable();
-      }
-      const web3 = createWeb3(manager);
-      const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
-      if (!identifier) {
-        throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
-      }
-      const latestUser = requireCurrentUser();
-      const latest = latestUser.web3Wallets.find(candidate => candidate.id === walletId);
-      if (
-        !latest ||
-        latest.verification.status === 'verified' ||
-        latest.verification.strategy !== provider.strategy ||
-        !allowsIdentificationCreation(latestUser, environment.userSettings.enterpriseSSO)
-      ) {
-        throw walletUnavailable();
-      }
-      if (normalizedWeb3Wallet(identifier) !== normalizedWeb3Wallet(latest.web3Wallet)) {
-        throw new ClerkRuntimeError('Select the wallet account that matches this address.', {
-          code: 'web3_wallet_account_mismatch',
-        });
-      }
-      await attemptVerification({ wallet: latest, provider, identifier, walletName, web3 });
-    },
-    setPrimary: async walletId => {
-      const current = requireCurrentUser();
-      if (!current.web3Wallets.some(wallet => wallet.id === walletId && wallet.verification.status === 'verified')) {
-        throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
-      }
-      await setPrimaryWallet(current, walletId);
-    },
+    connect: (strategy, walletName, onTarget) =>
+      callClerk(async () => {
+        requireCurrentUser();
+        const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === strategy);
+        const available = projection.availableProviders.some(candidate => candidate.id === strategy);
+        const manager = clerk.__internal_moduleManager;
+        if (!provider || !available || !manager) {
+          throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+        }
+        const web3 = createWeb3(manager);
+        const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
+        if (!identifier) {
+          throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
+        }
+        const current = requireCurrentUser();
+        const canConnect =
+          Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
+          !environment.userSettings.attributes.web3_wallet?.immutable &&
+          allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
+          environment.userSettings.web3FirstFactors.includes(strategy);
+        if (!canConnect) {
+          throw walletUnavailable();
+        }
+        const normalizedIdentifier = normalizedWeb3Wallet(identifier);
+        const existing = current.web3Wallets.find(
+          wallet =>
+            wallet.verification.status !== 'verified' &&
+            (wallet.verification.strategy === provider.strategy || wallet.verification.strategy === null) &&
+            normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
+        );
+        if (!existing && current.web3Wallets.some(wallet => wallet.verification.strategy === strategy)) {
+          throw walletUnavailable();
+        }
+        onTarget?.(existing ? { kind: 'wallet', id: existing.id } : { kind: 'address', address: normalizedIdentifier });
+        const wallet = existing ?? (await createWallet(current, identifier));
+        requireCurrentUser();
+        if (!wallet) {
+          throw new ClerkRuntimeError('The wallet could not be created.', { code: 'web3_wallet_creation_failed' });
+        }
+        onTarget?.({ kind: 'wallet', id: wallet.id });
+        await attemptVerification({ wallet, provider, identifier, walletName, web3 });
+      }),
+    verify: (walletId, walletName) =>
+      callClerk(async () => {
+        const current = requireCurrentUser();
+        const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
+        const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === wallet?.verification.strategy);
+        const canVerify =
+          Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
+          !environment.userSettings.attributes.web3_wallet?.immutable &&
+          allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
+          environment.userSettings.web3FirstFactors.some(strategy => strategy === wallet?.verification.strategy);
+        const manager = clerk.__internal_moduleManager;
+        if (!wallet || !provider || wallet.verification.status === 'verified' || !canVerify || !manager) {
+          throw walletUnavailable();
+        }
+        const web3 = createWeb3(manager);
+        const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
+        if (!identifier) {
+          throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
+        }
+        const latestUser = requireCurrentUser();
+        const latest = latestUser.web3Wallets.find(candidate => candidate.id === walletId);
+        if (
+          !latest ||
+          latest.verification.status === 'verified' ||
+          latest.verification.strategy !== provider.strategy ||
+          !allowsIdentificationCreation(latestUser, environment.userSettings.enterpriseSSO)
+        ) {
+          throw walletUnavailable();
+        }
+        if (normalizedWeb3Wallet(identifier) !== normalizedWeb3Wallet(latest.web3Wallet)) {
+          throw new ClerkRuntimeError('Select the wallet account that matches this address.', {
+            code: 'web3_wallet_account_mismatch',
+          });
+        }
+        await attemptVerification({ wallet: latest, provider, identifier, walletName, web3 });
+      }),
+    setPrimary: walletId =>
+      callClerk(async () => {
+        const current = requireCurrentUser();
+        if (!current.web3Wallets.some(wallet => wallet.id === walletId && wallet.verification.status === 'verified')) {
+          throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+        }
+        await setPrimaryWallet(current, walletId);
+      }),
     remove: web3Attribute.immutable
       ? undefined
-      : async walletId => {
-          if (environment.userSettings.attributes.web3_wallet?.immutable) {
-            throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
-          }
-          await removeWallet(requireCurrentUser(), walletId);
-        },
+      : walletId =>
+          callClerk(async () => {
+            if (environment.userSettings.attributes.web3_wallet?.immutable) {
+              throw new ClerkRuntimeError('This wallet provider is unavailable.', {
+                code: 'web3_provider_unavailable',
+              });
+            }
+            await removeWallet(requireCurrentUser(), walletId);
+          }),
     removeReverification,
     setPrimaryReverification,
     createReverification,

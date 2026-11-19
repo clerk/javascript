@@ -1,4 +1,3 @@
-import { isClerkRuntimeError } from '@clerk/shared/error';
 import { useEffect, useMemo } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
@@ -8,12 +7,13 @@ import { isLocalizableError, useErrorText, useMessages } from '../../localizatio
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableErrors } from '../../utils/errors';
+import { describeErrors, MosaicError } from '../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../utils/verification';
-import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
+import type { ReverificationModel } from './reverification.model';
 import type {
   ReverificationErrorReason,
   ReverificationMethod,
+  ReverificationPreparableMethod,
   ReverificationResult,
   ReverificationStep,
   ReverificationViewProps,
@@ -38,7 +38,12 @@ export type ReverificationController = ReverificationControllerState & {
 
 type Overlay = Extract<ReverificationStep, 'method-picker' | 'help'>;
 
-export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
+export interface ReverificationDeps {
+  start: () => Promise<ReverificationResult>;
+  prepare: (method: ReverificationPreparableMethod) => Promise<void>;
+  attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
+  finish: () => Promise<void>;
+}
 
 interface ReverificationContext {
   inputValue: string;
@@ -87,7 +92,7 @@ function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
 }
 
 function isPasskeyAbortedError(error: unknown): boolean {
-  return isClerkRuntimeError(error) && error.code === 'passkey_operation_aborted';
+  return error instanceof MosaicError && error.issues.some(issue => issue.code === 'passkey_operation_aborted');
 }
 
 function selectMethod(ctx: ReverificationContext, id: string): Partial<ReverificationContext> {
@@ -255,7 +260,7 @@ export const reverificationMachine = createMachine({
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({
-            errors: toLocalizableErrors(event.error),
+            errors: describeErrors(event.error),
             submitRequested: false,
             ...unlockResend(),
           })),
@@ -276,7 +281,11 @@ export const reverificationMachine = createMachine({
         onDone: { target: 'verifying', actions: assign(() => ({ overlay: [] })) },
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error), overlay: [], ...unlockResend() })),
+          actions: assign((_, event) => ({
+            errors: describeErrors(event.error),
+            overlay: [],
+            ...unlockResend(),
+          })),
         },
       }),
     },
@@ -314,7 +323,7 @@ export const reverificationMachine = createMachine({
           },
           {
             target: 'verifying',
-            actions: assign((_, event) => ({ errors: toLocalizableErrors(event.error) })),
+            actions: assign((_, event) => ({ errors: describeErrors(event.error) })),
           },
         ],
       }),

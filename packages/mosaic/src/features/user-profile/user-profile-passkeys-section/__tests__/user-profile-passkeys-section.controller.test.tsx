@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { deferred } from '../../../../__tests__/async';
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { callClerk } from '../../../clerk/errors';
 import { useUserProfilePasskeysSectionController } from '../user-profile-passkeys-section.controller';
 
 function renderController(onAdd: () => Promise<void>) {
@@ -12,10 +13,10 @@ function renderController(onAdd: () => Promise<void>) {
     () =>
       useUserProfilePasskeysSectionController({
         passkeys: [],
-        onAdd,
-        onRename: async () => {},
+        onAdd: () => callClerk(onAdd),
+        onRename: () => callClerk(async () => {}),
         validateName: () => undefined,
-        onRemove: async () => {},
+        onRemove: () => callClerk(async () => {}),
         reverification: { status: 'idle', visible: false },
       }),
     {

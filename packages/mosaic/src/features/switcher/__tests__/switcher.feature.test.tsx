@@ -427,7 +427,7 @@ describe('Switcher', () => {
       expect(reading('Gamma')).toEqual([]);
       expect(log).toHaveBeenCalledWith(
         '[Clerk] User button action failed',
-        expect.objectContaining({ errors: [expect.objectContaining({ code: 'organization_invitation_not_pending' })] }),
+        expect.objectContaining({ issues: [expect.objectContaining({ code: 'organization_invitation_not_pending' })] }),
       );
       expect(popup()).toBeInTheDocument();
     });
@@ -796,7 +796,7 @@ describe('Switcher', () => {
       expect(signOut()).toBeEnabled();
       expect(log).toHaveBeenCalledWith(
         '[Clerk] User button action failed',
-        expect.objectContaining({ errors: [expect.objectContaining({ code: 'session_touch_failed' })] }),
+        expect.objectContaining({ issues: [expect.objectContaining({ code: 'session_touch_failed' })] }),
       );
     });
 

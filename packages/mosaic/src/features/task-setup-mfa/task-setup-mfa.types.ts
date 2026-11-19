@@ -1,3 +1,4 @@
+import type { ClerkCall } from '../clerk/errors';
 import type { ReverificationController } from '../reverification';
 import type {
   MfaEnrollmentResult,
@@ -28,13 +29,13 @@ export type TaskSetupMfaModel =
       identifier: string;
       methods: readonly TaskSetupMfaMethod[];
       phones: readonly MfaPhone[];
-      enrollPhoneNumber?: (phoneNumber: string) => Promise<SmsEnrollmentResult>;
-      enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
-      resendSms?: (phoneId: string) => Promise<void>;
-      createAuthenticator?: () => Promise<AuthenticatorSetup>;
-      verifyAuthenticator?: (code: string) => Promise<MfaEnrollmentResult>;
-      onComplete: () => Promise<void>;
-      onSignOut: () => Promise<void>;
+      enrollPhoneNumber?: (phoneNumber: string) => ClerkCall<SmsEnrollmentResult>;
+      enrollSms?: (phoneId: string, code?: string) => ClerkCall<SmsEnrollmentResult>;
+      resendSms?: (phoneId: string) => ClerkCall;
+      createAuthenticator?: () => ClerkCall<AuthenticatorSetup>;
+      verifyAuthenticator?: (code: string) => ClerkCall<MfaEnrollmentResult>;
+      onComplete: () => ClerkCall;
+      onSignOut: () => ClerkCall;
       createPhoneReverification: ReverificationController;
       enrollSmsReverification: ReverificationController;
       authenticatorReverification: ReverificationController;

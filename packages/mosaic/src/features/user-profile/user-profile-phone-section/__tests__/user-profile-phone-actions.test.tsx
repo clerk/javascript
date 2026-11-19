@@ -3,15 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
+import { callClerk } from '../../../clerk/errors';
 import type { ReverificationController } from '../../../reverification';
 import { useUserProfilePhoneSectionController } from '../user-profile-phone-section.controller';
 import type { ReadyPhoneSectionModel } from '../user-profile-phone-section.types';
 import { UserProfilePhoneSectionView } from '../user-profile-phone-section.view';
 
-const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
+const phoneVerifier = {
+  sendCode: () => callClerk(() => Promise.resolve()),
+  verifyCode: () => callClerk(() => Promise.resolve()),
+};
 
 type PhoneSectionProps = Partial<Omit<ReadyPhoneSectionModel, 'status' | 'userId'>>;
 const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
@@ -19,7 +22,7 @@ const idleReverification = { status: 'idle', visible: false } satisfies Reverifi
 function PhoneSection({
   phones = [{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }],
   getPhoneVerifier = () => phoneVerifier,
-  onSetPrimaryPhone = () => Promise.resolve(),
+  onSetPrimaryPhone = () => callClerk(() => Promise.resolve()),
   removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
   createReverification = idleReverification,
@@ -64,7 +67,7 @@ describe('phone actions', () => {
     const pending = new Promise<void>(resolve => {
       finish = resolve;
     });
-    const onRemovePhone = vi.fn(() => pending);
+    const onRemovePhone = vi.fn(() => callClerk(() => pending));
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
@@ -85,7 +88,7 @@ describe('phone actions', () => {
     const pending = new Promise<void>(resolve => {
       finish = resolve;
     });
-    const onSetPrimaryPhone = vi.fn(() => pending);
+    const onSetPrimaryPhone = vi.fn(() => callClerk(() => pending));
     renderPhone({ onSetPrimaryPhone, onRemovePhone: vi.fn() });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
@@ -121,7 +124,7 @@ describe('phone actions', () => {
             phones={phones}
             onSetPrimaryPhone={id => {
               setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
-              return Promise.resolve();
+              return callClerk(() => Promise.resolve());
             }}
           />
         </MosaicProvider>
@@ -176,10 +179,10 @@ describe('phone actions', () => {
         <MosaicProvider>
           <PhoneSection
             phones={phones}
-            onCreatePhone={() => Promise.resolve(phoneVerifier)}
+            onCreatePhone={() => callClerk(() => Promise.resolve(phoneVerifier))}
             onRemovePhone={id => {
               setPhones(current => current.filter(phone => phone.id !== id));
-              return Promise.resolve();
+              return callClerk(() => Promise.resolve());
             }}
           />
         </MosaicProvider>
@@ -199,7 +202,7 @@ describe('phone actions', () => {
     const user = userEvent.setup();
     const onRemovePhone = vi
       .fn()
-      .mockRejectedValueOnce(clerkApiError('phone_number_in_use', 'Cannot remove this phone.'))
+      .mockRejectedValueOnce(new MosaicError([{ code: 'phone_number_in_use', message: 'Cannot remove this phone.' }]))
       .mockResolvedValue(undefined);
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
@@ -222,7 +225,9 @@ describe('phone actions', () => {
   });
   it('shows why the primary update failed, without opening a dialog', async () => {
     const user = userEvent.setup();
-    const onSetPrimaryPhone = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Not verified yet.' } }));
+    const onSetPrimaryPhone = vi
+      .fn()
+      .mockRejectedValue(new MosaicError([{ code: 'test_failure', message: 'Not verified yet.' }]));
     renderPhone({ onSetPrimaryPhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
@@ -286,7 +291,7 @@ describe('phone actions', () => {
   it('renders an actionable empty state when no phone number exists', () => {
     renderPhone({
       phones: [],
-      onCreatePhone: () => Promise.resolve(phoneVerifier),
+      onCreatePhone: () => callClerk(() => Promise.resolve(phoneVerifier)),
     });
 
     const group = screen.getByRole('group', { name: 'Phone' });

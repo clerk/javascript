@@ -1,4 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useEffect } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
@@ -8,7 +7,7 @@ import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { downloadBackupCodes, printBackupCodes } from '../../utils/backup-codes';
-import { toLocalizableError } from '../../utils/errors';
+import { CancelledError, describeError } from '../../utils/errors';
 import { CODE_RESEND_SECONDS } from '../../utils/verification';
 import type { SmsEnrollmentResult } from '../user-profile/user-profile-mfa-section/user-profile-mfa-section.types';
 import type {
@@ -110,10 +109,10 @@ function settle(context: TaskContext, output: ResolvedFlow): Partial<TaskContext
 
 function fail(context: TaskContext, error: unknown): Partial<TaskContext> {
   const flow = resolve(context);
-  if (isReverificationCancelledError(error)) {
+  if (error instanceof CancelledError) {
     return { flow, pending: undefined };
   }
-  return { flow: { ...flow, error: toLocalizableError(error) }, pending: undefined };
+  return { flow: { ...flow, error: describeError(error) }, pending: undefined };
 }
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };

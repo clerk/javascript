@@ -4,7 +4,8 @@ import type { CreateOrganizationProps, OrganizationResource } from '@clerk/share
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { save } from '../../utils/errors';
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 import { rejectedEmailAddresses } from '../organization-profile/organization-profile-members-panel/organization-profile-invite-members.model';
 import { resolveAfterUrl } from '../switcher/switcher.model';
 import type {
@@ -12,6 +13,8 @@ import type {
   CreateOrganizationInviteInput,
   CreateOrganizationValues,
 } from './create-organization.types';
+
+const CREATE_FIELDS: readonly (keyof CreateOrganizationValues)[] = ['name', 'slug'];
 
 export type CreateOrganizationModelOptions = Pick<
   CreateOrganizationProps,
@@ -25,9 +28,9 @@ export type CreateOrganizationModel =
       status: 'ready';
       slugEnabled: boolean;
       renderBranding: boolean;
-      onCreate: (values: CreateOrganizationValues) => Promise<CreatedOrganization>;
-      onInvite: (organizationId: string, input: CreateOrganizationInviteInput) => Promise<void>;
-      onComplete: (organizationId: string) => Promise<void>;
+      onCreate: (values: CreateOrganizationValues) => ClerkCall<CreatedOrganization>;
+      onInvite: (organizationId: string, input: CreateOrganizationInviteInput) => ClerkCall;
+      onComplete: (organizationId: string) => ClerkCall;
     };
 
 export function useCreateOrganizationModel(options: CreateOrganizationModelOptions = {}): CreateOrganizationModel {
@@ -76,26 +79,24 @@ export function useCreateOrganizationModel(options: CreateOrganizationModelOptio
     status: 'ready',
     slugEnabled,
     renderBranding: environment.displayConfig.branded,
-    onCreate: async ({ name, slug, logo }) => {
-      let organization: OrganizationResource | undefined;
-      await save(async () => {
-        organization = await createOrganization({ name, ...(slugEnabled ? { slug } : {}) });
-        if (logo) {
-          await organization.setLogo({ file: logo });
-        }
-        await clerk.setActive({ organization });
-      }, ['name', 'slug']);
-      void userMemberships.revalidate?.();
-      if (!organization) {
-        throw new ClerkRuntimeError('The organization was not created.', { code: 'generic' });
-      }
-      return {
-        organizationId: organization.id,
-        skipInvitations: options.skipInvitationScreen ?? organization.maxAllowedMemberships === 1,
-      };
-    },
+    onCreate: ({ name, slug, logo }) =>
+      callClerk(
+        async () => {
+          const organization = await createOrganization({ name, ...(slugEnabled ? { slug } : {}) });
+          if (logo) {
+            await organization.setLogo({ file: logo });
+          }
+          await clerk.setActive({ organization });
+          void userMemberships.revalidate?.();
+          return {
+            organizationId: organization.id,
+            skipInvitations: options.skipInvitationScreen ?? organization.maxAllowedMemberships === 1,
+          };
+        },
+        { fields: CREATE_FIELDS },
+      ),
     onInvite: (organizationId, { emailAddresses, role, onRejected }) =>
-      save(async () => {
+      callClerk(async () => {
         const organization = activeOrganization(organizationId);
         try {
           await organization.inviteMembers({ emailAddresses, role });
@@ -104,11 +105,12 @@ export function useCreateOrganizationModel(options: CreateOrganizationModelOptio
           throw cause;
         }
       }),
-    onComplete: async organizationId => {
-      const url = await afterCreateUrl(organizationId);
-      if (url) {
-        await router.navigate(url);
-      }
-    },
+    onComplete: organizationId =>
+      callClerk(async () => {
+        const url = await afterCreateUrl(organizationId);
+        if (url) {
+          await router.navigate(url);
+        }
+      }),
   };
 }

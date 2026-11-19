@@ -2,8 +2,9 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
-import type { MessageValues } from '../../localization';
-import { save, SaveError, UNEXPECTED_ERROR } from '../../utils/errors';
+import { MosaicError, UNEXPECTED_ERROR } from '../../utils/errors';
+import type { CallClerkOptions, ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 
 export type UserProfileUserModel =
   | { status: 'loading' }
@@ -13,11 +14,7 @@ export type UserProfileUserModel =
       user: UserResource;
       environment: EnvironmentResource;
       currentUser: () => UserResource;
-      saveAsUser: <TField extends string = never>(
-        run: (current: UserResource) => Promise<unknown>,
-        fields?: readonly TField[],
-        params?: MessageValues,
-      ) => Promise<void>;
+      saveAsUser: (run: (current: UserResource) => Promise<unknown>, options?: CallClerkOptions) => ClerkCall;
     };
 
 export function useUserProfileUserModel(): UserProfileUserModel {
@@ -38,7 +35,7 @@ export function useUserProfileUserModel(): UserProfileUserModel {
   const currentUser = (): UserResource => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
-      throw new SaveError({ global: UNEXPECTED_ERROR });
+      throw new MosaicError([UNEXPECTED_ERROR]);
     }
     return current;
   };
@@ -48,6 +45,9 @@ export function useUserProfileUserModel(): UserProfileUserModel {
     user,
     environment,
     currentUser,
-    saveAsUser: (run, fields = [], params) => save(() => run(currentUser()), fields, params),
+    saveAsUser: (run, options) =>
+      callClerk(async () => {
+        await run(currentUser());
+      }, options),
   };
 }

@@ -1,12 +1,15 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { SignOutOptions } from '@clerk/shared/types';
 
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
+
 export type SignOutButtonOptions = Pick<SignOutOptions, 'redirectUrl' | 'sessionId'>;
 
 export type SignOutButtonModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | { status: 'ready'; onSignOut: () => Promise<unknown> };
+  | { status: 'ready'; onSignOut: () => ClerkCall<unknown> };
 
 export function useSignOutButtonModel({ redirectUrl, sessionId }: SignOutButtonOptions): SignOutButtonModel {
   const clerk = useClerk();
@@ -20,5 +23,5 @@ export function useSignOutButtonModel({ redirectUrl, sessionId }: SignOutButtonO
     return { status: 'hidden' };
   }
 
-  return { status: 'ready', onSignOut: () => clerk.signOut({ redirectUrl, sessionId }) };
+  return { status: 'ready', onSignOut: () => callClerk(() => clerk.signOut({ redirectUrl, sessionId })) };
 }

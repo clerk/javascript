@@ -32,6 +32,16 @@ describe('Mosaic rule configuration', () => {
       excludeFiles: [],
     },
     {
+      rule: 'typescript/explicit-module-boundary-types',
+      files: ['src/**/*.model.{ts,tsx}'],
+      excludeFiles: [],
+    },
+    {
+      rule: 'mosaic/model-callbacks-return-clerk-call',
+      files: ['src/features/**/*.{model,types}.{ts,tsx}'],
+      excludeFiles: [],
+    },
+    {
       rule: 'mosaic/no-dynamic-message-catalogs',
       files: ['src/**/*.{view,controller}.{ts,tsx}'],
       excludeFiles: [],

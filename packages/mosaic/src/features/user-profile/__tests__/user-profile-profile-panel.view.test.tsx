@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { callClerk } from '../../clerk/errors';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
@@ -22,15 +23,15 @@ function Web3Wallets({
   const controller = useUserProfileWeb3WalletsController({
     wallets,
     availableProviders: [],
-    connect: () => Promise.resolve(),
-    setPrimary: () => Promise.resolve(),
-    remove: onRemove,
+    connect: () => callClerk(() => Promise.resolve()),
+    setPrimary: () => callClerk(() => Promise.resolve()),
+    remove: id => callClerk(() => onRemove(id)),
   });
   return <UserProfileWeb3WalletsSectionView {...controller} />;
 }
 
 function DeleteAccount() {
-  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  const controller = useConfirmController({ onConfirm: () => callClerk(() => Promise.resolve()) });
   return <UserProfileDangerSectionView controller={controller} />;
 }
 

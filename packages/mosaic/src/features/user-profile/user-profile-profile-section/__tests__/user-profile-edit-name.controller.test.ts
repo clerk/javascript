@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
 import { useUserProfileEditNameController } from '../user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from '../user-profile-edit-name.dialog';
 
@@ -62,10 +62,10 @@ describe('useUserProfileEditNameController', () => {
   it('keeps what was typed and shows why when the save fails', async () => {
     const result = renderController(() =>
       Promise.reject(
-        new SaveError({
-          global: { message: 'Your name could not be updated.' },
-          fields: { lastName: { message: 'Last name is too long.' } },
-        }),
+        new MosaicError([
+          { code: 'test_failure', message: 'Your name could not be updated.' },
+          { code: 'test_failure', message: 'Last name is too long.', field: 'lastName' },
+        ]),
       ),
     );
     act(() => result.current.form.setValue('lastName', 'Barton'));
@@ -79,7 +79,7 @@ describe('useUserProfileEditNameController', () => {
   });
 
   it('re-seeds from the saved name and drops the error on the next open', async () => {
-    const result = renderController(() => Promise.reject(new SaveError({ global: { message: 'nope' } })));
+    const result = renderController(() => Promise.reject(new MosaicError([{ code: 'test_failure', message: 'nope' }])));
     act(() => result.current.form.setValue('firstName', 'Ada'));
     act(() => result.current.form.submit());
     await waitFor(() => expect(result.current.form.error).toBe('nope'));

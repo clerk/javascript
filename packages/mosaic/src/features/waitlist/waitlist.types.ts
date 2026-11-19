@@ -1,3 +1,5 @@
+import type { ClerkCall } from '../clerk/errors';
+
 export type WaitlistField = 'emailAddress';
 
 export interface WaitlistValues {
@@ -12,7 +14,7 @@ export type WaitlistModel =
       status: 'ready';
       initialEmailAddress: string;
       renderBranding: boolean;
-      onJoinWaitlist: (emailAddress: string) => Promise<void>;
+      onJoinWaitlist: (emailAddress: string) => ClerkCall;
       onSignIn: () => void;
       onRedirect?: () => void;
     };

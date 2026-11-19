@@ -1,6 +1,8 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import type { UserProfilePhone } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import { useUserProfilePhoneSectionController } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.controller';
 import type { UserProfilePhoneSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.types';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { idleReverification } from './reverification';
@@ -37,19 +39,21 @@ export function useUserProfilePhonesFixture({
     setPrimaryReverification: idleReverification,
     createReverification: idleReverification,
     ...flow,
-    onSetPrimaryPhone: id => {
-      setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
-      return Promise.resolve();
-    },
-    onRemovePhone: async id => {
-      if (removalState === 'pending') {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-      if (removalState === 'error' && !removalFailed) {
-        setRemovalFailed(true);
-        throw new Error('Unable to remove this phone number. Try again.');
-      }
-      setPhones(current => current.filter(phone => phone.id !== id));
-    },
+    onSetPrimaryPhone: id =>
+      callClerk(async () => {
+        setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
+        return Promise.resolve();
+      }),
+    onRemovePhone: id =>
+      callClerk(async () => {
+        if (removalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (removalState === 'error' && !removalFailed) {
+          setRemovalFailed(true);
+          throw new MosaicError([{ code: 'fixture_error', message: 'Unable to remove this phone number. Try again.' }]);
+        }
+        setPhones(current => current.filter(phone => phone.id !== id));
+      }),
   });
 }

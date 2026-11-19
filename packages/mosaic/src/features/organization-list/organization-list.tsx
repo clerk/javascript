@@ -2,6 +2,7 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
+import { callClerk } from '../clerk/errors';
 import { useCreateOrganizationFlow } from '../create-organization/create-organization';
 import type { CreateOrganizationReadyModel } from '../create-organization/create-organization.controller';
 import { CreateOrganizationSteps } from '../create-organization/create-organization.view';
@@ -81,7 +82,8 @@ function ConnectedOrganizationList({ controller }: { controller: OrganizationLis
           <OrganizationListCreateSteps
             model={{
               ...createOrganization,
-              onComplete: organizationId => createOrganization.onComplete(organizationId).finally(screen.onCreated),
+              onComplete: organizationId =>
+                callClerk(() => createOrganization.onComplete(organizationId).finally(screen.onCreated)),
             }}
             onCancel={screen.onCancelCreate}
           />

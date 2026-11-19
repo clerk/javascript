@@ -1,3 +1,4 @@
+import { callClerk } from '@clerk/mosaic/features/clerk/errors';
 import { useUserProfileWeb3WalletsController } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
 import type {
   UserProfileWeb3Provider,
@@ -92,55 +93,59 @@ export function useWeb3WalletsFixture({
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id),
     ),
-    // eslint-disable-next-line @typescript-eslint/require-await
-    connect: async (id: Web3Strategy) => {
-      const provider = connectionProviders.find(item => item.id === id);
-      if (!provider) {
-        return;
-      }
-      setConnectionProviders(current =>
-        current.map(item => (item.id === id ? { ...item, connectError: undefined } : item)),
-      );
-      setWallets(current => {
-        return [
-          ...current,
-          {
-            provider: provider.provider,
-            iconId: provider.iconId,
-            iconUrl: provider.iconUrl,
-            id: `wallet_${id}`,
-            providerId: id,
-            address: '0x1234567890abcdef1234567890abcdef12345678',
-            isVerified: true,
-            canVerify: false,
-            isPrimary: !current.some(wallet => wallet.isPrimary),
-          },
-        ];
-      });
-    },
-    verify: (id: string) => {
-      setWallets(current =>
-        current.map(wallet => (wallet.id === id ? { ...wallet, isVerified: true, canVerify: false } : wallet)),
-      );
-      return Promise.resolve();
-    },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    setPrimary: async (id: string) => {
-      if (primaryError && !primaryFailed.current) {
-        primaryFailed.current = true;
-        throw new Error('Unable to set this wallet as primary. Please try again.');
-      }
-      setWallets(current => current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id })));
-    },
-    remove: async (id: string) => {
-      if (removalState === 'pending') {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-      }
-      if (removalState === 'error' && !removalFailed) {
-        setRemovalFailed(true);
-        throw new Error('Unable to remove wallet. Please try again.');
-      }
-      setWallets(current => current.filter(wallet => wallet.id !== id));
-    },
+    connect: (id: Web3Strategy) =>
+      // eslint-disable-next-line @typescript-eslint/require-await
+      callClerk(async () => {
+        const provider = connectionProviders.find(item => item.id === id);
+        if (!provider) {
+          return;
+        }
+        setConnectionProviders(current =>
+          current.map(item => (item.id === id ? { ...item, connectError: undefined } : item)),
+        );
+        setWallets(current => {
+          return [
+            ...current,
+            {
+              provider: provider.provider,
+              iconId: provider.iconId,
+              iconUrl: provider.iconUrl,
+              id: `wallet_${id}`,
+              providerId: id,
+              address: '0x1234567890abcdef1234567890abcdef12345678',
+              isVerified: true,
+              canVerify: false,
+              isPrimary: !current.some(wallet => wallet.isPrimary),
+            },
+          ];
+        });
+      }),
+    verify: (id: string) =>
+      callClerk(async () => {
+        setWallets(current =>
+          current.map(wallet => (wallet.id === id ? { ...wallet, isVerified: true, canVerify: false } : wallet)),
+        );
+        return Promise.resolve();
+      }),
+    setPrimary: (id: string) =>
+      // eslint-disable-next-line @typescript-eslint/require-await
+      callClerk(async () => {
+        if (primaryError && !primaryFailed.current) {
+          primaryFailed.current = true;
+          throw new Error('Unable to set this wallet as primary. Please try again.');
+        }
+        setWallets(current => current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id })));
+      }),
+    remove: (id: string) =>
+      callClerk(async () => {
+        if (removalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (removalState === 'error' && !removalFailed) {
+          setRemovalFailed(true);
+          throw new Error('Unable to remove wallet. Please try again.');
+        }
+        setWallets(current => current.filter(wallet => wallet.id !== id));
+      }),
   });
 }

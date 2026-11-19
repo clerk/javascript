@@ -1,9 +1,8 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
 import type { ErrorDescription } from '../localization';
 import { useErrorText } from '../localization';
-import { toLocalizableError } from '../utils/errors';
+import { CancelledError, describeError } from '../utils/errors';
 
 export interface PendingActionOptions {
   /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
@@ -51,8 +50,8 @@ export function usePendingAction<TKey extends string = string>({
       await action();
       return true;
     } catch (cause) {
-      if (!isReverificationCancelledError(cause)) {
-        setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+      if (!(cause instanceof CancelledError)) {
+        setFailure({ key, error: describeError(cause), errorFallback: options.errorFallback });
       }
       return false;
     } finally {

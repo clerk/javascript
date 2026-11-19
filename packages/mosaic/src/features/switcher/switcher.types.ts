@@ -191,4 +191,5 @@ export type SwitcherTriggerBadgeOptions = { kind: 'user' | 'organization'; id: s
 
 export type SwitcherTriggerBadge =
   | boolean
+  // eslint-disable-next-line mosaic/model-callbacks-return-clerk-call -- The app supplies this callback through props; no model makes it.
   | ((options: SwitcherTriggerBadgeOptions) => Promise<{ id: string; label: string } | null>);

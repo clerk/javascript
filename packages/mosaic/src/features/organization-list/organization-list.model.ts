@@ -4,6 +4,8 @@ import type { OrganizationListProps, OrganizationResource } from '@clerk/shared/
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import type { ClerkCall } from '../clerk/errors';
+import { callClerk } from '../clerk/errors';
 import type { CreateOrganizationModel } from '../create-organization/create-organization.model';
 import { useCreateOrganizationModel } from '../create-organization/create-organization.model';
 import { resolveAfterUrl } from '../switcher/switcher.model';
@@ -30,9 +32,9 @@ export type OrganizationListModel =
   | (OrganizationListData & {
       status: 'ready';
       createOrganization?: Extract<CreateOrganizationModel, { status: 'ready' }>;
-      onSelectOrganization: (organizationId: string | null) => Promise<unknown>;
-      onAcceptInvitation: (invitationId: string) => Promise<unknown>;
-      onAcceptSuggestion: (suggestionId: string) => Promise<unknown>;
+      onSelectOrganization: (organizationId: string | null) => ClerkCall<unknown>;
+      onAcceptInvitation: (invitationId: string) => ClerkCall<unknown>;
+      onAcceptSuggestion: (suggestionId: string) => ClerkCall<unknown>;
     });
 
 const UNAVAILABLE_ORGANIZATION_CODES = ['organization_not_found_or_unauthorized', 'not_a_member_in_organization'];
@@ -56,8 +58,8 @@ export type OrganizationListEntries = Pick<
   'organizationsLoading' | 'memberships' | 'invitations' | 'suggestions' | 'paging'
 > & {
   findOrganization: (organizationId: string) => OrganizationResource | undefined;
-  onAcceptInvitation: (invitationId: string) => Promise<unknown>;
-  onAcceptSuggestion: (suggestionId: string) => Promise<unknown>;
+  onAcceptInvitation: (invitationId: string) => ClerkCall<unknown>;
+  onAcceptSuggestion: (suggestionId: string) => ClerkCall<unknown>;
 };
 
 export function useOrganizationListEntries(): OrganizationListEntries {
@@ -113,30 +115,32 @@ export function useOrganizationListEntries(): OrganizationListEntries {
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
     findOrganization: organizationId => membershipData.find(m => m.organization.id === organizationId)?.organization,
-    onAcceptInvitation: async invitationId => {
-      const invitation = invitationData.find(i => i.id === invitationId);
-      try {
-        const accepted = await invitation?.accept();
-        if (accepted) {
-          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+    onAcceptInvitation: invitationId =>
+      callClerk(async () => {
+        const invitation = invitationData.find(i => i.id === invitationId);
+        try {
+          const accepted = await invitation?.accept();
+          if (accepted) {
+            await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+          }
+        } catch (error) {
+          await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+          throw error;
         }
-      } catch (error) {
-        await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
-        throw error;
-      }
-    },
-    onAcceptSuggestion: async suggestionId => {
-      const suggestion = suggestionData.find(s => s.id === suggestionId);
-      try {
-        const accepted = await suggestion?.accept();
-        if (accepted) {
-          await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+      }),
+    onAcceptSuggestion: suggestionId =>
+      callClerk(async () => {
+        const suggestion = suggestionData.find(s => s.id === suggestionId);
+        try {
+          const accepted = await suggestion?.accept();
+          if (accepted) {
+            await userSuggestions.setData?.(pages => replaceInPages(pages ?? [], accepted));
+          }
+        } catch (error) {
+          await Promise.allSettled([userSuggestions.revalidate?.()]);
+          throw error;
         }
-      } catch (error) {
-        await Promise.allSettled([userSuggestions.revalidate?.()]);
-        throw error;
-      }
-    },
+      }),
   };
 }
 
@@ -182,12 +186,13 @@ export function useOrganizationListModel(options: OrganizationListModelOptions =
     ...entries,
     createOrganization:
       createOrganization.status === 'ready' && user.createOrganizationEnabled ? createOrganization : undefined,
-    onSelectOrganization: async organizationId => {
-      try {
-        await clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) });
-      } catch (error) {
-        throw unavailableOrganization(error, user.createOrganizationEnabled);
-      }
-    },
+    onSelectOrganization: organizationId =>
+      callClerk(async () => {
+        try {
+          await clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) });
+        } catch (error) {
+          throw unavailableOrganization(error, user.createOrganizationEnabled);
+        }
+      }),
   };
 }

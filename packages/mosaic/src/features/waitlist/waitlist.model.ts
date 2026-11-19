@@ -3,7 +3,7 @@ import type { WaitlistProps } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { save } from '../../utils/errors';
+import { callClerk } from '../clerk/errors';
 import type { WaitlistField, WaitlistModel } from './waitlist.types';
 
 export type WaitlistModelOptions = Pick<WaitlistProps, 'afterJoinWaitlistUrl' | 'signInUrl'>;
@@ -27,7 +27,13 @@ export function useWaitlistModel(options: WaitlistModelOptions = {}): WaitlistMo
     status: 'ready',
     initialEmailAddress: router.getSearchParams().get('email_address') ?? '',
     renderBranding: displayConfig.branded,
-    onJoinWaitlist: emailAddress => save(() => clerk.joinWaitlist({ emailAddress }), WAITLIST_FIELDS),
+    onJoinWaitlist: emailAddress =>
+      callClerk(
+        async () => {
+          await clerk.joinWaitlist({ emailAddress });
+        },
+        { fields: WAITLIST_FIELDS },
+      ),
     onSignIn: () => void router.navigate(clerk.buildUrlWithAuth(signInUrl)),
     onRedirect: afterJoinWaitlistUrl ? () => void router.navigate(afterJoinWaitlistUrl) : undefined,
   };

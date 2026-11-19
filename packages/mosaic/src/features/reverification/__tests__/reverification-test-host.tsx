@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react';
 
 import { Card } from '../../../components/card';
+import { CancelledError } from '../../../utils/errors';
 import { Reverification, useReverificationFlow } from '../reverification';
 
 export function errorCode(error: unknown) {
+  if (error instanceof CancelledError) {
+    return 'cancelled';
+  }
   if (error instanceof Error) {
     return 'code' in error && typeof error.code === 'string' ? error.code : error.message;
   }

@@ -2,11 +2,15 @@ import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
+import { MosaicError, UNEXPECTED_ERROR } from '../../../utils/errors';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import { callClerk } from '../../clerk/errors';
 import type { OrganizationProfileEditNameValue } from './organization-profile-edit-name.dialog';
 import type { OrganizationProfileEditSlugValue } from './organization-profile-edit-slug.dialog';
 import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section.view';
+
+const NAME_FIELDS: readonly (keyof OrganizationProfileEditNameValue)[] = ['name'];
+const SLUG_FIELDS: readonly (keyof OrganizationProfileEditSlugValue)[] = ['slug'];
 
 type OrganizationProfileProfileSectionModel =
   | { status: 'loading' }
@@ -33,7 +37,7 @@ export function useOrganizationProfileProfileSectionModel(): OrganizationProfile
   const currentOrganization = (): OrganizationResource => {
     const current = clerk.organization;
     if (!current || current.id !== organizationId) {
-      throw new SaveError({ global: UNEXPECTED_ERROR });
+      throw new MosaicError([UNEXPECTED_ERROR]);
     }
     return current;
   };
@@ -52,16 +56,32 @@ export function useOrganizationProfileProfileSectionModel(): OrganizationProfile
 
   return {
     ...profile,
-    onLogoChange: file => save(() => currentOrganization().setLogo({ file })),
-    onRemoveLogo: organization.hasImage ? () => save(() => currentOrganization().setLogo({ file: null })) : undefined,
+    onLogoChange: file =>
+      callClerk(async () => {
+        await currentOrganization().setLogo({ file });
+      }),
+    onRemoveLogo: organization.hasImage
+      ? () =>
+          callClerk(async () => {
+            await currentOrganization().setLogo({ file: null });
+          })
+      : undefined,
     onSubmitName: name =>
-      save<keyof OrganizationProfileEditNameValue>(() => currentOrganization().update({ name }), ['name']),
+      callClerk(
+        async () => {
+          await currentOrganization().update({ name });
+        },
+        { fields: NAME_FIELDS },
+      ),
     onSubmitSlug: !environment.organizationSettings.slug.disabled
       ? slug =>
-          save<keyof OrganizationProfileEditSlugValue>(() => {
-            const current = currentOrganization();
-            return current.update({ name: current.name, slug });
-          }, ['slug'])
+          callClerk(
+            async () => {
+              const current = currentOrganization();
+              await current.update({ name: current.name, slug });
+            },
+            { fields: SLUG_FIELDS },
+          )
       : undefined,
   };
 }

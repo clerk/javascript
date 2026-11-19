@@ -1,13 +1,11 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import { createElement, StrictMode, useEffect, useLayoutEffect } from 'react';
 import { flushSync } from 'react-dom';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../../__tests__/async';
-import { SaveError } from '../../../utils/errors';
-import type { FieldFeedback } from '../form-submit-error';
-import { FormSubmitError } from '../form-submit-error';
+import { CancelledError, MosaicError } from '../../../utils/errors';
+import type { FieldFeedback } from '../form.types';
 import { useForm } from '../use-form';
 
 const resolved = () => Promise.resolve();
@@ -93,25 +91,25 @@ describe('useForm', () => {
     expect(result.current.isSubmitting).toBe(false);
   });
 
-  it.each([
-    new FormSubmitError({ message: 'Could not save' }),
-    new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
-  ])('does not report success when submission rejects with %s', async failure => {
-    const onSuccess = vi.fn();
-    const { result } = renderHook(() =>
-      useForm({
-        initialValues: { username: 'alex' },
-        onSubmit: () => Promise.reject(failure),
-        onSuccess,
-      }),
-    );
-    await act(async () => {
-      result.current.submit();
-      await tick();
-    });
-    expect(onSuccess).not.toHaveBeenCalled();
-    expect(result.current.isSubmitting).toBe(false);
-  });
+  it.each([new MosaicError([{ code: 'unknown_code', message: 'Could not save' }]), new CancelledError()])(
+    'does not report success when submission rejects with %s',
+    async failure => {
+      const onSuccess = vi.fn();
+      const { result } = renderHook(() =>
+        useForm({
+          initialValues: { username: 'alex' },
+          onSubmit: () => Promise.reject(failure),
+          onSuccess,
+        }),
+      );
+      await act(async () => {
+        result.current.submit();
+        await tick();
+      });
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(result.current.isSubmitting).toBe(false);
+    },
+  );
 
   it('does not report success after unmounting a pending form', async () => {
     const request = deferred<void>();
@@ -203,12 +201,17 @@ describe('useForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({ code: '123456' });
   });
 
-  it('maps FormSubmitError onto the form message and field feedback, clearing the field on change', async () => {
+  it('maps a MosaicError onto the form message and field feedback, clearing the field on change', async () => {
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: 'alex' },
         onSubmit: () =>
-          Promise.reject(new FormSubmitError({ message: 'Could not save', fields: { username: 'Taken' } })),
+          Promise.reject(
+            new MosaicError([
+              { code: 'unknown_code', message: 'Could not save' },
+              { code: 'unknown_code', message: 'Taken', field: 'username' },
+            ]),
+          ),
       }),
     );
     await act(async () => {
@@ -222,11 +225,14 @@ describe('useForm', () => {
     expect(result.current.fields.username.feedback).toBeUndefined();
   });
 
-  it('localizes a SaveError onto the form message and field feedback', async () => {
-    const failure = new SaveError<'username'>({
-      global: { code: 'unknown_code', message: 'Could not save' },
-      fields: { username: { code: 'generic' } },
-    });
+  it('localizes a MosaicError onto the form message and field feedback, first issue per slot', async () => {
+    const failure = new MosaicError([
+      { code: 'generic', field: 'username' },
+      { code: 'unknown_code', message: 'Could not save' },
+      { code: 'unknown_code', message: 'Second banner' },
+      { code: 'unknown_code', message: 'Second field', field: 'username' },
+      { code: 'unknown_code', message: 'Not on this form', field: 'code' },
+    ]);
     const { result } = renderHook(() =>
       useForm({ initialValues: { username: 'alex' }, onSubmit: () => Promise.reject(failure) }),
     );
@@ -241,9 +247,11 @@ describe('useForm', () => {
     });
   });
 
-  it('maps a fields-only FormSubmitError onto field feedback with no form message', async () => {
-    const failure = new FormSubmitError({ fields: { username: 'Taken', bio: 'Too long' } });
-    expect(failure.message).toBe('Taken Too long');
+  it('maps a MosaicError whose issues all name a field onto field feedback with no form message', async () => {
+    const failure = new MosaicError([
+      { code: 'unknown_code', message: 'Taken', field: 'username' },
+      { code: 'unknown_code', message: 'Too long', field: 'bio' },
+    ]);
     const { result } = renderHook(() =>
       useForm({ initialValues: { username: 'alex', bio: '' }, onSubmit: () => Promise.reject(failure) }),
     );
@@ -281,11 +289,8 @@ describe('useForm', () => {
   it('returns to editing with the draft and no message when a reverification is cancelled', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const outcomes: Array<() => Promise<void>> = [
-      () => Promise.reject(new FormSubmitError({ message: 'Username is taken.' })),
-      () =>
-        Promise.reject(
-          new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
-        ),
+      () => Promise.reject(new MosaicError([{ code: 'unknown_code', message: 'Username is taken.' }])),
+      () => Promise.reject(new CancelledError()),
     ];
     const { result } = renderHook(() =>
       useForm({ initialValues: { username: '' }, onSubmit: () => (outcomes.shift() ?? resolved)() }),
@@ -310,7 +315,7 @@ describe('useForm', () => {
 
   it('shows errorFallback instead of the generic message', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const rejections = [new Error('Nope'), new SaveError({})];
+    const rejections = [new Error('Nope'), new MosaicError([{ code: 'generic', field: 'code' }])];
     for (const rejection of rejections) {
       const { result } = renderHook(() =>
         useForm({
@@ -329,35 +334,16 @@ describe('useForm', () => {
 
   it('falls back to the generic message when a submit error has nothing to show', async () => {
     const empty = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new SaveError({})) }),
+      useForm({
+        initialValues: { username: '' },
+        onSubmit: () => Promise.reject(new MosaicError([{ code: 'generic', field: 'code' }])),
+      }),
     );
     await act(async () => {
       empty.result.current.submit();
       await tick();
     });
     expect(empty.result.current.error).toBe('Something went wrong. Please try again.');
-
-    const blank = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new FormSubmitError({})) }),
-    );
-    await act(async () => {
-      blank.result.current.submit();
-      await tick();
-    });
-    expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
-
-    const undisplayable = renderHook(() =>
-      useForm({
-        initialValues: { username: '' },
-        onSubmit: () => Promise.reject(new FormSubmitError({ fields: { username: '', server: 'Nope' } })),
-      }),
-    );
-    await act(async () => {
-      undisplayable.result.current.submit();
-      await tick();
-    });
-    expect(undisplayable.result.current.error).toBe('Something went wrong. Please try again.');
-    expect(undisplayable.result.current.fields.username.feedback).toBeUndefined();
   });
 
   it('recovers from an onSubmit that throws synchronously', async () => {
@@ -365,7 +351,7 @@ describe('useForm', () => {
       useForm({
         initialValues: { username: '' },
         onSubmit: () => {
-          throw new FormSubmitError({ message: 'Nope' });
+          throw new MosaicError([{ code: 'unknown_code', message: 'Nope' }]);
         },
       }),
     );
@@ -393,7 +379,8 @@ describe('useForm', () => {
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: '' },
-        onSubmit: () => (fail ? Promise.reject(new FormSubmitError({ message: 'Nope' })) : Promise.resolve()),
+        onSubmit: () =>
+          fail ? Promise.reject(new MosaicError([{ code: 'unknown_code', message: 'Nope' }])) : Promise.resolve(),
       }),
     );
     await act(async () => {

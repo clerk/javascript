@@ -2,12 +2,13 @@ import { formatRelative } from '@clerk/shared/date';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PasskeyResource, UserResource } from '@clerk/shared/types';
 
-import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
-import { save, SaveError } from '../../../utils/errors';
+import { MosaicError } from '../../../utils/errors';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import type {
@@ -15,6 +16,8 @@ import type {
   UserProfilePasskeyNameValidator,
   UserProfileRenamePasskeyValues,
 } from './user-profile-passkeys-section.types';
+
+const RENAME_FIELDS: readonly (keyof UserProfileRenamePasskeyValues)[] = ['name'];
 
 type Passkey = Pick<PasskeyResource, 'id' | 'name' | 'createdAt' | 'lastUsedAt'>;
 
@@ -61,10 +64,10 @@ export type UserProfilePasskeysModel =
       userId: string;
       sessionId: string;
       passkeys: UserProfilePasskey[];
-      onAdd?: () => Promise<void>;
-      onRename: (id: string, name: string) => Promise<void>;
+      onAdd?: () => ClerkCall;
+      onRename: (id: string, name: string) => ClerkCall;
       validateName: UserProfilePasskeyNameValidator;
-      onRemove: (id: string) => Promise<void>;
+      onRemove: (id: string) => ClerkCall;
       reverification: ReverificationController;
       addReverification: ReverificationController;
     };
@@ -119,9 +122,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       clerk.session?.id !== sessionId ||
       getPasskeysProjection(current, currentEnvironment, clerk.isSatellite).status === 'hidden'
     ) {
-      throw new SaveError({
-        global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
-      });
+      throw new MosaicError([{ code: 'passkey_account_unavailable', message: messages.accountUnavailableError }]);
     }
     return current;
   };
@@ -154,34 +155,40 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
         : undefined,
     })),
     onAdd: projection.canAdd
-      ? async () => {
-          const current = currentUser();
-          if (clerk.isSatellite) {
-            throw new SaveError({
-              global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
-            });
-          }
-          await save(() => createPasskey(current));
-        }
+      ? () =>
+          callClerk(async () => {
+            const current = currentUser();
+            if (clerk.isSatellite) {
+              throw new MosaicError([
+                { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
+              ]);
+            }
+            await createPasskey(current);
+          })
       : undefined,
-    onRename: async (id, name) => {
-      const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
-      if (!passkey) {
-        throw new FormSubmitError({ message: messages.unavailableError });
-      }
-      const feedback = validateName(name);
-      if (feedback) {
-        throw new FormSubmitError<UserProfileRenamePasskeyValues>({ fields: { name: feedback.message } });
-      }
-      await save<keyof UserProfileRenamePasskeyValues>(() => passkey.update({ name }), ['name']);
-    },
-    onRemove: async id => {
-      const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
-      if (!passkey) {
-        throw new SaveError({ global: { code: 'passkey_unavailable', message: messages.unavailableError } });
-      }
-      await save(() => deletePasskey(passkey));
-    },
+    onRename: (id, name) =>
+      callClerk(
+        async () => {
+          const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
+          if (!passkey) {
+            throw new MosaicError([{ code: 'passkey_unavailable', message: messages.unavailableError }]);
+          }
+          const feedback = validateName(name);
+          if (feedback) {
+            throw new MosaicError([{ code: 'passkey_name_invalid', message: feedback.message, field: 'name' }]);
+          }
+          await passkey.update({ name });
+        },
+        { fields: RENAME_FIELDS },
+      ),
+    onRemove: id =>
+      callClerk(async () => {
+        const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
+        if (!passkey) {
+          throw new MosaicError([{ code: 'passkey_unavailable', message: messages.unavailableError }]);
+        }
+        await deletePasskey(passkey);
+      }),
     reverification,
     addReverification,
   };

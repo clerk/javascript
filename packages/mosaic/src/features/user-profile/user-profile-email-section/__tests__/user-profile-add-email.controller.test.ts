@@ -2,7 +2,8 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../../utils/errors';
+import { MosaicError } from '../../../../utils/errors';
+import { callClerk } from '../../../clerk/errors';
 import type { ReverificationController } from '../../../reverification';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../../user-profile-contact.types';
 import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
@@ -19,14 +20,17 @@ function verifier(
   start: () => UserProfileEmailVerification = sentCode,
   verifyCode: (code: string) => Promise<void> = () => Promise.resolve(),
 ) {
-  return { start: vi.fn(start), verifyCode: vi.fn(verifyCode) } satisfies UserProfileEmailVerifier;
+  return {
+    start: vi.fn(start),
+    verifyCode: vi.fn((code: string) => callClerk(() => verifyCode(code))),
+  } satisfies UserProfileEmailVerifier;
 }
 
 const created = () => Promise.resolve(verifier());
 const other = { id: 'email_2', value: 'other@example.com' };
 
 function saveError(message: string, field?: 'emailAddress' | 'code') {
-  return new SaveError(field ? { fields: { [field]: { message } } } : { global: { message } });
+  return new MosaicError([{ code: 'test_failure', message, ...(field ? { field } : {}) }]);
 }
 
 describe('useUserProfileAddEmailController', () => {
@@ -341,7 +345,7 @@ describe('useUserProfileAddEmailController', () => {
   });
 
   it('connects once per click and stays on the SSO step when connecting fails', async () => {
-    const connect = vi.fn(() => Promise.reject(saveError('Connection unavailable')));
+    const connect = vi.fn(() => callClerk(() => Promise.reject(saveError('Connection unavailable'))));
     const email = verifier(() => ({ method: 'sso', connect }));
     const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
 

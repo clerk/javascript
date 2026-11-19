@@ -8,6 +8,25 @@ import rootConfig from '../../oxlint.config.mjs';
 const mosaicRoot = import.meta.dirname;
 const SHARED = ['primitives', 'icons', 'machine', 'utils', 'hooks', 'styles', 'components', 'localization', 'root'];
 const FLOW_UI = { file: { categories: { anyOf: ['view', 'controller'] } } };
+const CLERK_FREE = [...SHARED, 'modals', 'routing', 'blocks'];
+const CLERK_FREE_SHARED = [
+  '@clerk/shared/inert',
+  '@clerk/shared/logger',
+  '@clerk/shared/phone',
+  '@clerk/shared/underscore',
+];
+const CLERK_FREE_MESSAGE =
+  'Mosaic outside src/features and src/queries runs without Clerk. Read Clerk in a feature model and pass plain data or callbacks down.';
+const CLERK_BASELINE = [
+  'src/blocks/confirm/confirm-shell.tsx',
+  'src/blocks/confirm/confirm.controller.ts',
+  'src/blocks/reverification/reverification.tsx',
+  'src/components/captcha/captcha.tsx',
+
+  'src/hooks/use-mosaic-environment.ts',
+  'src/hooks/use-mosaic-router.ts',
+  'src/hooks/use-mosaic-support-email.ts',
+];
 const CLERK_DATA_HOOKS = [
   'useClerk',
   'useUser',
@@ -128,6 +147,7 @@ export default defineConfig({
       { category: 'messages', pattern: '**/*.messages.ts' },
       { category: 'css-entry', pattern: 'src/styles/index.ts' },
       { category: 'doc', pattern: '**/*.doc.ts' },
+      ...CLERK_BASELINE.map(pattern => ({ category: 'clerk-baseline', pattern })),
     ],
     'import/resolver': {
       node: true,
@@ -280,6 +300,13 @@ export default defineConfig({
       files: ['src/**/*.model.{ts,tsx}'],
       rules: {
         'mosaic/no-model-react-state': 'error',
+        'typescript/explicit-module-boundary-types': 'error',
+      },
+    },
+    {
+      files: ['src/features/**/*.{model,types}.{ts,tsx}'],
+      rules: {
+        'mosaic/model-callbacks-return-clerk-call': 'error',
       },
     },
     {
@@ -351,17 +378,35 @@ export default defineConfig({
                 from: { element: { type: 'localization' } },
                 allow: { to: { file: { categories: 'messages' } } },
               },
+              { from: { element: { type: 'blocks' } }, allow: { to: { element: { type: SHARED } } } },
               {
-                from: { element: { type: 'blocks' } },
-                allow: [
-                  { to: { element: { type: SHARED } } },
-                  { to: { element: { type: 'features', captured: { feature: 'reverification' } } } },
-                ],
+                from: { element: { type: 'blocks' }, file: { categories: 'clerk-baseline' } },
+                allow: { to: { element: { type: 'features', captured: { feature: 'reverification' } } } },
               },
               {
                 from: { element: { type: 'features' } },
                 allow: { to: { element: { type: [...SHARED, 'queries', 'modals', 'blocks', 'routing'] } } },
               },
+              {
+                from: { element: { type: CLERK_FREE } },
+                disallow: { dependency: { source: '@clerk/**', kind: 'value' } },
+                message: CLERK_FREE_MESSAGE,
+              },
+              {
+                from: { element: { type: CLERK_FREE } },
+                allow: [
+                  { dependency: { source: CLERK_FREE_SHARED } },
+                  { dependency: { source: '@clerk/shared/react', specifiers: ['useSafeLayoutEffect'] } },
+                ],
+              },
+              {
+                from: { element: { type: CLERK_FREE } },
+                disallow: {
+                  dependency: { source: '@clerk/shared/react', specifiers: ['!(useSafeLayoutEffect)'], kind: 'value' },
+                },
+                message: CLERK_FREE_MESSAGE,
+              },
+              { from: { file: { categories: 'clerk-baseline' } }, allow: { dependency: { source: '@clerk/**' } } },
               {
                 from: FLOW_UI,
                 disallow: {

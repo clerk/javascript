@@ -2,8 +2,9 @@ import { Banner } from '@clerk/mosaic/components/banner';
 import { SubmitButton } from '@clerk/mosaic/components/button';
 import { Field } from '@clerk/mosaic/components/field';
 import type { FieldFeedback, TextFieldName, UseFormResult } from '@clerk/mosaic/components/form';
-import { FormSubmitError, useForm } from '@clerk/mosaic/components/form';
+import { useForm } from '@clerk/mosaic/components/form';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { MosaicError } from '@clerk/mosaic/utils/errors';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -54,10 +55,10 @@ async function checkUsername(value: string): Promise<FieldFeedback | undefined> 
 async function saveProfile(values: ProfileValues): Promise<void> {
   await wait(800);
   if (values.username === 'error') {
-    throw new FormSubmitError<ProfileValues>({
-      message: 'Your profile could not be saved.',
-      fields: { username: 'That username is reserved.' },
-    });
+    throw new MosaicError([
+      { code: 'profile_not_saved', message: 'Your profile could not be saved.' },
+      { code: 'username_reserved', message: 'That username is reserved.', field: 'username' },
+    ]);
   }
 }
 

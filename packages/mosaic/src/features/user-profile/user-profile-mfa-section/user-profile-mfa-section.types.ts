@@ -1,5 +1,6 @@
 import type { PhoneNumberResource } from '@clerk/shared/types';
 
+import type { ClerkCall } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 
 export interface UserProfileMfaMethod {
@@ -38,14 +39,14 @@ export type UserProfileMfaModel =
       methods: readonly UserProfileMfaMethod[];
       addableMethods: readonly UserProfileMfaAddableMethod[];
       phones: readonly MfaPhone[];
-      enrollPhoneNumber?: (phoneNumber: string) => Promise<SmsEnrollmentResult>;
-      enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
-      resendSms?: (phoneId: string) => Promise<void>;
-      createAuthenticator?: () => Promise<{ secret: string; uri: string }>;
-      verifyAuthenticator?: (code: string) => Promise<MfaEnrollmentResult>;
-      generateBackupCodes?: () => Promise<readonly string[]>;
-      remove: (methodId: string) => Promise<void>;
-      setDefault?: (phoneId: string) => Promise<void>;
+      enrollPhoneNumber?: (phoneNumber: string) => ClerkCall<SmsEnrollmentResult>;
+      enrollSms?: (phoneId: string, code?: string) => ClerkCall<SmsEnrollmentResult>;
+      resendSms?: (phoneId: string) => ClerkCall;
+      createAuthenticator?: () => ClerkCall<{ secret: string; uri: string }>;
+      verifyAuthenticator?: (code: string) => ClerkCall<MfaEnrollmentResult>;
+      generateBackupCodes?: () => ClerkCall<readonly string[]>;
+      remove: (methodId: string) => ClerkCall;
+      setDefault?: (phoneId: string) => ClerkCall;
       removeReverification: ReverificationController;
       setDefaultReverification: ReverificationController;
       backupCodesReverification: ReverificationController;

@@ -27,16 +27,18 @@ const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step)
 
 ## Move on after a submit
 
-The model makes the Clerk call and returns the next step. The methods return `{ error }` instead of rejecting, so the model throws it for `save` and the controller's error owners. The controller passes the step to `next(step)`.
+The model makes the Clerk call and returns the next step. The methods return `{ error }` instead of rejecting, so the model throws it inside `callClerk` for the controller's error owners. The controller passes the step to `next(step)`.
 
 ```ts
-submitPassword: async (password: string) => {
-  await save(async () => {
-    const { error } = await signIn.password({ password });
-    if (error) throw error;
-  }, ['password']);
-  return getSignInNextStep(signIn);
-},
+submitPassword: (password: string) =>
+  callClerk(
+    async () => {
+      const { error } = await signIn.password({ password });
+      if (error) throw error;
+      return getSignInNextStep(signIn);
+    },
+    { fields: ['password'] },
+  ),
 ```
 
 - `complete`: the model's `finalize()`, then leave the flow. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.

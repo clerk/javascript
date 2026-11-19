@@ -1,14 +1,13 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { createActor } from '../../../machine/create-actor';
-import { SaveError } from '../../../utils/errors';
+import { CancelledError, MosaicError } from '../../../utils/errors';
 import { confirmMachine, useConfirmController } from '../confirm.controller';
 
-const blocked = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
-const cancelled = new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' });
+const blocked = new MosaicError([{ code: 'action_blocked', message: 'Raw server sentence.' }]);
+const cancelled = new CancelledError();
 
 function start() {
   const actor = createActor(confirmMachine).start();
@@ -80,7 +79,7 @@ describe('confirmMachine', () => {
     actor.send({ type: 'CONFIRM', run: () => Promise.reject(blocked) });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('confirming'));
-    expect(actor.getSnapshot().context.error).toEqual(blocked.formError.global);
+    expect(actor.getSnapshot().context.error).toEqual(blocked.issues[0]);
   });
 
   it('keeps the cause of an unexpected error, never its message', async () => {
@@ -114,6 +113,21 @@ describe('confirmMachine', () => {
 });
 
 describe('useConfirmController', () => {
+  it('shows the localized copy for the code the action refused with, not its message', async () => {
+    const { result } = renderHook(() =>
+      useConfirmController({ onConfirm: () => Promise.reject(blocked), errorFallback: 'Nope.' }),
+    );
+
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.confirm());
+
+    await waitFor(() =>
+      expect(result.current.errorMessage).toBe(
+        "This action couldn't be completed. Please try again later or contact support if this persists.",
+      ),
+    );
+  });
+
   it('ignores open while no block is mounted on the controller, and keeps one handle across renders', () => {
     const { result, rerender } = renderHook(() => useConfirmController({ onConfirm: () => Promise.resolve() }));
     const { handle } = result.current;

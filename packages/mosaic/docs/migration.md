@@ -33,7 +33,7 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
   packages/ui/src/components/<Feature>/
 ```
 
-Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`save`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
+Turn the hits into a behavior inventory, one row per effect, guard, error path, empty or loading state, permission gate, revalidate, reset-on-close and derived label. The table does not cover every behavior; read the files too. For shared answers (`callClerk`, `useReverificationFlow`), use [Reuse before you write](../AGENTS.md#reuse-before-you-write).
 
 ### Screens
 

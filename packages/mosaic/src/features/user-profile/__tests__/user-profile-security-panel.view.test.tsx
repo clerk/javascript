@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
+import { callClerk } from '../../clerk/errors';
 import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
@@ -35,9 +36,9 @@ function ActiveDevices({
 function Passkeys({ passkeys, onRemove }: { passkeys: UserProfilePasskey[]; onRemove: (id: string) => Promise<void> }) {
   const controller = useUserProfilePasskeysSectionController({
     passkeys,
-    onRename: () => Promise.resolve(),
+    onRename: () => callClerk(() => Promise.resolve()),
     validateName: () => undefined,
-    onRemove,
+    onRemove: id => callClerk(() => onRemove(id)),
   });
   return <UserProfilePasskeysSectionView {...controller} />;
 }

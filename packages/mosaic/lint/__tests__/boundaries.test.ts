@@ -214,9 +214,34 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       code: "import { useRouterScope } from '../../routing/use-router';",
     },
     {
-      name: "src/blocks/sample.tsx may import down or across: import { Reverification } from '../features/reverification';",
-      filename: 'src/blocks/sample.tsx',
-      code: "import { Reverification } from '../features/reverification';",
+      name: "a baselined block may import reverification: import { Reverification } from '../../features/reverification';",
+      filename: 'src/blocks/confirm/confirm-shell.tsx',
+      code: "import { Reverification } from '../../features/reverification';",
+    },
+    {
+      name: "src/components/sample.tsx may use a Clerk-free helper: import { useSafeLayoutEffect } from '@clerk/shared/react';",
+      filename: 'src/components/sample.tsx',
+      code: "import { useSafeLayoutEffect } from '@clerk/shared/react';",
+    },
+    {
+      name: "src/primitives/sample.tsx may use a Clerk-free helper: import { inertProps } from '@clerk/shared/inert';",
+      filename: 'src/primitives/sample.tsx',
+      code: "import { inertProps } from '@clerk/shared/inert';",
+    },
+    {
+      name: "src/utils/sample.ts may import Clerk types: import type { ClerkAPIError } from '@clerk/shared/types';",
+      filename: 'src/utils/sample.ts',
+      code: "import type { ClerkAPIError } from '@clerk/shared/types';",
+    },
+    {
+      name: "src/queries/sample.ts may read Clerk: import { useOrganization } from '@clerk/shared/react';",
+      filename: 'src/queries/sample.ts',
+      code: "import { useOrganization } from '@clerk/shared/react';",
+    },
+    {
+      name: "a baselined hook may read Clerk: import { useClerk } from '@clerk/shared/react';",
+      filename: 'src/hooks/use-mosaic-router.ts',
+      code: "import { useClerk } from '@clerk/shared/react';",
     },
     {
       name: "src/blocks/sample.tsx may import down or across: import { autoUpdate } from '@floating-ui/react';",
@@ -455,5 +480,34 @@ ruleTester.run('dependencies', boundaries.rules.dependencies, {
       code: "import { useRouter } from '../routing/use-router';",
       errors: [/down/],
     },
+    {
+      name: "src/blocks/sample.tsx cannot import up: import { Reverification } from '../features/reverification';",
+      filename: 'src/blocks/sample.tsx',
+      code: "import { Reverification } from '../features/reverification';",
+      errors: [/down/],
+    },
+    {
+      name: 'a baselined controller still cannot read Clerk data hooks',
+      filename: 'src/blocks/confirm/confirm.controller.ts',
+      code: "import { useUser } from '@clerk/shared/react';",
+      errors: [/models/],
+    },
+    ...[
+      ['src/primitives/sample.tsx', "import { useClerk } from '@clerk/shared/react';"],
+      ['src/components/sample.tsx', "import { useUser } from '@clerk/shared/react';"],
+      ['src/components/sample.tsx', "import { useSafeLayoutEffect, useUser } from '@clerk/shared/react';"],
+      ['src/hooks/sample.ts', "import { isReverificationCancelledError } from '@clerk/shared/error';"],
+      ['src/utils/sample.ts', "import { buildEmailAddress } from '@clerk/shared/internal/clerk-js/email';"],
+      ['src/blocks/sample.tsx', "import { useClerk } from '@clerk/react';"],
+      ['src/machine/sample.ts', "import { Clerk } from '@clerk/clerk-js';"],
+      ['src/routing/sample.ts', "import { useClerk } from '@clerk/shared/react';"],
+      ['src/modals/sample.ts', "import { useClerk } from '@clerk/shared/react';"],
+      ['src/localization/sample.ts', "import { isClerkAPIResponseError } from '@clerk/shared/error';"],
+    ].map(([filename, code]) => ({
+      name: `${filename} cannot reach Clerk: ${code}`,
+      filename,
+      code,
+      errors: [/runs without Clerk/],
+    })),
   ].map(testCase => ({ ...testCase, options, settings })),
 });

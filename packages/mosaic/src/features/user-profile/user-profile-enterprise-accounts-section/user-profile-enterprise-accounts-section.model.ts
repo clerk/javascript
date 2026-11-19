@@ -4,6 +4,8 @@ import type { EnterpriseAccountResource, EnterpriseConnectionResource, UserResou
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { withUserProfileModalReturn } from '../user-profile.modal-return';
@@ -78,7 +80,7 @@ export type UserProfileEnterpriseAccountsModel =
       userId: string;
       accounts: UserProfileEnterpriseAccount[];
       connections: UserProfileEnterpriseConnection[];
-      connect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
+      connect: (connectionId: string) => ClerkCall<EnterpriseAccountActionResult>;
       connectReverification: ReverificationController;
     };
 
@@ -132,23 +134,24 @@ export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAc
   return {
     ...projection,
     userId,
-    connect: async connectionId => {
-      const current = currentUser();
-      if (!projection.connections.some(connection => connection.id === connectionId)) {
-        throw unavailable();
-      }
-      const redirectUrl = withUserProfileModalReturn(window.location.href, { mode, combined });
-      const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
-      currentUser();
-      const redirect = account.verification?.externalVerificationRedirectURL;
-      if (!redirect) {
-        throw new ClerkRuntimeError('OAuth flow did not receive a verification URL.', {
-          code: 'oauth_missing_verification_url',
-        });
-      }
-      router.windowNavigate(redirect);
-      return 'redirecting';
-    },
+    connect: connectionId =>
+      callClerk(async (): Promise<EnterpriseAccountActionResult> => {
+        const current = currentUser();
+        if (!projection.connections.some(connection => connection.id === connectionId)) {
+          throw unavailable();
+        }
+        const redirectUrl = withUserProfileModalReturn(window.location.href, { mode, combined });
+        const account = await createAccount(current, { enterpriseConnectionId: connectionId, redirectUrl });
+        currentUser();
+        const redirect = account.verification?.externalVerificationRedirectURL;
+        if (!redirect) {
+          throw new ClerkRuntimeError('OAuth flow did not receive a verification URL.', {
+            code: 'oauth_missing_verification_url',
+          });
+        }
+        router.windowNavigate(redirect);
+        return 'redirecting';
+      }),
     connectReverification,
   };
 }

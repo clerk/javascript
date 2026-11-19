@@ -71,14 +71,14 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - An async action from a button or row: pending, an error, one lock → `usePendingAction` (`src/hooks/`)
 - A form: values, validation, submit, field errors, success UI → `useForm` (`src/components/form/`), with `validateAsync` for server checks and `onSuccess` for mounted success UI
 - A `<form>` element, without the browser's validation popup → `Form` (`src/primitives/form/`)
-- A model save whose Clerk errors should land on form fields → `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`
+- A model callback that calls Clerk → `callClerk` (`src/features/clerk/errors.ts`), with `fields` when its errors should land on form fields; anything else that fails a submit rejects with a `MosaicError` (`src/utils/errors.ts`)
 - A confirm step before an action → `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)
 - A delete that needs the user to type a phrase → `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)
 - An action that may need step-up verification → `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`
 - A direct action that needs step-up verification → `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view
 - A step that verifies a factor (a code, password, backup code or passkey, the method picker, help) → the steps in `src/blocks/verification/`, such as `VerificationCode`
 - A screen sign-in and sign-up both show (an email link and its status, a loading or protect-check notice, a blocked request, the wallet or enterprise connection picker, the alternative phone channel, the identity line, the captcha) → the steps in `src/blocks/auth/`, such as `AuthEmailLink`
-- Showing any error to the user → One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`
+- Showing any error to the user → One of the owners above. They read the `MosaicError` with `describeError` (`src/utils/errors.ts`) and resolve copy with `useErrorText`
 - Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
 - A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)
 - A spinner that should not flash or flicker → `useSpinDelay` (`src/hooks/`)

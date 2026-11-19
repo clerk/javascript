@@ -4,11 +4,27 @@ import type { OrganizationMembershipResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import type { ClerkCall } from '../../clerk/errors';
+import { callClerk } from '../../clerk/errors';
 import type { MembersRoles, OrganizationProfileMember } from './members-table-tab.types';
 
 const PAGE_SIZE = 10;
 
-export function useMembersTableModel(query: string) {
+export interface MembersTableModel {
+  rows: (Omit<OrganizationProfileMember, 'joinedAtLabel'> & { joinedAt: Date })[];
+  pageSize: number;
+  totalCount: number;
+  page: number;
+  isLoading: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  retry: () => unknown;
+  fetchPage: (page: number) => unknown;
+  changeRole: ((id: string, role: string, roles: MembersRoles) => ClerkCall) | undefined;
+  remove: ((id: string) => ClerkCall) | undefined;
+}
+
+export function useMembersTableModel(query: string): MembersTableModel {
   const { session } = useSession();
   const canRead = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsRead }) ?? false;
   const canManage = session?.checkAuthorization({ permission: ORGANIZATION_PERMISSIONS.membershipsManage }) ?? false;
@@ -51,23 +67,25 @@ export function useMembersTableModel(query: string) {
     retry: () => memberships?.revalidate?.(),
     fetchPage: (page: number) => memberships?.fetchPage?.(page),
     changeRole: canManage
-      ? async (id: string, role: string, roles: MembersRoles) => {
-          if (roles.hasRoleSetMigration || !roles.roles.some(option => option.key === role)) {
-            throw new ClerkRuntimeError('This role is unavailable.', { code: 'role_unavailable' });
-          }
-          await findManageable(id).update({ role });
-          await memberships?.revalidate?.();
-        }
+      ? (id: string, role: string, roles: MembersRoles) =>
+          callClerk(async () => {
+            if (roles.hasRoleSetMigration || !roles.roles.some(option => option.key === role)) {
+              throw new ClerkRuntimeError('This role is unavailable.', { code: 'role_unavailable' });
+            }
+            await findManageable(id).update({ role });
+            await memberships?.revalidate?.();
+          })
       : undefined,
     remove: canManage
-      ? async (id: string) => {
-          const lastOnPage = (memberships?.data?.length ?? 0) === 1 && (memberships?.page ?? 1) > 1;
-          await findManageable(id).destroy();
-          await memberships?.revalidate?.();
-          if (lastOnPage) {
-            memberships?.fetchPage?.((memberships?.page ?? 1) - 1);
-          }
-        }
+      ? (id: string) =>
+          callClerk(async () => {
+            const lastOnPage = (memberships?.data?.length ?? 0) === 1 && (memberships?.page ?? 1) > 1;
+            await findManageable(id).destroy();
+            await memberships?.revalidate?.();
+            if (lastOnPage) {
+              memberships?.fetchPage?.((memberships?.page ?? 1) - 1);
+            }
+          })
       : undefined,
   };
 }
