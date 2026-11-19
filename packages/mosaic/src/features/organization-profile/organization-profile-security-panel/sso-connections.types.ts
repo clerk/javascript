@@ -39,6 +39,7 @@ export interface SSOOidcDetails {
 interface SSOConnectionBase extends Pick<EnterpriseConnectionResource, 'id' | 'name' | 'domains'> {
   providerKey: SSOProviderKey;
   iconUrl: string | undefined;
+  monochromeIcon: boolean;
   status: SSOConnectionStatus;
   settings: Partial<Record<SSOConnectionSetting, boolean>>;
 }

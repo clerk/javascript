@@ -26,6 +26,7 @@ const exampleConnections: SSOConnection[] = [
     domains: ['acme.com', 'acme.io'],
     providerKey: 'okta',
     iconUrl: iconImageUrl('okta'),
+    monochromeIcon: true,
     status: 'active',
     family: 'saml',
     settings: {
@@ -60,6 +61,7 @@ const exampleConnections: SSOConnection[] = [
     domains: ['contractors.acme.com'],
     providerKey: 'microsoft',
     iconUrl: iconImageUrl('microsoft'),
+    monochromeIcon: false,
     status: 'inactive',
     family: 'saml',
     settings: {
@@ -85,6 +87,7 @@ const exampleConnections: SSOConnection[] = [
     domains: [],
     providerKey: 'oidc',
     iconUrl: iconImageUrl('oidc'),
+    monochromeIcon: false,
     status: 'inProgress',
     family: 'oidc',
     settings: { syncUserAttributes: false, allowAdditionalIdentifiers: false },
