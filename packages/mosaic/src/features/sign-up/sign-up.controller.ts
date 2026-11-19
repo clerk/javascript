@@ -143,8 +143,9 @@ export function useSignUpController(
   };
 
   return {
-    screen,
+    screen: screen === 'start' && details.alternativePhone ? 'alternativePhone' : screen,
     attempt: flow.signUpId,
+    alternativePhone: details.alternativePhone,
     start: details.start,
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },

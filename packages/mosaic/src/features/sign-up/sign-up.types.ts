@@ -63,7 +63,6 @@ export interface SignUpDetailsScreen {
 export interface SignUpVerifyScreen {
   verification: SignUpVerificationModel;
   onNext: (step: SignUpNextStep) => void;
-  provider?: string;
   isPending: boolean;
   globalErrorMessage?: string;
   onEditIdentifier: () => void;
