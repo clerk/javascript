@@ -18,6 +18,7 @@ export const constants = {
    * E2E_APP_ID=react.vite.*
    */
   E2E_APP_ID: process.env.E2E_APP_ID,
+  E2E_SUITE: process.env.E2E_SUITE,
   /**
    * Controls the URL the apps will load clerk.browser.js from.
    * This is the same as the clerkJsUrl prop.

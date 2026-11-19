@@ -26,6 +26,7 @@ export const common: PlaywrightTestConfig = {
 
 export default defineConfig({
   ...common,
+  testIgnore: ['chrome-extension/**'],
 
   // Emit a machine-readable report in CI so the staging workflow's report job can
   // classify failures (flaky vs failed, infra vs regression) instead of reading a
