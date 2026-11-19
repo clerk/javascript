@@ -1,5 +1,43 @@
 # @clerk/mosaic
 
+## 0.9.0
+
+### Minor Changes
+
+- **Breaking:** Remove the `placement` prop from `Icon`, along with the `data-icon` attribute it rendered. `Button` now tightens its padding on the side of an `Icon` placed directly before or after the label, read from its position. An icon inside a wrapper element no longer counts as leading or trailing, so the button keeps its text padding. Delete `placement` from your `Icon`s; TypeScript flags the ones left. ([#10910](https://github.com/clerk/javascript/pull/10910)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                           | After                   |
+  | ------------------------------------------------ | ----------------------- |
+  | `<Icon glyph={Plus} placement='inline-start' />` | `<Icon glyph={Plus} />` |
+
+  Find usages with `git grep -nE "placement=\{?['\"]inline-|data-icon"`.
+
+  The text label inside `Button` and `SubmitButton` now carries a `cl-button-label` class you can target in your styles.
+
+- **Breaking:** Two helpers move onto their component's namespace. Behavior is unchanged; TypeScript flags the old imports. ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                         | After                          |
+  | -------------------------------------------------------------- | ------------------------------ |
+  | `usePanelTitle` from `@clerk/mosaic/components/panel`          | `Panel.usePanelTitle`          |
+  | `sectionCompactStyles` from `@clerk/mosaic/components/section` | `Section.sectionCompactStyles` |
+
+  Find usages with `git grep -nE "usePanelTitle|sectionCompactStyles"`.
+
+  Every component and primitive on the Mosaic docs site now imports from its docs path:
+  - Components from `@clerk/mosaic/components/<name>`: `ActionBar`, `Checkbox`, `Combobox`, `CopyButton`, `Dialog`, `Drawer`, `Flow`, `InputGroup`, `Link`, `Menu`, `Otp`, `Pagination`, `PasswordInput`, `PhoneInput`, `Reveal`, `Select`, `Separator`, `Spinner`, `Stepper`, `Switch`, `Tabs`, `TagInput`, `Tooltip` and `VisuallyHidden`
+  - Headless primitives from `@clerk/mosaic/primitives/<name>`
+
+  Components and compound primitives export one namespace plus their types, and helpers live on the namespace.
+
+### Patch Changes
+
+- Compound components imported from `@clerk/mosaic/components/*` (`Avatar`, `Banner`, `Card`, `DataList`, `EmptyState`, `Entity`, `Field`, `Item`, `Panel`, `Popover`, `Profile`, `Radio`, `Section`, `SegmentedControl`, `Switcher` and `Table`) can now be rendered from React Server Components, e.g. `<Avatar.Root>` in a Next.js App Router page. ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Glyphs imported from `@clerk/mosaic/icons/glyphs/*` can now be passed to `Icon` from React Server Components, e.g. `<Icon glyph={External} />` in a Next.js App Router page. Before, the page failed to render with "Functions cannot be passed directly to Client Components". ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+
 ## 0.8.0
 
 ### Minor Changes

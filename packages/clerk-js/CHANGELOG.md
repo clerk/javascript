@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.46.1
+
+### Patch Changes
+
+- Fixed a case where the session refresh that runs when the tab regains focus could overwrite newer user, organization or session state, or set the session cookie again after sign-out. ([#10874](https://github.com/clerk/javascript/pull/10874)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- `organization.getRoles()`, `organization.getDomains()` and `organization.getInvitations()` no longer refresh the client as a side effect. ([#10874](https://github.com/clerk/javascript/pull/10874)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+
 ## 6.46.0
 
 ### Minor Changes
