@@ -23,6 +23,19 @@ export function Default() {
   );
 }
 
+export function FullWidth() {
+  return (
+    <SegmentedControl.Root
+      aria-label='Add by'
+      defaultValue='email'
+      fullWidth
+    >
+      <SegmentedControl.Item value='email'>Email</SegmentedControl.Item>
+      <SegmentedControl.Item value='role'>Role</SegmentedControl.Item>
+    </SegmentedControl.Root>
+  );
+}
+
 export function Disabled() {
   return (
     <SegmentedControl.Root
