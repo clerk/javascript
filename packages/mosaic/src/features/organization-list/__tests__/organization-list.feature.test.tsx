@@ -260,7 +260,7 @@ describe('OrganizationList', () => {
       await user.click(screen.getByRole('button', { name: 'Create organization' }));
 
       expect(await screen.findByRole('heading', { name: 'Choose an account' })).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Initech' })).toBeVisible();
+      expect(await screen.findByRole('button', { name: 'Initech' })).toBeVisible();
     });
 
     it('starts on the create form, with no way back, when there is nothing to list', async () => {
