@@ -121,18 +121,24 @@ export class Session extends BaseResource implements SessionResource {
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
     const isFocus = intent === 'focus';
     const revision = Client.getRevision();
+    const activeSession = BaseResource.clerk?.session;
+    const organizationId = this.lastActiveOrganizationId;
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
+        body: { active_organization_id: organizationId, intent } as any,
       },
       { skipUpdateClient: skipUpdateClient || isFocus },
     );
 
     if (isFocus) {
-      if (revision !== Client.getRevision()) {
+      if (
+        revision !== Client.getRevision() ||
+        activeSession !== BaseResource.clerk?.session ||
+        organizationId !== this.lastActiveOrganizationId
+      ) {
         return null;
       }
       if (!skipUpdateClient) {
@@ -151,7 +157,7 @@ export class Session extends BaseResource implements SessionResource {
 
     // Unless discarded, _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
-    if (json && this.lastActiveToken) {
+    if ((json || intent !== 'focus') && this.lastActiveToken) {
       eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
     }
 
