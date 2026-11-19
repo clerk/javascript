@@ -72,6 +72,10 @@ export type GetConnectionCredentialParams = {
    */
   scopes?: string[];
   expiresIn?: number;
+  /**
+   * The connector key or ID the connection must belong to. A connection of another connector is not found.
+   */
+  connector?: string;
 } & ({ key: string; connectionId?: never } | { connectionId: string; key?: never });
 
 export type ListConnectionsParams = {
