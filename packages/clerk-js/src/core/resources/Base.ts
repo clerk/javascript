@@ -300,7 +300,6 @@ export abstract class BaseResource {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
 
-  // Any new local-only change to the active session or organization must be part of this key, or a stale focus response can overwrite it.
   private static activeAuth(): string {
     const session = BaseResource.clerk?.session;
     return `${session?.id}:${session?.lastActiveOrganizationId}`;
