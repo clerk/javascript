@@ -48,3 +48,12 @@ Two shapes, chosen by whether the slice fetches its own data.
 - **A view owns its controller** when the slice is a leaf that takes its effect as a prop. There is no model: the Clerk call arrives from whoever renders it (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController` with its `onSubmit`).
 
 Either way, the controller never imports Clerk, and its effects arrive as injected plain functions.
+
+## A flow with several screens
+
+A flow such as sign-up keeps one model and splits its screens into folders, so one screen is one folder to read (`src/features/sign-up/`).
+
+- **The model stays whole and is grouped by screen.** It reads Clerk in one place and returns a group per screen (`details`, `verification.email`, `verification.phone`) and the groups the whole flow shares (`flow`, `app`, `navigation`) ([Models → Shape](models.md#shape)).
+- **Each screen gets a folder,** named `<feature>-<screen>/` like a profile section, holding that screen's controller and view (`sign-up-verify/`). It takes its group from the model whole.
+- **The flow controller keeps what outlives a screen:** the route and its guard, the next step, finishing, and state two screens share, such as the details form that start and continue both render.
+- **A screen that runs its own controller reaches the view as a slot** the wrapper builds, so the flow's view renders plain props only ([Views → Moving between screens](views.md#moving-between-screens-on-one-surface)).
