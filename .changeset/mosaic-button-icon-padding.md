@@ -7,8 +7,7 @@
 | Before                                      | After                                       |
 | ------------------------------------------- | ------------------------------------------- |
 | `<Icon glyph={Plus} placement='inline-start' />` | `<Icon glyph={Plus} />`                     |
-| `.cl-button:has([data-icon='inline-end'])`  | `.cl-button:has(> .cl-icon:last-child)`     |
 
-Find usages with `git grep -nE "placement=['\"]inline-|data-icon"`.
+Find usages with `git grep -nE "placement=\{?['\"]inline-|data-icon"`.
 
 The text label inside `Button` and `SubmitButton` now carries a `cl-button-label` class you can target in your styles.
