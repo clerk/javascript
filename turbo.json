@@ -48,6 +48,7 @@
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/scripts/rspack-common.js",
+        "$TURBO_ROOT$/scripts/search-for-rhc.mjs",
         "$TURBO_ROOT$/scripts/utils.ts",
         "!**/*.test.*",
         "!**/*.spec.*",
