@@ -1111,6 +1111,45 @@ describe('SignInFactorOne', () => {
           expect.objectContaining({ phoneNumberId: 'idn_B' }),
         );
       });
+
+      it('does not resend when switching back to the first phone number whose code is pending', async () => {
+        const { wrapper, fixtures } = await createTwoPhoneFixtures();
+        fixtures.signIn.firstFactorVerification.status = 'unverified';
+        fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+        fixtures.signIn.firstFactorVerification.channel = 'sms';
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await screen.findByText('Check your phone');
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText(/Send SMS code to \+30/));
+        await screen.findByText('Check your phone');
+
+        expect(fixtures.signIn.prepareFirstFactor).not.toHaveBeenCalled();
+      });
+
+      it('sends a code to the first phone number again after a code was sent to the second', async () => {
+        const { wrapper, fixtures } = await createTwoPhoneFixtures();
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText('Send SMS code to +1 (555) 555-0199'));
+        await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(2));
+
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(await screen.findByText('Use another method'));
+        await userEvent.click(screen.getByText(/Send SMS code to \+30/));
+        await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(3));
+
+        expect(fixtures.signIn.prepareFirstFactor).toHaveBeenLastCalledWith(
+          expect.not.objectContaining({ phoneNumberId: 'idn_B' }),
+        );
+      });
     });
 
     describe('switching between two email addresses through another method', () => {

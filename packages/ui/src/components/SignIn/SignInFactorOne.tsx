@@ -86,7 +86,6 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
-  const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor, prevCurrentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
@@ -111,6 +110,10 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: undefined,
     };
   });
+
+  const lastPreparedFactorKeyRef = React.useRef(
+    firstFactorVerification.status === 'unverified' ? factorKey(currentFactor) : '',
+  );
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
