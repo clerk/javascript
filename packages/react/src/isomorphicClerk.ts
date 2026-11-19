@@ -1674,22 +1674,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  // TODO: This function should likely return its promise and accept onCustomNavigate like the clerk-js version,
-  //       but because that might change behavior of existing callers we need to be careful, might be a major
-  handleRedirectCallback = async (params: HandleOAuthCallbackParams): Promise<void> => {
-    const callback = () => this.clerkjs?.handleRedirectCallback(params);
-    if (this.clerkjs && this.loaded) {
-      void callback()?.catch(() => {
-        // This catch was added to silence the error from a second call when a React 18
-        // host app remounted in strict mode. Swallowing the error to "fix" strict mode
-        // hid a real error and clerk-js now joins calls that overlap to fix it.
-        // This catch still hides every other callback failure from callers and should
-        // be removed, but that now changes the public API/behavior of this function
-        // if we happen to have other errors, so it's only safe to do in a major.
-      });
-    } else {
-      this.premountMethodCalls.set('handleRedirectCallback', callback);
-    }
+  handleRedirectCallback: Clerk['handleRedirectCallback'] = async (...args) => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.handleRedirectCallback(...args);
   };
 
   __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
@@ -1714,24 +1701,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  handleGoogleOneTapCallback = async (
-    signInOrUp: SignInResource | SignUpResource,
-    params: HandleOAuthCallbackParams,
-  ): Promise<void> => {
-    const callback = () => this.clerkjs?.handleGoogleOneTapCallback(signInOrUp, params);
-    if (this.clerkjs && this.loaded) {
-      void callback()?.catch(() => {
-        // This error is caused when the host app is using React18
-        // and strictMode is enabled. This useEffects runs twice because
-        // the clerk-react ui components mounts, unmounts and mounts again
-        // so the clerk-js component loses its state because of the custom
-        // unmount callback we're using.
-        // This needs to be solved by tweaking the logic in uiComponents.tsx
-        // or by making handleRedirectCallback idempotent
-      });
-    } else {
-      this.premountMethodCalls.set('handleGoogleOneTapCallback', callback);
-    }
+  handleGoogleOneTapCallback: Clerk['handleGoogleOneTapCallback'] = async (...args) => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.handleGoogleOneTapCallback(...args);
   };
 
   __internal_handleResourceCallback = async (
