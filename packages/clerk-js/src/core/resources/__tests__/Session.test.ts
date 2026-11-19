@@ -1410,6 +1410,25 @@ describe('Session', () => {
         expect(session.lastActiveOrganizationId).toBe('org_after');
       });
 
+      it('throws a discarded focus touch error without applying its client', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        requestSpy.mockImplementation(() => {
+          Client.getOrCreateInstance().fromJSON(clientJSON('client_newer', []) as any);
+          return Promise.resolve({
+            payload: {
+              errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
+              meta: { client: clientJSON('client_error', []) },
+            },
+            status: 422,
+          });
+        });
+
+        await expect(session.touch({ intent: 'focus' })).rejects.toThrow('Invalid');
+
+        expect(Client.getOrCreateInstance().id).toBe('client_newer');
+        expect(updateClient).not.toHaveBeenCalled();
+      });
+
       it('handles an unauthenticated focus touch', async () => {
         const handleUnauthenticated = vi.fn();
         BaseResource.clerk = clerkMock({ updateClient, handleUnauthenticated } as any);

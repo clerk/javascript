@@ -13,12 +13,11 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import { type Clerk, Client, getClientResourceFromPayload } from './internal';
+import { type Clerk, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   skipUpdateClient?: boolean;
-  discardIfClientChanged?: boolean;
   fetchMaxTries?: number;
   abortSignal?: AbortSignal;
 };
@@ -111,7 +110,6 @@ export abstract class BaseResource {
       fapiRequestInit = { ...requestInit, search };
     }
 
-    const revisionAtSend = Client.getRevision();
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(fapiRequestInit, { fetchMaxTries });
     } catch (e) {
@@ -137,7 +135,6 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
-    const clientChanged = opts.discardIfClientChanged && revisionAtSend !== Client.getRevision();
 
     if (headers) {
       const country = headers.get('x-country');
@@ -146,12 +143,12 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient && !clientChanged) {
+    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
       this._updateClient<J>(payload);
     }
 
     if (status >= 200 && status <= 299) {
-      return clientChanged ? null : payload;
+      return payload;
     }
 
     if (status >= 400) {

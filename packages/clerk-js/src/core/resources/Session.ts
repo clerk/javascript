@@ -56,7 +56,7 @@ import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
-import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
+import { BaseResource, Client, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 const TOKEN_REQUEST_TIMEOUT_MS = 10_000;
@@ -119,6 +119,8 @@ export class Session extends BaseResource implements SessionResource {
       skipUpdateClient: false,
     },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
+    const isFocus = intent === 'focus';
+    const revision = Client.getRevision();
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
@@ -126,8 +128,17 @@ export class Session extends BaseResource implements SessionResource {
         // any is how we type the body in the BaseMutateParams as well
         body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
-      { skipUpdateClient, discardIfClientChanged: intent === 'focus' },
+      { skipUpdateClient: skipUpdateClient || isFocus },
     );
+
+    if (isFocus) {
+      if (revision !== Client.getRevision()) {
+        return null;
+      }
+      if (!skipUpdateClient) {
+        BaseResource._updateClient(json);
+      }
+    }
 
     // Update session in-place from response (same as BaseResource._baseMutate)
     this.fromJSON((json?.response || json) as SessionJSON);

@@ -1,8 +1,7 @@
 import type { OrganizationJSON } from '@clerk/shared/types';
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { FraudProtection } from '../../fraudProtection';
-import { BaseResource, Client, Organization, Token } from '../internal';
+import { BaseResource, Organization } from '../internal';
 
 class TestResource extends BaseResource {
   constructor() {
@@ -116,118 +115,6 @@ describe('BaseResource', () => {
 
       expect(searchOf(request).get('_include_client')).toBeNull();
       expect(searchOf(request).get('limit')).toBe('5');
-    });
-  });
-
-  describe('discardIfClientChanged', () => {
-    const clientJSON = (id: string) => ({
-      object: 'client',
-      id,
-      sessions: [],
-      sign_up: null,
-      sign_in: null,
-      last_active_session_id: null,
-      created_at: 0,
-      updated_at: 0,
-    });
-
-    const payload = { response: { id: 'sess_1' }, client: clientJSON('client_response') };
-
-    let request: Mock;
-    let updateClient: Mock;
-
-    beforeEach(() => {
-      Client.clearInstance();
-      request = vi.fn();
-      updateClient = vi.fn();
-      BaseResource.clerk = {
-        // @ts-expect-error - We're not about to mock the entire FapiClient
-        getFapiClient: () => ({ request }),
-        __internal_setCountry: vi.fn(),
-        updateClient,
-        session: { id: 'sess_1', lastActiveOrganizationId: 'org_a' },
-      };
-    });
-
-    afterEach(() => {
-      Client.clearInstance();
-      BaseResource.clerk = null as any;
-    });
-
-    const respondAfter = (inFlight: () => unknown, response: unknown = { payload, status: 200 }) => {
-      request.mockImplementationOnce(async () => {
-        await inFlight();
-        return response;
-      });
-    };
-
-    const touch = (opts = { discardIfClientChanged: true }) =>
-      BaseResource._fetch({ method: 'POST', path: '/client/sessions/sess_1/touch' }, opts);
-
-    it('drops the response when the client is written in flight', async () => {
-      respondAfter(() => Client.getOrCreateInstance().fromJSON(clientJSON('client_newer') as any));
-
-      expect(await touch()).toBeNull();
-      expect(updateClient).not.toHaveBeenCalled();
-      expect(Client.getOrCreateInstance().id).toBe('client_newer');
-    });
-
-    it('applies the replayed response after its own captcha challenge', async () => {
-      const fraudProtection = FraudProtection.getInstance() as any;
-      vi.spyOn(fraudProtection, 'managedChallenge').mockResolvedValueOnce({});
-      vi.spyOn(Client.getOrCreateInstance(), '__internal_sendCaptchaToken').mockImplementationOnce(() =>
-        Promise.resolve(Client.getOrCreateInstance().fromJSON(clientJSON('client_verified') as any)),
-      );
-      request
-        .mockResolvedValueOnce({
-          payload: {
-            errors: [{ code: 'requires_captcha', long_message: 'Captcha' }],
-            meta: { client: clientJSON('client_challenge') },
-          },
-          status: 401,
-        })
-        .mockResolvedValueOnce({ payload, status: 200 });
-
-      expect(await touch()).toBe(payload);
-      expect(Client.getOrCreateInstance().id).toBe('client_response');
-    });
-
-    it('applies the response when nothing changed in flight', async () => {
-      respondAfter(() => undefined);
-
-      expect(await touch()).toBe(payload);
-      expect(updateClient).toHaveBeenCalledTimes(1);
-      expect(Client.getOrCreateInstance().id).toBe('client_response');
-    });
-
-    it('applies the response without discardIfClientChanged when the client is written in flight', async () => {
-      respondAfter(() => Client.getOrCreateInstance().fromJSON(clientJSON('client_newer') as any));
-
-      expect(await touch({ discardIfClientChanged: false })).toBe(payload);
-      expect(updateClient).toHaveBeenCalledTimes(1);
-      expect(Client.getOrCreateInstance().id).toBe('client_response');
-    });
-
-    it('still throws a discarded error response without applying its client', async () => {
-      respondAfter(() => Client.getOrCreateInstance().fromJSON(clientJSON('client_newer') as any), {
-        payload: {
-          errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
-          meta: { client: clientJSON('client_error') },
-        },
-        status: 422,
-      });
-
-      await expect(touch()).rejects.toThrow('Invalid');
-      expect(updateClient).not.toHaveBeenCalled();
-      expect(Client.getOrCreateInstance().id).toBe('client_newer');
-    });
-
-    it('is not discarded by a token request settling in flight', async () => {
-      respondAfter(() => Token.create('/client/sessions/sess_1/tokens'));
-      request.mockResolvedValueOnce({ payload: { object: 'token', jwt: null }, status: 200 });
-
-      expect(await touch()).toBe(payload);
-      expect(updateClient).toHaveBeenCalledTimes(1);
     });
   });
 });
