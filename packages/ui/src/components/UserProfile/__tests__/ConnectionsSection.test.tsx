@@ -28,7 +28,7 @@ const mockConnect = (fixtures: any, { connectors = [connector], connections = []
     connectors: { list: vi.fn().mockResolvedValue({ data: connectors, total_count: connectors.length }) },
     connections: {
       list: vi.fn().mockResolvedValue({ data: connections, total_count: connections.length }),
-      connect: vi.fn(),
+      create: vi.fn(),
       reauthorize: vi.fn(),
       disconnect: vi.fn().mockResolvedValue({}),
     },
@@ -108,13 +108,13 @@ describe('ConnectionsSection', () => {
   it('offers another account for a service the user already connected', async () => {
     const { wrapper, fixtures } = await createFixtures(withUser);
     const api = mockConnect(fixtures, { connections: [connection] });
-    api.connections.connect.mockResolvedValue({ status: 'complete', connection });
+    api.connections.create.mockResolvedValue({ status: 'complete', connection });
     const { userEvent } = render(<ConnectionsSection />, { wrapper });
 
     await userEvent.click(await screen.findByRole('button', { name: /connect service/i }));
     await userEvent.click(await screen.findByText('Acme Tasks (another account)'));
     await waitFor(() =>
-      expect(api.connections.connect).toHaveBeenCalledWith(
+      expect(api.connections.create).toHaveBeenCalledWith(
         expect.objectContaining({ connector: 'acme', additionalAccount: true }),
       ),
     );

@@ -129,7 +129,7 @@ export class Connect implements ConnectNamespace {
       toConnection(
         await request<ConnectionJSON>({ method: 'GET', path: `/me/connections/${encodeURIComponent(connectionId)}` }),
       ),
-    connect: async (params: CurrentUserConnectParams) =>
+    create: async (params: CurrentUserConnectParams) =>
       toConnectResult(await request<ConnectResultJSON>({ method: 'POST', path: '/me/connections', body: params })),
     reauthorize: async (connectionId: string, params: CurrentUserReauthorizeParams) =>
       toConnectResult(

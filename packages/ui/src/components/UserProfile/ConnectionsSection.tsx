@@ -122,7 +122,7 @@ export const ConnectionsSection = withCardStateProvider(() => {
 
   const connect = (connector: AvailableConnector) =>
     startFlow(connector.key, () =>
-      clerk.connect.connections.connect({
+      clerk.connect.connections.create({
         connector: connector.key,
         returnUrl: returnUrl(),
         additionalAccount: hasConnection(connector),

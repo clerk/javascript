@@ -70,7 +70,7 @@ export interface ConnectNamespace {
   connections: {
     list: (params?: ListCurrentUserConnectionsParams) => Promise<ClerkPaginatedResponse<CurrentUserConnection>>;
     get: (connectionId: string) => Promise<CurrentUserConnection>;
-    connect: (params: CurrentUserConnectParams) => Promise<CurrentUserConnectResult>;
+    create: (params: CurrentUserConnectParams) => Promise<CurrentUserConnectResult>;
     reauthorize: (connectionId: string, params: CurrentUserReauthorizeParams) => Promise<CurrentUserConnectResult>;
     disconnect: (connectionId: string) => Promise<CurrentUserConnection>;
   };

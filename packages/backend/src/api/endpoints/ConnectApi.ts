@@ -183,7 +183,7 @@ export class ConnectConnectorsAPI extends AbstractAPI {
  * @experimental Clerk Connect is in development and the API is subject to change.
  */
 export class ConnectConnectionsAPI extends AbstractAPI {
-  async connect({ userId, ...bodyParams }: ConnectUserParams) {
+  async create({ userId, ...bodyParams }: ConnectUserParams) {
     this.requireId(userId);
     return camelize<ConnectResult>(
       await this.request({ method: 'POST', path: joinPaths('/users', userId, 'connections'), bodyParams }),
