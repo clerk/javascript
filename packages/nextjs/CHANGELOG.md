@@ -1,5 +1,16 @@
 # Change Log
 
+## 7.10.5
+
+### Patch Changes
+
+- Include the application display name as `resource_name` in the OAuth protected resource metadata published by POPPY discovery. ([#10921](https://github.com/clerk/javascript/pull/10921)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+  - @clerk/backend@3.31.2
+  - @clerk/react@6.19.2
+
 ## 7.10.4
 
 ### Patch Changes

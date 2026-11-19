@@ -1587,6 +1587,7 @@ describe('Poppy middleware', () => {
         ? metadata
         : {
             resource: 'https://company.example',
+            resource_name: 'Company',
             authorization_servers: ['https://clerk.company.example'],
             scopes_supported: ['poppy:browser-sign-in', 'profile'],
             bearer_methods_supported: ['header'],
@@ -1595,6 +1596,25 @@ describe('Poppy middleware', () => {
     expect(response.headers.get('cache-control')).toBe('no-store');
     expect(getPoppyJson).toHaveBeenCalledExactlyOnceWith();
     expect(authenticateRequestMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { label: 'missing', organization: {} },
+    { label: 'blank', organization: { name: ' \t' } },
+  ])('omits resource_name when the organization name is $label', async ({ organization }) => {
+    const getPoppyJson = vi.fn().mockResolvedValue({
+      ...metadata,
+      organization: { domain: metadata.organization.domain, ...organization },
+    });
+    vi.mocked(clerkClient).mockResolvedValue(Object.assign(await clerkClient(), { artifacts: { getPoppyJson } }));
+    const middleware = clerkMiddleware({ poppy: true });
+    const response = await middleware(
+      mockRequest({ url: 'https://company.example/.well-known/oauth-protected-resource' }),
+      {} as NextFetchEvent,
+    );
+    assert(response instanceof Response);
+    expect(response.status).toBe(200);
+    expect(await response.json()).not.toHaveProperty('resource_name');
   });
 
   it.each([
