@@ -23,7 +23,7 @@ import { StoryMosaicProvider } from '../ChaosProvider';
 import { MotionControls } from './MotionControls';
 import { useHeightScale } from './useHeightScale';
 
-const DEFAULT_PRESET = 'Option A';
+const DEFAULT_PRESET = 'Proposal';
 
 const DEMOS = [
   { id: 'setup-mfa', label: 'Set up MFA', Demo: TaskSetupMfa.Default },

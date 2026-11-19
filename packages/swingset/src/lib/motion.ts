@@ -8,9 +8,9 @@ const EASES = {
   linear: { label: 'linear', value: 'linear' },
 } as const;
 
-type EaseKey = keyof typeof EASES;
+type EaseKey = keyof typeof EASES | 'spring';
 
-const EASE_KEYS = Object.keys(EASES) as EaseKey[];
+const EASE_KEYS = ['spring', ...Object.keys(EASES)] as EaseKey[];
 
 export interface MotionConfig {
   hMode: 'ease' | 'spring';
@@ -70,26 +70,29 @@ export const CLASSIC: MotionConfig = {
 
 export const PRESETS: Record<string, Partial<MotionConfig>> = {
   'Classic (current)': {},
-  'Option A': {
+  Proposal: {
     hMode: 'spring',
-    springDur: 0.28,
+    springDur: 0.22,
     bounce: 0,
-    outDur: 150,
+    outDur: 110,
     outScale: 1,
-    outBlur: 1.25,
-    outEase: 'outExpo',
-    inDur: 280,
-    inDelay: 65,
-    growDelay: 70,
+    outBlur: 1,
+    outEase: 'spring',
+    inDur: 265,
+    inDelay: 45,
+    growDelay: 50,
     inScale: 1,
-    inBlur: 1.75,
-    inEase: 'outQuint',
+    inBlur: 1.5,
+    inEase: 'spring',
+    mScale: 0.96,
+    mEase: 'spring',
   },
 };
 
 export const PRESET_NOTES: Record<string, string> = {
   'Classic (current)': "Today's Mosaic motion: a scale pulse with an overlapping crossfade.",
-  'Option A': 'Springy and quick: a spring height and a tight overlapping crossfade.',
+  Proposal:
+    'One curve for everything: the height, the crossfade and the dialog share a single spring, and the content lands as the height settles.',
 };
 
 const KEPT_KEYS = [
@@ -139,6 +142,10 @@ export function baseHeightMs(c: MotionConfig) {
   return ms / c.slow;
 }
 
+function easing(c: MotionConfig, key: EaseKey) {
+  return key === 'spring' ? springCurve(c.springDur, c.bounce).css : EASES[key].value;
+}
+
 const BOOST = ':not(#\\#)'.repeat(8);
 
 function time(value: number, speed: number) {
@@ -152,7 +159,7 @@ function flowRules(c: MotionConfig) {
           const spring = springCurve(c.springDur, c.bounce);
           return { duration: time(spring.ms, c.slow), easing: spring.css };
         })()
-      : { duration: time(c.hDur, c.slow), easing: EASES[c.hEase].value };
+      : { duration: time(c.hDur, c.slow), easing: easing(c, c.hEase) };
 
   const heightDuration = c.heightAware
     ? `calc(${height.duration} * (${c.minScale} + ${+(1 - c.minScale).toFixed(3)} * var(--motion-p, 1)))`
@@ -161,9 +168,9 @@ function flowRules(c: MotionConfig) {
   const rules = [
     `.cl-flow-root${BOOST} { transition-duration: ${heightDuration}; transition-timing-function: ${height.easing}; }`,
     `.cl-flow-root[data-initial]${BOOST} { transition-duration: 0s; }`,
-    `.cl-flow-step${BOOST} { opacity: 1; transform: scale(1); filter: blur(0px); transition-property: opacity, transform, filter; transition-duration: ${time(c.inDur, c.slow)}; transition-delay: ${time(c.inDelay, c.slow)}; transition-timing-function: ${EASES[c.inEase].value}; }`,
+    `.cl-flow-step${BOOST} { opacity: 1; transform: scale(1); filter: blur(0px); transition-property: opacity, transform, filter; transition-duration: ${time(c.inDur, c.slow)}; transition-delay: ${time(c.inDelay, c.slow)}; transition-timing-function: ${easing(c, c.inEase)}; }`,
     `.cl-flow-step[data-starting-style]${BOOST} { opacity: 0; transform: scale(${c.inScale}); filter: blur(${c.inBlur}px); }`,
-    `.cl-flow-step[data-ending-style]${BOOST} { opacity: 0; transform: scale(${c.outScale}); filter: blur(${c.outBlur}px); transition-duration: ${time(c.outDur, c.slow)}; transition-delay: 0ms; transition-timing-function: ${EASES[c.outEase].value}; }`,
+    `.cl-flow-step[data-ending-style]${BOOST} { opacity: 0; transform: scale(${c.outScale}); filter: blur(${c.outBlur}px); transition-duration: ${time(c.outDur, c.slow)}; transition-delay: 0ms; transition-timing-function: ${easing(c, c.outEase)}; }`,
   ];
 
   if (c.heightAware) {
@@ -188,7 +195,7 @@ function flowReducedRules(c: MotionConfig) {
 function dialogRules(c: MotionConfig) {
   const popup = `.cl-dialog-popup[data-variant='card']`;
   return [
-    `${popup}${BOOST} { filter: blur(0px); transition-property: opacity, transform, filter; transition-duration: ${time(c.mDur, c.slow)}; transition-timing-function: ${EASES[c.mEase].value}; }`,
+    `${popup}${BOOST} { filter: blur(0px); transition-property: opacity, transform, filter; transition-duration: ${time(c.mDur, c.slow)}; transition-timing-function: ${easing(c, c.mEase)}; }`,
     `${popup}[data-starting-style]${BOOST} { opacity: 0; transform: scale(${c.mScale}); filter: blur(${c.mBlur}px); }`,
     `${popup}[data-ending-style]${BOOST} { opacity: 0; transform: scale(${c.mScale}); filter: blur(${c.mBlur}px); transition-duration: ${time(c.mExit, c.slow)}; transition-timing-function: ${EASES.exit.value}; }`,
   ];
@@ -232,7 +239,10 @@ type CheckControl = { kind: 'check'; key: keyof MotionConfig; label: string; hin
 
 export type MotionControl = NumberControl | SelectControl | CheckControl;
 
-const easeOptions = EASE_KEYS.map(key => ({ value: key, label: EASES[key].label }));
+const easeOptions = EASE_KEYS.map(key => ({
+  value: key,
+  label: key === 'spring' ? 'spring (same curve as the height)' : EASES[key].label,
+}));
 
 export const CONTROL_GROUPS: { title: string; note?: string; controls: MotionControl[] }[] = [
   {
