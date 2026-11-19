@@ -9,6 +9,7 @@ import { useSignUpController } from './sign-up.controller';
 import type { SignUpReadyModel } from './sign-up.model';
 import { useSignUpModel } from './sign-up.model';
 import { SignUpView } from './sign-up.view';
+import { SignUpVerify } from './sign-up-verify/sign-up-verify';
 
 export interface SignUpProps extends RoutingProps {
   fallback?: ReactNode;
@@ -52,11 +53,25 @@ function SignUpFlow({
   routing,
   path,
 }: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement {
-  const view = useSignUpController(model, { routing, path });
+  const { attempt, verifyEmail, verifyPhone, ...view } = useSignUpController(model, { routing, path });
 
   return (
     <SignUpView
       {...view}
+      verifyEmail={
+        <SignUpVerify
+          key={attempt}
+          channel='email'
+          {...verifyEmail}
+        />
+      }
+      verifyPhone={
+        <SignUpVerify
+          key={attempt}
+          channel='phone'
+          {...verifyPhone}
+        />
+      }
       applicationName={model.app.applicationName}
       applicationLogoUrl={model.app.applicationLogoUrl}
       taskChooseOrganization={<TaskChooseOrganizationContent redirectUrlComplete={model.flow.afterSignUpUrl} />}

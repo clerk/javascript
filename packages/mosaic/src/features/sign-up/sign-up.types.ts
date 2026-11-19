@@ -129,13 +129,12 @@ export interface SignUpProtectCheckScreen {
 
 export interface SignUpViewProps {
   screen: SignUpScreen;
-  attempt?: string;
   applicationName: string;
   applicationLogoUrl?: string;
   start: SignUpDetailsScreen;
   continue: SignUpDetailsScreen;
-  verifyEmail: SignUpVerifyScreen;
-  verifyPhone: SignUpVerifyScreen;
+  verifyEmail: ReactNode;
+  verifyPhone: ReactNode;
   restricted: SignUpRestrictedScreen;
   actionBlocked?: AuthActionBlockedDetails;
   onStartOver: () => void;

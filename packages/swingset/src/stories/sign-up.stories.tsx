@@ -8,7 +8,7 @@ import type {
   SignUpVerifyScreen,
   SignUpViewProps,
 } from '@clerk/mosaic/features/sign-up';
-import { SignUpView } from '@clerk/mosaic/features/sign-up';
+import { SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
@@ -127,8 +127,18 @@ function ScreenPanel({
       applicationLogoUrl={APPLICATION_LOGO_URL}
       start={{ ...details, ...start }}
       continue={{ ...details, ...continueDetails }}
-      verifyEmail={verifyScreen(EMAIL)}
-      verifyPhone={verifyScreen(PHONE)}
+      verifyEmail={
+        <SignUpVerify
+          channel='email'
+          {...verifyScreen(EMAIL)}
+        />
+      }
+      verifyPhone={
+        <SignUpVerify
+          channel='phone'
+          {...verifyScreen(PHONE)}
+        />
+      }
       restricted={{ onSignIn: noop }}
       onStartOver={noop}
       alternativePhone={
@@ -327,7 +337,14 @@ export function VerifyPhoneAlternativeChannel() {
   return (
     <ScreenPanel
       screen='verifyPhone'
-      verifyPhone={{ ...verifyScreen(PHONE), provider: 'WhatsApp', onCancel: noop }}
+      verifyPhone={
+        <SignUpVerify
+          channel='phone'
+          {...verifyScreen(PHONE)}
+          provider='WhatsApp'
+          onCancel={noop}
+        />
+      }
     />
   );
 }
