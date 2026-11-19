@@ -58,9 +58,9 @@ function SignUpFlow({
   return (
     <SignUpView
       {...view}
-      applicationName={model.applicationName}
-      applicationLogoUrl={model.applicationLogoUrl}
-      taskChooseOrganization={<TaskChooseOrganizationContent redirectUrlComplete={model.afterSignUpUrl} />}
+      applicationName={model.app.applicationName}
+      applicationLogoUrl={model.app.applicationLogoUrl}
+      taskChooseOrganization={<TaskChooseOrganizationContent redirectUrlComplete={model.flow.afterSignUpUrl} />}
     />
   );
 }

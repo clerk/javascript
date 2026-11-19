@@ -11,7 +11,7 @@ import {
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
-import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
+import { SignUpRestricted } from '../../sign-up/sign-up-restricted/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
 import { emailLinkStatusMessages } from '../sign-in.utils';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';

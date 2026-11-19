@@ -25,7 +25,7 @@ The standalone sign-up view. It reuses the sign-up screens the sign-in view show
 
 ## Usage
 
-The view renders its own `Card.Root` and mounts one screen at a time inside it. `screen` says which one: a route of the sign-up, or a screen the flow shows on top of a route, such as `restricted` or `startOver`. Each screen takes its own props under its own name, so `start` and `continue` hold the details form and `verifyEmail` and `verifyPhone` hold what a code screen needs. `start` and `continue` share one `useForm`, so what the user typed is still there after a trip to a verify screen. A verify screen sends its code when it mounts with `needsCode`, and `attempt` remounts it for a new sign-up. `taskChooseOrganization` is a slot for the session task shown on its route. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for a screen's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
+The view renders its own `Card.Root` and mounts one screen at a time inside it. `screen` says which one: a route of the sign-up, or a screen the flow shows on top of a route, such as `restricted` or `startOver`. Each screen takes its own props under its own name, so `start` and `continue` hold the details form and `verifyEmail` and `verifyPhone` each take a `verification` (the address, whether a code is still needed, and `send` and `verify`) and `onNext` for the step a correct code returns. `start` and `continue` share one `useForm`, so what the user typed is still there after a trip to a verify screen. A verify screen sends its code when it mounts with `verification.needsCode`, and `attempt` remounts it for a new sign-up. `taskChooseOrganization` is a slot for the session task shown on its route. Leaving out a callback hides the control it drives: `onSignIn` for the sign-in link, `onCancel` for a screen's secondary action, `onResend` for the resend line, `onEmailSupport` and `onJoinWaitlist` for the restricted screens.
 
 ```tsx
 import { SignUpView } from '@clerk/mosaic/features/sign-up';
@@ -35,8 +35,8 @@ import { SignUpView } from '@clerk/mosaic/features/sign-up';
   applicationName='Acme'
   start={{ ...details, step: { purpose: 'start', fields: { emailAddress: { required: true } } } }}
   continue={{ ...details, step: { purpose: 'continue', fields: {} } }}
-  verifyEmail={{ identifier, needsCode, sendCode, verifyCode, onEditIdentifier }}
-  verifyPhone={{ identifier: phoneNumber, needsCode: false, sendCode, verifyCode, onEditIdentifier }}
+  verifyEmail={{ verification: emailVerification, onNext, onEditIdentifier }}
+  verifyPhone={{ verification: phoneVerification, onNext, onEditIdentifier }}
   restricted={{ onSignIn }}
   onStartOver={startOver}
 />;

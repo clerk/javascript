@@ -1,8 +1,10 @@
+import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import type { ReactNode, Ref } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
+import type { SignUpVerificationModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
@@ -59,11 +61,9 @@ export interface SignUpDetailsScreen {
 }
 
 export interface SignUpVerifyScreen {
-  identifier: string;
+  verification: SignUpVerificationModel;
+  onNext: (step: SignUpNextStep) => void;
   provider?: string;
-  needsCode: boolean;
-  sendCode: () => Promise<void>;
-  verifyCode: (code: string) => Promise<void>;
   isPending: boolean;
   globalErrorMessage?: string;
   onEditIdentifier: () => void;
