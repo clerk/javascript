@@ -26,6 +26,8 @@ export type SwitcherModel =
 
 `hidden` is an answer, not an absence: signed out is settled, so the wrapper drops the fallback instead of holding the space open. Keep `hidden` and `loading` apart.
 
+A flow with several screens groups its `ready` model by screen, plus the groups the whole flow shares, so each screen's folder takes its group whole (`SignUpReadyModel` in `sign-up.model.ts`, [Features → A flow with several screens](features.md#a-flow-with-several-screens)).
+
 ## What the model owns
 
 - **Clerk state.** `useUser()`, `useSession()`, `useOrganization()`, `useClerk()`, plus `useMosaicEnvironment()` and `useMosaicRouter()`.
