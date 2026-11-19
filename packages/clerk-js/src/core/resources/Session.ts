@@ -126,7 +126,7 @@ export class Session extends BaseResource implements SessionResource {
         // any is how we type the body in the BaseMutateParams as well
         body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
       },
-      { skipUpdateClient, supersedable: intent === 'focus' },
+      { skipUpdateClient, discardIfClientChanged: intent === 'focus' },
     );
 
     // Update session in-place from response (same as BaseResource._baseMutate)
@@ -138,7 +138,7 @@ export class Session extends BaseResource implements SessionResource {
   touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
     const json = await this._touchPost({ intent, skipUpdateClient: false });
 
-    // Unless superseded, _touchPost() will have updated `this` in-place
+    // Unless discarded, _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
     if (json && this.lastActiveToken) {
       eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });

@@ -1372,7 +1372,7 @@ describe('Session', () => {
         expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
       });
 
-      it('does not emit a token for a superseded focus touch without a client', async () => {
+      it('does not emit a token for a discarded focus touch without a client', async () => {
         const session = new Session(sessionJSON('org_before'));
         respondAfterNewerWrite({ response: sessionJSON('org_older') });
 
@@ -1397,38 +1397,7 @@ describe('Session', () => {
         expect(dispatchSpy).toHaveBeenCalledWith('token:update', { token: session.lastActiveToken });
       });
 
-      it('keeps the organization setActive set during a focus touch', async () => {
-        const session = new Session(sessionJSON('org_a'));
-        BaseResource.clerk = clerkMock({ updateClient, session } as any);
-        (BaseResource.clerk.getFapiClient().request as Mock).mockImplementation(() => {
-          session.lastActiveOrganizationId = 'org_b';
-          return Promise.resolve({
-            payload: { response: sessionJSON('org_a'), client: clientJSON('client_touch', [sessionJSON('org_a')]) },
-            status: 200,
-          });
-        });
-
-        await session.touch({ intent: 'focus' });
-
-        expect(session.lastActiveOrganizationId).toBe('org_b');
-        expect(updateClient).not.toHaveBeenCalled();
-        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
-      });
-
-      it('does not emit a token for a focus touch after a local sign-out', async () => {
-        const session = new Session(sessionJSON('org_a'));
-        BaseResource.clerk = clerkMock({ updateClient, session } as any);
-        (BaseResource.clerk.getFapiClient().request as Mock).mockImplementation(() => {
-          BaseResource.clerk.session = undefined;
-          return Promise.resolve({ payload: { response: sessionJSON('org_a') }, status: 200 });
-        });
-
-        await session.touch({ intent: 'focus' });
-
-        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
-      });
-
-      it('never supersedes __internal_touch with select_org', async () => {
+      it('never discards __internal_touch with select_org', async () => {
         const session = new Session(sessionJSON('org_before'));
         respondAfterNewerWrite({
           response: sessionJSON('org_after'),

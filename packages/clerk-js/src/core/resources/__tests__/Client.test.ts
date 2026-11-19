@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';
 
 import { SessionTokenCache } from '../../tokenCache';
-import { BaseResource, Client, getClientRevision } from '../internal';
+import { BaseResource, Client } from '../internal';
 
 const FIXED_DATE = new Date('2025-01-01T00:00:00Z');
 
@@ -164,21 +164,21 @@ describe('Client Singleton', () => {
     BaseResource._fetch = vi.fn().mockResolvedValue(null);
 
     const client = Client.getOrCreateInstance();
-    let revision = getClientRevision();
+    let revision = Client.getRevision();
 
     client.fromJSON(null);
-    expect(getClientRevision()).toBe(revision);
+    expect(Client.getRevision()).toBe(revision);
 
     client.fromJSON(clientObjectJSON);
-    expect(getClientRevision()).toBeGreaterThan(revision);
-    revision = getClientRevision();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
 
     await client.destroy();
-    expect(getClientRevision()).toBeGreaterThan(revision);
-    revision = getClientRevision();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
 
     Client.clearInstance();
-    expect(getClientRevision()).toBeGreaterThan(revision);
+    expect(Client.getRevision()).toBeGreaterThan(revision);
   });
 
   describe('__internal_signOut', () => {

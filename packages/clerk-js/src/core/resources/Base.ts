@@ -13,12 +13,12 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import { type Clerk, getClientResourceFromPayload, getClientRevision } from './internal';
+import { type Clerk, Client, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
   skipUpdateClient?: boolean;
-  supersedable?: boolean;
+  discardIfClientChanged?: boolean;
   fetchMaxTries?: number;
   abortSignal?: AbortSignal;
 };
@@ -89,15 +89,13 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    const authAtBuild = opts.supersedable ? BaseResource.activeAuth() : undefined;
-    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts, authAtBuild));
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
   // TODO @userland-errors:
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
-    authAtBuild = opts.supersedable ? BaseResource.activeAuth() : undefined,
   ): Promise<FapiResponseJSON<J> | null> {
     if (!BaseResource.fapiClient) {
       clerkMissingFapiClientInResources();
@@ -113,7 +111,7 @@ export abstract class BaseResource {
       fapiRequestInit = { ...requestInit, search };
     }
 
-    const revisionAtSend = getClientRevision();
+    const revisionAtSend = Client.getRevision();
     try {
       fapiResponse = await BaseResource.fapiClient.request<J>(fapiRequestInit, { fetchMaxTries });
     } catch (e) {
@@ -139,9 +137,7 @@ export abstract class BaseResource {
     }
 
     const { payload, status, statusText, headers } = fapiResponse;
-    const superseded =
-      authAtBuild !== undefined &&
-      (authAtBuild !== BaseResource.activeAuth() || revisionAtSend !== getClientRevision());
+    const clientChanged = opts.discardIfClientChanged && revisionAtSend !== Client.getRevision();
 
     if (headers) {
       const country = headers.get('x-country');
@@ -150,12 +146,12 @@ export abstract class BaseResource {
     }
 
     // TODO: Link to Client payload piggybacking design document
-    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient && !superseded) {
+    if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient && !clientChanged) {
       this._updateClient<J>(payload);
     }
 
     if (status >= 200 && status <= 299) {
-      return superseded ? null : payload;
+      return clientChanged ? null : payload;
     }
 
     if (status >= 400) {
@@ -298,11 +294,6 @@ export abstract class BaseResource {
 
   protected async _baseDelete<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<void> {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
-  }
-
-  private static activeAuth(): string {
-    const session = BaseResource.clerk?.session;
-    return `${session?.id}:${session?.lastActiveOrganizationId}`;
   }
 
   private static shouldRethrowOfflineNetworkErrors(): boolean {

@@ -119,7 +119,7 @@ describe('BaseResource', () => {
     });
   });
 
-  describe('supersedable requests', () => {
+  describe('discardIfClientChanged', () => {
     const clientJSON = (id: string) => ({
       object: 'client',
       id,
@@ -161,7 +161,7 @@ describe('BaseResource', () => {
       });
     };
 
-    const touch = (opts = { supersedable: true }) =>
+    const touch = (opts = { discardIfClientChanged: true }) =>
       BaseResource._fetch({ method: 'POST', path: '/client/sessions/sess_1/touch' }, opts);
 
     it('drops the response when the client is written in flight', async () => {
@@ -170,30 +170,6 @@ describe('BaseResource', () => {
       expect(await touch()).toBeNull();
       expect(updateClient).not.toHaveBeenCalled();
       expect(Client.getOrCreateInstance().id).toBe('client_newer');
-    });
-
-    it('drops the response when the active session changes in flight', async () => {
-      respondAfter(() => {
-        BaseResource.clerk.session = { id: 'sess_2', lastActiveOrganizationId: 'org_a' } as any;
-      });
-
-      expect(await touch()).toBeNull();
-      expect(updateClient).not.toHaveBeenCalled();
-    });
-
-    it('drops the response when the state changes while it waits on a captcha challenge', async () => {
-      const fraudProtection = FraudProtection.getInstance() as any;
-      fraudProtection.inflightException = Promise.resolve().then(() => {
-        (BaseResource.clerk.session as any).lastActiveOrganizationId = 'org_b';
-      });
-      request.mockResolvedValueOnce({ payload, status: 200 });
-
-      try {
-        expect(await touch()).toBeNull();
-        expect(updateClient).not.toHaveBeenCalled();
-      } finally {
-        fraudProtection.inflightException = null;
-      }
     });
 
     it('applies the replayed response after its own captcha challenge', async () => {
@@ -216,15 +192,6 @@ describe('BaseResource', () => {
       expect(Client.getOrCreateInstance().id).toBe('client_response');
     });
 
-    it('drops the response when the active organization changes in flight', async () => {
-      respondAfter(() => {
-        (BaseResource.clerk.session as any).lastActiveOrganizationId = 'org_b';
-      });
-
-      expect(await touch()).toBeNull();
-      expect(updateClient).not.toHaveBeenCalled();
-    });
-
     it('applies the response when nothing changed in flight', async () => {
       respondAfter(() => undefined);
 
@@ -233,15 +200,15 @@ describe('BaseResource', () => {
       expect(Client.getOrCreateInstance().id).toBe('client_response');
     });
 
-    it('applies a non-supersedable response when the client is written in flight', async () => {
+    it('applies the response without discardIfClientChanged when the client is written in flight', async () => {
       respondAfter(() => Client.getOrCreateInstance().fromJSON(clientJSON('client_newer') as any));
 
-      expect(await touch({ supersedable: false })).toBe(payload);
+      expect(await touch({ discardIfClientChanged: false })).toBe(payload);
       expect(updateClient).toHaveBeenCalledTimes(1);
       expect(Client.getOrCreateInstance().id).toBe('client_response');
     });
 
-    it('still throws on a superseded error response without applying its client', async () => {
+    it('still throws a discarded error response without applying its client', async () => {
       respondAfter(() => Client.getOrCreateInstance().fromJSON(clientJSON('client_newer') as any), {
         payload: {
           errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
@@ -255,7 +222,7 @@ describe('BaseResource', () => {
       expect(Client.getOrCreateInstance().id).toBe('client_newer');
     });
 
-    it('is not superseded by a token request settling in flight', async () => {
+    it('is not discarded by a token request settling in flight', async () => {
       respondAfter(() => Token.create('/client/sessions/sess_1/tokens'));
       request.mockResolvedValueOnce({ payload: { object: 'token', jwt: null }, status: 200 });
 
