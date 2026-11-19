@@ -221,12 +221,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
             return Response.json(metadata, { headers });
           }
           const { organization, auth } = metadata as {
-            organization: { domain: string };
+            organization: { domain: string; name?: string };
             auth: { issuer: string; scopes: Record<string, unknown> };
           };
           return Response.json(
             {
               resource: `https://${organization.domain}`,
+              resource_name: organization.name?.trim() ? organization.name : undefined,
               authorization_servers: [auth.issuer],
               scopes_supported: Object.keys(auth.scopes),
               bearer_methods_supported: ['header'],
