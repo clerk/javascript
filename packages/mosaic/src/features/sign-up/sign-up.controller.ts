@@ -1,5 +1,5 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useEffect, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
@@ -8,6 +8,7 @@ import { setup } from '../../machine/setup';
 import type { ErrorInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
+import { useRouteGuard } from '../../routing/use-route-guard';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
 import type { SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
@@ -105,13 +106,7 @@ export function useSignUpController(
   const shown = shownRoute(route, flow.step);
   const screen = screenFor(shown, flow);
 
-  // Guards the route: one the step does not allow is replaced with the one shown, leaving no history entry.
-  // TODO: Use routing's guard hook here if it adds one.
-  useEffect(() => {
-    if (shown !== undefined && shown !== route) {
-      go(shown, {}, { replace: true });
-    }
-  }, [shown, route, go]);
+  useRouteGuard({ route, go }, shown);
 
   // TODO: With a URL routing mode (#10780) a reload can mount on a sign-up that is already complete. Finalize it
   // here, once per mount.

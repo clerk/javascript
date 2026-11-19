@@ -99,6 +99,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - Arrow-key navigation with one tab stop across a group of items → `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)
 - A panel that animates open and closed to its measured size → `usePanelSize` (`src/primitives/hooks/`)
 - One screen replacing another on the same card or dialog → `Flow` (`src/components/flow/`), see [Views](docs/views.md)
+- A route the owner's state does not allow, replaced with the allowed one and no history entry → `useRouteGuard` (`src/routing/`)
 - An interaction with an async lifecycle or two values that move together → A machine in the controller file, via `setup()` (`src/machine/`)
 - Styles several components share → `src/styles/*.styles.ts`
 - Anything else small: a permission, verification codes, backup codes, avatar files, a list patch → List `src/utils/`, `src/hooks/` and `src/primitives/hooks/` first; most of these already have a helper
