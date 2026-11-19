@@ -192,6 +192,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #publishableKey: string;
   #eventBus = createClerkEventBus();
   #stateProxy: StateProxy;
+  #redirectCallbackInFlight: Promise<unknown> | undefined;
   get publishableKey(): string {
     return this.#publishableKey;
   }
@@ -1674,9 +1675,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  handleRedirectCallback: Clerk['handleRedirectCallback'] = async (...args) => {
-    const clerkjs = await this.#waitForClerkJS();
-    return clerkjs.handleRedirectCallback(...args);
+  handleRedirectCallback: Clerk['handleRedirectCallback'] = (...args) => {
+    this.#redirectCallbackInFlight ??= this.#waitForClerkJS()
+      .then(clerkjs => clerkjs.handleRedirectCallback(...args))
+      .finally(() => {
+        this.#redirectCallbackInFlight = undefined;
+      });
+    return this.#redirectCallbackInFlight;
   };
 
   __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
