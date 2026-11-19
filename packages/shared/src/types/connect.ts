@@ -70,7 +70,13 @@ export interface ConnectNamespace {
   connections: {
     list: (params?: ListCurrentUserConnectionsParams) => Promise<ClerkPaginatedResponse<CurrentUserConnection>>;
     get: (connectionId: string) => Promise<CurrentUserConnection>;
+    /**
+     * Starts a connection. When the result is `requires_action`, Clerk sends the browser to the provider.
+     */
     create: (params: CurrentUserConnectParams) => Promise<CurrentUserConnectResult>;
+    /**
+     * Asks for consent again, or for more scopes. When the result is `requires_action`, Clerk sends the browser to the provider.
+     */
     reauthorize: (connectionId: string, params: CurrentUserReauthorizeParams) => Promise<CurrentUserConnectResult>;
     disconnect: (connectionId: string) => Promise<CurrentUserConnection>;
   };

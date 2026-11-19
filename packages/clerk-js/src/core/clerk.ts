@@ -489,7 +489,7 @@ export class Clerk implements ClerkInterface {
 
   get connect(): ConnectNamespace {
     if (!Clerk._connect) {
-      Clerk._connect = new Connect();
+      Clerk._connect = new Connect(url => this.__internal_windowNavigate(url));
     }
     return Clerk._connect;
   }

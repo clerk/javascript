@@ -119,6 +119,18 @@ const list = async <J, T>(
  * @internal
  */
 export class Connect implements ConnectNamespace {
+  constructor(private readonly navigate: (url: string) => void) {}
+
+  // An incomplete command sends the browser to the provider, as
+  // authenticateWithRedirect does. The result still resolves for callers that
+  // track the pending action.
+  private redirectIfRequired = (result: CurrentUserConnectResult) => {
+    if (result.status === 'requires_action') {
+      this.navigate(result.action.url);
+    }
+    return result;
+  };
+
   connectors = {
     list: (params?: ListAvailableConnectorsParams) => list('/connectors', params, toConnector),
   };
@@ -130,14 +142,18 @@ export class Connect implements ConnectNamespace {
         await request<ConnectionJSON>({ method: 'GET', path: `/me/connections/${encodeURIComponent(connectionId)}` }),
       ),
     create: async (params: CurrentUserConnectParams) =>
-      toConnectResult(await request<ConnectResultJSON>({ method: 'POST', path: '/me/connections', body: params })),
+      this.redirectIfRequired(
+        toConnectResult(await request<ConnectResultJSON>({ method: 'POST', path: '/me/connections', body: params })),
+      ),
     reauthorize: async (connectionId: string, params: CurrentUserReauthorizeParams) =>
-      toConnectResult(
-        await request<ConnectResultJSON>({
-          method: 'POST',
-          path: `/me/connections/${encodeURIComponent(connectionId)}/reauthorize`,
-          body: params,
-        }),
+      this.redirectIfRequired(
+        toConnectResult(
+          await request<ConnectResultJSON>({
+            method: 'POST',
+            path: `/me/connections/${encodeURIComponent(connectionId)}/reauthorize`,
+            body: params,
+          }),
+        ),
       ),
     disconnect: async (connectionId: string) =>
       toConnection(

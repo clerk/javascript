@@ -8,7 +8,6 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
-import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { RemoveResourceForm } from '../../common';
 import { useUserProfileContext } from '../../contexts';
@@ -105,8 +104,8 @@ export const ConnectionsSection = withCardStateProvider(() => {
     card.setError(undefined);
     try {
       const result = await command();
-      if (result.status === 'requires_action' && result.action) {
-        clerkWindowNavigate(clerk, result.action.url);
+      if (result.status === 'requires_action') {
+        // clerk.connect already sent the browser to the provider.
         return;
       }
       connections.revalidate();
