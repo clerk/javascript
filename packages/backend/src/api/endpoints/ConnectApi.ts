@@ -58,6 +58,10 @@ export type ConnectUserParams = {
   key?: string;
   scopes?: string[];
   returnUrl: string;
+  /**
+   * Connect another account through the same connector, under the next free key such as `github-2`.
+   */
+  additionalAccount?: boolean;
 };
 
 export type ReauthorizeConnectionParams = {
