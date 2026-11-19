@@ -24,7 +24,7 @@ The flow's `*.routes.ts` exports this rule as one function, so the controller an
 
 - `routeFor(step)` returns the step's route, from the lists below. Sign-up's also takes the current route, so a verify step reached from `continue` stays under it.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
-- The component that owns the route table computes the screen during render. Its one effect replaces a route the step does not allow with the route shown, so the stored route never keeps it.
+- The component that owns the route table computes the screen during render, and passes the route shown to `useRouteGuard`, which replaces a route the step does not allow so the stored route never keeps it. It is a guard, not a route table that changes with the step: the route exists, the flow is just not ready for it.
 - This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
 
 ## Mount the screen
