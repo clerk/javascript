@@ -1,4 +1,11 @@
-import type { ClientJSON, SessionJSON, SignUpField, SignUpIdentificationField, SignUpJSON } from '@clerk/shared/types';
+import type {
+  ClientJSON,
+  PhoneCodeChannel,
+  SessionJSON,
+  SignUpField,
+  SignUpIdentificationField,
+  SignUpJSON,
+} from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -410,7 +417,9 @@ export function signUpHandlers(
       if (!signUp?.verifications) {
         return missing();
       }
-      const strategy = new URLSearchParams(await request.text()).get('strategy') ?? '';
+      const body = new URLSearchParams(await request.text());
+      const strategy = body.get('strategy') ?? '';
+      const channel = body.get('channel');
       const field = STRATEGIES[strategy];
       const attribute = field ? settings().attributes[field] : undefined;
       if (!field || !attribute?.verifications.some(supported => supported === strategy)) {
@@ -431,12 +440,23 @@ export function signUpHandlers(
           400,
         );
       }
-      state.signUp.preparations.push(strategy);
+      if (channel && field !== 'phone_number') {
+        return rejected('form_param_unknown', 'channel is not a valid parameter for this request.', 'channel');
+      }
+      if (channel && channel !== 'sms' && !attribute.channels?.includes(channel as never)) {
+        return rejected('form_param_value_invalid', `${channel} is not an enabled channel.`, 'channel');
+      }
+      state.signUp.preparations.push(channel ? `${strategy}:${channel}` : strategy);
       return store({
         ...signUp,
         verifications: {
           ...signUp.verifications,
-          [field]: { ...signUp.verifications[field], ...fapiVerification(strategy), next_action: 'needs_attempt' },
+          [field]: {
+            ...signUp.verifications[field],
+            ...fapiVerification(strategy),
+            next_action: 'needs_attempt',
+            channel: (channel || undefined) as PhoneCodeChannel | undefined,
+          },
         },
       });
     }),
