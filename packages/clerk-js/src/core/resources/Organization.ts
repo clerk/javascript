@@ -120,16 +120,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   getRoles = async (getRolesParams?: GetRolesParams) => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/roles`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(getRolesParams),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/roles`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getRolesParams),
+    }).then(res => {
       const {
         data: roles,
         total_count,
@@ -153,16 +148,11 @@ export class Organization extends BaseResource implements OrganizationResource {
       search.set('enrollment_mode', enrollmentMode);
     }
 
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/domains`,
-        method: 'GET',
-        search,
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/domains`,
+      method: 'GET',
+      search,
+    }).then(res => {
       const { data: invites, total_count } = res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
 
       return {
@@ -351,16 +341,11 @@ export class Organization extends BaseResource implements OrganizationResource {
     domainIds: string[],
   ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
     const { data, errors } = (
-      await BaseResource._fetch(
-        {
-          path: `/organizations/${this.id}/domains/${action}/bulk`,
-          method: 'POST',
-          body: { organization_domain_ids: domainIds } as any,
-        },
-        {
-          forceUpdateClient: true,
-        },
-      )
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/domains/${action}/bulk`,
+        method: 'POST',
+        body: { organization_domain_ids: domainIds } as any,
+      })
     )?.response as unknown as OrganizationDomainsBulkOwnershipVerificationJSON;
 
     return {
@@ -390,16 +375,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/invitations`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(getInvitationsParams),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/invitations`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getInvitationsParams),
+    }).then(res => {
       const { data: requests, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
 

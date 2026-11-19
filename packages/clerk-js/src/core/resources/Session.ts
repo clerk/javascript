@@ -56,7 +56,7 @@ import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
-import { BaseResource, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
+import { BaseResource, Client, getClientResourceFromPayload, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 const TOKEN_REQUEST_TIMEOUT_MS = 10_000;
@@ -119,15 +119,30 @@ export class Session extends BaseResource implements SessionResource {
       skipUpdateClient: false,
     },
   ): Promise<FapiResponseJSON<SessionJSON> | null> => {
+    const isFocus = intent === 'focus';
+    const revision = Client.getRevision();
+    const activeSession = BaseResource.clerk?.session;
+    const organizationId = this.lastActiveOrganizationId;
     const json = await BaseResource._fetch<SessionJSON>(
       {
         method: 'POST',
         path: this.path('touch'),
         // any is how we type the body in the BaseMutateParams as well
-        body: { active_organization_id: this.lastActiveOrganizationId, intent } as any,
+        body: { active_organization_id: organizationId, intent } as any,
       },
-      { skipUpdateClient },
+      { skipUpdateClient: skipUpdateClient || isFocus },
     );
+
+    const changedInFlight =
+      revision !== Client.getRevision() ||
+      activeSession !== BaseResource.clerk?.session ||
+      organizationId !== this.lastActiveOrganizationId;
+    if (isFocus && changedInFlight) {
+      return null;
+    }
+    if (isFocus && !skipUpdateClient) {
+      BaseResource._updateClient(json);
+    }
 
     // Update session in-place from response (same as BaseResource._baseMutate)
     this.fromJSON((json?.response || json) as SessionJSON);
@@ -136,11 +151,11 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   touch = async ({ intent }: SessionTouchParams = {}): Promise<SessionResource> => {
-    await this._touchPost({ intent, skipUpdateClient: false });
+    const json = await this._touchPost({ intent, skipUpdateClient: false });
 
-    // _touchPost() will have updated `this` in-place
+    // Unless discarded, _touchPost() will have updated `this` in-place
     // The post has potentially changed the session state, and so we need to ensure we emit the updated token that comes back in the response. This avoids potential issues where the session cookie is out of sync with the current session state.
-    if (this.lastActiveToken) {
+    if ((json || intent !== 'focus') && this.lastActiveToken) {
       eventBus.emit(events.TokenUpdate, { token: this.lastActiveToken });
     }
 
