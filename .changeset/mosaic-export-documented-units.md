@@ -4,10 +4,10 @@
 
 **Breaking:** Two helpers move onto their component's namespace. Behavior is unchanged; TypeScript flags the old imports.
 
-| Before                                                           | After                   |
-| ---------------------------------------------------------------- | ----------------------- |
-| `usePanelTitle` from `@clerk/mosaic/components/panel`            | `Panel.usePanelTitle`   |
-| `sectionCompactStyles` from `@clerk/mosaic/components/section`   | `Section.compactStyles` |
+| Before                                                         | After                          |
+| -------------------------------------------------------------- | ------------------------------ |
+| `usePanelTitle` from `@clerk/mosaic/components/panel`          | `Panel.usePanelTitle`          |
+| `sectionCompactStyles` from `@clerk/mosaic/components/section` | `Section.sectionCompactStyles` |
 
 Find usages with `git grep -nE "usePanelTitle|sectionCompactStyles"`.
 

@@ -20,7 +20,7 @@ import type {
 export default {
   name: 'Section',
   description:
-    'A compound layout for a topic of settings. `Section.Root` stacks groups; each `Section.Group` is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding `Section.Row`s (one setting each) or a `Section.Items` list of values. Each `Section.Group` is a `cl-section` size container that switches to a compact layout below 26rem; `Section.compactStyles.hidden` and `.only` show or hide content inside a group at that width.',
+    'A compound layout for a topic of settings. `Section.Root` stacks groups; each `Section.Group` is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding `Section.Row`s (one setting each) or a `Section.Items` list of values. Each `Section.Group` is a `cl-section` size container that switches to a compact layout below 26rem; `Section.sectionCompactStyles.hidden` and `.only` show or hide content inside a group at that width.',
   useFor: [
     'a settings page or profile section with rows of settings',
     'a row with a label, a value and an action, such as an Edit button',
@@ -128,7 +128,7 @@ export default {
   ],
   related: ['Heading', 'Skeleton', 'Field'],
   exports: {
-    'Section.compactStyles': {
+    'Section.sectionCompactStyles': {
       description:
         'StyleX styles for content inside a group: `hidden` hides it in the compact layout below 26rem, and `only` shows it only there.',
     },

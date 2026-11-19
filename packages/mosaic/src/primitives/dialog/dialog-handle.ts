@@ -1,6 +1,6 @@
 /**
  * A handle connects `Dialog.Trigger` and `Dialog.Root` without JSX nesting, mirroring Base UI's
- * `Dialog.createHandle()`: create one at module scope (or in state), pass it to both, and a
+ * `Dialog.createDialogHandle()`: create one at module scope (or in state), pass it to both, and a
  * trigger anywhere in the tree drives a root it is not nested under.
  *
  * The same store also backs in-context triggers — a root with no `handle` prop creates a private

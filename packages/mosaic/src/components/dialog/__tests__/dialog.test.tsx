@@ -500,7 +500,7 @@ describe('Dialog.CloseButton', () => {
 describe('composition APIs', () => {
   it('opens from a detached trigger through a handle', async () => {
     const user = userEvent.setup();
-    const handle = Dialog.createHandle();
+    const handle = Dialog.createDialogHandle();
     render(
       <>
         <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
@@ -519,7 +519,7 @@ describe('composition APIs', () => {
 
   it('renders per-trigger content from the payload', async () => {
     const user = userEvent.setup();
-    const handle = Dialog.createHandle<string>();
+    const handle = Dialog.createDialogHandle<string>();
     render(
       <>
         <Dialog.Trigger

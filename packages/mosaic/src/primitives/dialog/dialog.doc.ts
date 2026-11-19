@@ -12,14 +12,14 @@ import type { DialogViewportProps } from './dialog-viewport';
 export default {
   name: 'Dialog',
   description:
-    'Headless, unstyled dialog over the page, modal or not. Traps focus, locks scroll, wires `aria-labelledby` and `aria-describedby`, and keeps the popup mounted through its exit transition. Nested dialogs stack. `Dialog.createHandle()` connects a root to triggers rendered outside it.',
+    'Headless, unstyled dialog over the page, modal or not. Traps focus, locks scroll, wires `aria-labelledby` and `aria-describedby`, and keeps the popup mounted through its exit transition. Nested dialogs stack. `Dialog.createDialogHandle()` connects a root to triggers rendered outside it.',
   useFor: [
     'the base for a styled modal or sheet',
     'a dialog opened from a trigger elsewhere in the tree',
     'one dialog that renders per-trigger content from a payload',
     'a dialog presented inline in a page slot',
   ],
-  keywords: ['dialog', 'modal', 'alertdialog', 'overlay', 'focus trap', 'scroll lock', 'createHandle', 'payload'],
+  keywords: ['dialog', 'modal', 'alertdialog', 'overlay', 'focus trap', 'scroll lock', 'createDialogHandle', 'payload'],
   practices: [
     {
       do: false,
@@ -36,7 +36,7 @@ export default {
     },
     {
       do: true,
-      text: 'Type a payload through the handle, `Dialog.createHandle<Payload>()`. It is captured at open, so for data that changes while open pass an id and read live state.',
+      text: 'Type a payload through the handle, `Dialog.createDialogHandle<Payload>()`. It is captured at open, so for data that changes while open pass an id and read live state.',
     },
     {
       do: true,
@@ -70,7 +70,7 @@ export default {
         role: { type: 'DialogRole', doc: '`dialog` or `alertdialog` for the popup.', default: "'dialog'" },
         handle: {
           type: 'DialogHandle<Payload>',
-          doc: 'Connects triggers rendered outside the root. From `Dialog.createHandle()`.',
+          doc: 'Connects triggers rendered outside the root. From `Dialog.createDialogHandle()`.',
         },
         triggerId: {
           type: 'string | null',
@@ -157,7 +157,7 @@ export default {
     {
       title: 'A detached trigger with a payload',
       code: `
-const detail = Dialog.createHandle<{ name: string }>();
+const detail = Dialog.createDialogHandle<{ name: string }>();
 
 <Dialog.Trigger handle={detail} payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
 <Dialog.Root handle={detail}>
@@ -177,9 +177,9 @@ const detail = Dialog.createHandle<{ name: string }>();
   ],
   related: ['Drawer', 'Popover'],
   exports: {
-    'Dialog.createHandle': {
+    'Dialog.createDialogHandle': {
       description:
-        'Creates a handle that connects a `Dialog.Root` to triggers rendered outside it. Type a payload with `Dialog.createHandle<Payload>()`.',
+        'Creates a handle that connects a `Dialog.Root` to triggers rendered outside it. Type a payload with `Dialog.createDialogHandle<Payload>()`.',
     },
   },
 } satisfies ComponentDoc<{
