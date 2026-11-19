@@ -1,9 +1,20 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, relative, resolve, sep } from 'node:path';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, matchesGlob, relative, resolve, sep } from 'node:path';
 
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { ApplicationConfig } from '../../models/applicationConfig';
+import { assertSuiteBuildsPackages, localPackagesInstalledIn, packagesBuiltFor } from '../../models/suiteBuilds';
 import type { appConfigs as AppConfigs } from '..';
 
 vi.mock('../instanceKeys', () => {
@@ -31,17 +42,38 @@ const harnessPackages = Object.entries<string>(rootPackage.devDependencies)
   .map(([name]) => name);
 
 const scopedSuites = Object.entries<{ dependsOn?: string[]; inputs: string[] }>(turbo.tasks)
-  .filter(([id, task]) => id.startsWith('//#test:integration:') && !task.inputs.includes('packages/*/src/**'))
+  .filter(
+    ([id, task]) =>
+      id.startsWith('//#test:integration:') &&
+      !task.inputs.includes('packages/*/src/**') &&
+      !rootPackage.scripts[id.replace('//#', '')]?.startsWith('node '),
+  )
   .map(([id, task]) => ({
     suite: id.replace('//#test:integration:', ''),
     dependsOn: task.dependsOn ?? [],
     inputs: task.inputs,
   }));
 
-const integrationTasks = Object.entries<{ env?: string[] }>(turbo.tasks).filter(([id]) =>
+const integrationTasks = Object.entries<{ env?: string[]; inputs: string[] }>(turbo.tasks).filter(([id]) =>
   id.startsWith('//#test:integration:'),
 );
 const clerkEnv = (env: string[] = []) => env.filter(name => name.includes('CLERK')).sort();
+
+const ciWorkflow = readFileSync(join(repoRoot, '.github/workflows/ci.yml'), 'utf8');
+const integrationJob = ciWorkflow.slice(ciWorkflow.indexOf('\n  integration-tests:'));
+const integrationMatrix = integrationJob.slice(0, integrationJob.indexOf('\n    steps:'));
+const runIntegrationTestsStep = integrationJob.slice(
+  integrationJob.indexOf('- name: Run Integration Tests'),
+  integrationJob.indexOf('- name: Sanitize artifact name'),
+);
+const matrixList = integrationMatrix.match(/test-name:\s*\[([^\]]*)\]/)?.[1] ?? '';
+const ciSuites = [
+  ...new Set(
+    [...matrixList.matchAll(/'([^']+)'/g), ...integrationMatrix.matchAll(/- test-name: '([^']+)'/g)].map(
+      ([, name]) => name,
+    ),
+  ),
+];
 
 const helperDirs = [testsDir, resolve(repoRoot, 'integration/testUtils')];
 
@@ -106,8 +138,22 @@ const suiteFiles = (suite: string) => {
   return [];
 };
 
+const defaultConfigIgnores = [
+  ...(
+    readFileSync(join(repoRoot, 'integration/playwright.config.ts'), 'utf8').match(/testIgnore:\s*\[([^\]]*)\]/)?.[1] ??
+    ''
+  ).matchAll(/'([^']+)'/g),
+].map(([, glob]) => glob);
+
+const loadedByDefaultConfig = () =>
+  withLocalImports(
+    listFiles(testsDir, /(\.test\.tsx?|global\.(setup|teardown)\.ts)$/).filter(
+      file => !defaultConfigIgnores.some(glob => matchesGlob(relative(testsDir, file), glob)),
+    ),
+  );
+
 const importsOutsideIntegration = (suite: string) =>
-  suiteFiles(suite).flatMap(file =>
+  (parseScript(suite).tag ? loadedByDefaultConfig() : suiteFiles(suite)).flatMap(file =>
     [...readFileSync(file, 'utf8').matchAll(/^import (?!type )[^;]*?from '(\.{1,2}\/[^']+)'/gm)]
       .map(([, specifier]) => resolveImport(file, specifier))
       .filter((target): target is string => !!target && !target.startsWith(resolve(repoRoot, 'integration') + sep))
@@ -198,8 +244,91 @@ describe('scoped integration suites declare the builds they load', () => {
   });
 });
 
+describe('integration suites rerun when the workflow that runs them changes', () => {
+  it.each(integrationTasks)('%s', (_id, task) => {
+    expect(task.inputs).toEqual(expect.arrayContaining(['.github/actions/**', '.github/workflows/ci.yml']));
+  });
+});
+
 describe('integration suites hash the same Clerk variables', () => {
   it.each(integrationTasks)('%s', (_id, task) => {
     expect(clerkEnv(task.env)).toEqual(clerkEnv(turbo.tasks['//#test:integration:express'].env));
+  });
+});
+
+describe('integration tasks run in CI', () => {
+  const suites = integrationTasks.map(([id]) => id.replace('//#test:integration:', ''));
+
+  it('reads the integration matrix from ci.yml', () => {
+    expect(ciSuites).toContain('express');
+  });
+
+  it('looks up cached results by keys that include the builds each suite depends on', () => {
+    expect(runIntegrationTestsStep).toContain('turbo test:integration:');
+    expect(runIntegrationTestsStep, '--only leaves the dependency builds out of the cache key').not.toMatch(
+      /turbo test:integration:[^\n]*--only/,
+    );
+  });
+
+  it('tells each app its suite so setup can check the packages it installs', () => {
+    expect(runIntegrationTestsStep).toContain('E2E_SUITE: ${{ matrix.test-name }}');
+  });
+
+  it('reuses a cached pass for one UTC day at most', () => {
+    const dated = integrationJob.indexOf('E2E_CACHE_DATE=$(date -u +%F)');
+    expect(dated, 'set E2E_CACHE_DATE before the tests run').toBeGreaterThan(-1);
+    expect(dated).toBeLessThan(integrationJob.indexOf('- name: Run Integration Tests'));
+    expect(integrationTasks.every(([, task]) => task.env?.includes('E2E_*'))).toBe(true);
+  });
+
+  it.each(suites)('%s has a root script and a CI matrix entry', suite => {
+    expect(
+      rootPackage.scripts[`test:integration:${suite}`],
+      `package.json has no test:integration:${suite} script`,
+    ).toBeDefined();
+    expect(ciSuites, `the integration-tests matrix in ci.yml does not run ${suite}`).toContain(suite);
+  });
+
+  it('runs only suites that are integration tasks', () => {
+    expect(suites).toEqual(expect.arrayContaining(ciSuites));
+  });
+});
+
+describe('the runtime check on installed packages', () => {
+  it('follows the builds a suite depends on through their workspace dependencies', () => {
+    const built = packagesBuiltFor('nextjs');
+    expect([...built]).toEqual(expect.arrayContaining(['@clerk/nextjs', '@clerk/react', '@clerk/shared']));
+    expect(built.has('@clerk/vue')).toBe(false);
+  });
+
+  it('fails setup when an app installs a package outside its suite', () => {
+    expect(() =>
+      assertSuiteBuildsPackages('express-vite', ['@clerk/express', '@clerk/shared'], 'express'),
+    ).not.toThrow();
+    expect(() => assertSuiteBuildsPackages('express-vite', ['@clerk/express', '@clerk/vue'], 'express')).toThrow(
+      '"@clerk/vue#build"',
+    );
+  });
+
+  it('skips the check outside CI suite runs', () => {
+    expect(() => assertSuiteBuildsPackages('express-vite', ['@clerk/vue'], undefined)).not.toThrow();
+  });
+
+  it('finds every locally published Clerk package in hoisted, nested and pnpm layouts', () => {
+    const app = mkdtempSync(join(tmpdir(), 'suite-builds-'));
+    const write = (dir: string, version: string) => {
+      mkdirSync(join(app, dir), { recursive: true });
+      writeFileSync(join(app, dir, 'package.json'), JSON.stringify({ version }));
+    };
+    write('node_modules/@clerk/nextjs', '0.0.0-pkglab.1');
+    write('node_modules/@clerk/nextjs/node_modules/@clerk/react', '0.0.0-pkglab.1');
+    write('node_modules/.pnpm/@clerk+ui@0.0.0-pkglab.1/node_modules/@clerk/ui', '0.0.0-pkglab-ci.2');
+    write('node_modules/next/node_modules/@clerk/shared', '0.0.0-pkglab.1');
+    write('node_modules/@clerk/backend', '3.0.0');
+    try {
+      expect(localPackagesInstalledIn(app)).toEqual(['@clerk/nextjs', '@clerk/react', '@clerk/shared', '@clerk/ui']);
+    } finally {
+      rmSync(app, { recursive: true, force: true });
+    }
   });
 });

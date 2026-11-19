@@ -285,7 +285,7 @@ jobs:
       - name: Run Integration Tests
         id: integration-tests
         timeout-minutes: 25
-        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+        run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only
         env:
           # Staging e2e validates the LIVE staging deploy, which is not a turbo input
           # (the cache key is integration/** + env). Force re-execution so a cached green
