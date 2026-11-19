@@ -8,7 +8,7 @@ import type {
   SignUpVerifyScreen,
   SignUpViewProps,
 } from '@clerk/mosaic/features/sign-up';
-import { SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
+import { SignUpProtect, SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
@@ -140,6 +140,7 @@ function ScreenPanel({
         />
       }
       restricted={{ onSignIn: noop }}
+      protectCheck={null}
       onStartOver={noop}
       alternativePhone={
         alternativePhone
@@ -431,7 +432,12 @@ export function ProtectCheck() {
   return (
     <ScreenPanel
       screen='protectCheck'
-      protectCheck={{ challenge: false, isPending: true }}
+      protectCheck={
+        <SignUpProtect
+          protect={{ challengeId: 'ptk_story', resolve: () => new Promise(noop) }}
+          onNext={noop}
+        />
+      }
     />
   );
 }

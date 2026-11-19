@@ -14,7 +14,7 @@ import { toLocalizableError } from '../../utils/errors';
 import type { SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
-import type { SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
+import type { SignUpProtectScreen, SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
 import { useSignUpDetailsController } from './sign-up-details/sign-up-details.controller';
 
 interface FinishContext {
@@ -67,7 +67,7 @@ const finishMachine = finish.createMachine({
 });
 
 function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignUpScreen {
-  if (route === undefined || route === 'enterpriseConnections' || route === 'protectCheck') {
+  if (route === undefined || route === 'enterpriseConnections') {
     return 'startOver';
   }
   if (route !== 'start') {
@@ -81,11 +81,12 @@ function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignU
 
 type SignUpControllerResult = Omit<
   SignUpViewProps,
-  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone'
+  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone' | 'protectCheck'
 > & {
   attempt?: string;
   verifyEmail: SignUpVerifyScreen;
   verifyPhone: SignUpVerifyScreen;
+  protectCheck: SignUpProtectScreen;
 };
 
 export function useSignUpController(
@@ -148,6 +149,7 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
+    protectCheck: { protect: model.protect, onNext: next },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: app.supportEmail ? () => window.location.assign(`mailto:${app.supportEmail}`) : undefined,
