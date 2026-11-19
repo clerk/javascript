@@ -60,6 +60,11 @@ export type ConnectUserParams = {
   returnUrl: string;
 };
 
+export type ReauthorizeConnectionParams = {
+  scopes?: string[];
+  returnUrl: string;
+};
+
 export type GetConnectionCredentialParams = {
   userId: string;
   scopes: string[];
@@ -200,6 +205,13 @@ export class ConnectConnectionsAPI extends AbstractAPI {
     this.requireId(connectionId);
     return camelize<ConnectConnection>(
       await this.request({ method: 'GET', path: joinPaths('/connections', connectionId) }),
+    );
+  }
+
+  async reauthorize(connectionId: string, bodyParams: ReauthorizeConnectionParams) {
+    this.requireId(connectionId);
+    return camelize<ConnectResult>(
+      await this.request({ method: 'POST', path: joinPaths('/connections', connectionId, 'reauthorize'), bodyParams }),
     );
   }
 

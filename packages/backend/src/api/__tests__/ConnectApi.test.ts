@@ -83,4 +83,30 @@ describe('ConnectApi', () => {
     expect(body).toMatchObject({ key: 'acme', scopes: ['read'] });
     expect(credential).toMatchObject({ connectionId: 'con_1', accessToken: 'token', grantedScopes: ['read'] });
   });
+
+  it('reauthorizes a connection', async () => {
+    let body: unknown;
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/connections/con_1/reauthorize',
+        validateHeaders(async ({ request }) => {
+          body = await request.json();
+          return HttpResponse.json({
+            status: 'requires_action',
+            action: { type: 'redirect', url: 'https://clerk.test/v1/connect/authorize', expires_at: 1 },
+          });
+        }),
+      ),
+    );
+
+    const result = await apiClient.connect.connections.reauthorize('con_1', {
+      scopes: ['read', 'write'],
+      returnUrl: 'https://app.test/settings',
+    });
+    expect(body).toEqual({ scopes: ['read', 'write'], return_url: 'https://app.test/settings' });
+    expect(result).toEqual({
+      status: 'requires_action',
+      action: { type: 'redirect', url: 'https://clerk.test/v1/connect/authorize', expiresAt: 1 },
+    });
+  });
 });

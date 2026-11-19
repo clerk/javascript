@@ -58,6 +58,7 @@ export type {
   ConnectResult,
   ConnectUserParams,
   GetConnectionCredentialParams,
+  ReauthorizeConnectionParams,
   ListConnectionsParams,
 } from './api/endpoints/ConnectApi';
 export type { OrganizationMembershipRole } from './api/resources';
