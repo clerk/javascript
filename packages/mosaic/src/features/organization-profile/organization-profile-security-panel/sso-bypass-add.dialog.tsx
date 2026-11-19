@@ -31,7 +31,6 @@ export function SSOBypassAddDialog({ open, onOpenChange, finalFocus, ...current 
       >
         <Card.Root
           elevation='overlay'
-          size='lg'
           renderBranding={false}
         >
           <Flow.Root
