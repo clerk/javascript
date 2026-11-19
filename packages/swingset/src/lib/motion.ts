@@ -234,7 +234,7 @@ export type MotionControl = NumberControl | SelectControl | CheckControl;
 
 const easeOptions = EASE_KEYS.map(key => ({ value: key, label: EASES[key].label }));
 
-export const CONTROL_GROUPS: { title: string; controls: MotionControl[] }[] = [
+export const CONTROL_GROUPS: { title: string; note?: string; controls: MotionControl[] }[] = [
   {
     title: 'Height morph',
     controls: [
@@ -311,6 +311,7 @@ export const CONTROL_GROUPS: { title: string; controls: MotionControl[] }[] = [
   },
   {
     title: 'Height-aware timing',
+    note: "This is the one part that uses JavaScript. CSS can't read how far the height changed, so a small script sets one CSS variable (--motion-p) and retimes the running height animation. Everything else on this page is plain CSS. Turn the switch off to see the CSS-only result.",
     controls: [
       {
         kind: 'check',

@@ -118,6 +118,9 @@ export function MotionControls({ config, onChange }: MotionControlsProps) {
       {CONTROL_GROUPS.map(group => (
         <section key={group.title}>
           <h3 className='text-muted-foreground mb-2 text-[11px] font-medium uppercase tracking-wide'>{group.title}</h3>
+          {group.note ? (
+            <p className='bg-muted text-muted-foreground mb-2 rounded-md p-2 text-xs leading-snug'>{group.note}</p>
+          ) : null}
           <div className='grid grid-cols-[7rem_1fr_3rem] items-center gap-x-2 gap-y-1.5'>
             {group.controls
               .filter(control => !('when' in control && control.when) || control.when(config))
