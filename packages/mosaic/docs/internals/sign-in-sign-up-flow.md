@@ -38,7 +38,7 @@ Sign-up renders one component per screen, so the route decides what is mounted (
 - A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way. A screen that runs a controller reaches the view as a slot the wrapper builds, as the profile section's `nameAction` does, so `SignUpView` renders plain props only.
 - `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
 - A screen another feature owns arrives as a slot. The wrapper runs the task's model once, passes it to `TaskChooseOrganizationContent` (the task without its card), and tells the controller whether the task has loaded. The view mounts the slot on the task route.
-- A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`, `protectCheck`) shows `startOver`.
+- A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`) shows `startOver`.
 
 ## Move on after a submit
 
@@ -77,7 +77,7 @@ Sign-in:
 Sign-up:
 
 - `start` → `start`
-- `protect` → `protectCheck`
+- `protect` → `protectCheck`, where `SignUpProtect` runs the challenge when it mounts and submits the proof. It takes the challenge token as its `key`, so a chained challenge remounts it and runs again
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
 - `verify_email` (`target`, `sent`) → `verifyEmail`, or `continueVerifyEmail` when reached from `continue`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`

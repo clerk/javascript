@@ -21,6 +21,7 @@ export interface FakeSignUpSeed {
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
+  protectChecks?: number;
 }
 
 export interface FakeSignUpState {
@@ -29,6 +30,9 @@ export interface FakeSignUpState {
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
+  protectChecks: number;
+  issuedProtectChecks: number;
+  proofTokens: string[];
   creations: URLSearchParams[];
   updates: URLSearchParams[];
   preparations: string[];
@@ -40,12 +44,37 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     enterpriseDomains: [],
     sessionTasks: null,
     weakPasswords: {},
+    protectChecks: 0,
+    issuedProtectChecks: 0,
+    proofTokens: [],
     creations: [],
     updates: [],
     preparations: [],
     ...seed,
   };
 }
+
+export const PROTECT_CHECK_SCRIPT = `
+export default (container, { token, setWidgetVisible }) =>
+  new Promise((resolve, reject) => {
+    const pass = document.createElement('button');
+    pass.type = 'button';
+    pass.textContent = 'I am human';
+    pass.onclick = async () => {
+      await setWidgetVisible?.(false);
+      resolve('proof_' + token);
+    };
+    const fail = document.createElement('button');
+    fail.type = 'button';
+    fail.textContent = 'Fail the challenge';
+    fail.onclick = async () => {
+      await setWidgetVisible?.(false);
+      reject(new Error('challenge failed'));
+    };
+    container.replaceChildren(pass, fail);
+    void setWidgetVisible?.(true);
+  });
+`;
 
 const STRATEGIES: Record<string, Identifier> = { email_code: 'email_address', phone_code: 'phone_number' };
 const TEXT_FIELDS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'] as const;
@@ -65,6 +94,21 @@ export function signUpHandlers(
 ) {
   const settings = () => state.environment.user_settings;
   const current = (id: unknown) => (state.client.sign_up?.id === id ? state.client.sign_up : undefined);
+  const issueProtectCheck = (signUp: SignUpJSON): SignUpJSON => {
+    if (state.signUp.issuedProtectChecks >= state.signUp.protectChecks) {
+      return { ...signUp, protect_check: null };
+    }
+    state.signUp.issuedProtectChecks += 1;
+    return {
+      ...signUp,
+      protect_check: {
+        status: 'pending',
+        token: `ptk_${state.signUp.issuedProtectChecks}`,
+        sdk_url: fapiUrl(`/protect-check/challenge.js?round=${state.signUp.issuedProtectChecks}`),
+      },
+    };
+  };
+
   const store = (signUp: SignUpJSON) => {
     state.client = { ...state.client, sign_up: signUp.status === 'complete' ? null : signUp };
     return envelope(signUp, state.client);
@@ -135,6 +179,7 @@ export function signUpHandlers(
       ...required_fields.filter(field => !provided(field)),
       ...(anyIdentifierMissing ? identifierNames : []),
       ...(enterprise ? (['enterprise_sso'] as const) : []),
+      ...(signUp.protect_check ? (['protect_check'] as const) : []),
     ];
     const settled: SignUpJSON = {
       ...signUp,
@@ -271,7 +316,33 @@ export function signUpHandlers(
       }
       const blank = fapiSignUp({ id: `sua_${state.signUp.creations.length}` });
       const applied = apply(blank, body);
-      return applied instanceof HttpResponse ? applied : store(settle(applied));
+      return applied instanceof HttpResponse ? applied : store(settle(issueProtectCheck(applied)));
+    }),
+    http.get(fapiUrl('/protect-check/challenge.js'), () =>
+      HttpResponse.text(PROTECT_CHECK_SCRIPT, {
+        headers: { 'Content-Type': 'text/javascript', 'Access-Control-Allow-Origin': '*' },
+      }),
+    ),
+    http.post(fapiUrl('/v1/client/sign_ups/:id/protect_check'), async ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const signUp = current(params.id);
+      if (!signUp) {
+        return missing();
+      }
+      const proofToken = new URLSearchParams(await request.text()).get('proof_token');
+      if (!proofToken) {
+        return rejected('form_param_missing', 'proof_token must be included.', 'proof_token');
+      }
+      if (!signUp.protect_check) {
+        return rejected('protect_check_already_resolved', 'This check has already been resolved.', undefined, 400);
+      }
+      if (proofToken !== `proof_${signUp.protect_check.token}`) {
+        return rejected('protect_check_invalid', 'The verification could not be confirmed.', 'proof_token');
+      }
+      state.signUp.proofTokens.push(proofToken);
+      return store(settle(issueProtectCheck({ ...signUp, protect_check: null })));
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {

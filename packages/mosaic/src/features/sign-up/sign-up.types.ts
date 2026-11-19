@@ -1,10 +1,10 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
-import type { SignUpVerificationModel } from './sign-up.model';
+import type { SignUpProtectModel, SignUpVerificationModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
@@ -125,12 +125,9 @@ export interface SignUpWalletsScreen {
   onBack: () => void;
 }
 
-export interface SignUpProtectCheckScreen {
-  challenge: boolean;
-  isPending: boolean;
-  globalErrorMessage?: string;
-  containerRef?: Ref<HTMLDivElement>;
-  onRetry?: () => void;
+export interface SignUpProtectScreen {
+  protect: SignUpProtectModel;
+  onNext: (step: SignUpNextStep) => void;
 }
 
 export interface SignUpViewProps {
@@ -150,6 +147,6 @@ export interface SignUpViewProps {
   emailLinkStatus?: SignUpEmailLinkStatusScreen;
   enterpriseConnections?: SignUpEnterpriseConnectionsScreen;
   wallets?: SignUpWalletsScreen;
-  protectCheck?: SignUpProtectCheckScreen;
+  protectCheck: ReactNode;
   taskChooseOrganization?: ReactNode;
 }
