@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -46,6 +46,12 @@ function RouteProbe() {
         onClick={() => write('/sign-up', ['verify-email-address'])}
       >
         Open the verify route
+      </button>
+      <button
+        type='button'
+        onClick={() => write('/sign-up', ['continue'])}
+      >
+        Open the continue route
       </button>
     </>
   );
@@ -351,6 +357,37 @@ describe('SignUp', () => {
     expect(fapi.signUp.updates).toHaveLength(1);
     expect(fapi.signUp.updates[0].get('username')).toBe('alice');
     expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {
+    const fapi = serveFapi({
+      environment: environment({
+        attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
+      }),
+    });
+    const { clerk } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
+
+    await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'Username' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Use phone instead' }));
+    expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Use email instead' }));
+    await user.type(emailField(), EMAIL);
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.updates[0].get('email_address')).toBe(EMAIL);
+    expect(fapi.signUp.updates[0].get('username')).toBeNull();
   });
 
   it('offers Start over on an instance that verifies email by link', async () => {

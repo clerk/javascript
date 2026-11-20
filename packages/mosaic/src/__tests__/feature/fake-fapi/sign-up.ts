@@ -123,7 +123,15 @@ export function signUpHandlers(
         attributes[field as Identifier].verify_at_sign_up &&
         signUp.verifications?.[field as Identifier].status !== 'verified',
     );
-    const missingFields = required_fields.filter(field => !provided(field));
+    const identifierNames = (['email_address', 'phone_number', 'username'] as const).filter(
+      name => attributes[name].enabled,
+    );
+    const anyIdentifierMissing =
+      identifierNames.every(name => !attributes[name].required) && !identifierNames.some(name => provided(name));
+    const missingFields = [
+      ...required_fields.filter(field => !provided(field)),
+      ...(anyIdentifierMissing ? identifierNames : []),
+    ];
     const settled: SignUpJSON = {
       ...signUp,
       required_fields,
