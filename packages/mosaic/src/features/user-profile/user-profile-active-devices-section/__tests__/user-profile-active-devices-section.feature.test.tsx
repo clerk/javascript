@@ -217,21 +217,32 @@ describe('Active devices', () => {
     }
   });
 
-  it('drops cached devices on sign out', async () => {
+  it.each(['mounted', 'unmounted'] as const)('drops cached devices on sign out when %s', async state => {
     serveDevices([device('sess_current', 'active')]);
     const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
     expect(await screen.findByText('This device')).toBeVisible();
+    const queryClient = getClerkQueryClient();
     const cachedDevices = () =>
-      getClerkQueryClient()
+      queryClient
         ?.getQueryCache()
         .getAll()
         .filter(query => query.state.data !== undefined) ?? [];
     expect(cachedDevices()).toHaveLength(1);
+    const cachedKeys = cachedDevices().map(query => query.queryKey);
+
+    if (state === 'unmounted') {
+      view.unmount();
+      expect(cachedDevices()).toHaveLength(1);
+    }
 
     await act(() => view.clerk.signOut());
 
     expect(view.container).toBeEmptyDOMElement();
+    expect(getClerkQueryClient()).toBe(queryClient);
     expect(cachedDevices()).toHaveLength(0);
+    for (const queryKey of cachedKeys) {
+      expect(queryClient?.getQueryCache().find({ queryKey, exact: true })).toBeUndefined();
+    }
   });
 
   it('shows signed-in sessions and signs out another device inside the security panel', async () => {

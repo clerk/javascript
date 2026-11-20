@@ -1,5 +1,7 @@
 import { QueryClient } from '@tanstack/query-core';
 
+import type { Clerk } from '../../types';
+
 /**
  * The QueryClient backing every clerk-query hook. Owned by `@clerk/shared` so the
  * `QueryObserver` that observes it and the `Query` objects inside it always
@@ -11,6 +13,53 @@ import { QueryClient } from '@tanstack/query-core';
  */
 let clerkQueryClient: QueryClient | undefined;
 let initialized = false;
+
+type SignOutSubscription = {
+  clerk: Pick<Clerk, 'addListener' | 'user'>;
+  stableKeys: Set<string>;
+  unsubscribe: () => void;
+};
+
+let signOutSubscription: SignOutSubscription | undefined;
+
+function disposeSignOutSubscription(): void {
+  signOutSubscription?.unsubscribe();
+  signOutSubscription = undefined;
+}
+
+function removeAuthenticatedQueries(client: QueryClient, stableKeys: Set<string>): void {
+  client.removeQueries({
+    predicate: query => {
+      const [stableKey, authenticated] = query.queryKey;
+      return authenticated === true && typeof stableKey === 'string' && stableKeys.has(stableKey);
+    },
+  });
+}
+
+export function registerQueryCleanupOnSignOut(clerk: SignOutSubscription['clerk'], stableKey: string): void {
+  const client = getClerkQueryClient();
+  if (!client) {
+    return;
+  }
+
+  const stableKeys = signOutSubscription?.stableKeys ?? new Set<string>();
+  stableKeys.add(stableKey);
+
+  if (signOutSubscription?.clerk === clerk) {
+    if (clerk.user === null) {
+      removeAuthenticatedQueries(client, stableKeys);
+    }
+    return;
+  }
+
+  disposeSignOutSubscription();
+  const unsubscribe = clerk.addListener(({ user }) => {
+    if (user === null) {
+      removeAuthenticatedQueries(client, stableKeys);
+    }
+  });
+  signOutSubscription = { clerk, stableKeys, unsubscribe };
+}
 
 export function getClerkQueryClient(): QueryClient | undefined {
   if (typeof window === 'undefined') {
@@ -29,6 +78,7 @@ export function getClerkQueryClient(): QueryClient | undefined {
  * state without triggering lazy creation on subsequent reads.
  */
 export function __setClerkQueryClientForTest(client: QueryClient | undefined): void {
+  disposeSignOutSubscription();
   clerkQueryClient = client;
   initialized = true;
 }
@@ -61,6 +111,7 @@ export function __createClerkTestQueryClient(): QueryClient {
  * next read lazy-creates a fresh client.
  */
 export function __resetClerkQueryClientForTest(): void {
+  disposeSignOutSubscription();
   clerkQueryClient = undefined;
   initialized = false;
 }
