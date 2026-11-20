@@ -60,7 +60,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const sessionVerification = data!;
 
-  // A caller that already has the new password (UserProfile's change password)
+  // A caller that already has the new password (`useReverification`'s `prefill`)
   // passes it, so the user isn't asked for it again.
   const { resetPassword } = useUserVerification();
   const resetPasswordFactor = useMemo(
@@ -164,7 +164,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
       <UVResetPasswordCard
         initialPassword={newPassword.password}
         initialSignOutOfOtherSessions={newPassword.signOutOfOtherSessions}
-        // The change password form already asked; its choice stands, and its success page reports it.
+        // A caller that passed the new password also decided about other sessions; its choice stands.
         showSignOutOfOtherSessions={!resetPassword}
         initialError={error}
         onSubmit={values => {

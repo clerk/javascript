@@ -75,23 +75,8 @@ export type UseReverificationOptions<Args extends any[] = any[]> = {
   /**
    * Returns values the reverification modal reuses instead of asking for them. It's called with the request's
    * arguments when reverification is needed. Today it's used when the user resets a breached or compromised
-   * password to reverify: the modal saves `newPassword` with the reset code, so a password change form doesn't
-   * ask for its new password twice.
-   *
-   * @example
-   * ```tsx
-   * const updatePassword = useReverification(
-   *   (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>
-   *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
-   *   {
-   *     passReverificationResult: true,
-   *     prefill: (_currentUser, params) => ({
-   *       newPassword: params.newPassword,
-   *       signOutOfOtherSessions: !!params.signOutOfOtherSessions,
-   *     }),
-   *   },
-   * );
-   * ```
+   * password to reverify: the modal saves `passwordReset.newPassword` with the reset code, so a password change
+   * form doesn't ask for its new password twice.
    *
    * If it throws, the request rejects with that error and no modal opens.
    */
@@ -201,9 +186,9 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
            */
           params.openUIComponent?.({
             level: level,
-            resetPassword: prefill && {
-              password: prefill.newPassword,
-              signOutOfOtherSessions: prefill.signOutOfOtherSessions,
+            resetPassword: prefill?.passwordReset && {
+              password: prefill.passwordReset.newPassword,
+              signOutOfOtherSessions: prefill.passwordReset.signOutOfOtherSessions,
             },
             afterVerification: complete,
             afterVerificationCancelled: cancel,
@@ -286,13 +271,21 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * ### Handle a password reset during reverification
  *
  * If reverification reset the password, Clerk already saved the new password. Reload the user instead of sending the
- * original password update again.
+ * original password update again. `prefill` passes the new password to the modal, so the user isn't asked for it twice.
  *
  * ```tsx
  * const updatePassword = useReverification(
- *   (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+ *   (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>
  *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
- *   { passReverificationResult: true },
+ *   {
+ *     passReverificationResult: true,
+ *     prefill: (_currentUser, params) => ({
+ *       passwordReset: {
+ *         newPassword: params.newPassword,
+ *         signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+ *       },
+ *     }),
+ *   },
  * );
  *
  * // In the submit handler, once `user` is loaded:

@@ -3,7 +3,7 @@
 '@clerk/ui': patch
 ---
 
-`useReverification()` accepts a `prefill` option. When a user resets a breached or compromised password to reverify, the modal saves the new password from `prefill` instead of asking for it again, so a password change form doesn't make the user type it twice. It's called with the request's arguments when reverification is needed, and custom `onNeedsReverification` handlers receive its values as `prefill`.
+`useReverification()` accepts a `prefill` option. When a user resets a breached or compromised password to reverify, the modal saves the new password from `prefill.passwordReset` instead of asking for it again, so a password change form doesn't make the user type it twice. It's called with the request's arguments when reverification is needed, and custom `onNeedsReverification` handlers receive its values as `prefill`.
 
 With `passReverificationResult: true`, the fetcher's `reverification` argument is now inferred, and the option is a type error on a fetcher that doesn't take the result first. The option's type moved from `UseReverificationOptions` to `UseReverificationWithResultOptions`, so code that passes `UseReverificationOptions` through to the hook keeps compiling. An options value annotated as `UseReverificationOptions` that sets `passReverificationResult: true` no longer compiles; pass the options to `useReverification()` inline instead. Runtime behavior is unchanged.
 
@@ -15,8 +15,10 @@ const updatePassword = useReverification(
   {
     passReverificationResult: true,
     prefill: (_currentUser, params) => ({
-      newPassword: params.newPassword,
-      signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+      passwordReset: {
+        newPassword: params.newPassword,
+        signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+      },
     }),
   },
 );

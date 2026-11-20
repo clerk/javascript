@@ -46,8 +46,10 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
       passReverificationResult: true,
       // If the user resets a breached password to reverify, the modal saves this one instead of asking again.
       prefill: (_user, [params]) => ({
-        newPassword: params.newPassword,
-        signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+        passwordReset: {
+          newPassword: params.newPassword,
+          signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+        },
       }),
     },
   );

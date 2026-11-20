@@ -204,7 +204,9 @@ describe('useReverification', () => {
   });
 
   describe('prefill', () => {
-    const prefillValues: ReverificationPrefill = { newPassword: 'new-password-123', signOutOfOtherSessions: false };
+    const prefillValues: ReverificationPrefill = {
+      passwordReset: { newPassword: 'new-password-123', signOutOfOtherSessions: false },
+    };
     const openReverification = vi.mocked(useClerk().__internal_openReverification);
 
     beforeEach(() => {
@@ -265,10 +267,13 @@ describe('useReverification', () => {
       expect(fetchSpy).toHaveBeenNthCalledWith(2, { passwordReset }, 'arg');
     });
 
-    it('opens the modal without values when prefill returns none', async () => {
+    it.each([
+      ['returns undefined', undefined],
+      ['returns no passwordReset', {}],
+    ])('opens the modal without values when prefill %s', async (_name, values) => {
       openReverification.mockImplementation(props => props?.afterVerification?.());
       const fetchSpy = vi.fn().mockResolvedValueOnce(reverificationError()).mockResolvedValueOnce({ ok: true });
-      const { result: hook } = renderHook(() => useAnyReverification(fetchSpy, { prefill: () => undefined }));
+      const { result: hook } = renderHook(() => useAnyReverification(fetchSpy, { prefill: () => values }));
 
       await act(async () => {
         await hook.current('arg');
