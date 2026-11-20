@@ -2,83 +2,114 @@ package expo.modules.clerk.biometrics
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
-import expo.modules.kotlin.modules.Module
-import expo.modules.kotlin.modules.ModuleDefinition
-import expo.modules.kotlin.records.Field
-import expo.modules.kotlin.records.Record
+import io.github.expo.modules.v2.ExpoModule
+import io.github.expo.modules.v2.JS
+import io.github.expo.modules.v2.Module
+import io.github.expo.modules.v2.Record
+import io.github.expo.modules.v2.react.androidContextOrNull
+import io.github.expo.modules.v2.react.currentActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 class ClerkBiometricsException internal constructor(error: BiometricsError) :
   CodedException(error.code.value, error.message, error.cause)
 
-class BiometricCredentialRecordArgument : Record {
-  @Field var id: String = ""
-  @Field var localKeyId: String = ""
-  @Field var userId: String = ""
-  @Field var appIdentifier: String = ""
-  @Field var identifierHint: String? = null
-  @Field var policy: String = ""
-  @Field var createdAt: Double = -1.0
-  @Field var updatedAt: Double = -1.0
-}
+@Record
+data class BiometricCredentialRecordArgument(
+  val id: String = "",
+  val localKeyId: String = "",
+  val userId: String = "",
+  val appIdentifier: String = "",
+  val identifierHint: String? = null,
+  val policy: String = "",
+  val createdAt: Double = -1.0,
+  val updatedAt: Double = -1.0,
+)
 
-class SaveRecordOptionsArgument : Record {
-  @Field var removeOtherRecordsForApp: Boolean = false
-}
+@Record
+data class SaveRecordOptionsArgument(val removeOtherRecordsForApp: Boolean = false)
 
+@Record
+data class BiometricAvailabilityResult(
+  val biometryType: String,
+  val canEvaluateBiometrics: Boolean,
+  val canEvaluateDeviceOwner: Boolean,
+  val errorCode: String?,
+  val secureKeyStorageAvailable: Boolean,
+)
+
+@Record
+data class BiometricCredentialKeyResult(val localKeyId: String, val publicKeyJwk: String)
+
+@Record
+data class InstallationMarkerResult(val wiped: Boolean)
+
+@ExpoModule("ClerkExpoBiometrics")
 class ClerkExpoBiometricsModule : Module() {
   private val keyManager = BiometricKeyManager()
   private var cachedStore: BiometricCredentialStore? = null
 
-  override fun definition() = ModuleDefinition {
-    Name("ClerkExpoBiometrics")
+  @JS
+  fun getAppIdentifier(): String = context().packageName
 
-    Function("getAppIdentifier") { -> context().packageName }
+  @JS
+  fun hashIdentifierHint(hint: String): String? = BiometricCredentialCoding.hashIdentifierHint(hint)
 
-    Function("hashIdentifierHint") { hint: String -> BiometricCredentialCoding.hashIdentifierHint(hint) }
-
-    AsyncFunction("getAvailability") { ->
+  @JS
+  suspend fun getAvailability(): BiometricAvailabilityResult =
+    withContext(Dispatchers.IO) {
       val availability = keyManager.availability(context())
-      mapOf(
-        "biometryType" to availability.biometryType,
-        "canEvaluateBiometrics" to availability.canEvaluateBiometrics,
-        "canEvaluateDeviceOwner" to availability.canEvaluateDeviceOwner,
-        "errorCode" to availability.errorCode?.value,
-        "secureKeyStorageAvailable" to availability.secureKeyStorageAvailable,
+      BiometricAvailabilityResult(
+        biometryType = availability.biometryType,
+        canEvaluateBiometrics = availability.canEvaluateBiometrics,
+        canEvaluateDeviceOwner = availability.canEvaluateDeviceOwner,
+        errorCode = availability.errorCode?.value,
+        secureKeyStorageAvailable = availability.secureKeyStorageAvailable,
       )
     }
 
-    AsyncFunction("createKey") { policy: String ->
+  @JS
+  suspend fun createKey(policy: String): BiometricCredentialKeyResult =
+    withContext(Dispatchers.IO) {
       bridge {
         val parsed =
           BiometricCredentialPolicy.fromValue(policy)
             ?: throw BiometricsError(BiometricsErrorCode.INVALID_ARGUMENT, "Unknown biometric credential policy '$policy'.")
         val key = keyManager.createKey(context(), parsed)
-        mapOf("localKeyId" to key.localKeyId, "publicKeyJwk" to key.publicKeyJwk)
+        BiometricCredentialKeyResult(localKeyId = key.localKeyId, publicKeyJwk = key.publicKeyJwk)
       }
     }
 
-    AsyncFunction("sign") { localKeyId: String, clientData: String, reason: String?, promise: Promise ->
-      try {
-        val activity =
-          appContext.currentActivity as? FragmentActivity
-            ?: throw BiometricsError(BiometricsErrorCode.SIGNING_FAILED, "Signing requires a foreground FragmentActivity.")
-        keyManager.sign(activity, localKeyId, clientData, reason) { result ->
-          result.fold(promise::resolve) { error -> promise.reject(codedException(error)) }
+  @JS
+  suspend fun sign(localKeyId: String, clientData: String, reason: String?): String =
+    try {
+      val activity =
+        currentActivity as? FragmentActivity
+          ?: throw BiometricsError(BiometricsErrorCode.SIGNING_FAILED, "Signing requires a foreground FragmentActivity.")
+      withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+          keyManager.sign(activity, localKeyId, clientData, reason, continuation::resumeWith)
         }
-      } catch (e: Throwable) {
-        promise.reject(codedException(e))
       }
+    } catch (e: Throwable) {
+      throw codedException(e)
     }
 
-    AsyncFunction("hasKey") { localKeyId: String -> bridge { keyManager.hasKey(localKeyId) } }
+  @JS
+  suspend fun hasKey(localKeyId: String): Boolean = withContext(Dispatchers.IO) { bridge { keyManager.hasKey(localKeyId) } }
 
-    AsyncFunction("deleteKey") { localKeyId: String -> bridge { keyManager.deleteKey(localKeyId) } }
+  @JS
+  suspend fun deleteKey(localKeyId: String): Unit =
+    withContext(Dispatchers.IO) { bridge { keyManager.deleteKey(localKeyId) } }
 
-    AsyncFunction("listRecords") { -> storeCall { store().listRecordsJson() } }
+  @JS
+  suspend fun listRecords(): String = withContext(Dispatchers.IO) { storeCall { store().listRecordsJson() } }
 
-    AsyncFunction("saveRecord") { record: BiometricCredentialRecordArgument, options: SaveRecordOptionsArgument ->
+  @JS
+  suspend fun saveRecord(record: BiometricCredentialRecordArgument, options: SaveRecordOptionsArgument): Unit =
+    withContext(Dispatchers.IO) {
       storeCall {
         val input =
           BiometricCredentialRecordInput(
@@ -95,14 +126,16 @@ class ClerkExpoBiometricsModule : Module() {
       }
     }
 
-    AsyncFunction("deleteRecord") { localKeyId: String -> storeCall { store().deleteRecords(localKeyId) } }
+  @JS
+  suspend fun deleteRecord(localKeyId: String): Unit =
+    withContext(Dispatchers.IO) { storeCall { store().deleteRecords(localKeyId) } }
 
-    // Uninstalling wipes both noBackupFilesDir and the app's Keystore keys, so no reinstall marker is needed.
-    AsyncFunction("ensureInstallationMarker") { -> mapOf("wiped" to false) }
-  }
+  // Uninstalling wipes both noBackupFilesDir and the app's Keystore keys, so no reinstall marker is needed.
+  @JS
+  suspend fun ensureInstallationMarker(): InstallationMarkerResult = InstallationMarkerResult(wiped = false)
 
   private fun context(): Context =
-    appContext.reactContext?.applicationContext ?: throw CodedException("storage_failed", "The React context is not available.", null)
+    androidContextOrNull?.applicationContext ?: throw CodedException("storage_failed", "The React context is not available.", null)
 
   @Synchronized
   private fun store(): BiometricCredentialStore =
