@@ -279,6 +279,7 @@ import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
   meta as profileComponentMeta,
+  SubPages as ProfileSubPages,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import { Default as ProfileFeatureDefault, meta as profileFeatureMeta } from '../stories/profile.stories';
@@ -872,6 +873,7 @@ const profileComponentModule: StoryModule = {
   Default: ProfileDefault,
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
+  SubPages: ProfileSubPages,
 };
 const radioModule: StoryModule = {
   meta: radioMeta,

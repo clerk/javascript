@@ -5,8 +5,9 @@ import * as PanelStories from './panel.component.stories';
 Panel lays out one page of content: a title, and the sections below it. `Panel.Root` stacks its
 children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks a column of
 [Section](/components/section)s one heading level below the title. Inside a
-[Profile](/components/profile) page, `Panel.Title` renders nothing: the profile renders the page title,
-and a ref on `Panel.Title` reaches it.
+[Profile](/components/profile) page, `Panel.Title` is the page title: it names the page, and on
+compact layouts it opens the navigation. A ref on it reaches that heading. Inside a
+`Profile.SubPage` it gets a back button to the page above it, and on its own it has none.
 
 Wrap the title in [Skeleton](/components/skeleton) for a loading state:
 `<Panel.Title><Skeleton show={loading}>Account</Skeleton></Panel.Title>`.

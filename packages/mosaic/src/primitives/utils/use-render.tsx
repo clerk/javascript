@@ -243,7 +243,7 @@ export function useRender<
 >(params: UseRenderParamsBase<Tag, State> & { enabled?: boolean }): React.ReactElement | null {
   const { defaultTagName, render, ref, enabled = true, state, stateAttributesMapping, props } = params;
 
-  const normalizedRefs = ref == null ? [] : Array.isArray(ref) ? ref : [ref];
+  const normalizedRefs = Array.isArray(ref) ? ref : [ref];
   const elementRef = React.isValidElement(render) ? getReactElementRef(render) : undefined;
   const mergedRef = useMergeRefs([...normalizedRefs, elementRef]);
 

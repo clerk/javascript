@@ -15,6 +15,7 @@ export interface CustomOrganizationProfilePage {
   path: string;
   href?: never;
   icon?: ReactNode;
+  /** Rendered as the page, below a `Panel.Title` of `label`, so don't start it with one. */
   content: ReactNode;
 }
 
