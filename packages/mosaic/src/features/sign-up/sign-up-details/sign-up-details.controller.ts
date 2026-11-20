@@ -80,7 +80,7 @@ function requiredFields(
 }
 
 function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
-  const pick = (name: SignUpFieldName) => (fields[name] ? values[name] : undefined);
+  const pick = (name: SignUpFieldName) => (fields[name] && !fields[name].disabled ? values[name] : undefined);
   return {
     emailAddress: pick('emailAddress'),
     phoneNumber: pick('phoneNumber'),
@@ -122,7 +122,7 @@ export function useSignUpDetailsController(
     fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
       const submitted = detailsValues(values, fields);
-      if (purpose === 'continue') {
+      if (purpose === 'continue' || details.startUpdatesSignUp) {
         return details.update(submitted);
       }
       return details.create(
@@ -197,6 +197,7 @@ export function useSignUpDetailsController(
     },
     error: form.error,
     leaveChannel: () => switchChannel(undefined),
+    adoptInvitation: (emailAddress: string) => form.setValue('emailAddress', emailAddress),
     reset: () => {
       form.reset();
       setChosenChannel(undefined);
