@@ -72,20 +72,23 @@ export const PRESETS: Record<string, Partial<MotionConfig>> = {
   'Classic (current)': {},
   Proposal: {
     hMode: 'spring',
-    springDur: 0.22,
+    springDur: 0.24,
     bounce: 0,
-    outDur: 110,
+    outDur: 125,
     outScale: 1,
-    outBlur: 1,
+    outBlur: 0,
     outEase: 'spring',
-    inDur: 265,
-    inDelay: 45,
-    growDelay: 50,
+    inDur: 250,
+    inDelay: 0,
+    growDelay: 80,
     inScale: 1,
-    inBlur: 1.5,
+    inBlur: 0,
     inEase: 'spring',
-    mScale: 0.96,
-    mEase: 'spring',
+    mScale: 1,
+    mBlur: 2.5,
+    mDur: 200,
+    mExit: 120,
+    mEase: 'outQuint',
   },
   'Proposal 2': {
     hMode: 'spring',
@@ -95,9 +98,9 @@ export const PRESETS: Record<string, Partial<MotionConfig>> = {
     outScale: 1,
     outBlur: 0,
     outEase: 'spring',
-    inDur: 419,
+    inDur: 420,
     inDelay: 0,
-    growDelay: 0,
+    growDelay: 60,
     inScale: 1,
     inBlur: 0,
     inEase: 'spring',
@@ -153,7 +156,7 @@ export function springCurve(duration: number, bounce: number) {
     points.push(+xs[Math.round((i / n) * end)].toFixed(4));
   }
   points[points.length - 1] = 1;
-  return { css: `linear(${points.join(', ')})`, ms: Math.round(end * dt * 1000) };
+  return { css: `linear(${points.join(', ')})`, ms: Math.round(end * dt * 100) * 10 };
 }
 
 export function baseHeightMs(c: MotionConfig) {
@@ -194,7 +197,7 @@ function flowRules(c: MotionConfig) {
 
   if (c.heightAware) {
     rules.push(
-      `.cl-flow-root[data-height-change='grow'] .cl-flow-step:not([data-ending-style])${BOOST} { transition-delay: calc(${time(c.growDelay, c.slow)} * var(--motion-p, 1)); }`,
+      `.cl-flow-root[data-height-change] .cl-flow-step:not([data-ending-style])${BOOST} { transition-delay: calc(${time(c.growDelay, c.slow)} * var(--motion-p, 1)); }`,
     );
   }
 
@@ -351,8 +354,8 @@ export const CONTROL_GROUPS: { title: string; note?: string; controls: MotionCon
       {
         kind: 'range',
         key: 'growDelay',
-        label: 'Grow: content delay',
-        hint: 'How long the incoming content waits while the card grows, so it arrives once there is room. A shrink does not wait. The wait scales down for small height changes.',
+        label: 'Content delay (grow and shrink)',
+        hint: 'How long the incoming content waits while the card resizes, whether it grows or shrinks. The wait scales down for small height changes.',
         min: 0,
         max: 400,
         step: 5,
