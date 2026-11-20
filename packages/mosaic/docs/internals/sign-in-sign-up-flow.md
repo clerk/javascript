@@ -8,6 +8,8 @@ FAPI tracks which requirements are outstanding and whether a code has been sent.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
+Sign-up's `continue` screen asks for what FAPI lists in `missing_fields`, not for what the instance's settings would require, so the client never re-derives a rule FAPI already applied (`continueFields` in `mosaic/src/features/sign-up/sign-up.model.ts`). A missing email, phone or username that FAPI also lists in `optional_fields` is a choice, so the form asks for one of them, with the email/phone switch when both are allowed. Requirements another step owns, such as `oauth_*` or `enterprise_sso`, don't appear. `start` has no sign-up yet, so it reads the instance's settings.
+
 There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param, or whether a sign-up verify screen was reached from `continue`.
 
 ## Pick the screen

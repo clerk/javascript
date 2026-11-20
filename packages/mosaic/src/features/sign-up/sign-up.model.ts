@@ -12,10 +12,9 @@ import {
   determineActiveFields,
   emailOrPhone,
   getInitialActiveIdentifier,
-  minimizeFieldsForExistingSignup,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
-import type { SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import type { SessionTask, SignUpField, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
@@ -80,6 +79,7 @@ export interface SignUpDetailsModel {
   prefill: SignUpPrefill;
   startFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
   continueFieldsFor: (identifier: SignUpIdentifier) => SignUpFields;
+  continueCanSwitchIdentifier: boolean;
   startHiddenValuesFor: (identifier: SignUpIdentifier) => Partial<SignUpPrefill>;
   legalConsent?: SignUpLegalConsent;
   continueLegalConsent?: SignUpLegalConsent;
@@ -133,6 +133,55 @@ function toViewFields(
     }
   }
   return result;
+}
+
+const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
+  first_name: 'firstName',
+  last_name: 'lastName',
+  username: 'username',
+  password: 'password',
+  email_address: 'emailAddress',
+  phone_number: 'phoneNumber',
+};
+
+type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields'>;
+
+function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
+  return missingFields.filter(
+    field =>
+      field === 'email_address_or_phone_number' ||
+      (optionalFields.includes(field) &&
+        (field === 'email_address' || field === 'phone_number' || field === 'username')),
+  );
+}
+
+function missesEitherIdentifier(signUp: SignUpFieldLists): boolean {
+  const identifiers = missingIdentifiers(signUp);
+  return (
+    identifiers.includes('email_address_or_phone_number') ||
+    (identifiers.includes('email_address') && identifiers.includes('phone_number'))
+  );
+}
+
+function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier): SignUpFields {
+  const identifiers = missingIdentifiers(signUp);
+  const fields: SignUpFields = {};
+  for (const name of signUp.missingFields) {
+    const field = MISSING_FORM_FIELDS[name];
+    if (field && !identifiers.includes(name)) {
+      fields[field] = { required: true };
+    }
+  }
+  if (missesEitherIdentifier(signUp)) {
+    fields[identifier === 'phoneNumber' ? 'phoneNumber' : 'emailAddress'] = { required: true };
+  } else {
+    const only = identifiers.find(name => name !== 'username') ?? identifiers[0];
+    const field = only ? MISSING_FORM_FIELDS[only] : undefined;
+    if (field) {
+      fields[field] = { required: true };
+    }
+  }
+  return fields;
 }
 
 async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<void> {
@@ -316,14 +365,8 @@ export function useSignUpModel({
       canSwitchIdentifier,
       prefill,
       startFieldsFor: identifier => toViewFields(activeFields(identifier), isShown),
-      continueFieldsFor: identifier => {
-        const fields = activeFields(identifier);
-        minimizeFieldsForExistingSignup(fields, signUp);
-        if (signUp.hasPassword) {
-          delete fields.password;
-        }
-        return toViewFields(fields, isShown);
-      },
+      continueFieldsFor: identifier => continueFields(signUp, identifier),
+      continueCanSwitchIdentifier: missesEitherIdentifier(signUp),
       startHiddenValuesFor: identifier => {
         const fields = activeFields(identifier);
         const hidden: Partial<SignUpPrefill> = {};
@@ -336,7 +379,7 @@ export function useSignUpModel({
         return hidden;
       },
       legalConsent,
-      continueLegalConsent: signUp.legalAcceptedAt === null ? legalConsent : undefined,
+      continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       create: async values => {
         await save(

@@ -29,6 +29,10 @@ function otherIdentifier(identifier: SignUpIdentifier): 'emailAddress' | 'phoneN
   return identifier === 'phoneNumber' ? 'emailAddress' : 'phoneNumber';
 }
 
+function canSwitch(purpose: 'start' | 'continue', details: SignUpDetailsModel): boolean {
+  return purpose === 'continue' ? details.continueCanSwitchIdentifier : details.canSwitchIdentifier;
+}
+
 function detailsStep(
   purpose: 'start' | 'continue',
   fields: SignUpFields,
@@ -38,7 +42,7 @@ function detailsStep(
   return {
     purpose,
     fields,
-    nextField: details.canSwitchIdentifier && identifier ? otherIdentifier(identifier) : undefined,
+    nextField: canSwitch(purpose, details) && identifier ? otherIdentifier(identifier) : undefined,
     legalConsent: purpose === 'continue' ? details.continueLegalConsent : details.legalConsent,
   };
 }
@@ -100,7 +104,7 @@ export function useSignUpDetailsController(
     : strength.data;
   const isPending = form.isSubmitting || isBusy;
 
-  const screen: Omit<SignUpDetailsScreen, 'step'> = {
+  const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField'> = {
     socialProviders: [],
     onSelectProvider: () => undefined,
     form,
@@ -109,13 +113,23 @@ export function useSignUpDetailsController(
     isDisabled: isPending,
     globalErrorMessage: form.error ?? globalErrorMessage,
     passwordFeedback,
-    onSwitchField: details.canSwitchIdentifier ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined,
     onSignIn,
   };
 
+  const switchField = (purpose: 'start' | 'continue') =>
+    canSwitch(purpose, details) ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined;
+
   return {
-    start: { ...screen, step: detailsStep('start', startFields, details, identifier) },
-    continue: { ...screen, step: detailsStep('continue', continueFields, details, identifier) },
+    start: {
+      ...screen,
+      step: detailsStep('start', startFields, details, identifier),
+      onSwitchField: switchField('start'),
+    },
+    continue: {
+      ...screen,
+      step: detailsStep('continue', continueFields, details, identifier),
+      onSwitchField: switchField('continue'),
+    },
     error: form.error,
     reset: form.reset,
   };
