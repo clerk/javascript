@@ -87,6 +87,8 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: next@15.5.28
+  - next@15.5.28
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
