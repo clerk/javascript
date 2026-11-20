@@ -8,6 +8,7 @@ import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
+import { waitFor } from '../../../machine/wait-for';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
@@ -26,7 +27,7 @@ export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialog
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   pendingVerifyId: string | undefined;
-  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
+  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => Promise<void>;
 }
 
 interface Context {
@@ -198,9 +199,10 @@ export function useUserProfileAddPhoneController({
     },
     verifyingId: snapshot.context.verifyingId,
     pendingVerifyId: state === 'preparing' ? snapshot.context.verifyingId : undefined,
-    onVerifyPhone: (phone, verifier) => {
+    onVerifyPhone: async (phone, verifier) => {
       codeForm.reset();
       send({ type: 'START', id: phone.id, phoneNumber: phone.value, verifier });
+      await waitFor(actor, current => current.value !== 'preparing');
     },
   };
 }

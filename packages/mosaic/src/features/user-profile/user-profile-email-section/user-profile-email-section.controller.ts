@@ -58,7 +58,7 @@ export function useUserProfileEmailSectionController({
     onVerify: id => {
       const email = emails.find(email => email.id === id);
       if (email) {
-        verification.onVerifyEmail(email, getEmailVerifier(id));
+        void actions.run(id, () => verification.onVerifyEmail(email, getEmailVerifier(id)));
       }
     },
     onSetPrimary: id => void actions.run(id, () => onSetPrimaryEmail(id)),
