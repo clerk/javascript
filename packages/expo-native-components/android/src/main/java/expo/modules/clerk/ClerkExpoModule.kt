@@ -32,9 +32,6 @@ import org.json.JSONObject
 private const val TAG = "ClerkExpoModule"
 private const val NATIVE_AUTH_FLOW_CHANGED_EVENT = "clerkNativeAuthFlowChanged"
 private const val NATIVE_CLIENT_INVALIDATED_EVENT = "clerkNativeClientInvalidated"
-private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
-private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
-private const val HOST_SDK = "expo"
 
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
@@ -54,6 +51,9 @@ class ClerkExpoModule : Module() {
     )
     private var configuredProxyUrl: String? = null
     @Volatile private var updateRequiredViewEnabled = true
+    private var configuredHostSignsRequests = false
+    @Volatile private var hostSignsRequests = false
+    private val dpopBridge = ClerkDpopBridge()
 
     private data class AuthFlowStateSnapshot(
         val isLoaded: Boolean,
@@ -78,7 +78,19 @@ class ClerkExpoModule : Module() {
         }
 
         AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise ->
-            configureNative(pubKey, seedDeviceToken, proxyUrl, promise)
+            configureNative(pubKey, seedDeviceToken, proxyUrl, hostSignsRequests, promise)
+        }
+
+        AsyncFunction("setHostSignsRequests") { enabled: Boolean ->
+            hostSignsRequests = enabled
+        }
+
+        AsyncFunction("createDpopProof") { method: String, url: String, authorization: String?, promise: Promise ->
+            createDpopProof(method, url, authorization, promise)
+        }
+
+        Function("recordServerDate") { date: String ->
+            dpopBridge.recordServerDate(date)
         }
 
         AsyncFunction("setUpdateRequiredViewEnabled") { enabled: Boolean ->
@@ -105,20 +117,13 @@ class ClerkExpoModule : Module() {
     private val reactContext: Context?
         get() = appContext.reactContext
 
-    private fun clerkConfigurationOptions(proxyUrl: String?): ClerkConfigurationOptions {
-        val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
-        val customHeaders = buildMap {
-            put(HOST_SDK_HEADER, HOST_SDK)
-            if (hostSdkVersion.isNotEmpty()) {
-                put(HOST_SDK_VERSION_HEADER, hostSdkVersion)
-            }
-        }
-
-        // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
-        val options = ClerkConfigurationOptions(proxyUrl = proxyUrl).withForegroundRefreshDisabled()
-        return (if (updateRequiredViewEnabled) options else options.withUpdateRequiredViewDisabled())
-            .withCustomHeaders(customHeaders)
-    }
+    private fun clerkConfigurationOptions(proxyUrl: String?, hostSignsRequests: Boolean): ClerkConfigurationOptions =
+        clerkConfigurationOptions(
+            proxyUrl = proxyUrl,
+            updateRequiredViewEnabled = updateRequiredViewEnabled,
+            hostSignsRequests = hostSignsRequests,
+            hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim(),
+        )
 
     private fun startAuthFlowStateObserver() {
         if (authFlowStateObserverJob != null) {
@@ -153,7 +158,13 @@ class ClerkExpoModule : Module() {
 
     // MARK: - single-token client sync
 
-    private fun configureNative(pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise) {
+    private fun configureNative(
+        pubKey: String,
+        seedDeviceToken: String?,
+        proxyUrl: String?,
+        hostSignsRequests: Boolean,
+        promise: Promise
+    ) {
         val context = reactContext ?: run {
             promise.reject("E_CONFIGURE_FAILED", "React context is not available", null)
             return
@@ -166,11 +177,13 @@ class ClerkExpoModule : Module() {
                 val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
                 val didConfigure = when {
                     activePublishableKey == null -> {
-                        Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
+                        Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl, hostSignsRequests))
                         true
                     }
-                    activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl -> {
-                        Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
+                    activePublishableKey != pubKey ||
+                        activeProxyUrl != normalizedProxyUrl ||
+                        configuredHostSignsRequests != hostSignsRequests -> {
+                        Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl, hostSignsRequests))
                         true
                     }
                     else -> false
@@ -178,6 +191,7 @@ class ClerkExpoModule : Module() {
                 if (didConfigure) {
                     configuredPublishableKey = pubKey
                     configuredProxyUrl = normalizedProxyUrl
+                    configuredHostSignsRequests = hostSignsRequests
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     // Must follow initialize(), which resets customTheme.
                     loadThemeFromAssets(context)
@@ -291,6 +305,23 @@ class ClerkExpoModule : Module() {
                 }
             } catch (e: Exception) {
                 promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
+            }
+        }
+    }
+
+    private fun createDpopProof(method: String, url: String, authorization: String?, promise: Promise) {
+        if (!isClerkConfigured()) {
+            promise.reject(
+                "E_NOT_CONFIGURED",
+                "Clerk must be configured with configureNative before it can sign requests.",
+                null
+            )
+            return
+        }
+        coroutineScope.launch {
+            when (val result = dpopBridge.createDpopProof(method, url, authorization)) {
+                is ClerkDpopProofResult.Proof -> promise.resolve(result.value)
+                is ClerkDpopProofResult.Failure -> promise.reject(result.error.code, result.error.message, result.cause)
             }
         }
     }

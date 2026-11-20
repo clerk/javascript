@@ -421,6 +421,8 @@ final class ClerkNativeBridge {
   private static var configuredPublishableKey: String?
   private static var configuredProxyUrl: String?
   private static var updateRequiredViewEnabled = true
+  private static var hostSignsRequests = false
+  private static var configuredHostSignsRequests = false
 
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
@@ -482,6 +484,7 @@ final class ClerkNativeBridge {
         publishableKey: publishableKey, options: Self.makeClerkOptions(proxyUrl: normalizedProxyUrl))
       Self.configuredPublishableKey = publishableKey
       Self.configuredProxyUrl = normalizedProxyUrl
+      Self.configuredHostSignsRequests = Self.hostSignsRequests
       startAuthFlowObserver(reset: true)
     } else if Self.clerkConfigured {
       didConfigure = false
@@ -490,6 +493,7 @@ final class ClerkNativeBridge {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       Self.configuredProxyUrl = normalizedProxyUrl
+      Self.configuredHostSignsRequests = Self.hostSignsRequests
       Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions(proxyUrl: normalizedProxyUrl))
       startAuthFlowObserver()
     }
@@ -661,6 +665,7 @@ final class ClerkNativeBridge {
   private static func shouldReconfigure(for publishableKey: String, proxyUrl: String?) -> Bool {
     guard clerkConfigured, let configuredPublishableKey else { return false }
     return configuredPublishableKey != publishableKey || configuredProxyUrl != proxyUrl
+      || configuredHostSignsRequests != hostSignsRequests
   }
 
   private static func normalizedProxyUrl(_ proxyUrl: String?) -> String? {
@@ -670,22 +675,43 @@ final class ClerkNativeBridge {
     return trimmed
   }
 
-  private static func makeClerkOptions(proxyUrl: String?) -> Clerk.Options {
+  static func makeClerkOptions(proxyUrl: String?) -> Clerk.Options {
     let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
-    guard let service = keychainService else {
-      return .init(proxyUrl: proxyUrl, middleware: middleware, updateRequiredViewEnabled: updateRequiredViewEnabled)
+    var options: Clerk.Options
+    if let service = keychainService {
+      options = .init(
+        keychainConfig: .init(service: service),
+        proxyUrl: proxyUrl,
+        middleware: middleware,
+        updateRequiredViewEnabled: updateRequiredViewEnabled
+      )
+    } else {
+      options = .init(proxyUrl: proxyUrl, middleware: middleware, updateRequiredViewEnabled: updateRequiredViewEnabled)
     }
-    return .init(
-      keychainConfig: .init(service: service),
-      proxyUrl: proxyUrl,
-      middleware: middleware,
-      updateRequiredViewEnabled: updateRequiredViewEnabled
-    )
+    options.hostSignsRequests = hostSignsRequests
+    return options
   }
 
   @MainActor
   static func setUpdateRequiredViewEnabled(_ enabled: Bool) {
     updateRequiredViewEnabled = enabled
+  }
+
+  @MainActor
+  static func setHostSignsRequests(_ enabled: Bool) {
+    hostSignsRequests = enabled
+  }
+
+  @MainActor
+  func createDpopProof(method: String, url: String, authorization: String?) async throws -> String? {
+    guard Self.clerkConfigured else { throw ClerkClientSyncError.notConfigured }
+    return try await Clerk.shared.deviceBindingProof(method: method, url: url, authorization: authorization)
+  }
+
+  @MainActor
+  func recordServerDate(_ date: String) {
+    guard Self.clerkConfigured else { return }
+    Clerk.shared.recordServerDate(date)
   }
 
   @MainActor
