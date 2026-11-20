@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { act, isInaccessible, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserCircle } from '../../icons/glyphs/user-circle';
@@ -403,6 +404,96 @@ describe('Profile', () => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Profile.ContentPanel value="security">'));
     });
 
+    it('does not warn after hydrating a page that has a Panel.Title', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const page = (
+        <MosaicProvider>
+          <Profile.Root value='hydrated'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Content>
+              <Profile.ContentPanel value='hydrated'>
+                <Panel.Root>
+                  <Panel.Title>Account</Panel.Title>
+                </Panel.Root>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>
+      );
+      const container = document.createElement('div');
+      container.innerHTML = renderToString(page);
+      document.body.append(container);
+      render(page, { container, hydrate: true });
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('does not warn while the page waits on suspended content', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      let resolve = () => {};
+      const ready = new Promise<void>(r => {
+        resolve = r;
+      });
+      function Account() {
+        return (
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+          </Panel.Root>
+        );
+      }
+      const Lazy = React.lazy(() => ready.then(() => ({ default: Account })));
+      render(
+        <Profile.Root value='lazy'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Content>
+            <Profile.ContentPanel value='lazy'>
+              <Lazy />
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>,
+      );
+      await act(async () => {
+        resolve();
+        await ready;
+      });
+      expect(await screen.findByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('warns while the page shows its own Suspense fallback without a title', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      let resolve = () => {};
+      const ready = new Promise<void>(r => {
+        resolve = r;
+      });
+      function Account() {
+        return (
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+          </Panel.Root>
+        );
+      }
+      const Lazy = React.lazy(() => ready.then(() => ({ default: Account })));
+      render(
+        <Profile.Root value='loading'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Content>
+            <Profile.ContentPanel value='loading'>
+              <React.Suspense fallback={<p>Loading</p>}>
+                <Lazy />
+              </React.Suspense>
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>,
+      );
+      expect(screen.getByText('Loading')).toBeInTheDocument();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('outside any Suspense boundary'));
+      await act(async () => {
+        resolve();
+        await ready;
+      });
+    });
+
     it('does not warn when the title is inside a Flow step', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const { rerender } = render(<SubPageSurface value='account' />);
@@ -425,6 +516,35 @@ describe('Profile', () => {
   });
 
   describe('sub-pages', () => {
+    it('tells an empty-string sub-page apart from the page itself', () => {
+      render(
+        <Profile.Root value='security'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Content>
+            <Profile.ContentPanel
+              value='security'
+              label='Security'
+              subPage=''
+              onSubPageChange={() => {}}
+            >
+              <Profile.SubPage value={null}>
+                <Panel.Root>
+                  <Panel.Title>Security</Panel.Title>
+                </Panel.Root>
+              </Profile.SubPage>
+              <Profile.SubPage value=''>
+                <Panel.Root>
+                  <Panel.Title>Passkeys</Panel.Title>
+                </Panel.Root>
+              </Profile.SubPage>
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>,
+      );
+      expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+    });
+
     it('puts a back button to the parent page above the sub-page title', async () => {
       const onSubPageChange = vi.fn();
       render(

@@ -678,9 +678,8 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   { value, label, subPage, onSubPageChange, children, xstyle, ...rest },
   ref,
 ) {
-  const { compact, pageTitleId, pageTitleRef, value: selected } = useProfileContext('Profile.ContentPanel');
+  const { compact, pageTitleId, value: selected } = useProfileContext('Profile.ContentPanel');
   const active = value === selected;
-  useMissingTitleWarning(active, value, subPage, pageTitleRef);
   const page = React.useMemo(
     () => ({
       active,
@@ -714,7 +713,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           {subPages ? (
             <SubPagesContext.Provider value={subPages}>
               <Flow.Root
-                value={subPages.subPage ?? PAGE}
+                value={stepId(subPages.subPage)}
                 direction={subPages.subPage === null ? -1 : 1}
                 state={null}
               >
@@ -724,13 +723,20 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           ) : (
             children
           )}
+          <MissingTitleWarning
+            active={active}
+            value={value}
+            subPage={subPage}
+          />
         </Tabs.Panel>
       </HeadingLevelProvider>
     </ContentPanelContext.Provider>
   );
 });
 
-const PAGE = '';
+function stepId(subPage: string | null): string {
+  return subPage === null ? 'page' : `sub-page:${subPage}`;
+}
 
 export interface ProfileSubPageProps {
   /** The sub-page it shows for, or `null` for the page itself. Matches the `Profile.ContentPanel` `subPage`. */
@@ -766,7 +772,7 @@ function SubPage({ value, children }: ProfileSubPageProps) {
     [active, label, onSubPageChange],
   );
   return (
-    <Flow.Step ids={[value ?? PAGE]}>
+    <Flow.Step ids={[stepId(value)]}>
       {value === null ? (
         children
       ) : (
@@ -838,24 +844,29 @@ export {
  * Warns when the open page has no `Panel.Title`, which leaves the page unnamed and, on compact
  * layouts, without the trigger that opens the navigation.
  */
-function useMissingTitleWarning(
-  active: boolean,
-  value: string,
-  subPage: string | null | undefined,
-  pageTitleRef: React.RefObject<HTMLHeadingElement | null>,
-) {
+function MissingTitleWarning({
+  active,
+  value,
+  subPage,
+}: {
+  active: boolean;
+  value: string;
+  subPage: string | null | undefined;
+}) {
+  const { pageTitleRef } = useProfileContext('Profile.ContentPanel');
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production' || !active || pageTitleRef.current) {
       return;
     }
     if (typeof subPage === 'string') {
       logger.warnOnce(
-        `[Clerk] <Profile.ContentPanel value="${value}" subPage="${subPage}"> is open without a <Panel.Title>. Render a <Profile.SubPage value="${subPage}">, and start it with a <Panel.Title>.`,
+        `[Clerk] <Profile.ContentPanel value="${value}" subPage="${subPage}"> is open without a <Panel.Title>. Render a <Profile.SubPage value="${subPage}">, and start it with a <Panel.Title>, outside any Suspense boundary.`,
       );
       return;
     }
     logger.warnOnce(
-      `[Clerk] <Profile.ContentPanel value="${value}"> is open without a <Panel.Title>. Start the page with one: it names the page, and on compact layouts it opens the navigation.`,
+      `[Clerk] <Profile.ContentPanel value="${value}"> is open without a <Panel.Title>. Start the page with one, outside any Suspense boundary: it names the page, and on compact layouts it opens the navigation.`,
     );
   }, [active, value, subPage, pageTitleRef]);
+  return null;
 }
