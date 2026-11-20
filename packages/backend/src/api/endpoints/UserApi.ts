@@ -949,7 +949,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Sets the given user's password as compromised. The user will be prompted to reset their password on their next sign-in. See the [guide on password protection and rules](/docs/guides/secure/password-protection-and-rules#reject-compromised-passwords) for more information.
+   * Sets the given user's password as compromised. The user will be prompted to reset their password on their next sign-in. Clerk also marks all of the user's devices as untrusted, unless the password was already compromised and `revokeAllSessions` is `false`. On instances with Device Trust enabled, the next password sign-in on any of those devices can require a Device Trust challenge. See the [guide on password protection and rules](/docs/guides/secure/password-protection-and-rules#reject-compromised-passwords) for more information.
    * @param userId - The ID of the user to set the password as compromised for.
    * @param params - Other parameters for the request.
    * @returns The updated [`User`](https://clerk.com/docs/reference/backend/types/backend-user).
