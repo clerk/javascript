@@ -5462,6 +5462,71 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('.mountUserProfile() while signed out', () => {
+    const mountComponent = vi.fn();
+    const mockClerkUICtor = vi.fn(function () {
+      return { ensureMounted: () => Promise.resolve({ mountComponent }) };
+    });
+
+    const loadSignedOut = async (publishableKey: string) => {
+      const sut = new Clerk(publishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      return sut;
+    };
+
+    const flushMount = () => new Promise(resolve => setTimeout(resolve, 0));
+
+    beforeEach(() => {
+      mountComponent.mockReset();
+    });
+
+    it.each(['verified', 'expired', 'failed', 'client_mismatch'])(
+      'mounts the email verification link status page for __clerk_status=%s',
+      async status => {
+        setWindowQueryParams([['__clerk_status', status]]);
+        const sut = await loadSignedOut(productionPublishableKey);
+        const node = document.createElement('div');
+
+        sut.mountUserProfile(node);
+
+        await waitFor(() => {
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'UserProfile', node }));
+        });
+      },
+    );
+
+    it.each([
+      ['no link status', []],
+      ['a status that email verification links do not use', [['__clerk_status', 'transferable']]],
+      ['an unknown status', [['__clerk_status', 'unknown']]],
+    ] as Array<[string, Array<[string, string]>]>)('does not mount with %s', async (_, params) => {
+      setWindowQueryParams(params);
+      const sut = await loadSignedOut(productionPublishableKey);
+
+      sut.mountUserProfile(document.createElement('div'));
+      await flushMount();
+
+      expect(mountComponent).not.toHaveBeenCalled();
+    });
+
+    it('still reports the missing user in development when there is no link status', async () => {
+      const sut = await loadSignedOut(developmentPublishableKey);
+
+      expect(() => sut.mountUserProfile(document.createElement('div'))).toThrow(ClerkRuntimeError);
+    });
+
+    it('mounts in development for a link status', async () => {
+      setWindowQueryParams([['__clerk_status', 'client_mismatch']]);
+      const sut = await loadSignedOut(developmentPublishableKey);
+
+      sut.mountUserProfile(document.createElement('div'));
+
+      await waitFor(() => {
+        expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'UserProfile' }));
+      });
+    });
+  });
+
   describe('page focus session touch', () => {
     const windowListeners = new Map<string, Array<(event: any) => void>>();
 
