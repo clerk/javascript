@@ -100,7 +100,7 @@ export const VerificationCodeContent = (props: PropsWithChildren<VerificationCod
             localizationKey={localizationKeys('formButtonPrimary')}
             onClick={otp.onFakeContinue}
           />
-          {props.onBackLinkClicked && (
+          {props.onBackLinkClicked && props.backLinkLabel && (
             <Button
               elementDescriptor={descriptors.formButtonReset}
               block
