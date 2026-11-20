@@ -107,7 +107,9 @@ export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
   tokenIssuedAt?: number;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking' | 'ssoBypass' | 'signUp'>> & {
+export type FakeFapiSeed = Partial<
+  Omit<FakeFapiState, 'verification' | 'enterpriseLinking' | 'ssoBypass' | 'signUp'>
+> & {
   signUp?: FakeSignUpSeed;
   verification?: FakeVerificationSeed;
   enterpriseLinking?: Partial<FakeEnterpriseLinking>;
