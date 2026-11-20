@@ -2,11 +2,13 @@
 
 import * as React from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   buildMotionCss,
   CLASSIC,
   type MotionConfig,
+  NEW_PRESETS,
   PRESET_NOTES,
   PRESETS,
   springCurve,
@@ -81,7 +83,7 @@ export function MotionPlayground() {
   return (
     <div className='flex flex-col lg:flex-row'>
       <style>{css}</style>
-      <main className='flex min-w-0 flex-1 flex-col gap-5 p-6 lg:h-[calc(100svh-3rem)]'>
+      <main className='flex min-w-0 flex-1 flex-col gap-5 p-6 lg:min-h-[calc(100svh-3rem)]'>
         <div>
           <h1 className='text-xl font-semibold'>Motion</h1>
           <p className='text-muted-foreground mt-1 max-w-2xl text-sm'>
@@ -101,6 +103,14 @@ export function MotionPlayground() {
               onClick={() => applyPreset(name)}
             >
               {name}
+              {NEW_PRESETS.includes(name) ? (
+                <Badge
+                  variant='secondary'
+                  className='h-4 px-1.5 text-[10px]'
+                >
+                  New
+                </Badge>
+              ) : null}
             </Button>
           ))}
           <p className='text-muted-foreground basis-full text-xs'>
@@ -131,7 +141,7 @@ export function MotionPlayground() {
         </div>
 
         <StoryMosaicProvider>
-          <div className='bg-muted/40 grid min-h-[24rem] flex-1 place-items-center overflow-y-auto rounded-xl border p-8'>
+          <div className='bg-muted/40 grid min-h-[44rem] flex-1 place-items-center rounded-xl border p-8'>
             <demo.Demo key={demo.id} />
           </div>
         </StoryMosaicProvider>
