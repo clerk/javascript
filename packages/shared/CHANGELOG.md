@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.48.3
+
+### Patch Changes
+
+- Move the code behind `useSignIn()`, `useSignUp()` and `useWaitlist()` that listens for sign-in, sign-up and waitlist updates into `@clerk/shared`, so `@clerk/mosaic` can use it too. No behavior change. ([#10867](https://github.com/clerk/javascript/pull/10867)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Move the rules that decide which fields the `<SignUp />` form shows and requires, and the parser for blocked-request errors, into `@clerk/shared` so `@clerk/mosaic` can use them too. No behavior change. ([#10868](https://github.com/clerk/javascript/pull/10868)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Fix the internal sign-up step helper used by `@clerk/mosaic` so it verifies the email and phone before asking for missing fields, the same order `<SignUp />` follows. `<SignUp />` is unaffected. ([#10883](https://github.com/clerk/javascript/pull/10883)) by [@austincalvelage](https://github.com/austincalvelage)
+
 ## 4.48.2
 
 ### Patch Changes

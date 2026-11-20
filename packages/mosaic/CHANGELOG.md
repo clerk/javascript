@@ -1,5 +1,32 @@
 # @clerk/mosaic
 
+## 0.10.0
+
+### Minor Changes
+
+- `<OrganizationProfile />` and `<Profile />` now show a Security page with the organization's SSO bypass allow list. Members with the `org:sys_entconns_sso_bypass:manage` permission can see who is on the list, page through it, remove members after a confirmation, and add members by email or by role. The page shows to members with `org:sys_entconns_sso_bypass:manage` once the organization has an enterprise connection, and to members with `org:sys_entconns:manage` when self-serve SSO or self-serve Directory Sync is enabled for the instance and the organization. ([#10882](https://github.com/clerk/javascript/pull/10882)) by [@kylemac](https://github.com/kylemac)
+
+- **Breaking:** A page's `Panel.Title` is now its profile page title, so `Profile.Content` no longer takes `pageTitle`. On compact layouts it still opens the navigation. ([#10932](https://github.com/clerk/javascript/pull/10932)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  A page can now open sub-pages. Give its `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap each view in a `Profile.SubPage`, with `value={null}` for the page itself. A sub-page's `Panel.Title` gets a back button to the page above it.
+
+  | Before                                | After                                                                                         |
+  | ------------------------------------- | --------------------------------------------------------------------------------------------- |
+  | `<Profile.Content pageTitle={label}>` | `<Profile.Content>`, with `<Panel.Title>{label}</Panel.Title>` in each `Profile.ContentPanel` |
+
+  Find affected usage with `git grep -n "pageTitle="`.
+
+### Patch Changes
+
+- A `Card.Root` inside a `Dialog.Popup` now defaults to `elevation='overlay'`, so dialog cards no longer need to set it. Cards outside a dialog still default to `'card'`, and an explicit `elevation` still wins. ([#10935](https://github.com/clerk/javascript/pull/10935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `Flow.Root` clips its content only vertically, and only while it moves between steps, so a focus ring at the edge of a step is no longer cut off. ([#10932](https://github.com/clerk/javascript/pull/10932)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `SegmentedControl.Root` now keeps its natural width inside flex and grid containers instead of stretching to fill them. Pass the new `fullWidth` prop to fill the container, with the items sharing the width evenly. ([#10920](https://github.com/clerk/javascript/pull/10920)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+
 ## 0.9.1
 
 ### Patch Changes
