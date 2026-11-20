@@ -253,12 +253,12 @@ describe('When the connections request fails', () => {
     expect(screen.queryByRole('list', { name: 'SSO bypass allow list' })).toBeNull();
   });
 
-  it('shows the allow list after Try again succeeds', async () => {
+  it('shows the allow list after Retry succeeds', async () => {
     const { user, outage } = await renderWithFailedConnections();
     expect(screen.getByRole('alert')).toHaveTextContent(ERROR_TEXT);
 
     outage.active = false;
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
 
     const list = await screen.findByRole('list', { name: 'SSO bypass allow list' });
     expect(within(list).getByText('Bob')).toBeVisible();

@@ -169,7 +169,7 @@ export function SSOBypassConnectionsErrorView({ isRetrying, onRetry }: SSOBypass
                   focusableWhenDisabled
                   onClick={onRetry}
                 >
-                  {m.retry}
+                  {m.connectionsRetry}
                 </Button>
               </Section.Actions>
             </Section.Item>

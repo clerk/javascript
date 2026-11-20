@@ -16,6 +16,7 @@ export const organizationProfileSecurityPanelMessages = {
     empty: 'There are no members on the allow list yet',
     loadError: 'Could not load the SSO allow list',
     connectionsError: 'Could not check this organization’s SSO connections',
+    connectionsRetry: 'Retry',
     retry: 'Try again',
     loading: 'Loading the SSO allow list',
     pagination: 'Allow list pagination',
