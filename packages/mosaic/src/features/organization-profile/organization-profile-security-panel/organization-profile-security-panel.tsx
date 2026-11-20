@@ -9,6 +9,7 @@ import {
 import type { SecurityCapabilities } from './organization-profile-security-panel-access.model';
 import { useSecurityPanelAccessModel } from './organization-profile-security-panel-access.model';
 import { SSOBypassSectionSkeleton } from './sso-bypass.skeleton';
+import { SSOBypassConnectionsErrorView } from './sso-bypass.view';
 import { SSOBypassSection } from './sso-bypass-section';
 
 export interface OrganizationProfileSecurityPanelProps {
@@ -38,6 +39,11 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
     <OrganizationProfileSecurityPanelView>
       {model.isLoading ? (
         <SSOBypassSectionSkeleton />
+      ) : model.isConnectionsError ? (
+        <SSOBypassConnectionsErrorView
+          isRetrying={model.isRetryingConnections}
+          onRetry={model.retryConnections}
+        />
       ) : model.showSSOBypass ? (
         <SSOBypassSection />
       ) : (

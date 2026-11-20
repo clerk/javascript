@@ -1,4 +1,5 @@
 import { __internal_useOrganizationEnterpriseConnections, useOrganization, useSession } from '@clerk/shared/react';
+import { useState } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
@@ -13,6 +14,28 @@ export type SecurityPanelAccessModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | ({ status: 'ready' } & SecurityCapabilities);
+
+export interface ConnectionsStatus {
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export function useConnectionsStatus(connections: {
+  data: unknown[] | undefined;
+  error: Error | null;
+  isLoading: boolean;
+}): ConnectionsStatus {
+  const [failed, setFailed] = useState(false);
+  const isFailing = Boolean(connections.error) && !connections.data;
+  if (isFailing && !failed) {
+    setFailed(true);
+  }
+  if (connections.data && failed) {
+    setFailed(false);
+  }
+  const isError = isFailing || (failed && !connections.data);
+  return { isLoading: connections.isLoading && !isError, isError };
+}
 
 export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
   const { isLoaded, organization } = useOrganization();
@@ -40,6 +63,7 @@ export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
     enabled: Boolean(organization) && needsConnections,
     keepPreviousData: false,
   });
+  const connectionsStatus = useConnectionsStatus(connections);
 
   if (!isLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
@@ -47,13 +71,13 @@ export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
   if (!organization || !session) {
     return { status: 'hidden' };
   }
-  if (needsConnections && connections.isLoading) {
+  if (needsConnections && connectionsStatus.isLoading) {
     return { status: 'loading' };
   }
   const allowed =
     capabilities.canConfigureSso ||
     capabilities.canConfigureDirectorySync ||
-    (capabilities.canManageSSOBypass && (connections.data?.length ?? 0) > 0);
+    (capabilities.canManageSSOBypass && (connectionsStatus.isError || (connections.data?.length ?? 0) > 0));
 
   return allowed ? { status: 'ready', ...capabilities } : { status: 'hidden' };
 }

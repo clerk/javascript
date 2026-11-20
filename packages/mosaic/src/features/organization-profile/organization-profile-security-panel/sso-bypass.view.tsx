@@ -138,6 +138,48 @@ export function SSOBypassSectionView({
   );
 }
 
+export interface SSOBypassConnectionsErrorViewProps {
+  isRetrying: boolean;
+  onRetry: () => void;
+}
+
+export function SSOBypassConnectionsErrorView({ isRetrying, onRetry }: SSOBypassConnectionsErrorViewProps) {
+  const m = useMessages('organizationProfile').security.ssoBypass;
+  return (
+    <Section.Root {...themeProps('organization-profile-sso-bypass')}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.title}</Section.Title>
+            <Section.Description>{m.description}</Section.Description>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Error>{m.connectionsError}</Section.Error>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                  disabled={isRetrying}
+                  focusableWhenDisabled
+                  onClick={onRetry}
+                >
+                  {m.retry}
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
+  );
+}
+
 function SSOBypassRowView({
   row,
   isDisabled,

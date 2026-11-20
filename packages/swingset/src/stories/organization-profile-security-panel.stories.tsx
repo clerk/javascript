@@ -2,6 +2,7 @@ import type { StoryMeta } from '@/lib/types';
 
 import {
   SecurityPanelExample,
+  SecurityPanelConnectionsErrorExample,
   SecurityPanelNoSectionsExample,
   SSOBypassAllowlistExample,
 } from './fixtures/organization-profile-security-panel';
@@ -28,6 +29,10 @@ export function Loading() {
 
 export function NoSections() {
   return <SecurityPanelNoSectionsExample />;
+}
+
+export function ConnectionsError() {
+  return <SecurityPanelConnectionsErrorExample />;
 }
 
 export function AllowListLoadError() {
