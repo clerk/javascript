@@ -1,4 +1,5 @@
-import { getClerkQueryParam, getEmailAddressLinkStatus } from '@clerk/shared/internal/clerk-js/queryParams';
+import { getClerkQueryParam, toEmailAddressLinkStatus } from '@clerk/shared/internal/clerk-js/queryParams';
+import { __internal_useUserBase } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -12,6 +13,7 @@ import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { useEmailLink } from '../../hooks';
+import { useRouter } from '../../router';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;
@@ -85,14 +87,21 @@ const verificationLinkTexts = {
 };
 
 export const VerificationSuccessPage = () => {
-  // A URL without a status keeps the page's original success message. Any status a link does not
-  // redirect with reads as an invalid link.
-  const linkStatus = getClerkQueryParam('__clerk_status') ? (getEmailAddressLinkStatus() ?? 'failed') : 'verified';
+  const router = useRouter();
+  const user = __internal_useUserBase();
+  const status = router.queryParams['__clerk_status'] ?? getClerkQueryParam('__clerk_status');
+  const linkStatus = toEmailAddressLinkStatus(status);
+
+  if (!user && (!linkStatus || !router.matches(undefined, true))) {
+    return null;
+  }
+
+  const shownStatus = status ? (linkStatus ?? 'failed') : 'verified';
 
   return (
     <EmailLinkStatusCard
-      {...verificationLinkTexts[linkStatus]}
-      status={linkStatus}
+      {...verificationLinkTexts[shownStatus]}
+      status={shownStatus}
     />
   );
 };

@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen } from '@/test/utils';
+import { act, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { PathRouter } from '@/ui/router';
 
 import { UserProfile } from '../';
 import { VerificationSuccessPage } from '../VerifyWithLink';
@@ -24,13 +25,6 @@ const renderWithStatus = async (status?: string) => {
     </CardStateProvider>,
     { wrapper },
   );
-};
-
-const renderSignedOutUserProfile = async (route: 'verify' | 'index', status: string) => {
-  visit(status);
-  const { wrapper, fixtures } = await createFixtures();
-  fixtures.router.matches.mockImplementation((path?: string) => route === 'verify' && path === 'verify');
-  return render(<UserProfile />, { wrapper });
 };
 
 describe('VerificationSuccessPage', () => {
@@ -76,18 +70,22 @@ describe('VerificationSuccessPage', () => {
     expect(screen.queryByText('Successfully verified email')).not.toBeInTheDocument();
   });
 
-  describe('in <UserProfile /> while signed out', () => {
-    it('shows only the link status', async () => {
-      await renderSignedOutUserProfile('verify', 'client_mismatch');
-
-      screen.getByText('Verification link is invalid for this device');
-      expect(screen.queryByRole('button', { name: /Security/i })).not.toBeInTheDocument();
+  it('shows the status of the link it navigates to in a mounted <UserProfile />', async () => {
+    visit('verified');
+    const { wrapper } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
     });
+    render(
+      <PathRouter basePath='/user'>
+        <UserProfile />
+      </PathRouter>,
+      { wrapper },
+    );
+    await screen.findByText('Successfully verified email');
 
-    it('shows nothing outside the verification page', async () => {
-      const { container } = await renderSignedOutUserProfile('index', 'verified');
+    act(() => window.history.pushState({}, '', '/user/verify?__clerk_status=expired'));
 
-      expect(container).toBeEmptyDOMElement();
-    });
+    await screen.findByText('This verification link has expired');
+    expect(screen.queryByText('Successfully verified email')).not.toBeInTheDocument();
   });
 });

@@ -1,6 +1,8 @@
 import type { EmailLinkErrorCodeStatus } from '../../error';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '../../netlifyCacheHandler';
+import type { RoutingStrategy } from '../../types';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from './constants';
+import { hasUrlInFragment, mergeFragmentIntoUrl, trimTrailingSlash } from './url';
 
 const _ClerkQueryParams = [
   '__clerk_status',
@@ -44,12 +46,36 @@ const EMAIL_ADDRESS_LINK_STATUSES = [
 export type EmailAddressLinkStatus = (typeof EMAIL_ADDRESS_LINK_STATUSES)[number];
 
 /**
- * Returns the `__clerk_status` of the current URL when it is a status that a `<UserProfile />`
- * email address verification link redirects with, and `null` otherwise.
+ * Returns `status` when it is a `__clerk_status` value that a `<UserProfile />` email address verification link
+ * redirects with, and `null` otherwise.
  */
-export function getEmailAddressLinkStatus(): EmailAddressLinkStatus | null {
-  const status = getClerkQueryParam('__clerk_status');
+export function toEmailAddressLinkStatus(status: string | null | undefined): EmailAddressLinkStatus | null {
   return EMAIL_ADDRESS_LINK_STATUSES.find(s => s === status) ?? null;
+}
+
+/**
+ * Returns the `__clerk_status` of `url` when `url` is the `verify` page that a `<UserProfile />` email address
+ * verification link redirects to, for a `<UserProfile />` mounted with these routing options. Returns `null` for
+ * any other page or status.
+ */
+export function getUserProfileEmailAddressLinkStatus(
+  { routing, path }: { routing?: RoutingStrategy; path?: string } = {},
+  url: URL = new URL(window.location.href),
+): EmailAddressLinkStatus | null {
+  const status = toEmailAddressLinkStatus(url.searchParams.get('__clerk_status'));
+  if (!status) {
+    return null;
+  }
+
+  const pathRouting = routing === 'path' || (!routing && !!path);
+  const verifyPath = pathRouting ? `${trimTrailingSlash(path ?? '')}/verify` : '/verify';
+  const routedPath = pathRouting
+    ? mergeFragmentIntoUrl(url).pathname
+    : hasUrlInFragment(url)
+      ? new URL(url.hash.substring(1), url.origin).pathname
+      : '/';
+
+  return trimTrailingSlash(routedPath) === verifyPath ? status : null;
 }
 
 /**

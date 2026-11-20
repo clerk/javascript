@@ -162,7 +162,7 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
-  getEmailAddressLinkStatus,
+  getUserProfileEmailAddressLinkStatus,
   hasExternalAccountSignUpError,
   inActiveBrowserTab,
   inBrowser,
@@ -1348,9 +1348,8 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
-    // An email address verification link can open in a browser that is not signed in.
-    // Signed out, <UserProfile /> renders only the page that shows the link's status.
-    if (noUserExists(this) && !getEmailAddressLinkStatus()) {
+    const signedOut = noUserExists(this);
+    if (signedOut && !getUserProfileEmailAddressLinkStatus(props)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
@@ -1362,17 +1361,28 @@ export class Clerk implements ClerkInterface {
     const component = 'UserProfile';
     void this.#clerkUI
       .then(ui => ui.ensureMounted({ preloadHint: component }))
-      .then(controls =>
+      .then(controls => {
+        if (signedOut && !controls.supportsSignedOutUserProfile) {
+          return;
+        }
         controls.mountComponent({
           name: component,
           appearanceKey: 'userProfile',
           node,
           props,
-        }),
-      );
+        });
+      });
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData));
+  };
+
+  public __internal_canMountSignedOutUserProfile = async (props?: UserProfileProps): Promise<boolean> => {
+    if (!this.#clerkUI || !getUserProfileEmailAddressLinkStatus(props)) {
+      return false;
+    }
+    const controls = await this.#clerkUI.then(ui => ui.ensureMounted({ preloadHint: 'UserProfile' }));
+    return !!controls.supportsSignedOutUserProfile;
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {

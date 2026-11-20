@@ -12,6 +12,7 @@ import type {
   SignInJSON,
   SignUpJSON,
   TokenResource,
+  UserProfileProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { waitFor } from '@testing-library/react';
@@ -5464,13 +5465,22 @@ describe('Clerk singleton', () => {
 
   describe('.mountUserProfile() while signed out', () => {
     const mountComponent = vi.fn();
-    const mockClerkUICtor = vi.fn(function () {
+    const uiWithSignedOutUserProfile = vi.fn(function () {
+      return { ensureMounted: () => Promise.resolve({ mountComponent, supportsSignedOutUserProfile: true }) };
+    });
+    const uiWithoutSignedOutUserProfile = vi.fn(function () {
       return { ensureMounted: () => Promise.resolve({ mountComponent }) };
     });
 
-    const loadSignedOut = async (publishableKey: string) => {
+    const visit = (url: string) => {
+      // @ts-expect-error - Forcing delete on non-optional property for testing purposes
+      delete window.location;
+      (window.location as any) = new URL(url, oldWindowLocation.origin);
+    };
+
+    const loadSignedOut = async (publishableKey: string, ClerkUI = uiWithSignedOutUserProfile) => {
       const sut = new Clerk(publishableKey);
-      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI } });
       return sut;
     };
 
@@ -5480,46 +5490,76 @@ describe('Clerk singleton', () => {
       mountComponent.mockReset();
     });
 
-    it.each(['verified', 'expired', 'failed', 'client_mismatch'])(
-      'mounts the email verification link status page for __clerk_status=%s',
-      async status => {
-        setWindowQueryParams([['__clerk_status', status]]);
+    it.each([
+      ['/user/verify?__clerk_status=verified', { routing: 'path', path: '/user' }],
+      ['/user/verify?__clerk_status=expired', { path: '/user' }],
+      ['/user/verify/?__clerk_status=failed', { routing: 'path', path: '/user' }],
+      ['/settings/account/verify?__clerk_status=client_mismatch', { routing: 'path', path: '/settings/account' }],
+      ['/user?__clerk_status=client_mismatch#/verify', { routing: 'path', path: '/user' }],
+      ['/account?__clerk_status=expired#/verify', undefined],
+      ['/account?__clerk_status=verified#/verify', { routing: 'hash' }],
+    ] as Array<[string, UserProfileProps | undefined]>)(
+      'mounts the email verification link status page at %s',
+      async (url, props) => {
+        visit(url);
         const sut = await loadSignedOut(productionPublishableKey);
         const node = document.createElement('div');
 
-        sut.mountUserProfile(node);
+        sut.mountUserProfile(node, props);
 
         await waitFor(() => {
-          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'UserProfile', node }));
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'UserProfile', node, props }));
         });
+        await expect(sut.__internal_canMountSignedOutUserProfile(props)).resolves.toBe(true);
       },
     );
 
     it.each([
-      ['no link status', []],
-      ['a status that email verification links do not use', [['__clerk_status', 'transferable']]],
-      ['an unknown status', [['__clerk_status', 'unknown']]],
-    ] as Array<[string, Array<[string, string]>]>)('does not mount with %s', async (_, params) => {
-      setWindowQueryParams(params);
+      ['/user/verify', { routing: 'path', path: '/user' }],
+      ['/user/verify?__clerk_status=transferable', { routing: 'path', path: '/user' }],
+      ['/user/verify?__clerk_status=unknown', { routing: 'path', path: '/user' }],
+      ['/user/security?__clerk_status=verified', { routing: 'path', path: '/user' }],
+      ['/user/verify/extra?__clerk_status=verified', { routing: 'path', path: '/user' }],
+      ['/user?__clerk_status=verified', { routing: 'path', path: '/user' }],
+      ['/account?__clerk_status=verified#/security', undefined],
+      ['/account?__clerk_status=verified#/verify/extra', undefined],
+    ] as Array<[string, UserProfileProps | undefined]>)('does not mount at %s', async (url, props) => {
+      visit(url);
       const sut = await loadSignedOut(productionPublishableKey);
 
-      sut.mountUserProfile(document.createElement('div'));
+      sut.mountUserProfile(document.createElement('div'), props);
       await flushMount();
 
       expect(mountComponent).not.toHaveBeenCalled();
+      await expect(sut.__internal_canMountSignedOutUserProfile(props)).resolves.toBe(false);
     });
 
-    it('still reports the missing user in development when there is no link status', async () => {
-      const sut = await loadSignedOut(developmentPublishableKey);
+    it('does not mount with a UI that cannot show the link status while signed out', async () => {
+      const props = { routing: 'path', path: '/user' } as const;
+      visit('/user/verify?__clerk_status=expired');
+      const sut = await loadSignedOut(productionPublishableKey, uiWithoutSignedOutUserProfile);
 
-      expect(() => sut.mountUserProfile(document.createElement('div'))).toThrow(ClerkRuntimeError);
+      sut.mountUserProfile(document.createElement('div'), props);
+      await flushMount();
+
+      expect(mountComponent).not.toHaveBeenCalled();
+      await expect(sut.__internal_canMountSignedOutUserProfile(props)).resolves.toBe(false);
     });
 
-    it('mounts in development for a link status', async () => {
-      setWindowQueryParams([['__clerk_status', 'client_mismatch']]);
+    it('still reports the missing user in development away from the verification page', async () => {
+      visit('/user/security?__clerk_status=verified');
       const sut = await loadSignedOut(developmentPublishableKey);
 
-      sut.mountUserProfile(document.createElement('div'));
+      expect(() => sut.mountUserProfile(document.createElement('div'), { routing: 'path', path: '/user' })).toThrow(
+        ClerkRuntimeError,
+      );
+    });
+
+    it('mounts in development on the verification page', async () => {
+      visit('/user/verify?__clerk_status=client_mismatch');
+      const sut = await loadSignedOut(developmentPublishableKey);
+
+      sut.mountUserProfile(document.createElement('div'), { routing: 'path', path: '/user' });
 
       await waitFor(() => {
         expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'UserProfile' }));
