@@ -134,12 +134,18 @@ function parseAbsoluteUrl(value: string) {
   }
 }
 
-function isAllowedResourceUrl({ protocol, hostname }: URL) {
-  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
+function rawResourceHost(resource: string) {
+  const authority = resource.slice(resource.indexOf('//') + 2).split(/[/?]/, 1)[0];
+  return authority.slice(authority.lastIndexOf('@') + 1).replace(/:[0-9]*$/, '');
+}
+
+function isAllowedResourceUrl({ protocol, hostname }: URL, resource: string) {
+  const host = rawResourceHost(resource).toLowerCase();
+  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(host) && host === hostname);
 }
 
 const rfc3986AbsoluteUriPattern =
-  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:[A-Za-z0-9\-._~:/?@!$&'()*+,;=[\]]|%[0-9A-Fa-f]{2})*$/;
+  /^[A-Za-z][A-Za-z0-9+.-]*:\/\/(?:(?:[A-Za-z0-9\-._~!$&'()*+,;=:]|%[0-9A-Fa-f]{2})*@)?(?:\[[0-9A-Fa-f:.]+\]|(?:[A-Za-z0-9\-._~!$&'()*+,;=]|%[0-9A-Fa-f]{2})*)(?::[0-9]*)?(?:\/(?:[A-Za-z0-9\-._~!$&'()*+,;=:@/]|%[0-9A-Fa-f]{2})*)?(?:\?(?:[A-Za-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-Fa-f]{2})*)?$/;
 
 function assertValidTokenExchangeResource(resource: string) {
   if (resource.includes('#')) {
@@ -149,7 +155,7 @@ function assertValidTokenExchangeResource(resource: string) {
   if (!url) {
     throw tokenExchangeRequestError('`resource` must be an absolute URI.');
   }
-  if (!isAllowedResourceUrl(url)) {
+  if (!isAllowedResourceUrl(url, resource)) {
     throw tokenExchangeRequestError('`resource` must use https, or http on a loopback host.');
   }
 }
@@ -157,10 +163,18 @@ function assertValidTokenExchangeResource(resource: string) {
 const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
 
 function assertValidTokenExchangeScope(scope: string[] | undefined) {
-  if (scope?.some(token => !scopeTokenPattern.test(token))) {
-    throw tokenExchangeRequestError(
-      'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
-    );
+  if (scope == null) {
+    return;
+  }
+  if (!Array.isArray(scope)) {
+    throw tokenExchangeRequestError('`scope` must be an array of scope tokens.');
+  }
+  for (const token of scope) {
+    if (!isString(token) || !scopeTokenPattern.test(token)) {
+      throw tokenExchangeRequestError(
+        'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',
+      );
+    }
   }
 }
 

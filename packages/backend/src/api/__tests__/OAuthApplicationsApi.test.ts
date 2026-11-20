@@ -531,9 +531,18 @@ describe('OAuthApplications', () => {
       ['has a non-ASCII character', 'https://a.example/é'],
       ['has a newline', 'https://a.example/a\nb'],
       ['has an invalid percent-encoding', 'https://a.example/%zz'],
+      ['has an opening bracket in its path', 'https://a.example/['],
+      ['has a closing bracket in its path', 'https://a.example/]'],
+      ['has a bracket in its query', 'https://a.example/?value=['],
+      ['has a bracket in its userinfo', 'https://user[name@a.example/'],
+      ['has multiple userinfo delimiters', 'https://user@@a.example/'],
+      ['has a trailing newline', 'https://a.example/\n'],
       ['has a leading control character', '\u0000https://a.example'],
       ['has no authority', 'https:a.example'],
       ['hides a host behind a backslash', 'http://localhost\\@evil.example/'],
+      ['uses plain http for a decimal loopback address', 'http://2130706433/'],
+      ['uses plain http for a shorthand hex loopback address', 'http://0x7f.1/'],
+      ['uses plain http for a percent-encoded localhost', 'http://%6c%6fcalhost/'],
     ])('rejects a resource that %s before making any request', async (_, resource) => {
       const requested = recordRequests();
 
@@ -555,6 +564,12 @@ describe('OAuthApplications', () => {
       ['an http resource on localhost', 'http://localhost:3000'],
       ['an http resource on 127.0.0.1', 'http://127.0.0.1:8080/api'],
       ['an http resource on [::1]', 'http://[::1]:8080'],
+      ['an http resource on an uppercase localhost', 'HTTP://LOCALHOST:3000/api'],
+      ['an http resource on localhost with userinfo', 'http://user:pass@localhost/api?next=/a'],
+      ['an https resource on an IPv6 host', 'https://[2001:db8::1]:443/api?tenant=a'],
+      ['an https resource with encoded brackets', 'https://a.example/%5B%5D?value=%5b%5d'],
+      ['an https resource with path and query delimiters', 'https://a.example/a:b@c?value=/a?b'],
+      ['an https resource with userinfo', 'https://user:pass@a.example/api'],
     ])('sends %s', async (_, resource) => {
       let sent: string[] | undefined;
       server.use(
@@ -577,6 +592,14 @@ describe('OAuthApplications', () => {
       ['an element with a non-ASCII character', ['café']],
       ['an element with a control character', ['a\tb']],
       ['an element with DEL', ['a\u007fb']],
+      ['a trailing hole', Object.assign(new Array<string>(2), { 0: 'read' })],
+      ['a leading hole', Object.assign(new Array<string>(2), { 1: 'read' })],
+      ['an interior hole', Object.assign(new Array<string>(3), { 0: 'read', 2: 'write' })],
+      ['only holes', new Array<string>(2)],
+      ['an undefined element', ['read', undefined] as unknown as string[]],
+      ['a non-string element', ['read', 42] as unknown as string[]],
+      ['a Set instead of an array', new Set(['read']) as unknown as string[]],
+      ['a string instead of an array', 'read' as unknown as string[]],
     ])('rejects a scope with %s before making any request', async (_, scope) => {
       const requested = recordRequests();
 
@@ -595,6 +618,7 @@ describe('OAuthApplications', () => {
     it.each([
       ['no scope parameter for an empty scope list', [], null],
       ['scope tokens at the edges of the allowed character ranges', ['!', '#', '[', ']', '~'], '! # [ ] ~'],
+      ['scope tokens that resemble non-string values', ['undefined', 'null', '42'], 'undefined null 42'],
     ])('sends %s', async (_, scope, expected) => {
       let body: URLSearchParams | undefined;
       server.use(
