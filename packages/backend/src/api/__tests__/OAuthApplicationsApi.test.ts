@@ -540,6 +540,9 @@ describe('OAuthApplications', () => {
       ['has a leading control character', '\u0000https://a.example'],
       ['has no authority', 'https:a.example'],
       ['hides a host behind a backslash', 'http://localhost\\@evil.example/'],
+      ['uses plain http for a decimal loopback address', 'http://2130706433/'],
+      ['uses plain http for a shorthand hex loopback address', 'http://0x7f.1/'],
+      ['uses plain http for a percent-encoded localhost', 'http://%6c%6fcalhost/'],
     ])('rejects a resource that %s before making any request', async (_, resource) => {
       const requested = recordRequests();
 
@@ -561,6 +564,8 @@ describe('OAuthApplications', () => {
       ['an http resource on localhost', 'http://localhost:3000'],
       ['an http resource on 127.0.0.1', 'http://127.0.0.1:8080/api'],
       ['an http resource on [::1]', 'http://[::1]:8080'],
+      ['an http resource on an uppercase localhost', 'HTTP://LOCALHOST:3000/api'],
+      ['an http resource on localhost with userinfo', 'http://user:pass@localhost/api?next=/a'],
       ['an https resource on an IPv6 host', 'https://[2001:db8::1]:443/api?tenant=a'],
       ['an https resource with encoded brackets', 'https://a.example/%5B%5D?value=%5b%5d'],
       ['an https resource with path and query delimiters', 'https://a.example/a:b@c?value=/a?b'],
