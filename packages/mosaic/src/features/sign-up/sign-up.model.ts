@@ -71,6 +71,7 @@ export interface SignUpFlowModel {
   actionBlocked?: AuthActionBlockedDetails;
   afterSignUpUrl: string;
   ticket: string | undefined;
+  inTicketSignUp: boolean;
   redeemTicket: () => Promise<{ step: SignUpNextStep; emailAddress: string }>;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
@@ -313,7 +314,7 @@ export function useSignUpModel({
     showOptionalFields || required || (canSwitchIdentifier && (name === 'emailAddress' || name === 'phoneNumber'));
 
   const ticket = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || undefined;
-  const inTicketSignUp = Boolean(ticket && signUp.id);
+  const inTicketSignUp = signUp.verifications.emailAddress.strategy === 'ticket';
   const forgetTicket = () => {
     removeClerkQueryParam('__clerk_ticket');
     removeClerkQueryParam('__clerk_invitation_token');
@@ -384,6 +385,7 @@ export function useSignUpModel({
         : undefined,
       afterSignUpUrl: clerk.buildAfterSignUpUrl(),
       ticket,
+      inTicketSignUp,
       redeemTicket: async () => {
         const { error } = await signUp.ticket({ ticket: ticket ?? '', unsafeMetadata });
         if (error) {
@@ -419,7 +421,10 @@ export function useSignUpModel({
           }),
         );
       },
-      reset: () => run(() => signUp.reset()),
+      reset: () => {
+        forgetTicket();
+        return run(() => signUp.reset());
+      },
     },
     app: {
       applicationName: displayConfig.applicationName,
