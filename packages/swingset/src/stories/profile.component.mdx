@@ -126,9 +126,11 @@ phone's viewport as well.
 
 ## Sub-pages
 
-A page opens a sub-page with `Flow`, one step per screen. The sub-page's `Panel.Title` takes `back`
-(`{ label, onClick }`), which makes the whole title a back button: its name is `label`, then the
-title. On compact layouts it replaces the navigation trigger, so the menu returns with the page.
+Give a page's `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap each of
+its views in a `Profile.SubPage`, with `value={null}` for the page itself. A sub-page's
+`Panel.Title` gets a small back button above it, named "Back to" the page's `label`. On compact
+layouts a sub-page's title doesn't open the navigation; the page's title does again once you go
+back.
 
 <Story
   name='SubPages'
