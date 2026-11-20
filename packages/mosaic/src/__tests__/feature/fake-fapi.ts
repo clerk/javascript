@@ -27,6 +27,11 @@ import { setupWorker } from 'msw/browser';
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { organizationMemberHandlers } from './fake-fapi/organization-members';
+import {
+  createSSOBypassState,
+  type FakeSSOBypassState,
+  organizationSecurityHandlers,
+} from './fake-fapi/organization-security';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
 import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
 import {
@@ -83,6 +88,7 @@ export interface FakeFapiState {
   waitlistEntries: string[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
+  ssoBypass: FakeSSOBypassState;
   mfa: FakeMfaState;
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
@@ -99,9 +105,10 @@ export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
   tokenIssuedAt?: number;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking' | 'ssoBypass'>> & {
   verification?: FakeVerificationSeed;
   enterpriseLinking?: Partial<FakeEnterpriseLinking>;
+  ssoBypass?: Partial<FakeSSOBypassState>;
   passkeys?: FakePasskeysSeed;
 };
 
@@ -310,7 +317,7 @@ export function verifyEmailOutOfBand(state: FakeFapiState, id: string): void {
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, enterpriseLinking, passkeys, ...rest } = seed;
+  const { verification, enterpriseLinking, passkeys, ssoBypass, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -330,6 +337,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     mfa: createMfaState(),
     ...rest,
     verification: createVerificationState(verification),
+    ssoBypass: createSSOBypassState(ssoBypass),
     enterpriseLinking: {
       enabled: false,
       preparations: {},
@@ -344,6 +352,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     ...organizationMemberHandlers(state, fapiUrl),
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
+    ...organizationSecurityHandlers(state, fapiUrl),
     ...passkeyHandlers(state, fapiUrl, passkeys),
     ...mfaHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () =>

@@ -219,6 +219,18 @@ import {
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
 import {
+  AllowList as OrganizationProfileSecurityPanelAllowList,
+  AllowListLoadError as OrganizationProfileSecurityPanelAllowListLoadError,
+  AllowListLoading as OrganizationProfileSecurityPanelAllowListLoading,
+  ConnectionsError as OrganizationProfileSecurityPanelConnectionsError,
+  Default as OrganizationProfileSecurityPanelDefault,
+  EmptyAllowList as OrganizationProfileSecurityPanelEmptyAllowList,
+  Loading as OrganizationProfileSecurityPanelLoading,
+  meta as organizationProfileSecurityPanelMeta,
+  NoSections as OrganizationProfileSecurityPanelNoSections,
+  RemoveFails as OrganizationProfileSecurityPanelRemoveFails,
+} from '../stories/organization-profile-security-panel.stories';
+import {
   Default as OrganizationSwitcherDefault,
   meta as organizationSwitcherMeta,
   NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
@@ -1440,6 +1452,19 @@ const organizationProfileMembersPanelModule: StoryModule = {
   Empty: OrganizationProfileMembersPanelEmpty,
 };
 
+const organizationProfileSecurityPanelModule: StoryModule = {
+  meta: organizationProfileSecurityPanelMeta,
+  Default: OrganizationProfileSecurityPanelDefault,
+  Loading: OrganizationProfileSecurityPanelLoading,
+  NoSections: OrganizationProfileSecurityPanelNoSections,
+  ConnectionsError: OrganizationProfileSecurityPanelConnectionsError,
+  AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
+  AllowList: OrganizationProfileSecurityPanelAllowList,
+  EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,
+  RemoveFails: OrganizationProfileSecurityPanelRemoveFails,
+  AllowListLoading: OrganizationProfileSecurityPanelAllowListLoading,
+};
+
 export const registry: StoryModule[] = [
   // Switcher
   switcherModule,
@@ -1473,6 +1498,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
