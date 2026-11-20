@@ -19,6 +19,10 @@ import type { WithSign } from './util-types';
 
 const basePath = '/users';
 
+type ExternalAccountFilter =
+  | { provider: string; providerUserId: string[] }
+  | { provider?: undefined; providerUserId?: undefined };
+
 /** @generateWithEmptyComment */
 export type UserCountParams = {
   /** Counts users with emails that match the given query, via case-insensitive partial match. For example, `emailAddress=hello` will match a user with the email `HELLO@example.com`. Accepts up to 100 email addresses. */
@@ -35,7 +39,30 @@ export type UserCountParams = {
   userId?: string[];
   /** Counts users with the specified external IDs. Accepts up to 100 external IDs. */
   externalId?: string[];
-};
+  /**
+   * @deprecated Use `lastActiveAtAfter` instead. This parameter will be removed in a future version.
+   */
+  last_active_at_since?: number;
+  /** Filters users who were last active before the given date (with millisecond precision). */
+  lastActiveAtBefore?: number;
+  /** Filters users who were last active after the given date (with millisecond precision). */
+  lastActiveAtAfter?: number;
+  /** Filters users who were created before the given date (with millisecond precision). */
+  createdAtBefore?: number;
+  /** Filters users who were created after the given date (with millisecond precision). */
+  createdAtAfter?: number;
+  /** Filters users who were last signed in after the given date (with millisecond precision). */
+  lastSignInAtAfter?: number;
+  /** Filters users who were last signed in before the given date (with millisecond precision). */
+  lastSignInAtBefore?: number;
+  /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
+  organizationId?: string[];
+  emailAddressQuery?: string;
+  phoneNumberQuery?: string;
+  usernameQuery?: string;
+  nameQuery?: string;
+  banned?: boolean;
+} & ExternalAccountFilter;
 
 /** @generateWithEmptyComment */
 export type UserListParams = ClerkPaginationRequest<{
@@ -89,7 +116,7 @@ export type UserListParams = ClerkPaginationRequest<{
   lastSignInAtBefore?: number;
   /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
   organizationId?: string[];
-}>;
+} & ExternalAccountFilter>;
 
 /** @inline */
 export type UserMetadataParams = {
