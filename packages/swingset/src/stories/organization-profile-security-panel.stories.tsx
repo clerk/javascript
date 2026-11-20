@@ -1,8 +1,8 @@
 import type { StoryMeta } from '@/lib/types';
 
 import {
-  SecurityPanelExample,
   SecurityPanelConnectionsErrorExample,
+  SecurityPanelExample,
   SecurityPanelNoSectionsExample,
   SSOBypassAllowlistExample,
 } from './fixtures/organization-profile-security-panel';

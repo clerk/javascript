@@ -1,8 +1,8 @@
 import { __internal_useOrganizationEnterpriseConnections } from '@clerk/shared/react';
 
 import type { SecurityCapabilities } from './organization-profile-security-panel-access.model';
-import { useConnectionsStatus } from './organization-profile-security-panel-access.model';
 import { useSSOBypassAvailabilityModel } from './sso-bypass.model';
+import { useConnectionsStatus } from './use-connections-status';
 
 export interface SecurityPanelModel {
   isLoading: boolean;

@@ -1,8 +1,8 @@
 import { __internal_useOrganizationEnterpriseConnections, useOrganization, useSession } from '@clerk/shared/react';
-import { useState } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import { useConnectionsStatus } from './use-connections-status';
 
 export interface SecurityCapabilities {
   canConfigureSso: boolean;
@@ -14,28 +14,6 @@ export type SecurityPanelAccessModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | ({ status: 'ready' } & SecurityCapabilities);
-
-export interface ConnectionsStatus {
-  isLoading: boolean;
-  isError: boolean;
-}
-
-export function useConnectionsStatus(connections: {
-  data: unknown[] | undefined;
-  error: Error | null;
-  isLoading: boolean;
-}): ConnectionsStatus {
-  const [failed, setFailed] = useState(false);
-  const isFailing = Boolean(connections.error) && !connections.data;
-  if (isFailing && !failed) {
-    setFailed(true);
-  }
-  if (connections.data && failed) {
-    setFailed(false);
-  }
-  const isError = isFailing || (failed && !connections.data);
-  return { isLoading: connections.isLoading && !isError, isError };
-}
 
 export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
   const { isLoaded, organization } = useOrganization();
