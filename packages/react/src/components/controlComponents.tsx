@@ -198,7 +198,7 @@ export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
     React.useEffect(() => {
-      void clerk.handleRedirectCallback(handleRedirectCallbackParams);
+      clerk.handleRedirectCallback(handleRedirectCallbackParams).catch(() => {});
     }, []);
 
     return null;
