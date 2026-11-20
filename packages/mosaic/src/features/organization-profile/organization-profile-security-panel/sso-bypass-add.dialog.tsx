@@ -177,6 +177,7 @@ function SSOBypassAddFormStep({
         <SubmitButton
           form={form.id}
           isPending={form.isSubmitting}
+          pendingLabel={m.submitting}
           disabled={!form.canSubmit}
           focusableWhenDisabled
         >

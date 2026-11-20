@@ -189,6 +189,14 @@ export function useSSOBypassFixture({
             code: 'sso_bypass_already_added',
           });
         }
+        if (member.outsideConnection) {
+          throw new ClerkRuntimeError(
+            'This member could not be added because their email address is not served by a connection.',
+            {
+              code: 'sso_bypass_domain_not_served',
+            },
+          );
+        }
         setUserIds(current => [...current, member.userId]);
       }, ['emailAddress']);
       return { mode: 'email', added: 1, skipped: 0, skipReason: 'unknown' };
