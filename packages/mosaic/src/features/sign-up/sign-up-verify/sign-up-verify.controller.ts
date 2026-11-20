@@ -58,7 +58,10 @@ const codeMachine = code.createMachine({
           onDone: { target: 'sent', actions: startCooldown },
           onError: {
             target: 'sent',
-            actions: code.assign<ErrorInvokeEvent>((_, event) => ({ error: toLocalizableError(event.error) })),
+            actions: code.assign<ErrorInvokeEvent>((_, event) => ({
+              error: toLocalizableError(event.error),
+              resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS),
+            })),
           },
         },
       ),
@@ -96,7 +99,8 @@ export function useSignUpVerifyController({
     send({ type: needsCode ? 'SEND' : 'ALREADY_SENT' });
   }, [needsCode, send]);
 
-  const isPending = actions.isPending || isFlowPending;
+  const isSwitchingToSms = snapshot.value === 'sending' && snapshot.context.channel === 'sms';
+  const isPending = actions.isPending || isFlowPending || isSwitchingToSms;
   const submit = (submitted: string) =>
     void actions.run('code', async () => onNext(await verification.verify(submitted)));
 
@@ -109,8 +113,16 @@ export function useSignUpVerifyController({
     canEditIdentifier: !isPending && snapshot.value !== 'sending',
     errorMessage: actions.error,
     globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
-    onResend: () => send({ type: 'RESEND' }),
-    onSendSms: verification.provider ? () => send({ type: 'SEND_SMS' }) : undefined,
+    onResend: () => {
+      setValue('');
+      send({ type: 'RESEND' });
+    },
+    onSendSms: verification.provider
+      ? () => {
+          setValue('');
+          send({ type: 'SEND_SMS' });
+        }
+      : undefined,
     canResend: snapshot.value === 'sent' && resendSeconds === 0 && !isPending,
     resendRemainingSeconds: resendSeconds || undefined,
   };
