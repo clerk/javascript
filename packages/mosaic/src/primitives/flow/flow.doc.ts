@@ -5,7 +5,7 @@ import type { FlowStepProps } from './flow-step';
 export default {
   name: 'Flow',
   description:
-    'Headless, unstyled viewport that shows one step of a multi-step flow at a time, keeping the outgoing step mounted, inert and `aria-hidden` until its exit transition ends. Measures the active step into `--cl-flow-step-height` on the root. `useFlowAutoFocus` marks what a step focuses when it enters, and `useFlowStepActive` is `false` inside an exiting step.',
+    'Headless, unstyled viewport that shows one step of a multi-step flow at a time, keeping the outgoing step mounted, inert and `aria-hidden` until its exit transition ends. Measures the active step into `--cl-flow-step-height` on the root. `Flow.useFlowAutoFocus` marks what a step focuses when it enters, and `Flow.useFlowStepActive` is `false` inside an exiting step.',
   useFor: [
     'the base for a styled component that swaps screens on one surface',
     'focusing a field when a step of a multi-step flow enters',
@@ -21,7 +21,7 @@ export default {
       do: true,
       text: 'List every controller state a screen covers in one `Flow.Step` `ids`, such as its pending and error states, so moving between them does not transition.',
     },
-    { do: true, text: 'Attach `useFlowAutoFocus()` to the field a step should focus when it enters.' },
+    { do: true, text: 'Attach `Flow.useFlowAutoFocus()` to the field a step should focus when it enters.' },
     {
       do: true,
       text: 'Style `Flow.Root` with `overflow: clip`, not `hidden`, so focusing a sliding step cannot scroll it.',
@@ -67,4 +67,8 @@ export default {
 `,
     },
   ],
+  exports: {
+    'Flow.useFlowAutoFocus': { description: 'Returns a ref for the element a step focuses when it enters.' },
+    'Flow.useFlowStepActive': { description: 'Returns `false` inside a step that is exiting.' },
+  },
 } satisfies ComponentDoc<{ 'Flow.Root': FlowRootProps; 'Flow.Step': FlowStepProps }>;

@@ -1,5 +1,3 @@
-'use client';
-
 /** A floating box anchored to a trigger. */
 export * as Popover from './popover.parts';
 export type {

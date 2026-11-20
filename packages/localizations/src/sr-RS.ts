@@ -1103,6 +1103,10 @@ export const srRS: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1575,12 +1579,14 @@ export const srRS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lista svih naloga',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
+    membershipListLabel: 'Lista svih članstava u organizacijama',
     notSelected: 'Organizacija nije izabrana',
     personalWorkspace: 'Lični nalog',
     suggestionsAcceptedLabel: 'Čeka odobrenje',

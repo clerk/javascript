@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
  * once its source loads; `Avatar.Fallback` holds the space until then, as a blank

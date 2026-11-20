@@ -8,6 +8,7 @@ import type {
 import {
   AuthStatus,
   constants,
+  createDebug,
   getAuthObjectForAcceptedToken,
   getAuthObjectFromJwt,
   invalidTokenAuthObject,
@@ -168,7 +169,7 @@ const handleMachineToken = (
     const authObject = getAuthObjectForAcceptedToken({
       authObject: {
         ...rawAuthObject,
-        debug: () => options,
+        debug: createDebug(options),
       },
       acceptsToken,
     });

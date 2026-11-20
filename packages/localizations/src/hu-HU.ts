@@ -1111,6 +1111,10 @@ export const huHU: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1586,12 +1590,14 @@ export const huHU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Az összes fiók listája',
     action__closeOrganizationSwitcher: 'Szervezetváltó bezárása',
     action__createOrganization: 'Szervezet létrehozása',
     action__invitationAccept: 'Csatlakozás',
     action__manageOrganization: 'Kezelés',
     action__openOrganizationSwitcher: 'Szervezetváltó megnyitása',
     action__suggestionsAccept: 'Csatlakozás kérése',
+    membershipListLabel: 'Az összes szervezeti tagság listája',
     notSelected: 'Nincs szervezet kiválasztva',
     personalWorkspace: 'Személyes fiók',
     suggestionsAcceptedLabel: 'Elfogadásra vár',

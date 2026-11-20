@@ -39,4 +39,7 @@ export default {
 `,
     },
   ],
+  exports: {
+    TextContext: { description: 'Supplies default props to every `Text` below it.' },
+  },
 } satisfies ComponentDoc<{ Text: TextProps }>;

@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * A page of content. `Panel.Sections` sit one heading level below `Panel.Title`.
  *
@@ -13,5 +11,4 @@
  * ```
  */
 export * as Panel from './panel.parts';
-export { usePanelTitle } from './panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from './panel';

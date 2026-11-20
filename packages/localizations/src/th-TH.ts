@@ -1106,6 +1106,10 @@ export const thTH: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1576,12 +1580,14 @@ export const thTH: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'รายการบัญชีทั้งหมด',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'สร้างองค์กร',
     action__invitationAccept: 'เข้าร่วม',
     action__manageOrganization: 'จัดการ',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'ขอเข้าร่วม',
+    membershipListLabel: 'รายการการเป็นสมาชิกองค์กรทั้งหมด',
     notSelected: 'ไม่ได้เลือกองค์กร',
     personalWorkspace: 'บัญชีส่วนตัว',
     suggestionsAcceptedLabel: 'รออนุมัติ',

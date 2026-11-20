@@ -3,13 +3,13 @@ import type { Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
 import type { IconProps } from '../../components/icon';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { ChevronRight } from '../../icons/glyphs/chevron-right';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { rtl } from '../../styles/rtl.styles';
 import { styles } from './verification.styles';
 

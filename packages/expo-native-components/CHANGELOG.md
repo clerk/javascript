@@ -1,5 +1,11 @@
 # @clerk/expo-native-components
 
+## 0.4.6
+
+### Patch Changes
+
+- Fix a custom page in the Android `UserProfileView` closing right after it opens when the profile was shown before the native SDK finished picking up the signed-in session. ([#10899](https://github.com/clerk/javascript/pull/10899)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.4.5
 
 ### Patch Changes

@@ -1107,6 +1107,10 @@ export const ruRU: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1583,12 +1587,14 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Список всех учётных записей',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
+    membershipListLabel: 'Список всех членств в организациях',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
     suggestionsAcceptedLabel: 'Ожидает одобрения',

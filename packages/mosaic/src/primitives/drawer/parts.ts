@@ -8,3 +8,5 @@ export { type DrawerHandleProps, DrawerHandleGrip as Handle } from './drawer-han
 export { type DrawerTitleProps, DrawerTitle as Title } from './drawer-title';
 export { type DrawerDescriptionProps, DrawerDescription as Description } from './drawer-description';
 export { type DrawerCloseProps, DrawerClose as Close } from './drawer-close';
+export { createDrawerHandle } from './drawer-handle';
+export { registerDrawerCssVars } from './css-vars';

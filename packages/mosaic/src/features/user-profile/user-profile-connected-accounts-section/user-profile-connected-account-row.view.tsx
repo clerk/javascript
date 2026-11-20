@@ -63,11 +63,7 @@ export function UserProfileConnectProviderRowView({
             onClick={() => onConnect(provider.id)}
           >
             {m.connect}
-            <Icon
-              glyph={ArrowUpRight}
-              placement='inline-end'
-              size='md'
-            />
+            <Icon glyph={ArrowUpRight} />
           </SubmitButton>
         </Section.Actions>
       </Section.Item>

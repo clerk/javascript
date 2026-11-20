@@ -40,8 +40,21 @@ export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
   client_id: string;
   state: string;
   redirect_domain: string | null;
+  client_registration?: OAuthClientRegistration;
+  client_metadata_host?: string | null;
   scopes: OAuthConsentScopeJSON[];
 }
+
+/**
+ * How an OAuth client's identity was established.
+ *
+ * - `preregistered`: created by the instance admin.
+ * - `dynamic`: registered itself through Dynamic Client Registration, so its name and logo are self-asserted.
+ * - `metadata_document`: identified by a Client ID Metadata Document URL, see `clientMetadataHost`.
+ *
+ * @inline
+ */
+export type OAuthClientRegistration = 'preregistered' | 'dynamic' | 'metadata_document';
 
 /**
  * A single OAuth scope with its description and whether it requires consent.
@@ -95,6 +108,14 @@ export type OAuthConsentInfo = {
    * or when it points to an IP address or localhost.
    */
   redirectDomain: string | null;
+  /**
+   * How the client's identity was established. Undefined when the backend does not report it.
+   */
+  clientRegistration?: OAuthClientRegistration;
+  /**
+   * The host that serves the client's Client ID Metadata Document. Null unless `clientRegistration` is `metadata_document`.
+   */
+  clientMetadataHost?: string | null;
   /**
    * A list of scopes the application is requesting, with descriptions and consent requirements.
    */

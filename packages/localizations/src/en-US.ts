@@ -1141,6 +1141,10 @@ export const enUS: LocalizationResource = {
   oauthConsent: {
     action__allow: 'Allow',
     action__deny: 'Deny',
+    clientIdentity: {
+      dynamic: '{{applicationName}} registered itself, so its name and logo are not verified.',
+      metadataDocument: 'Details published by {{metadataHost}}.',
+    },
     offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
     redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
     redirectUriModal: {
@@ -1621,12 +1625,14 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'List of all accounts',
     action__closeOrganizationSwitcher: 'Close organization switcher',
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
     action__openOrganizationSwitcher: 'Open organization switcher',
     action__suggestionsAccept: 'Request to join',
+    membershipListLabel: 'List of all organization memberships',
     notSelected: 'No organization selected',
     personalWorkspace: 'Personal account',
     suggestionsAcceptedLabel: 'Pending approval',

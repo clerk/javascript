@@ -1104,6 +1104,10 @@ export const bgBG: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1577,12 +1581,14 @@ export const bgBG: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Списък с всички акаунти',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Създаване на организация',
     action__invitationAccept: 'Присъединяване',
     action__manageOrganization: 'Управление',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Заявка за присъединяване',
+    membershipListLabel: 'Списък с всички членства в организации',
     notSelected: 'Няма избрана организация',
     personalWorkspace: 'Личен акаунт',
     suggestionsAcceptedLabel: 'Чакащо одобрение',

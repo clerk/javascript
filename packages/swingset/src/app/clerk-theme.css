@@ -1,0 +1,75 @@
+html[data-swingset-theme='clerk'] {
+  --clerk-main: light-dark(#ffffff, #1b1b1f);
+  --clerk-separator: light-dark(#ececee, #232328);
+  --clerk-brand: light-dark(#6c47ff, #846bff);
+
+  --cl-font-family-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --cl-color-neutral: light-dark(#767684, #ffffff);
+  --cl-color-neutral-alpha-100: light-dark(rgb(118 118 132 / 0.04), rgb(255 255 255 / 0.04));
+  --cl-color-neutral-alpha-200: light-dark(rgb(118 118 132 / 0.08), rgb(255 255 255 / 0.08));
+  --cl-color-neutral-alpha-300: light-dark(rgb(118 118 132 / 0.16), rgb(255 255 255 / 0.12));
+  --cl-color-neutral-subtle: light-dark(rgb(118 118 132 / 0.04), rgb(118 118 132 / 0.24));
+
+  --cl-color-page: var(--clerk-main);
+  --cl-color-surface: var(--clerk-main);
+  --cl-color-surface-subtle: light-dark(#fafafb, #232328);
+  --cl-color-foreground: light-dark(#2b2b34, #f6f6f7);
+  --cl-color-foreground-secondary: light-dark(#5f5f6f, #adadb7);
+  --cl-color-foreground-disabled: light-dark(#adadb7, #5f5f6f);
+  --cl-color-border: var(--clerk-separator);
+  --cl-color-border-subtle: var(--clerk-separator);
+  --cl-color-input: light-dark(#ffffff, #33333e);
+  --cl-color-input-placeholder: light-dark(#adadb7, #767684);
+  --cl-color-ring: var(--clerk-brand);
+
+  --cl-color-brand: var(--clerk-brand);
+  --cl-color-brand-foreground: #ffffff;
+  --cl-color-brand-subtle: light-dark(rgb(108 71 255 / 0.04), rgb(108 71 255 / 0.24));
+  --cl-color-brand-border: rgb(108 71 255 / 0.16);
+
+  --cl-color-negative: light-dark(#e02e2e, #f73d3d);
+  --cl-color-negative-subtle: light-dark(rgb(224 46 46 / 0.04), rgb(224 46 46 / 0.24));
+  --cl-color-negative-border: rgb(224 46 46 / 0.16);
+
+  --cl-color-positive: light-dark(#15892b, #31c854);
+  --cl-color-positive-foreground: #ffffff;
+  --cl-color-positive-subtle: light-dark(rgb(21 137 43 / 0.04), rgb(21 137 43 / 0.16));
+  --cl-color-positive-border: rgb(21 137 43 / 0.16);
+
+  --cl-color-warning: #fd7224;
+  --cl-color-warning-foreground: #ffffff;
+  --cl-color-warning-subtle: light-dark(rgb(195 84 15 / 0.04), rgb(195 84 15 / 0.24));
+  --cl-color-warning-border: rgb(195 84 15 / 0.16);
+
+  --cl-radius-2xl: 1rem;
+
+  --cl-text-base-leading: calc(1.375 / 1);
+  --cl-text-lg-size: 1.0625rem;
+  --cl-text-lg-leading: calc(1.5 / 1.0625);
+
+  --cl-font-semibold: 500;
+  --cl-font-bold: 500;
+
+  --cl-duration-fast: 0.12s;
+  --cl-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --cl-focus-outline-offset: 3px;
+
+  --cl-scrollbar-width: 6px;
+  --cl-scrollbar-thumb: light-dark(#c7c7cf, #5f5f6f);
+  --cl-scrollbar-thumb-idle: light-dark(#c7c7cf, #5f5f6f);
+
+  --cl-shadow-sm:
+    0 1px 0 -1px rgb(0 0 0 / 0.02), 0 1px 1px -0.5px rgb(0 0 0 / 0.02), 0 0 2px 0 rgb(0 0 0 / 0.02),
+    0 1px 2px 0 rgb(0 0 0 / 0.02);
+  --cl-shadow-md:
+    0 0 0 1px light-dark(rgb(25 28 33 / 0.08), rgb(17 17 19 / 0.32)),
+    inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.04)), 0 16px 36px -6px rgb(0 0 0 / 0.07),
+    0 6px 16px -2px rgb(0 0 0 / 0.2);
+  --cl-shadow-lg:
+    0 0 0 1px light-dark(rgb(25 28 33 / 0.04), rgb(0 0 0 / 0.2)),
+    inset 0 0 1px 1px light-dark(transparent, rgb(255 255 255 / 0.01)),
+    0 1px 2px 0 light-dark(rgb(25 28 33 / 0.06), transparent), 0 1px 3px 0 light-dark(transparent, rgb(0 0 0 / 0.4)),
+    0 0 2px 0 light-dark(rgb(0 0 0 / 0.08), transparent), 0 0 3px 0 light-dark(transparent, rgb(0 0 0 / 0.2));
+}

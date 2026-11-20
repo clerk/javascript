@@ -1,0 +1,41 @@
+{
+  "name": "@clerk/mosaic-docs",
+  "version": "0.0.3",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm generate && next build",
+    "dev": "pnpm generate && next dev --port 6021",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "generate": "node scripts/generate-docs.mjs",
+    "lint": "oxlint -c ../../oxlint.config.mjs src scripts",
+    "test": "node --test 'scripts/*.test.mjs' 'src/**/*.test.ts'",
+    "typecheck": "pnpm generate && next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@clerk/mosaic": "workspace:*",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.4.3",
+    "estree-util-value-to-estree": "^3.5.0",
+    "github-slugger": "^2.0.0",
+    "mdast-util-to-string": "^4.0.0",
+    "next": "^16.4.3",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "shiki": "^4.1.0",
+    "unist-util-visit": "^5.2.0"
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "^3.1.1",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/mdast": "^4.0.4",
+    "@types/mdx": "^2.0.14",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "tailwindcss": "^4.3.0",
+    "typescript": "catalog:repo"
+  }
+}

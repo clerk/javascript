@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+@import '@clerk/mosaic/styles.css' layer(mosaic);
+@import '../ui/styles.css';
+@plugin '@tailwindcss/typography';
+
+:root {
+  --docs-font-body:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}

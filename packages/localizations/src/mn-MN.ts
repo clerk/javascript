@@ -1104,6 +1104,10 @@ export const mnMN: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1578,12 +1582,14 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Бүх бүртгэлийн жагсаалт',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
+    membershipListLabel: 'Бүх байгууллагын гишүүнчлэлийн жагсаалт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
     suggestionsAcceptedLabel: 'Зөвшөөрөл хүлээгдэж байна',

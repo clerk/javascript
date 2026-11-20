@@ -1222,7 +1222,7 @@ describe('Session', () => {
 
     it('dispatches token:update event on touch', async () => {
       const mockToken = { object: 'token', jwt: mockJwt };
-      const session = new Session({
+      const sessionJSON = {
         status: 'active',
         id: 'session_1',
         object: 'session',
@@ -1232,10 +1232,12 @@ describe('Session', () => {
         created_at: new Date().getTime(),
         updated_at: new Date().getTime(),
         last_active_token: mockToken,
-      } as SessionJSON);
+      } as SessionJSON;
+      const session = new Session(sessionJSON);
 
       (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
-        payload: session,
+        payload: { response: sessionJSON },
+        status: 200,
       });
 
       await session.touch();
@@ -1275,6 +1277,199 @@ describe('Session', () => {
         }),
         expect.anything(),
       );
+    });
+
+    describe('with a client write in flight', () => {
+      const sessionJSON = (orgId: string) =>
+        ({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: orgId,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+          last_active_token: { object: 'token', jwt: mockJwt },
+        }) as SessionJSON;
+
+      const clientJSON = (id: string, sessions: SessionJSON[]) => ({
+        object: 'client',
+        id,
+        sessions,
+        sign_up: null,
+        sign_in: null,
+        last_active_session_id: sessions[0]?.id ?? null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      });
+
+      let updateClient: Mock;
+      let requestSpy: Mock;
+
+      beforeEach(() => {
+        updateClient = vi.fn();
+        BaseResource.clerk = clerkMock({ updateClient } as any);
+        requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+        Client.clearInstance();
+      });
+
+      afterEach(() => {
+        Client.clearInstance();
+      });
+
+      const respondAfterNewerWrite = (payload: Record<string, unknown>, status = 200) => {
+        requestSpy.mockImplementation(() => {
+          Client.getOrCreateInstance().fromJSON(clientJSON('client_newer', []) as any);
+          return Promise.resolve({ payload, status });
+        });
+      };
+
+      it('applies a focus touch without a client', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        requestSpy.mockResolvedValue({ payload: { response: sessionJSON('org_after') }, status: 200 });
+
+        await session.touch({ intent: 'focus' });
+
+        expect(session.lastActiveOrganizationId).toBe('org_after');
+        expect(updateClient).not.toHaveBeenCalled();
+        expect(dispatchSpy).toHaveBeenCalledWith('token:update', { token: session.lastActiveToken });
+      });
+
+      it('applies the client of a focus touch when nothing was written in flight', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        requestSpy.mockResolvedValue({
+          payload: {
+            response: sessionJSON('org_after'),
+            client: clientJSON('client_touch', [sessionJSON('org_after')]),
+          },
+          status: 200,
+        });
+
+        await session.touch({ intent: 'focus' });
+
+        expect(updateClient).toHaveBeenCalledTimes(1);
+        expect(updateClient).toHaveBeenCalledWith(Client.getOrCreateInstance());
+        expect(Client.getOrCreateInstance().id).toBe('client_touch');
+        expect(session.lastActiveOrganizationId).toBe('org_after');
+        expect(dispatchSpy).toHaveBeenCalledWith('token:update', { token: session.lastActiveToken });
+      });
+
+      it('discards a focus touch response when the client was written in flight', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        respondAfterNewerWrite({
+          response: sessionJSON('org_older'),
+          client: clientJSON('client_older', [sessionJSON('org_older')]),
+        });
+
+        await session.touch({ intent: 'focus' });
+
+        const client = Client.getOrCreateInstance();
+        expect(client.id).toBe('client_newer');
+        expect(client.sessions).toEqual([]);
+        expect(session.lastActiveOrganizationId).toBe('org_before');
+        expect(updateClient).not.toHaveBeenCalled();
+        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
+      });
+
+      it('does not emit a token for a discarded focus touch without a client', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        respondAfterNewerWrite({ response: sessionJSON('org_older') });
+
+        await session.touch({ intent: 'focus' });
+
+        expect(session.lastActiveOrganizationId).toBe('org_before');
+        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
+      });
+
+      it.each([{ intent: 'select_org' as const }, {}])('applies a touch with %o despite the write', async params => {
+        const session = new Session(sessionJSON('org_before'));
+        respondAfterNewerWrite({
+          response: sessionJSON('org_after'),
+          client: clientJSON('client_touch', [sessionJSON('org_after')]),
+        });
+
+        await session.touch(params);
+
+        expect(Client.getOrCreateInstance().id).toBe('client_touch');
+        expect(updateClient).toHaveBeenCalledTimes(1);
+        expect(session.lastActiveOrganizationId).toBe('org_after');
+        expect(dispatchSpy).toHaveBeenCalledWith('token:update', { token: session.lastActiveToken });
+      });
+
+      it('keeps the organization setActive set during a focus touch', async () => {
+        const session = new Session(sessionJSON('org_a'));
+        BaseResource.clerk = clerkMock({ updateClient, session } as any);
+        (BaseResource.clerk.getFapiClient().request as Mock).mockImplementation(() => {
+          session.lastActiveOrganizationId = 'org_b';
+          return Promise.resolve({
+            payload: { response: sessionJSON('org_a'), client: clientJSON('client_touch', [sessionJSON('org_a')]) },
+            status: 200,
+          });
+        });
+
+        await session.touch({ intent: 'focus' });
+
+        expect(session.lastActiveOrganizationId).toBe('org_b');
+        expect(updateClient).not.toHaveBeenCalled();
+        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
+      });
+
+      it('does not emit a token for a focus touch after a local sign-out', async () => {
+        const session = new Session(sessionJSON('org_a'));
+        BaseResource.clerk = clerkMock({ updateClient, session } as any);
+        (BaseResource.clerk.getFapiClient().request as Mock).mockImplementation(() => {
+          BaseResource.clerk.session = undefined;
+          return Promise.resolve({ payload: { response: sessionJSON('org_a') }, status: 200 });
+        });
+
+        await session.touch({ intent: 'focus' });
+
+        expect(dispatchSpy).not.toHaveBeenCalledWith('token:update', expect.anything());
+      });
+
+      it('never discards __internal_touch with select_org', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        respondAfterNewerWrite({
+          response: sessionJSON('org_after'),
+          client: clientJSON('client_touch', [sessionJSON('org_after')]),
+        });
+
+        const client = await session.__internal_touch({ intent: 'select_org' });
+
+        expect(client?.id).toBe('client_touch');
+        expect(session.lastActiveOrganizationId).toBe('org_after');
+      });
+
+      it('throws a discarded focus touch error without applying its client', async () => {
+        const session = new Session(sessionJSON('org_before'));
+        respondAfterNewerWrite(
+          {
+            errors: [{ code: 'form_param_invalid', long_message: 'Invalid' }],
+            meta: { client: clientJSON('client_error', []) },
+          },
+          422,
+        );
+
+        await expect(session.touch({ intent: 'focus' })).rejects.toThrow('Invalid');
+
+        expect(Client.getOrCreateInstance().id).toBe('client_newer');
+        expect(updateClient).not.toHaveBeenCalled();
+      });
+
+      it('handles an unauthenticated focus touch', async () => {
+        const handleUnauthenticated = vi.fn();
+        BaseResource.clerk = clerkMock({ updateClient, handleUnauthenticated } as any);
+        (BaseResource.clerk.getFapiClient().request as Mock).mockResolvedValue({
+          payload: { errors: [{ code: 'authentication_invalid', long_message: 'Unauthenticated' }] },
+          status: 401,
+        });
+        const session = new Session(sessionJSON('org_before'));
+
+        await expect(session.touch({ intent: 'focus' })).rejects.toThrow('Unauthenticated');
+
+        expect(handleUnauthenticated).toHaveBeenCalled();
+      });
     });
   });
 
@@ -1620,6 +1815,24 @@ describe('Session', () => {
         }),
         expect.anything(),
       );
+    });
+
+    it('does not ask for the client on the touch request', async () => {
+      const session = new Session(mockSessionData);
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+
+      requestSpy.mockResolvedValue({
+        payload: { response: mockSessionData },
+        status: 200,
+      });
+
+      await session.__internal_touch();
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'POST', path: '/client/sessions/session_1/touch' }),
+        expect.anything(),
+      );
+      expect(requestSpy.mock.calls[0][0].search).toBeUndefined();
     });
   });
 

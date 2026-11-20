@@ -1101,6 +1101,10 @@ export const zhCN: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1566,12 +1570,14 @@ export const zhCN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: '所有账户列表',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '创建组织',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理组织',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '请求加入',
+    membershipListLabel: '所有组织成员身份列表',
     notSelected: '未选择组织',
     personalWorkspace: '个人工作区',
     suggestionsAcceptedLabel: '等待批准',

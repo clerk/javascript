@@ -1102,6 +1102,10 @@ export const heIL: LocalizationResource = {
   oauthConsent: {
     action__allow: 'אישור',
     action__deny: 'דחייה',
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: 'תישאר מחובר עד שתתנתק או תבטל את הגישה.',
     redirectNotice: 'אם תאשר גישה, האפליקציה תעביר אותך אל {{domainAction}}.',
     redirectUriModal: {
@@ -1570,12 +1574,14 @@ export const heIL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'רשימת כל החשבונות',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'צור ארגון',
     action__invitationAccept: 'הצטרף',
     action__manageOrganization: 'נהל ארגון',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'בקשה להצטרפות',
+    membershipListLabel: 'רשימת כל החברויות בארגונים',
     notSelected: 'לא נבחר ארגון',
     personalWorkspace: 'אזור אישי',
     suggestionsAcceptedLabel: 'ממתין לאישור',

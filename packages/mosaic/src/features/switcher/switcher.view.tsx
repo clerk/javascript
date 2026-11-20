@@ -155,7 +155,9 @@ function membershipSubtitle(membership: SwitcherMembership, m: Messages, locale:
 
 function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
   if (lead.kind === 'organization') {
-    return lead.user ? identifier : membershipSubtitle(lead.organization, m, locale);
+    return lead.user
+      ? joinDetails(identifier, lead.organization.roleName)
+      : membershipSubtitle(lead.organization, m, locale);
   }
   if (lead.kind === 'none') {
     // No selection is not the account, so it carries no identifier line.
@@ -267,10 +269,7 @@ function SwitcherRow({
         <SwitcherItemTrailing>{trailing}</SwitcherItemTrailing>
       ) : active ? (
         <SwitcherItemTrailing>
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
+          <Icon glyph={Checkmark} />
         </SwitcherItemTrailing>
       ) : null}
     </SwitcherItem>
@@ -571,12 +570,9 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
-        <Menu.Media>
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
-        </Menu.Media>
+        <Menu.Indicator>
+          <Icon glyph={Checkmark} />
+        </Menu.Indicator>
       ) : null}
     </Menu.Item>
   );
@@ -608,16 +604,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
         aria-busy={busy || undefined}
         render={<SwitcherItem render={rowButton(disabled)} />}
       >
-        <SwitcherItemMedia>
-          {busy ? (
-            <PendingSpinner />
-          ) : (
-            <Icon
-              glyph={icon}
-              size='md'
-            />
-          )}
-        </SwitcherItemMedia>
+        <SwitcherItemMedia>{busy ? <PendingSpinner /> : <Icon glyph={icon} />}</SwitcherItemMedia>
         <SwitcherItemContent>
           <SwitcherItemLabel variant='interactive'>{label}</SwitcherItemLabel>
         </SwitcherItemContent>
@@ -625,7 +612,6 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           <Icon
             glyph={ChevronRight}
             xstyle={rtl.mirror}
-            size='md'
           />
         </SwitcherItemTrailing>
       </Menu.Trigger>
@@ -675,10 +661,7 @@ function SwitchAccountRow() {
           onClick={addAccount}
         >
           <Menu.Media>
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
+            <Icon glyph={Plus} />
           </Menu.Media>
           <Menu.Label>{m.accounts.add}</Menu.Label>
         </Menu.Item>
@@ -693,7 +676,6 @@ function SwitchAccountRow() {
             <Menu.Media>
               <Icon
                 glyph={SignOut}
-                size='md'
                 xstyle={rtl.mirror}
               />
             </Menu.Media>
@@ -736,12 +718,7 @@ function OrganizationSection() {
       actions.push(
         <ActionRow
           key='createOrganization'
-          icon={
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={Plus} />}
           label={m.manage.createOrganization}
           // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           onClick={data.onCreateOrganization}
@@ -800,12 +777,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
   if (targets.length === 1 && only) {
     return (
       <ActionRow
-        icon={
-          <Icon
-            glyph={Cog6Teeth}
-            size='md'
-          />
-        }
+        icon={<Icon glyph={Cog6Teeth} />}
         label={m.manage.settings}
         onClick={only.onClick}
       />
@@ -824,10 +796,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
           onClick={target.onClick}
         >
           <Menu.Media>
-            <Icon
-              glyph={target.icon}
-              size='md'
-            />
+            <Icon glyph={target.icon} />
           </Menu.Media>
           <Menu.Label>{target.label}</Menu.Label>
         </Menu.Item>
@@ -840,7 +809,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
 function settingsTargets(data: SwitcherContextValue, lead: LeadSelection, m: Messages): SettingsTarget[] {
   const targets: SettingsTarget[] = [];
   if ((lead.kind !== 'organization' || leadUser(lead)) && data.onManageAccount) {
-    targets.push({ label: m.manage.profile, icon: UserCircle, onClick: data.onManageAccount });
+    targets.push({ label: m.manage.account, icon: UserCircle, onClick: data.onManageAccount });
   }
   if (lead.kind === 'organization' && data.onManageOrganization) {
     targets.push({ label: m.manage.organization, icon: Building, onClick: data.onManageOrganization });
@@ -870,12 +839,7 @@ function ManageSection() {
         id: 'inviteMembers',
         node: (
           <ActionRow
-            icon={
-              <Icon
-                glyph={UsersAddRight}
-                size='md'
-              />
-            }
+            icon={<Icon glyph={UsersAddRight} />}
             label={m.manage.invite}
             onClick={data.onInviteMembers}
           />
@@ -930,12 +894,7 @@ function Footer() {
       rows.push(
         <ActionRow
           key='addAccount'
-          icon={
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={Plus} />}
           label={m.accounts.add}
           onClick={data.onAddAccount}
         />,
@@ -945,12 +904,7 @@ function Footer() {
       rows.push(
         <ActionRow
           key='signOut'
-          icon={
-            <Icon
-              glyph={SignOut}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={SignOut} />}
           label={m.accounts.signOut}
           onClick={() => signOutSession(sessionId, 'footer')}
           busyKey={switcherBusyKeys.signOutSession(sessionId, 'footer')}

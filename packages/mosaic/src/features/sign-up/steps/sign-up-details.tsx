@@ -9,7 +9,6 @@ import { AuthCaptcha } from '../../../blocks/auth';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { PasswordInput } from '../../../components/password-input';
@@ -18,6 +17,7 @@ import { ProviderButton, ProviderButtonGroup } from '../../../components/provide
 import { Separator } from '../../../components/separator';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-up.styles';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';

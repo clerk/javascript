@@ -1,9 +1,9 @@
 import { getRedirectDisplay } from '@clerk/shared/internal/clerk-js/oauthConsent';
 import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
+import { Box, Button, descriptors, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -13,16 +13,10 @@ import { Modal } from '@/ui/elements/Modal';
 import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
+import { getClientIdentityNotice } from './clientIdentity';
 import { InlineAction } from './InlineAction';
 import { getKnownOAuthClient } from './knownClients';
-import {
-  ListGroup,
-  ListGroupContent,
-  ListGroupHeader,
-  ListGroupHeaderTitle,
-  ListGroupItem,
-  ListGroupItemLabel,
-} from './ListGroup';
+import { ListGroup, ListGroupCheckboxItem, ListGroupContent, ListGroupHeader, ListGroupHeaderTitle } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch } from './utils';
@@ -42,6 +36,7 @@ function _OAuthConsent() {
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const [uncheckedScopes, setUncheckedScopes] = useState<string[]>([]);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
   const hasContextCallbacks = Boolean(ctx.onAllow || ctx.onDeny);
@@ -50,6 +45,10 @@ function _OAuthConsent() {
   const fromUrl = getOAuthConsentFromSearch();
   const oauthClientId = ctx.oauthClientId ?? fromUrl.oauthClientId;
   const scope = ctx.scope ?? fromUrl.scope;
+
+  useEffect(() => {
+    setUncheckedScopes([]);
+  }, [oauthClientId, scope]);
 
   // Public path: fetch via hook. Disabled on the accounts portal path
   // (which already has all data via context) to avoid a wasted FAPI request.
@@ -71,12 +70,14 @@ function _OAuthConsent() {
 
   // Context (accounts portal path) wins over hook data (public path).
   const scopes = ctx.scopes ?? mappedHookScopes ?? [];
+  const selectedScopes = scopes.filter(item => !uncheckedScopes.includes(item.scope));
+  const selectedScope = selectedScopes.map(item => item.scope).join(' ') || OFFLINE_ACCESS_SCOPE;
   const oauthApplicationName = ctx.oauthApplicationName ?? data?.oauthApplicationName ?? '';
   const oauthApplicationLogoUrl = ctx.oauthApplicationLogoUrl ?? data?.oauthApplicationLogoUrl;
   const oauthApplicationUrl = ctx.oauthApplicationUrl ?? data?.oauthApplicationUrl;
   const redirectUrl = ctx.redirectUrl ?? redirectUri;
 
-  const hasOrgReadScope = scopes.some(s => s.scope === USER_ORG_READ_SCOPE);
+  const hasOrgReadScope = selectedScopes.some(s => s.scope === USER_ORG_READ_SCOPE);
   const orgSelectionEnabled = !!(hasOrgReadScope && organizationSettings.enabled);
   const orgOptions = orgSelectionEnabled
     ? (user?.organizationMemberships ?? []).map(m => ({
@@ -97,6 +98,11 @@ function _OAuthConsent() {
   // brand mark (Claude, ChatGPT, ...). Keyed on the trusted redirect domain, not
   // the app-owner-set name, so a look-alike name cannot borrow the branding.
   const knownClient = oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(domainAction);
+  const clientIdentityNotice = getClientIdentityNotice(
+    data?.clientRegistration,
+    data?.clientMetadataHost,
+    oauthApplicationName || applicationName,
+  );
 
   // Error states only apply to the public flow.
   if (!hasContextCallbacks) {
@@ -132,7 +138,9 @@ function _OAuthConsent() {
   }
 
   const actionUrl = clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId });
-  const forwardedParams = getForwardedParams();
+  const forwardedParams = getForwardedParams().filter(
+    ([key]) => !['scope', 'organization_id', 'consented'].includes(key),
+  );
 
   // Accounts portal path delegates to context callbacks; public path lets the form submit natively.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -150,15 +158,13 @@ function _OAuthConsent() {
 
   const primaryIdentifier = user?.primaryEmailAddress?.emailAddress || user?.primaryPhoneNumber?.phoneNumber;
 
-  const displayedScopes = scopes
-    .filter(item => item.scope !== OFFLINE_ACCESS_SCOPE)
-    .map(item => ({
-      ...item,
-      description:
-        item.scope === PRIVATE_METADATA_SCOPE
-          ? t(localizationKeys('oauthConsent.scopeList.privateMetadata', { applicationName }))
-          : item.description,
-    }));
+  const displayedScopes = scopes.map(item => ({
+    ...item,
+    description:
+      item.scope === PRIVATE_METADATA_SCOPE
+        ? t(localizationKeys('oauthConsent.scopeList.privateMetadata', { applicationName }))
+        : item.description,
+  }));
   const hasOfflineAccess = scopes.some(item => item.scope === OFFLINE_ACCESS_SCOPE);
 
   return (
@@ -275,9 +281,20 @@ function _OAuthConsent() {
                 </ListGroupHeader>
                 <ListGroupContent>
                   {displayedScopes.map(item => (
-                    <ListGroupItem key={item.scope}>
-                      <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
-                    </ListGroupItem>
+                    <ListGroupCheckboxItem
+                      key={item.scope}
+                      value={item.scope}
+                      checked={!uncheckedScopes.includes(item.scope)}
+                      isDisabled={hasContextCallbacks || item.scope === OFFLINE_ACCESS_SCOPE}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setUncheckedScopes(previous =>
+                          checked ? previous.filter(scope => scope !== item.scope) : [...previous, item.scope],
+                        );
+                      }}
+                    >
+                      {item.description || item.scope || ''}
+                    </ListGroupCheckboxItem>
                   ))}
                 </ListGroupContent>
               </ListGroup>
@@ -287,6 +304,18 @@ function _OAuthConsent() {
                 colorScheme='warning'
                 variant='caption'
               >
+                {clientIdentityNotice && (
+                  <>
+                    <Text
+                      elementDescriptor={descriptors.oauthConsentClientIdentity}
+                      as='span'
+                      colorScheme='warning'
+                      variant='caption'
+                      sx={t => ({ fontWeight: t.fontWeights.$semibold })}
+                      localizationKey={clientIdentityNotice}
+                    />{' '}
+                  </>
+                )}
                 <InlineAction
                   text={t(
                     localizationKeys('oauthConsent.warning', {
@@ -344,6 +373,13 @@ function _OAuthConsent() {
               value={value}
             />
           ))}
+        {!hasContextCallbacks && (
+          <input
+            type='hidden'
+            name='scope'
+            value={selectedScope}
+          />
+        )}
         {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
           <input
             type='hidden'

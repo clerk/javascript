@@ -170,12 +170,7 @@ function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolea
           <Profile.NavItem
             key={item.id}
             value={item.id}
-            icon={
-              <Icon
-                glyph={item.icon}
-                size='md'
-              />
-            }
+            icon={<Icon glyph={item.icon} />}
             badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}

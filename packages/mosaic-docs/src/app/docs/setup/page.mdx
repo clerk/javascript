@@ -1,0 +1,20 @@
+import Setup, { headings as setupHeadings } from '@/content/setup.mdx';
+import { DocsPage } from '@/ui/docs-page';
+
+export const metadata = {
+  title: 'Setup',
+  alternates: { types: { 'text/markdown': '/docs/setup.md' } },
+};
+
+export default function Layout({ children }) {
+  return (
+    <DocsPage
+      headings={setupHeadings}
+      markdownHref='/docs/setup.md'
+    >
+      {children}
+    </DocsPage>
+  );
+}
+
+<Setup />

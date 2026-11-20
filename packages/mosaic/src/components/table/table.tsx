@@ -222,17 +222,14 @@ const Column = React.forwardRef<HTMLTableCellElement, TableColumnProps>(function
           {children}
           <Icon
             glyph={ChevronUpDown}
-            size='md'
             xstyle={sortIcons.none}
           />
           <Icon
             glyph={ChevronUp}
-            size='md'
             xstyle={sortIcons.ascending}
           />
           <Icon
             glyph={ChevronDown}
-            size='md'
             xstyle={sortIcons.descending}
           />
         </span>
@@ -355,7 +352,6 @@ const ExpandButton = React.forwardRef<HTMLButtonElement, TableExpandButtonProps>
     >
       <Icon
         glyph={ChevronRight}
-        size='md'
         xstyle={styles.expandIcon}
       />
     </Primitive.ExpandButton>

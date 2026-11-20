@@ -13,7 +13,7 @@ export default {
     'A modal surface over the page. The popup holds a `Card` or a `Profile`, and owns focus, scroll lock and the backdrop.',
   useFor: [
     'a modal over the page',
-    'a dialog opened from a trigger elsewhere in the tree, with `createHandle`',
+    'a dialog opened from a trigger elsewhere in the tree, with `createDialogHandle`',
     'an alert that needs an answer',
   ],
   keywords: ['dialog', 'modal', 'alertdialog', 'overlay', 'sheet', 'popup'],
@@ -55,7 +55,7 @@ export default {
       props: {
         handle: {
           type: 'DialogHandle<Payload>',
-          doc: 'Connects a trigger to a root rendered elsewhere. Create with `Dialog.createHandle()`.',
+          doc: 'Connects a trigger to a root rendered elsewhere. Create with `Dialog.createDialogHandle()`.',
         },
         payload: { type: 'Payload', doc: "Delivered to the root's children-as-function as `{ payload }`." },
       },
@@ -106,6 +106,11 @@ export default {
     },
   ],
   related: ['Card', 'useConfirmController', 'Drawer'],
+  exports: {
+    'Dialog.createDialogHandle': {
+      description: 'Creates a handle that connects a `Dialog.Root` to triggers rendered outside it.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Dialog.Root': DialogRootProps;
   'Dialog.Trigger': DialogTriggerProps;

@@ -399,7 +399,7 @@ describe('Mosaic ActionBar', () => {
   describe('with a confirmation dialog beside the bar', () => {
     function ConfirmRemove() {
       const [selected, setSelected] = React.useState(true);
-      const handle = React.useMemo(() => Dialog.createHandle(), []);
+      const handle = React.useMemo(() => Dialog.createDialogHandle(), []);
       const selectRef = React.useRef<HTMLInputElement>(null);
       return (
         <>

@@ -2,7 +2,7 @@
 
 A headless image cropper. The user pans the image by dragging or with the arrow keys, zooms with the
 wheel, a pinch, the keyboard, a slider or step buttons, turns it a quarter at a time, and resets it.
-The crop is a square. `cropImage` draws the square the user chose into a new image.
+The crop is a square. `ImageCropper.cropImage` draws the square the user chose into a new image.
 
 ## When to Use
 
@@ -16,10 +16,10 @@ controls through `data-*` attributes.
 ```tsx
 import { useState } from 'react';
 
-import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
+import { type Crop, ImageCropper } from '../../primitives/image-cropper';
 
 function Cropper({ src, onSave }: { src: string; onSave: (blob: Blob) => void }) {
-  const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
+  const [crop, setCrop] = useState<Crop>(ImageCropper.INITIAL_CROP);
 
   return (
     <ImageCropper.Root
@@ -37,7 +37,7 @@ function Cropper({ src, onSave }: { src: string; onSave: (blob: Blob) => void })
       <ImageCropper.ZoomIn aria-label='Zoom in'>+</ImageCropper.ZoomIn>
       <ImageCropper.Rotate>Rotate</ImageCropper.Rotate>
       <ImageCropper.Reset>Reset</ImageCropper.Reset>
-      <button onClick={async () => onSave(await cropImage(src, crop, { type: 'image/png' }))}>Save</button>
+      <button onClick={async () => onSave(await ImageCropper.cropImage(src, crop, { type: 'image/png' }))}>Save</button>
     </ImageCropper.Root>
   );
 }
@@ -59,7 +59,7 @@ the `Viewport` around it shows the rest of the image for context. Drags are meas
 | `ImageCropper.ZoomIn`   | `<button>`             | Zooms in one step. Disabled at `maxZoom`                               |
 | `ImageCropper.ZoomOut`  | `<button>`             | Zooms out one step. Disabled at `minZoom`                              |
 | `ImageCropper.Rotate`   | `<button>`             | Turns the image a quarter clockwise                                    |
-| `ImageCropper.Reset`    | `<button>`             | Returns to `INITIAL_CROP`                                              |
+| `ImageCropper.Reset`    | `<button>`             | Returns to `ImageCropper.INITIAL_CROP`                                 |
 
 Every control stays disabled until the image has loaded, because the crop limits depend on its size.
 
@@ -67,14 +67,14 @@ Every control stays disabled until the image has loaded, because the crop limits
 
 ### `ImageCropper.Root`
 
-| Prop            | Type                   | Default        | Description                                     |
-| --------------- | ---------------------- | -------------- | ----------------------------------------------- |
-| `src`           | `string`               | —              | The image to crop, such as an object URL        |
-| `value`         | `Crop`                 | —              | Controlled crop                                 |
-| `defaultValue`  | `Crop`                 | `INITIAL_CROP` | Initial crop (uncontrolled)                     |
-| `onValueChange` | `(crop: Crop) => void` | —              | Called on every pan, zoom, turn and reset       |
-| `maxZoom`       | `number`               | `4`            | Largest zoom, as a multiple of the cover scale  |
-| `disabled`      | `boolean`              | `false`        | Ignores every gesture and disables the controls |
+| Prop            | Type                   | Default                     | Description                                     |
+| --------------- | ---------------------- | --------------------------- | ----------------------------------------------- |
+| `src`           | `string`               | —                           | The image to crop, such as an object URL        |
+| `value`         | `Crop`                 | —                           | Controlled crop                                 |
+| `defaultValue`  | `Crop`                 | `ImageCropper.INITIAL_CROP` | Initial crop (uncontrolled)                     |
+| `onValueChange` | `(crop: Crop) => void` | —                           | Called on every pan, zoom, turn and reset       |
+| `maxZoom`       | `number`               | `4`                         | Largest zoom, as a multiple of the cover scale  |
+| `disabled`      | `boolean`              | `false`                     | Ignores every gesture and disables the controls |
 
 A `Crop` is `{ x, y, zoom, rotation }`. `x` and `y` move the image centre from the frame centre, as a
 fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame. Below 1 the image
@@ -84,7 +84,7 @@ stops at the frame's: an image larger than the frame covers it, and a smaller on
 Other parts take no additional props. All parts except `Root` accept a `render` prop and standard
 HTML attributes for their default element.
 
-### `cropImage(src, crop, { type, size })`
+### `ImageCropper.cropImage(src, crop, { type, size })`
 
 Returns a `Promise<Blob>` holding the square the crop shows, encoded as `type`. A browser that
 cannot encode `type` returns `image/png`, so read the type from the blob. The square keeps the
