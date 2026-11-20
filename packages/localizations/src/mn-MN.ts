@@ -1741,8 +1741,9 @@ export const mnMN: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'Үргэлжлүүлэхийн тулд нэвтрэлтийг эхлүүлсэн төхөөрөмж болон хөтөч дээрээ баталгаажуулах холбоосыг нээнэ үү',
+        title: 'Баталгаажуулах холбоос энэ төхөөрөмж дээр хүчингүй байна',
       },
       expired: {
         subtitle: 'Үргэлжлүүлэхийн тулд анхны таб руу буцна уу.',
@@ -2378,6 +2379,10 @@ export const mnMN: LocalizationResource = {
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Энэ имэйл хаягийг баталгаажуулахын тулд холбоосыг хүсэлт илгээсэн төхөөрөмж болон хөтөч дээрээ нээнэ үү',
+        },
         formHint: 'Баталгаажуулах холбоос бүхий имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}}руу илгээсэн имэйл дэх баталгаажуулах холбоос дээр дарна уу.',
         formTitle: 'Баталгаажуулах холбоос',

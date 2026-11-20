@@ -1740,8 +1740,9 @@ export const bgBG: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'За да продължите, отворете линка за потвърждение на устройството и в браузъра, от които сте започнали влизането',
+        title: 'Линкът за потвърждение е невалиден за това устройство',
       },
       expired: {
         subtitle: 'Върнете се в оригиналния таб, за да продължите.',
@@ -2375,6 +2376,10 @@ export const bgBG: LocalizationResource = {
         successMessage: 'Имейлът {{identifier}} беше добавен към вашия профил.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'За да потвърдите този имейл адрес, отворете линка на устройството и в браузъра, от които сте го заявили',
+        },
         formHint: 'На този имейл адрес ще бъде изпратен имейл с линк за потвърждение.',
         formSubtitle: 'Кликнете върху линка за потвърждение в имейла, изпратен на {{identifier}}',
         formTitle: 'Линк за потвърждение',

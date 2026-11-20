@@ -2377,6 +2377,10 @@ export const nlNL: LocalizationResource = {
         successMessage: 'Het e-mailadres {{identifier}} is toegevoegd aan je account.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Om dit e-mailadres te verifiëren, open de link op het apparaat en in de browser waarmee de link is aangevraagd',
+        },
         formHint: 'Een mail met daarin een verificatielink is verstuurd naar dit adres.',
         formSubtitle: 'Klik op de verificatielink die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatielink',

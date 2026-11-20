@@ -1738,8 +1738,8 @@ export const srRS: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Da nastaviš, otvori verifikacioni link na uređaju i u pregledaču sa kojih je pokrenuta prijava',
+        title: 'Verifikacioni link je nevažeći za ovaj uređaj',
       },
       expired: {
         subtitle: 'Vrati se na originalni tab da nastaviš.',
@@ -2373,6 +2373,9 @@ export const srRS: LocalizationResource = {
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: 'Za verifikaciju ove e-mail adrese otvori link na uređaju i u pregledaču sa kojih je zatražen',
+        },
         formHint: 'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',
         formTitle: 'Verifikacioni link',

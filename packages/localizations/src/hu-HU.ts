@@ -2406,6 +2406,9 @@ export const huHU: LocalizationResource = {
         successMessage: 'Az email: {{identifier}} hozzá lett adva a fiókodhoz.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: 'Az email cím megerősítéséhez nyisd meg a linket azon az eszközön és böngészőben, ahol kérted',
+        },
         formHint: 'Egy visszaigazoló linket tartalmazó emailt fogunk küldeni erre az email címre.',
         formSubtitle: 'Kattints a visszaigazoló linkre az emailben, amit ide küldtünk: {{identifier}}',
         formTitle: 'Visszaigazoló link',

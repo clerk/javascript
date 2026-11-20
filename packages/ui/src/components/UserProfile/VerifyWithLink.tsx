@@ -1,3 +1,4 @@
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -64,12 +65,42 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   );
 };
 
+const verificationLinkTexts = {
+  verified: {
+    title: localizationKeys('signUp.emailLink.verifiedSwitchTab.title'),
+    subtitle: localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitle'),
+  },
+  expired: {
+    title: localizationKeys('signIn.emailLink.expired.title'),
+    subtitle: localizationKeys('signIn.emailLink.expired.subtitle'),
+  },
+  failed: {
+    title: localizationKeys('signIn.emailLink.failed.title'),
+    subtitle: localizationKeys('signIn.emailLink.failed.subtitle'),
+  },
+  client_mismatch: {
+    title: localizationKeys('signIn.emailLink.clientMismatch.title'),
+    subtitle: localizationKeys('userProfile.emailAddressPage.emailLink.clientMismatch.subtitle'),
+  },
+};
+
+const linkStatusFrom = (status: string | null): keyof typeof verificationLinkTexts => {
+  if (!status || status === 'verified') {
+    return 'verified';
+  }
+  if (status === 'expired' || status === 'client_mismatch') {
+    return status;
+  }
+  return 'failed';
+};
+
 export const VerificationSuccessPage = () => {
+  const linkStatus = linkStatusFrom(getClerkQueryParam('__clerk_status'));
+
   return (
     <EmailLinkStatusCard
-      title={localizationKeys('signUp.emailLink.verifiedSwitchTab.title')}
-      subtitle={localizationKeys('signUp.emailLink.verifiedSwitchTab.subtitle')}
-      status='verified'
+      {...verificationLinkTexts[linkStatus]}
+      status={linkStatus}
     />
   );
 };

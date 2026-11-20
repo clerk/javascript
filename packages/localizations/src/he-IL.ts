@@ -2359,6 +2359,9 @@ export const heIL: LocalizationResource = {
         successMessage: 'האימייל {{identifier}} התווסף לחשבון שלך.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: 'כדי לאמת את כתובת האימייל הזו, פתח את הקישור במכשיר ובדפדפן שמהם ביקשת אותו',
+        },
         formHint: 'אימייל שמכיל קישור לאימות ישלח לכתובת זו.',
         formSubtitle: 'לחץ על קישור האימות באימייל שנשלח ל-{{identifier}}',
         formTitle: 'קישור לאימות',
