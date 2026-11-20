@@ -157,7 +157,13 @@ function assertValidTokenExchangeResource(resource: string) {
 const scopeTokenPattern = /^[\x21\x23-\x5B\x5D-\x7E]+$/;
 
 function assertValidTokenExchangeScope(scope: string[] | undefined) {
-  for (const token of scope ?? []) {
+  if (scope == null) {
+    return;
+  }
+  if (!Array.isArray(scope)) {
+    throw tokenExchangeRequestError('`scope` must be an array of scope tokens.');
+  }
+  for (const token of scope) {
     if (!isString(token) || !scopeTokenPattern.test(token)) {
       throw tokenExchangeRequestError(
         'Each `scope` element must be a non-empty scope token without spaces, `"`, `\\`, or non-ASCII characters.',

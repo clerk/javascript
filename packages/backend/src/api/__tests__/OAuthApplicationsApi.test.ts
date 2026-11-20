@@ -593,6 +593,8 @@ describe('OAuthApplications', () => {
       ['only holes', new Array<string>(2)],
       ['an undefined element', ['read', undefined] as unknown as string[]],
       ['a non-string element', ['read', 42] as unknown as string[]],
+      ['a Set instead of an array', new Set(['read']) as unknown as string[]],
+      ['a string instead of an array', 'read' as unknown as string[]],
     ])('rejects a scope with %s before making any request', async (_, scope) => {
       const requested = recordRequests();
 
