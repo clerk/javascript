@@ -7,6 +7,7 @@ export { AuthEnterpriseConnections } from './auth-enterprise-connections';
 export { AuthIdentityPreview } from './auth-identity-preview';
 export { AuthLoading } from './auth-loading';
 export { AuthProtectCheck } from './auth-protect-check';
+export { AuthStartOver } from './auth-start-over';
 export { AuthWallets } from './auth-wallets';
 export type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from './auth.types';
 export type { AuthEmailLinkStatusMessages } from './auth-email-link-status';

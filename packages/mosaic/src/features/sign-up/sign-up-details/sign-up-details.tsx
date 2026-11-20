@@ -20,23 +20,11 @@ import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { styles } from '../sign-up.styles';
-import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
+import type { SignUpDetailsScreen, SignUpFieldName, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
 import { SignUpLegalConsentField } from './sign-up-legal-consent';
 
-interface SignUpDetailsProps {
-  step: SignUpDetails;
-  onSwitchField?: () => void;
-  socialProviders: readonly AuthProvider[];
-  pendingProviderId?: string;
-  onSelectProvider: (id: string) => void;
-  isDisabled: boolean;
-  form: UseFormResult<SignUpValues>;
-  globalErrorMessage?: string;
-  isPending: boolean;
-  onSubmit: (event: SignUpSubmitEvent) => void;
-  passwordFeedback?: FieldFeedback;
-  onSignIn?: () => void;
+interface SignUpDetailsProps extends SignUpDetailsScreen {
   focusRef?: Ref<HTMLElement>;
   logo?: { src: string; alt: string };
 }
@@ -135,7 +123,8 @@ export function SignUpDetailsStep({
           <SubmitButton
             form={form.id}
             fullWidth
-            disabled={Boolean(pendingProviderId)}
+            disabled={Boolean(pendingProviderId) || !form.canSubmit}
+            focusableWhenDisabled
             isPending={isPending}
             pendingLabel={m.verifying}
           >
@@ -211,7 +200,7 @@ function SignUpFields({
           <TextField
             {...field('emailAddress')}
             {...switchField}
-            name='identifier'
+            name='emailAddress'
             type='email'
             label={m.form.emailLabel}
             placeholder={m.form.emailPlaceholder}
@@ -342,7 +331,7 @@ function TextField({
   switchLabel,
   onSwitch,
 }: FieldProps & {
-  name: 'firstName' | 'lastName' | 'username' | 'identifier';
+  name: 'firstName' | 'lastName' | 'username' | 'emailAddress';
   type?: 'text' | 'email';
   label: string;
   placeholder: string;

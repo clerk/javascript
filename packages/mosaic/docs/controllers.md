@@ -150,12 +150,13 @@ return {
 
 The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
-**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)).
+**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)). Sign-up mounts one component per screen: its controller holds what outlives a screen, and a screen with work to do on arrival owns its own ([Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen)).
 
 ## Wrapping actions
 
 - **One wrapper for every action**, so each is wrapped the same way and only one is in flight (`runAction` in `switcher.controller.tsx`).
 - **Hold the surface still while an action runs.** `setActive` swaps the active organization while its promise is in flight, so the live model would rearrange the popup mid-action. Freeze the model the action started from and render it until the action settles (`context.frozenModel ?? model`). This also covers the model dropping `ready → loading` during Clerk's transitive state.
+- **Hold it past the action when the next screen is still loading.** Make the wait a named state with an `always` transition whose guard reads the live model from injected context, and call `actor.recheck()` in a layout effect when that value changes. Leaving the state clears the frozen model, so the hold ends once and does not come back (`handingOff` in `sign-up.controller.ts`).
 - **Derive view props.** A `pendingKey` run through `useSpinDelay`, a `mode` forced by a capability flag: anything the view would otherwise re-derive.
 
 ## Composition and dialog lifetime

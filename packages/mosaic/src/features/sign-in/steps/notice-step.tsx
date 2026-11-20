@@ -6,17 +6,17 @@ import {
   AuthEmailLinkStatus,
   AuthLoading,
   AuthProtectCheck,
+  AuthStartOver,
 } from '../../../blocks/auth';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
-import { SignUpRestricted } from '../../sign-up/steps/sign-up-restricted';
+import { SignUpRestricted } from '../../sign-up/sign-up-restricted/sign-up-restricted';
 import type { SignInStep } from '../sign-in.types';
 import { emailLinkStatusMessages } from '../sign-in.utils';
 import { SignInEnterpriseSso } from './sign-in-enterprise-sso';
 import { SignInForgotPassword } from './sign-in-forgot-password';
 import { SignInPasswordCompromised } from './sign-in-password-compromised';
-import { SignInStartOver } from './sign-in-start-over';
 
 interface NoticeStepProps {
   step: Extract<SignInStep, { kind: 'notice' }>;
@@ -187,7 +187,12 @@ export function NoticeStep({
         />
       );
     case 'start-over':
-      return <SignInStartOver onStartOver={onStartOver} />;
+      return (
+        <AuthStartOver
+          messages={m.startOver}
+          onStartOver={onStartOver}
+        />
+      );
     case 'email-link-status':
       return (
         <AuthEmailLinkStatus

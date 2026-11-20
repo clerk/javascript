@@ -16,7 +16,7 @@ import type {
 export type CreateOrganizationModelOptions = Pick<
   CreateOrganizationProps,
   'afterCreateOrganizationUrl' | 'skipInvitationScreen'
->;
+> & { enabled?: boolean };
 
 export type CreateOrganizationModel =
   | { status: 'loading' }
@@ -36,7 +36,7 @@ export function useCreateOrganizationModel(options: CreateOrganizationModelOptio
     isLoaded: isListLoaded,
     createOrganization,
     userMemberships,
-  } = useOrganizationList({ userMemberships: { infinite: true } });
+  } = useOrganizationList(options.enabled === false ? undefined : { userMemberships: { infinite: true } });
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();

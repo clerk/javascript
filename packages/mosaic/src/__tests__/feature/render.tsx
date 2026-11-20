@@ -10,6 +10,27 @@ import type { MosaicLocalization } from '../../localization';
 import { MosaicProvider } from '../../mosaic-provider';
 import { publishableKey } from './fake-fapi';
 
+type Signal<T> = (value: T) => void;
+
+interface AuthSignals {
+  signInResourceSignal: Signal<{ resource: null }>;
+  signInErrorSignal: Signal<{ error: null }>;
+  signInFetchSignal: Signal<{ status: 'idle' }>;
+  signUpResourceSignal: Signal<{ resource: null }>;
+  signUpErrorSignal: Signal<{ error: null }>;
+  signUpFetchSignal: Signal<{ status: 'idle' }>;
+}
+
+function resetAuthSignals(clerk: Clerk) {
+  const signals = clerk.__internal_state as unknown as AuthSignals;
+  signals.signInResourceSignal({ resource: null });
+  signals.signInErrorSignal({ error: null });
+  signals.signInFetchSignal({ status: 'idle' });
+  signals.signUpResourceSignal({ resource: null });
+  signals.signUpErrorSignal({ error: null });
+  signals.signUpFetchSignal({ status: 'idle' });
+}
+
 export async function renderWithClerk(
   ui: ReactElement,
   options?: Parameters<Clerk['load']>[0],
@@ -18,6 +39,7 @@ export async function renderWithClerk(
   profile?: MosaicProfile,
 ) {
   const clerk = new Clerk(publishableKey());
+  resetAuthSignals(clerk);
   const navigate = vi.fn((_to: string) => Promise.resolve());
 
   const wrap = (element: ReactElement) => (
