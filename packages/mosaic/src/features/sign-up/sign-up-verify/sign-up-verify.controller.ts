@@ -17,11 +17,13 @@ interface CodeContext {
   error: ErrorDescription | undefined;
 }
 
-type CodeEvent = { type: 'SEND' } | { type: 'RESEND' };
+type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'ALREADY_SENT' };
 
 const code = setup<CodeContext, CodeEvent>();
 
 const clearError = code.assign(() => ({ error: undefined }));
+
+const startCooldown = code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) }));
 
 const codeMachine = code.createMachine({
   id: 'signUpCode',
@@ -33,14 +35,11 @@ const codeMachine = code.createMachine({
   },
   states: {
     idle: {
-      on: { SEND: 'sending', RESEND: 'sending' },
+      on: { SEND: 'sending', RESEND: 'sending', ALREADY_SENT: { target: 'sent', actions: startCooldown } },
     },
     sending: {
       invoke: code.fromPromise(context => context.sendCode(), {
-        onDone: {
-          target: 'sent',
-          actions: code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) })),
-        },
+        onDone: { target: 'sent', actions: startCooldown },
         onError: {
           target: 'sent',
           actions: code.assign<ErrorInvokeEvent>((_, event) => ({ error: toLocalizableError(event.error) })),
@@ -75,13 +74,9 @@ export function useSignUpVerifyController({
   const [snapshot, send, actor] = useMachine(codeMachine, { context: { sendCode } });
   const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Sends the code when the screen mounts on a step with none out, which a reload or a redirect reaches with no event. */
   useEffect(() => {
-    if (needsCode) {
-      send({ type: 'SEND' });
-    }
+    send({ type: needsCode ? 'SEND' : 'ALREADY_SENT' });
   }, [needsCode, send]);
-  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   const isPending = actions.isPending || isFlowPending;
   const submit = (submitted: string) =>
