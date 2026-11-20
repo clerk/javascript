@@ -156,6 +156,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   styles: {
     // Atomic styles — shipped as StyleX atoms rather than components.
+    motion: dynamic(() => import('../stories/motion.mdx')),
     'scroll-area': dynamic(() => import('../stories/scroll-area.mdx')),
   },
   hooks: {

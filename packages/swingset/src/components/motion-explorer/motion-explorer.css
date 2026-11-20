@@ -1,0 +1,100 @@
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-root:not(.cr-demo .cl-flow-root) {
+  transition-duration: calc(var(--m-height) * var(--m-slow)) !important;
+  transition-timing-function: var(--m-ease) !important;
+}
+
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-root:not(.cr-demo .cl-flow-root)[data-initial] {
+  transition-duration: 0s !important;
+}
+
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-step:not(.cr-demo .cl-flow-step) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  transition-property: opacity, transform, filter !important;
+  transition-duration: calc(var(--m-fade) * var(--m-slow)), calc(var(--m-move) * var(--m-slow)) !important;
+  transition-delay: 0s !important;
+  transition-timing-function: var(--m-ease) !important;
+}
+
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-step:not(.cr-demo .cl-flow-step)[data-starting-style] {
+  opacity: var(--m-from-opacity) !important;
+  transform: var(--m-from-transform) !important;
+  filter: var(--m-from-filter) !important;
+}
+
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-step:not(.cr-demo .cl-flow-step)[data-ending-style] {
+  opacity: var(--m-from-opacity) !important;
+  transform: var(--m-exit-transform) !important;
+  filter: var(--m-from-filter) !important;
+  transition-duration: calc(var(--m-exit) * var(--m-slow)) !important;
+  transition-timing-function: var(--m-ease-exit) !important;
+}
+
+html[data-motion-explorer][data-m-target='flow']
+  .cl-flow-root[data-height-change='grow']
+  .cl-flow-step:not([data-ending-style]) {
+  transition-delay: calc(var(--m-grow-wait) * var(--m-slow)) !important;
+}
+
+html[data-motion-explorer][data-m-target='flow'] .cl-flow-step:not(.cr-demo .cl-flow-step)[data-closed] {
+  display: var(--m-closed-display) !important;
+}
+
+html[data-motion-explorer][data-m-target='menu'] .cl-menu-popup,
+html[data-motion-explorer][data-m-target='select'] .cl-select-popup,
+html[data-motion-explorer][data-m-target='combobox'] .cl-combobox-popup,
+html[data-motion-explorer][data-m-target='popover'] .cl-popover-popup,
+html[data-motion-explorer][data-m-target='tooltip'] .cl-tooltip-popup,
+html[data-motion-explorer][data-m-target='dialog'] .cl-dialog-popup[data-variant='card'],
+html[data-motion-explorer][data-m-target='profile']
+  .cl-dialog-popup:is([data-variant='profile'], [data-variant='fullscreen']),
+html[data-motion-explorer][data-m-target='drawer'] .cl-drawer-popup,
+html[data-motion-explorer][data-m-target='toast'] .cl-toast-root,
+html[data-motion-explorer][data-m-target='actionbar'] .cl-action-bar {
+  transition-property: opacity, transform, filter !important;
+  transition-duration: calc(var(--m-fade) * var(--m-slow)), calc(var(--m-move) * var(--m-slow)) !important;
+  transition-timing-function: var(--m-ease) !important;
+}
+
+html[data-motion-explorer][data-m-target='menu'] .cl-menu-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='select'] .cl-select-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='combobox'] .cl-combobox-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='popover'] .cl-popover-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='tooltip'] .cl-tooltip-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='dialog']
+  .cl-dialog-popup[data-variant='card']:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='profile']
+  .cl-dialog-popup:is([data-variant='profile'], [data-variant='fullscreen']):is(
+    [data-starting-style],
+    [data-ending-style]
+  ),
+html[data-motion-explorer][data-m-target='drawer'] .cl-drawer-popup:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='toast'] .cl-toast-root:is([data-starting-style], [data-ending-style]),
+html[data-motion-explorer][data-m-target='actionbar'] .cl-action-bar:is([data-starting-style], [data-ending-style]) {
+  opacity: var(--m-from-opacity) !important;
+  transform: var(--m-from-transform) !important;
+  filter: var(--m-from-filter) !important;
+  translate: 0 0 !important;
+}
+
+html[data-motion-explorer][data-m-target='menu'] .cl-menu-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='select'] .cl-select-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='combobox'] .cl-combobox-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='popover'] .cl-popover-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='tooltip'] .cl-tooltip-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='dialog'] .cl-dialog-popup[data-variant='card'][data-ending-style],
+html[data-motion-explorer][data-m-target='profile']
+  .cl-dialog-popup:is([data-variant='profile'], [data-variant='fullscreen'])[data-ending-style],
+html[data-motion-explorer][data-m-target='drawer'] .cl-drawer-popup[data-ending-style],
+html[data-motion-explorer][data-m-target='toast'] .cl-toast-root[data-ending-style],
+html[data-motion-explorer][data-m-target='actionbar'] .cl-action-bar[data-ending-style] {
+  transform: var(--m-exit-transform) !important;
+  transition-duration: calc(var(--m-exit) * var(--m-slow)) !important;
+  transition-timing-function: var(--m-ease-exit) !important;
+}
+
+html[data-motion-explorer][data-m-target='toast'] .cl-toast-root {
+  margin-block-end: 1rem !important;
+  pointer-events: auto !important;
+}

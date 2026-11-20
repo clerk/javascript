@@ -1,0 +1,174 @@
+import * as MotionStories from './motion.stories';
+
+# Motion
+
+Every animation in Mosaic is one of a short list of recipes. A recipe is a starting pose, a timing and a curve. Each component uses one recipe by default, and you can retime a recipe, give a component a different one, or write your own, all the same way: by setting the recipe's values on the part. The variables on this page are proposed.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={MotionStories}
+/>
+
+## Anatomy of a recipe
+
+A recipe is five values. Mosaic's rules read them on every part that enters and leaves, and move the part between its starting pose and its resting state.
+
+| Value         | Variable                                                       | Declared on                                | What it does                                                               |
+| ------------- | -------------------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
+| Starting pose | `--cl-from-opacity`, `--cl-from-transform`, `--cl-from-filter` | The part                                   | Where the part is before it enters. It animates from here to rest.         |
+| Exit pose     | `--cl-exit-transform`                                          | The part                                   | Where the part goes when it leaves. It defaults to the starting transform. |
+| Duration      | `--cl-motion-duration`                                         | The part, a wrapper of your own or `:root` | The length of the way in. The way out is 66% of it.                        |
+| Curve         | `--cl-motion-ease`                                             | The part, a wrapper of your own or `:root` | How progress is spread across the duration.                                |
+
+The rules switch a part between rest and its starting pose with the `data-starting-style` and `data-ending-style` attributes, and they transition `opacity`, `transform` and `filter`. The pose is declared on the part because a variable is resolved on the element that declares it, so the part can use values that belong to it, such as `--cl-flow-transition-direction`. The timing has no per-element value, so it can sit on a wrapper or on `:root`.
+
+## Usage
+
+Retime a recipe with its two tokens. Only the components that use the recipe change:
+
+```css
+:root {
+  --cl-motion-pop-duration: 200ms;
+  --cl-motion-morph-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+```
+
+Give one component its own animation by declaring the recipe's values on the part's class. This reaches every component, including those that render in a portal, such as a dialog, a menu or a toast:
+
+```css
+.cl-dialog-popup[data-variant='card'] {
+  --cl-from-opacity: 0;
+  --cl-from-transform: translateY(-1.5rem) scale(0.98);
+  --cl-from-filter: blur(4px);
+  --cl-motion-duration: 260ms;
+  --cl-motion-ease: cubic-bezier(0.19, 1, 0.22, 1);
+}
+```
+
+Limit it to part of your app with a selector of your own. A wrapper reaches only what renders inside it, so it suits inline components such as a flow. For example, to push sign in and sign up from right to left:
+
+```tsx
+<div className='auth-page'>
+  <SignIn />
+  <SignUp />
+</div>
+```
+
+```css
+.auth-page {
+  --cl-motion-duration: 320ms;
+  --cl-motion-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.auth-page .cl-flow-step {
+  --cl-from-opacity: 0;
+  --cl-from-transform: translateX(calc(var(--cl-flow-transition-direction, 1) * 1.5rem));
+  --cl-from-filter: blur(2px);
+  --cl-exit-transform: translateX(calc(var(--cl-flow-transition-direction, 1) * -1.5rem));
+}
+```
+
+Declare a pose on the part when it reads a value that belongs to one element, such as `--cl-flow-transition-direction`. A variable declared on a wrapper is resolved on the wrapper, where that value does not exist.
+
+Turn every recipe off with one attribute on the root:
+
+```html
+<html data-motion="none"></html>
+```
+
+## Build a recipe
+
+Define a recipe for the sign-in step, scope it, and see what Mosaic provides to make it move. The step on the page runs the code shown.
+
+<Story
+  name='CustomRecipe'
+  storyModule={MotionStories}
+/>
+
+## Parts
+
+| Recipe  | Used by                                                                               | Description                                                                                                             |
+| ------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `morph` | Sign in, sign up, set up MFA, reverification, create organization                     | Resizes the container with a spring and crossfades the content under a light blur. It waits briefly for room on a grow. |
+| `push`  | Opt-in for flows that read as a sequence                                              | Moves a short way in from the right and out to the left under a light blur, and reverses on Back.                       |
+| `pop`   | Menu, combobox, popover, tooltip, card dialog, action bar                             | Fades and scales in from 0.94, and closes faster.                                                                       |
+| `fade`  | User profile, organization profile and fullscreen dialogs                             | Opacity only, with no scale.                                                                                            |
+| `slide` | Toast, sheet, drawer                                                                  | Enters from an edge while fading, and leaves faster.                                                                    |
+| `none`  | Select, nested page navigation, keyboard-driven actions, anything repeated constantly | Instant.                                                                                                                |
+
+Each component applies its recipe by default. You change it by setting the values on the part, not by naming a recipe. Hover and press color changes, expanding rows, the tab indicator and skeleton shimmer are not recipes. They stay with their component.
+
+### Morph and the height
+
+Morph animates the height of the container, and a height cannot animate to `auto`. `Flow` measures the active step with a `ResizeObserver` and publishes the result on `Flow.Root` as `--cl-flow-step-height`, along with `data-height-change` (`grow` or `shrink`), `data-transitioning` while the resize runs and `data-initial` for the first frame. The recipe animates the root to that height and uses `data-height-change` for the short wait on a grow. That measurement is the only script Morph depends on, and `Flow` already runs it.
+
+## Tokens
+
+Every recipe has a duration and an ease. The ease defaults to the existing easing token.
+
+| Token                        | Default                          | Description                                                               |
+| ---------------------------- | -------------------------------- | ------------------------------------------------------------------------- |
+| `--cl-motion-morph-duration` | `420ms`                          | The resize and the content fading in. The content fades out in 36% of it. |
+| `--cl-motion-morph-ease`     | spring                           | The curve of the resize and the content.                                  |
+| `--cl-motion-push-duration`  | `320ms`                          | The slide and the resize.                                                 |
+| `--cl-motion-push-ease`      | `cubic-bezier(0.23, 1, 0.32, 1)` | The curve of the slide.                                                   |
+| `--cl-motion-pop-duration`   | `150ms`                          | The scale. The fade in and the close are two thirds of it.                |
+| `--cl-motion-pop-ease`       | `var(--cl-ease-enter)`           | The curve of the way in.                                                  |
+| `--cl-motion-fade-duration`  | `100ms`                          | The fade in and out.                                                      |
+| `--cl-motion-fade-ease`      | `var(--cl-ease-enter)`           | The curve of the way in.                                                  |
+| `--cl-motion-slide-duration` | `250ms`                          | The way in. The way out is 60% of it.                                     |
+| `--cl-motion-slide-ease`     | `var(--cl-ease-enter)`           | The curve of the way in.                                                  |
+
+A way out always uses `--cl-ease-exit`.
+
+The values a recipe is made of are set on a part, or on a wrapper of your own, to write a recipe of your own:
+
+| Variable                                                       | Default           | Description                         |
+| -------------------------------------------------------------- | ----------------- | ----------------------------------- |
+| `--cl-from-opacity`, `--cl-from-transform`, `--cl-from-filter` | Set by the recipe | The starting pose of the part.      |
+| `--cl-exit-transform`                                          | The starting pose | Where the part goes when it leaves. |
+| `--cl-motion-duration`                                         | Set by the recipe | The length of the way in.           |
+| `--cl-motion-ease`                                             | Set by the recipe | The curve of the way in.            |
+
+## Strengths and limits
+
+### Strengths
+
+- One idea: every animation moves a part from a pose to rest.
+- Plain CSS. It needs no script, no new props and no per-component API.
+- It reaches any part that has a class and enter and exit attributes, including components in a portal.
+- Reduced motion lives in the rules once. A recipe drops movement and blur and keeps the fade.
+- Timing comes from shared values, so retuning one value retunes every component that uses it.
+- There are few things to learn and to check, for people and for agents.
+
+### Limits
+
+- A recipe moves a part between one pose and rest. Staggers, sequences, loops and keyframes cannot be expressed.
+- Only `opacity`, `transform` and `filter` are animated, plus the height of a flow. Color, clip-path and layout changes are not covered.
+- The exit pose is a transform. The opacity and filter on the way out match the starting pose.
+- A selector scoped to a wrapper does not reach a component in a portal. Scope with `:root` or the part's class.
+- A feature's flow has no class of its own yet, so a selector that targets flows reaches every flow that matches it.
+- A value that belongs to one element, such as the direction, must be declared on that element.
+- A part's own state can compete with a recipe. A toast's stacking and a drawer's swipe are not recipes, so a recipe on them only changes the way in and out.
+- Changing size is a flow behavior, because it depends on `Flow` measuring its step. A recipe on a popup cannot morph its size.
+- A spring is a fixed curve. It does not carry its velocity when it is interrupted halfway.
+- In a development build a component's own styles can win, so an override needs `!important` until the rules ship in Mosaic's layer.
+- None of this is in Mosaic yet. The names and the rules on this page are a proposal.
+
+### Trade-offs
+
+- A recipe you reuse is copied, not referenced. There is no name to point to, so a copy does not follow a later change to a built-in recipe.
+- There are new public variables to document and keep stable.
+- A lint rule or a review is needed to keep a component from writing its own timing.
+
+## Styling
+
+| Attribute or variable                                            | On          | Description                                                                         |
+| ---------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
+| `data-motion='none'`                                             | `<html>`    | Turns every recipe off.                                                             |
+| `--cl-flow-step-height`, `data-height-change='grow' \| 'shrink'` | `Flow.Root` | The measured height of the active step, and which way it changed. Morph reads them. |
+| `--cl-flow-transition-direction`                                 | A flow step | `1` going forward and `-1` going back. A push reads it.                             |
+
+Under `prefers-reduced-motion: reduce`, a recipe keeps its fade and drops its movement.

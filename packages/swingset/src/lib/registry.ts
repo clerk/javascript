@@ -171,6 +171,11 @@ import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../s
 import { meta as menuMeta } from '../stories/menu.stories';
 import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
 import {
+  CustomRecipe as MotionCustomRecipe,
+  Default as MotionDefault,
+  meta as motionMeta,
+} from '../stories/motion.stories';
+import {
   Default as OAuthConsentDefault,
   ManyScopes as OAuthConsentManyScopes,
   meta as oauthConsentMeta,
@@ -1099,6 +1104,8 @@ const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
+const motionModule: StoryModule = { meta: motionMeta, Default: MotionDefault, CustomRecipe: MotionCustomRecipe };
+
 const scrollAreaModule: StoryModule = {
   meta: scrollAreaMeta,
   Default: ScrollAreaDefault,
@@ -1571,6 +1578,7 @@ export const registry: StoryModule[] = [
   toastPrimitiveModule,
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
+  motionModule,
   scrollAreaModule,
   // Hooks
   useFormModule,
