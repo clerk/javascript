@@ -191,6 +191,36 @@ describe('api.client', () => {
     await expect(apiClient.users.getUserList({ query: 'john', limit: 1 })).rejects.toMatchObject({ status: 500 });
   });
 
+  it('executes 1 backend API request for users.getUserListWithoutCount()', async () => {
+    let countRequests = 0;
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('query')).toBe('john');
+          expect(url.searchParams.get('limit')).toBe('1');
+          expect(url.searchParams.get('offset')).toBe('2');
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, () => {
+        countRequests++;
+        return HttpResponse.json({ object: 'total_count', total_count: 2 });
+      }),
+    );
+
+    // The page is full, so getUserList() would have to wait for the count here.
+    const response = await apiClient.users.getUserListWithoutCount({
+      query: 'john',
+      offset: 2,
+      limit: 1,
+    });
+
+    expect(response).toEqual({ data: [expect.objectContaining({ id: 'user_cafebabe', firstName: 'John' })] });
+    expect(countRequests).toBe(0);
+  });
+
   it('sends startingAfter only to the users list request', async () => {
     server.use(
       http.get(

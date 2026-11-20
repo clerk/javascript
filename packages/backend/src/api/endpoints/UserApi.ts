@@ -586,6 +586,21 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
+   * Retrieves the list of users in your instance without their total count. It takes the same parameters as `getUserList()` and returns the same users, but makes no request to count them, which can be slow for a search over many users. By default, the list is returned in descending order by creation date (newest first).
+   *
+   * There is no total, so page until a page holds fewer users than its `limit`.
+   * @returns An object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects.
+   */
+  public async getUserListWithoutCount(params: UserListParams = {}): Promise<{ data: User[] }> {
+    const data = await this.request<User[]>({
+      method: 'GET',
+      path: basePath,
+      queryParams: params,
+    });
+    return { data };
+  }
+
+  /**
    * Retrieves one page of the users in your instance that match the given filters, or of all users when none are given. By default, the page is returned in descending order by creation date (newest first).
    *
    * Pages are linked by the `cursor` in the response. Pass `cursor.startingAfter` as `startingAfter` to get the next page, until it is `null`, or `cursor.endingBefore` as `endingBefore` to get the previous page. Paging by cursor works with every `orderBy` and does not slow down on later pages.
