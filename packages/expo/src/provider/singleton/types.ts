@@ -8,6 +8,7 @@ import type {
 } from '@clerk/shared/types';
 
 import type { TokenCache } from '../../cache/types';
+import type { DeviceBinding } from '../deviceBinding';
 
 export interface IStorage {
   set: (key: string, value: string) => Promise<void>;
@@ -44,4 +45,11 @@ export type BuildClerkOptions = {
     isAutoFillSupported: () => Promise<boolean>;
   };
   __experimental_resourceCache?: () => IStorage;
+  /**
+   * Signs Frontend API requests with the native SDK's device key. Set by `ClerkProvider` when
+   * `@clerk/expo-native-components` can sign.
+   *
+   * @internal
+   */
+  __internal_deviceBinding?: DeviceBinding | null;
 };

@@ -1,11 +1,12 @@
-import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
 
 import { MemoryTokenCache } from '../cache/MemoryTokenCache';
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
+import type { NativeDeviceBindingModule } from '../specs/NativeClerkModule.types';
 import type { ClerkExpoNativeModule } from '../utils/native-module';
 import { waitUntilAppIsActive } from '../utils/runtime';
+import { createDeviceBinding, type DeviceBinding, jwtClaims } from './deviceBinding';
 
 const CONFIGURE_TIMEOUT_MS = 3_000;
 const IDLE_TIMEOUT_MS = 5_000;
@@ -106,19 +107,18 @@ function fingerprint(clerk: SyncableClerk): string {
 }
 
 function clientIdOf(token: string | null): string | null {
-  const payload = token?.split('.')[1];
-  if (!payload) {
-    return null;
-  }
-  try {
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const { id } = JSON.parse(isomorphicAtob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='))) as {
-      id?: unknown;
-    };
-    return typeof id === 'string' ? id : null;
-  } catch {
-    return null;
-  }
+  const id = jwtClaims(token)?.id;
+  return typeof id === 'string' ? id : null;
+}
+
+type SigningNativeModule = ClerkExpoNativeModule & NativeDeviceBindingModule;
+
+function signsRequests(native: ClerkExpoNativeModule): native is SigningNativeModule {
+  return (
+    typeof native.setHostSignsRequests === 'function' &&
+    typeof native.createDpopProof === 'function' &&
+    typeof native.recordServerDate === 'function'
+  );
 }
 
 async function readSeedDeviceToken(tokenCache: TokenCache): Promise<string | null> {
@@ -145,6 +145,11 @@ function configureOnce(
       await native
         .setUpdateRequiredViewEnabled?.(updateRequiredViewEnabled)
         .catch(error => warn('Failed to set whether the native SDK shows its update screen.', error));
+      if (signsRequests(native)) {
+        await native
+          .setHostSignsRequests(true)
+          .catch(error => warn('Failed to bind the client to the device key; requests stay unsigned.', error));
+      }
       await native
         .configureNative(publishableKey, seed, proxyUrl)
         .catch(() => native.configureNative(publishableKey, seed, proxyUrl));
@@ -249,6 +254,28 @@ export function createNativeClientSync(
       }
     },
   };
+
+  const dropClientToken = async (requestToken: string) => {
+    if (await ready()) {
+      await setDeviceToken(null, requestToken);
+    }
+    const kept = await Promise.resolve(fallback().getToken(CLERK_CLIENT_JWT_KEY)).catch(() => null);
+    if (kept === requestToken) {
+      const userCache = fallback();
+      await Promise.resolve(
+        userCache.clearToken
+          ? userCache.clearToken(CLERK_CLIENT_JWT_KEY)
+          : userCache.saveToken(CLERK_CLIENT_JWT_KEY, ''),
+      ).catch(noop);
+    }
+    if (mirroredToken === requestToken) {
+      mirroredToken = null;
+    }
+  };
+
+  const deviceBinding: DeviceBinding | null = signsRequests(native)
+    ? createDeviceBinding(native, dropClientToken)
+    : null;
 
   const attach = (clerk: SyncableClerk): (() => void) => {
     let reconciling: Promise<void> | null = null;
@@ -385,7 +412,7 @@ export function createNativeClientSync(
     };
   };
 
-  return { tokenCache, attach };
+  return { tokenCache, attach, deviceBinding };
 }
 
 /**

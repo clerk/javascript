@@ -26,6 +26,7 @@ import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
 import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
+import type { DeviceBinding, FetchAttempt } from '../deviceBinding';
 import type { ClientTokenCache } from '../nativeClientSync';
 import type { BuildClerkOptions } from './types';
 
@@ -63,6 +64,7 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+let __internal_deviceBinding: DeviceBinding | null = null;
 
 async function readClientJwt(): Promise<string | null | undefined> {
   try {
@@ -122,6 +124,10 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
     if (hasOwnOption(options, 'tokenCache')) {
       __internal_tokenCache = options.tokenCache ?? MemoryTokenCache;
+    }
+
+    if (hasOwnOption(options, '__internal_deviceBinding')) {
+      __internal_deviceBinding = options.__internal_deviceBinding ?? null;
     }
 
     if (!__internal_clerk || hasConfigChanged) {
@@ -329,6 +335,17 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         }
       });
 
+      // @ts-expect-error - This is an internal API
+      __internal_clerk.__internal_onBeforeFetch?.((attempt: FetchAttempt) =>
+        __internal_deviceBinding?.beforeFetch(attempt),
+      );
+
+      // @ts-expect-error - This is an internal API
+      __internal_clerk.__internal_onFetchResponse?.(
+        async (attempt: FetchAttempt, response: Response) =>
+          (await __internal_deviceBinding?.onFetchResponse(attempt, response)) ?? false,
+      );
+
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
       __internal_clerk.__internal_onAfterResponse(async (requestInit: FapiRequestInit, response: FapiResponse) => {
@@ -336,6 +353,8 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (authHeader) {
           await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
         }
+
+        await __internal_deviceBinding?.afterResponse(requestTokens.get(requestInit) ?? null, response);
 
         appVersionRequestHooks?.afterResponse(requestInit, response);
 
