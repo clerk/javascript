@@ -390,6 +390,52 @@ describe('SignUp', () => {
     expect(fapi.signUp.updates[0].get('username')).toBeNull();
   });
 
+  it('asks for an email or a phone number on the continue screen of an instance without progressive sign-up', async () => {
+    const fapi = serveFapi({
+      environment: environment({
+        attributes: {
+          phone_number: {
+            enabled: true,
+            used_for_first_factor: true,
+            first_factors: ['phone_code'],
+            verifications: ['phone_code'],
+          },
+        },
+        user_settings: {
+          sign_up: {
+            allowlist_only: false,
+            progressive: false,
+            captcha_enabled: false,
+            mode: 'public',
+            legal_consent_enabled: false,
+          },
+        },
+      }),
+    });
+    const { clerk } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
+
+    await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Use phone instead' }));
+    expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Use email instead' }));
+    await user.type(emailField(), EMAIL);
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.updates[0].get('email_address')).toBe(EMAIL);
+    expect(fapi.signUp.updates[0].get('phone_number')).toBeNull();
+  });
+
   it('offers Start over on an instance that verifies email by link', async () => {
     const { fapi, user } = await renderSignUp({
       environment: environment({ attributes: { email_address: { required: true, verifications: ['email_link'] } } }),

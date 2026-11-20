@@ -93,11 +93,26 @@ export function signUpHandlers(
     return envelope(signUp, state.client);
   };
 
+  const combinesEmailOrPhone = () => {
+    const { attributes, sign_up } = settings();
+    return (
+      !sign_up.progressive &&
+      attributes.email_address.used_for_first_factor &&
+      attributes.phone_number.used_for_first_factor
+    );
+  };
+
   const requirements = (): Pick<SignUpJSON, 'required_fields' | 'optional_fields'> => {
     const { attributes, sign_up } = settings();
     const names = ['email_address', 'phone_number', 'username', 'first_name', 'last_name', 'password'] as const;
-    const enabled = names.filter(name => attributes[name].enabled);
-    const required = enabled.filter(name => attributes[name].required);
+    const combined = combinesEmailOrPhone();
+    const enabled = names.filter(
+      name => attributes[name].enabled && !(combined && (name === 'email_address' || name === 'phone_number')),
+    );
+    const required: SignUpField[] = enabled.filter(name => attributes[name].required);
+    if (combined) {
+      required.push('email_address_or_phone_number');
+    }
     return {
       required_fields: sign_up.legal_consent_enabled ? [...required, 'legal_accepted'] : required,
       optional_fields: enabled.filter(name => !attributes[name].required),
@@ -114,6 +129,9 @@ export function signUpHandlers(
       if (field === 'legal_accepted') {
         return signUp.legal_accepted_at !== null;
       }
+      if (field === 'email_address_or_phone_number') {
+        return Boolean(signUp.email_address || signUp.phone_number);
+      }
       return Boolean(signUp[field as (typeof TEXT_FIELDS)[number]]);
     };
     const identifiers: SignUpIdentificationField[] = ['email_address', 'phone_number'];
@@ -127,7 +145,9 @@ export function signUpHandlers(
       name => attributes[name].enabled,
     );
     const anyIdentifierMissing =
-      identifierNames.every(name => !attributes[name].required) && !identifierNames.some(name => provided(name));
+      settings().sign_up.progressive &&
+      identifierNames.every(name => !attributes[name].required) &&
+      !identifierNames.some(name => provided(name));
     const missingFields = [
       ...required_fields.filter(field => !provided(field)),
       ...(anyIdentifierMissing ? identifierNames : []),
