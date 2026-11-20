@@ -31,7 +31,7 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
     <Flow.Part part='resetPassword'>
       <UVFactorOneCodeForm
         {...codeCardProps}
-        // Outside the change-password form, this code verifies the user for the action they started,
+        // Without a prefilled new password, this code verifies the user for the action they started,
         // so it uses the same copy as the plain code screens.
         cardTitle={
           !hasNewPassword

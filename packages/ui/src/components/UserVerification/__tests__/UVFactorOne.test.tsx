@@ -526,7 +526,7 @@ describe('UserVerificationFactorOne', () => {
       expect(screen.queryByText('Too many requests. Please try again in a bit.')).not.toBeInTheDocument();
     });
 
-    it("keeps the change password form's sign-out choice when its new password is rejected", async () => {
+    it('keeps the prefilled sign-out choice when the prefilled new password is rejected', async () => {
       const { userEvent, fixtures } = await submitPwnedPassword({
         resetPassword: { password: 'from-the-form-123', signOutOfOtherSessions: false },
         resetButtonText: 'Email code to xxx@hello.com',
