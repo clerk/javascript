@@ -8,6 +8,7 @@ import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
 import type { SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
 import type { SignUpDetails, SignUpDetailsScreen, SignUpFieldName, SignUpFields, SignUpValues } from '../sign-up.types';
+import { signUpFieldNames } from '../sign-up.utils';
 
 const emptyValues: SignUpValues = {
   identifier: '',
@@ -47,6 +48,11 @@ function detailsStep(
   };
 }
 
+function hasRequired(values: SignUpValues, fields: SignUpFields, consentRequired: boolean): boolean {
+  const filled = signUpFieldNames(fields).every(name => !fields[name]?.required || values[name].trim() !== '');
+  return filled && (!consentRequired || values.legalAccepted);
+}
+
 function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
   const pick = (name: SignUpFieldName) => (fields[name] ? values[name] : undefined);
   return {
@@ -79,8 +85,11 @@ export function useSignUpDetailsController(
   const continueFields = details.continueFieldsFor(identifier);
   const fields = purpose === 'continue' ? continueFields : startFields;
 
+  const consentRequired = Boolean(purpose === 'continue' ? details.continueLegalConsent : details.legalConsent);
+
   const form = useForm<SignUpValues, SignUpNextStep | undefined>({
     initialValues: { ...emptyValues, ...details.prefill },
+    canSubmit: values => hasRequired(values, fields, consentRequired),
     onSubmit: values => {
       const submitted = detailsValues(values, fields);
       return purpose === 'continue'

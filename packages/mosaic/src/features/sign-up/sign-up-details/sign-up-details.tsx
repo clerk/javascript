@@ -123,7 +123,8 @@ export function SignUpDetailsStep({
           <SubmitButton
             form={form.id}
             fullWidth
-            disabled={Boolean(pendingProviderId)}
+            disabled={Boolean(pendingProviderId) || !form.canSubmit}
+            focusableWhenDisabled
             isPending={isPending}
             pendingLabel={m.verifying}
           >

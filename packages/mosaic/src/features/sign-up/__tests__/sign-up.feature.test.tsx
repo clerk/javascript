@@ -335,15 +335,36 @@ describe('SignUp', () => {
     expect(passwordField()).toHaveValue(PASSWORD);
   });
 
-  it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
-    const { fapi, user, navigate } = await renderSignUp({
+  it('keeps Continue disabled until every required field is filled', async () => {
+    const { fapi, user } = await renderSignUp({
       environment: environment({ attributes: { username: { required: true } } }),
     });
 
     await submitStart(user);
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(continueButton()).toHaveAttribute('aria-disabled', 'true');
+    expect(fapi.signUp.creations).toHaveLength(0);
 
+    await user.type(screen.getByRole('textbox', { name: 'Username' }), 'alice');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.creations[0].get('username')).toBe('alice');
+  });
+
+  it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
+    const fapi = serveFapi({ environment: environment({ attributes: { username: { required: true } } }) });
+    const { clerk, navigate } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL, password: PASSWORD }));
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
     await enterCode(user);
 
     expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
