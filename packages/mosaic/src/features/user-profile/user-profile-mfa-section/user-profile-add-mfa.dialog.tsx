@@ -63,12 +63,7 @@ export function UserProfileAddMfaDialog({
         initialFocus={initialFocus}
         finalFocus={addButtonRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
-          {children}
-        </Card.Root>
+        <Card.Root renderBranding={false}>{children}</Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
   );

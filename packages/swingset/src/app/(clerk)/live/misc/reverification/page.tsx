@@ -196,10 +196,7 @@ function DialogHarness() {
         }}
       >
         <Dialog.Popup>
-          <Card.Root
-            elevation='overlay'
-            renderBranding={false}
-          >
+          <Card.Root renderBranding={false}>
             <Flow.Root
               value={step}
               direction={direction}

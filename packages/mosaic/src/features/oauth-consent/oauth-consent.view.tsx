@@ -212,10 +212,7 @@ function RedirectUrlDialog({
       onOpenChange={onOpenChange}
     >
       <Dialog.Popup>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>{m.redirectUrlTitle}</Card.Title>
             <Card.Description>

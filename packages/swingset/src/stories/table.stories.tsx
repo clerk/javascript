@@ -530,10 +530,7 @@ export function ClickableRows() {
               variant='card'
               compactPlacement='center'
             >
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              >
+              <Card.Root renderBranding={false}>
                 <Card.Header>
                   <Card.Title>{payload.name}</Card.Title>
                   <Card.Description>API key</Card.Description>

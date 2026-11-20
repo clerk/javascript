@@ -61,10 +61,7 @@ export function UserProfileEditNameDialog({
         variant='card'
         initialFocus={initialFocusRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>{title ?? m.name.dialogTitle}</Card.Title>
           </Card.Header>

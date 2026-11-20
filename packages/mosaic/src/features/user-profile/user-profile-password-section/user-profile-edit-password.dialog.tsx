@@ -148,10 +148,7 @@ export function UserProfileEditPasswordDialog({
         variant='card'
         initialFocus={initialFocusRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           {reverification ? (
             <Flow.Root
               value={step}

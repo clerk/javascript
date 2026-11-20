@@ -95,7 +95,7 @@ export default {
       code: `
 <Dialog.Root open={open} onOpenChange={onOpenChange}>
   <Dialog.Popup>
-    <Card.Root elevation='overlay'>
+    <Card.Root>
       <Card.Header>
         <Card.Title>{m.title}</Card.Title>
       </Card.Header>
