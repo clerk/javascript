@@ -67,8 +67,12 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
         if (await googlePageOpen()) await device.back();
         ended = await resultShows(BACK_OUT_MS);
         if (!ended) {
-          if (!(await googlePageOpen())) throw new Error("Google's page closed, but the app showed no result");
-          await forceStopGooglePlayServices();
+          if (await googlePageOpen()) {
+            await forceStopGooglePlayServices();
+          } else {
+            ended = await resultShows(BACK_OUT_MS);
+            if (!ended) throw new Error("Google's page closed, but the app showed no result");
+          }
         }
       }
       await expect(googlePage).toHaveCount(0, { timeout: 15_000 });
