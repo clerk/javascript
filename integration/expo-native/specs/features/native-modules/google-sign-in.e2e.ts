@@ -6,6 +6,8 @@ import { homeLinks } from '../../native.ts';
 
 const GOOGLE_UI_TIMEOUT_MS = 30_000;
 const BACK_OUT_MS = 5_000;
+const SELF_CLOSE_MS = 5_000;
+const ANDROID_NO_SESSION_RESULT = /^Google sign-in (was cancelled|failed: No credentials available)$/;
 
 async function forceStopGooglePlayServices(): Promise<void> {
   const result = await deviceCommand(readTarget(app, process.env).device, 'android', [
@@ -29,7 +31,16 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
   await host.launch();
   await host.tap(homeLinks(screen).nativeModules);
   await host.tap(screen.getByTestId('google-sign-in-button'));
+  const resultShows = (timeout: number) =>
+    expect
+      .poll(() => googleResult.count().catch(() => 0), { timeout })
+      .toBeGreaterThan(0)
+      .then(
+        () => true,
+        () => false,
+      );
   try {
+    let ended = true;
     if (platform === 'android') {
       await expect
         .poll(() => googlePage.count().catch(() => 0), {
@@ -37,24 +48,25 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
           message: 'a page of Google Play services is on screen',
         })
         .toBeGreaterThan(0);
-    } else {
-      await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
-    }
-    await host.screenshot('google-system-prompt');
-    let cancelled = true;
-    if (platform === 'android') {
-      await device.back();
-      cancelled = await googleResult.waitFor({ timeout: BACK_OUT_MS }).then(
-        () => true,
-        () => false,
-      );
-      if (!cancelled) await forceStopGooglePlayServices();
+      // With no Google account on the emulator, Google Play services moves on to its add-account page, which sometimes gives up within a second and ends the flow by itself.
+      // A snapshot taken while that page closes fails, so the page gets no screenshot, the reads here count a failed snapshot as nothing on screen, and back is pressed only when the page stays open.
+      ended = await resultShows(SELF_CLOSE_MS);
+      if (!ended) {
+        await device.back();
+        ended = await resultShows(BACK_OUT_MS);
+        if (!ended) await forceStopGooglePlayServices();
+      }
       await expect(googlePage).toHaveCount(0, { timeout: 15_000 });
     } else {
+      await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
+      await host.screenshot('google-system-prompt');
       await device.alert('dismiss');
     }
-    if (cancelled) {
-      await expect(googleResult).toHaveText('Google sign-in was cancelled', { timeout: 15_000 });
+    if (ended) {
+      await expect(googleResult).toHaveText(
+        platform === 'android' ? ANDROID_NO_SESSION_RESULT : 'Google sign-in was cancelled',
+        { timeout: 15_000 },
+      );
       await host.screenshot('google-cancelled');
     }
   } catch (error) {
