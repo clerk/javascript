@@ -6,7 +6,7 @@ Worked example: `src/features/reverification/` (model, controller, view, types, 
 
 ## Rules
 
-- Before you add a feature, check `packages/ui/src/components/` for a legacy version. If one exists, this is a migration: read [Migration](migration.md) first.
+- Before you add a feature, check `packages/ui/src/components/` and `packages/react/src/components/` for a legacy version, including for a headless port. If one exists, this is a migration: read [Migration](migration.md) first.
 - Only a `*.model.ts(x)`, or a shared Clerk-reading hook in `src/hooks/` (`useMosaicEnvironment`, `useMosaicRouter`, `useMosaicSupportEmail`), imports Clerk hooks or calls Clerk resource methods.
 - What crosses each boundary is plain data: no Clerk resource reaches the controller, and no machine snapshot reaches the view.
 - A feature's machine lives in its `*.controller.ts(x)`, not in `src/machine/` and not in a `*.machine.ts`.
