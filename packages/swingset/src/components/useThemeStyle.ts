@@ -2,11 +2,17 @@
 
 import * as React from 'react';
 
-export type ThemeStyle = 'default' | 'clerk';
+export const THEME_STYLES = ['default', 'clerk'] as const;
+
+export type ThemeStyle = (typeof THEME_STYLES)[number];
+
+export function parseThemeStyle(value: unknown): ThemeStyle {
+  return THEME_STYLES.find(style => style === value) ?? 'default';
+}
 
 export const THEME_STYLE_STORAGE_KEY = 'swingset-theme-style';
 
-export const THEME_STYLE_INIT_SCRIPT = `try{if(localStorage.getItem('${THEME_STYLE_STORAGE_KEY}')==='clerk')document.documentElement.dataset.swingsetTheme='clerk'}catch(e){}`;
+export const THEME_STYLE_INIT_SCRIPT = `try{var s=localStorage.getItem('${THEME_STYLE_STORAGE_KEY}');if(s!=='default'&&${JSON.stringify(THEME_STYLES)}.indexOf(s)!==-1)document.documentElement.dataset.swingsetTheme=s}catch(e){}`;
 
 const listeners = new Set<() => void>();
 
@@ -18,7 +24,7 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot(): ThemeStyle {
-  return document.documentElement.dataset.swingsetTheme === 'clerk' ? 'clerk' : 'default';
+  return parseThemeStyle(document.documentElement.dataset.swingsetTheme);
 }
 
 function getServerSnapshot(): ThemeStyle {
@@ -26,10 +32,10 @@ function getServerSnapshot(): ThemeStyle {
 }
 
 function setThemeStyle(next: ThemeStyle) {
-  if (next === 'clerk') {
-    document.documentElement.dataset.swingsetTheme = 'clerk';
-  } else {
+  if (next === 'default') {
     delete document.documentElement.dataset.swingsetTheme;
+  } else {
+    document.documentElement.dataset.swingsetTheme = next;
   }
   listeners.forEach(listener => listener());
   try {

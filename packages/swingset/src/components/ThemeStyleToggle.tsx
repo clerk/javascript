@@ -2,12 +2,14 @@
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { type ThemeStyle, useThemeStyle } from './useThemeStyle';
+import { parseThemeStyle, THEME_STYLES, type ThemeStyle, useThemeStyle } from './useThemeStyle';
 
-const items: { label: string; value: ThemeStyle }[] = [
-  { label: 'Default', value: 'default' },
-  { label: 'Clerk', value: 'clerk' },
-];
+const labels: Record<ThemeStyle, string> = {
+  default: 'Default',
+  clerk: 'Clerk',
+};
+
+const items = THEME_STYLES.map(value => ({ label: labels[value], value }));
 
 export function ThemeStyleToggle() {
   const { themeStyle, setThemeStyle } = useThemeStyle();
@@ -18,7 +20,7 @@ export function ThemeStyleToggle() {
       <Select
         items={items}
         value={themeStyle}
-        onValueChange={value => setThemeStyle(value === 'clerk' ? 'clerk' : 'default')}
+        onValueChange={value => setThemeStyle(parseThemeStyle(value))}
       >
         <SelectTrigger
           size='sm'
