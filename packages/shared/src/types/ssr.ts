@@ -1,4 +1,4 @@
-import type { ActClaim, JwtPayload, SessionStatusClaim } from './jwtv2';
+import type { ActClaim, AgentActClaim, JwtPayload, SessionStatusClaim } from './jwtv2';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
 import type { SessionResource } from './session';
@@ -37,6 +37,7 @@ export type InitialState = Serializable<{
   sessionStatus: SessionStatusClaim;
   session: SessionResource | undefined;
   actor: ActClaim | undefined;
+  agent?: AgentActClaim | null;
   userId: string | undefined;
   user: UserResource | undefined;
   orgId: string | undefined;

@@ -13,6 +13,10 @@ export class AgentTask {
     readonly agentTaskId: string,
     /** The Frontend API URL that, when visited, creates a session for the user. Only returned by [`create()`](https://clerk.com/docs/reference/backend/agent-tasks/create); omitted from [`revoke()`](https://clerk.com/docs/reference/backend/agent-tasks/revoke). */
     readonly url: string,
+    /** Whether the session created by the Agent Task is restricted. */
+    readonly sessionRestricted: boolean = false,
+    /** The ID of the Organization that the session created by the Agent Task starts in, or `null` for the user's personal account. A restricted session can only use this Organization or personal account. */
+    readonly organizationId: string | null = null,
   ) {}
 
   /**
@@ -23,6 +27,13 @@ export class AgentTask {
    */
   static fromJSON(data: AgentTaskJSON): AgentTask {
     const agentTaskId = data.agent_task_id ?? data.task_id ?? '';
-    return new AgentTask(data.agent_id, agentTaskId, agentTaskId, data.url);
+    return new AgentTask(
+      data.agent_id,
+      agentTaskId,
+      agentTaskId,
+      data.url,
+      data.session_restricted,
+      data.session_organization_id,
+    );
   }
 }

@@ -1,4 +1,4 @@
-import type { ActClaim, JwtHeader, JwtPayload } from './jwtv2';
+import type { ActClaim, AgentClaim, JwtHeader, JwtPayload } from './jwtv2';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 
 export interface JWT {
@@ -81,6 +81,11 @@ export interface ClerkJWTClaims {
    * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
    */
   act?: ActClaim;
+
+  /**
+   * Agent claim (agt). Present on agent sessions. These sessions do not carry an `act` claim.
+   */
+  agt?: AgentClaim;
 
   /**
    * Active Organization ID.

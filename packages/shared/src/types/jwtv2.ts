@@ -88,6 +88,11 @@ type JWTPayloadBase = {
   act?: ActClaim;
 
   /**
+   * Agent claim (agt). Present on agent sessions. These sessions do not carry an `act` claim.
+   */
+  agt?: AgentClaim;
+
+  /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
    *
    * @experimental This API is experimental and may change at any moment.
@@ -211,11 +216,83 @@ export interface ActClaim {
 }
 
 /**
- * ActClaim narrowed to actor type `'agent'`. Use for session.agent.
+ * Agent claim (`agt`). Present on agent sessions: agent task sessions and Poppy sessions.
  *
  * @inline
  */
-export type AgentActClaim = ActClaim & { type: 'agent' };
+export interface AgentClaim {
+  /**
+   * The ID of the agent. For a Poppy session, the agent's client ID URL.
+   */
+  id: string;
+  /**
+   * The ID of the agent task that was used to create the session. Absent for a Poppy session.
+   */
+  tsk?: string;
+  /**
+   * The registry that issued the agent. For a Poppy session, the same client ID URL as `id`.
+   */
+  reg: string;
+  /**
+   * The Poppy identity of a Poppy session. Absent for an agent task session.
+   *
+   * @experimental This field can change in a minor release.
+   */
+  poppy?: PoppyClaim;
+  /**
+   * Present and `true` when the session is restricted. Poppy sessions are always restricted.
+   */
+  rst?: boolean;
+}
+
+/**
+ * The Poppy identity of a Poppy session.
+ *
+ * @experimental These fields can change in a minor release.
+ *
+ * @inline
+ */
+export interface PoppyClaim {
+  /**
+   * The Poppy session ID.
+   */
+  session_id: string;
+  /**
+   * The agent's client ID URL.
+   */
+  client_id: string;
+  /**
+   * The user ID that the agent uses for the user. It is not a Clerk user ID.
+   */
+  user_id: string;
+  /**
+   * An optional ID that the agent sets for itself. It is not a Clerk ID.
+   */
+  agent_id?: string;
+}
+
+/**
+ * ActClaim narrowed to actor type `'agent'`. This shape is shared by `Session.agent` and the `agent` property of the auth object.
+ *
+ * @inline
+ */
+export type AgentActClaim = ActClaim & {
+  type: 'agent';
+  /**
+   * The ID of the agent task that was used to create the session. `undefined` for a Poppy session.
+   */
+  task_id?: string;
+  /**
+   * The Poppy identity of a Poppy session, from the session token. Set on the `agent` property returned by `auth()` on the server. `useAuth()` and `Session.agent` never set it, and it is `undefined` for an agent task session.
+   *
+   * @experimental This field can change in a minor release.
+   */
+  poppy?: PoppyClaim;
+  /**
+   * Whether the session is restricted. In a restricted session, Clerk's Frontend API refuses the agent's writes. `false` when the session does not say so. Until Clerk adds the flag to the session token, it reads `false` on the server and during server rendering. Clerk enforces the restriction; to refuse agent sessions, check the agent itself, not this field.
+   */
+  restricted?: boolean;
+};
 
 /**
  * The current state of the session which can only be `active` or `pending`.
