@@ -350,6 +350,7 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.creations[0].get('username')).toBe('alice');
+    await codeSent();
   });
 
   it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
@@ -409,6 +410,7 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.updates[0].get('email_address')).toBe(EMAIL);
     expect(fapi.signUp.updates[0].get('username')).toBeNull();
+    await codeSent();
   });
 
   it('asks for an email or a phone number on the continue screen of an instance without progressive sign-up', async () => {
@@ -453,6 +455,7 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.updates[0].get('email_address')).toBe(EMAIL);
     expect(fapi.signUp.updates[0].get('phone_number')).toBeNull();
+    await codeSent();
   });
 
   it('asks for legal consent on the continue screen when the sign-up has not accepted it', async () => {
