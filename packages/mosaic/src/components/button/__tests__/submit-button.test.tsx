@@ -22,6 +22,11 @@ const atoms = (el: Element | null | undefined) => el?.className.split(' ').filte
 const isSupersetOf = (all: string[], some: string[]) => some.every(atom => all.includes(atom));
 
 describe('Mosaic SubmitButton', () => {
+  it('gives the text label a class consumers can target', () => {
+    render(<SubmitButton>Save</SubmitButton>);
+    expect(screen.getByText('Save')).toHaveClass('cl-button-label');
+  });
+
   it('renders a submit button with its children', () => {
     render(<SubmitButton>Save</SubmitButton>);
     const button = screen.getByRole('button', { name: 'Save' });

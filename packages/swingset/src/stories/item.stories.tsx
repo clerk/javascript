@@ -134,7 +134,6 @@ export function Group() {
           </Item.Content>
           <Icon
             glyph={ChevronRight}
-            size='md'
             xstyle={styles.iconWidth}
           />
         </Item.Root>

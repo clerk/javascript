@@ -1111,6 +1111,10 @@ export const itIT: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1585,12 +1589,14 @@ export const itIT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Elenco di tutti gli account',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea Organizzazione',
     action__invitationAccept: 'Unisciti',
     action__manageOrganization: 'Gestisci Organizzazione',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Richiedi di unirti',
+    membershipListLabel: 'Elenco di tutte le appartenenze alle organizzazioni',
     notSelected: 'Nessuna organizzazione selezionata',
     personalWorkspace: 'Spazio di lavoro personale',
     suggestionsAcceptedLabel: 'In attesa di approvazione',

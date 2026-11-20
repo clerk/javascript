@@ -1110,6 +1110,10 @@ export const jaJP: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1584,12 +1588,14 @@ export const jaJP: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'すべてのアカウントの一覧',
     action__closeOrganizationSwitcher: '組織スイッチャーを閉じる',
     action__createOrganization: '組織の作成',
     action__invitationAccept: '参加する',
     action__manageOrganization: '組織の管理',
     action__openOrganizationSwitcher: '組織スイッチャーを開く',
     action__suggestionsAccept: '参加をリクエストする',
+    membershipListLabel: 'すべての組織メンバーシップの一覧',
     notSelected: '組織が選択されていません',
     personalWorkspace: '個人ワークスペース',
     suggestionsAcceptedLabel: '承認待ち',

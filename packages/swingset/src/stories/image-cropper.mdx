@@ -4,7 +4,7 @@ import * as ImageCropperStories from './image-cropper.stories';
 
 Crops an image to a square. The user pans by dragging or with the arrow keys, zooms with the wheel, a
 pinch, the keyboard, a slider or step buttons, turns it a quarter at a time, and resets it.
-`cropImage` then draws the chosen square into a new image. It is a **headless** primitive: it ships
+`ImageCropper.cropImage` then draws the chosen square into a new image. It is a **headless** primitive: it ships
 **no styles**. You size the frame, draw any mask over it, and style the controls through the `data-*`
 attributes each part emits.
 
@@ -12,7 +12,7 @@ attributes each part emits.
 
 The demo is intentionally unstyled. The only inline styles give the frame a size and clip the image,
 which the primitive leaves to you. Drag, zoom or rotate the image, then press Crop to see the 128px
-result from `cropImage`.
+result from `ImageCropper.cropImage`.
 
 <Story
   name='Default'
@@ -24,9 +24,9 @@ result from `cropImage`.
 ```tsx
 import { useState } from 'react';
 
-import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '@clerk/mosaic/primitives/image-cropper';
+import { type Crop, ImageCropper } from '@clerk/mosaic/primitives/image-cropper';
 
-const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
+const [crop, setCrop] = useState<Crop>(ImageCropper.INITIAL_CROP);
 
 <ImageCropper.Root
   src={src}
@@ -43,7 +43,7 @@ const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
   <ImageCropper.Reset>Reset</ImageCropper.Reset>
 </ImageCropper.Root>;
 
-const blob = await cropImage(src, crop, { type: 'image/png' });
+const blob = await ImageCropper.cropImage(src, crop, { type: 'image/png' });
 ```
 
 ### A crop area inside a larger frame
@@ -72,7 +72,7 @@ against the `Area`, so the image follows the pointer either way.
 | `ImageCropper.ZoomIn`   | `<button>`             | Zooms in one step. Disabled at `maxZoom`                               |
 | `ImageCropper.ZoomOut`  | `<button>`             | Zooms out one step. Disabled at 1                                      |
 | `ImageCropper.Rotate`   | `<button>`             | Turns the image a quarter clockwise                                    |
-| `ImageCropper.Reset`    | `<button>`             | Returns to `INITIAL_CROP`                                              |
+| `ImageCropper.Reset`    | `<button>`             | Returns to `ImageCropper.INITIAL_CROP`                                 |
 
 All parts except `Root` accept a `render` prop and standard HTML attributes for their default
 element. Every control stays disabled until the image has loaded, because the crop limits depend on
@@ -82,14 +82,14 @@ its size.
 
 ### `ImageCropper.Root`
 
-| Prop                       | Type                              | Default                   | Description                                     |
-| -------------------------- | --------------------------------- | ------------------------- | ----------------------------------------------- |
-| <code>src</code>           | <code>string</code>               | — (required)              | The image to crop, such as an object URL        |
-| <code>value</code>         | <code>Crop</code>                 | —                         | Controlled crop                                 |
-| <code>defaultValue</code>  | <code>Crop</code>                 | <code>INITIAL_CROP</code> | Initial crop (uncontrolled)                     |
-| <code>onValueChange</code> | <code>(crop: Crop) => void</code> | —                         | Called on every pan, zoom, turn and reset       |
-| <code>maxZoom</code>       | <code>number</code>               | <code>4</code>            | Largest zoom, as a multiple of the cover scale  |
-| <code>disabled</code>      | <code>boolean</code>              | <code>false</code>        | Ignores every gesture and disables the controls |
+| Prop                       | Type                              | Default                                | Description                                     |
+| -------------------------- | --------------------------------- | -------------------------------------- | ----------------------------------------------- |
+| <code>src</code>           | <code>string</code>               | — (required)                           | The image to crop, such as an object URL        |
+| <code>value</code>         | <code>Crop</code>                 | —                                      | Controlled crop                                 |
+| <code>defaultValue</code>  | <code>Crop</code>                 | <code>ImageCropper.INITIAL_CROP</code> | Initial crop (uncontrolled)                     |
+| <code>onValueChange</code> | <code>(crop: Crop) => void</code> | —                                      | Called on every pan, zoom, turn and reset       |
+| <code>maxZoom</code>       | <code>number</code>               | <code>4</code>                         | Largest zoom, as a multiple of the cover scale  |
+| <code>disabled</code>      | <code>boolean</code>              | <code>false</code>                     | Ignores every gesture and disables the controls |
 
 A `Crop` is `{ x, y, zoom, rotation }`. `x` and `y` move the image centre from the frame centre, as a
 fraction of the frame. `zoom` 1 is the smallest scale that still covers the frame. `rotation` is `0`,
@@ -97,7 +97,7 @@ fraction of the frame. `zoom` 1 is the smallest scale that still covers the fram
 
 Other parts take no additional props beyond standard HTML attributes for their default element.
 
-### `cropImage(src, crop, { type, size })`
+### `ImageCropper.cropImage(src, crop, { type, size })`
 
 Returns a `Promise<Blob>` holding the square the crop shows, encoded as `type`. A browser that
 cannot encode `type` returns `image/png`, so read the type from the blob. The square keeps the

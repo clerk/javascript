@@ -1109,6 +1109,10 @@ export const faIR: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1583,12 +1587,14 @@ export const faIR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'فهرست همه حساب‌ها',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
     action__manageOrganization: 'مدیریت',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'درخواست عضویت',
+    membershipListLabel: 'فهرست همه عضویت‌های سازمانی',
     notSelected: 'هیچ سازمانی انتخاب نشده است',
     personalWorkspace: 'حساب شخصی',
     suggestionsAcceptedLabel: 'در انتظار تایید',

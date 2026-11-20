@@ -1,4 +1,7 @@
-import { OrganizationProfileSecurityPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.view';
+import {
+  OrganizationProfileSecurityPanelEmptyState,
+  OrganizationProfileSecurityPanelView,
+} from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.view';
 import { useSSOBypassSectionController } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.controller';
 import type { SSOBypassModel } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.model';
 import { SSOBypassSectionSkeleton } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.skeleton';
@@ -234,6 +237,14 @@ export function SecurityPanelExample({
     <OrganizationProfileSecurityPanelView>
       <SSOSectionExample {...sso} />
       <SSOBypassSectionExample model={bypass} />
+    </OrganizationProfileSecurityPanelView>
+  );
+}
+
+export function SecurityPanelNoSectionsExample() {
+  return (
+    <OrganizationProfileSecurityPanelView>
+      <OrganizationProfileSecurityPanelEmptyState />
     </OrganizationProfileSecurityPanelView>
   );
 }

@@ -61,11 +61,7 @@ export function SSOBypassSectionView({
               focusableWhenDisabled
               onClick={onAdd}
             >
-              <Icon
-                glyph={Plus}
-                placement='inline-start'
-                size='md'
-              />
+              <Icon glyph={Plus} />
               {m.add}
             </Button>
           </Section.Actions>
@@ -76,7 +72,7 @@ export function SSOBypassSectionView({
               <Section.Row>
                 <Section.Item>
                   <Section.Content>
-                    <Section.Description>{m.loadError}</Section.Description>
+                    <Section.Error>{m.loadError}</Section.Error>
                   </Section.Content>
                   <Section.Actions>
                     <Button
@@ -120,8 +116,11 @@ export function SSOBypassSectionView({
               disabled={isFetching}
               onChange={onPageChange}
               label={m.pagination}
+              rangeLabel={m.range}
+              firstPageLabel={m.firstPage}
               previousPageLabel={m.previousPage}
               nextPageLabel={m.nextPage}
+              lastPageLabel={m.lastPage}
             />
           ) : null}
         </div>

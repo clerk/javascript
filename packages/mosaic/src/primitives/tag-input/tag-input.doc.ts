@@ -94,6 +94,11 @@ function Tags() {
 `,
     },
   ],
+  exports: {
+    'TagInput.useTagInput': {
+      description: 'Returns the tags inside a `TagInput.Root`, keeping removed tags until their exit animation ends.',
+    },
+  },
 } satisfies ComponentDoc<{
   'TagInput.Root': TagInputProps;
   'TagInput.List': TagInputListProps;

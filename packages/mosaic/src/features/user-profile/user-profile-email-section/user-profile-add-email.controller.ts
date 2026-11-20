@@ -180,7 +180,7 @@ export function useUserProfileAddEmailController({
   reverification,
 }: UserProfileAddEmailControllerOptions): UserProfileAddEmailController {
   const errorText = useErrorText();
-  const handle = useMemo(() => Dialog.createHandle(), []);
+  const handle = useMemo(() => Dialog.createDialogHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
   const { resendAvailableAt, error, verification } = snapshot.context;
   const resendSeconds = useResendSeconds(

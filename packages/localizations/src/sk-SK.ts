@@ -1104,6 +1104,10 @@ export const skSK: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1576,12 +1580,14 @@ export const skSK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Zoznam všetkých účtov',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvoriť organizáciu',
     action__invitationAccept: 'Pripojiť sa',
     action__manageOrganization: 'Spravovať organizáciu',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požiadať o pripojenie',
+    membershipListLabel: 'Zoznam všetkých členstiev v organizáciách',
     notSelected: 'Nie je vybraná žiadna organizácia',
     personalWorkspace: 'Osobný pracovný priestor',
     suggestionsAcceptedLabel: 'Čaká na schválenie',

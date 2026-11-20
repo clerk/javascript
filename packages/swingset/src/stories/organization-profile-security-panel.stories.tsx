@@ -1,6 +1,10 @@
 import type { StoryMeta } from '@/lib/types';
 
-import { SecurityPanelExample, SSOBypassAllowlistExample } from './fixtures/organization-profile-security-panel';
+import {
+  SecurityPanelExample,
+  SecurityPanelNoSectionsExample,
+  SSOBypassAllowlistExample,
+} from './fixtures/organization-profile-security-panel';
 import { SSOConnectionExample } from './fixtures/organization-profile-security-sso';
 
 export { default as __source } from './organization-profile-security-panel.stories?raw';
@@ -42,6 +46,10 @@ export function ManageSAMLConnection() {
 
 export function ManageOIDCConnection() {
   return <SSOConnectionExample id='ent_oidc' />;
+}
+
+export function NoSections() {
+  return <SecurityPanelNoSectionsExample />;
 }
 
 export function AllowListLoadError() {

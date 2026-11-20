@@ -195,29 +195,17 @@ export function Icons(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <Button {...knobsAsProps(props)}>
-        <Icon
-          glyph={Checkmark}
-          placement='inline-start'
-        />
+        <Icon glyph={Checkmark} />
         Approve
       </Button>
       <Button {...knobsAsProps(props)}>
         Options
-        <Icon
-          glyph={ChevronDown}
-          placement='inline-end'
-        />
+        <Icon glyph={ChevronDown} />
       </Button>
       <Button {...knobsAsProps(props)}>
-        <Icon
-          glyph={Checkmark}
-          placement='inline-start'
-        />
+        <Icon glyph={Checkmark} />
         Both sides
-        <Icon
-          glyph={ChevronDown}
-          placement='inline-end'
-        />
+        <Icon glyph={ChevronDown} />
       </Button>
     </div>
   );
@@ -239,7 +227,6 @@ export function IconSizes(props: Record<string, unknown>) {
           >
             <Icon
               glyph={Checkmark}
-              placement='inline-start'
               size={size === 'xs' ? 'sm' : size}
             />
             Approve
@@ -257,7 +244,6 @@ export function IconSizes(props: Record<string, unknown>) {
             Options
             <Icon
               glyph={ChevronDown}
-              placement='inline-end'
               size={size === 'xs' ? 'sm' : size}
             />
           </Button>
@@ -289,10 +275,7 @@ export function Truncation(props: Record<string, unknown>) {
         {...knobsAsProps(props)}
         fullWidth
       >
-        <Icon
-          glyph={Checkmark}
-          placement='inline-start'
-        />
+        <Icon glyph={Checkmark} />
         Save this organization&rsquo;s billing details
       </Button>
     </div>

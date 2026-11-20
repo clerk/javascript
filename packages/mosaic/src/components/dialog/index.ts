@@ -31,7 +31,6 @@
  * management, scroll lock, and ARIA wiring.
  */
 export * as Dialog from './dialog.parts';
-export { DialogContext, isInDialog } from './dialog';
 export type { DialogFocusTarget, DialogHandle, DialogOpenChangeDetails, DialogRole } from '../../primitives/dialog';
 export type {
   DialogCloseButtonProps,

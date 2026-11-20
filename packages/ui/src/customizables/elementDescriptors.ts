@@ -65,6 +65,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'listGroupContent',
   'listGroupItem',
   'listGroupItemLabel',
+  'listGroupItemCheckbox',
+
+  'oauthConsentClientIdentity',
 
   'header',
   'headerTitle',

@@ -1105,6 +1105,10 @@ export const esCR: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1580,12 +1584,14 @@ export const esCR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lista de todas las cuentas',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear Organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Administrar Organización',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
+    membershipListLabel: 'Lista de todas las membresías de organizaciones',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Espacio personal',
     suggestionsAcceptedLabel: 'Pendiente de aprobación',

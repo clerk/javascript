@@ -4,7 +4,7 @@ import type { IconName } from './registry';
 
 /**
  * A replacement glyph for a named icon, authored as a React element (`<MyIcon />` or a raw
- * `<svg>…</svg>`). Mosaic injects its sizing/color `className`, `data-size`/`data-icon`, and any svg props
+ * `<svg>…</svg>`). Mosaic injects its sizing/color `className`, `data-size`, and any svg props
  * forwarded from the `<Icon>` call site into this element via `cloneElement`, so the override is
  * styled and targetable exactly like the built-in glyph. Author the element to accept those props
  * (a component should spread them onto its root svg; a raw svg receives them directly).

@@ -1,7 +1,7 @@
 import type { OrganizationMembershipJSON, RoleJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiSSOBypassUser } from '../../../../__tests__/feature/fake-fapi/organization-security';
@@ -185,11 +185,71 @@ describe('Who sees the Security page', () => {
 
   it('hides the SSO bypass section when the instance does not offer it', async () => {
     serve({ permissions: [BYPASS, CONNECTIONS], selfServeSso: true, ssoBypass: { enabled: false } });
+    const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      await renderWithClerk(<OrganizationProfileSecurityPanel />);
+      expect(await screen.findByText('Security')).toBeVisible();
+
+      for (let step = 0; step < 20 && screen.queryByText('SSO bypass'); step++) {
+        await act(async () => vi.advanceTimersByTimeAsync(1_000));
+        await settle();
+      }
+
+      expect(screen.queryByText('SSO bypass')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('The Security page with no sections to show', () => {
+  const EMPTY = 'No security settings yet';
+
+  it('shows an empty state to a connection manager with self-serve Directory Sync', async () => {
+    serve({ permissions: [CONNECTIONS], selfServeDirectorySync: true, connections: [] });
     await renderWithClerk(<OrganizationProfileSecurityPanel />);
 
-    expect(await screen.findByText('Security')).toBeVisible();
-    await waitFor(() => expect(screen.queryByText('SSO bypass')).toBeNull(), { timeout: 15_000 });
-  }, 20_000);
+    expect(await screen.findByText(EMPTY)).toBeVisible();
+    expect(
+      screen.getByText('Single sign-on and directory sync settings for this organization will appear here.'),
+    ).toBeVisible();
+    expect(screen.queryByText('SSO bypass')).toBeNull();
+  });
+
+  it.each([
+    {
+      name: 'a connection manager with self-serve SSO and no connection',
+      permissions: [CONNECTIONS],
+      selfServeSso: true,
+      connections: [],
+    },
+    {
+      name: 'a connection manager with self-serve SSO and a connection',
+      permissions: [CONNECTIONS],
+      selfServeSso: true,
+    },
+    {
+      name: 'a member with both permissions, self-serve SSO and no connection',
+      permissions: [BYPASS, CONNECTIONS],
+      selfServeSso: true,
+      connections: [],
+    },
+  ])('shows the SSO section instead of the empty state to $name', async ({ name: _name, ...options }) => {
+    serve(options);
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+
+    expect(await screen.findByText('Single Sign-On (SSO)')).toBeVisible();
+    expect(screen.queryByText(EMPTY)).toBeNull();
+  });
+
+  it('does not show the empty state with the SSO bypass allow list', async () => {
+    serve({ permissions: [BYPASS, CONNECTIONS], selfServeSso: true });
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+
+    await screen.findByRole('list', { name: 'SSO bypass allow list' });
+    expect(screen.queryByText(EMPTY)).toBeNull();
+  });
 });
 
 describe('Managing the SSO bypass allow list', () => {

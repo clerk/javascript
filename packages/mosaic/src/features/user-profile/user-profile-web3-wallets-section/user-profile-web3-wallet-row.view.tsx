@@ -100,11 +100,7 @@ export function UserProfileWeb3WalletRowView({
                 onClick={() => onConnect(wallet.id)}
               >
                 {m.connect}
-                <Icon
-                  glyph={ArrowUpRight}
-                  placement='inline-end'
-                  size='md'
-                />
+                <Icon glyph={ArrowUpRight} />
               </SubmitButton>
             ) : null}
             {actions.length > 0 ? (

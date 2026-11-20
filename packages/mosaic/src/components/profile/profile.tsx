@@ -21,11 +21,12 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import type { DialogContextValue } from '../dialog';
-import { Dialog, DialogContext, isInDialog } from '../dialog';
+import { Dialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
 import { Drawer } from '../drawer';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
-import { SelectPopup } from '../select';
+import { SelectPopup } from '../select/select';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
@@ -253,7 +254,6 @@ function BackButton() {
       >
         <Icon
           glyph={ArrowLeft}
-          size='md'
           xstyle={rtl.mirror}
         />
       </span>
@@ -532,7 +532,6 @@ function PageTitle({ title }: { title: React.ReactNode }) {
       {label}
       <Icon
         glyph={ChevronDown}
-        size='md'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
     </>

@@ -6,11 +6,12 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import { Flow } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { SegmentedControl } from '../../../components/segmented-control';
 import { Select } from '../../../components/select';
 import { plural, useLocale, useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { styles } from './organization-profile-security-panel.styles';
 import type { SSOBypassAddDialogController } from './sso-bypass.controller';
@@ -31,7 +32,6 @@ export function SSOBypassAddDialog({ open, onOpenChange, finalFocus, ...current 
       >
         <Card.Root
           elevation='overlay'
-          size='lg'
           renderBranding={false}
         >
           <Flow.Root

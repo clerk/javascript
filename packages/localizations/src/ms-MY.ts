@@ -1112,6 +1112,10 @@ export const msMY: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1587,12 +1591,14 @@ export const msMY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Senarai semua akaun',
     action__closeOrganizationSwitcher: 'Tutup penukar organisasi',
     action__createOrganization: 'Cipta organisasi',
     action__invitationAccept: 'Sertai',
     action__manageOrganization: 'Urus',
     action__openOrganizationSwitcher: 'Buka penukar organisasi',
     action__suggestionsAccept: 'Minta untuk menyertai',
+    membershipListLabel: 'Senarai semua keahlian organisasi',
     notSelected: 'Tiada organisasi dipilih',
     personalWorkspace: 'Akaun peribadi',
     suggestionsAcceptedLabel: 'Menunggu kelulusan',

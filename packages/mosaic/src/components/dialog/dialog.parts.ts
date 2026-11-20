@@ -4,5 +4,5 @@ export {
   DialogPopup as Popup,
   DialogClose as Close,
   DialogCloseButton as CloseButton,
-  createDialogHandle as createHandle,
+  createDialogHandle,
 } from './dialog';

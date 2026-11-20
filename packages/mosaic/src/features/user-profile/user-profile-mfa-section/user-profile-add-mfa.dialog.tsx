@@ -54,11 +54,7 @@ export function UserProfileAddMfaDialog({
             />
           }
         >
-          <Icon
-            glyph={Plus}
-            placement='inline-start'
-            size='md'
-          />
+          <Icon glyph={Plus} />
           {m.add}
         </Dialog.Trigger>
       ) : null}

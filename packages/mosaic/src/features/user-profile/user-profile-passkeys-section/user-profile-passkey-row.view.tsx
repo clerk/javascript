@@ -28,7 +28,7 @@ export function UserProfilePasskeyRowView({
   onRemove?: () => void;
 }) {
   const m = useMessages('userProfile').passkeys;
-  const renameDialog = useMemo(() => Dialog.createHandle(), []);
+  const renameDialog = useMemo(() => Dialog.createDialogHandle(), []);
   const controller = useUserProfileRenamePasskeyController({
     id: passkey.id,
     name: passkey.name,
@@ -58,7 +58,6 @@ export function UserProfilePasskeyRowView({
           >
             <Icon
               glyph={SecurityPasskey}
-              size='md'
               xstyle={styles.icon}
             />
           </IconFrame>

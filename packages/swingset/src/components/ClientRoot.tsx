@@ -21,6 +21,7 @@ import { ChaosToggle } from './ChaosToggle';
 import { CommandPalette } from './CommandPalette';
 import { DirectionProvider } from './DirectionProvider';
 import { DirectionToggle } from './DirectionToggle';
+import { ThemeStyleToggle } from './ThemeStyleToggle';
 import { ThemeToggle } from './ThemeToggle';
 
 function useBreadcrumb() {
@@ -91,6 +92,7 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
               <div className='ml-auto flex items-center gap-4'>
                 <ChaosToggle />
                 <DirectionToggle />
+                <ThemeStyleToggle />
                 <ThemeToggle />
               </div>
             </header>

@@ -1,3 +1,5 @@
+'use client';
+
 import { glyph } from '../glyph';
 
 export const ChevronDown = glyph(

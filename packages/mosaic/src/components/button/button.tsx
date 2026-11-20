@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -110,7 +112,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
         rest,
       )}
     >
-      {withTruncatableLabel(children)}
+      {withTruncatableLabel(children, { slot: 'button-label' })}
     </HeadlessButton>
   );
 });

@@ -99,6 +99,12 @@ function FileList() {
     },
   ],
   related: ['AvatarUpload', 'ImageCropper'],
+  exports: {
+    'FileUpload.useFileUpload': { description: 'Returns the files and actions inside a `FileUpload.Root`.' },
+    'FileUpload.useObjectUrl': {
+      description: 'Returns a preview URL for a file, revoked when the file changes or the caller unmounts.',
+    },
+  },
 } satisfies ComponentDoc<{
   'FileUpload.Root': FileUploadProps;
   'FileUpload.Trigger': FileUploadTriggerProps;

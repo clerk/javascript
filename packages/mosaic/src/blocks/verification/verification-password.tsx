@@ -5,8 +5,8 @@ import { useId } from 'react';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
-import { useFlowAutoFocus } from '../../components/flow';
 import { PasswordInput } from '../../components/password-input';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 
 interface VerificationPasswordMessages {

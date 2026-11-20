@@ -18,7 +18,7 @@ export const organizationSwitcherMessages = {
   manage: {
     invite: 'Invite members',
     settings: 'Settings',
-    profile: 'Manage profile',
+    account: 'Manage account',
     organization: 'Manage organization',
     createOrganization: 'Add organization',
   },

@@ -221,7 +221,7 @@ describe('the profile the switchers open', () => {
   it('routes the one profile with a URL, and opens the other as a modal', async () => {
     const { navigate } = await renderWithProfile(<Switcher />, { userProfileUrl: '/account' });
 
-    await chooseSetting(buttonTrigger, 'Manage profile');
+    await chooseSetting(buttonTrigger, 'Manage account');
     expect(navigate).toHaveBeenCalledWith('/account');
 
     await chooseSetting(buttonTrigger, 'Manage organization');

@@ -1106,6 +1106,10 @@ export const koKR: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1574,12 +1578,14 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: '모든 계정 목록',
     action__closeOrganizationSwitcher: '조직 전환기 닫기',
     action__createOrganization: '조직 만들기',
     action__invitationAccept: '참여',
     action__manageOrganization: '조직 관리',
     action__openOrganizationSwitcher: '조직 전환기 열기',
     action__suggestionsAccept: '참여 요청',
+    membershipListLabel: '모든 조직 멤버십 목록',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
     suggestionsAcceptedLabel: '승인 대기',

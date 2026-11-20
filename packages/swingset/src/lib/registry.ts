@@ -229,6 +229,7 @@ import {
   ManageSAMLConnection as OrganizationProfileSecurityPanelManageSAMLConnection,
   meta as organizationProfileSecurityPanelMeta,
   NoSSOConnections as OrganizationProfileSecurityPanelNoSSOConnections,
+  NoSections as OrganizationProfileSecurityPanelNoSections,
   RemoveFails as OrganizationProfileSecurityPanelRemoveFails,
   SSOLoadError as OrganizationProfileSecurityPanelSSOLoadError,
 } from '../stories/organization-profile-security-panel.stories';
@@ -1462,6 +1463,7 @@ const organizationProfileSecurityPanelModule: StoryModule = {
   SSOLoadError: OrganizationProfileSecurityPanelSSOLoadError,
   ManageSAMLConnection: OrganizationProfileSecurityPanelManageSAMLConnection,
   ManageOIDCConnection: OrganizationProfileSecurityPanelManageOIDCConnection,
+  NoSections: OrganizationProfileSecurityPanelNoSections,
   AllowListLoadError: OrganizationProfileSecurityPanelAllowListLoadError,
   AllowList: OrganizationProfileSecurityPanelAllowList,
   EmptyAllowList: OrganizationProfileSecurityPanelEmptyAllowList,

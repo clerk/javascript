@@ -3,7 +3,7 @@ import type { ReactNode, Ref } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 
 interface VerificationPasskeyMessages {
   title: string;

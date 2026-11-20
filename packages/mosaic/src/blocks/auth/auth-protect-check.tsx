@@ -3,9 +3,9 @@ import type { Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
 import { Spinner } from '../../components/spinner';
 import { useSpinDelay } from '../../hooks/use-spin-delay';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 
 export interface AuthProtectCheckMessages {

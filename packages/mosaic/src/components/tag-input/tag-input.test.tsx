@@ -1,17 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createLayoutAnimator } from '../../primitives/utils/layout-animator';
 import { Field } from '../field';
 import { TagInput } from './tag-input';
-
-vi.mock('../../primitives/utils/layout-animator', async importOriginal => ({
-  ...(await importOriginal<typeof import('../../primitives/utils/layout-animator')>()),
-  createLayoutAnimator: vi.fn(() => () => {}),
-}));
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -247,7 +241,7 @@ describe('Mosaic TagInput', () => {
     expect(input).toHaveAttribute('placeholder', 'Add an email');
   });
 
-  it('animates tag and input layout from the root', () => {
+  it('marks the tags and the input as layout items', () => {
     render(
       <TagInput
         aria-label='Email'
@@ -256,11 +250,24 @@ describe('Mosaic TagInput', () => {
     );
 
     const input = screen.getByRole('textbox', { name: 'Email' });
-    expect(createLayoutAnimator).toHaveBeenCalledWith(rootOf(input));
     expect(input).toHaveAttribute('data-layout-item', '');
     for (const tag of screen.getAllByRole('listitem')) {
       expect(tag).toHaveAttribute('data-layout-item', '');
     }
+  });
+
+  it('pins an exiting tag inside the root', async () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const tag = screen.getAllByRole('listitem')[0];
+    tag.setAttribute('data-ending-style', '');
+
+    await waitFor(() => expect(tag).toHaveAttribute('data-layout-popped'));
   });
 
   it('merges xstyle atoms onto the root', () => {
