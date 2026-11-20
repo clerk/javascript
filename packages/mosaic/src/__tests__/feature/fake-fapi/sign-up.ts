@@ -113,6 +113,11 @@ export function signUpHandlers(
     if (combined) {
       required.push('email_address_or_phone_number');
     }
+    for (const provider of Object.values(settings().social)) {
+      if (provider?.enabled && provider.required) {
+        required.push(provider.strategy);
+      }
+    }
     return {
       required_fields: sign_up.legal_consent_enabled ? [...required, 'legal_accepted'] : required,
       optional_fields: enabled.filter(name => !attributes[name].required),

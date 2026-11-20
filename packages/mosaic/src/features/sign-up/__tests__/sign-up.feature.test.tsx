@@ -436,6 +436,66 @@ describe('SignUp', () => {
     expect(fapi.signUp.updates[0].get('phone_number')).toBeNull();
   });
 
+  it('asks for legal consent on the continue screen when the sign-up has not accepted it', async () => {
+    const fapi = serveFapi({
+      environment: environment({
+        user_settings: {
+          sign_up: {
+            allowlist_only: false,
+            progressive: true,
+            captcha_enabled: false,
+            mode: 'public',
+            legal_consent_enabled: true,
+          },
+        },
+      }),
+    });
+    const { clerk, navigate } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL, password: PASSWORD }));
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+    await enterCode(user);
+
+    expect(await screen.findByRole('heading', { name: 'Legal consent' })).toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox'));
+    await user.click(continueButton());
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.signUp.updates[0].get('legal_accepted')).toBe('true');
+  });
+
+  it('offers Start over when the sign-up needs a requirement the continue screen cannot ask for', async () => {
+    const { user } = await renderSignUp({
+      environment: environment({
+        user_settings: {
+          social: {
+            oauth_google: {
+              enabled: true,
+              required: true,
+              authenticatable: true,
+              strategy: 'oauth_google',
+              name: 'Google',
+              logo_url: null,
+            },
+          },
+        },
+      }),
+    });
+
+    await submitStart(user);
+    await enterCode(user);
+
+    expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Fill in missing fields' })).toBeNull();
+  });
+
   it('offers Start over on an instance that verifies email by link', async () => {
     const { fapi, user } = await renderSignUp({
       environment: environment({ attributes: { email_address: { required: true, verifications: ['email_link'] } } }),

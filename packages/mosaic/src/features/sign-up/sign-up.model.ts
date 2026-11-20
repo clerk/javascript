@@ -155,6 +155,18 @@ function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists)
   );
 }
 
+const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
+
+function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
+  const asksForIdentifier = missingIdentifiers(signUp).length > 0;
+  return signUp.missingFields.every(
+    field =>
+      field in MISSING_FORM_FIELDS ||
+      CONTINUE_REQUIREMENTS.includes(field) ||
+      (asksForIdentifier && signUp.optionalFields.includes(field)),
+  );
+}
+
 function missesEitherIdentifier(signUp: SignUpFieldLists): boolean {
   const identifiers = missingIdentifiers(signUp);
   return (
@@ -244,7 +256,10 @@ export function useSignUpModel({
 
   const next = (resource: SignUpFutureResource): SignUpNextStep => {
     const step = getSignUpNextStep(resource);
-    return step.type === 'verify_email' && verifiesEmailByLink ? { type: 'unknown' } : step;
+    if (step.type === 'verify_email' && verifiesEmailByLink) {
+      return { type: 'unknown' };
+    }
+    return step.type === 'fields' && !continueCanSatisfy(resource) ? { type: 'unknown' } : step;
   };
 
   const flowStep = (): SignUpFlowStep => {
