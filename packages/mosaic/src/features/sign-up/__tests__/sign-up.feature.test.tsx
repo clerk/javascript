@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -702,6 +702,26 @@ describe('SignUp', () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('resends the phone code over WhatsApp from the WhatsApp code screen', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
+    try {
+      await act(() => vi.advanceTimersByTimeAsync(30_000));
+      await user.click(await screen.findByRole('button', { name: 'Resend' }));
+
+      await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:whatsapp']));
+      expect(screen.getByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+      await codeSent();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('switches the phone code to SMS from the WhatsApp code screen', async () => {
