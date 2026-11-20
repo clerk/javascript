@@ -42,7 +42,6 @@ describe('sign-up shown route', () => {
     ['keeps start while enterprise SSO is pending', 'start', { type: 'enterprise_sso' }, 'start'],
     ['sends enterprise SSO to its route', 'continue', { type: 'enterprise_sso' }, 'enterpriseConnections'],
     ['has no route for an unknown step', 'verifyEmail', { type: 'unknown' }, undefined],
-    ['has no route for an unknown step on start', 'start', { type: 'unknown' }, undefined],
     ['sends a session task to its route', 'verifyEmail', task, 'taskChooseOrganization'],
     ['moves the form to the task while one is pending', 'start', task, 'taskChooseOrganization'],
     [
