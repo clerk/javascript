@@ -2,6 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "env": ["RSDOCTOR"],
       "inputs": [
         "*.d.ts",
         "src/**",
@@ -22,6 +23,7 @@
     },
     "build:sandbox": {
       "dependsOn": ["^build", "@clerk/localizations#build"],
+      "env": ["RSDOCTOR"],
       "inputs": ["sandbox/**"],
       "outputs": ["dist/**"]
     },
