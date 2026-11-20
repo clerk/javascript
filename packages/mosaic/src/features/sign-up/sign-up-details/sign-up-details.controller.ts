@@ -96,13 +96,14 @@ interface SignUpDetailsOptions {
   purpose: 'start' | 'continue';
   isBusy: boolean;
   globalErrorMessage?: string;
+  onSubmit?: () => void;
   onNext: (result: SignUpCreateResult) => void;
   onSignIn: () => void;
 }
 
 export function useSignUpDetailsController(
   details: SignUpDetailsModel,
-  { purpose, isBusy, globalErrorMessage, onNext, onSignIn }: SignUpDetailsOptions,
+  { purpose, isBusy, globalErrorMessage, onSubmit, onNext, onSignIn }: SignUpDetailsOptions,
 ) {
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
   const [chosenChannel, setChosenChannel] = useState<PhoneCodeChannel | undefined>(undefined);
@@ -121,6 +122,7 @@ export function useSignUpDetailsController(
     initialValues: { ...emptyValues, ...details.prefill },
     fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
+      onSubmit?.();
       const submitted = detailsValues(values, fields);
       if (purpose === 'continue' || details.startUpdatesSignUp) {
         return details.update(submitted);

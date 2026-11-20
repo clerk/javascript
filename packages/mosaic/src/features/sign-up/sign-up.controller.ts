@@ -71,7 +71,7 @@ const finishMachine = finish.createMachine({
   },
 });
 
-function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode'], isBlocked: boolean): SignUpScreen {
+function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel, isBlocked: boolean): SignUpScreen {
   if (route === undefined || route === 'enterpriseConnections') {
     return 'startOver';
   }
@@ -81,7 +81,7 @@ function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode']
   if (route !== 'start') {
     return route;
   }
-  return mode === 'public' ? 'start' : mode;
+  return flow.mode === 'public' || flow.ticket ? 'start' : flow.mode;
 }
 
 type SignUpControllerResult =
@@ -128,7 +128,7 @@ export function useSignUpController(
   const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
   const shown = shownRoute(route, outcome, flow.step);
-  const screen = actions.pendingKey === 'ticket' ? 'loading' : screenFor(shown, flow.mode, blocked !== undefined);
+  const screen = actions.pendingKey === 'ticket' ? 'loading' : screenFor(shown, flow, blocked !== undefined);
 
   useRouteGuard({ route, go }, shown);
 
@@ -153,12 +153,13 @@ export function useSignUpController(
     purpose: screen === 'continue' ? 'continue' : 'start',
     isBusy: actions.isPending || isHolding,
     globalErrorMessage: flowError,
+    onSubmit: actions.reset,
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Redeems the invitation once when sign-up opens on start with a ticket in the URL; arriving from the invitation link is not an event a handler could run from. */
   useEffect(() => {
-    if (!flow.ticket || flow.signUpId || route !== 'start' || redeemedTicket.current === flow.ticket) {
+    if (!flow.ticket || flow.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
       return;
     }
     redeemedTicket.current = flow.ticket;
