@@ -1,4 +1,10 @@
 export { UserButtonSignedIn } from './user-button-signed-in';
+export {
+  UserProfileAgentConnections,
+  UserProfileAgentConnectionsEmpty,
+  UserProfileAgentConnectionsError,
+  UserProfileAgentConnectionsPaginated,
+} from './user-profile-agent-connections';
 export { CheckoutAccountCredit } from './checkout-account-credit';
 export { CheckoutSeats } from './checkout-seats';
 export { OrgProfileSeatLimit } from './org-profile-seat-limit';

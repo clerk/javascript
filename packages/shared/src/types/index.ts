@@ -1,3 +1,4 @@
+export type * from './agentConnection';
 export type * from './apiKeys';
 export type * from './apiKeysSettings';
 export type * from './attributes';
