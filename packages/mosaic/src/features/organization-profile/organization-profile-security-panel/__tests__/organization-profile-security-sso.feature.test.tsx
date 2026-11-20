@@ -129,6 +129,18 @@ describe('Seeing the organization’s SSO connections', () => {
     expect(within(draftRow).getByText('In progress')).toBeVisible();
   });
 
+  it('draws a one-color provider logo in the text color and keeps full-color logos as images', async () => {
+    serve({ connections: [okta, draft] });
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+
+    const oktaIcon = (await findRow('Acme Okta')).querySelector('.cl-provider-icon');
+    expect(oktaIcon?.tagName).toBe('SPAN');
+    expect(oktaIcon && getComputedStyle(oktaIcon).maskImage).toContain('okta');
+
+    const draftIcon = (await findRow('Draft OIDC')).querySelector('.cl-provider-icon');
+    expect(draftIcon?.tagName).toBe('IMG');
+  });
+
   it('says so when the organization has no connection', async () => {
     serve({ connections: [] });
     await renderWithClerk(<OrganizationProfileSecurityPanel />);

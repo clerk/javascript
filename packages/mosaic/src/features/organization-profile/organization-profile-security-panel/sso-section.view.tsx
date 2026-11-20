@@ -147,6 +147,7 @@ function SSOConnectionRowView({
         <UserProfileProviderMedia
           provider={row.name}
           iconUrl={row.iconUrl}
+          monochromeIcon={row.monochromeIcon}
         />
         <Section.Content>
           <Section.Label>

@@ -9,6 +9,7 @@ import type {
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useOrganizationRolesQuery } from '../../../queries/use-organization-roles-query';
 import { save } from '../../../utils/errors';
+import { isMonochromeProvider, providerId } from '../../user-profile/user-profile-provider.utils';
 import { haveCertificatesChanged } from './sso-certificates.utils';
 import type {
   SSOCertificate,
@@ -94,6 +95,7 @@ function toSSOConnection(connection: EnterpriseConnectionResource): SSOConnectio
     domains: connection.domains,
     providerKey: providerKey(connection.provider),
     iconUrl: providerIconUrl(connection),
+    monochromeIcon: isMonochromeProvider(providerId(connection.provider)),
     status: connectionStatus(connection),
   };
   const shared = {
