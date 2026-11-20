@@ -1,0 +1,5 @@
+packages:
+  - '.'
+
+patchedDependencies:
+  '@clerk/expo@4.7.1': patches/clerk-expo.patch
