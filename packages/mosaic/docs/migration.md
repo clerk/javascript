@@ -27,9 +27,10 @@ Grep the legacy files for the primitives that carry hidden logic. Every hit is a
 | `useCalloutLabel`                 | derived, computed labels or counts                 |
 | `useFetch` / `useOrganization`    | data loading, pagination, loading and empty states |
 | `useInView`                       | infinite-scroll or intersection triggers           |
+| `ProviderIcon`                    | one-color logos masked to the text color           |
 
 ```bash
-rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useOrganization|\.reload\(|useInView' \
+rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useOrganization|\.reload\(|useInView|ProviderIcon' \
   packages/ui/src/components/<Feature>/
 ```
 
