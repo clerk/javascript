@@ -64,6 +64,7 @@
   },
   "types": "./dist/types/index.d.ts",
   "files": [
+    "AGENTS.md",
     "dist",
     "server",
     "errors",

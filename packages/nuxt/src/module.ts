@@ -12,6 +12,8 @@ import {
   updateRuntimeConfig,
 } from '@nuxt/kit';
 
+import { writeAgentRulesOnce } from './agent-rules';
+
 export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'> &
   InternalClerkScriptProps & {
     publishableKey?: string;
@@ -45,6 +47,10 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(options, nuxt) {
+    if (nuxt.options.dev) {
+      writeAgentRulesOnce(nuxt.options.rootDir);
+    }
+
     // These values must be set (even as undefined) to allow runtime config to work properly.
     // In Nuxt, having these keys defined (even as undefined) allows them to be overridden
     // by environment variables following the pattern NUXT_PUBLIC_CLERK_* (e.g. NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY).

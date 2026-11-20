@@ -55,6 +55,7 @@
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
   "files": [
+    "AGENTS.md",
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map"
