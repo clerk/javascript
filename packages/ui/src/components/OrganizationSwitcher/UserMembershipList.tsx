@@ -8,7 +8,7 @@ import { PreviewButton } from '@/ui/elements/PreviewButton';
 
 import { InfiniteListSpinner } from '../../common';
 import { useOrganizationSwitcherContext } from '../../contexts';
-import { Box, descriptors, localizationKeys } from '../../customizables';
+import { Box, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { useInView } from '../../hooks';
 import { ArrowRight } from '../../icons';
 import { common } from '../../styledSystem';
@@ -48,6 +48,7 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   const { organization: currentOrg } = useOrganization();
   const { ref, userMemberships } = useFetchMemberships();
   const { user } = useUser();
+  const { t } = useLocalizations();
 
   const otherOrgs = ((userMemberships.count || 0) > 0 ? userMemberships.data || [] : [])
     .map(e => e.organization)
@@ -75,7 +76,11 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         ...common.unstyledScrollbar(t),
       })}
       role='group'
-      aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}
+      aria-label={t(
+        localizationKeys(
+          hidePersonal ? 'organizationSwitcher.membershipListLabel' : 'organizationSwitcher.accountListLabel',
+        ),
+      )}
     >
       {currentOrg && !hidePersonal && (
         <PreviewButton
