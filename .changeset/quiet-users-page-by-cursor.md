@@ -5,15 +5,16 @@
 Add `clerkClient.users.searchUsers()`, a faster way to list and filter users on large instances.
 
 ```ts
-const filters = {
+const { data, cursor } = await clerkClient.users.searchUsers({
   metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
-};
+});
 
-const { data, cursor } = await clerkClient.users.searchUsers(filters);
-
-// Next page
+// Next page: the same filters, plus the cursor
 if (cursor.startingAfter) {
-  await clerkClient.users.searchUsers({ ...filters, startingAfter: cursor.startingAfter });
+  await clerkClient.users.searchUsers({
+    metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+    startingAfter: cursor.startingAfter,
+  });
 }
 ```
 
