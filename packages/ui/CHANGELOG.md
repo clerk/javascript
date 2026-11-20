@@ -1,5 +1,15 @@
 # @clerk/ui
 
+## 1.44.2
+
+### Patch Changes
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+  - @clerk/localizations@4.26.2
+
 ## 1.44.1
 
 ### Patch Changes

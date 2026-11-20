@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.48.2
+
+### Patch Changes
+
+- Request Frontend API version `2026-11-18`, where `GET` responses only include the client when clerk-js asks for it. ([#10931](https://github.com/clerk/javascript/pull/10931)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.48.1
 
 ### Patch Changes
