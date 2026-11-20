@@ -2,14 +2,26 @@
 '@clerk/backend': minor
 ---
 
-Add cursor pagination to `clerkClient.users.getUserList()`. Pass `pagination: 'cursor'` to get `{ data, cursor }` in place of `{ data, totalCount }`, and pass `cursor.startingAfter` back as `startingAfter` to get the next page, or `cursor.endingBefore` back as `endingBefore` to get the previous page. Paging by cursor works with every `orderBy` and does not slow down on later pages.
-
-In this mode, `getUserList()` also accepts `metadata`, to filter users on their public, private or unsafe metadata, and `remainingCount`, to get a count of the users from the current page onward in the `cursor`.
+Add `clerkClient.users.searchUsers()`, a faster way to list and filter users on large instances.
 
 ```ts
-const { data, cursor } = await clerkClient.users.getUserList({
-  pagination: 'cursor',
+const filters = {
   metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
-  remainingCount: 1000,
-});
+};
+
+const { data, cursor } = await clerkClient.users.searchUsers(filters);
+
+// Next page
+if (cursor.startingAfter) {
+  await clerkClient.users.searchUsers({ ...filters, startingAfter: cursor.startingAfter });
+}
 ```
+
+Compared with `getUserList()`:
+
+- It pages with a cursor instead of an offset, so later pages are as fast as the first.
+- It can also filter on public, private and unsafe metadata, on an external account's provider and provider user ID, and on banned or deprovisioned users.
+- It returns no `totalCount`. Pass `remainingCount` to get a count of the users from the current page onward.
+- Results can lag a recent change by a short time. Use `getUserList()` when you need to read a change right after making it.
+
+`getUserList()` is unchanged.

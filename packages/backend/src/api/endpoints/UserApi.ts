@@ -94,7 +94,7 @@ export type UserListParams = ClerkPaginationRequest<{
 /**
  * A filter on user metadata. A user matches when the filter's `match` holds for the value at `key` in the metadata named by `scope`.
  */
-export type UserListMetadataFilter = {
+export type UserSearchMetadataFilter = {
   /** The metadata to match against. */
   scope: 'public' | 'private' | 'unsafe';
   /** A dot-separated path into the metadata, for example `settings.theme`. Escape a literal dot in a key as `\.`. */
@@ -108,13 +108,7 @@ export type UserListMetadataFilter = {
 };
 
 /** @generateWithEmptyComment */
-export type UserListCursorParams = Omit<UserListParams, 'offset' | 'startingAfter'> & {
-  /**
-   * Pages the list by cursor. The response carries a `cursor` in place of a `totalCount`.
-   *
-   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count.
-   */
-  pagination: 'cursor';
+export type UserSearchParams = Omit<UserListParams, 'offset' | 'startingAfter' | 'last_active_at_since'> & {
   /** The `cursor.startingAfter` of the previous page. Omit it for the first page, and keep every other parameter the same across pages. */
   startingAfter?: string;
   /** The `cursor.endingBefore` of a previous page. Returns the page before that one. It cannot be combined with `startingAfter`. A page read backward can hold fewer users than `limit` even when more users exist. */
@@ -127,14 +121,30 @@ export type UserListCursorParams = Omit<UserListParams, 'offset' | 'startingAfte
    * The count is computed separately from the page. Treat it as a close estimate: it can differ slightly from the number of users that paging through the results returns.
    */
   remainingCount?: 100 | 1000 | 10000 | 'exact';
+  /** Filters users with emails that match the given query, via case-insensitive partial match. For example, `emailAddressQuery=ello` will match a user with the email `HELLO@example.com`. */
+  emailAddressQuery?: string;
+  /** Filters users with phone numbers that match the given query, via case-insensitive partial match. For example, `phoneNumberQuery=555` will match a user with the phone number `+1555xxxxxxx`. */
+  phoneNumberQuery?: string;
+  /** Filters users with usernames that match the given query, via case-insensitive partial match. For example, `usernameQuery=CoolUser` will match a user with the username `SomeCoolUser`. */
+  usernameQuery?: string;
+  /** Filters users with names that match the given query, via case-insensitive partial match. */
+  nameQuery?: string;
+  /** Filters users that have an external account with the specified provider, for example `oauth_google`. Must be used together with `providerUserId`. */
+  provider?: string;
+  /** Filters users with the specified provider user IDs for the given `provider`. Must be used together with `provider`. Accepts up to 100 provider user IDs. */
+  providerUserId?: string[];
+  /** Filters users that are banned (`true`) or not banned (`false`). */
+  banned?: boolean;
+  /** Filters users that are deprovisioned (`true`) or not deprovisioned (`false`). */
+  deprovisioned?: boolean;
   /** Filters users that match every one of the given metadata filters. Accepts up to 10 filters. */
-  metadata?: UserListMetadataFilter[];
+  metadata?: UserSearchMetadataFilter[];
 };
 
 /**
- * The position of a page in a list of users paged by cursor.
+ * The position of a page of users returned by `searchUsers()`.
  */
-export type UserListCursor = {
+export type UserSearchCursor = {
   /** The value to pass as `startingAfter` to get the next page, or `null` if this is the last page. */
   startingAfter: string | null;
   /** The value to pass as `endingBefore` to get the page before this one. It is also set on pages read forward, and is `null` if there is no earlier page. */
@@ -148,13 +158,13 @@ export type UserListCursor = {
 };
 
 /**
- * The response of [`getUserList()`](https://clerk.com/docs/reference/backend/user/get-user-list) when called with `pagination: 'cursor'`.
+ * The response of `searchUsers()`.
  */
-export type UserListCursorResponse = {
+export type UserSearchResponse = {
   /** The users on this page. */
   data: User[];
   /** The cursor to the next and previous pages, with the count if one was requested. */
-  cursor: UserListCursor;
+  cursor: UserSearchCursor;
 };
 
 /** @inline */
@@ -522,10 +532,6 @@ type UserID = {
   userId: string;
 };
 
-function isCursorParams(params: UserListParams | UserListCursorParams): params is UserListCursorParams {
-  return 'pagination' in params && params.pagination === 'cursor';
-}
-
 // The API replaces a limit outside this range with its default instead of
 // rejecting it, so a page can only be compared against a limit inside it.
 const MIN_LIST_LIMIT = 1;
@@ -562,17 +568,7 @@ export class UserAPI extends AbstractAPI {
    * Retrieves the list of users in your instance. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
-  public async getUserList(params?: UserListParams): Promise<PaginatedResourceResponse<User[]>>;
-  /**
-   * Retrieves one page of the users in your instance, paged by cursor. Pass the response's `cursor.startingAfter` as `startingAfter` to get the next page, until `cursor.hasNextPage` is `false`, or `cursor.endingBefore` as `endingBefore` to get the previous page.
-   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
-   */
-  public async getUserList(params: UserListCursorParams): Promise<UserListCursorResponse>;
-  public async getUserList(params: UserListParams | UserListCursorParams = {}) {
-    if (isCursorParams(params)) {
-      return this.getUserListByCursor(params);
-    }
-
+  public async getUserList(params: UserListParams = {}) {
     const { limit, offset, orderBy, startingAfter, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
@@ -589,12 +585,28 @@ export class UserAPI extends AbstractAPI {
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
 
-  private async getUserListByCursor(params: UserListCursorParams): Promise<UserListCursorResponse> {
-    const { metadata, ...queryParams } = params;
+  /**
+   * Retrieves one page of the users in your instance that match the given filters, or of all users when none are given. By default, the page is returned in descending order by creation date (newest first).
+   *
+   * Pages are linked by the `cursor` in the response. Pass `cursor.startingAfter` as `startingAfter` to get the next page, until it is `null`, or `cursor.endingBefore` as `endingBefore` to get the previous page. Paging by cursor works with every `orderBy` and does not slow down on later pages.
+   *
+   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count. Use `getUserList()` when you need to read a change right after making it.
+   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
+   */
+  public async searchUsers(params: UserSearchParams = {}): Promise<UserSearchResponse> {
+    const { metadata, banned, deprovisioned, ...queryParams } = params;
     const { data, cursor } = await this.request<{ data: User[]; cursor: PaginationCursorJSON }>({
       method: 'GET',
       path: basePath,
-      queryParams: { ...queryParams, metadata: metadata?.map(filter => JSON.stringify(filter)) },
+      queryParams: {
+        ...queryParams,
+        // The request drops falsy query params, so `false` is sent as a string.
+        banned: banned?.toString(),
+        deprovisioned: deprovisioned?.toString(),
+        metadata: metadata?.map(filter => JSON.stringify(filter)),
+        // GET /v1/users returns a cursor only in this mode.
+        pagination: 'cursor',
+      },
     });
     return {
       data,
