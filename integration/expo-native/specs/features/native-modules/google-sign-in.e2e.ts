@@ -50,9 +50,10 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
         .toBeGreaterThan(0);
       // With no Google account on the emulator, Google Play services moves on to its add-account page, which sometimes gives up within a second and ends the flow by itself.
       // A snapshot taken while that page closes fails, so the page gets no screenshot, the reads here count a failed snapshot as nothing on screen, and back is pressed only when the page stays open.
+      // The page can still close between the check and the press, so back can reach the app in that narrow window.
       ended = await resultShows(SELF_CLOSE_MS);
+      if (!ended && (await googlePage.count().catch(() => 0)) > 0) await device.back();
       if (!ended) {
-        await device.back();
         ended = await resultShows(BACK_OUT_MS);
         if (!ended) await forceStopGooglePlayServices();
       }
