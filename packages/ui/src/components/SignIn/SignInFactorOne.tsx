@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
@@ -121,11 +122,16 @@ function SignInFactorOneInternal(): JSX.Element {
     return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
   });
 
-  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
-    () => resetPasswordIntent && !!resetPasswordFactor,
+  // The first step hands over this error when a password it submitted needs a reset.
+  const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(() =>
+    typeof card.rawError === 'object' && card.rawError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED
+      ? 'resetRequired'
+      : null,
   );
 
-  const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
+    () => (resetPasswordIntent && !!resetPasswordFactor) || !!passwordErrorCode,
+  );
 
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
