@@ -134,6 +134,8 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
         <SubmitButton
           form={form.id}
           fullWidth
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

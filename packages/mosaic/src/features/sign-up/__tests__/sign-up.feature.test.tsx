@@ -713,10 +713,13 @@ describe('SignUp', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
 
     try {
+      await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+      await user.keyboard('12');
       await act(() => vi.advanceTimersByTimeAsync(30_000));
       await user.click(await screen.findByRole('button', { name: 'Resend' }));
 
       await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:whatsapp']));
+      expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveValue('');
       expect(screen.getByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
       await codeSent();
     } finally {
@@ -739,17 +742,73 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual([]);
   });
 
-  it("shows FAPI's message when the WhatsApp code can't be sent", async () => {
-    const { user } = await renderSignUp({ environment: phoneEnvironment() });
-    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+  it("shows FAPI's message when the instance can't send WhatsApp codes", async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment(), signUp: { whatsAppEnabled: false } });
 
     await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
     await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
     await user.click(continueButton());
-    await waitFor(() => expect(hold.requests).toHaveLength(1));
-    hold.fail('channel_unavailable', 'WhatsApp is not available for this phone number.');
 
-    expect(await screen.findByText('WhatsApp is not available for this phone number.')).toBeInTheDocument();
+    expect(await screen.findByText("The 'whatsapp' channel is not available for this instance.")).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
+  });
+
+  it('keeps Continue disabled on the WhatsApp phone screen until the phone number is filled', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await screen.findByRole('heading', { name: /with WhatsApp/ });
+    await user.click(continueButton());
+
+    expect(continueButton()).toHaveAttribute('aria-disabled', 'true');
+    expect(fapi.signUp.creations).toHaveLength(0);
+    await user.type(screen.getByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    expect(continueButton()).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('shows the SMS code screen when FAPI sends the code by SMS instead of WhatsApp', async () => {
+    const { user } = await renderSignUp({
+      environment: phoneEnvironment(),
+      signUp: { whatsAppQuotaExceeded: true },
+    });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Send code via SMS instead' })).toBeNull();
+    await codeSent();
+  });
+
+  it('locks the code screen while switching the code to SMS', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+    await user.click(screen.getByRole('button', { name: 'Send code via SMS instead' }));
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+
+    expect(screen.getByRole('button', { name: 'Send code via SMS instead' })).toBeDisabled();
+    hold.release();
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    await codeSent();
+  });
+
+  it('starts the resend countdown after a code fails to send', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+
+    await user.type(await screen.findByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    hold.fail('verification_code_too_many_requests', 'Too many requests. Please wait before trying again.');
+
+    expect(await screen.findByText('Too many requests. Please wait before trying again.')).toBeInTheDocument();
+    await codeSent();
   });
 
   it('returns to the main form when the phone number is edited from the WhatsApp code screen', async () => {
