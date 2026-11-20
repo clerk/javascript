@@ -14,7 +14,8 @@ describe('accessible warning part names', () => {
   it.each([
     {
       name: 'accessible name warning',
-      useWarning: useAccessibleNameWarning,
+      useWarning: (node: HTMLElement | null, component: string, part: string) =>
+        useAccessibleNameWarning(node, { part: `${component}.Popup`, roles: ['dialog', 'alertdialog'], title: part }),
       initialPart: 'Card.Title',
       nextPart: 'Profile.Title',
     },

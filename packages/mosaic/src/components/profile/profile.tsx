@@ -1,11 +1,11 @@
 'use client';
 
-import { logger } from '@clerk/shared/logger';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import { ArrowLeft } from '../../icons/glyphs/arrow-left';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { fill, useMessages } from '../../localization';
@@ -699,11 +699,21 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
         : null,
     [label, subPage, onSubPageChange],
   );
+  const [panel, setPanel] = React.useState<HTMLDivElement | null>(null);
+  const panelRef = useMergeRefs([ref, setPanel]);
+  useAccessibleNameWarning(active ? panel : null, {
+    part:
+      typeof subPage === 'string'
+        ? `Profile.ContentPanel value="${value}" subPage="${subPage}"`
+        : `Profile.ContentPanel value="${value}"`,
+    roles: ['tabpanel', 'group'],
+    title: 'Panel.Title',
+  });
   return (
     <ContentPanelContext.Provider value={page}>
       <HeadingLevelProvider>
         <Tabs.Panel
-          ref={ref}
+          ref={panelRef}
           value={value}
           aria-labelledby={`${pageTitleId}-label`}
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
@@ -723,11 +733,6 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           ) : (
             children
           )}
-          <MissingTitleWarning
-            active={active}
-            value={value}
-            subPage={subPage}
-          />
         </Tabs.Panel>
       </HeadingLevelProvider>
     </ContentPanelContext.Provider>
@@ -839,34 +844,3 @@ export {
   ContentPanel as ProfileContentPanel,
   SubPage as ProfileSubPage,
 };
-
-/**
- * Warns when the open page has no `Panel.Title`, which leaves the page unnamed and, on compact
- * layouts, without the trigger that opens the navigation.
- */
-function MissingTitleWarning({
-  active,
-  value,
-  subPage,
-}: {
-  active: boolean;
-  value: string;
-  subPage: string | null | undefined;
-}) {
-  const { pageTitleRef } = useProfileContext('Profile.ContentPanel');
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !active || pageTitleRef.current) {
-      return;
-    }
-    if (typeof subPage === 'string') {
-      logger.warnOnce(
-        `[Clerk] <Profile.ContentPanel value="${value}" subPage="${subPage}"> is open without a <Panel.Title>. Render a <Profile.SubPage value="${subPage}">, and start it with a <Panel.Title>, outside any Suspense boundary.`,
-      );
-      return;
-    }
-    logger.warnOnce(
-      `[Clerk] <Profile.ContentPanel value="${value}"> is open without a <Panel.Title>. Start the page with one, outside any Suspense boundary: it names the page, and on compact layouts it opens the navigation.`,
-    );
-  }, [active, value, subPage, pageTitleRef]);
-  return null;
-}

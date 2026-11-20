@@ -19,6 +19,11 @@ import { Section } from '../section';
 import { Profile } from '.';
 import type { ProfileRootProps } from './profile';
 
+const settle = () =>
+  act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
     <Profile.Root
@@ -371,7 +376,7 @@ describe('Profile', () => {
       expect(screen.getByRole('tabpanel', { name: 'Security' })).toHaveTextContent('Security page');
     });
 
-    it('warns when the open page has no Panel.Title', () => {
+    it('warns when the open page has no Panel.Title', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const { rerender } = render(
         <Profile.Root value='account'>
@@ -386,6 +391,7 @@ describe('Profile', () => {
           </Profile.Content>
         </Profile.Root>,
       );
+      await settle();
       expect(warn).not.toHaveBeenCalled();
 
       rerender(
@@ -401,10 +407,12 @@ describe('Profile', () => {
           </Profile.Content>
         </Profile.Root>,
       );
+      await settle();
+      expect(warn).toHaveBeenCalledOnce();
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Profile.ContentPanel value="security">'));
     });
 
-    it('does not warn after hydrating a page that has a Panel.Title', () => {
+    it('does not warn after hydrating a page that has a Panel.Title', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const page = (
         <MosaicProvider>
@@ -424,11 +432,12 @@ describe('Profile', () => {
       container.innerHTML = renderToString(page);
       document.body.append(container);
       render(page, { container, hydrate: true });
+      await settle();
       expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
       expect(warn).not.toHaveBeenCalled();
     });
 
-    it('does not warn while the page waits on suspended content', async () => {
+    it('warns while the page waits on suspended content', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       let resolve = () => {};
       const ready = new Promise<void>(r => {
@@ -452,12 +461,12 @@ describe('Profile', () => {
           </Profile.Content>
         </Profile.Root>,
       );
+      await settle();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Profile.ContentPanel value="lazy">'));
       await act(async () => {
         resolve();
         await ready;
       });
-      expect(await screen.findByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
-      expect(warn).not.toHaveBeenCalled();
     });
 
     it('warns while the page shows its own Suspense fallback without a title', async () => {
@@ -487,23 +496,27 @@ describe('Profile', () => {
         </Profile.Root>,
       );
       expect(screen.getByText('Loading')).toBeInTheDocument();
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining('outside any Suspense boundary'));
+      await settle();
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Profile.ContentPanel value="loading">'));
       await act(async () => {
         resolve();
         await ready;
       });
     });
 
-    it('does not warn when the title is inside a Flow step', () => {
+    it('does not warn when the title is inside a Flow step', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const { rerender } = render(<SubPageSurface value='account' />);
+      await settle();
       rerender(<SubPageSurface value='security' />);
+      await settle();
       rerender(
         <SubPageSurface
           value='security'
           subPage='passkeys'
         />,
       );
+      await settle();
       expect(warn).not.toHaveBeenCalled();
     });
 
@@ -628,7 +641,7 @@ describe('Profile', () => {
       expect(step).toHaveStyle({ '--cl-flow-transition-direction': direction });
     });
 
-    it('warns when no sub-page matches the open one', () => {
+    it('warns when no sub-page matches the open one', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       render(
         <SubPageSurface
@@ -636,6 +649,7 @@ describe('Profile', () => {
           subPage='missing'
         />,
       );
+      await settle();
       expect(warn).toHaveBeenCalledWith(
         expect.stringContaining('<Profile.ContentPanel value="security" subPage="missing">'),
       );
