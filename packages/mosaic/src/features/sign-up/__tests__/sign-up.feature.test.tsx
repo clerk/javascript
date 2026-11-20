@@ -587,7 +587,7 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
-  it('sends no second code when a verify route is reopened with a code out', async () => {
+  it('sends no second code and keeps Resend locked when a verify route is reopened with a code out', async () => {
     const fapi = serveFapi({ environment: environment() });
     const { navigate } = await renderWithClerk(
       <>
@@ -603,7 +603,8 @@ describe('SignUp', () => {
     await screen.findByRole('heading', { name: 'Create your account' });
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
-    await user.click(await screen.findByRole('textbox', { name: 'Verification code' }));
+    await codeSent();
+    await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
     await user.keyboard(VERIFICATION_CODE);
 
     await waitFor(() => expect(navigate).toHaveBeenCalled());
