@@ -425,9 +425,7 @@ describe('SignUp', () => {
     await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
 
     expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Use phone instead' }));
-    expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Use email instead' }));
+    expect(screen.getByRole('button', { name: 'Use phone instead' })).toBeInTheDocument();
     await user.type(emailField(), EMAIL);
     await user.click(continueButton());
 
