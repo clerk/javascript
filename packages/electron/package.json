@@ -114,7 +114,7 @@
   "devDependencies": {
     "@clerk/electron-passkeys": "workspace:*",
     "@types/node": "^22.20.1",
-    "electron": "^41.0.0",
+    "electron": "^42.0.0",
     "electron-store": "^8.2.0",
     "tslib": "catalog:repo"
   },
