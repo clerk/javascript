@@ -31,6 +31,27 @@ export type VerifyTokenStatus =
   | 'transferable'
   | (typeof EmailLinkErrorCodeStatus)[keyof typeof EmailLinkErrorCodeStatus];
 
+const EMAIL_ADDRESS_LINK_STATUSES = [
+  'verified',
+  'expired',
+  'failed',
+  'client_mismatch',
+] as const satisfies readonly VerifyTokenStatus[];
+
+/**
+ * The `__clerk_status` values that a `<UserProfile />` email address verification link redirects with.
+ */
+export type EmailAddressLinkStatus = (typeof EMAIL_ADDRESS_LINK_STATUSES)[number];
+
+/**
+ * Returns the `__clerk_status` of the current URL when it is a status that a `<UserProfile />`
+ * email address verification link redirects with, and `null` otherwise.
+ */
+export function getEmailAddressLinkStatus(): EmailAddressLinkStatus | null {
+  const status = getClerkQueryParam('__clerk_status');
+  return EMAIL_ADDRESS_LINK_STATUSES.find(s => s === status) ?? null;
+}
+
 /**
  * Used for instance invitations and organization invitations
  */

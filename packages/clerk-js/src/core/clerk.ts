@@ -162,6 +162,7 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
+  getEmailAddressLinkStatus,
   hasExternalAccountSignUpError,
   inActiveBrowserTab,
   inBrowser,
@@ -1347,7 +1348,9 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
-    if (noUserExists(this)) {
+    // An email address verification link can open in a browser that is not signed in.
+    // Signed out, <UserProfile /> renders only the page that shows the link's status.
+    if (noUserExists(this) && !getEmailAddressLinkStatus()) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,

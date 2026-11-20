@@ -1,4 +1,4 @@
-import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { getClerkQueryParam, getEmailAddressLinkStatus } from '@clerk/shared/internal/clerk-js/queryParams';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -85,8 +85,9 @@ const verificationLinkTexts = {
 };
 
 export const VerificationSuccessPage = () => {
-  const status = getClerkQueryParam('__clerk_status');
-  const linkStatus = status === 'expired' || status === 'failed' || status === 'client_mismatch' ? status : 'verified';
+  // A URL without a status keeps the page's original success message. Any status a link does not
+  // redirect with reads as an invalid link.
+  const linkStatus = getClerkQueryParam('__clerk_status') ? (getEmailAddressLinkStatus() ?? 'failed') : 'verified';
 
   return (
     <EmailLinkStatusCard
