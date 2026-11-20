@@ -15,8 +15,9 @@ export interface HandleSSOCallbackProps {
    */
   navigateToSignIn: () => void;
   /**
-   * Called when a sign-in is transfered to a sign-up that requires additional verification. Also called when a Clerk
-   * Protect challenge fails during a sign-up, with the error available on `errors` from `useSignUp()`.
+   * Called when a sign-up needs more information, including when a sign-in is transfered to a sign-up that requires
+   * additional verification. Also called when a Clerk Protect challenge fails during a sign-up, with the error available
+   * on `errors` from `useSignUp()`.
    */
   navigateToSignUp: () => void;
 }
@@ -167,6 +168,10 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
           });
           return;
         }
+      }
+
+      if (flow !== 'signIn' && signUp.id && signUp.status === 'missing_requirements') {
+        return navigateToSignUp();
       }
     })();
   }, [clerk, clerk.loaded, signIn, signUp]);
