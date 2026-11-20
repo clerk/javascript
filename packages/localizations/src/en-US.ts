@@ -1482,6 +1482,7 @@ export const enUS: LocalizationResource = {
       },
       directorySyncSection: {
         badge__active: 'Active',
+        badge__inProgress: 'In Progress',
         badge__inactive: 'Inactive',
         badge__ssoRequired: 'SSO required',
         description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
@@ -1491,6 +1492,7 @@ export const enUS: LocalizationResource = {
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
         primaryButton__configure: 'Configure',
+        primaryButton__continueConfiguration: 'Continue configuration',
         removeDialog: {
           confirmButton: 'Remove Directory Sync',
           subtitle:
