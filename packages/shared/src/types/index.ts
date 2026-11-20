@@ -1,5 +1,6 @@
 export type * from './apiKeys';
 export type * from './apiKeysSettings';
+export type * from './connect';
 export type * from './attributes';
 export type * from './authConfig';
 export type * from './authObject';

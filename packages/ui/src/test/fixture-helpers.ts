@@ -29,6 +29,9 @@ export const createEnvironmentFixtureHelpers = (baseEnvironment: EnvironmentJSON
     ...createOrganizationSettingsFixtureHelpers(baseEnvironment),
     ...createBillingSettingsFixtureHelpers(baseEnvironment),
     ...createUserSettingsFixtureHelpers(baseEnvironment),
+    withConnect: () => {
+      baseEnvironment.connect_settings = { enabled: true };
+    },
   };
 };
 

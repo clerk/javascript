@@ -16,6 +16,7 @@ export interface EnvironmentResource extends ClerkResource {
   displayConfig: DisplayConfigResource;
   commerceSettings: CommerceSettingsResource;
   apiKeysSettings: APIKeysSettingsResource;
+  connectSettings: { enabled: boolean };
   protectConfig: ProtectConfigResource;
   isSingleSession: () => boolean;
   isProduction: () => boolean;

@@ -17,6 +17,7 @@ exports[`@clerk/ui/experimental flat exports > exposes a stable set of flat name
   "UserProfileActiveDevicesSection",
   "UserProfileBillingPanel",
   "UserProfileConnectedAccountsSection",
+  "UserProfileConnectionsSection",
   "UserProfileDeleteSection",
   "UserProfileEmailSection",
   "UserProfileEnterpriseAccountsSection",

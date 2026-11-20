@@ -93,6 +93,7 @@ export interface ImageJSON {
 
 export interface EnvironmentJSON extends ClerkResourceJSON {
   api_keys_settings: APIKeysSettingsJSON;
+  connect_settings?: { enabled: boolean };
   auth_config: AuthConfigJSON;
   client_debug_mode?: boolean;
   commerce_settings: CommerceSettingsJSON;
