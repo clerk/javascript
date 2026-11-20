@@ -313,7 +313,7 @@ function SignInStartInternal(): JSX.Element {
             }
             if (options?.passwordResetRequiredError) {
               // Factor one opens on the password reset screen when it receives this error.
-              showErrorOnNextCard(options.passwordResetRequiredError);
+              showErrorOnNextCard(clerk, options.passwordResetRequiredError);
             }
             return navigate('factor-one');
           }

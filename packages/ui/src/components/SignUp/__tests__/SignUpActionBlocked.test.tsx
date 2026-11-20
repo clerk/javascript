@@ -1,9 +1,10 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
+import { showErrorOnNextCard } from '@/ui/elements/contexts';
 
 import { SignUpStart } from '../SignUpStart';
 
@@ -16,11 +17,6 @@ const blockedError = (meta?: ClerkAPIErrorJSON['meta']) =>
   });
 
 describe('a blocked sign-up', () => {
-  const originalClerk = window.Clerk;
-  afterEach(() => {
-    window.Clerk = originalClerk;
-  });
-
   it('replaces the start form with the blocked screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
@@ -38,17 +34,10 @@ describe('a blocked sign-up', () => {
   });
 
   it('shows the blocked screen rather than the restricted-access screen', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withRestrictedMode();
     });
-    let lastError: unknown = blockedError({ trace_id: '7Q8ikxgt' }).errors[0];
-    window.Clerk = {
-      get __internal_last_error() {
-        const value = lastError;
-        lastError = null;
-        return value;
-      },
-    } as typeof window.Clerk;
+    showErrorOnNextCard(fixtures.clerk, blockedError({ trace_id: '7Q8ikxgt' }).errors[0]);
 
     render(<SignUpStart />, { wrapper });
 
