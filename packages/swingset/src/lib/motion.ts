@@ -75,13 +75,13 @@ export const PRESETS: Record<string, Partial<MotionConfig>> = {
     springDur: 0.22,
     bounce: 0,
     outDur: 110,
-    outScale: 0.97,
+    outScale: 1,
     outBlur: 1,
     outEase: 'spring',
     inDur: 265,
     inDelay: 45,
     growDelay: 50,
-    inScale: 0.97,
+    inScale: 1,
     inBlur: 1.5,
     inEase: 'spring',
     mScale: 0.96,
@@ -109,7 +109,7 @@ export const NEW_PRESETS: string[] = ['Proposal 2'];
 export const PRESET_NOTES: Record<string, string> = {
   'Classic (current)': "Today's Mosaic motion: a scale pulse with an overlapping crossfade.",
   Proposal:
-    'One curve for everything: the height, the crossfade and the dialog share a single spring, the content carries a subtle 0.97 scale, and it lands as the height settles.',
+    'One curve for everything: the height, the crossfade and the dialog share a single spring, and the content lands as the height settles.',
   'Proposal 2':
     'A crossfade on one spring (0.3s, no bounce) shared by the height and the content, with no scale, blur or delay. The exit is short so the old step does not ghost over the new one.',
 };
