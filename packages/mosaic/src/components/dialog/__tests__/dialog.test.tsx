@@ -9,8 +9,8 @@ import { colorVars, radiusVars, space } from '../../../tokens.stylex';
 import { Button } from '../../button';
 import { ButtonContext } from '../../button/button.context';
 import { Card } from '../../card';
+import { Dialog } from '..';
 import type { DialogVariant } from '../dialog';
-import { Dialog } from '../dialog';
 import { styles as dialogStyles } from '../dialog.styles';
 
 afterEach(() => cleanup());
@@ -19,7 +19,7 @@ afterEach(() => cleanup());
 // id the popup points `aria-labelledby` at. These tests need nothing else from it.
 function Surface({ title, description }: { title: string; description?: string }) {
   return (
-    <Card.Root elevation='overlay'>
+    <Card.Root>
       <Card.Header>
         <Card.Title>{title}</Card.Title>
         {description ? <Card.Description>{description}</Card.Description> : null}
@@ -500,7 +500,7 @@ describe('Dialog.CloseButton', () => {
 describe('composition APIs', () => {
   it('opens from a detached trigger through a handle', async () => {
     const user = userEvent.setup();
-    const handle = Dialog.createHandle();
+    const handle = Dialog.createDialogHandle();
     render(
       <>
         <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
@@ -519,7 +519,7 @@ describe('composition APIs', () => {
 
   it('renders per-trigger content from the payload', async () => {
     const user = userEvent.setup();
-    const handle = Dialog.createHandle<string>();
+    const handle = Dialog.createDialogHandle<string>();
     render(
       <>
         <Dialog.Trigger

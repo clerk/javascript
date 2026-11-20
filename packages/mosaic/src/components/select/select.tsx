@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -170,8 +172,6 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       )}
       <Icon
         glyph={ChevronDown}
-        size='md'
-        placement='inline-end'
         {...themeProps('select-trigger-icon')}
       />
     </Primitive.Trigger>
@@ -286,7 +286,6 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
       </OptionContext.Provider>
       <Icon
         glyph={Checkmark}
-        size='md'
         xstyle={slots.indicator.base}
         {...themeProps('select-option-indicator')}
       />
@@ -381,14 +380,3 @@ export const SelectDescription = React.forwardRef<HTMLSpanElement, SelectDescrip
     });
   },
 );
-
-export const Select = {
-  Root: SelectRoot,
-  Trigger: SelectTrigger,
-  Popup: SelectPopup,
-  Option: SelectOption,
-  Media: SelectMedia,
-  Content: SelectContent,
-  Label: SelectLabel,
-  Description: SelectDescription,
-};

@@ -1116,6 +1116,8 @@ export type __internal_LocalizationResource = {
     action__openOrganizationSwitcher: LocalizationValue;
     action__closeOrganizationSwitcher: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
+    membershipListLabel: LocalizationValue;
+    accountListLabel: LocalizationValue;
   };
   impersonationFab: {
     title: LocalizationValue<'identifier'>;
@@ -1555,6 +1557,10 @@ export type __internal_LocalizationResource = {
     redirectUriModal: {
       title: LocalizationValue;
       subtitle: LocalizationValue<'applicationName'>;
+    };
+    clientIdentity: {
+      dynamic: LocalizationValue<'applicationName'>;
+      metadataDocument: LocalizationValue<'metadataHost'>;
     };
   };
   oauthDeviceVerification: {

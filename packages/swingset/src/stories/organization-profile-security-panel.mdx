@@ -1,0 +1,67 @@
+import * as Stories from './organization-profile-security-panel.stories';
+
+# OrganizationProfileSecurityPanel
+
+## Example
+
+The overview lists the organization's security settings. A member who can manage the SSO bypass allow list sees it inline once the organization has an enterprise connection, laid out like the user profile's email section: the section title and a description of the allow list, an Add button, and the members below, 5 to a page.
+
+<Story name='Default' storyModule={Stories} composition={[
+  { name: 'Panel', href: '/components/panel', layer: 'Components' },
+  { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  { name: 'Section', href: '/components/section', layer: 'Components' },
+  { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  { name: 'Badge', href: '/components/badge', layer: 'Components' },
+]} />
+
+## Examples
+
+### Loading
+
+<Story name='Loading' storyModule={Stories} />
+
+### No sections
+
+A member who can configure SSO or directory sync, but not the SSO bypass allow list, sees the page with an empty state until those sections land.
+
+<Story name='NoSections' storyModule={Stories} />
+
+### Connections error
+
+When the organization's SSO connections can't be loaded, a member who manages the SSO bypass allow list still sees the page, with an error and Retry in place of the allow list.
+
+<Story name='ConnectionsError' storyModule={Stories} />
+
+### Allow list load error
+
+<Story name='AllowListLoadError' storyModule={Stories} />
+
+### Allow list
+
+The example allow list holds 36 members, so it spans eight pages. Remove in a row menu opens a confirmation dialog that names the member and their email. Confirming removes them and moves focus to the next row. Add opens a dialog that adds one member by email, or everyone with a role. Adding by email fails when no member has that address or the member is already listed. Adding by role skips members already listed, and reports members the server skips, such as members whose email domain no connection serves. Try `carol@acme.com`, `zed@acme.com`, or the Member role.
+
+<Story name='AllowList' storyModule={Stories} composition={[
+  { name: 'Section', href: '/components/section', layer: 'Components' },
+  { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+  { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+  { name: 'SegmentedControl', href: '/components/segmented-control', layer: 'Components' },
+  { name: 'Select', href: '/components/select', layer: 'Components' },
+  { name: 'Field', href: '/components/field', layer: 'Components' },
+  { name: 'Banner', href: '/components/banner', layer: 'Components' },
+]} />
+
+### Remove fails
+
+Every removal fails in this example, to show the error inside the confirmation dialog.
+
+<Story name='RemoveFails' storyModule={Stories} />
+
+### Empty allow list
+
+<Story name='EmptyAllowList' storyModule={Stories} />
+
+### Allow list loading
+
+<Story name='AllowListLoading' storyModule={Stories} />

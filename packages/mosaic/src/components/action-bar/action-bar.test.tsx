@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
-import { ActionBar } from './action-bar';
+import { ActionBar } from '.';
 
 const testStyles = stylex.create({
   positioner: {
@@ -399,7 +399,7 @@ describe('Mosaic ActionBar', () => {
   describe('with a confirmation dialog beside the bar', () => {
     function ConfirmRemove() {
       const [selected, setSelected] = React.useState(true);
-      const handle = React.useMemo(() => Dialog.createHandle(), []);
+      const handle = React.useMemo(() => Dialog.createDialogHandle(), []);
       const selectRef = React.useRef<HTMLInputElement>(null);
       return (
         <>

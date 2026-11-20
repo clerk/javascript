@@ -8,10 +8,11 @@ import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import { Flow } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
 import { useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
@@ -147,10 +148,7 @@ export function UserProfileEditPasswordDialog({
         variant='card'
         initialFocus={initialFocusRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           {reverification ? (
             <Flow.Root
               value={step}

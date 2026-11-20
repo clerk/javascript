@@ -4,7 +4,7 @@ import { Dialog } from '../index';
 
 describe('Dialog.Trigger payload', () => {
   test('a detached trigger must pass the payload its handle carries', () => {
-    const handle = Dialog.createHandle<string>();
+    const handle = Dialog.createDialogHandle<string>();
     void (
       <>
         <Dialog.Trigger
@@ -20,9 +20,9 @@ describe('Dialog.Trigger payload', () => {
   test('a trigger whose handle carries no payload may omit it', () => {
     void (
       <>
-        <Dialog.Trigger handle={Dialog.createHandle()} />
-        <Dialog.Trigger handle={Dialog.createHandle<void>()} />
-        <Dialog.Trigger handle={Dialog.createHandle<unknown>()} />
+        <Dialog.Trigger handle={Dialog.createDialogHandle()} />
+        <Dialog.Trigger handle={Dialog.createDialogHandle<void>()} />
+        <Dialog.Trigger handle={Dialog.createDialogHandle<unknown>()} />
         <Dialog.Trigger />
       </>
     );

@@ -1,5 +1,5 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import type { ExternalAccountResource, UserResource } from '@clerk/shared/types';
+import type { ExternalAccountResource, OAuthTransport, UserResource } from '@clerk/shared/types';
 
 export function getExternalVerificationRedirectURL(response: ExternalAccountResource | undefined): URL {
   const url = response?.verification?.externalVerificationRedirectURL;
@@ -10,6 +10,20 @@ export function getExternalVerificationRedirectURL(response: ExternalAccountReso
   }
 
   return url;
+}
+
+export async function openOAuthTransportWithClerkErrors(
+  transport: OAuthTransport,
+  url: URL,
+): Promise<{ callbackUrl: string }> {
+  try {
+    return await transport.open(url);
+  } catch (cause) {
+    throw new ClerkRuntimeError('The OAuth transport failed to complete the flow.', {
+      code: 'something_went_wrong',
+      cause: cause instanceof Error ? cause : undefined,
+    });
+  }
 }
 
 export async function reloadUserAfterOAuthCallback(user: UserResource, callbackUrl: string): Promise<void> {

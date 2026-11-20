@@ -1,21 +1,31 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
-import { Badge } from '../../components/badge';
 import { SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
-import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
+import { Switcher } from '../../components/switcher';
+import { SwitcherSurfaceProvider } from '../../components/switcher/switcher.context';
+import { BadgedAvatar, RowAvatar } from '../../components/switcher/switcher-avatar';
+import { SwitcherHeader } from '../../components/switcher/switcher-header';
+import {
+  SwitcherGroup,
+  SwitcherItem,
+  SwitcherItemContent,
+  SwitcherItemDescription,
+  SwitcherItemLabel,
+  SwitcherItemMedia,
+  SwitcherItemTrailing,
+  SwitcherSeparator,
+} from '../../components/switcher/switcher-item';
+import type { SwitcherTriggerVariant } from '../../components/switcher/switcher-trigger';
 import type { IconComponent } from '../../icons/glyph';
 import { Building } from '../../icons/glyphs/building';
 import { Checkmark } from '../../icons/glyphs/checkmark';
-import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { Cog6Teeth } from '../../icons/glyphs/cog-6-teeth';
 import { Plus } from '../../icons/glyphs/plus';
@@ -26,10 +36,7 @@ import { UsersAddRight } from '../../icons/glyphs/users-add-right';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
-import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
 import type { SwitcherLayout } from './switcher.layout';
 import { resolveSwitcherLayout } from './switcher.layout';
@@ -47,25 +54,14 @@ import type {
   SwitcherTriggerBadge,
 } from './switcher.types';
 import { switcherBusyKeys } from './switcher.types';
-import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
-import { SwitcherHeader } from './switcher-header.view';
-import {
-  SwitcherGroup,
-  SwitcherItem,
-  SwitcherItemContent,
-  SwitcherItemDescription,
-  SwitcherItemLabel,
-  SwitcherItemMedia,
-  SwitcherItemTrailing,
-  SwitcherSeparator,
-} from './switcher-item.view';
 import type { SwitcherMessages } from './switcher-surface';
-import { surfaceForMode, SwitcherSurfaceProvider, useSlot, useSwitcherMessages } from './switcher-surface';
+import { surfaceForMode, useSwitcherMessages } from './switcher-surface';
 import { useSwitcherTriggerController } from './switcher-trigger.controller';
 
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
 export type * from './switcher.types';
+export type { SwitcherTriggerVariant };
 
 type SwitcherContextValue = SwitcherData &
   SwitcherCallbacks &
@@ -159,7 +155,9 @@ function membershipSubtitle(membership: SwitcherMembership, m: Messages, locale:
 
 function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
   if (lead.kind === 'organization') {
-    return lead.user ? identifier : membershipSubtitle(lead.organization, m, locale);
+    return lead.user
+      ? joinDetails(identifier, lead.organization.roleName)
+      : membershipSubtitle(lead.organization, m, locale);
   }
   if (lead.kind === 'none') {
     // No selection is not the account, so it carries no identifier line.
@@ -271,10 +269,7 @@ function SwitcherRow({
         <SwitcherItemTrailing>{trailing}</SwitcherItemTrailing>
       ) : active ? (
         <SwitcherItemTrailing>
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
+          <Icon glyph={Checkmark} />
         </SwitcherItemTrailing>
       ) : null}
     </SwitcherItem>
@@ -575,12 +570,9 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
       {active ? (
-        <Menu.Media>
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
-        </Menu.Media>
+        <Menu.Indicator>
+          <Icon glyph={Checkmark} />
+        </Menu.Indicator>
       ) : null}
     </Menu.Item>
   );
@@ -612,16 +604,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
         aria-busy={busy || undefined}
         render={<SwitcherItem render={rowButton(disabled)} />}
       >
-        <SwitcherItemMedia>
-          {busy ? (
-            <PendingSpinner />
-          ) : (
-            <Icon
-              glyph={icon}
-              size='md'
-            />
-          )}
-        </SwitcherItemMedia>
+        <SwitcherItemMedia>{busy ? <PendingSpinner /> : <Icon glyph={icon} />}</SwitcherItemMedia>
         <SwitcherItemContent>
           <SwitcherItemLabel variant='interactive'>{label}</SwitcherItemLabel>
         </SwitcherItemContent>
@@ -629,7 +612,6 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
           <Icon
             glyph={ChevronRight}
             xstyle={rtl.mirror}
-            size='md'
           />
         </SwitcherItemTrailing>
       </Menu.Trigger>
@@ -679,10 +661,7 @@ function SwitchAccountRow() {
           onClick={addAccount}
         >
           <Menu.Media>
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
+            <Icon glyph={Plus} />
           </Menu.Media>
           <Menu.Label>{m.accounts.add}</Menu.Label>
         </Menu.Item>
@@ -697,7 +676,6 @@ function SwitchAccountRow() {
             <Menu.Media>
               <Icon
                 glyph={SignOut}
-                size='md'
                 xstyle={rtl.mirror}
               />
             </Menu.Media>
@@ -740,12 +718,7 @@ function OrganizationSection() {
       actions.push(
         <ActionRow
           key='createOrganization'
-          icon={
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={Plus} />}
           label={m.manage.createOrganization}
           // eslint-disable-next-line react-hooks-js/refs -- The context also contains a paging ref; these reads use its plain view data.
           onClick={data.onCreateOrganization}
@@ -804,12 +777,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
   if (targets.length === 1 && only) {
     return (
       <ActionRow
-        icon={
-          <Icon
-            glyph={Cog6Teeth}
-            size='md'
-          />
-        }
+        icon={<Icon glyph={Cog6Teeth} />}
         label={m.manage.settings}
         onClick={only.onClick}
       />
@@ -828,10 +796,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
           onClick={target.onClick}
         >
           <Menu.Media>
-            <Icon
-              glyph={target.icon}
-              size='md'
-            />
+            <Icon glyph={target.icon} />
           </Menu.Media>
           <Menu.Label>{target.label}</Menu.Label>
         </Menu.Item>
@@ -844,7 +809,7 @@ function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
 function settingsTargets(data: SwitcherContextValue, lead: LeadSelection, m: Messages): SettingsTarget[] {
   const targets: SettingsTarget[] = [];
   if ((lead.kind !== 'organization' || leadUser(lead)) && data.onManageAccount) {
-    targets.push({ label: m.manage.profile, icon: UserCircle, onClick: data.onManageAccount });
+    targets.push({ label: m.manage.account, icon: UserCircle, onClick: data.onManageAccount });
   }
   if (lead.kind === 'organization' && data.onManageOrganization) {
     targets.push({ label: m.manage.organization, icon: Building, onClick: data.onManageOrganization });
@@ -874,12 +839,7 @@ function ManageSection() {
         id: 'inviteMembers',
         node: (
           <ActionRow
-            icon={
-              <Icon
-                glyph={UsersAddRight}
-                size='md'
-              />
-            }
+            icon={<Icon glyph={UsersAddRight} />}
             label={m.manage.invite}
             onClick={data.onInviteMembers}
           />
@@ -934,12 +894,7 @@ function Footer() {
       rows.push(
         <ActionRow
           key='addAccount'
-          icon={
-            <Icon
-              glyph={Plus}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={Plus} />}
           label={m.accounts.add}
           onClick={data.onAddAccount}
         />,
@@ -949,12 +904,7 @@ function Footer() {
       rows.push(
         <ActionRow
           key='signOut'
-          icon={
-            <Icon
-              glyph={SignOut}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={SignOut} />}
           label={m.accounts.signOut}
           onClick={() => signOutSession(sessionId, 'footer')}
           busyKey={switcherBusyKeys.signOutSession(sessionId, 'footer')}
@@ -990,7 +940,7 @@ export interface SwitcherRootProps
 
 /**
  * Owns the account/organization data + callbacks and forwards the popover's open state straight to
- * the headless `Popover.Root` — it does not keep a second controllable-state copy. Leaves consume
+ * `Switcher.Root` — it does not keep a second controllable-state copy. Leaves consume
  * the data through context.
  */
 export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
@@ -1000,21 +950,21 @@ export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
   const layout = resolveSwitcherLayout(mode, data);
 
   return (
-    <Popover.Root
+    <Switcher.Root
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      placement={placement ?? 'bottom-start'}
+      placement={placement}
       sideOffset={sideOffset}
     >
       <SwitcherSurfaceProvider value={surfaceForMode(mode)}>
         <SwitcherContext.Provider value={{ ...data, layout }}>{children}</SwitcherContext.Provider>
       </SwitcherSurfaceProvider>
-    </Popover.Root>
+    </Switcher.Root>
   );
 }
 
-export interface SwitcherTriggerProps {
+export interface SwitcherTriggerOptions {
   /**
    * Names the lead beside its avatar — the organization wherever one heads the trigger, no
    * selection when personal is hidden and none is active, the account otherwise. Turn it off for the avatar alone.
@@ -1034,16 +984,13 @@ export interface SwitcherTriggerProps {
   triggerBadge?: SwitcherTriggerBadge;
 }
 
-export type SwitcherTriggerVariant = 'full' | 'condensed';
-
 /** The trigger: the lead's avatar, and what it is called. */
 export function SwitcherTrigger({
   showTriggerLabel = true,
   triggerBadge = true,
   triggerVariant = 'condensed',
-}: SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
+}: SwitcherTriggerOptions & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
-  const slot = useSlot();
   const data = useSwitcherContext();
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
@@ -1059,46 +1006,20 @@ export function SwitcherTrigger({
   const user = leadUser(lead);
 
   return (
-    <Popover.Trigger
-      {...themeProps(slot('trigger'), { variant: triggerVariant })}
+    <Switcher.Trigger
       aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
-      xstyle={[
-        focusOutline.visible,
-        styles.trigger,
-        showTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-        !showTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
-      ]}
-    >
-      <TriggerAvatar
-        lead={lead}
-        variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
-      />
-      {showTriggerLabel ? (
-        <>
-          <span
-            {...mergeStyleProps(
-              themeProps(slot('trigger-label')),
-              stylex.props(styles.triggerName, truncationStyles.singleLine),
-            )}
-          >
-            {name}
-          </span>
-          {typeof planLabel === 'string' ? (
-            <Badge
-              color='neutral'
-              data-badge-id={badge?.id}
-            >
-              {planLabel}
-            </Badge>
-          ) : null}
-          <Icon
-            glyph={ChevronDown}
-            size='md'
-            xstyle={styles.triggerCaret}
-          />
-        </>
-      ) : null}
-    </Popover.Trigger>
+      avatar={
+        <TriggerAvatar
+          lead={lead}
+          variant={showTriggerLabel ? triggerVariant : 'avatarOnly'}
+        />
+      }
+      name={showTriggerLabel ? name : undefined}
+      badge={typeof planLabel === 'string' ? planLabel : undefined}
+      badgeId={badge?.id}
+      shape={shape}
+      variant={triggerVariant}
+    />
   );
 }
 
@@ -1134,27 +1055,23 @@ function TriggerAvatar({
 /** The popover surface: header, organizations, what can be done about the lead, and footer. */
 export function SwitcherPopup(): ReactElement {
   const m = useSwitcherMessages();
-  const slot = useSlot();
   const { renderBranding } = useSwitcherContext();
 
   return (
-    <Popover.Popup
-      {...themeProps(slot('popover'))}
+    <Switcher.Popup
       aria-label={m.popup.label}
-      xstyle={styles.popup}
+      renderBranding={renderBranding}
     >
-      <Card.Root renderBranding={renderBranding}>
-        <Header />
-        <OrganizationSection />
-        <ManageSection />
-        <Footer />
-      </Card.Root>
-    </Popover.Popup>
+      <Header />
+      <OrganizationSection />
+      <ManageSection />
+      <Footer />
+    </Switcher.Popup>
   );
 }
 
 export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> &
-  SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant };
+  SwitcherTriggerOptions & { triggerVariant?: SwitcherTriggerVariant };
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The

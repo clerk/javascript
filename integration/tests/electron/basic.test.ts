@@ -95,4 +95,27 @@ test.describe('electron basic auth @electron', () => {
     await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
     await expect(electronPage.evaluate(() => (window as ElectronWindow).__hardNavigations)).resolves.toEqual([]);
   });
+
+  test('recovers the connect account button when the browser cannot open', async ({
+    electronApplication,
+    electronPage,
+  }) => {
+    const { userButton } = createPageObjects({ page: electronPage, useTestingToken: false });
+
+    await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
+    await electronApplication.evaluate(({ shell }) => {
+      shell.openExternal = async () => {
+        throw new Error('No application is registered to open this URL');
+      };
+    });
+
+    await userButton.toggleTrigger();
+    await userButton.triggerManageAccount();
+    await electronPage.getByText(/^connect account$/i).click();
+    const connectGoogle = electronPage.getByRole('menuitem', { name: /connect google account/i });
+    await connectGoogle.click();
+
+    await expect(electronPage.getByText('Something went wrong. Please try again.')).toBeVisible();
+    await expect(connectGoogle).toBeEnabled();
+  });
 });

@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { Input } from '../../input';
-import { Field } from '../field';
+import { Field } from '..';
 
 describe('Mosaic Field SSR', () => {
   it('emits render-time relationships and defers registered relationships until hydration', () => {

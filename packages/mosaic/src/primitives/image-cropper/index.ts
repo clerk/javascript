@@ -1,5 +1,5 @@
 export * as ImageCropper from './parts';
-export { type Crop, INITIAL_CROP, type PixelCrop, type Rotation, type Size, ZOOM_STEP } from './crop';
+export type { Crop, PixelCrop, Rotation, Size } from './crop';
 
 export type {
   ImageCropperAreaProps,
@@ -12,4 +12,4 @@ export type {
   ImageCropperZoomOutProps,
   ImageCropperZoomProps,
 } from './parts';
-export { cropImage, type CropImageOptions } from './crop-image';
+export type { CropImageOptions } from './crop-image';

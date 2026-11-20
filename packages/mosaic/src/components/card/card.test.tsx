@@ -8,7 +8,7 @@ import { Button, SubmitButton } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Dialog } from '../dialog';
 import { Flow } from '../flow';
-import { Card } from './card';
+import { Card } from '.';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -206,6 +206,22 @@ describe('Mosaic Card', () => {
       >
         <Card.Footer data-testid='footer' />
       </Card.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
+  });
+
+  it('defaults to overlay elevation inside a dialog', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root data-testid='root'>
+            <Card.Title>Title</Card.Title>
+            <Card.Footer data-testid='footer' />
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
@@ -562,10 +578,7 @@ describe('Mosaic Card', () => {
         </Card.Root>
         <Dialog.Trigger>Open</Dialog.Trigger>
         <Dialog.Popup>
-          <Card.Root
-            elevation='overlay'
-            renderBranding={false}
-          >
+          <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>Review terms</Card.Title>
             </Card.Header>
@@ -758,7 +771,7 @@ describe('Mosaic Card', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Account</Card.Title>
             </Card.Header>

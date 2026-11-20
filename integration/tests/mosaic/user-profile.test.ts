@@ -62,15 +62,14 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await expect(page.getByText(fakeUser.email)).toBeVisible();
   });
 
-  test("lists the active organization's pages after the account's", async ({ page, context }) => {
+  test("leaves out the organization's pages with an active organization", async ({ page, context }) => {
     await signIn({ page, context });
 
     await page.evaluate(orgId => window.Clerk?.setActive({ organization: orgId }), organization.id);
     await page.waitForFunction(orgId => window.Clerk?.organization?.id === orgId, organization.id);
 
-    await tab(page, 'General').click();
-    await expect(tab(page, 'General')).toHaveAttribute('aria-selected', 'true');
-    await expect(page.getByText(organization.name).first()).toBeVisible();
+    await expect(tab(page, 'Security')).toBeVisible();
+    await expect(tab(page, 'General')).toHaveCount(0);
   });
 
   test('renders a custom page', async ({ page, context }) => {

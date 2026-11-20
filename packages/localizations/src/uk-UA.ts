@@ -1104,6 +1104,10 @@ export const ukUA: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1575,12 +1579,14 @@ export const ukUA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Список усіх облікових записів',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Створити організацію',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Управління організацією',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
+    membershipListLabel: 'Список усіх членств в організаціях',
     notSelected: 'Організація не обрана',
     personalWorkspace: 'Особистий робочий простір',
     suggestionsAcceptedLabel: 'Pending approval',

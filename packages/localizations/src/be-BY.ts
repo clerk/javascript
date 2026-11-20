@@ -1105,6 +1105,10 @@ export const beBY: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1580,12 +1584,14 @@ export const beBY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Спіс усіх уліковых запісаў',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Стварыць арганізацыю',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Кіраванне арганізацыяй',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
+    membershipListLabel: 'Спіс усіх членстваў у арганізацыях',
     notSelected: 'Арганізацыя не выбрана',
     personalWorkspace: 'Асабістае працоўнае прастора',
     suggestionsAcceptedLabel: 'У чаканні адабрэння',

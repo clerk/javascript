@@ -1,9 +1,9 @@
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
-import { consentMessages } from '../features/consent/consent.messages';
 import { createOrganizationMessages } from '../features/create-organization/create-organization.messages';
 import { inviteMembersButtonMessages } from '../features/invite-members-button/invite-members-button.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { organizationListMessages } from '../features/organization-list/organization-list.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -12,6 +12,7 @@ import { membersTableTabMessages } from '../features/organization-profile/organi
 import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.messages';
 import { requestsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.messages';
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
+import { organizationProfileSecurityPanelMessages } from '../features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { signInMessages } from '../features/sign-in/sign-in.messages';
@@ -80,6 +81,7 @@ export const mosaicMessages = {
       invite: organizationProfileInviteMembersMessages,
     },
     danger: organizationProfileDangerSectionMessages,
+    security: organizationProfileSecurityPanelMessages,
   },
   inviteMembersButton: inviteMembersButtonMessages,
   apiKeys: apiKeysTableMessages,
@@ -91,7 +93,7 @@ export const mosaicMessages = {
   form: formMessages,
   errors: errorMessages,
   roles: roleMessages,
-  consent: consentMessages,
+  oauthConsent: oauthConsentMessages,
   waitlist: waitlistMessages,
   signIn: signInMessages,
   taskSetupMfa: taskSetupMfaMessages,

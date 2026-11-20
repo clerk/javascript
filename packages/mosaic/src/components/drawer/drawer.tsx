@@ -1,12 +1,15 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '../../primitives/drawer';
-import { Drawer as Primitive, registerDrawerCssVars } from '../../primitives/drawer';
+import { Drawer as Primitive } from '../../primitives/drawer';
+import { registerDrawerCssVars } from '../../primitives/drawer/css-vars';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { DialogContext, isInDialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
 import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;
@@ -118,17 +121,11 @@ const Description = React.forwardRef<HTMLParagraphElement, DrawerDescriptionProp
   );
 });
 
-/**
- * A bottom sheet: `Drawer.Root` holds the state, `Drawer.Trigger` opens it, and `Drawer.Popup`
- * renders the sheet with its scrim, portal and grip. `Drawer.Title` and `Drawer.Description` name
- * and describe it; `Drawer.Close` dismisses it from inside. Drag it down, press Escape, or press
- * outside to dismiss.
- */
-export const Drawer = {
-  Root,
-  Popup,
-  Trigger,
-  Title,
-  Description,
-  Close,
+export {
+  Root as DrawerRoot,
+  Popup as DrawerPopup,
+  Trigger as DrawerTrigger,
+  Title as DrawerTitle,
+  Description as DrawerDescription,
+  Close as DrawerClose,
 };

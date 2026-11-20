@@ -1,6 +1,4 @@
-'use client';
-
-export { Table } from './table';
+export * as Table from './table.parts';
 export type {
   TableAlign,
   TableBodyProps,

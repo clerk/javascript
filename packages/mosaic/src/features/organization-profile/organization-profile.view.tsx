@@ -2,6 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
+import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import type { ProfilePage, ProfilePagesViewProps } from '../profile-pages/profile-pages.view';
 import { ProfilePagesView } from '../profile-pages/profile-pages.view';
@@ -43,16 +44,21 @@ export function organizationProfilePageList(
 ): ProfilePage[] {
   return organizationProfileNavEntries(options).map(entry =>
     entry.custom
-      ? { id: entry.id, label: entry.custom.label, icon: entry.custom.icon, content: entry.custom.content }
+      ? {
+          id: entry.id,
+          label: entry.custom.label,
+          icon: entry.custom.icon,
+          content: (
+            <Panel.Root>
+              <Panel.Title>{entry.custom.label}</Panel.Title>
+              {entry.custom.content}
+            </Panel.Root>
+          ),
+        }
       : {
           id: entry.id,
           label: labels[entry.id],
-          icon: (
-            <Icon
-              glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
-              size='md'
-            />
-          ),
+          icon: <Icon glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]} />,
           content: options.pages[entry.id],
         },
   );

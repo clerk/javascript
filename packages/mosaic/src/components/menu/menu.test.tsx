@@ -5,7 +5,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { Menu } from './menu';
+import { Menu } from '.';
 
 const scrollClasses = stylex.props(...scrollAreaViewport()).className?.split(' ') ?? [];
 // The popup shares the root's atoms (both are `min-height: 0` flex columns), so only what the

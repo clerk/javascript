@@ -9,8 +9,11 @@ import { PlaygroundProvider } from './PlaygroundContext';
 // MDX docs keyed by `group` slug → `component` slug. Group-aware so identically-named
 // entries (the headless `Dialog` primitive vs. the styled `Dialog` component) stay distinct.
 const docModules: Record<string, Record<string, React.ComponentType>> = {
-  'user-button': {
-    'user-button': dynamic(() => import('../stories/user-button.mdx')),
+  switcher: {
+    switcher: dynamic(() => import('../stories/switcher.mdx')),
+  },
+  profile: {
+    profile: dynamic(() => import('../stories/profile.mdx')),
   },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
@@ -50,9 +53,11 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
   },
   misc: {
     'mosaic-provider': dynamic(() => import('../stories/mosaic-provider.mdx')),
+    'user-button': dynamic(() => import('../stories/user-button.mdx')),
     'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'create-organization': dynamic(() => import('../stories/create-organization.mdx')),
     'organization-list': dynamic(() => import('../stories/organization-list.mdx')),
@@ -60,7 +65,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-avatar': dynamic(() => import('../stories/user-avatar.mdx')),
     'invite-members-button': dynamic(() => import('../stories/invite-members-button.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-    consent: dynamic(() => import('../stories/consent.mdx')),
+    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
     reverification: dynamic(() => import('../stories/reverification.mdx')),
     waitlist: dynamic(() => import('../stories/waitlist.mdx')),
     'task-setup-mfa': dynamic(() => import('../stories/task-setup-mfa.mdx')),

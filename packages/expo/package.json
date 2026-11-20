@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "4.16.2",
+  "version": "4.17.3",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -73,6 +73,10 @@
       "types": "./dist/hosted-auth/index.d.ts",
       "default": "./dist/hosted-auth/index.js"
     },
+    "./native-to-web": {
+      "types": "./dist/native-to-web/index.d.ts",
+      "default": "./dist/native-to-web/index.js"
+    },
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
@@ -105,6 +109,7 @@
     "apple",
     "biometrics",
     "hosted-auth",
+    "native-to-web",
     "experimental",
     "legacy",
     "app.plugin.js",
@@ -141,10 +146,12 @@
     "expo-auth-session": "^7.0.11",
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
+    "expo-intent-launcher": "^13.0.8",
     "expo-local-authentication": "^17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-web-browser": "^15.0.11",
     "react-native": "^0.86.0",
+    "react-native-webview": "^14.0.1",
     "tslib": "catalog:repo"
   },
   "peerDependencies": {
@@ -158,12 +165,14 @@
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
     "expo-crypto": ">=12",
+    "expo-intent-launcher": ">=12",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-native": ">=0.75"
+    "react-native": ">=0.75",
+    "react-native-webview": ">=13.0.0"
   },
   "peerDependenciesMeta": {
     "@clerk/expo-biometrics": {
@@ -193,6 +202,9 @@
     "expo-crypto": {
       "optional": true
     },
+    "expo-intent-launcher": {
+      "optional": true
+    },
     "expo-local-authentication": {
       "optional": true
     },
@@ -203,6 +215,9 @@
       "optional": true
     },
     "react-dom": {
+      "optional": true
+    },
+    "react-native-webview": {
       "optional": true
     }
   },

@@ -65,10 +65,7 @@ function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => stri
         aria-label={removeLabel(tag.value)}
         {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, styles.tagRemove))}
       >
-        <Icon
-          glyph={X}
-          size='md'
-        />
+        <Icon glyph={X} />
       </Primitive.TagRemove>
     </Primitive.Tag>
   ));

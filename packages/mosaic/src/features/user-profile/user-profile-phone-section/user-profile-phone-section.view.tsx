@@ -42,11 +42,7 @@ export function UserProfilePhoneSectionView({
         />
       }
     >
-      <Icon
-        glyph={Plus}
-        placement='inline-start'
-        size='md'
-      />
+      <Icon glyph={Plus} />
       {messages.contact.add}
     </Dialog.Trigger>
   ) : undefined;

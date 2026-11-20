@@ -149,6 +149,38 @@ describe('Client Singleton', () => {
     });
   });
 
+  it('moves the client revision on every write of the singleton', async () => {
+    const clientObjectJSON = {
+      object: 'client',
+      id: 'test_id',
+      sessions: [],
+      sign_in: null,
+      sign_up: null,
+      last_active_session_id: null,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    } as unknown as ClientJSON;
+    // @ts-expect-error This is a private method that we are mocking
+    BaseResource._fetch = vi.fn().mockResolvedValue(null);
+
+    const client = Client.getOrCreateInstance();
+    let revision = Client.getRevision();
+
+    client.fromJSON(null);
+    expect(Client.getRevision()).toBe(revision);
+
+    client.fromJSON(clientObjectJSON);
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
+
+    await client.destroy();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
+
+    Client.clearInstance();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+  });
+
   describe('__internal_signOut', () => {
     it('returns the response URL and clears sessions while retaining the client', async () => {
       const user = createUser({ id: 'user_1' });

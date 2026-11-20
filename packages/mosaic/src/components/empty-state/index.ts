@@ -1,6 +1,4 @@
-'use client';
-
-export { EmptyState } from './empty-state';
+export * as EmptyState from './empty-state.parts';
 export type {
   EmptyStateActionsProps,
   EmptyStateDescriptionProps,

@@ -293,10 +293,7 @@ export function Empty() {
             </EmptyState.Description>
             <EmptyState.Actions>
               <Button size='sm'>
-                <Icon
-                  glyph={Plus}
-                  placement='inline-start'
-                />
+                <Icon glyph={Plus} />
                 Create key
               </Button>
             </EmptyState.Actions>
@@ -505,7 +502,7 @@ export function ColumnWidths() {
   );
 }
 
-const keyDetails = Dialog.createHandle<ApiKey>();
+const keyDetails = Dialog.createDialogHandle<ApiKey>();
 
 export function ClickableRows() {
   return (
@@ -533,10 +530,7 @@ export function ClickableRows() {
               variant='card'
               compactPlacement='center'
             >
-              <Card.Root
-                elevation='overlay'
-                renderBranding={false}
-              >
+              <Card.Root renderBranding={false}>
                 <Card.Header>
                   <Card.Title>{payload.name}</Card.Title>
                   <Card.Description>API key</Card.Description>

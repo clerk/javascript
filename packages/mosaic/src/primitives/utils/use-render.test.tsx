@@ -181,6 +181,22 @@ describe('useRender', () => {
     expect(refB).toHaveBeenCalledWith(el);
   });
 
+  it('attaches and detaches a ref that comes and goes between renders', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const ref = React.createRef<HTMLDivElement>();
+    function C({ attach }: { attach: boolean }) {
+      return useRender({ defaultTagName: 'div', ref: attach ? ref : undefined, props: { 'data-testid': 'test' } });
+    }
+    const { rerender } = render(<C attach />);
+    rerender(<C attach={false} />);
+
+    expect(ref.current).toBeNull();
+    rerender(<C attach />);
+
+    expect(ref.current).toBe(screen.getByTestId('test'));
+    expect(error).not.toHaveBeenCalled();
+  });
+
   it("merges a render element's own ref with the params ref", () => {
     const paramRef = React.createRef<HTMLElement>();
     const elementRef = React.createRef<HTMLElement>();

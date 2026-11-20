@@ -79,11 +79,7 @@ export function UserProfilePasskeysSectionView({
                   aria-busy={isAdding}
                   onClick={onAdd}
                 >
-                  <Icon
-                    glyph={Plus}
-                    placement='inline-start'
-                    size='md'
-                  />
+                  <Icon glyph={Plus} />
                   {m.add}
                 </Button>
               </Section.Actions>

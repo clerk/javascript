@@ -1,20 +1,4 @@
-export {
-  Combobox,
-  ComboboxClear,
-  ComboboxCollection,
-  ComboboxDetail,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxInputGroup,
-  ComboboxLabel,
-  ComboboxList,
-  ComboboxMedia,
-  ComboboxOption,
-  ComboboxOptionIndicator,
-  ComboboxPopup,
-  ComboboxRoot,
-  ComboboxTrigger,
-} from './combobox';
+export * as Combobox from './combobox.parts';
 export type {
   ComboboxClearProps,
   ComboboxDetailProps,

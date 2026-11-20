@@ -99,10 +99,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
         <Menu.Root placement='top'>
           <Menu.Trigger render={<ActionBar.Action />}>
             Change role
-            <Icon
-              glyph={ChevronDown}
-              placement='inline-end'
-            />
+            <Icon glyph={ChevronDown} />
           </Menu.Trigger>
           <Menu.Popup>
             <Menu.Item
@@ -157,17 +154,12 @@ function MembersProfile({
       <Profile.Nav>
         <Profile.NavItem
           value='members'
-          icon={
-            <Icon
-              glyph={Users}
-              size='md'
-            />
-          }
+          icon={<Icon glyph={Users} />}
         >
           Members
         </Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content pageTitle='Members'>
+      <Profile.Content>
         <Profile.ContentPanel value='members'>
           <Panel.Root>
             <Panel.Title>Members</Panel.Title>

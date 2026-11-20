@@ -107,19 +107,6 @@ export type UseReverificationWithResultOptions<Args extends any[] = any[]> = Use
   /**
    * When `true`, the fetcher's first argument is a `ReverificationResult` (`undefined` on the first call), and the
    * returned function takes the remaining arguments.
-   *
-   * @example
-   * ```tsx
-   * const updatePassword = useReverification(
-   *   (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>
-   *     // A password reset during reverification already saved the new password.
-   *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
-   *   { passReverificationResult: true },
-   * );
-   *
-   * // In the submit handler, once `user` is loaded:
-   * await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
-   * ```
    */
   passReverificationResult: true;
 };
@@ -281,8 +268,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   const handleClick = async () => {
  *     try {
  *       const myData = await enhancedFetcher()
- *       //     ^ is types as `MyData`
- *     } catch (e) {
+ *       //     ^ is typed as `MyData`
+ *     } catch (err) {
  *       // Handle error returned from the fetcher here
  *
  *       // You can also handle cancellation with the following
@@ -294,6 +281,22 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  *   return <button onClick={handleClick}>Update User</button>
  * }
+ * ```
+ *
+ * ### Handle a password reset during reverification
+ *
+ * If reverification reset the password, Clerk already saved the new password. Reload the user instead of sending the
+ * original password update again.
+ *
+ * ```tsx
+ * const updatePassword = useReverification(
+ *   (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+ *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
+ *   { passReverificationResult: true },
+ * );
+ *
+ * // In the submit handler, once `user` is loaded:
+ * await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
  * ```
  */
 export const useReverification = ((

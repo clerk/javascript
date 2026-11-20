@@ -5,8 +5,9 @@ import * as PanelStories from './panel.component.stories';
 Panel lays out one page of content: a title, and the sections below it. `Panel.Root` stacks its
 children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks a column of
 [Section](/components/section)s one heading level below the title. Inside a
-[Profile](/components/profile) page, `Panel.Title` renders nothing: the profile renders the page title,
-and a ref on `Panel.Title` reaches it.
+[Profile](/components/profile) page, `Panel.Title` is the page title: it names the page, and on
+compact layouts it opens the navigation. A ref on it reaches that heading. Inside a
+`Profile.SubPage` it gets a back button to the page above it, and on its own it has none.
 
 Wrap the title in [Skeleton](/components/skeleton) for a loading state:
 `<Panel.Title><Skeleton show={loading}>Account</Skeleton></Panel.Title>`.
@@ -68,13 +69,13 @@ Every part takes `xstyle`, `ref`, and `render` along with its element's props.
 ## Focus
 
 `Panel.Title` takes `tabIndex={-1}`, so it can receive focus without joining the tab order. Content
-inside `Panel.Root` reaches the title with `usePanelTitle()`, which returns a function that gives
+inside `Panel.Root` reaches the title with `Panel.usePanelTitle()`, which returns a function that gives
 the title element. Inside a profile page, that is the profile's page title.
 
 ```tsx
-import { usePanelTitle } from '@clerk/mosaic/components/panel';
+import { Panel } from '@clerk/mosaic/components/panel';
 
-const panelTitle = usePanelTitle();
+const panelTitle = Panel.usePanelTitle();
 panelTitle()?.focus();
 ```
 

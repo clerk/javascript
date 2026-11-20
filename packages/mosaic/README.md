@@ -58,13 +58,13 @@ Import the stylesheet and render Mosaic components beneath the SDK `ClerkProvide
 
 ```tsx
 import { ClerkProvider } from '@clerk/react';
-import { UserButton } from '@clerk/mosaic';
+import { Switcher } from '@clerk/mosaic';
 import '@clerk/mosaic/styles.css';
 
 export function App({ children }) {
   return (
     <ClerkProvider publishableKey={process.env.CLERK_PUBLISHABLE_KEY}>
-      <UserButton />
+      <Switcher />
       {children}
     </ClerkProvider>
   );
@@ -78,6 +78,18 @@ If you want to use custom CSS to theme the components, instead import the styles
 ```
 
 This ensures your unlayered custom CSS takes priority. Expect more documentation on custom theming soon.
+
+### Set a color scheme
+
+Mosaic's colors use [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark), which resolves against the `color-scheme` in scope. Mosaic does not set one, so your app must:
+
+```css
+:root {
+  color-scheme: light dark;
+}
+```
+
+Use `light dark` to follow the visitor's system setting, or `light` or `dark` to pin one. You can also set it on any element to scope a scheme to part of the page.
 
 ## Troubleshooting
 
@@ -100,6 +112,10 @@ yarn why @clerk/shared
 ```
 
 If multiple versions remain, the supported ranges are likely incompatible. Update Mosaic and your Clerk framework SDK to the latest versions, then deduplicate again.
+
+### Components render with transparent backgrounds or missing colors
+
+Your app does not set a `color-scheme`; see [Set a color scheme](#set-a-color-scheme). This is most visible when your build runs the stylesheet through Lightning CSS, as Tailwind CSS v4 does. For browser targets without native `light-dark()` support, Lightning CSS rewrites `light-dark()` into a fallback that only works once a `color-scheme` is declared, so without one each color resolves to two values at once (for example `#171717 #fafafa`), which is invalid and drops the property.
 
 ## License
 

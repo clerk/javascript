@@ -332,11 +332,11 @@ export const sizes = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     paddingInlineEnd: {
       default: space['2'],
-      [stylex.when.descendant("[data-icon='inline-end']", iconScope)]: space['1.5'],
+      [stylex.when.descendant(':last-child:not(:first-child)', iconScope)]: space['1.5'],
     },
     paddingInlineStart: {
       default: space['2'],
-      [stylex.when.descendant("[data-icon='inline-start']", iconScope)]: space['1.5'],
+      [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['1.5'],
     },
     height: space['6'],
   },
@@ -347,11 +347,11 @@ export const sizes = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     paddingInlineEnd: {
       default: space['2.5'],
-      [stylex.when.descendant("[data-icon='inline-end']", iconScope)]: space['2'],
+      [stylex.when.descendant(':last-child:not(:first-child)', iconScope)]: space['2'],
     },
     paddingInlineStart: {
       default: space['2.5'],
-      [stylex.when.descendant("[data-icon='inline-start']", iconScope)]: space['2'],
+      [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['7'],
   },
@@ -361,11 +361,11 @@ export const sizes = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     paddingInlineEnd: {
       default: space['3'],
-      [stylex.when.descendant("[data-icon='inline-end']", iconScope)]: space['2'],
+      [stylex.when.descendant(':last-child:not(:first-child)', iconScope)]: space['2'],
     },
     paddingInlineStart: {
       default: space['3'],
-      [stylex.when.descendant("[data-icon='inline-start']", iconScope)]: space['2'],
+      [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['8'],
   },
@@ -375,11 +375,11 @@ export const sizes = stylex.create({
     lineHeight: typeScaleVars['--cl-text-base-leading'],
     paddingInlineEnd: {
       default: space['3'],
-      [stylex.when.descendant("[data-icon='inline-end']", iconScope)]: space['2'],
+      [stylex.when.descendant(':last-child:not(:first-child)', iconScope)]: space['2'],
     },
     paddingInlineStart: {
       default: space['3'],
-      [stylex.when.descendant("[data-icon='inline-start']", iconScope)]: space['2'],
+      [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['9'],
   },

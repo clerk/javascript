@@ -98,6 +98,11 @@
       "cache": false,
       "dependsOn": ["@clerk/localizations#build"]
     },
+    "@clerk/mosaic-docs#dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["@clerk/mosaic#build"]
+    },
     "dev:current": {
       "cache": false,
       "dependsOn": ["^build", "dev"],

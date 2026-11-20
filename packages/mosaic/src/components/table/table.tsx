@@ -1,3 +1,5 @@
+'use client';
+
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -220,17 +222,14 @@ const Column = React.forwardRef<HTMLTableCellElement, TableColumnProps>(function
           {children}
           <Icon
             glyph={ChevronUpDown}
-            size='md'
             xstyle={sortIcons.none}
           />
           <Icon
             glyph={ChevronUp}
-            size='md'
             xstyle={sortIcons.ascending}
           />
           <Icon
             glyph={ChevronDown}
-            size='md'
             xstyle={sortIcons.descending}
           />
         </span>
@@ -353,23 +352,22 @@ const ExpandButton = React.forwardRef<HTMLButtonElement, TableExpandButtonProps>
     >
       <Icon
         glyph={ChevronRight}
-        size='md'
         xstyle={styles.expandIcon}
       />
     </Primitive.ExpandButton>
   );
 });
 
-export const Table = {
-  Root,
-  Toolbar,
-  Search,
-  Header,
-  Column,
-  Body,
-  Row,
-  Cell,
-  SelectionColumn,
-  SelectionCell,
-  ExpandButton,
+export {
+  Root as TableRoot,
+  Toolbar as TableToolbar,
+  Search as TableSearch,
+  Header as TableHeader,
+  Column as TableColumn,
+  Body as TableBody,
+  Row as TableRow,
+  Cell as TableCell,
+  SelectionColumn as TableSelectionColumn,
+  SelectionCell as TableSelectionCell,
+  ExpandButton as TableExpandButton,
 };

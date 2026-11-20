@@ -67,11 +67,7 @@ export function UserProfileContactListRowView({
               onClick={onAdd}
               disabled={isDisabled}
             >
-              <Icon
-                glyph={Plus}
-                placement='inline-start'
-                size='md'
-              />
+              <Icon glyph={Plus} />
               {m.add}
             </Button>
           </Section.Actions>

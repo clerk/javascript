@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -94,10 +96,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
           onClick={handleClick}
           {...rest}
         >
-          <Icon
-            glyph={Clipboard}
-            size='md'
-          />
+          <Icon glyph={Clipboard} />
         </Button>
         <Toast.Portal>
           <Toast.Viewport aria-label={label}>
@@ -113,10 +112,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
                   <Toast.Title
                     {...mergeStyleProps(themeProps('copy-button-toast-title'), stylex.props(styles.title))}
                   />
-                  <Icon
-                    glyph={Checkmark}
-                    size='md'
-                  />
+                  <Icon glyph={Checkmark} />
                 </Toast.Root>
               </Toast.Positioner>
             ))}

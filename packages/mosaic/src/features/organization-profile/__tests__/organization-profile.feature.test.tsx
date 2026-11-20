@@ -7,6 +7,7 @@ import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  fapiEnterpriseConnection,
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
@@ -25,7 +26,13 @@ function serve({
   permissions = ['org:sys_memberships:read'],
   orgAPIKeysEnabled = false,
   activeOrganizationId = acme.id,
-}: { permissions?: string[]; orgAPIKeysEnabled?: boolean; activeOrganizationId?: string | null } = {}) {
+  enterpriseConnections = [],
+}: {
+  permissions?: string[];
+  orgAPIKeysEnabled?: boolean;
+  activeOrganizationId?: string | null;
+  enterpriseConnections?: ReturnType<typeof fapiEnterpriseConnection>[];
+} = {}) {
   const memberships = [fapiMembership(acme, { permissions })];
   const user = fapiUser({ id: 'user_1', first_name: 'Alice', organization_memberships: memberships });
   return serveFapi({
@@ -34,6 +41,7 @@ function serve({
     }),
     client: fapiClient([fapiSession({ id: 'sess_1', user, last_active_organization_id: activeOrganizationId })]),
     memberships,
+    enterpriseConnections,
   });
 }
 
@@ -73,11 +81,37 @@ describe('OrganizationProfile', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'General' })).toBeVisible();
   });
 
+  it('shows the other pages while the Security check loads, then adds Security', async () => {
+    serve({
+      permissions: ['org:sys_entconns_sso_bypass:manage'],
+      enterpriseConnections: [fapiEnterpriseConnection({ id: 'ent_1', organization_id: acme.id })],
+    });
+    const connections = holdRequests('get', '/v1/organizations/:organizationId/enterprise_connections');
+    await renderWithClerk(<OrganizationProfile />);
+    await waitFor(() => expect(connections.requests.length).toBeGreaterThan(0));
+
+    expect(await screen.findByRole('heading', { level: 3, name: 'General' })).toBeVisible();
+    expect(tabNames()).toEqual(['General']);
+
+    connections.release();
+
+    await waitFor(() => expect(tabNames()).toEqual(['General', 'Security']));
+  });
+
   it('renders nothing without an active organization', async () => {
     serve({ activeOrganizationId: null });
     await renderWithClerk(<OrganizationProfile fallback={<p>Loading profile</p>} />);
     expect(screen.queryByRole('navigation', { name: 'Organization' })).toBeNull();
     expect(screen.queryByText('Loading profile')).toBeNull();
+  });
+
+  it("adds the provider's organization pages", async () => {
+    serve();
+    await renderWithClerk(<OrganizationProfile />, undefined, undefined, undefined, {
+      userProfileProps: { customPages: [{ path: 'usage', label: 'Usage', content: <p>Usage</p> }] },
+      organizationProfileProps: { customPages: [{ path: 'audit', label: 'Audit log', content: <p>Audit</p> }] },
+    });
+    expect(tabNames()).toEqual(['General', 'Members', 'Audit log']);
   });
 
   it('renders nothing when signed out', async () => {

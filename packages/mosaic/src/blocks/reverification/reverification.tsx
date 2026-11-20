@@ -30,10 +30,7 @@ export function ReverificationDialog({ controller, finalFocus }: ReverificationD
         initialFocus={controller.status === 'error' ? undefined : initialFocusRef}
         finalFocus={finalFocus}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Reverification
             controller={controller}
             initialFocusRef={initialFocusRef}

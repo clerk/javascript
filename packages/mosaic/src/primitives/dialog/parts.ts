@@ -6,7 +6,7 @@ export {
   DialogRoot as Root,
 } from './dialog-root';
 export { type DialogTriggerProps, DialogTrigger as Trigger } from './dialog-trigger';
-export { createDialogHandle as createHandle, type DialogHandle } from './dialog-handle';
+export { createDialogHandle, type DialogHandle } from './dialog-handle';
 export { type DialogPortalProps, DialogPortal as Portal } from './dialog-portal';
 export { type DialogBackdropProps, DialogBackdrop as Backdrop } from './dialog-backdrop';
 export { type DialogViewportProps, DialogViewport as Viewport } from './dialog-viewport';

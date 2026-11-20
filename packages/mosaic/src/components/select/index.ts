@@ -1,14 +1,4 @@
-export {
-  Select,
-  SelectContent,
-  SelectDescription,
-  SelectLabel,
-  SelectMedia,
-  SelectOption,
-  SelectPopup,
-  SelectRoot,
-  SelectTrigger,
-} from './select';
+export * as Select from './select.parts';
 export type {
   SelectContentProps,
   SelectDescriptionProps,

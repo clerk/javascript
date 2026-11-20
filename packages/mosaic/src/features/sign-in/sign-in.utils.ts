@@ -1,8 +1,10 @@
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-
+import type { AuthEmailLinkStatusMessages } from '../../blocks/auth';
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
-import type { SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
+import { formatPhoneIdentifier } from '../auth-flow/auth-flow.utils';
+import type { SignInFactor, SignInIdentifierField, SignInProvider, SignInStep } from './sign-in.types';
+
+type Messages = MosaicMessages['signIn'];
 
 export const stepIds = {
   identifier: ['identifier'],
@@ -65,45 +67,96 @@ export function stepKey(step: SignInStep): SignInStepKey {
   }
 }
 
-export function httpsUrl(url: string | undefined): string | undefined {
-  if (!url) {
-    return undefined;
-  }
-  try {
-    return new URL(url).protocol === 'https:' ? url : undefined;
-  } catch {
-    return undefined;
+export function backupCodeDescription(step: Extract<SignInStep, { credential: 'backup-code' }>, m: Messages): string {
+  return step.resetting ? m.resetPasswordMfa.description : m.backupCodeMfa.description;
+}
+
+export function factorLabel(factor: SignInFactor, m: Messages): string {
+  switch (factor.strategy) {
+    case 'password':
+      return m.alternativeMethods.password;
+    case 'passkey':
+      return m.alternativeMethods.passkey;
+    case 'email_code':
+      return fill(m.alternativeMethods.emailCode, { identifier: factor.identifier });
+    case 'email_link':
+      return fill(m.alternativeMethods.emailLink, { identifier: factor.identifier });
+    case 'phone_code':
+      return fill(m.alternativeMethods.phoneCode, { identifier: factor.identifier });
+    case 'totp':
+      return m.alternativeMethods.totp;
+    case 'backup_code':
+      return m.alternativeMethods.backupCode;
+    case 'reset_password_email_code':
+      return fill(m.resetMethods.emailCode, { identifier: factor.identifier });
+    case 'reset_password_phone_code':
+      return fill(m.resetMethods.phoneCode, { identifier: factor.identifier });
   }
 }
 
-type Messages = MosaicMessages['signIn'];
-type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
-type CodeResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
-
-type EmailLinkStatusStep = Extract<SignInStep, { purpose: 'email-link-status' }>;
-
-export function emailLinkStatusCopy(
-  { status, flow }: Pick<EmailLinkStatusStep, 'status' | 'flow'>,
+export function choiceCopy(
+  step: Extract<SignInStep, { kind: 'choice' }>,
   m: Messages,
 ): { title: string; description: string } {
-  const copy = flow === 'sign-up' ? { ...m.emailLink, ...m.emailLink.signUp } : m.emailLink;
-  switch (status) {
-    case 'loading':
-      return copy.loading;
-    case 'signed-in':
-      return copy.signedIn;
-    case 'signed-in-other-tab':
-      return copy.signedInOtherTab;
-    case 'transferable':
-      return copy.transferable;
-    case 'expired':
-      return copy.expired;
-    case 'failed':
-      return copy.failed;
-    case 'client-mismatch':
-      return copy.clientMismatch;
+  return step.purpose === 'reset-methods'
+    ? { title: m.resetMethods.title, description: m.resetMethods.description }
+    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+}
+
+interface IdentifierFieldCopy {
+  label: string;
+  placeholder: string;
+  switchLabel: string;
+}
+
+export function identifierFieldCopy(field: SignInIdentifierField, m: Messages): IdentifierFieldCopy {
+  switch (field) {
+    case 'email':
+      return { label: m.start.emailLabel, placeholder: m.start.emailPlaceholder, switchLabel: m.start.useEmail };
+    case 'email-or-username':
+      return {
+        label: m.start.emailOrUsernameLabel,
+        placeholder: m.start.emailOrUsernamePlaceholder,
+        switchLabel: m.start.useEmailOrUsername,
+      };
+    case 'username':
+      return {
+        label: m.start.usernameLabel,
+        placeholder: m.start.usernamePlaceholder,
+        switchLabel: m.start.useUsername,
+      };
+    case 'phone':
+      return { label: m.start.phoneLabel, placeholder: m.start.phonePlaceholder, switchLabel: m.start.usePhone };
   }
 }
+
+export function startPrompt(
+  m: Messages,
+  { onSignUp, onJoinWaitlist }: { onSignUp?: () => void; onJoinWaitlist?: () => void },
+): { text: string; link: string; onClick: () => void } | undefined {
+  if (onJoinWaitlist) {
+    return { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist };
+  }
+  if (onSignUp) {
+    return { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp };
+  }
+  return undefined;
+}
+
+export function splitLastUsedProvider(
+  providers: readonly SignInProvider[],
+  lastUsedProviderId: string | undefined,
+): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
+  const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
+  return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
+}
+
+export function emailLinkStatusMessages(flow: 'sign-in' | 'sign-up', m: Messages): AuthEmailLinkStatusMessages {
+  return flow === 'sign-up' ? { ...m.emailLink, ...m.emailLink.signUp } : m.emailLink;
+}
+
+type CodeStepData = Extract<SignInStep, { kind: 'code' }>;
+type CodeResendCopy = Pick<Messages['emailCode'], 'resendText' | 'resend' | 'resendCountdown'>;
 
 export function codeCopy(
   step: CodeStepData,
@@ -150,10 +203,6 @@ export function codeCopy(
       ? fill(m.alternativePhoneCode.title, { provider: step.provider })
       : copy.title;
   return { title, description, fieldLabel: copy.label };
-}
-
-export function backupCodeDescription(step: Extract<SignInStep, { credential: 'backup-code' }>, m: Messages): string {
-  return step.resetting ? m.resetPasswordMfa.description : m.backupCodeMfa.description;
 }
 
 export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy {
@@ -211,10 +260,10 @@ function sentToIdentifier(step: CodeStepData): boolean {
 
 function displayIdentifier(step: CodeStepData): string | undefined {
   const { identifier } = step;
-  if (step.channel !== 'phone' || !identifier || identifier.includes('*')) {
+  if (step.channel !== 'phone' || !identifier) {
     return identifier;
   }
-  return stringToFormattedPhoneString(identifier);
+  return formatPhoneIdentifier(identifier);
 }
 
 export function codeIdentity(step: CodeStepData, m: Messages): { identifier?: string; editLabel: string } {
@@ -257,52 +306,4 @@ export function codeSecondaryAction(
     return { label: m.back, onClick: onBack };
   }
   return { label: m.useAnotherMethod, onClick: onCancel };
-}
-
-interface IdentifierFieldCopy {
-  label: string;
-  placeholder: string;
-  switchLabel: string;
-}
-
-export function identifierFieldCopy(field: SignInIdentifierField, m: Messages): IdentifierFieldCopy {
-  switch (field) {
-    case 'email':
-      return { label: m.start.emailLabel, placeholder: m.start.emailPlaceholder, switchLabel: m.start.useEmail };
-    case 'email-or-username':
-      return {
-        label: m.start.emailOrUsernameLabel,
-        placeholder: m.start.emailOrUsernamePlaceholder,
-        switchLabel: m.start.useEmailOrUsername,
-      };
-    case 'username':
-      return {
-        label: m.start.usernameLabel,
-        placeholder: m.start.usernamePlaceholder,
-        switchLabel: m.start.useUsername,
-      };
-    case 'phone':
-      return { label: m.start.phoneLabel, placeholder: m.start.phonePlaceholder, switchLabel: m.start.usePhone };
-  }
-}
-
-export function startPrompt(
-  m: Messages,
-  { onSignUp, onJoinWaitlist }: { onSignUp?: () => void; onJoinWaitlist?: () => void },
-): { text: string; link: string; onClick: () => void } | undefined {
-  if (onJoinWaitlist) {
-    return { text: m.start.waitlistPrompt, link: m.start.waitlistLink, onClick: onJoinWaitlist };
-  }
-  if (onSignUp) {
-    return { text: m.start.signUpPrompt, link: m.start.signUpLink, onClick: onSignUp };
-  }
-  return undefined;
-}
-
-export function splitLastUsedProvider(
-  providers: readonly SignInProvider[],
-  lastUsedProviderId: string | undefined,
-): { lastUsed?: SignInProvider; others: readonly SignInProvider[] } {
-  const lastUsed = providers.find(provider => provider.id === lastUsedProviderId);
-  return { lastUsed, others: lastUsed ? providers.filter(provider => provider !== lastUsed) : providers };
 }

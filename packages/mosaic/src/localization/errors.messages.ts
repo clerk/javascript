@@ -55,8 +55,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   not_a_member_in_organization: 'You are no longer a member of this organization.',
   not_allowed_access: 'Some of these email addresses are not allowed to access this application.',
   oauth_access_denied: 'You did not grant access to your account.',
-  consent_missing_client_id: 'The client ID is missing.',
-  consent_missing_redirect_uri: 'The redirect URI is missing.',
+  oauth_consent_missing_client_id: 'The client ID is missing.',
+  oauth_consent_missing_redirect_uri: 'The redirect URI is missing.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
   organization_changed: 'The active organization changed. Please try again.',
   organization_invitation_not_unique: 'An invitation is already pending for this email address.',
@@ -84,6 +84,13 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
   role_unavailable: 'This role is no longer available.',
+  sso_bypass_member_not_found: 'No member of this organization has that email address.',
+  sso_bypass_already_added: 'This member is already on the allow list.',
+  sso_bypass_all_already_added: 'Everyone with that role is already on the allow list.',
+  sso_bypass_none_added_domain_not_served:
+    'No members could be added because their email addresses are not served by a connection.',
+  sso_bypass_none_added_not_member: 'No members could be added because they are no longer in the organization.',
+  sso_bypass_none_added: 'No members could be added.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',
   resource_not_found__role: 'This role is no longer available.',

@@ -4,7 +4,6 @@ import { durationVars, easingVars, space, typeScaleVars } from '../../tokens.sty
 
 export const styles = stylex.create({
   root: {
-    overflow: 'clip',
     position: 'relative',
     transitionDuration: {
       default: durationVars['--cl-duration-slow'],
@@ -20,6 +19,7 @@ export const styles = stylex.create({
       ':where([data-height-change="shrink"])': easingVars['--cl-ease-in-out'],
     },
     height: 'var(--cl-flow-step-height)',
+    overflowY: { default: 'visible', ':where([data-transitioning])': 'clip' },
   },
   step: {
     display: 'flex',

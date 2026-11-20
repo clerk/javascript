@@ -1,5 +1,41 @@
 # Change Log
 
+## 4.26.2
+
+### Patch Changes
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+
+## 4.26.1
+
+### Patch Changes
+
+- Move the OAuth client identity notice on `<OAuthConsent />` into the existing consent warning instead of a separate line under the header. A client that registered itself through Dynamic Client Registration now reads "{{applicationName}} registered itself, so its name and logo are not verified.", and a client identified by a Client ID Metadata Document reads "Details published by {{metadataHost}}.". ([#10905](https://github.com/clerk/javascript/pull/10905)) by [@Zertsov](https://github.com/Zertsov)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+
+## 4.26.0
+
+### Minor Changes
+
+- Show how an OAuth client's identity was established on `<OAuthConsent />`. Clients that registered themselves through Dynamic Client Registration get an "Unverified app" notice, and clients identified by a Client ID Metadata Document show the host that publishes their details. `OAuthConsentInfo` gains optional `clientRegistration` and `clientMetadataHost` fields, and the notice can be styled with the new `oauthConsentClientIdentity` appearance element. ([#10895](https://github.com/clerk/javascript/pull/10895)) by [@Zertsov](https://github.com/Zertsov)
+
+### Patch Changes
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+
+## 4.25.1
+
+### Patch Changes
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
 ## 4.25.0
 
 ### Minor Changes

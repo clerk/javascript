@@ -1,6 +1,7 @@
 import type { LocalizableError } from '../localization';
 import type { FileRejectionReason } from '../primitives/file-upload';
-import { type Crop, cropImage } from '../primitives/image-cropper';
+import type { Crop } from '../primitives/image-cropper';
+import { cropImage } from '../primitives/image-cropper/crop-image';
 import { SaveError } from './errors';
 
 export const AVATAR_UPLOAD = {

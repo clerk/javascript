@@ -1,4 +1,4 @@
-export { Menu, MenuItem, MenuLabel, MenuMedia, MenuPopup, MenuSeparator, MenuTrigger } from './menu';
+export * as Menu from './menu.parts';
 export type {
   MenuItemProps,
   MenuLabelProps,

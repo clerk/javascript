@@ -43,7 +43,7 @@ const esES: MosaicCatalog = {
     manage: {
       invite: 'Invitar miembros',
       settings: 'Configuración',
-      profile: 'Gestionar perfil',
+      account: 'Gestionar cuenta',
       organization: 'Gestionar organización',
       createOrganization: 'Añadir organización',
     },

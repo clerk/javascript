@@ -64,11 +64,7 @@ export function UserProfileEnterpriseAccountRowView({
               onClick={() => onConnect(account.id)}
             >
               {m.connect}
-              <Icon
-                glyph={ArrowUpRight}
-                placement='inline-end'
-                size='md'
-              />
+              <Icon glyph={ArrowUpRight} />
             </SubmitButton>
           </Section.Actions>
         ) : null}

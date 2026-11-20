@@ -17,7 +17,8 @@ import { Minus } from '../../icons/glyphs/minus';
 import { Plus } from '../../icons/glyphs/plus';
 import type { FileUploadProps } from '../../primitives/file-upload';
 import { FileUpload } from '../../primitives/file-upload';
-import { type Crop, ImageCropper, INITIAL_CROP } from '../../primitives/image-cropper';
+import { type Crop, ImageCropper } from '../../primitives/image-cropper';
+import { INITIAL_CROP } from '../../primitives/image-cropper/crop';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -253,10 +254,7 @@ function CropStep({ file, src, labels, shape, save }: CropStepProps) {
     });
 
   return (
-    <Card.Root
-      elevation='overlay'
-      renderBranding={false}
-    >
+    <Card.Root renderBranding={false}>
       <Card.Header>
         <Card.Title>{labels.title}</Card.Title>
       </Card.Header>

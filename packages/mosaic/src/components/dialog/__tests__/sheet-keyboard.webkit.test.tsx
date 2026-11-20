@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { Card } from '../../card';
-import { Dialog } from '../dialog';
+import { Dialog } from '..';
 
 const KEYBOARD = 336;
 
@@ -76,7 +76,7 @@ function Sheet({ spacer }: { spacer: number }) {
   return (
     <Dialog.Root defaultOpen>
       <Dialog.Popup>
-        <Card.Root elevation='overlay'>
+        <Card.Root>
           <Card.Header>
             <Card.Title>Change password</Card.Title>
           </Card.Header>

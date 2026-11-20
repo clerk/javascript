@@ -1,5 +1,6 @@
 import type { MosaicMessages } from '../../localization';
-import type { SignInStep } from '../sign-in';
+import { fill } from '../../localization';
+import { formatPhoneIdentifier } from '../auth-flow/auth-flow.utils';
 import type { SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent, SignUpStep } from './sign-up.types';
 
 type Messages = MosaicMessages['signUp'];
@@ -67,12 +68,42 @@ export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalCon
   return m.legalConsent.termsAndPrivacy;
 }
 
-export function signUpCodeStep(step: Extract<SignUpStep, { kind: 'code' }>): Extract<SignInStep, { kind: 'code' }> {
-  return {
-    kind: 'code',
-    purpose: step.purpose,
-    channel: step.purpose === 'verify-email' ? 'email' : 'phone',
-    identifier: step.identifier,
-    provider: step.provider,
-  };
+type SignUpCodeStep = Extract<SignUpStep, { kind: 'code' }>;
+
+export function signUpCodeCopy(
+  step: SignUpCodeStep,
+  m: Messages,
+): { title: string; description: string; fieldLabel: string } {
+  if (step.purpose === 'verify-email') {
+    return {
+      title: m.verifyEmail.title,
+      description: fill<string>(m.verifyEmail.description, { identifier: step.identifier }),
+      fieldLabel: m.verifyEmail.label,
+    };
+  }
+  const { provider } = step;
+  return provider
+    ? {
+        title: fill(m.verifyPhone.titleProvider, { provider }),
+        description: fill(m.verifyPhone.descriptionProvider, { provider }),
+        fieldLabel: m.verifyPhone.label,
+      }
+    : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
+}
+
+export function signUpCodeIdentity(step: SignUpCodeStep, m: Messages): { identifier: string; editLabel: string } {
+  return step.purpose === 'verify-email'
+    ? { identifier: step.identifier, editLabel: m.editIdentifier }
+    : { identifier: formatPhoneIdentifier(step.identifier), editLabel: m.editPhoneNumber };
+}
+
+export function signUpCodeSecondaryAction(
+  step: SignUpCodeStep,
+  m: Messages,
+  onCancel?: () => void,
+): { label: string; onClick?: () => void } {
+  if (step.purpose === 'verify-email') {
+    return { label: m.useAnotherMethod, onClick: onCancel };
+  }
+  return step.provider ? { label: m.verifyPhone.useSms, onClick: onCancel } : { label: m.useAnotherMethod };
 }
