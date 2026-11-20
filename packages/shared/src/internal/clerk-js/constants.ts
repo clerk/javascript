@@ -25,6 +25,7 @@ export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
   FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
   FORM_PASSWORD_PWNED: 'form_password_pwned',
+  PASSWORD_RESET_REQUIRED: 'password_reset_required',
   INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
   NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
   OAUTH_ACCESS_DENIED: 'oauth_access_denied',

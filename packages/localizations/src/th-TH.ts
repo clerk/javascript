@@ -1653,6 +1653,10 @@ export const thTH: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -1828,6 +1832,9 @@ export const thTH: LocalizationResource = {
     },
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2179,6 +2186,7 @@ export const thTH: LocalizationResource = {
       requireUppercase: 'ตัวอักษรพิมพ์ใหญ่',
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
+    password_reset_required: undefined,
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

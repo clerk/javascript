@@ -131,6 +131,15 @@ export function isPasswordCompromisedError(err: any) {
 }
 
 /**
+ * Checks if the provided error is a clerk api response error indicating the password must be reset before it can be used.
+ *
+ * @internal
+ */
+export function isPasswordResetRequiredError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'password_reset_required';
+}
+
+/**
  * Checks if the provided error is an EmailLinkError.
  */
 export function isEmailLinkError(err: Error): err is EmailLinkError {

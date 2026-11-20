@@ -1668,6 +1668,10 @@ export const deDE: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Geben Sie den Code ein, den wir an Ihre Telefonnummer gesendet haben.',
       resendButton: 'Code erneut senden',
@@ -1844,6 +1848,9 @@ export const deDE: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Passwort kompromittiert',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2211,6 +2218,7 @@ export const deDE: LocalizationResource = {
       requireUppercase: 'einen Großbuchstaben enthalten',
       sentencePrefix: 'Das Passwort muss',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

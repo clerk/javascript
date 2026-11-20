@@ -1661,6 +1661,10 @@ export const faIR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'کد تأیید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -1838,6 +1842,9 @@ export const faIR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2192,6 +2199,7 @@ export const faIR: LocalizationResource = {
       requireUppercase: 'یک حرف بزرگ',
       sentencePrefix: 'رمز عبور شما باید حاوی',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

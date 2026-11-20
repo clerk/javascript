@@ -1,3 +1,4 @@
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
@@ -22,7 +23,7 @@ import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpris
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
-import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
+import { passwordErrorModes, SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -53,15 +54,7 @@ function determineAlternativeMethodsMode(
     return 'default';
   }
 
-  if (passwordErrorCode === 'pwned') {
-    return 'pwned';
-  }
-
-  if (passwordErrorCode === 'compromised') {
-    return 'passwordCompromised';
-  }
-
-  return 'forgot';
+  return passwordErrorCode ? passwordErrorModes[passwordErrorCode] : 'forgot';
 }
 
 function removeSignInResetPasswordIntentParam(): void {
@@ -129,11 +122,16 @@ function SignInFactorOneInternal(): JSX.Element {
     return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
   });
 
-  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
-    () => resetPasswordIntent && !!resetPasswordFactor,
+  // The first step hands over this error when a password it submitted needs a reset.
+  const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(() =>
+    typeof card.rawError === 'object' && card.rawError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED
+      ? 'resetRequired'
+      : null,
   );
 
-  const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
+  const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
+    () => (resetPasswordIntent && !!resetPasswordFactor) || !!passwordErrorCode,
+  );
 
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {

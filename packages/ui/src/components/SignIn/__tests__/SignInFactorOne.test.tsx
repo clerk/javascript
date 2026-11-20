@@ -449,6 +449,91 @@ describe('SignInFactorOne', () => {
         await userEvent.click(screen.getByText('Email code to hello@clerk.com'));
         await screen.findByText('Check your email');
       });
+
+      it('Prompts the user to reset their password if a password reset is required', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'password_reset_required',
+          long_message:
+            'This account requires a password reset before sign-in can continue. Please reset your password or contact support.',
+          message: 'password reset required',
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password reset required');
+        screen.getByText('You need to reset your password before you can use it again.');
+        screen.getByText('Or, sign in with another method');
+        screen.getByText('Email code to hello@clerk.com');
+        expect(screen.queryByText('Back')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('Reset your password'));
+        await screen.findByText('First, enter the code sent to your email address');
+      });
+
+      it('Opens the password reset screen when the first step reports that a password reset is required', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const originalClerk = window.Clerk;
+        let errorFromFirstStep: unknown = parseError({
+          code: 'password_reset_required',
+          long_message:
+            'This account requires a password reset before sign-in can continue. Please reset your password or contact support.',
+          message: 'password reset required',
+        });
+        window.Clerk = {
+          get __internal_last_error() {
+            const value = errorFromFirstStep;
+            errorFromFirstStep = null;
+            return value;
+          },
+        } as typeof window.Clerk;
+
+        try {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+          await screen.findByText('Password reset required');
+          screen.getByText('You need to reset your password before you can use it again.');
+          screen.getByText('Email code to hello@clerk.com');
+          expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
+          expect(screen.queryByText('Back')).not.toBeInTheDocument();
+          expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+
+          await userEvent.click(screen.getByText('Reset your password'));
+          await screen.findByText('First, enter the code sent to your email address');
+        } finally {
+          window.Clerk = originalClerk;
+        }
+      });
     });
 
     describe('Forgot Password', () => {

@@ -17,10 +17,10 @@ import { useUserVerificationSession } from './useUserVerificationSession';
 import { withHavingTrouble } from './withHavingTrouble';
 
 /**
- * 'pwned' and 'passwordCompromised' follow a rejected password: the list leads
- * with resetting it.
+ * Every mode but 'default' follows a rejected password: the list leads with
+ * resetting it.
  */
-export type AlternativeMethodsMode = 'default' | 'pwned' | 'passwordCompromised';
+export type AlternativeMethodsMode = 'default' | 'pwned' | 'passwordCompromised' | 'passwordResetRequired';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -74,13 +74,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
               <Header.Subtitle localizationKey={localizationKeys('reverification.alternativeMethods.subtitle')} />
             )}
             {mode !== 'default' && reset?.hasNewPassword && (
-              <Header.Subtitle
-                localizationKey={
-                  mode === 'pwned'
-                    ? localizationKeys('reverification.passwordPwned.subtitle__saveNewPassword')
-                    : localizationKeys('reverification.passwordCompromised.subtitle__saveNewPassword')
-                }
-              />
+              <Header.Subtitle localizationKey={determineSaveNewPasswordSubtitle(mode)} />
             )}
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
@@ -211,6 +205,8 @@ function determineFlowPart(mode: AlternativeMethodsMode) {
       return 'passwordPwnedMethods';
     case 'passwordCompromised':
       return 'passwordCompromisedMethods';
+    case 'passwordResetRequired':
+      return 'passwordResetRequiredMethods';
     default:
       return 'alternativeMethods';
   }
@@ -222,8 +218,21 @@ function determineTitle(mode: AlternativeMethodsMode): LocalizationKey {
       return localizationKeys('reverification.passwordPwned.title');
     case 'passwordCompromised':
       return localizationKeys('reverification.passwordCompromised.title');
+    case 'passwordResetRequired':
+      return localizationKeys('reverification.passwordResetRequired.title');
     default:
       return localizationKeys('reverification.alternativeMethods.title');
+  }
+}
+
+function determineSaveNewPasswordSubtitle(mode: Exclude<AlternativeMethodsMode, 'default'>): LocalizationKey {
+  switch (mode) {
+    case 'pwned':
+      return localizationKeys('reverification.passwordPwned.subtitle__saveNewPassword');
+    case 'passwordCompromised':
+      return localizationKeys('reverification.passwordCompromised.subtitle__saveNewPassword');
+    case 'passwordResetRequired':
+      return localizationKeys('reverification.passwordResetRequired.subtitle__saveNewPassword');
   }
 }
 

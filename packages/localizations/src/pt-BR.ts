@@ -1663,6 +1663,10 @@ export const ptBR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificação',
       resendButton: 'Reenviar código',
@@ -1839,6 +1843,9 @@ export const ptBR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Senha comprometida',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: 'Senha não confiável',
@@ -2200,6 +2207,7 @@ export const ptBR: LocalizationResource = {
       requireUppercase: 'uma letra maiúscula',
       sentencePrefix: 'Sua senha deve conter',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

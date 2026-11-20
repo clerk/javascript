@@ -1661,6 +1661,10 @@ export const caES: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Introdueix el codi enviat al teu telèfon.',
       resendButton: 'Reenvia codi',
@@ -1836,6 +1840,9 @@ export const caES: LocalizationResource = {
     },
     passwordPwned: {
       title: 'La teva contrasenya ha estat compromesa',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2194,6 +2201,7 @@ export const caES: LocalizationResource = {
       requireUppercase: 'una lletra majúscula',
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
+    password_reset_required: undefined,
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

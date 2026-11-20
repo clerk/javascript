@@ -1651,6 +1651,10 @@ export const ukUA: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1825,6 +1829,9 @@ export const ukUA: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordResetRequired: {
       title: undefined,
     },
     passwordUntrusted: {
@@ -2179,6 +2186,7 @@ export const ukUA: LocalizationResource = {
       requireUppercase: 'букву у верхньому регістрі',
       sentencePrefix: 'Ваш пароль повинен містити',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1645,6 +1645,10 @@ export const kkKZ: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Растау коды',
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
@@ -1820,6 +1824,9 @@ export const kkKZ: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2171,6 +2178,7 @@ export const kkKZ: LocalizationResource = {
       requireUppercase: 'бас әріп',
       sentencePrefix: 'Құпия сөзде болуы керек:',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

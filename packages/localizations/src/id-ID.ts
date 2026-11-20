@@ -1655,6 +1655,10 @@ export const idID: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kode verifikasi',
       resendButton: 'Tidak menerima kode? Kirim ulang',
@@ -1832,6 +1836,9 @@ export const idID: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Kata sandi terkompromi',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2191,6 +2198,7 @@ export const idID: LocalizationResource = {
       requireUppercase: 'huruf besar',
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

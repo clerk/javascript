@@ -1654,6 +1654,10 @@ export const mnMN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1829,6 +1833,9 @@ export const mnMN: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordResetRequired: {
       title: undefined,
     },
     passwordUntrusted: {
@@ -2183,6 +2190,7 @@ export const mnMN: LocalizationResource = {
       requireUppercase: 'том үсэг',
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

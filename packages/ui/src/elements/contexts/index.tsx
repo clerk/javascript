@@ -44,6 +44,15 @@ export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
 };
 
+/**
+ * Shows `error` on the next card that mounts, such as the card a navigation leads to.
+ */
+export const showErrorOnNextCard = (error: ClerkAPIError) => {
+  if (window.Clerk) {
+    window.Clerk.__internal_last_error = error;
+  }
+};
+
 export const useCardState = () => {
   const { state, setState } = _useCardState();
   const { translateError } = useLocalizations();
@@ -133,6 +142,7 @@ export type FlowMetadata = {
     | 'forgotPasswordMethods'
     | 'passwordPwnedMethods'
     | 'passwordCompromisedMethods'
+    | 'passwordResetRequiredMethods'
     | 'havingTrouble'
     | 'ssoCallback'
     | 'popupCallback'

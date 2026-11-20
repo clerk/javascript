@@ -18,7 +18,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
 
-export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordCompromised' | 'default';
+export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordCompromised' | 'passwordResetRequired' | 'default';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -187,6 +187,8 @@ function determineFlowPart(mode: AlternativeMethodsMode) {
       return 'passwordPwnedMethods';
     case 'passwordCompromised':
       return 'passwordCompromisedMethods';
+    case 'passwordResetRequired':
+      return 'passwordResetRequiredMethods';
     default:
       return 'alternativeMethods';
   }
@@ -200,6 +202,8 @@ function determineTitle(mode: AlternativeMethodsMode): LocalizationKey {
       return localizationKeys('signIn.passwordPwned.title');
     case 'passwordCompromised':
       return localizationKeys('signIn.passwordCompromised.title');
+    case 'passwordResetRequired':
+      return localizationKeys('signIn.passwordResetRequired.title');
     default:
       return localizationKeys('signIn.alternativeMethods.title');
   }
@@ -209,6 +213,7 @@ function determineIsReset(mode: AlternativeMethodsMode): boolean {
   switch (mode) {
     case 'forgot':
     case 'pwned':
+    case 'passwordResetRequired':
       return true;
     case 'passwordCompromised':
       return false;

@@ -1661,6 +1661,10 @@ export const itIT: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Inserisci il codice che ti è stato inviato via SMS.',
       resendButton: 'Invia di nuovo il codice',
@@ -1836,6 +1840,9 @@ export const itIT: LocalizationResource = {
     },
     passwordPwned: {
       title: 'La tua password è stata trovata in un data breach.',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2190,6 +2197,7 @@ export const itIT: LocalizationResource = {
       requireUppercase: undefined,
       sentencePrefix: undefined,
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

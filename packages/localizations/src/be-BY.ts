@@ -1656,6 +1656,10 @@ export const beBY: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Увядзіце код, які быў адпраўлены на ваш тэлефон.',
       resendButton: 'Пераадправіць код на тэлефон',
@@ -1832,6 +1836,9 @@ export const beBY: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Пароль быў узламаны',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2188,6 +2195,7 @@ export const beBY: LocalizationResource = {
       requireUppercase: 'літару ў верхнім рэгістры',
       sentencePrefix: 'Ваш пароль павінен утрымліваць',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

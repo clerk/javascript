@@ -1655,6 +1655,10 @@ export const nlNL: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verificatiecode',
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
@@ -1829,6 +1833,9 @@ export const nlNL: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: undefined,
@@ -2182,6 +2189,7 @@ export const nlNL: LocalizationResource = {
       requireUppercase: 'Wachtwoord moet minstens 1 hoofdletter bevatten.',
       sentencePrefix: 'Wachtwoord moet minstens 1 speciaal teken bevatten.',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

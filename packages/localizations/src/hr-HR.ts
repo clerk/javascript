@@ -1662,6 +1662,10 @@ export const hrHR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
       resendButton: 'Niste primili kod? Pošalji ponovno',
@@ -1839,6 +1843,9 @@ export const hrHR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
+    },
+    passwordResetRequired: {
+      title: undefined,
     },
     passwordUntrusted: {
       title: 'Lozinka nije pouzdana',
@@ -2212,6 +2219,7 @@ export const hrHR: LocalizationResource = {
       requireUppercase: 'veliko slovo',
       sentencePrefix: 'Vaša lozinka mora sadržavati',
     },
+    password_reset_required: undefined,
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

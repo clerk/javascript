@@ -15,7 +15,7 @@ import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { showErrorOnNextCard, useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
@@ -251,7 +251,7 @@ function SignInStartInternal(): JSX.Element {
 
   const signInWithFields = async (
     fields: Array<FormControlState<string>>,
-    options?: { resetPasswordIntent?: boolean },
+    options?: { resetPasswordIntent?: boolean; passwordResetRequiredError?: ClerkAPIError },
   ) => {
     // If the user has already selected an alternative phone code provider, we use that.
     const preferredAlternativePhoneChannel =
@@ -311,6 +311,10 @@ function SignInStartInternal(): JSX.Element {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
               });
             }
+            if (options?.passwordResetRequiredError) {
+              // Factor one opens on the password reset screen when it receives this error.
+              showErrorOnNextCard(options.passwordResetRequiredError);
+            }
             return navigate('factor-one');
           }
 
@@ -369,7 +373,8 @@ function SignInStartInternal(): JSX.Element {
       (e: ClerkAPIError) =>
         e.code === ERROR_CODES.INVALID_STRATEGY_FOR_USER ||
         e.code === ERROR_CODES.FORM_PASSWORD_INCORRECT ||
-        e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
+        e.code === ERROR_CODES.FORM_PASSWORD_PWNED ||
+        e.code === ERROR_CODES.PASSWORD_RESET_REQUIRED,
     );
 
     const sessionAlreadyExistsError: ClerkAPIError = e.errors.find(
@@ -384,7 +389,10 @@ function SignInStartInternal(): JSX.Element {
     );
 
     if (instantPasswordError) {
-      await signInWithFields([identifierField]);
+      await signInWithFields([identifierField], {
+        passwordResetRequiredError:
+          instantPasswordError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED ? instantPasswordError : undefined,
+      });
     } else if (sessionAlreadyExistsError) {
       await clerk.setActive({
         session: clerk.client.lastActiveSessionId,
