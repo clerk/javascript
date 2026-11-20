@@ -2,12 +2,14 @@
 
 import { logger } from '@clerk/shared/logger';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { ArrowLeft } from '../../icons/glyphs/arrow-left';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
-import { useMessages } from '../../localization';
+import { fill, useMessages } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
@@ -21,16 +23,18 @@ import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
+import { Button } from '../button';
 import type { DialogContextValue } from '../dialog';
 import { Dialog } from '../dialog';
 import { DialogContext, isInDialog } from '../dialog/dialog';
 import { Drawer } from '../drawer';
+import { Flow } from '../flow';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { SelectPopup } from '../select/select';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
-import { ContentPanelContext, ProfileContext } from './profile.context';
+import { ContentPanelContext, ProfileContext, SubPagesContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
@@ -533,6 +537,8 @@ function PageTitle({ title, claim }: { title: React.ReactNode; claim: boolean })
     navTriggerRef,
   } = useProfileContext('Profile.Content');
   const level = useHeadingLevel();
+  const focusRef = useFlowAutoFocus<HTMLHeadingElement>();
+  const headingRef = useMergeRefs([claim ? pageTitleRef : undefined, focusRef]);
   const label = <span id={claim ? `${pageTitleId}-label` : undefined}>{title}</span>;
   const triggerProps = mergeStyleProps(
     themeProps('profile-nav-trigger'),
@@ -549,7 +555,7 @@ function PageTitle({ title, claim }: { title: React.ReactNode; claim: boolean })
   );
   const heading = (children: React.ReactNode) => (
     <Heading
-      ref={claim ? pageTitleRef : undefined}
+      ref={headingRef}
       id={claim ? pageTitleId : undefined}
       level={level}
       size='2xl'
@@ -649,17 +655,32 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   });
 });
 
-export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
-  value: string;
+interface ProfileContentPanelSubPagesProps {
+  /** The page's name, shown on the back button of each of its sub-pages. */
+  label: string;
+  /** The open sub-page, or `null` for the page itself. Matches a `Profile.SubPage` value. */
+  subPage: string | null;
+  /** Called with the sub-page to open, or `null` to go back to the page. */
+  onSubPageChange: (subPage: string | null) => void;
 }
 
+interface ProfileContentPanelNoSubPagesProps {
+  label?: never;
+  subPage?: never;
+  onSubPageChange?: never;
+}
+
+export type ProfileContentPanelProps = MosaicComponentProps<'div'> & {
+  value: string;
+} & (ProfileContentPanelSubPagesProps | ProfileContentPanelNoSubPagesProps);
+
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, xstyle, ...rest },
+  { value, label, subPage, onSubPageChange, children, xstyle, ...rest },
   ref,
 ) {
   const { compact, pageTitleId, pageTitleRef, value: selected } = useProfileContext('Profile.ContentPanel');
   const active = value === selected;
-  useMissingTitleWarning(active, value, pageTitleRef);
+  useMissingTitleWarning(active, value, subPage, pageTitleRef);
   const page = React.useMemo(
     () => ({
       active,
@@ -672,6 +693,13 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
     }),
     [active],
   );
+  const subPages = React.useMemo(
+    () =>
+      label !== undefined && subPage !== undefined && onSubPageChange !== undefined
+        ? { label, subPage, onSubPageChange }
+        : null,
+    [label, subPage, onSubPageChange],
+  );
   return (
     <ContentPanelContext.Provider value={page}>
       <HeadingLevelProvider>
@@ -682,11 +710,118 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
           {...(compact ? { role: 'group', tabIndex: undefined } : null)}
           {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
-        />
+        >
+          {subPages ? (
+            <SubPagesContext.Provider value={subPages}>
+              <Flow.Root
+                value={subPages.subPage ?? PAGE}
+                direction={subPages.subPage === null ? -1 : 1}
+                state={null}
+              >
+                {() => children}
+              </Flow.Root>
+            </SubPagesContext.Provider>
+          ) : (
+            children
+          )}
+        </Tabs.Panel>
       </HeadingLevelProvider>
     </ContentPanelContext.Provider>
   );
 });
+
+const PAGE = '';
+
+export interface ProfileSubPageProps {
+  /** The sub-page it shows for, or `null` for the page itself. Matches the `Profile.ContentPanel` `subPage`. */
+  value: string | null;
+  children?: React.ReactNode;
+}
+
+/**
+ * One view of a `Profile.ContentPanel` with sub-pages, shown while its `value` is the open `subPage`.
+ * A sub-page's `Panel.Title` gets a back button to the page above it, and never opens the
+ * navigation on compact layouts.
+ */
+function SubPage({ value, children }: ProfileSubPageProps) {
+  const subPages = React.useContext(SubPagesContext);
+  const page = React.useContext(ContentPanelContext);
+  if (!subPages || !page) {
+    throw new Error('Profile.SubPage must be rendered inside a Profile.ContentPanel with subPage');
+  }
+  const { label, onSubPageChange } = subPages;
+  const { active } = page;
+  const subPage = React.useMemo(
+    () => ({
+      active,
+      renderTitle: (title: React.ReactNode, claim: boolean) => (
+        <SubPageTitle
+          title={title}
+          claim={claim}
+          parent={label}
+          onBack={() => onSubPageChange(null)}
+        />
+      ),
+    }),
+    [active, label, onSubPageChange],
+  );
+  return (
+    <Flow.Step ids={[value ?? PAGE]}>
+      {value === null ? (
+        children
+      ) : (
+        <ContentPanelContext.Provider value={subPage}>{children}</ContentPanelContext.Provider>
+      )}
+    </Flow.Step>
+  );
+}
+
+function SubPageTitle({
+  title,
+  claim,
+  parent,
+  onBack,
+}: {
+  title: React.ReactNode;
+  claim: boolean;
+  parent: string;
+  onBack: () => void;
+}) {
+  const { pageTitleId, pageTitleRef } = useProfileContext('Profile.SubPage');
+  const m = useMessages('profile');
+  const level = useHeadingLevel();
+  const focusRef = useFlowAutoFocus<HTMLHeadingElement>();
+  const headingRef = useMergeRefs([claim ? pageTitleRef : undefined, focusRef]);
+  return (
+    <div {...mergeStyleProps(themeProps('profile-sub-page-title'), stylex.props(reset.base, styles.subPageTitle))}>
+      <Button
+        color='neutral'
+        variant='ghost'
+        size='sm'
+        onClick={onBack}
+        aria-label={fill(m.backTo, { page: parent })}
+        xstyle={styles.subPageBack}
+        {...themeProps('profile-sub-page-back')}
+      >
+        <Icon
+          glyph={ArrowLeft}
+          xstyle={rtl.mirror}
+        />
+        {parent}
+      </Button>
+      <Heading
+        ref={headingRef}
+        id={claim ? pageTitleId : undefined}
+        level={level}
+        size='2xl'
+        tabIndex={-1}
+        {...themeProps('profile-page-title')}
+      >
+        <span id={claim ? `${pageTitleId}-label` : undefined}>{title}</span>
+      </Heading>
+    </div>
+  );
+}
 
 export {
   Root as ProfileRoot,
@@ -696,6 +831,7 @@ export {
   NavItem as ProfileNavItem,
   Content as ProfileContent,
   ContentPanel as ProfileContentPanel,
+  SubPage as ProfileSubPage,
 };
 
 /**
@@ -704,15 +840,22 @@ export {
  */
 function useMissingTitleWarning(
   active: boolean,
-  value: string | undefined,
+  value: string,
+  subPage: string | null | undefined,
   pageTitleRef: React.RefObject<HTMLHeadingElement | null>,
 ) {
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production' || !active || pageTitleRef.current) {
       return;
     }
+    if (typeof subPage === 'string') {
+      logger.warnOnce(
+        `[Clerk] <Profile.ContentPanel value="${value}" subPage="${subPage}"> is open without a <Panel.Title>. Render a <Profile.SubPage value="${subPage}">, and start it with a <Panel.Title>.`,
+      );
+      return;
+    }
     logger.warnOnce(
       `[Clerk] <Profile.ContentPanel value="${value}"> is open without a <Panel.Title>. Start the page with one: it names the page, and on compact layouts it opens the navigation.`,
     );
-  }, [active, value, pageTitleRef]);
+  }, [active, value, subPage, pageTitleRef]);
 }

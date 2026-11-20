@@ -320,6 +320,17 @@ export const styles = stylex.create({
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
   },
+
+  subPageTitle: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  subPageBack: {
+    marginBlockEnd: space['2'],
+    marginInlineStart: `calc(-1 * ${space['2']})`,
+  },
 });
 
 export const contentScroll = scrollAreaRoot;

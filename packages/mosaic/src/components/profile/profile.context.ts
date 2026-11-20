@@ -31,3 +31,11 @@ export interface ContentPanelContextValue {
 }
 
 export const ContentPanelContext = React.createContext<ContentPanelContextValue | null>(null);
+
+export interface SubPagesContextValue {
+  label: string;
+  subPage: string | null;
+  onSubPageChange: (subPage: string | null) => void;
+}
+
+export const SubPagesContext = React.createContext<SubPagesContextValue | null>(null);

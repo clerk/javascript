@@ -2,7 +2,9 @@
 '@clerk/mosaic': minor
 ---
 
-**Breaking:** A page's `Panel.Title` is now its profile page title, so `Profile.Content` no longer takes `pageTitle`. The title renders inside the page, so it moves with `Flow` transitions, and on compact layouts it still opens the navigation. Give `Panel.Title` a `back` of `{ label, onClick }` to make the whole title a back button for a sub-page.
+**Breaking:** A page's `Panel.Title` is now its profile page title, so `Profile.Content` no longer takes `pageTitle`. On compact layouts it still opens the navigation.
+
+A page can now open sub-pages. Give its `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap each view in a `Profile.SubPage`, with `value={null}` for the page itself. A sub-page's `Panel.Title` gets a back button to the page above it.
 
 | Before | After |
 | --- | --- |

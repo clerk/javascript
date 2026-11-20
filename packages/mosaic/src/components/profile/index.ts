@@ -22,5 +22,6 @@ export type {
   ProfileNavProps,
   ProfileContentPanelProps,
   ProfileRootProps,
+  ProfileSubPageProps,
   ProfileTitleProps,
 } from './profile';

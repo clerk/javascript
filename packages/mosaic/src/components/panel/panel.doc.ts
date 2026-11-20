@@ -27,12 +27,6 @@ export default {
       description:
         "A focusable `div` (`tabIndex={-1}`) around a `2xl` `Heading` at the current level. In a `Profile.ContentPanel` it is the page title, and on compact layouts the navigation's trigger.",
       slot: 'cl-panel-title',
-      props: {
-        back: {
-          type: '{ label: string; onClick: () => void }',
-          doc: 'Makes the whole title a back button for a page opened from another one. Its name is `label`, such as "Back", then the title.',
-        },
-      },
     },
     'Panel.Sections': {
       description: 'A `div` that sets the heading level one deeper for its children.',
