@@ -24,6 +24,10 @@ export function needsPrepare(method: ReverificationMethod): method is Reverifica
   return method.strategy === 'email_code' || method.strategy === 'phone_code';
 }
 
+export function invalidatesPreparedCode(method: ReverificationMethod): boolean {
+  return method.strategy !== 'totp' && method.strategy !== 'backup_code';
+}
+
 function pickStartingFirstFactor(
   methods: readonly ReverificationMethod[],
   preferredSignInStrategy: PreferredSignInStrategy | undefined,

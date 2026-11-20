@@ -16,6 +16,7 @@ type RuntimeOperation =
   | { status: 'requesting'; promise: Promise<unknown> }
   | {
       status: 'active';
+      runId: symbol;
       promise: Promise<unknown>;
       sessionId: string | null;
       complete: () => void;
@@ -71,9 +72,9 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     runtimeRef.current.sessionId = session?.id ?? null;
   });
 
-  const completeChallenge = useCallback(() => {
+  const completeChallenge = useCallback((runId: symbol) => {
     const operation = runtimeRef.current.operation;
-    if (operation.status !== 'active') {
+    if (operation.status !== 'active' || operation.runId !== runId) {
       return;
     }
     runtimeRef.current.operation = { status: 'retrying', promise: operation.promise };
@@ -100,8 +101,10 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
         return;
       }
 
+      const runId = Symbol();
       runtimeRef.current.operation = {
         status: 'active',
+        runId,
         promise: operation.promise,
         sessionId: runtimeRef.current.sessionId,
         complete,
@@ -110,8 +113,10 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
 
       setReverificationState({
         phase: 'active',
+        runId,
+        sessionId: runtimeRef.current.sessionId,
         level,
-        complete: completeChallenge,
+        complete: () => completeChallenge(runId),
         cancel: cancelChallenge,
       });
     },
