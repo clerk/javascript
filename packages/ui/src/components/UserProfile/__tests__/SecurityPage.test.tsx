@@ -1,4 +1,4 @@
-import type { SessionWithActivitiesResource } from '@clerk/shared/types';
+import type { ActClaim, SessionWithActivitiesResource } from '@clerk/shared/types';
 import { within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -365,6 +365,48 @@ describe('SecurityPage', () => {
         expect(elem?.children[1]).toBeDefined();
       }
     });
+  });
+
+  it('does not label agent sessions as impersonation', async () => {
+    const agentActor: ActClaim = { sub: 'agent_123', type: 'agent', task_id: 'agt_task_123' };
+    const makeSession = (id: string, deviceType: string, actor: ActClaim | null) =>
+      ({
+        pathRoot: '/me/sessions',
+        id,
+        status: 'active',
+        expireAt: '2022-12-01T01:55:44.636Z',
+        abandonAt: '2022-12-24T01:55:44.636Z',
+        lastActiveAt: '2022-11-24T12:11:49.328Z',
+        latestActivity: {
+          id: `sess_activity_${id}`,
+          deviceType,
+          browserName: 'Chrome',
+          browserVersion: '107.0.0.0',
+          country: 'Greece',
+          city: 'Athens',
+          isMobile: false,
+        },
+        actor,
+        revoke: vi.fn().mockResolvedValue({}),
+      }) as any as SessionWithActivitiesResource;
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'], actor: agentActor });
+    });
+    fixtures.clerk.user!.getSessions.mockReturnValue(
+      Promise.resolve([
+        makeSession(fixtures.clerk.session!.id, 'Macintosh', agentActor),
+        makeSession('sess_agent', 'Macintosh', { ...agentActor, task_id: 'agt_task_456' }),
+        makeSession('sess_impersonator', 'Windows', { sub: 'user_impersonator' }),
+        makeSession('sess_user', 'Macintosh', null),
+      ]),
+    );
+
+    render(<SecurityPage />, { wrapper });
+
+    expect(await screen.findByText('This device')).toHaveAttribute('data-color', 'primary');
+    expect(screen.getByText('Other impersonator device').parentElement).toHaveTextContent('Windows');
+    expect(screen.queryByText('User device')).not.toBeInTheDocument();
   });
 
   it('does not leak the previous user device activity across a user switch', async () => {
