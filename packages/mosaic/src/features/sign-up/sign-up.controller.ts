@@ -161,6 +161,7 @@ export function useSignUpController(
     globalErrorMessage: finishError,
     onEditIdentifier: () => {
       sendFinish({ type: 'DISMISS' });
+      details.leaveChannel();
       go(detailsRouteFor(route));
     },
   };
