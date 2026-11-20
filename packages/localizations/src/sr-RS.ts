@@ -1736,8 +1736,8 @@ export const srRS: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'Da nastaviš, otvori verifikacioni link na uređaju i u pregledaču sa kojih je pokrenuta prijava',
+        title: 'Verifikacioni link je nevažeći za ovaj uređaj',
       },
       expired: {
         subtitle: 'Vrati se na originalni tab da nastaviš.',

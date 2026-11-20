@@ -1726,8 +1726,8 @@ export const zhCN: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '要继续，请在您发起登录的设备和浏览器上打开验证链接',
+        title: '验证链接在此设备上无效',
       },
       expired: {
         subtitle: '返回原始标签页继续。',

@@ -1746,8 +1746,9 @@ export const caES: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          "Per continuar, obre l'enllaç de verificació al dispositiu i al navegador des d'on has iniciat la sessió",
+        title: "L'enllaç de verificació no és vàlid per a aquest dispositiu",
       },
       expired: {
         subtitle: 'Torna a la pestanya original per continuar.',

@@ -1736,8 +1736,9 @@ export const ukUA: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'Щоб продовжити, відкрийте посилання для підтвердження на пристрої та в браузері, з яких ви почали вхід',
+        title: 'Посилання для підтвердження недійсне для цього пристрою',
       },
       expired: {
         subtitle: 'Поверніться на початкову вкладку, щоб продовжити.',

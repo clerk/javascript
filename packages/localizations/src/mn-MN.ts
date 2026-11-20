@@ -1739,8 +1739,9 @@ export const mnMN: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'Үргэлжлүүлэхийн тулд нэвтрэлтийг эхлүүлсэн төхөөрөмж болон хөтөч дээрээ баталгаажуулах холбоосыг нээнэ үү',
+        title: 'Баталгаажуулах холбоос энэ төхөөрөмж дээр хүчингүй байна',
       },
       expired: {
         subtitle: 'Үргэлжлүүлэхийн тулд анхны таб руу буцна уу.',

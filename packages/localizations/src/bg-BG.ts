@@ -1738,8 +1738,9 @@ export const bgBG: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'За да продължите, отворете линка за потвърждение на устройството и в браузъра, от които сте започнали влизането',
+        title: 'Линкът за потвърждение е невалиден за това устройство',
       },
       expired: {
         subtitle: 'Върнете се в оригиналния таб, за да продължите.',
