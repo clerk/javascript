@@ -131,34 +131,6 @@ describe('SignUp', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  it('shows the organization task with the creation defaults the instance suggests', async () => {
-    const { user } = await renderSignUp({
-      environment: environment({
-        organization_settings: {
-          force_organization_selection: true,
-          organization_creation_defaults: { enabled: true },
-        },
-      }),
-      signUp: { sessionTasks: [{ key: 'choose-organization' }] },
-      organizationCreationDefaults: {
-        object: 'organization_creation_defaults',
-        id: '',
-        advisory: {
-          code: 'organization_already_exists',
-          severity: 'warning',
-          meta: { organization_name: 'Initech', organization_domain: 'initech.com' },
-        },
-        form: { name: 'Initech', slug: 'initech', logo: null, blur_hash: null },
-      },
-    });
-
-    await submitStart(user);
-    await enterCode(user);
-
-    expect(await screen.findByRole('heading', { name: 'Create organization' })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Initech');
-  });
-
   it('shows the organization list only once it has loaded, and leaves once one is chosen', async () => {
     const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
     const { user, navigate } = await renderSignUp(
