@@ -2374,7 +2374,8 @@ export const bgBG: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'За да потвърдите този имейл адрес, отворете линка на устройството и в браузъра, от които сте го заявили',
         },
         formHint: 'На този имейл адрес ще бъде изпратен имейл с линк за потвърждение.',
         formSubtitle: 'Кликнете върху линка за потвърждение в имейла, изпратен на {{identifier}}',

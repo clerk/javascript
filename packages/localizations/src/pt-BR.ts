@@ -2394,7 +2394,8 @@ export const ptBR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Para verificar este endereço de e-mail, abra o link no mesmo dispositivo e navegador em que você o solicitou',
         },
         formHint: 'Um e-mail contendo um link de verificação será enviado para este endereço de e-mail.',
         formSubtitle: 'Clique no link de verificação enviado para {{identifier}}',

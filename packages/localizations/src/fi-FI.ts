@@ -2403,7 +2403,7 @@ export const fiFI: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Vahvistaaksesi tämän sähköpostiosoitteen avaa linkki laitteella ja selaimella, josta pyysit sen',
         },
         formHint: 'Vahvistuslinkki lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',

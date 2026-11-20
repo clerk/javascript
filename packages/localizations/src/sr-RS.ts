@@ -2372,7 +2372,7 @@ export const srRS: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Za verifikaciju ove e-mail adrese otvori link na uređaju i u pregledaču sa kojih je zatražen',
         },
         formHint: 'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',

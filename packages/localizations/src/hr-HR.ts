@@ -2405,7 +2405,8 @@ export const hrHR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Za potvrdu ove adrese e-pošte otvorite poveznicu na uređaju i u pregledniku s kojeg ste je zatražili',
         },
         formHint: 'Poruka s verifikacijskom poveznicom bit će poslana na ovu adresu e-pošte.',
         formSubtitle: 'Kliknite na verifikacijsku poveznicu u e-pošti poslanoj na {{identifier}}',

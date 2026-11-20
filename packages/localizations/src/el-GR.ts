@@ -2398,7 +2398,8 @@ export const elGR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Για να επαληθεύσετε αυτήν τη διεύθυνση email, ανοίξτε τον σύνδεσμο στη συσκευή και τον φυλλομετρητή από τον οποίο τον ζητήσατε.',
         },
         formHint: 'Θα σταλεί ένα email που περιέχει έναν σύνδεσμο επαλήθευσης σε αυτήν τη διεύθυνση email.',
         formSubtitle: 'Κάντε κλικ στον σύνδεσμο επαλήθευσης στο email που εστάλη στην {{identifier}}',

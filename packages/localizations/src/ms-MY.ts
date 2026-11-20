@@ -2410,7 +2410,7 @@ export const msMY: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Untuk mengesahkan alamat e-mel ini, buka pautan pada peranti dan pelayar tempat anda memintanya',
         },
         formHint: 'E-mel yang mengandungi pautan pengesahan akan dihantar ke alamat e-mel ini.',
         formSubtitle: 'Klik pada pautan pengesahan dalam e-mel yang dihantar ke {{identifier}}',

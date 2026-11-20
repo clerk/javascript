@@ -2384,7 +2384,7 @@ export const idID: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Untuk memverifikasi alamat email ini, buka tautan di perangkat dan browser tempat Anda memintanya',
         },
         formHint: 'Email berisi tautan verifikasi akan dikirim ke alamat email ini.',
         formSubtitle: 'Klik tautan verifikasi di email yang dikirim ke {{identifier}}',

@@ -2390,7 +2390,8 @@ export const caES: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            "Per verificar aquesta adreça de correu electrònic, obre l'enllaç al dispositiu i al navegador des d'on l'has sol·licitat",
         },
         formHint:
           "S'enviarà un correu electrònic que conté un enllaç de verificació a aquesta adreça de correu electrònic.",

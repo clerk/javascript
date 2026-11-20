@@ -2367,7 +2367,7 @@ export const koKR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: '이 이메일 주소를 인증하려면 링크를 요청한 기기와 브라우저에서 열어 주세요.',
         },
         formHint: '인증 링크가 포함된 이메일이 이 이메일 주소로 전송돼요.',
         formSubtitle: '{{identifier}}에게 전송된 이메일의 링크를 클릭해 주세요.',

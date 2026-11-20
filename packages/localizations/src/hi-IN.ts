@@ -2401,7 +2401,8 @@ export const hiIN: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'इस ईमेल पते को सत्यापित करने के लिए, लिंक को उसी डिवाइस और ब्राउज़र पर खोलें जिससे आपने इसका अनुरोध किया था',
         },
         formHint: 'इस ईमेल पते पर एक सत्यापन लिंक वाला ईमेल भेजा जाएगा।',
         formSubtitle: '{{identifier}} पर भेजे गए ईमेल में सत्यापन लिंक पर क्लिक करें',

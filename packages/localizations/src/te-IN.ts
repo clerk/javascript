@@ -2405,7 +2405,8 @@ export const teIN: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'ఈ ఇమెయిల్ చిరునామాను ధృవీకరించడానికి, మీరు లింక్‌ను అభ్యర్థించిన పరికరం మరియు బ్రౌజర్‌లో దాన్ని తెరవండి',
         },
         formHint: 'ధృవీకరణ లింక్‌తో ఈమెయిల్ ఈ ఇమెయిల్ చిరునామాకు పంపబడుతుంది.',
         formSubtitle: '{{identifier}}కి పంపిన ఇమెయిల్‌లోని ధృవీకరణ లింక్‌పై క్లిక్ చేయండి',

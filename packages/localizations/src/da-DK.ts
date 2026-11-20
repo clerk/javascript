@@ -2371,7 +2371,8 @@ export const daDK: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'For at bekræfte denne e-mailadresse skal du åbne linket på den enhed og i den browser, hvor du anmodede om det',
         },
         formHint: 'En e-mail indeholdende et bekræftelseslink vil blive sendt til denne e-mailadresse.',
         formSubtitle: 'Klik på bekræftelseslinket i e-mailen sendt til {{identifier}}',

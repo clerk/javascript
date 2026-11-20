@@ -2396,7 +2396,7 @@ export const jaJP: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'このメールアドレスを検証するには、リンクをリクエストしたデバイスとブラウザで開いてください',
         },
         formHint: 'このメールアドレスには検証リンクが含まれたメールが送信されます。',
         formSubtitle: '{{identifier}}に送信されたメールの検証リンクをクリックしてください。',

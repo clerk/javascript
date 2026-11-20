@@ -2360,7 +2360,7 @@ export const kkKZ: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Бұл электрондық пошта мекенжайын растау үшін сілтемені оны сұраған құрылғы мен браузерде ашыңыз.',
         },
         formHint: 'Растау сілтемесі осы электрондық пошта мекенжайына жіберіледі.',
         formSubtitle: '{{identifier}} жіберілген электрондық хаттағы растау сілтемесін басыңыз',

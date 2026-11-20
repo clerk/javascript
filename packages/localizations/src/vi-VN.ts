@@ -2395,7 +2395,8 @@ export const viVN: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Để xác thực địa chỉ email này, hãy mở liên kết trên thiết bị và trình duyệt mà bạn đã dùng để yêu cầu liên kết',
         },
         formHint: 'Một email chứa liên kết xác thực sẽ được gửi đến địa chỉ email này.',
         formSubtitle: 'Nhấp vào liên kết xác thực trong email được gửi đến {{identifier}}',

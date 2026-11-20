@@ -2398,7 +2398,8 @@ export const ptPT: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Para verificar este endereço de e-mail, abra a ligação no mesmo dispositivo e navegador em que a solicitou',
         },
         formHint: 'Será enviado um e-mail com uma ligação de verificação para este endereço de e-mail.',
         formSubtitle: 'Clique na ligação de verificação enviada para {{identifier}}',

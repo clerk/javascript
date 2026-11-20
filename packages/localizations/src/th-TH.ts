@@ -2370,7 +2370,7 @@ export const thTH: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'เพื่อยืนยันที่อยู่อีเมลนี้ ให้เปิดลิงก์ในอุปกรณ์และเบราว์เซอร์ที่คุณใช้ขอลิงก์',
         },
         formHint: 'อีเมลที่มีลิงก์ยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'คลิกที่ลิงก์ยืนยันในอีเมลที่ส่งไปยัง {{identifier}}',

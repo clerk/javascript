@@ -2368,7 +2368,7 @@ export const arSA: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'للتحقق من عنوان البريد الإلكتروني هذا، افتح الرابط على نفس الجهاز والمتصفح الذي طلبت الرابط منه',
         },
         formHint: 'سيتم إرسال بريد إلكتروني يحتوي على رمز التحقق لهذا البريد الإلكتروني',
         formSubtitle: 'أنقر على رابط التحقق المرسل إلى البريد الألكتروني {{identifier}}',

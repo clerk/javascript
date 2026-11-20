@@ -2377,7 +2377,8 @@ export const svSE: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'För att verifiera den här e-postadressen, öppna länken på den enhet och i den webbläsare där du begärde den',
         },
         formHint: 'Ett e-postmeddelande med en verifieringslänk kommer att skickas till denna e-postadress.',
         formSubtitle: 'Klicka på verifieringslänken i e-postmeddelandet som skickats till {{identifier}}',

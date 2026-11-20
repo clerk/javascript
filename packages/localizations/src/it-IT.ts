@@ -2384,7 +2384,8 @@ export const itIT: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            "Per verificare questo indirizzo email, apri il link sul dispositivo e nel browser da cui l'hai richiesto",
         },
         formHint: 'Una email contenente un link di verifica sarà inviata a questo indirizzo email.',
         formSubtitle: 'Clicca sul link di verifica nella email inviata a {{identifier}}',

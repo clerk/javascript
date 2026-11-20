@@ -2383,7 +2383,8 @@ export const plPL: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Aby zweryfikować ten adres e-mail, otwórz link na urządzeniu i w przeglądarce, z których o niego poproszono',
         },
         formHint: 'E-mail zawierający link weryfikacyjny zostanie wysłany na ten adres e-mail.',
         formSubtitle: 'Kliknij w link weryfikacyjny w e-mailu wysłanym na adres {{identifier}}',

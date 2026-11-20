@@ -2387,7 +2387,8 @@ export const esUY: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Para verificar este correo electrónico, abrí el enlace en el dispositivo y navegador desde el cual lo solicitaste',
         },
         formHint: 'Se enviará un correo con un enlace de verificación a este correo electrónico.',
         formSubtitle: 'Hacé clic en el enlace de verificación enviado a {{identifier}}',

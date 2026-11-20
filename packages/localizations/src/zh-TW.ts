@@ -2354,7 +2354,7 @@ export const zhTW: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: '若要驗證此電子郵件地址，請在您申請連結的裝置與瀏覽器上開啟該連結',
         },
         formHint: '系統將會傳送一封包含驗證連結的郵件至此電子郵件地址。',
         formSubtitle: '請點擊傳送至 {{identifier}} 的郵件中的驗證連結',

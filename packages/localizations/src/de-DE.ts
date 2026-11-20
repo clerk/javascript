@@ -2408,7 +2408,8 @@ export const deDE: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Um diese E-Mail-Adresse zu bestätigen, öffnen Sie den Link auf demselben Gerät und im selben Browser, mit dem Sie ihn angefordert haben',
         },
         formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungslink gesendet.',
         formSubtitle: 'Klicken Sie auf den Bestätigungslink in der an {{identifier}} gesendeten E-Mail',

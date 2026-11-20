@@ -2388,7 +2388,8 @@ export const esMX: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Para verificar esta dirección de correo electrónico, abre el enlace en el dispositivo y navegador donde lo solicitaste',
         },
         formHint:
           'Se enviará un correo electrónico con un enlace de verificación a esta dirección de correo electrónico.',

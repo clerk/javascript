@@ -2379,7 +2379,7 @@ export const trTR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'Bu e-posta adresini doğrulamak için bağlantıyı talep ettiğiniz cihaz ve tarayıcıda açın',
         },
         formHint: 'Doğrulama bağlantısını içeren bir e-posta belirttiğiniz adrese gönderilecektir.',
         formSubtitle: '{{identifier}} adresine gönderilen doğrulama bağlantısını tıklayınız',

@@ -2385,7 +2385,7 @@ export const faIR: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'برای تأیید این آدرس ایمیل، لینک را در دستگاه و مرورگری که از آن درخواست کرده‌اید باز کنید.',
         },
         formHint: 'ایمیلی حاوی لینک تأیید به این آدرس ایمیل ارسال خواهد شد.',
         formSubtitle: 'روی لینک تأیید در ایمیل ارسال شده به {{identifier}} کلیک کنید',

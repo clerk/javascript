@@ -2377,7 +2377,8 @@ export const mnMN: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle:
+            'Энэ имэйл хаягийг баталгаажуулахын тулд холбоосыг хүсэлт илгээсэн төхөөрөмж болон хөтөч дээрээ нээнэ үү',
         },
         formHint: 'Баталгаажуулах холбоос бүхий имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}}руу илгээсэн имэйл дэх баталгаажуулах холбоос дээр дарна уу.',

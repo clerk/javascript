@@ -2403,7 +2403,7 @@ export const nbNO: LocalizationResource = {
       },
       emailLink: {
         clientMismatch: {
-          subtitle: undefined,
+          subtitle: 'For å verifisere denne e-postadressen, åpne lenken på enheten og i nettleseren der du ba om den',
         },
         formHint: 'En e-post med en verifiseringslenke vil bli sendt til denne e-postadressen.',
         formSubtitle: 'Klikk på verifiseringslenken i e-posten sendt til {{identifier}}',
