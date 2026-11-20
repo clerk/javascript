@@ -16,6 +16,8 @@ const baseURL = `http://localhost:${PORT}`;
  */
 export default defineConfig({
   testDir: './sandbox/integration',
+  /* The ChatGPT SIWC journey needs a local FAPI fixture and runs through playwright.siwc.config.ts. */
+  testIgnore: 'chatgpt-siwc-real-browser.spec.ts',
   /* Global setup for Clerk testing */
   globalSetup: './sandbox/integration/global.setup.ts',
   /* Run tests in files in parallel */

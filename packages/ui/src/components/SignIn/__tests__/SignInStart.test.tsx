@@ -215,6 +215,34 @@ describe('SignInStart', () => {
         screen.getByText('Use passkey instead');
       });
 
+      it('ChatGPTSIWC_PasskeyAutofill_SkippedWhileChatGPTAuthorizationRuns', async () => {
+        window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({ allow_autofill: true, show_sign_in_button: false });
+          f.withSocialProvider({ provider: 'chatgpt' });
+        });
+        fixtures.router.queryParams = {
+          target_flow: 'chatgpt_siwc',
+          redirect_url:
+            'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        } as any;
+        fixtures.signIn.create.mockResolvedValueOnce({ status: 'needs_identifier' } as any);
+        fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+        render(<SignInStart />, { wrapper });
+
+        // The ChatGPT preflight owns the sign-in attempt, so no autofill assertion races it.
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+            expect.objectContaining({ strategy: 'oauth_chatgpt' }),
+          );
+        });
+        expect(fixtures.signIn.authenticateWithPasskey).not.toHaveBeenCalled();
+        window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      });
+
       it('skips autofill when the host reports no autofill support', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
@@ -539,6 +567,184 @@ describe('SignInStart', () => {
   });
 
   describe('Enterprise SSO', () => {
+    it('continues with ChatGPT when the optional login hint cannot identify a Clerk user', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        login_hint: 'new-user@example.com',
+      } as any;
+      fixtures.signIn.create.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'form_identifier_not_found',
+              long_message: '',
+              message: 'Identifier not found',
+              meta: { param_name: 'identifier' },
+            },
+          ],
+          status: 422,
+        }),
+      );
+      fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+      render(<SignInStart />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({ strategy: 'oauth_chatgpt', oidcLoginHint: 'new-user@example.com' }),
+        );
+      });
+      window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+    });
+
+    it('drops a malformed optional login hint before starting ChatGPT sign-in', async () => {
+      window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        login_hint: 'not an address',
+      } as any;
+      fixtures.signIn.create.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'form_param_format_invalid',
+              long_message: '',
+              message: 'Invalid format',
+              meta: { param_name: 'identifier' },
+            },
+          ],
+          status: 422,
+        }),
+      );
+      fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+      render(<SignInStart />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({ strategy: 'oauth_chatgpt' }),
+        );
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalledWith(
+        expect.objectContaining({ oidcLoginHint: 'not an address' }),
+      );
+    }, 15000);
+
+    it('does not automatically restart ChatGPT sign-in after returning to the page', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      } as any;
+      window.sessionStorage.setItem(
+        '__clerk_siwc_auto_start_at',
+        JSON.stringify({ href: window.location.href, startedAt: Date.now() }),
+      );
+
+      try {
+        render(<SignInStart />, { wrapper });
+        await waitFor(() => expect(screen.getByText('Continue')).toBeInTheDocument());
+        expect(fixtures.signIn.create).not.toHaveBeenCalled();
+        expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      } finally {
+        window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      }
+    });
+
+    it('hands the ChatGPT plugin flow to required enterprise SSO before OAuth', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        email_address: 'hello@enterprise.example',
+        __clerk_siwc_prompt_login: 'true',
+        __clerk_siwc_prompt_select_account: 'true',
+      } as any;
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+      } as unknown as SignInResource);
+
+      render(<SignInStart />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({ strategy: 'enterprise_sso', oidcPrompt: 'login select_account' }),
+        );
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'oauth_chatgpt' }),
+      );
+    });
+
+    it('ChatGPTSIWC_CraftedLink_ContinuationOnAnotherOrigin_DoesNotStartPluginFlow', async () => {
+      window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      // GIVEN a well-formed SIWC link whose continuation is not on this instance's Frontend API
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://evil.example/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+        login_hint: 'victim@example.com',
+      } as any;
+
+      render(<SignInStart />, { wrapper });
+
+      // THEN sign-in renders normally without a preflight or a ChatGPT redirect
+      await waitFor(() => expect(screen.getByText('Continue')).toBeInTheDocument());
+      expect(fixtures.signIn.create).not.toHaveBeenCalled();
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+
+    it('hands an unidentified plugin sign-in to enterprise SSO when the instance requires it', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      } as any;
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_identifier',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+      } as unknown as SignInResource);
+
+      render(<SignInStart />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({ strategy: 'enterprise_sso' }),
+        );
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'oauth_chatgpt' }),
+      );
+    });
+
     it('initiates a Enterprise SSO flow if enterprise_sso is listed as the only supported first factor', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();

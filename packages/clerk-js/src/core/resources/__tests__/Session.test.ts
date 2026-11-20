@@ -1693,6 +1693,35 @@ describe('Session', () => {
     });
   });
 
+  describe('__internal_acknowledgeChatGPTAccountChoice()', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('rejects when the request returns no response, as it does offline', async () => {
+      vi.spyOn(BaseResource, '_fetch' as any).mockResolvedValue(null);
+      const session = new Session({ status: 'active', id: 'session_1', object: 'session' } as SessionJSON);
+
+      await expect(
+        session.__internal_acknowledgeChatGPTAccountChoice('https://example.com/oauth/authorize/continue'),
+      ).rejects.toMatchObject({ code: 'network_error' });
+    });
+
+    it('resolves once FAPI acknowledges the choice', async () => {
+      const fetchSpy = vi
+        .spyOn(BaseResource, '_fetch' as any)
+        .mockResolvedValue({ response: { acknowledged: true }, client: null });
+      const session = new Session({ status: 'active', id: 'session_1', object: 'session' } as SessionJSON);
+
+      await expect(
+        session.__internal_acknowledgeChatGPTAccountChoice('https://example.com/oauth/authorize/continue'),
+      ).resolves.toBeUndefined();
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'POST', path: '/oauth/authorize/account-selection' }),
+      );
+    });
+  });
+
   describe('__internal_touch()', () => {
     const mockSessionData = {
       status: 'active',

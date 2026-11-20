@@ -21,6 +21,7 @@ import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInF
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { isChatGPTSIWCAccountChoicePending, isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
 import {
   LazySignUpContinue,
   LazySignUpEnterpriseConnections,
@@ -33,7 +34,7 @@ import {
 } from './lazy-sign-up';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
-import { SignInAccountSwitcher } from './SignInAccountSwitcher';
+import { SignInAccountSwitcher, SignInAccountSwitcherForChatGPTSIWC } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
 import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
 import { SignInFactorOne } from './SignInFactorOne';
@@ -53,6 +54,10 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
+  // After an OAuth redirect, record a pending ChatGPT account choice before resuming the authorization.
+  const siwcCallbackParams = isChatGPTSIWCAccountChoicePending(signInContext.queryParams)
+    ? { __internal_navigateOnSetActive: signInContext.navigateOnSetActive }
+    : {};
 
   return (
     <Flow.Root flow='signIn'>
@@ -81,7 +86,10 @@ function SignInRoutes(): JSX.Element {
           <ResetPasswordSuccess />
         </Route>
         <Route path='sso-callback'>
-          <SignInSSOCallback {...buildSignInOAuthCallbackParams(signInContext)} />
+          <SignInSSOCallback
+            {...buildSignInOAuthCallbackParams(signInContext)}
+            {...siwcCallbackParams}
+          />
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
@@ -113,7 +121,10 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
+              <LazySignUpSSOCallback
+                {...buildCombinedFlowOAuthCallbackParams(signUpContext)}
+                {...siwcCallbackParams}
+              />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete
@@ -163,7 +174,11 @@ function SignInRoutes(): JSX.Element {
           <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
         </Route>
         <Route index>
-          <SignInStart />
+          {isChatGPTSIWCAccountMismatch(signInContext.queryParams) ? (
+            <SignInAccountSwitcherForChatGPTSIWC />
+          ) : (
+            <SignInStart />
+          )}
         </Route>
         <Route>
           <RedirectToSignIn />

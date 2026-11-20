@@ -98,6 +98,30 @@ describe('SocialButtons', () => {
       });
     });
 
+    it('prioritizes ChatGPT with an explicit continue label for plugin sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+
+      fixtures.clerk.client.lastAuthenticationStrategy = null;
+
+      render(
+        <CardStateProvider>
+          <SocialButtons
+            {...defaultProps}
+            preferredOAuthStrategy='oauth_chatgpt'
+            showLastAuthenticationStrategy={false}
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const buttons = screen.getAllByRole('button');
+      expect(buttons[0]).toHaveTextContent('Continue with ChatGPT');
+      expect(buttons[1]).toHaveTextContent('Google');
+    });
+
     it('should return null when no strategies are enabled', async () => {
       const { wrapper } = await createFixtures();
 

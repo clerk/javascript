@@ -8,6 +8,13 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import {
+  chatGPTSIWCAccountChoicePendingParams,
+  createChatGPTSIWCContinuationGuard,
+  isChatGPTSIWCAccountChoicePending,
+  isChatGPTSIWCFlow,
+  resolveChatGPTSIWCQueryParams,
+} from '../../components/SignIn/chatGPTSIWC';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -47,10 +54,19 @@ export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
+  const { queryParams: routedQueryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
+  // Only a ChatGPT plugin (SIWC) authorization changes these params; see resolveChatGPTSIWCQueryParams.
+  const queryParams = resolveChatGPTSIWCQueryParams(
+    routedQueryParams,
+    createChatGPTSIWCContinuationGuard(() => ({
+      frontendApi: clerk.frontendApi,
+      proxyUrl: clerk.proxyUrl,
+      allowedRedirectOrigins: options.allowedRedirectOrigins,
+    })),
+  );
 
   if (context === null || context.componentName !== 'SignIn') {
     throw new Error(`Clerk: useSignInContext called outside of the mounted SignIn component.`);
@@ -65,7 +81,11 @@ export const useSignInContext = (): SignInContextType => {
 
   const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
-    () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
+    () =>
+      getInitialValuesFromQueryParams(
+        queryParams === routedQueryParams ? queryString : new URLSearchParams(queryParams).toString(),
+        SIGN_IN_INITIAL_VALUE_KEYS,
+      ),
     [],
   );
 
@@ -115,10 +135,18 @@ export const useSignInContext = (): SignInContextType => {
     path: ctx.path,
     endpoint: isCombinedFlow ? '/create' + MAGIC_LINK_VERIFY_PATH_ROUTE : MAGIC_LINK_VERIFY_PATH_ROUTE,
   });
+  // A pending ChatGPT account choice is recorded when the session is activated. The SSO callback only
+  // sees the redirect URLs in authQueryString, so carry the SIWC markers through the OAuth round trip.
+  const ssoAuthQueryString = isChatGPTSIWCAccountChoicePending(queryParams)
+    ? new URLSearchParams({
+        ...Object.fromEntries(new URLSearchParams(authQueryString)),
+        ...chatGPTSIWCAccountChoicePendingParams,
+      }).toString()
+    : authQueryString;
   const ssoCallbackUrl = buildRedirectUrl({
     routing: ctx.routing,
     baseUrl: signInUrl,
-    authQueryString,
+    authQueryString: ssoAuthQueryString,
     path: ctx.path,
     endpoint:
       isCombinedFlow && ctx.routing !== 'virtual' ? '/create' + SSO_CALLBACK_PATH_ROUTE : SSO_CALLBACK_PATH_ROUTE,
@@ -129,6 +157,20 @@ export const useSignInContext = (): SignInContextType => {
       { base: signInUrl, hashPath: '/create', hashSearchParams: [queryParams, preservedParams] },
       { stringify: true },
     );
+  }
+
+  if (isChatGPTSIWCFlow(queryParams)) {
+    // A separate sign-up route must receive the validated outer authorization
+    // continuation in its ordinary search params so it survives a full-page
+    // navigation and can be resumed after OpenAI sign-in.
+    const signUpURL = new URL(signUpUrl, window.location.origin);
+    for (const key of ['target_flow', 'redirect_url', 'login_hint'] as const) {
+      const value = queryParams[key];
+      if (value) {
+        signUpURL.searchParams.set(key, value);
+      }
+    }
+    signUpUrl = signUpURL.href;
   }
 
   // Static preconditions of the sign-up-if-missing flow, shared by SignInStart (which requests
@@ -167,6 +209,19 @@ export const useSignInContext = (): SignInContextType => {
     redirectUrl: string;
     decorateUrl: DecorateUrl;
   }) => {
+    if (isChatGPTSIWCAccountChoicePending(queryParams)) {
+      // Resume the authorization even if the choice could not be recorded: FAPI asks the user to
+      // choose an account again, which beats stranding them on a signed-in sign-in page.
+      try {
+        if (!session.__internal_acknowledgeChatGPTAccountChoice) {
+          throw new Error('This session cannot confirm the ChatGPT account choice.');
+        }
+        await session.__internal_acknowledgeChatGPTAccountChoice(afterSignInUrl);
+      } catch (error) {
+        console.error('Clerk: Failed to record the ChatGPT account choice.', error);
+      }
+    }
+
     const currentTask = session.currentTask;
     if (!currentTask) {
       // Use decorateUrl to enable Safari ITP cookie refresh when needed

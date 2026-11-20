@@ -8,6 +8,7 @@ import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
+import { createChatGPTSIWCContinuationGuard, resolveChatGPTSIWCQueryParams } from '../../components/SignIn/chatGPTSIWC';
 import { useEnvironment, useOptions } from '../../contexts';
 import type { ParsedQueryString } from '../../router';
 import { useRouter } from '../../router';
@@ -42,10 +43,19 @@ export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
+  const { queryParams: routedQueryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
+  // Only a ChatGPT plugin (SIWC) authorization changes these params; see resolveChatGPTSIWCQueryParams.
+  const queryParams = resolveChatGPTSIWCQueryParams(
+    routedQueryParams,
+    createChatGPTSIWCContinuationGuard(() => ({
+      frontendApi: clerk.frontendApi,
+      proxyUrl: clerk.proxyUrl,
+      allowedRedirectOrigins: options.allowedRedirectOrigins,
+    })),
+  );
   const isCombinedFlow =
     (signUpMode !== 'restricted' &&
       Boolean(
