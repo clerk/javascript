@@ -134,8 +134,14 @@ function parseAbsoluteUrl(value: string) {
   }
 }
 
-function isAllowedResourceUrl({ protocol, hostname }: URL) {
-  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(hostname));
+function rawResourceHost(resource: string) {
+  const authority = resource.slice(resource.indexOf('//') + 2).split(/[/?]/, 1)[0];
+  return authority.slice(authority.lastIndexOf('@') + 1).replace(/:[0-9]*$/, '');
+}
+
+function isAllowedResourceUrl({ protocol, hostname }: URL, resource: string) {
+  const host = rawResourceHost(resource).toLowerCase();
+  return protocol === 'https:' || (protocol === 'http:' && loopbackHostnames.has(host) && host === hostname);
 }
 
 const rfc3986AbsoluteUriPattern =
@@ -149,7 +155,7 @@ function assertValidTokenExchangeResource(resource: string) {
   if (!url) {
     throw tokenExchangeRequestError('`resource` must be an absolute URI.');
   }
-  if (!isAllowedResourceUrl(url)) {
+  if (!isAllowedResourceUrl(url, resource)) {
     throw tokenExchangeRequestError('`resource` must use https, or http on a loopback host.');
   }
 }
