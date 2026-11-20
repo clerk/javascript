@@ -6,7 +6,10 @@ import { useSSOBypassSectionController } from '@clerk/mosaic/features/organizati
 import type { SSOBypassModel } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.model';
 import { SSOBypassSectionSkeleton } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.skeleton';
 import type { SSOBypassEntry } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.types';
-import { SSOBypassSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.view';
+import {
+  SSOBypassConnectionsErrorView,
+  SSOBypassSectionView,
+} from '@clerk/mosaic/features/organization-profile/organization-profile-security-panel/sso-bypass.view';
 import { save } from '@clerk/mosaic/utils/errors';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useState } from 'react';
@@ -189,6 +192,14 @@ export function useSSOBypassFixture({
             code: 'sso_bypass_already_added',
           });
         }
+        if (member.outsideConnection) {
+          throw new ClerkRuntimeError(
+            'This member could not be added because their email address is not served by a connection.',
+            {
+              code: 'sso_bypass_domain_not_served',
+            },
+          );
+        }
         setUserIds(current => [...current, member.userId]);
       }, ['emailAddress']);
       return { mode: 'email', added: 1, skipped: 0, skipReason: 'unknown' };
@@ -245,6 +256,21 @@ export function SecurityPanelNoSectionsExample() {
   return (
     <OrganizationProfileSecurityPanelView>
       <OrganizationProfileSecurityPanelEmptyState />
+    </OrganizationProfileSecurityPanelView>
+  );
+}
+
+export function SecurityPanelConnectionsErrorExample() {
+  const [isRetrying, setIsRetrying] = useState(false);
+  return (
+    <OrganizationProfileSecurityPanelView>
+      <SSOBypassConnectionsErrorView
+        isRetrying={isRetrying}
+        onRetry={() => {
+          setIsRetrying(true);
+          setTimeout(() => setIsRetrying(false), 1_000);
+        }}
+      />
     </OrganizationProfileSecurityPanelView>
   );
 }

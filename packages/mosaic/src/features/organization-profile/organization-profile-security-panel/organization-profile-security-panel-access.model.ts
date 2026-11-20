@@ -2,6 +2,7 @@ import { __internal_useOrganizationEnterpriseConnections, useOrganization, useSe
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { ORGANIZATION_PERMISSIONS } from '../../../utils/permissions';
+import { useConnectionsStatus } from './use-connections-status';
 
 export interface SecurityCapabilities {
   canConfigureSso: boolean;
@@ -40,6 +41,7 @@ export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
     enabled: Boolean(organization) && needsConnections,
     keepPreviousData: false,
   });
+  const connectionsStatus = useConnectionsStatus(connections);
 
   if (!isLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
@@ -47,13 +49,13 @@ export function useSecurityPanelAccessModel(): SecurityPanelAccessModel {
   if (!organization || !session) {
     return { status: 'hidden' };
   }
-  if (needsConnections && connections.isLoading) {
+  if (needsConnections && connectionsStatus.isLoading) {
     return { status: 'loading' };
   }
   const allowed =
     capabilities.canConfigureSso ||
     capabilities.canConfigureDirectorySync ||
-    (capabilities.canManageSSOBypass && (connections.data?.length ?? 0) > 0);
+    (capabilities.canManageSSOBypass && (connectionsStatus.isError || (connections.data?.length ?? 0) > 0));
 
   return allowed ? { status: 'ready', ...capabilities } : { status: 'hidden' };
 }

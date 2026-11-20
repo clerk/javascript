@@ -1,9 +1,10 @@
 import type { OrganizationMembershipJSON, RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import { fapiSSOBypassUser } from '../../../../__tests__/feature/fake-fapi/organization-security';
 import {
   fapiClient,
@@ -203,8 +204,70 @@ describe('Who sees the Security page', () => {
   });
 });
 
+describe('When the connections request fails', () => {
+  const ERROR_TEXT = 'Could not check this organization’s SSO connections';
+  const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  async function renderWithFailedConnections() {
+    serve({ allowlisted: [bob] });
+    const outage = { active: true, requests: 0 };
+    worker.use(
+      http.get(fapiUrl('/v1/organizations/:organizationId/enterprise_connections'), () => {
+        if (!outage.active) {
+          return undefined;
+        }
+        outage.requests++;
+        return HttpResponse.json(
+          {
+            errors: [
+              { code: 'internal_clerk_error', message: 'Something went wrong', long_message: 'Something went wrong' },
+            ],
+          },
+          { status: 500 },
+        );
+      }),
+    );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await renderWithClerk(<OrganizationProfileSecurityPanel />);
+    for (let step = 0; step < 20 && !screen.queryByText(ERROR_TEXT); step++) {
+      await act(async () => vi.advanceTimersByTimeAsync(1_000));
+      await settle();
+    }
+    return { user, outage };
+  }
+
+  it('keeps the Security page and says the check failed', async () => {
+    const { outage } = await renderWithFailedConnections();
+
+    expect(outage.requests).toBeGreaterThan(0);
+    expect(screen.getByText('Security')).toBeVisible();
+    expect(screen.getByRole('alert')).toHaveTextContent(ERROR_TEXT);
+    expect(screen.queryByRole('list', { name: 'SSO bypass allow list' })).toBeNull();
+  });
+
+  it('shows the allow list after Retry succeeds', async () => {
+    const { user, outage } = await renderWithFailedConnections();
+    expect(screen.getByRole('alert')).toHaveTextContent(ERROR_TEXT);
+
+    outage.active = false;
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    const list = await screen.findByRole('list', { name: 'SSO bypass allow list' });
+    expect(within(list).getByText('Bob')).toBeVisible();
+    expect(screen.queryByText(ERROR_TEXT)).toBeNull();
+  });
+});
+
 describe('The Security page with no sections to show', () => {
-  const EMPTY = 'No security settings yet';
+  const EMPTY = 'No connections to secure';
 
   it('shows an empty state to a connection manager with self-serve Directory Sync', async () => {
     serve({ permissions: [CONNECTIONS], selfServeDirectorySync: true, connections: [] });

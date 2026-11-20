@@ -136,7 +136,7 @@ export const organizationProfileSecurityPanelMessages = {
     },
   },
   empty: {
-    label: 'No security settings yet',
+    label: 'No connections to secure',
     description: 'Single sign-on and directory sync settings for this organization will appear here.',
   },
   ssoBypass: {
@@ -150,6 +150,8 @@ export const organizationProfileSecurityPanelMessages = {
     remove: 'Remove',
     empty: 'There are no members on the allow list yet',
     loadError: 'Could not load the SSO allow list',
+    connectionsError: 'Could not check this organization’s SSO connections',
+    connectionsRetry: 'Retry',
     retry: 'Try again',
     loading: 'Loading the SSO allow list',
     pagination: 'Allow list pagination',
@@ -178,6 +180,7 @@ export const organizationProfileSecurityPanelMessages = {
       rolesError: 'Could not load the organization’s roles.',
       roleWarning: 'This list does not sync, members are managed manually.',
       submit: 'Add members',
+      submitting: 'Adding members',
       cancel: 'Cancel',
       done: 'Done',
       addedMember: 'Added member successfully',

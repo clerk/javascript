@@ -1,6 +1,7 @@
 import type { StoryMeta } from '@/lib/types';
 
 import {
+  SecurityPanelConnectionsErrorExample,
   SecurityPanelExample,
   SecurityPanelNoSectionsExample,
   SSOBypassAllowlistExample,
@@ -50,6 +51,10 @@ export function ManageOIDCConnection() {
 
 export function NoSections() {
   return <SecurityPanelNoSectionsExample />;
+}
+
+export function ConnectionsError() {
+  return <SecurityPanelConnectionsErrorExample />;
 }
 
 export function AllowListLoadError() {
