@@ -71,7 +71,7 @@ const useLoadedIsomorphicClerk = (mergedOptions: IsomorphicClerkOptions) => {
   }, [mergedOptions.localization]);
 
   React.useEffect(() => {
-    isomorphicClerkRef.current.on('status', setClerkStatus);
+    isomorphicClerkRef.current.on('status', setClerkStatus, { notify: true });
     return () => {
       if (isomorphicClerkRef.current) {
         isomorphicClerkRef.current.off('status', setClerkStatus);

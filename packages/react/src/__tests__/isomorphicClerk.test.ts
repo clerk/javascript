@@ -458,6 +458,19 @@ describe('isomorphicClerk', () => {
       expect(mockClerkCtor).not.toHaveBeenCalled();
     });
 
+    it('does not attach a preloaded Clerk instance when a Clerk JS URL is configured', () => {
+      const instance = { loaded: true, status: 'ready', addListener: vi.fn() };
+      const clerk = new IsomorphicClerk({
+        publishableKey: 'pk_test_XXX',
+        Clerk: instance as any,
+        __internal_clerkJSUrl: 'https://staging.clerk.com/clerk.js',
+      });
+
+      expect(clerk.loaded).toBe(false);
+      expect(clerk.status).toBe('loading');
+      expect(loadClerkJSScript).toHaveBeenCalled();
+    });
+
     it('__internal_clerkUIUrl causes script loading even when ui.ClerkUI prop is provided', async () => {
       const mockClerkUI = vi.fn();
 

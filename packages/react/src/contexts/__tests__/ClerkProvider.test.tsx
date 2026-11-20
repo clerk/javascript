@@ -20,14 +20,20 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import { IsomorphicClerk } from '../../isomorphicClerk';
 import type { ClerkProviderProps as GenericClerkProviderProps, Ui } from '../../types';
 import { ClerkProvider } from '../ClerkProvider';
+import { useIsomorphicClerkContext } from '../IsomorphicClerkContext';
 
 vi.mock('../../isomorphicClerk', () => {
   let instance: any;
   class IsomorphicClerk {
     status = 'loading';
-    on = vi.fn();
+    on = vi.fn((_event, listener, options) => {
+      if (options?.notify) {
+        listener(this.status);
+      }
+    });
     off = vi.fn();
     __internal_updateProps = vi.fn().mockResolvedValue(undefined);
     static getOrCreateInstance() {
@@ -251,6 +257,30 @@ describe('ClerkProvider', () => {
         routerReplace: () => {},
       }).toMatchTypeOf<ClerkProviderProps>();
     });
+  });
+
+  it('catches up when status changes before the subscription is registered', () => {
+    const clerk = IsomorphicClerk.getOrCreateInstance({ publishableKey: 'test' });
+    const Status = React.memo(() => {
+      const context = useIsomorphicClerkContext();
+      return <div>{context.status}</div>;
+    });
+    const Transition = () => {
+      React.useLayoutEffect(() => {
+        (clerk as any).status = 'ready';
+      }, []);
+      return <Status />;
+    };
+
+    const result = render(
+      <ClerkProvider publishableKey='pk_test_Y2xlcmsuY2xlcmsuZGV2JA'>
+        <Transition />
+      </ClerkProvider>,
+    );
+
+    expect(result.getByText('ready')).toBeTruthy();
+    expect(clerk.on).toHaveBeenCalledWith('status', expect.any(Function), { notify: true });
+    result.unmount();
   });
 
   describe('duplicate detection', () => {
