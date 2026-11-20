@@ -98,7 +98,7 @@ With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSig
 
 - FAPI's state changes only on submit. A route the step doesn't allow is replaced with the step's route.
 - Back to `start` shows the identifier form; submitting it creates a new sign-in. Forward to `factorOne` still works.
-- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`). Reload on a sign-up verify route sends a code only when `sent` is false.
+- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`). Reload on a sign-up verify route sends a code only when `sent` is false, and starts the resend countdown either way, as `ui`'s code card does.
 - Virtual routing has no history: a remount starts at `start`, and FAPI's state is kept.
 
 ## Entry actions
