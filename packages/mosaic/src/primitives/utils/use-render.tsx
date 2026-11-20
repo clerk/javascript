@@ -188,7 +188,11 @@ function getReactElementRef(element: React.ReactElement): React.Ref<unknown> | u
 }
 
 function unwrapLazyRenderProp(render: RenderPropOrElement | undefined): RenderPropOrElement | undefined {
-  const isLazy = typeof render === 'object' && '$$typeof' in render && render.$$typeof === Symbol.for('react.lazy');
+  const isLazy =
+    typeof render === 'object' &&
+    render !== null &&
+    '$$typeof' in render &&
+    render.$$typeof === Symbol.for('react.lazy');
   if (!isLazy || React.version.startsWith('18.')) {
     return render;
   }

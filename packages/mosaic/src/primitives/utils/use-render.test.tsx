@@ -133,6 +133,20 @@ describe('useRender', () => {
     expect(el).toHaveTextContent('content');
   });
 
+  it('renders the default tag when render is null', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        // @ts-expect-error -- `render` is not typed to accept null, but an untyped caller can pass it
+        render: null,
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+  });
+
   it('returns null when enabled is false', () => {
     const { result } = renderHook(() =>
       useRender({ defaultTagName: 'div', enabled: false, props: { children: 'hidden' } }),
