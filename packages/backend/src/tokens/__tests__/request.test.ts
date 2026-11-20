@@ -1862,13 +1862,23 @@ describe('tokens.authenticateRequest(options)', () => {
     });
 
     test.each([['sesion_token'], ['m2m-token'], [['m2m_token', 'apikey']]])(
-      'throws an error if acceptsToken is %j',
+      'warns once if acceptsToken is %j',
       async acceptsToken => {
-        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
-
-        await expect(authenticateRequest(request, mockOptions({ acceptsToken }))).rejects.toThrow(
-          `Invalid acceptsToken: ${JSON.stringify(acceptsToken)}.`,
+        server.use(
+          http.post(mockMachineAuthResponses.m2m_token.endpoint, () =>
+            HttpResponse.json(mockVerificationResults.m2m_token),
+          ),
         );
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const message = `Invalid acceptsToken: ${JSON.stringify(acceptsToken)}.`;
+
+        for (let i = 0; i < 2; i++) {
+          const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+          await authenticateRequest(request, mockOptions({ acceptsToken }));
+        }
+
+        expect(warn.mock.calls.filter(([msg]) => String(msg).includes(message))).toHaveLength(1);
+        warn.mockRestore();
       },
     );
 
