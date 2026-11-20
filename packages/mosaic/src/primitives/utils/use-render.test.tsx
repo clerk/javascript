@@ -271,3 +271,129 @@ describe('useRender', () => {
     );
   });
 });
+
+function lazyNode(payload: unknown): React.ReactElement {
+  const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: payload, _init: (p: unknown) => p };
+  // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
+  return lazy;
+}
+
+const isReact18 = React.version.startsWith('18.');
+
+describe.skipIf(isReact18)('useRender with a lazy render element', () => {
+  it('clones the element the lazy node resolves to, with computed props and state attributes', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'div',
+        render: lazyNode(<article data-variant='x' />),
+        state: { open: true },
+        stateAttributesMapping: { open: (v: boolean) => (v ? { 'data-open': '' } : null) },
+        props: { 'data-testid': 'test', children: 'content' },
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    expect(el.tagName).toBe('ARTICLE');
+    expect(el).toHaveAttribute('data-variant', 'x');
+    expect(el).toHaveAttribute('data-open', '');
+    expect(el).toHaveTextContent('content');
+  });
+
+  it("keeps the resolved element's className and event handlers", () => {
+    const partHandler = vi.fn();
+    const elementHandler = vi.fn();
+    function C() {
+      return useRender({
+        defaultTagName: 'button',
+        render: lazyNode(
+          <button
+            type='button'
+            className='from-element'
+            onClick={elementHandler}
+            data-testid='test'
+          />,
+        ),
+        props: { className: 'from-part', onClick: partHandler },
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    el.click();
+
+    expect(el).toHaveClass('from-part', 'from-element');
+    expect(partHandler).toHaveBeenCalledTimes(1);
+    expect(elementHandler).toHaveBeenCalledTimes(1);
+  });
+
+  it("merges the resolved element's own ref with the params ref", () => {
+    const paramRef = React.createRef<HTMLElement>();
+    const elementRef = React.createRef<HTMLElement>();
+    function C() {
+      return useRender({
+        defaultTagName: 'div',
+        ref: paramRef,
+        render: lazyNode(
+          <article
+            ref={elementRef}
+            data-testid='test'
+          />,
+        ),
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    expect(paramRef.current).toBe(el);
+    expect(elementRef.current).toBe(el);
+  });
+
+  it('does not resolve the lazy node when enabled is false', () => {
+    const init = vi.fn((p: unknown) => p);
+    const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: <article />, _init: init };
+    const { result } = renderHook(() =>
+      useRender({
+        defaultTagName: 'div',
+        enabled: false,
+        // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
+        render: lazy,
+      }),
+    );
+
+    expect(result.current).toBeNull();
+    expect(init).not.toHaveBeenCalled();
+  });
+
+  it('renders the default tag when the lazy node resolves to something other than an element', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        render: lazyNode('text'),
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+  });
+});
+
+describe.runIf(isReact18)('useRender with a lazy render element on React 18', () => {
+  it('renders the default tag without resolving the lazy node', () => {
+    const init = vi.fn((p: unknown) => p);
+    const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: <article />, _init: init };
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
+        render: lazy,
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+    expect(init).not.toHaveBeenCalled();
+  });
+});

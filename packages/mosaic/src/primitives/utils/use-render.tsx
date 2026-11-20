@@ -187,6 +187,15 @@ function getReactElementRef(element: React.ReactElement): React.Ref<unknown> | u
   return (element as { ref?: React.Ref<unknown> }).ref ?? undefined;
 }
 
+function unwrapLazyRenderProp(render: RenderPropOrElement | undefined): RenderPropOrElement | undefined {
+  const isLazy = typeof render === 'object' && '$$typeof' in render && render.$$typeof === Symbol.for('react.lazy');
+  if (!isLazy || React.version.startsWith('18.')) {
+    return render;
+  }
+  const [child] = React.Children.toArray(render);
+  return React.isValidElement(child) ? child : render;
+}
+
 interface UseRenderParamsBase<
   Tag extends keyof React.JSX.IntrinsicElements,
   State extends Record<string, unknown> = Record<string, never>,
@@ -241,7 +250,8 @@ export function useRender<
   Tag extends keyof React.JSX.IntrinsicElements,
   State extends Record<string, unknown> = Record<string, never>,
 >(params: UseRenderParamsBase<Tag, State> & { enabled?: boolean }): React.ReactElement | null {
-  const { defaultTagName, render, ref, enabled = true, state, stateAttributesMapping, props } = params;
+  const { defaultTagName, ref, enabled = true, state, stateAttributesMapping, props } = params;
+  const render = enabled ? unwrapLazyRenderProp(params.render) : params.render;
 
   const normalizedRefs = ref == null ? [] : Array.isArray(ref) ? ref : [ref];
   const elementRef = React.isValidElement(render) ? getReactElementRef(render) : undefined;
