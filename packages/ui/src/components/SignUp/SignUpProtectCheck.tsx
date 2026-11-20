@@ -67,6 +67,8 @@ function SignUpProtectCheckInternal({
     getResource: () => signUp,
     reload: () => signUp.reload(),
     submitProtectCheck: params => signUp.submitProtectCheck(params),
+    // An expired challenge is replaced only by starting over, so retrying it returns to the start.
+    onRestart: () => navigateToFlowStart(),
     // Routes on the resolved resource. `completeSignUpFlow` handles the `complete` case (via
     // `handleComplete`) as well as routing to the next missing-field / verification / chained-
     // challenge step, so both the normal success and the `protect_check_already_resolved` reload

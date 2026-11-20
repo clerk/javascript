@@ -18,6 +18,13 @@ export interface ProtectCheckRunnerParams<TResource> extends ProtectCheckRunnerR
    */
   onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
   onError?: (error: unknown) => void;
+  /**
+   * Starts the attempt over. Retry calls it instead of re-running the challenge when the challenge
+   * has expired, because reloading the resource returns the same expired challenge and the retry
+   * would fail the same way. Starting over issues a new challenge. Without it, retry re-runs the
+   * challenge as for any other error.
+   */
+  onRestart?: () => Promise<unknown>;
 }
 
 export interface ProtectCheckRunnerState {
@@ -31,9 +38,27 @@ export interface ProtectCheckRunnerState {
   isWidgetVisible: boolean;
   /** The (recoverable) error the card is currently showing, if any. */
   error: string | undefined;
-  /** Clears the error and re-runs the challenge from scratch. */
+  /** The code of the error the card is currently showing, if it has one. */
+  errorCode: string | undefined;
+  /**
+   * The id of the sign-in or sign-up attempt. Shown next to an error so the user can quote it to
+   * support, who can look up that attempt.
+   */
+  referenceId: string | undefined;
+  /**
+   * Clears the error and re-runs the challenge from scratch, or starts the attempt over (see
+   * `onRestart`) when the challenge has expired.
+   */
   retry: () => void;
 }
+
+const errorCodeOf = (error: unknown): string | undefined => {
+  if (!error || typeof error !== 'object') {
+    return undefined;
+  }
+  const code = (error as { code?: unknown }).code;
+  return typeof code === 'string' && code ? code : undefined;
+};
 
 /**
  * Shared driver for the `<SignInProtectCheck />` and `<SignUpProtectCheck />` cards. The challenge
@@ -42,8 +67,11 @@ export interface ProtectCheckRunnerState {
  *
  * Must be called from within a `CardStateProvider`.
  */
-export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunnerState {
+export function useProtectCheckRunner<TResource extends { id?: string }>(
+  params: ProtectCheckRunnerParams<TResource>,
+): ProtectCheckRunnerState {
   const card = useCardState();
+  const errorCode = errorCodeOf(card.rawError);
 
   // Override for the module-LOAD bound only (see `executeProtectCheck`), resolved loader first
   // and instance second: a loader being rolled out gradually can carry its own value without
@@ -227,9 +255,22 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   }, [token, retryNonce]);
 
   const retry = React.useCallback(() => {
+    const expired = errorCode === ERROR_CODES.PROTECT_CHECK_TIMED_OUT;
     card.setError('');
     isRunningRef.current = false;
     reloadCountRef.current = 0;
+
+    // An expired challenge can't be run again: reloading returns the same expired challenge. Start
+    // the attempt over instead, which issues a new one.
+    const { onRestart } = paramsRef.current;
+    if (expired && onRestart) {
+      void onRestart().catch(err => {
+        if (mountedRef.current) {
+          reportError(err);
+        }
+      });
+      return;
+    }
 
     // The gate already cleared and it was the continuation that failed: there is no challenge left
     // to re-run, so re-running the effect would do nothing. Retry the continuation instead.
@@ -256,7 +297,15 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     setRetryNonce(n => n + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [errorCode]);
 
-  return { containerRef, isRunning, isWidgetVisible, error: card.error, retry };
+  return {
+    containerRef,
+    isRunning,
+    isWidgetVisible,
+    error: card.error,
+    errorCode,
+    referenceId: params.getResource()?.id || undefined,
+    retry,
+  };
 }

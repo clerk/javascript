@@ -53,6 +53,8 @@ function SignInProtectCheckInternal(): JSX.Element | null {
     getResource: () => signIn,
     reload: () => signIn.reload(),
     submitProtectCheck: params => signIn.submitProtectCheck(params),
+    // An expired challenge is replaced only by starting over, so retrying it returns to the start.
+    onRestart: () => navigateToFlowStart(),
     // Routes on the resolved resource. This single path finalizes `complete` from both the normal
     // success and the `protect_check_already_resolved` reload, so neither strands the user with an
     // unactivated session.
