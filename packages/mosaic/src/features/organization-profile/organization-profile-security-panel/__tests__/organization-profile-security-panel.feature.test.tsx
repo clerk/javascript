@@ -267,7 +267,7 @@ describe('When the connections request fails', () => {
 });
 
 describe('The Security page with no sections to show', () => {
-  const EMPTY = 'No security settings yet';
+  const EMPTY = 'No connections to secure';
 
   it.each([
     {
