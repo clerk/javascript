@@ -10,6 +10,7 @@ import { axe } from '../../primitives/test-utils/axe';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
+import { Flow } from '../flow';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
 import { Panel } from '../panel';
@@ -17,8 +18,6 @@ import { usePanelTitle } from '../panel/panel';
 import { Section } from '../section';
 import { Profile } from '.';
 import type { ProfileRootProps } from './profile';
-
-const pageTitles: Record<string, string> = { account: 'Account', security: 'Security' };
 
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
@@ -36,7 +35,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
         </Profile.NavItem>
         <Profile.NavItem value='security'>Security</Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content pageTitle={pageTitles[rootProps.value ?? 'account']}>
+      <Profile.Content>
         <Profile.ContentPanel value='account'>
           <Panel.Root>
             <Panel.Title>Account</Panel.Title>
@@ -53,7 +52,48 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
             </Panel.Sections>
           </Panel.Root>
         </Profile.ContentPanel>
-        <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
+        <Profile.ContentPanel value='security'>
+          <Panel.Root>
+            <Panel.Title>Security</Panel.Title>
+            Security page
+          </Panel.Root>
+        </Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
+  );
+}
+
+function SubPageSurface({ value, step = 'overview' }: { value: string; step?: string }) {
+  return (
+    <Profile.Root value={value}>
+      <Profile.Title>User profile</Profile.Title>
+      <Profile.Content>
+        <Profile.ContentPanel value='account'>
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+          </Panel.Root>
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='security'>
+          <Flow.Root
+            value={step}
+            state={null}
+          >
+            {() => (
+              <>
+                <Flow.Step ids={['overview']}>
+                  <Panel.Root>
+                    <Panel.Title>Security</Panel.Title>
+                  </Panel.Root>
+                </Flow.Step>
+                <Flow.Step ids={['passkeys']}>
+                  <Panel.Root>
+                    <Panel.Title back={{ label: 'Back', onClick: () => {} }}>Passkeys</Panel.Title>
+                  </Panel.Root>
+                </Flow.Step>
+              </>
+            )}
+          </Flow.Root>
+        </Profile.ContentPanel>
       </Profile.Content>
     </Profile.Root>
   );
@@ -84,8 +124,13 @@ function GroupedSurface(rootProps: Partial<ProfileRootProps>) {
           <Profile.NavItem value='organization/security'>Security</Profile.NavItem>
         </Profile.NavGroup>
       </Profile.Nav>
-      <Profile.Content pageTitle='Account'>
-        <Profile.ContentPanel value='account'>Account page</Profile.ContentPanel>
+      <Profile.Content>
+        <Profile.ContentPanel value='account'>
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+            Account page
+          </Panel.Root>
+        </Profile.ContentPanel>
       </Profile.Content>
     </Profile.Root>
   );
@@ -111,7 +156,7 @@ describe('Profile', () => {
             Account
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content pageTitle='Account'>
+        <Profile.Content>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
         </Profile.Content>
       </Profile.Root>,
@@ -145,7 +190,7 @@ describe('Profile', () => {
             Security
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content pageTitle='Account'>
+        <Profile.Content>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
           <Profile.ContentPanel value='security'>Security content</Profile.ContentPanel>
         </Profile.Content>
@@ -306,11 +351,57 @@ describe('Profile', () => {
       expect(screen.getByRole('tabpanel', { name: 'Security' })).toHaveTextContent('Security page');
     });
 
-    it('sits in the scrolling content, above the pages', () => {
+    it('warns when the open page has no Panel.Title', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { rerender } = render(
+        <Profile.Root value='account'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Content>
+            <Profile.ContentPanel value='account'>
+              <Panel.Root>
+                <Panel.Title>Account</Panel.Title>
+              </Panel.Root>
+            </Profile.ContentPanel>
+            <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>,
+      );
+      expect(warn).not.toHaveBeenCalled();
+
+      rerender(
+        <Profile.Root value='security'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Content>
+            <Profile.ContentPanel value='account'>
+              <Panel.Root>
+                <Panel.Title>Account</Panel.Title>
+              </Panel.Root>
+            </Profile.ContentPanel>
+            <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>,
+      );
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Profile.ContentPanel value="security">'));
+    });
+
+    it('does not warn when the title is inside a Flow step', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const { rerender } = render(<SubPageSurface value='account' />);
+      rerender(<SubPageSurface value='security' />);
+      rerender(
+        <SubPageSurface
+          value='security'
+          step='passkeys'
+        />,
+      );
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('sits in its page, in the scrolling content', () => {
       renderSurface();
       const title = screen.getByRole('heading', { level: 3, name: 'Account' });
       expect(document.querySelector('.cl-profile-content-body')).toContainElement(title);
-      expect(title.compareDocumentPosition(screen.getByRole('tabpanel'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      expect(screen.getByRole('tabpanel')).toContainElement(title);
     });
   });
 
@@ -475,8 +566,7 @@ describe('Profile', () => {
       await user.keyboard('{Enter}');
 
       await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
-      expect(headline).toHaveFocus();
-      expect(headline).toHaveAccessibleName('Security');
+      expect(screen.getByRole('combobox', { name: 'Security' })).toHaveFocus();
       expect(screen.getByRole('group', { name: 'Security' })).toHaveTextContent('Security page');
     });
 
@@ -521,6 +611,31 @@ describe('Profile', () => {
       expect(headline).toHaveFocus();
     });
 
+    it('does not take focus on a later page change when a choice was not applied', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(
+        <MosaicProvider>
+          <Surface value='account' />
+          <button type='button'>Elsewhere</button>
+        </MosaicProvider>,
+      );
+      act(() => observe?.(3));
+      await user.click(screen.getByRole('button', { name: 'Account' }));
+      await user.click(screen.getByRole('tab', { name: 'Security' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      const elsewhere = screen.getByRole('button', { name: 'Elsewhere' });
+      elsewhere.focus();
+      rerender(
+        <MosaicProvider>
+          <Surface value='security' />
+          <button type='button'>Elsewhere</button>
+        </MosaicProvider>,
+      );
+
+      expect(elsewhere).toHaveFocus();
+    });
+
     it('hands focus back to the page title once the sheet closes on a choice', async () => {
       const user = userEvent.setup();
       function Controlled() {
@@ -544,8 +659,7 @@ describe('Profile', () => {
       await user.click(screen.getByRole('tab', { name: 'Security' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-      await waitFor(() => expect(headline).toHaveFocus());
-      expect(headline).toHaveAccessibleName('Security');
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Security' })).toHaveFocus());
     });
 
     it.each([
@@ -616,7 +730,7 @@ describe('Profile', () => {
             <Profile.Nav>
               <Profile.NavItem value='account'>Account</Profile.NavItem>
             </Profile.Nav>
-            <Profile.Content pageTitle='Account'>
+            <Profile.Content>
               <Profile.ContentPanel value='account'>
                 <Panel.Title ref={titleRef}>Account</Panel.Title>
               </Profile.ContentPanel>
@@ -646,7 +760,7 @@ describe('Profile', () => {
             <Profile.Nav>
               <Profile.NavItem value='account'>Account</Profile.NavItem>
             </Profile.Nav>
-            <Profile.Content pageTitle='Account'>
+            <Profile.Content>
               <Profile.ContentPanel value='account'>
                 <Panel.Root>
                   <Panel.Title>Account</Panel.Title>

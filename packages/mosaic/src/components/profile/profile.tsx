@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@clerk/shared/logger';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -110,13 +111,24 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     // eslint-disable-next-line react/set-state-in-effect -- Reset navigation when the active profile panel changes.
     setNavOpenIn(null);
   }, [navLayout]);
+  const pickedPage = React.useRef<string | null>(null);
   const selectPage = React.useCallback(
     (next: string) => {
+      pickedPage.current = next;
       onValueChange?.(next);
       closeNav();
     },
     [onValueChange, closeNav],
   );
+  React.useEffect(() => {
+    const trigger = navTriggerRef.current;
+    const picked = pickedPage.current === value;
+    pickedPage.current = null;
+    const focusLost = trigger?.ownerDocument.activeElement === trigger?.ownerDocument.body;
+    if (picked && focusLost) {
+      trigger?.focus();
+    }
+  }, [value]);
   const context = React.useMemo(
     () => ({
       titleId,
@@ -221,8 +233,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   const Tag = `h${useHeadingLevel()}` as const;
   return (
     <VisuallyHidden
-      // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
-      ref={ref as React.Ref<HTMLSpanElement>}
+      ref={ref}
       render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
       id={titleId}
@@ -508,7 +519,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   );
 });
 
-function PageTitle({ title }: { title: React.ReactNode }) {
+function PageTitle({ title, claim }: { title: React.ReactNode; claim: boolean }) {
   const {
     navLayout,
     navOpen,
@@ -522,7 +533,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     navTriggerRef,
   } = useProfileContext('Profile.Content');
   const level = useHeadingLevel();
-  const label = <span id={`${pageTitleId}-label`}>{title}</span>;
+  const label = <span id={claim ? `${pageTitleId}-label` : undefined}>{title}</span>;
   const triggerProps = mergeStyleProps(
     themeProps('profile-nav-trigger'),
     stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
@@ -538,12 +549,11 @@ function PageTitle({ title }: { title: React.ReactNode }) {
   );
   const heading = (children: React.ReactNode) => (
     <Heading
-      ref={pageTitleRef}
-      id={pageTitleId}
+      ref={claim ? pageTitleRef : undefined}
+      id={claim ? pageTitleId : undefined}
       level={level}
       size='2xl'
       tabIndex={-1}
-      xstyle={styles.pageTitle}
       {...themeProps('profile-page-title')}
     >
       {children}
@@ -556,7 +566,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
   if (navLayout === 'sheet') {
     return heading(
       <button
-        ref={navTriggerRef}
+        ref={claim ? navTriggerRef : undefined}
         type='button'
         aria-haspopup='dialog'
         aria-expanded={navOpen}
@@ -576,6 +586,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     >
       {heading(
         <SelectPrimitive.Trigger
+          ref={claim ? navTriggerRef : undefined}
           // A combobox takes no name from its content.
           aria-labelledby={`${pageTitleId}-label`}
           {...triggerProps}
@@ -590,14 +601,11 @@ function PageTitle({ title }: { title: React.ReactNode }) {
   );
 }
 
-export interface ProfileContentProps extends MosaicComponentProps<'div'> {
-  /** The selected page's name, shown as the page title. */
-  pageTitle: React.ReactNode;
-}
+export type ProfileContentProps = MosaicComponentProps<'div'>;
 
 // A plain `div`, not `main`: the profile often renders inside the host's `main` or a dialog.
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
-  { pageTitle, children, render, xstyle, ...rest },
+  { children, render, xstyle, ...rest },
   ref,
 ) {
   const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
@@ -623,9 +631,6 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
           )}
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
-            <HeadingLevelProvider>
-              <PageTitle title={pageTitle} />
-            </HeadingLevelProvider>
             {children}
             {inline && renderBranding && !compact ? (
               <div
@@ -652,9 +657,23 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   { value, xstyle, ...rest },
   ref,
 ) {
-  const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
+  const { compact, pageTitleId, pageTitleRef, value: selected } = useProfileContext('Profile.ContentPanel');
+  const active = value === selected;
+  useMissingTitleWarning(active, value, pageTitleRef);
+  const page = React.useMemo(
+    () => ({
+      active,
+      renderTitle: (title: React.ReactNode, claim: boolean) => (
+        <PageTitle
+          title={title}
+          claim={claim}
+        />
+      ),
+    }),
+    [active],
+  );
   return (
-    <ContentPanelContext.Provider value>
+    <ContentPanelContext.Provider value={page}>
       <HeadingLevelProvider>
         <Tabs.Panel
           ref={ref}
@@ -678,3 +697,22 @@ export {
   Content as ProfileContent,
   ContentPanel as ProfileContentPanel,
 };
+
+/**
+ * Warns when the open page has no `Panel.Title`, which leaves the page unnamed and, on compact
+ * layouts, without the trigger that opens the navigation.
+ */
+function useMissingTitleWarning(
+  active: boolean,
+  value: string | undefined,
+  pageTitleRef: React.RefObject<HTMLHeadingElement | null>,
+) {
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production' || !active || pageTitleRef.current) {
+      return;
+    }
+    logger.warnOnce(
+      `[Clerk] <Profile.ContentPanel value="${value}"> is open without a <Panel.Title>. Start the page with one: it names the page, and on compact layouts it opens the navigation.`,
+    );
+  }, [active, value, pageTitleRef]);
+}

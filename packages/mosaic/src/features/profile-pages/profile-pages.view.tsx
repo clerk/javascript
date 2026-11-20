@@ -62,7 +62,7 @@ export const ProfilePagesView = React.forwardRef<HTMLDivElement, ProfilePagesVie
           ),
         )}
       </Profile.Nav>
-      <Profile.Content pageTitle={activeEntry?.label}>
+      <Profile.Content>
         {pages.map(page => (
           <Profile.ContentPanel
             key={page.id}

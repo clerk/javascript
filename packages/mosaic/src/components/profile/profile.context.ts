@@ -25,4 +25,9 @@ export interface ProfileContextValue {
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
-export const ContentPanelContext = React.createContext(false);
+export interface ContentPanelContextValue {
+  active: boolean;
+  renderTitle: (title: React.ReactNode, claim: boolean) => React.ReactNode;
+}
+
+export const ContentPanelContext = React.createContext<ContentPanelContextValue | null>(null);

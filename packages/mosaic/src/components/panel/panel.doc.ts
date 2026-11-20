@@ -15,7 +15,7 @@ export default {
     { do: true, text: 'Put each `Section` inside `Panel.Sections`, so its heading is one level below the title.' },
     {
       do: false,
-      text: 'Expect `Panel.Title` to render inside a `Profile.ContentPanel`. The profile renders the page title there, and the title ref reaches that heading instead.',
+      text: 'Render your own heading for a `Profile.ContentPanel` page. Use `Panel.Title`: it is the page title there, and on compact layouts it opens the navigation.',
     },
   ],
   parts: {
@@ -24,8 +24,15 @@ export default {
       slot: 'cl-panel',
     },
     'Panel.Title': {
-      description: 'A focusable `div` (`tabIndex={-1}`) around a `2xl` `Heading` at the current level.',
+      description:
+        "A focusable `div` (`tabIndex={-1}`) around a `2xl` `Heading` at the current level. In a `Profile.ContentPanel` it is the page title, and on compact layouts the navigation's trigger.",
       slot: 'cl-panel-title',
+      props: {
+        back: {
+          type: '{ label: string; onClick: () => void }',
+          doc: 'Makes the whole title a back button for a page opened from another one. Its name is `label`, such as "Back", then the title.',
+        },
+      },
     },
     'Panel.Sections': {
       description: 'A `div` that sets the heading level one deeper for its children.',

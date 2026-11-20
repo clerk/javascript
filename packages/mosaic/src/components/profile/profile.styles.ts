@@ -155,10 +155,6 @@ export const styles = stylex.create({
     minBlockSize: 0,
   },
 
-  pageTitle: {
-    marginBlockEnd: space['6'],
-  },
-
   // Inline so the caret can align to the title's x-height.
   navTrigger: {
     font: 'inherit',

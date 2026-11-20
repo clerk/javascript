@@ -7,7 +7,7 @@
  *   <Profile.Nav>
  *     <Profile.NavItem value='account' icon={<Icon glyph={UserCircle} />}>Account</Profile.NavItem>
  *   </Profile.Nav>
- *   <Profile.Content pageTitle='Account'>
+ *   <Profile.Content>
  *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
  *   </Profile.Content>
  * </Profile.Root>

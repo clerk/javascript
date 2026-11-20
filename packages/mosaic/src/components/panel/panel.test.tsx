@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../mosaic-provider';
 import { HeadingLevelProvider } from '../heading';
@@ -65,7 +66,80 @@ describe('Panel', () => {
     expect(screen.getByRole('heading', { level: 5, name: 'Email addresses' })).toBeInTheDocument();
   });
 
-  it('leaves the title to the profile inside a profile page', () => {
+  it('turns the title into a back button', async () => {
+    const onBack = vi.fn();
+    render(
+      <MosaicProvider>
+        <Panel.Root>
+          <Panel.Title back={{ label: 'Back', onClick: onBack }}>Passkeys</Panel.Title>
+        </Panel.Root>
+      </MosaicProvider>,
+    );
+
+    const back = screen.getByRole('button', { name: 'Back Passkeys' });
+    expect(screen.getByRole('heading', { level: 2, name: 'Back Passkeys' })).toContainElement(back);
+    await userEvent.click(back);
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it('labels the profile page with a back title', async () => {
+    const onBack = vi.fn();
+    render(
+      <MosaicProvider>
+        <Profile.Root value='security'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Nav>
+            <Profile.NavItem value='security'>Security</Profile.NavItem>
+          </Profile.Nav>
+          <Profile.Content>
+            <Profile.ContentPanel value='security'>
+              <Panel.Root>
+                <Panel.Title back={{ label: 'Back', onClick: onBack }}>Passkeys</Panel.Title>
+              </Panel.Root>
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('tabpanel', { name: 'Passkeys' })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Back Passkeys' }));
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it('labels the profile page from the open panel when hidden panels stay mounted', () => {
+    render(
+      <MosaicProvider>
+        <Profile.Root value='security'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Nav>
+            <Profile.NavItem value='account'>Account</Profile.NavItem>
+            <Profile.NavItem value='security'>Security</Profile.NavItem>
+          </Profile.Nav>
+          <Profile.Content>
+            <Profile.ContentPanel
+              value='account'
+              keepMounted
+            >
+              <Account />
+            </Profile.ContentPanel>
+            <Profile.ContentPanel
+              value='security'
+              keepMounted
+            >
+              <Panel.Root>
+                <Panel.Title>Security</Panel.Title>
+              </Panel.Root>
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('tabpanel', { name: 'Security' })).toBeInTheDocument();
+  });
+
+  it('renders the profile page title in its place inside a profile page', () => {
     render(
       <MosaicProvider>
         <Profile.Root value='account'>
@@ -73,7 +147,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content pageTitle='Account'>
+          <Profile.Content>
             <Profile.ContentPanel value='account'>
               <Account />
             </Profile.ContentPanel>
@@ -85,6 +159,7 @@ describe('Panel', () => {
     expect(document.querySelector('.cl-panel-title')).not.toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Account' })).toHaveLength(1);
     expect(screen.getByRole('heading', { name: 'Account' })).toHaveClass('cl-profile-page-title');
+    expect(screen.getByTestId('root')).toContainElement(screen.getByRole('heading', { name: 'Account' }));
   });
 
   it('hands its ref to the page title inside a profile page', () => {
@@ -96,7 +171,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content pageTitle='Account'>
+          <Profile.Content>
             <Profile.ContentPanel value='account'>
               <Panel.Root>
                 <Panel.Title ref={titleRef}>Account</Panel.Title>

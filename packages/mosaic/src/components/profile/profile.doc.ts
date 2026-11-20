@@ -17,18 +17,23 @@ export default {
     'a user or organization profile with several pages',
     'a settings surface with side navigation',
     'a tabbed page layout that collapses on small screens',
+    'a page that opens sub-pages with a back button',
   ],
   keywords: ['profile', 'settings', 'navigation', 'sidebar', 'tabs', 'user profile', 'organization profile'],
   practices: [
     { do: true, text: 'Render a `Profile.Title`. It names the nav, and stays visually hidden.' },
     {
       do: true,
-      text: 'Give each `Profile.NavItem` a `value` that matches a `Profile.ContentPanel`, and pass the selected page name as `pageTitle`.',
+      text: 'Give each `Profile.NavItem` a `value` that matches a `Profile.ContentPanel`, and start each page with a `Panel.Title`, its page title.',
     },
     { do: true, text: 'Pass a string as a `Profile.NavItem` child, so it names the option when the nav is a select.' },
     {
+      do: true,
+      text: 'Open a sub-page with `Flow`, and give its `Panel.Title` a `back` that returns to the page.',
+    },
+    {
       do: false,
-      text: 'Render a `Panel.Title` inside `Profile.ContentPanel` and expect it to show. `Profile.Content` renders the page title.',
+      text: 'Give a page in the nav a `Panel.Title` with `back`. On compact layouts its plain title is what opens the navigation.',
     },
   ],
   parts: {
@@ -76,9 +81,9 @@ export default {
       },
     },
     'Profile.Content': {
-      description: 'The scrolling page area. Renders the page title, then its children.',
+      description:
+        "The scrolling page area. Each page's `Panel.Title` is its page title, and the navigation's trigger on compact layouts.",
       slot: 'cl-profile-content',
-      props: { pageTitle: { type: 'React.ReactNode', doc: 'The selected page name, shown as the page title.' } },
     },
     'Profile.ContentPanel': {
       description: 'One page, shown while its `value` is selected. Sets the heading level one below the page title.',
@@ -96,8 +101,13 @@ export default {
     <Profile.NavItem value='account'>Account</Profile.NavItem>
     <Profile.NavItem value='security'>Security</Profile.NavItem>
   </Profile.Nav>
-  <Profile.Content pageTitle={titles[page]}>
-    <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
+  <Profile.Content>
+    <Profile.ContentPanel value='account'>
+      <Panel.Root>
+        <Panel.Title>Account</Panel.Title>
+        …
+      </Panel.Root>
+    </Profile.ContentPanel>
     <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
 </Profile.Root>

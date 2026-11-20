@@ -48,8 +48,13 @@ import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
       Security
     </Profile.NavItem>
   </Profile.Nav>
-  <Profile.Content pageTitle={page === 'security' ? 'Security' : 'Account'}>
-    <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
+  <Profile.Content>
+    <Profile.ContentPanel value='account'>
+      <Panel.Root>
+        <Panel.Title>Account</Panel.Title>
+        …
+      </Panel.Root>
+    </Profile.ContentPanel>
     <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
 </Profile.Root>;
@@ -63,9 +68,8 @@ scrolls, the columns a gap apart, held to a reading width and centered. A
 leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
-`Content` renders its `pageTitle` above the pages, the selected page's name, as a heading that
-scrolls with the page and names it. A page's `Panel.Title` renders nothing there, and a ref on it
-reaches the page title instead.
+Each page's `Panel.Title` is its page title. It scrolls with the page, names it, and on compact
+layouts opens the navigation.
 
 ## Parts
 
@@ -119,6 +123,17 @@ caret and opens it. On a viewport of `40rem` or more the title is a `Select` tri
 tall as its content, holding the tablist. A choice closes either. The root
 reads the layout off a sentinel it renders: `1px` wide, `2px` once the query matches, `3px` on a
 phone's viewport as well.
+
+## Sub-pages
+
+A page opens a sub-page with `Flow`, one step per screen. The sub-page's `Panel.Title` takes `back`
+(`{ label, onClick }`), which makes the whole title a back button: its name is `label`, then the
+title. On compact layouts it replaces the navigation trigger, so the menu returns with the page.
+
+<Story
+  name='SubPages'
+  storyModule={ProfileStories}
+/>
 
 ## Customising the marks
 

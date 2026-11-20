@@ -2,6 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
+import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import type {
   OrganizationProfilePageId,
@@ -83,7 +84,17 @@ function userProfilePageList(
 ): ProfilePage[] {
   return userProfileNavEntries({ pages, customPages, pageOrder }).map(entry =>
     entry.custom
-      ? { id: entry.id, label: entry.custom.label, icon: entry.custom.icon, content: entry.custom.content }
+      ? {
+          id: entry.id,
+          label: entry.custom.label,
+          icon: entry.custom.icon,
+          content: (
+            <Panel.Root>
+              <Panel.Title>{entry.custom.label}</Panel.Title>
+              {entry.custom.content}
+            </Panel.Root>
+          ),
+        }
       : {
           id: entry.id,
           label: labels[entry.id],

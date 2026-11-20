@@ -1,5 +1,6 @@
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
+import { Flow } from '@clerk/mosaic/components/flow';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Panel } from '@clerk/mosaic/components/panel';
 import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
@@ -177,7 +178,7 @@ function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolea
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
+      <Profile.Content>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
@@ -344,5 +345,97 @@ export function Transitions() {
       `}</style>
       <Surface stub />
     </>
+  );
+}
+
+/**
+ * A sub-page inside one page: Security opens Passkeys in a `Flow` step, and the sub-page's
+ * `Panel.Title` takes `back`, so the title itself goes back. The Manage button takes focus again on
+ * the way back.
+ */
+export function SubPages() {
+  const [page, setPage] = useState('security');
+  const [subPage, setSubPage] = useState<'overview' | 'passkeys'>('overview');
+  return (
+    <Profile.Root
+      value={page}
+      onValueChange={setPage}
+    >
+      <Profile.Title>Settings</Profile.Title>
+      <Profile.Nav>
+        {pages.map(item => (
+          <Profile.NavItem
+            key={item.id}
+            value={item.id}
+            icon={<Icon glyph={item.icon} />}
+          >
+            {item.label}
+          </Profile.NavItem>
+        ))}
+      </Profile.Nav>
+      <Profile.Content>
+        <Profile.ContentPanel value='general'>
+          <Placeholder title='General' />
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='security'>
+          <Flow.Root
+            value={subPage}
+            direction={subPage === 'passkeys' ? 1 : -1}
+            state={null}
+          >
+            {() => (
+              <>
+                <Flow.Step ids={['overview']}>
+                  <Panel.Root>
+                    <Panel.Title>Security</Panel.Title>
+                    <Section.Root>
+                      <Section.Group>
+                        <Section.Body>
+                          <Section.Row>
+                            <Section.Item>
+                              <Section.Content>
+                                <Section.Label>Passkeys</Section.Label>
+                                <Section.Description>MacBook Pro · iPhone</Section.Description>
+                              </Section.Content>
+                              <Section.Actions>
+                                <ManageButton onClick={() => setSubPage('passkeys')} />
+                              </Section.Actions>
+                            </Section.Item>
+                          </Section.Row>
+                        </Section.Body>
+                      </Section.Group>
+                    </Section.Root>
+                  </Panel.Root>
+                </Flow.Step>
+                <Flow.Step ids={['passkeys']}>
+                  <Panel.Root>
+                    <Panel.Title back={{ label: 'Back', onClick: () => setSubPage('overview') }}>Passkeys</Panel.Title>
+                    <Text>Your passkeys.</Text>
+                  </Panel.Root>
+                </Flow.Step>
+              </>
+            )}
+          </Flow.Root>
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='billing'>
+          <Placeholder title='Billing' />
+        </Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
+  );
+}
+
+function ManageButton({ onClick }: { onClick: () => void }) {
+  const focusOnReturn = Flow.useFlowAutoFocus<HTMLButtonElement>();
+  return (
+    <Button
+      ref={focusOnReturn}
+      color='neutral'
+      size='sm'
+      variant='outline'
+      onClick={onClick}
+    >
+      Manage
+    </Button>
   );
 }
