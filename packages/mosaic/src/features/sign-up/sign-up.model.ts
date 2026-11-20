@@ -19,7 +19,13 @@ import {
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { getPreferredPhoneCodeChannelByCountry } from '@clerk/shared/phone';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
-import type { PhoneCodeChannel, SessionTask, SignUpField, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import type {
+  PhoneCodeChannel,
+  SessionTask,
+  SignUpField,
+  SignUpFutureResource,
+  SignUpInitialValues,
+} from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { AuthActionBlockedDetails, AuthProvider } from '../../blocks/auth';
