@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { maxDateSeconds } from '../../fixtures';
 import {
   assertActivationClaim,
   assertAudienceClaim,
@@ -341,6 +342,21 @@ describe('assertExpirationClaim(exp, clockSkewInMs)', () => {
     expect(() => assertExpirationClaim(nowInSeconds + 5, 0)).not.toThrow();
     expect(() => assertExpirationClaim(nowInSeconds + 5, 6000)).not.toThrow();
   });
+
+  it.each([-1e300, -maxDateSeconds - 1])(
+    'throws err with the raw exp if exp is %s, beyond the Date lower bound',
+    exp => {
+      expect(() => assertExpirationClaim(exp, 0)).toThrow(
+        `JWT is expired. Expiry date: ${String(exp)}, Current date: ${new Date().toUTCString()}.`,
+      );
+    },
+  );
+
+  it.each([Infinity, -Infinity, NaN])('throws error if exp is %s', exp => {
+    expect(() => assertExpirationClaim(exp, 0)).toThrow(
+      `Invalid JWT expiry date claim (exp) ${String(exp)}. Expected number.`,
+    );
+  });
 });
 
 describe('assertActivationClaim(nbf, clockSkewInMs)', () => {
@@ -387,6 +403,18 @@ describe('assertActivationClaim(nbf, clockSkewInMs)', () => {
     const nowInSeconds = Date.now() / 1000;
     expect(() => assertActivationClaim(nowInSeconds + 5, 6000)).not.toThrow();
   });
+
+  it('throws error with the raw nbf if nbf is beyond the Date upper bound', () => {
+    expect(() => assertActivationClaim(1e300, 0)).toThrow(
+      `JWT cannot be used prior to not before date claim (nbf). Not before date: 1e+300; Current date: ${new Date().toUTCString()};`,
+    );
+  });
+
+  it.each([Infinity, -Infinity, NaN])('throws error if nbf is %s', nbf => {
+    expect(() => assertActivationClaim(nbf, 0)).toThrow(
+      `Invalid JWT not before date claim (nbf) ${String(nbf)}. Expected number.`,
+    );
+  });
 });
 
 describe('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
@@ -432,5 +460,21 @@ describe('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
   it('does not throw error if iat is in the future but less than clock skew', () => {
     const nowInSeconds = Date.now() / 1000;
     expect(() => assertIssuedAtClaim(nowInSeconds + 5, 6000)).not.toThrow();
+  });
+
+  it.each([1e300, maxDateSeconds + 1])('throws error if iat is %s, beyond the Date upper bound', iat => {
+    expect(() => assertIssuedAtClaim(iat, 0)).toThrow(
+      `JWT issued at date claim (iat) is in the future. Issued at date: ${String(iat)}; Current date: ${new Date().toUTCString()};`,
+    );
+  });
+
+  it('does not throw error if iat is -1e300', () => {
+    expect(() => assertIssuedAtClaim(-1e300, 0)).not.toThrow();
+  });
+
+  it.each([Infinity, -Infinity, NaN])('throws error if iat is %s', iat => {
+    expect(() => assertIssuedAtClaim(iat, 0)).toThrow(
+      `Invalid JWT issued at date claim (iat) ${String(iat)}. Expected number.`,
+    );
   });
 });
