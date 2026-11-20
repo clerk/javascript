@@ -7,6 +7,7 @@ import { homeLinks } from '../../native.ts';
 const GOOGLE_UI_TIMEOUT_MS = 30_000;
 const BACK_OUT_MS = 5_000;
 const SELF_CLOSE_MS = 5_000;
+const PAGE_READ_MS = 5_000;
 const ANDROID_NO_SESSION_RESULT = /^Google sign-in (was cancelled|failed: No credentials available)$/;
 
 async function forceStopGooglePlayServices(): Promise<void> {
@@ -39,6 +40,19 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
         () => true,
         () => false,
       );
+  const googlePageOpen = async () => {
+    let open = false;
+    await expect
+      .poll(
+        async () => {
+          open = (await googlePage.count()) > 0;
+          return true;
+        },
+        { timeout: PAGE_READ_MS, message: 'a read of the screen succeeds' },
+      )
+      .toBe(true);
+    return open;
+  };
   try {
     let ended = true;
     if (platform === 'android') {
@@ -48,14 +62,14 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
           message: 'a page of Google Play services is on screen',
         })
         .toBeGreaterThan(0);
-      // With no Google account on the emulator, Google Play services moves on to its add-account page, which sometimes gives up within a second and ends the flow by itself.
-      // A snapshot taken while that page closes fails, so the page gets no screenshot, the reads here count a failed snapshot as nothing on screen, and back is pressed only when the page stays open.
-      // The page can still close between the check and the press, so back can reach the app in that narrow window.
       ended = await resultShows(SELF_CLOSE_MS);
-      if (!ended && (await googlePage.count().catch(() => 0)) > 0) await device.back();
       if (!ended) {
+        if (await googlePageOpen()) await device.back();
         ended = await resultShows(BACK_OUT_MS);
-        if (!ended) await forceStopGooglePlayServices();
+        if (!ended) {
+          if (!(await googlePageOpen())) throw new Error("Google's page closed, but the app showed no result");
+          await forceStopGooglePlayServices();
+        }
       }
       await expect(googlePage).toHaveCount(0, { timeout: 15_000 });
     } else {
