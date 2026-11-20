@@ -53,6 +53,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
     'organization-profile-logs-panel': dynamic(() => import('../stories/organization-profile-logs-panel.mdx')),
   },
   misc: {

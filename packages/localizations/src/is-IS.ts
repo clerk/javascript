@@ -1110,6 +1110,10 @@ export const isIS: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1585,12 +1589,14 @@ export const isIS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Listi yfir alla reikninga',
     action__closeOrganizationSwitcher: 'Loka samtakavali',
     action__createOrganization: 'Stofna samtök',
     action__invitationAccept: 'Ganga í',
     action__manageOrganization: 'Stjórna',
     action__openOrganizationSwitcher: 'Opna samtakaval',
     action__suggestionsAccept: 'Biðja um að ganga í',
+    membershipListLabel: 'Listi yfir allar aðildir að samtökum',
     notSelected: 'Engin samtök valin',
     personalWorkspace: 'Persónulegur reikningur',
     suggestionsAcceptedLabel: 'Bíður samþykkis',

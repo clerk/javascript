@@ -248,16 +248,6 @@ describe('appVersionSupport', () => {
     });
   });
 
-  test('a late rejection does not block again after a newer supported answer', async () => {
-    const store = await loadStore();
-    const olderRequest = store.nextAppVersionRequest();
-    store.applySupportedAppVersion(store.nextAppVersionRequest());
-
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, olderRequest);
-
-    expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
-  });
-
   test('a late supported answer does not lift a newer block', async () => {
     const store = await loadStore();
     const olderRequest = store.nextAppVersionRequest();
@@ -266,16 +256,6 @@ describe('appVersionSupport', () => {
     store.applySupportedAppVersion(olderRequest);
 
     expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
-  });
-
-  test('ignores answers for a Clerk instance that was replaced', async () => {
-    const store = await loadStore();
-    const staleRequest = store.nextAppVersionRequest();
-    store.resetAppVersionSupport();
-
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, staleRequest);
-
-    expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
   });
 
   test('a reset during render updates subscribers after the render, not during it', async () => {

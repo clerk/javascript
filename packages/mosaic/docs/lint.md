@@ -10,6 +10,10 @@ Mosaic runs Oxlint with stricter rules than the rest of the repo. Lint with `pnp
 - Every disable directive in `src` needs a `-- reason` (`require-description`). Write why the rule does not apply here, not what the code does; it is what a reviewer judges. The reason is not a code comment, so the no-comments rule does not apply to it.
 - This guide does not authorize a suppression. When complexity is inherent, keep the logic together and explain the tradeoff in review.
 
+## Custom rules
+
+Mosaic's own rules live in `lint/rules/`, one rule per file with its test next to it (`<rule>.ts` and `<rule>.test.ts`). Oxlint loads them through `lint/plugin.ts` under the `mosaic/` prefix. To add a rule, add the file and its test, register it in `plugin.ts`, and turn it on in `oxlint.config.mjs`. Run the rule tests with `pnpm vitest run --project lint-rules` from `packages/mosaic`; `pnpm test` includes them.
+
 ## When `sonarjs/cognitive-complexity` fires
 
 The limit (15) flags code worth a second look. It is not a score to game.

@@ -1110,6 +1110,10 @@ export const hiIN: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1583,12 +1587,14 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'सभी खातों की सूची',
     action__closeOrganizationSwitcher: 'संगठन स्विचर बंद करें',
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
     action__openOrganizationSwitcher: 'संगठन स्विचर खोलें',
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
+    membershipListLabel: 'सभी संगठन सदस्यताओं की सूची',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
     suggestionsAcceptedLabel: 'अनुमोदन के लिए लंबित',

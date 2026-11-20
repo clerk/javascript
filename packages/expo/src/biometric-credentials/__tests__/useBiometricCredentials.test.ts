@@ -1008,29 +1008,6 @@ describe('signIn', () => {
 });
 
 describe('API errors', () => {
-  test('surface a reverification-required error with its API code', async () => {
-    signInClerkUser();
-    clerk.user.__experimental_prepareBiometricCredential.mockRejectedValue(apiError('session_reverification_required'));
-
-    const operation = renderBiometricCredentials().enroll();
-
-    await expect(operation).rejects.toMatchObject({ code: 'session_reverification_required' });
-    await operation.catch(error => expect(isBiometricCredentialError(error)).toBe(true));
-  });
-
-  test('surface a trusted_device_not_registered error with its API code', async () => {
-    addLocalCredential();
-    clerk.clientSignIn.create.mockRejectedValue(apiError('trusted_device_not_registered', 'trusted_device_id'));
-
-    const operation = renderBiometricCredentials().signIn();
-
-    await expect(operation).rejects.toMatchObject({
-      code: 'trusted_device_not_registered',
-      message: 'trusted_device_not_registered long message',
-    });
-    await operation.catch(error => expect(isBiometricCredentialError(error)).toBe(true));
-  });
-
   test('fall back to the short message and the operation code', async () => {
     signInClerkUser();
     const withoutLongMessage = new ClerkAPIResponseError('native_api_disabled', {

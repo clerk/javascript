@@ -470,7 +470,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
 
       expect(openUserProfile).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
@@ -485,7 +485,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
 
       expect(openUserProfile.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
@@ -508,7 +508,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
       await waitFor(() => expect(popup()).toBeNull());
 
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
@@ -534,7 +534,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
       await waitFor(() => expect(popup()).toBeNull());
 
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
@@ -551,7 +551,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
       await waitFor(() => expect(popup()).toBeNull());
 
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
@@ -681,7 +681,7 @@ describe('Switcher', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage profile');
+      await openSettings(user, 'Manage account');
 
       expect(navigate).toHaveBeenCalledWith('/account');
       expect(openUserProfile).not.toHaveBeenCalled();
@@ -993,7 +993,7 @@ describe('Switcher', () => {
 
       const header = requiredPopup().querySelector('.cl-switcher-header');
       expect(header?.querySelector('.cl-switcher-header-title')).toHaveTextContent('Acme');
-      expect(header?.querySelector('.cl-switcher-header-description')).toHaveTextContent('alice');
+      expect(header?.querySelector('.cl-switcher-header-description')).toHaveTextContent('alice · Member');
       expect(header?.querySelector('.cl-switcher-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
       expect(header?.querySelector('.cl-switcher-avatar-badge > [data-shape]')).toHaveAttribute('data-shape', 'circle');
       expect(within(header ?? requiredPopup()).queryAllByRole('button')).toEqual([]);

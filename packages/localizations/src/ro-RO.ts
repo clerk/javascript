@@ -1111,6 +1111,10 @@ export const roRO: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1586,12 +1590,14 @@ export const roRO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lista tuturor conturilor',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Creează organizație',
     action__invitationAccept: 'Alătură-te',
     action__manageOrganization: 'Gestionează',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicită alăturarea',
+    membershipListLabel: 'Lista tuturor calităților de membru în organizații',
     notSelected: 'Nicio organizație selectată',
     personalWorkspace: 'Cont personal',
     suggestionsAcceptedLabel: 'În așteptare',

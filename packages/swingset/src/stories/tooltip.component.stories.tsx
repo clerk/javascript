@@ -24,10 +24,7 @@ export function Default() {
         <Tooltip.Trigger render={props => <Button {...props}>Hover me</Button>} />
         <Tooltip.Popup>
           Tooltip
-          <Icon
-            glyph={Checkmark}
-            size='md'
-          />
+          <Icon glyph={Checkmark} />
         </Tooltip.Popup>
       </Tooltip.Root>
       <Tooltip.Root>

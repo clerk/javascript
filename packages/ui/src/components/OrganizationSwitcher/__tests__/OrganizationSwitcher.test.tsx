@@ -1,11 +1,13 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
+import type React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render, screen } from '@/test/utils';
 
+import { OptionsProvider } from '../../../contexts';
 import { OrganizationSwitcher } from '../';
 import {
   createFakeUserOrganizationInvitation,
@@ -223,6 +225,37 @@ describe('OrganizationSwitcher', () => {
       const { getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
       expect(getByText('Create organization')).toBeInTheDocument();
+    });
+
+    it.each([
+      { hidePersonal: true, label: 'Localized organization memberships' },
+      { hidePersonal: false, label: 'Localized accounts' },
+    ])('localizes the list label when hidePersonal is $hidePersonal', async ({ hidePersonal, label }) => {
+      const { wrapper: Wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+      });
+      props.setProps({ hidePersonal });
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <Wrapper>
+          <OptionsProvider
+            value={{
+              localization: {
+                organizationSwitcher: {
+                  membershipListLabel: 'Localized organization memberships',
+                  accountListLabel: 'Localized accounts',
+                },
+              },
+            }}
+          >
+            {children}
+          </OptionsProvider>
+        </Wrapper>
+      );
+
+      const { getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      expect(getByRole('group', { name: label })).toBeInTheDocument();
     });
 
     it('renders organization switcher popover as standalone', async () => {

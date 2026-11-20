@@ -1103,6 +1103,10 @@ export const trTR: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1576,12 +1580,14 @@ export const trTR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Tüm hesapların listesi',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organizasyon oluştur',
     action__invitationAccept: 'Katıl',
     action__manageOrganization: 'Organizasyonu yönet',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Katılmak için talepte bulun',
+    membershipListLabel: 'Tüm organizasyon üyeliklerinin listesi',
     notSelected: 'Organizasyon seçilmedi',
     personalWorkspace: 'Kişisel Çalışma Alanı',
     suggestionsAcceptedLabel: 'Onay bekleniyor',

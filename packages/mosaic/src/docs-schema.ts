@@ -22,6 +22,10 @@ export interface PartDoc<Props> {
   props?: PropDocs<Props>;
 }
 
+export interface ExportDoc {
+  description: string;
+}
+
 interface BaseDoc {
   name: string;
   description: string;
@@ -30,6 +34,7 @@ interface BaseDoc {
   practices?: Practice[];
   examples?: Example[];
   related?: string[];
+  exports?: Record<string, ExportDoc>;
 }
 
 export interface ComponentDoc<Parts extends Record<string, object>> extends BaseDoc {

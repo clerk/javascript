@@ -1108,6 +1108,10 @@ export const csCZ: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1581,12 +1585,14 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Seznam všech účtů',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
+    membershipListLabel: 'Seznam všech členství v organizacích',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
     suggestionsAcceptedLabel: 'Čeká na schválení',

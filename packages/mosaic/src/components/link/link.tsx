@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -45,7 +47,6 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Mosa
             <span {...stylex.props(styles.iconSlot)}>
               <Icon
                 glyph={External}
-                placement='inline-end'
                 size='inherit'
               />
             </span>

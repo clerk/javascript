@@ -16,6 +16,7 @@ import { OrganizationProfileApiKeysPanel } from '../organization-profile/organiz
 import { OrganizationProfileGeneralPanel } from '../organization-profile/organization-profile-general-panel';
 import { OrganizationProfileLogsPanel } from '../organization-profile/organization-profile-logs-panel';
 import { OrganizationProfileMembersPanel } from '../organization-profile/organization-profile-members-panel/organization-profile-members-panel';
+import { OrganizationProfileSecurityPanel } from '../organization-profile/organization-profile-security-panel/organization-profile-security-panel';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
@@ -29,9 +30,6 @@ import { UserProfileApiKeysPanel } from '../user-profile/user-profile-api-keys-p
 import { UserProfileProfilePanel } from '../user-profile/user-profile-profile-panel';
 import { UserProfileSecurityPanel } from '../user-profile/user-profile-security-panel';
 import { useUserProfileUserModel } from '../user-profile/user-profile-user.model';
-
-/** Which pages the profile carries: the account's and the active organization's, or one of them alone. */
-export type ProfileMode = 'combined' | 'user' | 'organization';
 
 /** Everything `<Profile />` takes in `combined` mode. */
 export interface CombinedProfileProps extends UserProfileProps {
@@ -312,6 +310,7 @@ function organizationProfilePanels(
     general: <OrganizationProfileGeneralPanel />,
     logs: available.includes('logs') ? <OrganizationProfileLogsPanel /> : undefined,
     members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
+    security: available.includes('security') ? <OrganizationProfileSecurityPanel /> : undefined,
     apiKeys:
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };

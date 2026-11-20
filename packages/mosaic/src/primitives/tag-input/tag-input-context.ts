@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext } from 'react';
 
 import type { CompositeKeyEvent } from '../hooks/use-composite';

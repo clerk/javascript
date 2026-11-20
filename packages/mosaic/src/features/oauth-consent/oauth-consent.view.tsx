@@ -13,6 +13,7 @@ import { Radio } from '../../components/radio';
 import { Reveal } from '../../components/reveal';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Select } from '../../components/select';
+import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -21,7 +22,6 @@ import { fill, plural, rich, useLocale } from '../../localization';
 import { Form } from '../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { RowAvatar } from '../switcher/switcher-avatar.view';
 import { styles } from './oauth-consent.styles';
 import type {
   OAuthConsentOrganization,

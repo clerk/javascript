@@ -152,6 +152,15 @@ manager
     },
   ],
   related: ['Portal', 'Dialog'],
+  exports: {
+    'Toast.useToastManager': {
+      description: 'Returns the toasts and the `add`, `update`, `close` and `promise` actions.',
+    },
+    'Toast.createToastManager': { description: 'Creates a manager for adding toasts outside React.' },
+    'Toast.isAnchored': {
+      description: 'Whether a toast is anchored to an element, for filtering into a `Toast.Positioner`.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Toast.Provider': ToastProviderProps;
   'Toast.Portal': ToastPortalProps;

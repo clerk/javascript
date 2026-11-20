@@ -3,14 +3,15 @@ import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import { Flow, useFlowAutoFocus } from '../../components/flow';
+import { Flow } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
+import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
-import { RowAvatar } from '../switcher/switcher-avatar.view';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import type {
   OrganizationListData,
   OrganizationListInvitation,

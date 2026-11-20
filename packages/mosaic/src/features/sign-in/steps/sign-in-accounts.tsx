@@ -3,14 +3,14 @@ import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
+import { RowAvatar } from '../../../components/switcher/switcher-avatar';
 import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 import { Button as HeadlessButton } from '../../../primitives/button';
-import { RowAvatar } from '../../switcher/switcher-avatar.view';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import type { SignInAccount } from '../sign-in.types';
 
 interface SignInAccountsProps {

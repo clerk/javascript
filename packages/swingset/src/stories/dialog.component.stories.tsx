@@ -369,7 +369,7 @@ export function Standalone() {
  * A handle at module scope: the trigger and the root only share it, not a JSX ancestor.
  * The same handle also has imperative `open()` / `close()` for opens with no trigger at all.
  */
-const notificationsDialog = Dialog.createHandle();
+const notificationsDialog = Dialog.createDialogHandle();
 
 export function DetachedTrigger() {
   return (
@@ -395,7 +395,7 @@ export function DetachedTrigger() {
   );
 }
 
-const memberDialog = Dialog.createHandle<{ name: string; role: string }>();
+const memberDialog = Dialog.createDialogHandle<{ name: string; role: string }>();
 
 const MEMBERS = [
   { name: 'Ada Lovelace', role: 'Admin' },

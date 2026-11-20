@@ -5,6 +5,7 @@ import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
 import { useLogsAccess } from '../logs/logs-table.model';
 import type { OrganizationProfilePageId } from './organization-profile.types';
 import { useMembersPanelAccessModel } from './organization-profile-members-panel/organization-profile-members-panel.model';
+import { useSecurityPanelAccessModel } from './organization-profile-security-panel/organization-profile-security-panel-access.model';
 
 export type OrganizationProfileModel =
   | { status: 'loading' }
@@ -17,6 +18,7 @@ export function useOrganizationProfileModel(): OrganizationProfileModel {
   const membersAccess = useMembersPanelAccessModel();
   const apiKeysAccess = useAPIKeysAccess(organization?.id);
   const logsAccess = useLogsAccess();
+  const securityAccess = useSecurityPanelAccessModel();
 
   if (
     !isLoaded ||
@@ -34,6 +36,9 @@ export function useOrganizationProfileModel(): OrganizationProfileModel {
   const pages: OrganizationProfilePageId[] = ['general'];
   if (membersAccess.status === 'ready') {
     pages.push('members');
+  }
+  if (securityAccess.status === 'ready') {
+    pages.push('security');
   }
   if (apiKeysAccess.isAvailable) {
     pages.push('apiKeys');

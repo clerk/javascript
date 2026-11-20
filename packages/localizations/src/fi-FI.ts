@@ -1110,6 +1110,10 @@ export const fiFI: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1585,12 +1589,14 @@ export const fiFI: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Luettelo kaikista tileistä',
     action__closeOrganizationSwitcher: 'Sulje organisaatiovalitsin',
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
     action__manageOrganization: 'Hallitse',
     action__openOrganizationSwitcher: 'Avaa organisaatiovalitsin',
     action__suggestionsAccept: 'Pyydä liittymistä',
+    membershipListLabel: 'Luettelo kaikista organisaatiojäsenyyksistä',
     notSelected: 'Ei valittua organisaatiota',
     personalWorkspace: 'Henkilökohtainen tili',
     suggestionsAcceptedLabel: 'Odottaa hyväksyntää',

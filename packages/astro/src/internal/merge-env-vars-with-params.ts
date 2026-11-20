@@ -69,7 +69,7 @@ const mergeEnvVarsWithParams = (
     unsafe_disableDevelopmentModeConsoleWarning:
       paramUnsafeDisableDevelopmentModeConsoleWarning ??
       isTruthy(import.meta.env.PUBLIC_CLERK_UNSAFE_DISABLE_DEVELOPMENT_MODE_CONSOLE_WARNING),
-    // Read from params (server-injected via __CLERK_ASTRO_SAFE_VARS__)
+    // Read from params (server-injected via the clerk-astro-safe-vars meta tag)
     // These are dynamically resolved by middleware, not from env vars
     __internal_keylessClaimUrl: internalOptions?.keylessClaimUrl,
     __internal_keylessApiKeysUrl: internalOptions?.keylessApiKeysUrl,

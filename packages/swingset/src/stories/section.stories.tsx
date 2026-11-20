@@ -220,11 +220,7 @@ export function Cards() {
                 size='sm'
                 variant='outline'
               >
-                <Icon
-                  glyph={Plus}
-                  placement='inline-start'
-                  size='md'
-                />
+                <Icon glyph={Plus} />
                 Add
               </Button>
             </Section.Actions>
@@ -350,11 +346,7 @@ export function ConnectedAccounts() {
                   variant='outline'
                 >
                   Connect
-                  <Icon
-                    glyph={ArrowUpRight}
-                    placement='inline-end'
-                    size='md'
-                  />
+                  <Icon glyph={ArrowUpRight} />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -520,11 +512,7 @@ export function ContainedHeader() {
                   size='sm'
                   variant='outline'
                 >
-                  <Icon
-                    glyph={Plus}
-                    placement='inline-start'
-                    size='md'
-                  />
+                  <Icon glyph={Plus} />
                   Add
                 </Button>
               </Section.Actions>

@@ -1,7 +1,7 @@
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 
 interface SignInStartOverProps {
   onStartOver: () => void;

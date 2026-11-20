@@ -385,10 +385,10 @@ describe('Dialog', () => {
     });
   });
 
-  describe('detached triggers (createHandle)', () => {
+  describe('detached triggers (createDialogHandle)', () => {
     it('opens a root from a trigger rendered outside it', async () => {
       const user = userEvent.setup();
-      const handle = Dialog.createHandle();
+      const handle = Dialog.createDialogHandle();
       render(
         <>
           <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
@@ -413,7 +413,7 @@ describe('Dialog', () => {
 
     it('returns focus to the detached trigger on Escape', async () => {
       const user = userEvent.setup();
-      const handle = Dialog.createHandle();
+      const handle = Dialog.createDialogHandle();
       render(
         <>
           <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
@@ -434,7 +434,7 @@ describe('Dialog', () => {
     });
 
     it('supports imperative open and close, ignored while no root is attached', () => {
-      const handle = Dialog.createHandle();
+      const handle = Dialog.createDialogHandle();
 
       // No root mounted: ignored, no crash.
       handle.open();
@@ -459,7 +459,7 @@ describe('Dialog', () => {
 
   describe('multiple triggers and payload', () => {
     function renderMultiTrigger(rootProps: Partial<React.ComponentProps<typeof Dialog.Root<string>>> = {}) {
-      const handle = Dialog.createHandle<string>();
+      const handle = Dialog.createDialogHandle<string>();
       render(
         <>
           <Dialog.Trigger
@@ -535,7 +535,7 @@ describe('Dialog', () => {
     // a confirmation raised by a close request, say, which has to say what it is asking.
     describe('handle.open(payload)', () => {
       function renderDetached() {
-        const handle = Dialog.createHandle<string>();
+        const handle = Dialog.createDialogHandle<string>();
         render(
           <Dialog.Root handle={handle}>
             {({ payload }) => (
@@ -816,7 +816,7 @@ describe('Dialog', () => {
 
     describe('opened from a menu item into a dialog mounted elsewhere', () => {
       function HoistedFixture() {
-        const handle = React.useMemo(() => Dialog.createHandle<string>(), []);
+        const handle = React.useMemo(() => Dialog.createDialogHandle<string>(), []);
         return (
           <>
             <Menu.Root>
@@ -873,7 +873,7 @@ describe('Dialog', () => {
     });
 
     it('resolves the function form with an empty type on programmatic close', () => {
-      const handle = Dialog.createHandle();
+      const handle = Dialog.createDialogHandle();
       const finalFocus = vi.fn(() => undefined);
       render(
         <Dialog.Root

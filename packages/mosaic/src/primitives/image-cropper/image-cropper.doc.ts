@@ -11,7 +11,7 @@ import type { ImageCropperZoomInProps, ImageCropperZoomOutProps } from './image-
 export default {
   name: 'ImageCropper',
   description:
-    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), with zoom clamped between the zoom where the whole image fits in the frame and `maxZoom`. At zoom `1` and above the image covers the frame. Below `1` the frame shows empty space along the short side of the image, and the long side stays cropped until the minimum zoom, where the whole image fits. `cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
+    'Headless, unstyled square image cropper. The user pans by dragging or with the arrow keys, zooms with the wheel, a pinch, the keyboard, a slider or step buttons, turns the image a quarter at a time, and resets it. The crop is a `Crop` (`{ x, y, zoom, rotation }`), with zoom clamped between the zoom where the whole image fits in the frame and `maxZoom`. At zoom `1` and above the image covers the frame. Below `1` the frame shows empty space along the short side of the image, and the long side stays cropped until the minimum zoom, where the whole image fits. `ImageCropper.cropImage(src, crop, { type, size })` draws the chosen square into a `Blob`. Every control stays disabled until the image has loaded.',
   useFor: [
     'cropping a picked image to a square before upload',
     'pan, zoom and rotate controls for an image',
@@ -34,7 +34,7 @@ export default {
     },
     {
       do: true,
-      text: 'Read the output type from the blob `cropImage` returns. A browser that cannot encode `type` returns `image/png`.',
+      text: 'Read the output type from the blob `ImageCropper.cropImage` returns. A browser that cannot encode `type` returns `image/png`.',
     },
   ],
   parts: {
@@ -43,7 +43,11 @@ export default {
       props: {
         src: { type: 'string', doc: 'The image to crop, such as an object URL for a picked file.' },
         value: { type: 'Crop', doc: 'The crop, when controlled.' },
-        defaultValue: { type: 'Crop', doc: 'The crop on mount, when uncontrolled.', default: '`INITIAL_CROP`' },
+        defaultValue: {
+          type: 'Crop',
+          doc: 'The crop on mount, when uncontrolled.',
+          default: '`ImageCropper.INITIAL_CROP`',
+        },
         onValueChange: {
           type: '(crop: Crop) => void',
           doc: 'Called with the next crop on every pan, zoom, turn and reset.',
@@ -73,24 +77,25 @@ export default {
         'An `input type="range"` from the zoom where the whole image fits to `maxZoom`. Carries `data-disabled`.',
     },
     'ImageCropper.ZoomIn': {
-      description: 'A `button` that zooms in one `ZOOM_STEP`. Disabled at `maxZoom`. Carries `data-disabled`.',
+      description:
+        'A `button` that zooms in one `ImageCropper.ZOOM_STEP`. Disabled at `maxZoom`. Carries `data-disabled`.',
     },
     'ImageCropper.ZoomOut': {
       description:
-        'A `button` that zooms out one `ZOOM_STEP`. Disabled once the whole image fits in the frame. Carries `data-disabled`.',
+        'A `button` that zooms out one `ImageCropper.ZOOM_STEP`. Disabled once the whole image fits in the frame. Carries `data-disabled`.',
     },
     'ImageCropper.Rotate': {
       description: 'A `button` that turns the image a quarter clockwise. Carries `data-disabled`.',
     },
     'ImageCropper.Reset': {
-      description: 'A `button` that returns to `INITIAL_CROP`. Carries `data-disabled`.',
+      description: 'A `button` that returns to `ImageCropper.INITIAL_CROP`. Carries `data-disabled`.',
     },
   },
   examples: [
     {
       title: 'Crop and save',
       code: `
-const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
+const [crop, setCrop] = useState<Crop>(ImageCropper.INITIAL_CROP);
 
 <ImageCropper.Root src={src} value={crop} onValueChange={setCrop}>
   <ImageCropper.Viewport aria-label='Crop. Drag or use the arrow keys to move, plus and minus to zoom.'>
@@ -103,12 +108,23 @@ const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
   <ImageCropper.ZoomIn aria-label='Zoom in'>+</ImageCropper.ZoomIn>
   <ImageCropper.Rotate>Rotate</ImageCropper.Rotate>
   <ImageCropper.Reset>Reset</ImageCropper.Reset>
-  <button onClick={async () => onSave(await cropImage(src, crop, { type: 'image/png' }))}>Save</button>
+  <button onClick={async () => onSave(await ImageCropper.cropImage(src, crop, { type: 'image/png' }))}>Save</button>
 </ImageCropper.Root>
 `,
     },
   ],
   related: ['AvatarUpload', 'FileUpload'],
+  exports: {
+    'ImageCropper.cropImage': {
+      description: 'Draws the chosen square into a `Blob`: `ImageCropper.cropImage(src, crop, { type, size })`.',
+    },
+    'ImageCropper.INITIAL_CROP': {
+      description: 'The crop an image starts at: centered in the frame, zoom 1, no rotation.',
+    },
+    'ImageCropper.ZOOM_STEP': {
+      description: 'How much one zoom in or out step scales the image, from a button or the keyboard.',
+    },
+  },
 } satisfies ComponentDoc<{
   'ImageCropper.Root': ImageCropperRootProps;
   'ImageCropper.Viewport': ImageCropperViewportProps;

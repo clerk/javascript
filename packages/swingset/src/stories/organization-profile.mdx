@@ -4,8 +4,8 @@ import * as Stories from './organization-profile.stories';
 
 The organization profile: a `Profile` whose navigation lists the General, Members, Security,
 Billing, API Keys, and Logs pages it was given content for, then any pages of the consumer's own, in the
-order asked for. The Members panel owns its table tabs, including Members, Invitations, and Requests. Security and
-Billing hold their place with a placeholder.
+order asked for. The Members panel owns its table tabs, including Members, Invitations, and Requests. Security
+shows the SSO bypass allow list, and Billing holds its place with a placeholder.
 
 `apiKeysProps` configures the API Keys page: `hide` leaves it out of the navigation, and `perPage`
 and `showDescription` pass through to its `APIKeysTable`.

@@ -1,5 +1,47 @@
 # Change Log
 
+## 6.46.2
+
+### Patch Changes
+
+- Request Frontend API version `2026-11-18`, where `GET` responses only include the client when clerk-js asks for it. ([#10931](https://github.com/clerk/javascript/pull/10931)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+
+## 6.46.1
+
+### Patch Changes
+
+- Fixed a case where the session refresh that runs when the tab regains focus could overwrite newer user, organization or session state, or set the session cookie again after sign-out. ([#10874](https://github.com/clerk/javascript/pull/10874)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- `organization.getRoles()`, `organization.getDomains()` and `organization.getInvitations()` no longer refresh the client as a side effect. ([#10874](https://github.com/clerk/javascript/pull/10874)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+
+## 6.46.0
+
+### Minor Changes
+
+- Show how an OAuth client's identity was established on `<OAuthConsent />`. Clients that registered themselves through Dynamic Client Registration get an "Unverified app" notice, and clients identified by a Client ID Metadata Document show the host that publishes their details. `OAuthConsentInfo` gains optional `clientRegistration` and `clientMetadataHost` fields, and the notice can be styled with the new `oauthConsentClientIdentity` appearance element. ([#10895](https://github.com/clerk/javascript/pull/10895)) by [@Zertsov](https://github.com/Zertsov)
+
+### Patch Changes
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+
+## 6.45.0
+
+### Minor Changes
+
+- Add `clientTrustState` to `SignInFuture`, so custom sign-in flows can read whether Clerk trusts the user's device (`'new'`, `'known'`, or `'pending'`). With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, and it's `undefined` before then. Without that update, Clerk returns it on every response. It's `undefined` when Device Trust is off. ([#10775](https://github.com/clerk/javascript/pull/10775)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
 ## 6.44.0
 
 ### Minor Changes

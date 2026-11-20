@@ -172,8 +172,6 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       )}
       <Icon
         glyph={ChevronDown}
-        size='md'
-        placement='inline-end'
         {...themeProps('select-trigger-icon')}
       />
     </Primitive.Trigger>
@@ -288,7 +286,6 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
       </OptionContext.Provider>
       <Icon
         glyph={Checkmark}
-        size='md'
         xstyle={slots.indicator.base}
         {...themeProps('select-option-indicator')}
       />

@@ -1,7 +1,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Switcher } from '@clerk/mosaic/components/switcher';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
-import { BadgedAvatar } from '@clerk/mosaic/features/switcher/switcher-avatar.view';
 import type { UserProfileModalOptions } from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
@@ -136,7 +136,7 @@ export function CustomizedAvatar(_args: Record<string, unknown>) {
           triggerVariant='full'
         />
         {activeOrganization ? (
-          <BadgedAvatar
+          <Switcher.BadgedAvatar
             name={activeOrganization.name}
             imageUrl={activeOrganization.imageUrl}
             badge={activeSession}
@@ -209,12 +209,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
         {
           id: 'app-settings',
           label: 'App settings',
-          icon: (
-            <Icon
-              glyph={Cog6Teeth}
-              size='md'
-            />
-          ),
+          icon: <Icon glyph={Cog6Teeth} />,
           onClick: () => {},
         },
         // `icon` takes any node, so an app brings its own glyph rather than picking from Mosaic's set.

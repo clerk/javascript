@@ -47,12 +47,7 @@ export function organizationProfilePageList(
       : {
           id: entry.id,
           label: labels[entry.id],
-          icon: (
-            <Icon
-              glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
-              size='md'
-            />
-          ),
+          icon: <Icon glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]} />,
           content: options.pages[entry.id],
         },
   );

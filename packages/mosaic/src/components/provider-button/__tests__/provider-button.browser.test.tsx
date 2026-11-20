@@ -2,6 +2,8 @@ import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { Plus } from '../../../icons/glyphs/plus';
+import { Icon } from '../../icon/icon';
 import { ProviderButton, ProviderButtonGroup } from '../index';
 
 afterEach(() => cleanup());
@@ -365,5 +367,30 @@ describe('last used provider', () => {
       renderGroup(1);
       expect(screen.queryByText('Last used')).toBeNull();
     });
+  });
+});
+
+describe('padding', () => {
+  function padding(icon: React.ReactNode, props: { isPending?: boolean; badge?: string } = {}) {
+    render(
+      <ProviderButton
+        icon={icon}
+        longLabel='Continue with Google'
+        shortLabel='Google'
+        spinDelay={{ delay: 0, minDuration: 0 }}
+        {...props}
+      />,
+    );
+    const style = getComputedStyle(screen.getByRole('button'));
+    return { start: style.paddingInlineStart, end: style.paddingInlineEnd };
+  }
+
+  it.each([
+    ['an image logo', () => <img alt='' />, {}],
+    ['an Icon logo', () => <Icon glyph={Plus} />, {}],
+    ['a pending Icon logo', () => <Icon glyph={Plus} />, { isPending: true }],
+    ['an Icon logo with a badge', () => <Icon glyph={Plus} />, { badge: 'Last used' }],
+  ])('keeps the default padding on both sides for %s', (_, icon, props) => {
+    expect(padding(icon(), props)).toEqual({ start: '12px', end: '12px' });
   });
 });

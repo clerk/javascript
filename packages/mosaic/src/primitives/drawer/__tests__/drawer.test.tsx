@@ -9,7 +9,7 @@ import { axe } from '../../test-utils/axe';
 import { OPEN_GRACE_PERIOD } from '../constants';
 import { DrawerCssVars } from '../css-vars';
 import { getSnapPointSwipeMovement, safeCapture } from '../helpers';
-import { createDrawerHandle, Drawer } from '../index';
+import { Drawer } from '../index';
 
 // happy-dom does not implement pointer capture; the engine's safeCapture already
 // try/catches, but stub so nothing throws and the calls are observable.
@@ -387,7 +387,7 @@ describe('Drawer', () => {
 
   describe('detached handle', () => {
     function DetachedFixture(
-      handle: ReturnType<typeof createDrawerHandle>,
+      handle: ReturnType<typeof Drawer.createDrawerHandle>,
       props: Partial<React.ComponentProps<typeof Drawer.Root>> = {},
     ) {
       return (
@@ -418,7 +418,7 @@ describe('Drawer', () => {
 
     it('a trigger outside Root opens the drawer via a shared handle', async () => {
       const user = userEvent.setup();
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       render(DetachedFixture(handle));
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -432,7 +432,7 @@ describe('Drawer', () => {
 
     it('handle.close() closes the drawer and updates the trigger', async () => {
       const user = userEvent.setup();
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       render(DetachedFixture(handle));
 
       await user.click(screen.getByTestId('ext-trigger'));
@@ -445,7 +445,7 @@ describe('Drawer', () => {
     it('fires onOpenChange for handle-driven transitions', async () => {
       const user = userEvent.setup();
       const onOpenChange = vi.fn();
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       render(DetachedFixture(handle, { onOpenChange }));
 
       await user.click(screen.getByTestId('ext-trigger'));
@@ -456,7 +456,7 @@ describe('Drawer', () => {
     });
 
     it('honors defaultOpen when a handle is provided', () => {
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       render(DetachedFixture(handle, { defaultOpen: true }));
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -464,7 +464,7 @@ describe('Drawer', () => {
     });
 
     it('honors a controlled open prop when a handle is provided', () => {
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       const { rerender } = render(DetachedFixture(handle, { open: false }));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -474,7 +474,7 @@ describe('Drawer', () => {
     });
 
     it('adopts an imperative open requested before the root mounts', () => {
-      const handle = createDrawerHandle();
+      const handle = Drawer.createDrawerHandle();
       handle.open(); // called before render/connect
       render(DetachedFixture(handle));
 

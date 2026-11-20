@@ -1103,6 +1103,10 @@ export const daDK: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1575,12 +1579,14 @@ export const daDK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Liste over alle konti',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opret organisation',
     action__invitationAccept: 'Deltag',
     action__manageOrganization: 'Administrer organisation',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Anmod om at deltage',
+    membershipListLabel: 'Liste over alle organisationsmedlemskaber',
     notSelected: 'Ingen organisation valgt',
     personalWorkspace: 'Personligt arbejdsområde',
     suggestionsAcceptedLabel: 'Afventer godkendelse',

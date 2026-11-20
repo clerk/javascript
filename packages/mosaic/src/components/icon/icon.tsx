@@ -1,3 +1,5 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -12,29 +14,21 @@ import { sizes, styles } from './icon.styles';
 export interface IconProps extends MosaicElementProps<'svg'> {
   glyph: IconComponent;
   size?: 'sm' | 'md' | 'lg' | 'inherit';
-  placement?: 'inline-start' | 'inline-end';
 }
 
 /**
  * Renders a Mosaic glyph. The glyph can be swapped by its name via the `icons` prop on
  * `MosaicProvider`; Mosaic's sizing is applied to the override exactly as it is to the built-in
  * glyph, so the two stay visually consistent.
- *
- * `placement` marks the icon as leading or trailing content within a container. It applies no
- * style here — it reflects an attribute the container styles against, so a `Button` can tighten
- * the padding on whichever side the icon sits. The values are the CSS logical directions, so they
- * follow the writing mode rather than naming a physical edge.
  */
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIcon(
-  { glyph: Glyph, size = 'md', placement, xstyle, ...rest },
+  { glyph: Glyph, size = 'md', xstyle, ...rest },
   ref,
 ) {
   const override = useMosaicIcons()[Glyph.iconName];
-  // The placement axis reflects as `data-icon`, not `data-placement`, so a container selects the
-  // child by what it is: `:has([data-icon='inline-end'])` can't match some other placed descendant.
   const props = mergeStyleProps(
     { 'aria-hidden': true },
-    themeProps('icon', { size, icon: placement }),
+    themeProps('icon', { size }),
     stylex.props(reset.base, styles.base, sizes[size], iconScope, xstyle),
     rest,
   );

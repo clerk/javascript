@@ -4,9 +4,9 @@ import type { Ref } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { useFlowAutoFocus } from '../../../components/flow';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { styles } from '../sign-in.styles';
 
 interface SignInEnterpriseSsoProps {

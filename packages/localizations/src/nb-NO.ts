@@ -1112,6 +1112,10 @@ export const nbNO: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1586,12 +1590,14 @@ export const nbNO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Liste over alle kontoer',
     action__closeOrganizationSwitcher: 'Lukk organisasjonsvelger',
     action__createOrganization: 'Opprett organisasjon',
     action__invitationAccept: 'Bli med',
     action__manageOrganization: 'Administrer organisasjon',
     action__openOrganizationSwitcher: 'Åpne organisasjonsvelger',
     action__suggestionsAccept: 'Spør om å bli med',
+    membershipListLabel: 'Liste over alle organisasjonsmedlemskap',
     notSelected: 'Ingen organisasjon valgt',
     personalWorkspace: 'Personlig arbeidsområde',
     suggestionsAcceptedLabel: 'Venter på godkjenning',

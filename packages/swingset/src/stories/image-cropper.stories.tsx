@@ -1,4 +1,4 @@
-import { type Crop, cropImage, ImageCropper, INITIAL_CROP } from '@clerk/mosaic/primitives/image-cropper';
+import { type Crop, ImageCropper } from '@clerk/mosaic/primitives/image-cropper';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -21,7 +21,7 @@ const SAMPLE = `data:image/svg+xml,${encodeURIComponent(
 )}`;
 
 export function Default() {
-  const [crop, setCrop] = useState<Crop>(INITIAL_CROP);
+  const [crop, setCrop] = useState<Crop>(ImageCropper.INITIAL_CROP);
   const [result, setResult] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export function Default() {
           <button
             type='button'
             onClick={() => {
-              void cropImage(SAMPLE, crop, { type: 'image/png', size: () => 128 }).then(blob =>
+              void ImageCropper.cropImage(SAMPLE, crop, { type: 'image/png', size: () => 128 }).then(blob =>
                 setResult(URL.createObjectURL(blob)),
               );
             }}

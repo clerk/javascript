@@ -6,8 +6,8 @@ import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
-import { useFlowAutoFocus } from '../../components/flow';
 import { Otp } from '../../components/otp';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { CODE_LENGTH } from '../../utils/verification';
 

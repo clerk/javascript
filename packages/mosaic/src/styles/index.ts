@@ -64,7 +64,7 @@ export type {
 export { Entity } from '../components/entity';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
-export { Flow, useFlowAutoFocus } from '../components/flow';
+export { Flow } from '../components/flow';
 export type { FlowRootProps, FlowStepProps } from '../components/flow';
 export { Heading, HeadingContext } from '../components/heading';
 export type { HeadingProps } from '../components/heading';
@@ -190,6 +190,8 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+// Aliased: `Switcher` below is the feature.
+export { Switcher as SwitcherParts } from '../components/switcher';
 export { OAuthConsent } from '../features/oauth-consent/oauth-consent';
 export { CreateOrganization } from '../features/create-organization/create-organization';
 export { OrganizationList } from '../features/organization-list/organization-list';

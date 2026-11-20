@@ -33,6 +33,7 @@ const livePages = new Set([
   '/organization-profile/organization-profile-general-panel',
   '/organization-profile/organization-profile-members-panel',
   '/organization-profile/organization-profile-api-keys-panel',
+  '/organization-profile/organization-profile-security-panel',
   '/organization-profile/organization-profile-logs-panel',
   '/organization-profile/organization-profile-profile-section',
   '/organization-profile/organization-profile-danger-section',

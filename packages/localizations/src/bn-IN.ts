@@ -1110,6 +1110,10 @@ export const bnIN: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1583,12 +1587,14 @@ export const bnIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'সমস্ত অ্যাকাউন্টের তালিকা',
     action__closeOrganizationSwitcher: 'সংস্থা সুইচার বন্ধ করুন',
     action__createOrganization: 'সংগঠন তৈরি করুন',
     action__invitationAccept: 'যোগ দিন',
     action__manageOrganization: 'পরিচালনা',
     action__openOrganizationSwitcher: 'সংস্থা সুইচার খুলুন',
     action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
+    membershipListLabel: 'সমস্ত সংস্থার সদস্যপদের তালিকা',
     notSelected: 'কোনো সংগঠন নির্বাচিত নেই',
     personalWorkspace: 'ব্যক্তিগত অ্যাকাউন্ট',
     suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',

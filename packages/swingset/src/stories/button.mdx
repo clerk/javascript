@@ -77,9 +77,13 @@ the same for every cell.
 
 ### Icons
 
-An icon is a child, not a prop. Give it a `placement` and `Icon` reflects that as `data-icon`,
-which the button selects on to tighten the padding on that edge — pass icons on either side, or
-both, with nothing to declare on the button itself.
+An icon is a child, not a prop. The button tightens the padding on whichever side an `Icon` sits,
+read from its position beside the label — pass icons on either side, or both, with nothing to
+declare on the icon or the button. An icon inside a wrapper element doesn't count as leading or
+trailing, so the button keeps its text padding.
+
+The text beside the icon renders in a span with the class `cl-button-label`, so it can be targeted
+directly.
 
 <Story
   name='Icons'

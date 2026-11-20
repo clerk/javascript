@@ -1103,6 +1103,10 @@ export const kkKZ: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1568,12 +1572,14 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Барлық есептік жазбалардың тізімі',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
+    membershipListLabel: 'Барлық ұйым мүшеліктерінің тізімі',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
     suggestionsAcceptedLabel: 'Растауды күтуде',

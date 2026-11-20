@@ -36,7 +36,7 @@ export function LogsTableView({
   isError = false,
   onRetry,
 }: LogsTableViewProps) {
-  const details = useMemo(() => Dialog.createHandle<LogEntry>(), []);
+  const details = useMemo(() => Dialog.createDialogHandle<LogEntry>(), []);
   // The row opens the dialog through its handle, so there is no trigger for focus to return to.
   const openerRef = useRef<HTMLTableRowElement | null>(null);
   const openDetails = (log: LogEntry, row: HTMLTableRowElement) => {

@@ -1104,6 +1104,10 @@ export const idID: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1578,12 +1582,14 @@ export const idID: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Daftar semua akun',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Buat organisasi',
     action__invitationAccept: 'Gabung',
     action__manageOrganization: 'Kelola',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta bergabung',
+    membershipListLabel: 'Daftar semua keanggotaan organisasi',
     notSelected: 'Tidak ada organisasi dipilih',
     personalWorkspace: 'Akun pribadi',
     suggestionsAcceptedLabel: 'Menunggu persetujuan',

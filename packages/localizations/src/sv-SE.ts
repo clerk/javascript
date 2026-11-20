@@ -1104,6 +1104,10 @@ export const svSE: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1576,12 +1580,14 @@ export const svSE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lista över alla konton',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Skapa organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Hantera organisation',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
+    membershipListLabel: 'Lista över alla organisationsmedlemskap',
     notSelected: 'Ingen organisation vald',
     personalWorkspace: 'Personligt Arbetsområde',
     suggestionsAcceptedLabel: 'Pending approval',

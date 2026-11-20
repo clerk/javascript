@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
-import { toCountryIso } from '../../../components/phone-input';
+import { toCountryIso } from '../../../components/phone-input/phone-input';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
