@@ -162,7 +162,6 @@ import {
   createPageLifecycle,
   errorThrower,
   getClerkQueryParam,
-  getUserProfileEmailAddressLinkStatus,
   hasExternalAccountSignUpError,
   inActiveBrowserTab,
   inBrowser,
@@ -1348,8 +1347,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
-    const signedOut = noUserExists(this);
-    if (signedOut && !getUserProfileEmailAddressLinkStatus(props)) {
+    if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
@@ -1361,28 +1359,17 @@ export class Clerk implements ClerkInterface {
     const component = 'UserProfile';
     void this.#clerkUI
       .then(ui => ui.ensureMounted({ preloadHint: component }))
-      .then(controls => {
-        if (signedOut && !controls.supportsSignedOutUserProfile) {
-          return;
-        }
+      .then(controls =>
         controls.mountComponent({
           name: component,
           appearanceKey: 'userProfile',
           node,
           props,
-        });
-      });
+        }),
+      );
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData));
-  };
-
-  public __internal_canMountSignedOutUserProfile = async (props?: UserProfileProps): Promise<boolean> => {
-    if (!this.#clerkUI || !getUserProfileEmailAddressLinkStatus(props)) {
-      return false;
-    }
-    const controls = await this.#clerkUI.then(ui => ui.ensureMounted({ preloadHint: 'UserProfile' }));
-    return !!controls.supportsSignedOutUserProfile;
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {

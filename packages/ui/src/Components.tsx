@@ -158,7 +158,6 @@ export type ComponentControls = {
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
   openProtectCheckModal: (props: __internal_ProtectCheckModalProps) => void;
-  supportsSignedOutUserProfile: true;
 };
 
 interface HtmlNodeOptions {
@@ -296,7 +295,7 @@ export const mountComponentRenderer = (
 
 export type MountComponentRenderer = typeof mountComponentRenderer;
 
-const componentsControls = { supportsSignedOutUserProfile: true } as ComponentControls;
+const componentsControls = {} as ComponentControls;
 
 const componentNodes = Object.freeze({
   SignUp: 'signUpModal',

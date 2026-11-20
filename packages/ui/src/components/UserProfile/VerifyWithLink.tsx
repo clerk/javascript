@@ -1,5 +1,4 @@
-import { getClerkQueryParam, toEmailAddressLinkStatus } from '@clerk/shared/internal/clerk-js/queryParams';
-import { __internal_useUserBase } from '@clerk/shared/react';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -13,7 +12,6 @@ import { buildVerificationRedirectUrl } from '../../common/redirects';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { Button, descriptors, localizationKeys } from '../../customizables';
 import { useEmailLink } from '../../hooks';
-import { useRouter } from '../../router';
 
 type VerifyWithLinkProps = {
   email: EmailAddressResource;
@@ -86,22 +84,23 @@ const verificationLinkTexts = {
   },
 };
 
-export const VerificationSuccessPage = () => {
-  const router = useRouter();
-  const user = __internal_useUserBase();
-  const status = router.queryParams['__clerk_status'] ?? getClerkQueryParam('__clerk_status');
-  const linkStatus = toEmailAddressLinkStatus(status);
-
-  if (!user && (!linkStatus || !router.matches(undefined, true))) {
-    return null;
+const linkStatusFrom = (status: string | null): keyof typeof verificationLinkTexts => {
+  if (!status || status === 'verified') {
+    return 'verified';
   }
+  if (status === 'expired' || status === 'client_mismatch') {
+    return status;
+  }
+  return 'failed';
+};
 
-  const shownStatus = status ? (linkStatus ?? 'failed') : 'verified';
+export const VerificationSuccessPage = () => {
+  const linkStatus = linkStatusFrom(getClerkQueryParam('__clerk_status'));
 
   return (
     <EmailLinkStatusCard
-      {...verificationLinkTexts[shownStatus]}
-      status={shownStatus}
+      {...verificationLinkTexts[linkStatus]}
+      status={linkStatus}
     />
   );
 };

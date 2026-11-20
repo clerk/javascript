@@ -22,7 +22,6 @@ export type ComponentControls = {
   prefetch: (component: 'organizationSwitcher') => void;
   mountImpersonationFab: () => void;
   openProtectCheckModal?: (props: __internal_ProtectCheckModalProps) => void;
-  supportsSignedOutUserProfile?: boolean;
 };
 
 // Instance shape that the class will implement
