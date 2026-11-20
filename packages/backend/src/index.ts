@@ -5,6 +5,7 @@ import type { SDKMetadata } from '@clerk/shared/types';
 import type { ApiClient, CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
 import { withLegacyReturn } from './jwt/legacyReturn';
+import { createPoppyClient } from './poppy';
 import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
 import { verifyToken as _verifyToken } from './tokens/verify';
@@ -24,6 +25,7 @@ export type ClerkOptions = Omit<CreateBackendApiOptions, 'skipApiVersionInUrl' |
 export type ClerkClient = {
   telemetry: TelemetryCollector;
 } & ApiClient &
+  ReturnType<typeof createPoppyClient> &
   ReturnType<typeof createAuthenticateRequest>;
 
 export function createClerkClient(options: ClerkOptions): ClerkClient {
@@ -41,6 +43,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   return {
     ...apiClient,
     ...requestState,
+    ...createPoppyClient(opts.publishableKey),
     telemetry,
   };
 }
