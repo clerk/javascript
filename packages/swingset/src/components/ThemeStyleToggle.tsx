@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { type ThemeStyle, useThemeStyle } from './useThemeStyle';
 
 const items: { label: string; value: ThemeStyle }[] = [
-  { label: 'Clerk', value: 'clerk' },
   { label: 'Default', value: 'default' },
+  { label: 'Clerk', value: 'clerk' },
 ];
 
 export function ThemeStyleToggle() {
@@ -18,7 +18,7 @@ export function ThemeStyleToggle() {
       <Select
         items={items}
         value={themeStyle}
-        onValueChange={value => setThemeStyle(value === 'default' ? 'default' : 'clerk')}
+        onValueChange={value => setThemeStyle(value === 'clerk' ? 'clerk' : 'default')}
       >
         <SelectTrigger
           size='sm'

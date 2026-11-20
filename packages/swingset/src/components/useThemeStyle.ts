@@ -6,7 +6,7 @@ export type ThemeStyle = 'default' | 'clerk';
 
 export const THEME_STYLE_STORAGE_KEY = 'swingset-theme-style';
 
-export const THEME_STYLE_INIT_SCRIPT = `try{var s=localStorage.getItem('${THEME_STYLE_STORAGE_KEY}');if(s!=='default')document.documentElement.dataset.swingsetTheme='clerk'}catch(e){document.documentElement.dataset.swingsetTheme='clerk'}`;
+export const THEME_STYLE_INIT_SCRIPT = `try{if(localStorage.getItem('${THEME_STYLE_STORAGE_KEY}')==='clerk')document.documentElement.dataset.swingsetTheme='clerk'}catch(e){}`;
 
 const listeners = new Set<() => void>();
 
@@ -22,7 +22,7 @@ function getSnapshot(): ThemeStyle {
 }
 
 function getServerSnapshot(): ThemeStyle {
-  return 'clerk';
+  return 'default';
 }
 
 function setThemeStyle(next: ThemeStyle) {
