@@ -202,7 +202,7 @@ describe('UserProfile modal return', () => {
         name: 'a combined profile',
         param: 'profile%2Faccount',
         profile: { combined: false },
-        expected: ['Account', 'Security', 'General'],
+        expected: ['Account', 'Security', 'General', 'Logs'],
       },
     ])('reopens $name whatever the provider says', async ({ param, profile, expected }) => {
       const tabs = await tabsAfterReturning(profile, param);

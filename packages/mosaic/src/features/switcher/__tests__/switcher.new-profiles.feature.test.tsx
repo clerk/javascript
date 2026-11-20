@@ -121,7 +121,7 @@ describe('Switcher with experimental.newProfiles', () => {
 
     expect(screen.queryByRole('menu')).toBeNull();
     expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
-    expect(profileTabs()).toEqual(['Account', 'Security', 'General', 'Members']);
+    expect(profileTabs()).toEqual(['Account', 'Security', 'General', 'Members', 'Logs']);
     expect(openUserProfile).not.toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
     await waitFor(() => expect(popup()).toBeNull());
@@ -178,7 +178,7 @@ describe('Switcher with experimental.newProfiles', () => {
 
     expect(await screen.findByRole('tab', { name: 'Terms' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('Terms body')).toBeVisible();
-    expect(profileTabs()).toEqual(['Terms', 'Account', 'Security', 'General', 'Members']);
+    expect(profileTabs()).toEqual(['Terms', 'Account', 'Security', 'General', 'Members', 'Logs']);
   });
 
   it("lists the organization's own pages in order in the combined profile", async () => {
@@ -190,7 +190,7 @@ describe('Switcher with experimental.newProfiles', () => {
     await user.click(screen.getByRole('button', { name: 'Settings' }));
 
     expect(await screen.findByRole('tab', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
-    expect(profileTabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members']);
+    expect(profileTabs()).toEqual(['Account', 'Security', 'Terms', 'General', 'Members', 'Logs']);
   });
 
   it('still asks which to manage when the organization profile routes to a page', async () => {

@@ -91,11 +91,11 @@ describe('OrganizationProfile', () => {
     await waitFor(() => expect(connections.requests.length).toBeGreaterThan(0));
 
     expect(await screen.findByRole('heading', { level: 3, name: 'General' })).toBeVisible();
-    expect(tabNames()).toEqual(['General']);
+    expect(tabNames()).toEqual(['General', 'Logs']);
 
     connections.release();
 
-    await waitFor(() => expect(tabNames()).toEqual(['General', 'Security']));
+    await waitFor(() => expect(tabNames()).toEqual(['General', 'Security', 'Logs']));
   });
 
   it('renders nothing without an active organization', async () => {
@@ -111,7 +111,7 @@ describe('OrganizationProfile', () => {
       userProfileProps: { customPages: [{ path: 'usage', label: 'Usage', content: <p>Usage</p> }] },
       organizationProfileProps: { customPages: [{ path: 'audit', label: 'Audit log', content: <p>Audit</p> }] },
     });
-    expect(tabNames()).toEqual(['General', 'Members', 'Audit log']);
+    expect(tabNames()).toEqual(['General', 'Members', 'Logs', 'Audit log']);
   });
 
   it('renders nothing when signed out', async () => {
@@ -123,9 +123,9 @@ describe('OrganizationProfile', () => {
   });
 
   it.each([
-    { permissions: [], tabs: ['General'] },
-    { permissions: ['org:sys_memberships:read'], tabs: ['General', 'Members'] },
-    { permissions: ['org:sys_memberships:manage'], tabs: ['General', 'Members'] },
+    { permissions: [], tabs: ['General', 'Logs'] },
+    { permissions: ['org:sys_memberships:read'], tabs: ['General', 'Members', 'Logs'] },
+    { permissions: ['org:sys_memberships:manage'], tabs: ['General', 'Members', 'Logs'] },
   ])('lists members only with a memberships permission: $permissions', async ({ permissions, tabs }) => {
     serve({ permissions });
     await renderWithClerk(<OrganizationProfile />);
@@ -133,9 +133,9 @@ describe('OrganizationProfile', () => {
   });
 
   it.each([
-    { orgAPIKeysEnabled: false, permissions: ['org:sys_api_keys:read'], tabs: ['General'] },
-    { orgAPIKeysEnabled: true, permissions: [], tabs: ['General'] },
-    { orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'API Keys'] },
+    { orgAPIKeysEnabled: false, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'Logs'] },
+    { orgAPIKeysEnabled: true, permissions: [], tabs: ['General', 'Logs'] },
+    { orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'API Keys', 'Logs'] },
   ])(
     'lists API keys only when organization API keys are enabled and permitted: $orgAPIKeysEnabled $permissions',
     async ({ orgAPIKeysEnabled, permissions, tabs }) => {
@@ -146,8 +146,8 @@ describe('OrganizationProfile', () => {
   );
 
   it.each([
-    { hide: true, tabs: ['General'] },
-    { hide: false, tabs: ['General', 'API Keys'] },
+    { hide: true, tabs: ['General', 'Logs'] },
+    { hide: false, tabs: ['General', 'API Keys', 'Logs'] },
   ])('lists API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
     serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'] });
     await renderWithClerk(<OrganizationProfile apiKeysProps={{ hide }} />);
@@ -235,7 +235,7 @@ describe('OrganizationProfile', () => {
         pageOrder={['usage', 'general']}
       />,
     );
-    expect(tabNames()).toEqual(['Usage', 'General', 'Members']);
+    expect(tabNames()).toEqual(['Usage', 'General', 'Members', 'Logs']);
     expect(profileNav().getByRole('tab', { name: 'Usage' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('Usage this month')).toBeVisible();
   });
@@ -271,9 +271,9 @@ describe('OrganizationProfile', () => {
     await userEvent.setup().click(profileNav().getByRole('tab', { name: 'Members' }));
 
     await act(() => clerk.setActive({ organization: globex.id }));
-    await waitFor(() => expect(tabNames()).toEqual(['General']));
+    await waitFor(() => expect(tabNames()).toEqual(['General', 'Logs']));
     await act(() => clerk.setActive({ organization: acme.id }));
-    await waitFor(() => expect(tabNames()).toEqual(['General', 'Members']));
+    await waitFor(() => expect(tabNames()).toEqual(['General', 'Members', 'Logs']));
 
     expect(profileNav().getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
   });

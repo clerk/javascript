@@ -14,6 +14,7 @@ import { chaosCompany, chaosSlug } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
+import { LogsPanelExample, useLogsTableFixture } from './logs-table';
 import { useMembersTableFixture } from './members-table-tab';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { SecurityPanelExample } from './organization-profile-security-panel';
@@ -53,6 +54,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const [slug, setSlug] = useState(organization.slug);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
   const apiKeys = useAPIKeysTableFixture({ subjectKind: 'organization' });
+  const logs = useLogsTableFixture();
   const members = useMembersTableFixture();
   const invitations = useInvitationsTableFixture();
   const requests = useRequestsTableFixture();
@@ -100,6 +102,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     security: <SecurityPanelExample />,
     billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
+    logs: <LogsPanelExample {...logs} />,
   };
 
   return { activePage, setActivePage, pages, profile, name };

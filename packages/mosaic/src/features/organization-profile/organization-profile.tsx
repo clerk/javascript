@@ -32,8 +32,8 @@ export interface OrganizationProfileProps
 
 /**
  * The active organization's profile, the same as `<Profile mode='organization' />`: General, Members when the user may read or manage
- * memberships, and API keys when the instance enables them and the user may use them, with your own
- * pages alongside. It reads the organization from Clerk, so it takes no data. It renders `fallback`
+ * memberships, API keys when the instance enables them and the user may use them, and Logs, with
+ * your own pages alongside. It reads the organization from Clerk, so it takes no data. It renders `fallback`
  * until Clerk answers, and nothing at all when there is no active organization or nobody is signed in.
  *
  * @example
