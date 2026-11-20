@@ -104,10 +104,7 @@ export function UserProfileEditUsernameDialog({
         variant='card'
         initialFocus={usernameRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           {reverification ? (
             <Flow.Root
               value={step}

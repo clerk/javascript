@@ -399,7 +399,7 @@ export const variants = stylex.create({
   // The surface is a `Card` — so it comes from `Card`'s own `elevations.overlay`, and the popup
   // contributes geometry and motion. Compose it by rendering the card INSIDE the popup:
   //
-  //   <Dialog.Popup><Card.Root elevation='overlay'>…</Card.Root></Dialog.Popup>
+  //   <Dialog.Popup><Card.Root>…</Card.Root></Dialog.Popup>
   //
   // The card reads `DialogContext` from there: `Card.Title` names the dialog and `Card.Header`
   // carries its dismiss, so the surface stays self-contained. The popup is a transparent box that

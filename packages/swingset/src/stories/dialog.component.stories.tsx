@@ -111,10 +111,7 @@ export function Alert() {
     >
       <Dialog.Trigger render={deleteTrigger} />
       <Dialog.Popup>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>Delete Acme Inc?</Card.Title>
             <Card.Description>
@@ -161,10 +158,7 @@ export function Sheet() {
     >
       <Dialog.Trigger render={addEmailTrigger} />
       <Dialog.Popup initialFocus={inputRef}>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>Add email address</Card.Title>
             <Card.Description>You will need to verify this address before it can be used.</Card.Description>
@@ -238,10 +232,7 @@ export function Stacked() {
     >
       <Dialog.Trigger render={editProfileTrigger} />
       <Dialog.Popup initialFocus={nameRef}>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>Update profile</Card.Title>
             <Card.Description>Change the name people see on your account.</Card.Description>
@@ -273,10 +264,7 @@ export function Stacked() {
             <Dialog.Root role='alertdialog'>
               <Dialog.Trigger render={<Button variant='outline' />}>Cancel</Dialog.Trigger>
               <Dialog.Popup finalFocus={nameRef}>
-                <Card.Root
-                  elevation='overlay'
-                  renderBranding={false}
-                >
+                <Card.Root renderBranding={false}>
                   <Card.Header>
                     <Card.Title>Discard changes?</Card.Title>
                     <Card.Description>Your edits will be lost.</Card.Description>
@@ -380,10 +368,7 @@ export function DetachedTrigger() {
       />
       <Dialog.Root handle={notificationsDialog}>
         <Dialog.Popup>
-          <Card.Root
-            elevation='overlay'
-            renderBranding={false}
-          >
+          <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>Notifications</Card.Title>
               <Card.Description>You are all caught up. Good job!</Card.Description>
@@ -428,10 +413,7 @@ export function MultipleTriggers() {
       <Dialog.Root handle={memberDialog}>
         {({ payload }) => (
           <Dialog.Popup>
-            <Card.Root
-              elevation='overlay'
-              renderBranding={false}
-            >
+            <Card.Root renderBranding={false}>
               <Card.Header>
                 <Card.Title>{payload?.name}</Card.Title>
                 <Card.Description>{payload ? `${payload.role} of this organization.` : null}</Card.Description>
@@ -450,7 +432,7 @@ export function CardSurface() {
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Sign in</Button>} />
       <Dialog.Popup variant='card'>
-        <Card.Root elevation='overlay'>
+        <Card.Root>
           <Card.Header>
             <Card.Title>Sign in</Card.Title>
             <Card.Description>Continue to your account.</Card.Description>
@@ -494,7 +476,7 @@ export function OutsideScroll() {
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Review terms</Button>} />
       <Dialog.Popup variant='card'>
-        <Card.Root elevation='overlay'>
+        <Card.Root>
           <Card.Header>
             <Card.Title>Terms of service</Card.Title>
             <Card.Description>
@@ -537,10 +519,7 @@ export function CustomFocus() {
     <Dialog.Root>
       <Dialog.Trigger render={props => <Button {...props}>Give feedback</Button>} />
       <Dialog.Popup initialFocus={feedbackRef}>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>Feedback</Card.Title>
             <Card.Description>

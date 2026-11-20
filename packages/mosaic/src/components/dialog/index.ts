@@ -6,7 +6,7 @@
  * <Dialog.Root>
  *   <Dialog.Trigger render={<Button />}>Open</Dialog.Trigger>
  *   <Dialog.Popup>
- *     <Card.Root elevation='overlay'>
+ *     <Card.Root>
  *       <Card.Header>
  *         <Card.Title>…</Card.Title>
  *         <Card.Description>…</Card.Description>

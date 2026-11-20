@@ -37,7 +37,11 @@ export default {
         'The surface. Draws the card treatment only when it is the outermost card in its dialog and not `flush`. Appends the branding when `renderBranding`.',
       slot: 'cl-card-root',
       props: {
-        elevation: { type: 'CardElevation', doc: '`card`, `flush` or `overlay`.', default: "'card'" },
+        elevation: {
+          type: 'CardElevation',
+          doc: '`card`, `flush` or `overlay`.',
+          default: "'overlay' inside a dialog, otherwise 'card'",
+        },
         size: {
           type: 'CardSize',
           doc: 'Width. `lg` is for forms that need the room, like a tag input.',

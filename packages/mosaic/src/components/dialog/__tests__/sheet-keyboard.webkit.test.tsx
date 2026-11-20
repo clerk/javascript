@@ -76,7 +76,7 @@ function Sheet({ spacer }: { spacer: number }) {
   return (
     <Dialog.Root defaultOpen>
       <Dialog.Popup>
-        <Card.Root elevation='overlay'>
+        <Card.Root>
           <Card.Header>
             <Card.Title>Change password</Card.Title>
           </Card.Header>
