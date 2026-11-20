@@ -15,11 +15,6 @@ vi.mock('@/ui/router', () => ({
   useRouter: () => ({ currentPath: '/' }),
 }));
 
-vi.mock('@clerk/shared/react', async importOriginal => ({
-  ...(await importOriginal<typeof import('@clerk/shared/react')>()),
-  useClerk: () => ({}),
-}));
-
 const blocked: ClerkAPIError = {
   code: 'action_blocked',
   message: 'Action blocked',

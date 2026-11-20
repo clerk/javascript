@@ -5,7 +5,7 @@ import React from 'react';
 import { Flow } from '../customizables';
 import { CaptchaElement } from '../elements/CaptchaElement';
 import { Card } from '../elements/Card';
-import { showErrorOnNextCard, useCardState, withCardStateProvider } from '../elements/contexts';
+import { useCardState, withCardStateProvider } from '../elements/contexts';
 import { LoadingCardContainer } from '../elements/LoadingCard';
 import { useRouter } from '../router';
 import { handleError } from '../utils/errorHandler';
@@ -19,8 +19,7 @@ export const SSOCallback = withCardStateProvider<HandleOAuthCallbackParams | Han
 });
 
 export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCallbackParams) => {
-  const clerk = useClerk();
-  const { handleRedirectCallback, __internal_setActiveInProgress } = clerk;
+  const { handleRedirectCallback, __internal_setActiveInProgress } = useClerk();
   const { navigate } = useRouter();
   const card = useCardState();
 
@@ -44,7 +43,9 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
         };
 
         bounceTimeoutRef.current = setTimeout(() => {
-          showErrorOnNextCard(clerk, shownError);
+          if (window.Clerk) {
+            window.Clerk.__internal_last_error = shownError;
+          }
           void navigate('../');
         }, 4000);
         try {

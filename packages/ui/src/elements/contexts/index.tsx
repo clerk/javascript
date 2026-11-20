@@ -1,5 +1,5 @@
-import { createContextAndHook, useClerk } from '@clerk/shared/react';
-import type { ClerkAPIError, ClerkRuntimeError, LoadedClerk } from '@clerk/shared/types';
+import { createContextAndHook } from '@clerk/shared/react';
+import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/shared/types';
 import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
@@ -23,35 +23,34 @@ type CardStateCtxValue = {
 
 const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
 
-type ClerkWithLastError = LoadedClerk & { __internal_last_error?: CardError | null };
-
-/**
- * Shows `error` on the next card that mounts, such as the card a navigation leads to.
- */
-export const showErrorOnNextCard = (clerk: LoadedClerk, error: CardError) => {
-  (clerk as ClerkWithLastError).__internal_last_error = error;
-};
-
 export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
   const router = useRouter();
-  const clerk = useClerk() as ClerkWithLastError;
 
   const [state, setState] = React.useState<State>(() => {
-    const lastError = clerk.__internal_last_error || undefined;
+    const lastError = window?.Clerk?.__internal_last_error || undefined;
     return { status: 'idle', metadata: undefined, error: translateError(lastError), rawError: lastError };
   });
 
   React.useEffect(() => {
-    const error = clerk.__internal_last_error;
+    const error = window?.Clerk?.__internal_last_error;
 
     if (error) {
       setState(s => ({ ...s, error: translateError(error), rawError: error }));
     }
-  }, [clerk, translateError, setState, router.currentPath]);
+  }, [translateError, setState, router.currentPath]);
 
   const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
+};
+
+/**
+ * Shows `error` on the next card that mounts, such as the card a navigation leads to.
+ */
+export const showErrorOnNextCard = (error: ClerkAPIError) => {
+  if (window.Clerk) {
+    window.Clerk.__internal_last_error = error;
+  }
 };
 
 export const useCardState = () => {

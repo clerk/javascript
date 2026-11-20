@@ -1,10 +1,9 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON, SignInResource } from '@clerk/shared/types';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
-import { showErrorOnNextCard } from '@/ui/elements/contexts';
 
 import { SignInFactorOne } from '../SignInFactorOne';
 import { SignInStart } from '../SignInStart';
@@ -20,6 +19,11 @@ const blockedError = (meta?: ClerkAPIErrorJSON['meta']) =>
 const INLINE_ERROR = /This action couldn't be completed/i;
 
 describe('a blocked sign-in', () => {
+  const originalClerk = window.Clerk;
+  afterEach(() => {
+    window.Clerk = originalClerk;
+  });
+
   it('replaces the start form with the blocked screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
@@ -50,10 +54,17 @@ describe('a blocked sign-in', () => {
   });
 
   it('shows the blocked screen for an error handed over from another card', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
     });
-    showErrorOnNextCard(fixtures.clerk, blockedError({ trace_id: '7Q8ikxgt' }).errors[0]);
+    let lastError: unknown = blockedError({ trace_id: '7Q8ikxgt' }).errors[0];
+    window.Clerk = {
+      get __internal_last_error() {
+        const value = lastError;
+        lastError = null;
+        return value;
+      },
+    } as typeof window.Clerk;
 
     render(<SignInStart />, { wrapper });
 

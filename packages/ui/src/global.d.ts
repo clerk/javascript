@@ -13,7 +13,7 @@ declare global {
   declare const PACKAGE_VERSION: string;
   declare const __BUILD_DISABLE_RHC__: string;
   interface Window {
-    Clerk?: Clerk;
+    Clerk?: Clerk & { __internal_last_error?: any };
 
     /**
      * Unstable API for accessing UI components separately from clerk-js.
