@@ -109,7 +109,7 @@ export function useSignUpDetailsController(
         return details.update(submitted);
       }
       if (alternativeChannel) {
-        return details.create(submitted, { channel });
+        return details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) }, { channel });
       }
       return details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) });
     },
@@ -130,10 +130,7 @@ export function useSignUpDetailsController(
     : strength.data;
   const isPending = form.isSubmitting || isBusy;
 
-  const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField'> = {
-    socialProviders: details.alternativeChannels,
-    onSelectProvider: (id: string) =>
-      setChosenChannel(details.alternativeChannels.find(provider => provider.id === id)?.id),
+  const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField' | 'socialProviders' | 'onSelectProvider'> = {
     form,
     onSubmit: form.handleSubmit,
     isPending,
@@ -165,13 +162,22 @@ export function useSignUpDetailsController(
       ...screen,
       step: detailsStep('start', startFields, details, identifier),
       onSwitchField: switchField('start'),
+      socialProviders: details.alternativeChannels,
+      onSelectProvider: (id: string) =>
+        setChosenChannel(details.alternativeChannels.find(provider => provider.id === id)?.id),
     },
     continue: {
       ...screen,
       step: detailsStep('continue', continueFields, details, identifier),
       onSwitchField: switchField('continue'),
+      socialProviders: [],
+      onSelectProvider: () => undefined,
     },
     error: form.error,
-    reset: form.reset,
+    leaveChannel: () => setChosenChannel(undefined),
+    reset: () => {
+      form.reset();
+      setChosenChannel(undefined);
+    },
   };
 }
