@@ -23,6 +23,7 @@ export function SSOSectionView({
   rows,
   isDisabled,
   isError,
+  isRetrying,
   onRetry,
   enrollmentRoleName,
   onManage,
@@ -76,6 +77,8 @@ export function SSOSectionView({
                     size='sm'
                     variant='outline'
                     color='neutral'
+                    disabled={isRetrying}
+                    focusableWhenDisabled
                     onClick={onRetry}
                   >
                     {m.retry}

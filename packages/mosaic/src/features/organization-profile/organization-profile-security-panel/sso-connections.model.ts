@@ -19,6 +19,7 @@ import type {
   SSOSamlValues,
 } from './sso-connections.types';
 import { connectionStatus, providerIconUrl, providerKey, sortConnections } from './sso-connections.utils';
+import { useConnectionsStatus } from './use-connections-status';
 
 export interface SSOEnrollmentRole {
   key: string;
@@ -30,6 +31,7 @@ export interface SSOConnectionsModel {
   connections: SSOConnection[];
   isLoading: boolean;
   isError: boolean;
+  isRetrying: boolean;
   enrollmentRole: SSOEnrollmentRole | undefined;
   retry: () => void;
   rename: (id: string, name: string) => Promise<void>;
@@ -52,6 +54,7 @@ const SETTING_PARAMS: Record<SSOConnectionSetting, (enabled: boolean) => UpdateO
 export function useSSOConnectionsModel({ enabled }: { enabled: boolean }): SSOConnectionsModel {
   const { organization } = useOrganization();
   const source = __internal_useOrganizationEnterpriseConnections({ enabled });
+  const status = useConnectionsStatus(source);
   const environment = useMosaicEnvironment();
   const defaultRole = environment?.organizationSettings.domains.defaultRole ?? undefined;
   const rolesQuery = useOrganizationRolesQuery({ enabled });
@@ -69,8 +72,9 @@ export function useSSOConnectionsModel({ enabled }: { enabled: boolean }): SSOCo
   return {
     organizationName: organization?.name ?? '',
     connections,
-    isLoading: source.isLoading,
-    isError: Boolean(source.error) && !source.data,
+    isLoading: status.isLoading,
+    isError: status.isError,
+    isRetrying: status.isError && source.isFetching,
     enrollmentRole: roleKey ? { key: roleKey, name: roles.find(role => role.key === roleKey)?.name } : undefined,
     retry: () => void source.revalidate(),
     rename: (id, name) => save(() => update(id, { name: name.trim() }), ['name']),

@@ -42,10 +42,12 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
       {model.isLoading ? (
         <SSOBypassSectionSkeleton />
       ) : model.isConnectionsError ? (
-        <SSOBypassConnectionsErrorView
-          isRetrying={model.isRetryingConnections}
-          onRetry={model.retryConnections}
-        />
+        capabilities.canConfigureSso ? null : (
+          <SSOBypassConnectionsErrorView
+            isRetrying={model.isRetryingConnections}
+            onRetry={model.retryConnections}
+          />
+        )
       ) : model.showSSOBypass ? (
         <SSOBypassSection />
       ) : capabilities.canConfigureSso ? null : (

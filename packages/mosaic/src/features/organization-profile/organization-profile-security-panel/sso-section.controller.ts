@@ -20,6 +20,7 @@ export interface SSOSectionController {
   organizationName: string;
   isDisabled: boolean;
   isError: boolean;
+  isRetrying: boolean;
   onRetry: () => void;
   enrollmentRoleName: string | undefined;
   onManage: (id: string) => void;
@@ -60,6 +61,7 @@ export function useSSOSectionController(model: SSOConnectionsModel): SSOSectionC
     organizationName: model.organizationName,
     isDisabled: actions.isPending || remove.isPending,
     isError: model.isError,
+    isRetrying: model.isRetrying,
     onRetry: model.retry,
     enrollmentRoleName: role ? (roleNames[role.key] ?? role.name ?? humanizeRoleKey(role.key)) : undefined,
     onManage: id => {

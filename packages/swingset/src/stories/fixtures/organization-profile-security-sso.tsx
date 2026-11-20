@@ -125,6 +125,7 @@ export function useSSOConnectionsFixture({
     connections,
     isLoading,
     isError,
+    isRetrying: false,
     enrollmentRole: { key: 'org:member', name: 'Member' },
     retry: () => undefined,
     rename: (id, name) => save(() => patch(id, connection => ({ ...connection, name: name.trim() })), ['name']),

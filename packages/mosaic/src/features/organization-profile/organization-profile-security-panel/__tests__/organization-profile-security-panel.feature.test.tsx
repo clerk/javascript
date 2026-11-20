@@ -206,6 +206,7 @@ describe('Who sees the Security page', () => {
 
 describe('When the connections request fails', () => {
   const ERROR_TEXT = 'Could not check this organization’s SSO connections';
+  const SSO_ERROR_TEXT = 'Could not load SSO connections';
   const settle = () => new Promise(resolve => setTimeout(resolve, 50));
 
   beforeEach(() => {
@@ -216,8 +217,11 @@ describe('When the connections request fails', () => {
     vi.useRealTimers();
   });
 
-  async function renderWithFailedConnections() {
-    serve({ allowlisted: [bob] });
+  async function renderWithFailedConnections({
+    waitFor = ERROR_TEXT,
+    ...options
+  }: Parameters<typeof serve>[0] & { waitFor?: string } = {}) {
+    serve({ allowlisted: [bob], ...options });
     const outage = { active: true, requests: 0 };
     worker.use(
       http.get(fapiUrl('/v1/organizations/:organizationId/enterprise_connections'), () => {
@@ -237,7 +241,7 @@ describe('When the connections request fails', () => {
     );
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     await renderWithClerk(<OrganizationProfileSecurityPanel />);
-    for (let step = 0; step < 20 && !screen.queryByText(ERROR_TEXT); step++) {
+    for (let step = 0; step < 20 && !screen.queryByText(waitFor); step++) {
       await act(async () => vi.advanceTimersByTimeAsync(1_000));
       await settle();
     }
@@ -263,6 +267,33 @@ describe('When the connections request fails', () => {
     const list = await screen.findByRole('list', { name: 'SSO bypass allow list' });
     expect(within(list).getByText('Bob')).toBeVisible();
     expect(screen.queryByText(ERROR_TEXT)).toBeNull();
+  });
+
+  it('shows the failure once, in the SSO section, to a member who can configure SSO', async () => {
+    await renderWithFailedConnections({
+      permissions: [BYPASS, CONNECTIONS],
+      selfServeSso: true,
+      waitFor: SSO_ERROR_TEXT,
+    });
+
+    expect(screen.getByText(SSO_ERROR_TEXT)).toBeVisible();
+    expect(screen.queryByText(ERROR_TEXT)).toBeNull();
+    expect(screen.queryByText('No connections to secure')).toBeNull();
+  });
+
+  it('lists the SSO connections after Try again succeeds', async () => {
+    const { user, outage } = await renderWithFailedConnections({
+      permissions: [BYPASS, CONNECTIONS],
+      selfServeSso: true,
+      waitFor: SSO_ERROR_TEXT,
+    });
+
+    outage.active = false;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByText('Okta')).toBeVisible();
+    expect(screen.queryByText(SSO_ERROR_TEXT)).toBeNull();
+    await screen.findByRole('list', { name: 'SSO bypass allow list' });
   });
 });
 
