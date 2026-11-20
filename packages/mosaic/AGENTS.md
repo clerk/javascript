@@ -90,6 +90,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - Data read from a Clerk resource that should be cached across mounts → A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)
 - The seconds left on a resend cooldown, for display → `useResendSeconds` (`src/hooks/`), from a `resendAvailableAt` time kept in the machine
 - The Resend link on a code or email link step, with its countdown → `verificationResend` (`src/blocks/verification/`), passed to the step as `resend`
+- A provider logo on a row (OAuth, Web3 wallet, enterprise or SSO connection) → `UserProfileProviderMedia` (`src/features/user-profile/`), with `monochromeIcon: isMonochromeProvider(providerId(provider))` (`user-profile-provider.utils.ts`) set in the model. Without it a one-color logo such as Okta or GitHub stays black in dark mode
 - An avatar or logo row: picker, drop target, crop dialog, Upload button or manage menu → `AvatarUpload` (`src/blocks/avatar-upload/`), laid out by the caller
 - Any other file picker or drop zone, such as a metadata or key file → `FileUpload` (`src/primitives/file-upload/`), see its `README.md`
 - Cropping an image to a square: pan, zoom, rotate, then draw the result → `ImageCropper`, with `ImageCropper.cropImage` (`src/primitives/image-cropper/`), see its `README.md`

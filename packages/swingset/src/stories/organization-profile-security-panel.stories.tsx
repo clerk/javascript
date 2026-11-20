@@ -6,6 +6,7 @@ import {
   SecurityPanelNoSectionsExample,
   SSOBypassAllowlistExample,
 } from './fixtures/organization-profile-security-panel';
+import { SSOConnectionExample } from './fixtures/organization-profile-security-sso';
 
 export { default as __source } from './organization-profile-security-panel.stories?raw';
 
@@ -24,7 +25,28 @@ export function Default() {
 }
 
 export function Loading() {
-  return <SecurityPanelExample isLoading />;
+  return (
+    <SecurityPanelExample
+      isLoading
+      sso={{ isLoading: true }}
+    />
+  );
+}
+
+export function NoSSOConnections() {
+  return <SecurityPanelExample sso={{ initialIds: [] }} />;
+}
+
+export function SSOLoadError() {
+  return <SecurityPanelExample sso={{ isError: true }} />;
+}
+
+export function ManageSAMLConnection() {
+  return <SSOConnectionExample id='ent_okta' />;
+}
+
+export function ManageOIDCConnection() {
+  return <SSOConnectionExample id='ent_oidc' />;
 }
 
 export function NoSections() {

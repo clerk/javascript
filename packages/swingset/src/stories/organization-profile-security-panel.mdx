@@ -4,7 +4,7 @@ import * as Stories from './organization-profile-security-panel.stories';
 
 ## Example
 
-The overview lists the organization's security settings. A member who can manage the SSO bypass allow list sees it inline once the organization has an enterprise connection, laid out like the user profile's email section: the section title and a description of the allow list, an Add button, and the members below, 5 to a page.
+The overview lists the organization's security settings. A member who can manage enterprise connections, in an organization with self-serve SSO, sees each SSO connection with its domains and status. The row menu opens the connection in a dialog, activates or deactivates it, or removes it once the organization name is typed. A member who can manage the SSO bypass allow list sees it inline once the organization has an enterprise connection, laid out like the user profile's email section: the section title and a description of the allow list, an Add button, and the members below, 5 to a page.
 
 <Story name='Default' storyModule={Stories} composition={[
   { name: 'Panel', href: '/components/panel', layer: 'Components' },
@@ -20,9 +20,34 @@ The overview lists the organization's security settings. A member who can manage
 
 <Story name='Loading' storyModule={Stories} />
 
+### No SSO connections
+
+<Story name='NoSSOConnections' storyModule={Stories} />
+
+### SSO load error
+
+<Story name='SSOLoadError' storyModule={Stories} />
+
+### Manage a SAML connection
+
+The dialog shows the connection's name, domains, the service provider values to copy into the identity provider, and the identity provider settings. Edit opens a dialog over it, which takes a metadata URL or a sign on URL, issuer and up to five signing certificates. The settings switches save as they change. Turning on Force re-authentication fails in this example, to show the row error.
+
+<Story name='ManageSAMLConnection' storyModule={Stories} composition={[
+  { name: 'Card', href: '/components/card', layer: 'Components' },
+  { name: 'Section', href: '/components/section', layer: 'Components' },
+  { name: 'CopyButton', href: '/components/copy-button', layer: 'Components' },
+  { name: 'Switch', href: '/components/switch', layer: 'Components' },
+  { name: 'SegmentedControl', href: '/components/segmented-control', layer: 'Components' },
+  { name: 'Field', href: '/components/field', layer: 'Components' },
+]} />
+
+### Manage an OIDC connection
+
+<Story name='ManageOIDCConnection' storyModule={Stories} />
+
 ### No sections
 
-A member who can configure SSO or directory sync, but not the SSO bypass allow list, sees the page with an empty state until those sections land.
+A member who can configure directory sync, but not SSO or the SSO bypass allow list, sees the page with an empty state until the directory sync section lands.
 
 <Story name='NoSections' storyModule={Stories} />
 
