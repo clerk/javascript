@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError, errorToJSON, isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AvailableConnector,
   ClerkPaginatedResponse,
@@ -21,15 +21,20 @@ type ConnectorJSON = {
   scopes: string[];
   scope_labels?: Record<string, string>;
   logo_url: string | null;
+  authentication_method?: AvailableConnector['authenticationMethod'];
+  api_key?: { instructions: string | null; help_url: string | null } | null;
 };
 
 type ConnectionJSON = {
   id: string;
   connector: string;
+  connector_display_name?: string | null;
+  connector_status?: CurrentUserConnection['connectorStatus'];
   slug: string;
   scopes: string[];
   status: CurrentUserConnection['status'];
   provider_account: { id: string; label: string | null } | null;
+  api_key_hint?: string | null;
   created_at: number;
   updated_at: number;
   disconnected_at: number | null;
@@ -51,15 +56,20 @@ const toConnector = (json: ConnectorJSON): AvailableConnector => ({
   scopes: json.scopes,
   scopeLabels: json.scope_labels ?? {},
   logoUrl: json.logo_url,
+  authenticationMethod: json.authentication_method ?? 'oauth',
+  apiKey: json.api_key ? { instructions: json.api_key.instructions, helpUrl: json.api_key.help_url } : null,
 });
 
 const toConnection = (json: ConnectionJSON): CurrentUserConnection => ({
   id: json.id,
   connector: json.connector,
+  connectorDisplayName: json.connector_display_name ?? null,
+  connectorStatus: json.connector_status ?? 'active',
   slug: json.slug,
   scopes: json.scopes,
   status: json.status,
   providerAccount: json.provider_account,
+  apiKeyHint: json.api_key_hint ?? null,
   createdAt: new Date(json.created_at),
   updatedAt: new Date(json.updated_at),
   disconnectedAt: json.disconnected_at === null ? null : new Date(json.disconnected_at),
@@ -115,6 +125,38 @@ const list = async <J, T>(
   return { data: json.data.map(convert), total_count: json.total_count };
 };
 
+// The API names parameters in snake case. Errors from these calls name the SDK's parameters instead.
+const SDK_PARAM_NAMES: Record<string, string> = {
+  return_url: 'returnUrl',
+  api_key: 'apiKey',
+  additional_account: 'additionalAccount',
+};
+const API_PARAM_PATTERN = new RegExp(`\\b(${Object.keys(SDK_PARAM_NAMES).join('|')})\\b`, 'g');
+const toSdkNames = (text: string | undefined) => text?.replace(API_PARAM_PATTERN, name => SDK_PARAM_NAMES[name]);
+
+const withSdkParamNames = (err: unknown): unknown => {
+  if (!isClerkAPIResponseError(err)) {
+    return err;
+  }
+  const data = err.errors.map(error => {
+    const json = errorToJSON(error);
+    return {
+      ...json,
+      message: toSdkNames(json.message) ?? '',
+      long_message: toSdkNames(json.long_message),
+      meta: { ...json.meta, param_name: toSdkNames(json.meta?.param_name) },
+    };
+  });
+  return new ClerkAPIResponseError(toSdkNames(err.message) ?? '', {
+    data,
+    status: err.status,
+    clerkTraceId: err.clerkTraceId,
+    retryAfter: err.retryAfter,
+  });
+};
+
+const REAUTHORIZATION_REQUIRED = 'connection_reauthorization_required';
+
 /**
  * @internal
  */
@@ -122,13 +164,26 @@ export class Connect implements ConnectNamespace {
   constructor(private readonly navigate: (url: string) => void) {}
 
   // An incomplete command sends the browser to the provider, as
-  // authenticateWithRedirect does. The result still resolves for callers that
-  // track the pending action.
-  private redirectIfRequired = (result: CurrentUserConnectResult) => {
-    if (result.status === 'requires_action') {
+  // authenticateWithRedirect does. The page is unloading by then, so the
+  // promise never settles and no code runs after the caller's await.
+  // `redirect: false` returns the action instead.
+  private redirectIfRequired = (
+    result: CurrentUserConnectResult,
+    redirect: boolean | undefined,
+  ): Promise<CurrentUserConnectResult> => {
+    if (result.status === 'requires_action' && redirect !== false) {
       this.navigate(result.action.url);
+      return new Promise<never>(() => {});
     }
-    return result;
+    return Promise.resolve(result);
+  };
+
+  private command = async (path: string, body: Record<string, unknown>): Promise<CurrentUserConnectResult> => {
+    try {
+      return toConnectResult(await request<ConnectResultJSON>({ method: 'POST', path, body }));
+    } catch (err) {
+      throw withSdkParamNames(err);
+    }
   };
 
   connectors = {
@@ -141,19 +196,40 @@ export class Connect implements ConnectNamespace {
       toConnection(
         await request<ConnectionJSON>({ method: 'GET', path: `/me/connections/${encodeURIComponent(connectionId)}` }),
       ),
-    create: async (params: CurrentUserConnectParams) =>
+    create: async ({ redirect, ...params }: CurrentUserConnectParams): Promise<CurrentUserConnectResult> => {
+      let result: CurrentUserConnectResult;
+      try {
+        result = await this.command('/me/connections', params);
+      } catch (err) {
+        // The slug already has a connection to bring back: reauthorize it with the same options.
+        const connectionId = isClerkAPIResponseError(err)
+          ? err.errors.find(error => error.code === REAUTHORIZATION_REQUIRED)?.meta?.connectionId
+          : undefined;
+        if (!connectionId) {
+          throw err;
+        }
+        const { returnUrl, scopes, apiKey } = params;
+        const reauthorizeParams: CurrentUserReauthorizeParams = { redirect };
+        if (returnUrl !== undefined) {
+          reauthorizeParams.returnUrl = returnUrl;
+        }
+        if (scopes !== undefined) {
+          reauthorizeParams.scopes = scopes;
+        }
+        if (apiKey !== undefined) {
+          reauthorizeParams.apiKey = apiKey;
+        }
+        return this.connections.reauthorize(connectionId, reauthorizeParams);
+      }
+      return this.redirectIfRequired(result, redirect);
+    },
+    reauthorize: async (
+      connectionId: string,
+      { redirect, ...params }: CurrentUserReauthorizeParams,
+    ): Promise<CurrentUserConnectResult> =>
       this.redirectIfRequired(
-        toConnectResult(await request<ConnectResultJSON>({ method: 'POST', path: '/me/connections', body: params })),
-      ),
-    reauthorize: async (connectionId: string, params: CurrentUserReauthorizeParams) =>
-      this.redirectIfRequired(
-        toConnectResult(
-          await request<ConnectResultJSON>({
-            method: 'POST',
-            path: `/me/connections/${encodeURIComponent(connectionId)}/reauthorize`,
-            body: params,
-          }),
-        ),
+        await this.command(`/me/connections/${encodeURIComponent(connectionId)}/reauthorize`, params),
+        redirect,
       ),
     disconnect: async (connectionId: string) =>
       toConnection(

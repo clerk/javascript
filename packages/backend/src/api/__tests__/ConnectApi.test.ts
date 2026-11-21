@@ -109,4 +109,129 @@ describe('ConnectApi', () => {
       action: { type: 'redirect', url: 'https://clerk.test/v1/connect/authorize', expiresAt: 1 },
     });
   });
+
+  it('connects with an API key and reads an API key credential without scopes', async () => {
+    const bodies: unknown[] = [];
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connections',
+        validateHeaders(async ({ request }) => {
+          bodies.push(await request.json());
+          return HttpResponse.json({
+            status: 'complete',
+            connection: { object: 'connection', id: 'cnn_1', slug: 'openai', api_key_hint: '••••abcd' },
+          });
+        }),
+      ),
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connection_credentials',
+        validateHeaders(async ({ request }) => {
+          bodies.push(await request.json());
+          return HttpResponse.json({
+            object: 'connection_credential',
+            connection_id: 'cnn_1',
+            type: 'api_key',
+            api_key: 'sk-test-abcd',
+            expires_at: null,
+            granted_scopes: [],
+          });
+        }),
+      ),
+    );
+
+    const result = await apiClient.connect.connections.create({
+      userId: 'user_1',
+      connector: 'openai',
+      apiKey: 'sk-test-abcd',
+    });
+    const credential = await apiClient.connect.connections.getCredential({ userId: 'user_1', slug: 'openai' });
+
+    expect(bodies).toEqual([{ connector: 'openai', api_key: 'sk-test-abcd' }, { slug: 'openai' }]);
+    expect(result.status === 'complete' && result.connection.apiKeyHint).toBe('••••abcd');
+    expect(credential.type === 'api_key' && credential.apiKey).toBe('sk-test-abcd');
+  });
+
+  it('puts the Clerk message and meta on a Connect error', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connection_credentials',
+        validateHeaders(() =>
+          HttpResponse.json(
+            {
+              errors: [
+                {
+                  code: 'connection_disconnected',
+                  message: 'Connection is disconnected',
+                  long_message: 'The user disconnected this connection. Ask them to reconnect it.',
+                  meta: { connection_id: 'con_1', connection_status: 'disconnected' },
+                },
+              ],
+              clerk_trace_id: 'trace_1',
+            },
+            { status: 409, statusText: 'Conflict' },
+          ),
+        ),
+      ),
+    );
+
+    const error = await apiClient.connect.connections
+      .getCredential({ userId: 'user_1', slug: 'acme' })
+      .catch((err: unknown) => err);
+
+    expect(error).toMatchObject({
+      message: 'The user disconnected this connection. Ask them to reconnect it.',
+      status: 409,
+      clerkTraceId: 'trace_1',
+    });
+    expect((error as { errors: unknown[] }).errors[0]).toMatchObject({
+      code: 'connection_disconnected',
+      meta: { connectionId: 'con_1', connectionStatus: 'disconnected' },
+    });
+  });
+
+  it('falls back to the short message and keeps scope meta', async () => {
+    server.use(
+      http.post(
+        'https://api.clerk.test/v1/users/user_1/connection_credentials',
+        validateHeaders(() =>
+          HttpResponse.json(
+            {
+              errors: [
+                { code: 'connection_scope_missing', message: 'Missing scopes', meta: { missing_scopes: ['repo'] } },
+              ],
+            },
+            { status: 403, statusText: 'Forbidden' },
+          ),
+        ),
+      ),
+    );
+
+    const error = await apiClient.connect.connections
+      .getCredential({ userId: 'user_1', slug: 'acme', scopes: ['repo'] })
+      .catch((err: unknown) => err);
+
+    expect(error).toMatchObject({ message: 'Missing scopes', status: 403 });
+    expect((error as { errors: Array<{ meta: unknown }> }).errors[0].meta).toMatchObject({ missingScopes: ['repo'] });
+  });
+
+  it('reads the connector status and display name of a connection', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/connections/con_1',
+        validateHeaders(() =>
+          HttpResponse.json({
+            object: 'connection',
+            id: 'con_1',
+            connector: 'acme',
+            connector_display_name: 'Acme',
+            connector_status: 'disabled',
+          }),
+        ),
+      ),
+    );
+
+    const connection = await apiClient.connect.connections.get('con_1');
+
+    expect(connection).toMatchObject({ connectorDisplayName: 'Acme', connectorStatus: 'disabled' });
+  });
 });

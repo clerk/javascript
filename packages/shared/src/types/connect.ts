@@ -3,6 +3,11 @@ import type { ClerkPaginatedResponse } from './pagination';
 export type ConnectionStatus = 'active' | 'needs_attention' | 'disconnected';
 
 /**
+ * How a connector authorizes a user: an OAuth redirect, or an API key the user pastes.
+ */
+export type ConnectAuthenticationMethod = 'oauth' | 'api_key';
+
+/**
  * A connector the current user can connect to. It has no OAuth client settings.
  */
 export interface AvailableConnector {
@@ -13,6 +18,11 @@ export interface AvailableConnector {
   scopes: string[];
   scopeLabels: Record<string, string>;
   logoUrl: string | null;
+  authenticationMethod: ConnectAuthenticationMethod;
+  /**
+   * Help for finding the key, present when `authenticationMethod` is `api_key`.
+   */
+  apiKey: { instructions: string | null; helpUrl: string | null } | null;
 }
 
 /**
@@ -21,10 +31,23 @@ export interface AvailableConnector {
 export interface CurrentUserConnection {
   id: string;
   connector: string;
+  /**
+   * The connector's display name. It is set even when the connector is disabled.
+   */
+  connectorDisplayName: string | null;
+  /**
+   * The status of the connection's connector. A `disabled` connector is turned off by the application:
+   * it is not listed in `connectors.list()` and cannot be connected or reauthorized.
+   */
+  connectorStatus: 'active' | 'disabled';
   slug: string;
   scopes: string[];
   status: ConnectionStatus;
   providerAccount: { id: string; label: string | null } | null;
+  /**
+   * The masked end of the stored API key, such as `••••abcd`, for an API key connection.
+   */
+  apiKeyHint: string | null;
   createdAt: Date;
   updatedAt: Date;
   disconnectedAt: Date | null;
@@ -48,16 +71,38 @@ export type CurrentUserConnectParams = {
   connector: string;
   slug?: string;
   scopes?: string[];
-  returnUrl: string;
+  /**
+   * Where the browser returns after an OAuth redirect. API key connectors do not redirect.
+   */
+  returnUrl?: string;
+  /**
+   * The key the user pastes, for a connector whose `authenticationMethod` is `api_key`.
+   */
+  apiKey?: string;
   /**
    * Connects another account to a connector the user already uses. Clerk picks the slug.
    */
   additionalAccount?: boolean;
+  /**
+   * Whether Clerk sends the browser to the provider when the result is `requires_action`. Defaults to `true`.
+   *
+   * With `true`, the returned promise never settles once the redirect starts, since the page is unloading.
+   * Pass `false` to get the `requires_action` result and handle `action.url` yourself, such as in a popup.
+   */
+  redirect?: boolean;
 };
 
 export type CurrentUserReauthorizeParams = {
   scopes?: string[];
-  returnUrl: string;
+  returnUrl?: string;
+  /**
+   * A replacement key for an API key connection.
+   */
+  apiKey?: string;
+  /**
+   * See `CurrentUserConnectParams.redirect`.
+   */
+  redirect?: boolean;
 };
 
 /**
@@ -71,11 +116,16 @@ export interface ConnectNamespace {
     list: (params?: ListCurrentUserConnectionsParams) => Promise<ClerkPaginatedResponse<CurrentUserConnection>>;
     get: (connectionId: string) => Promise<CurrentUserConnection>;
     /**
-     * Starts a connection. When the result is `requires_action`, Clerk sends the browser to the provider.
+     * Starts a connection. When the result is `requires_action`, Clerk sends the browser to the provider
+     * and the promise never settles, unless `redirect` is `false`.
+     *
+     * If the slug already has a disconnected connection, or one that needs attention, it is reauthorized
+     * with the same `returnUrl`, `scopes` and `apiKey` instead.
      */
     create: (params: CurrentUserConnectParams) => Promise<CurrentUserConnectResult>;
     /**
-     * Asks for consent again, or for more scopes. When the result is `requires_action`, Clerk sends the browser to the provider.
+     * Asks for consent again, or for more scopes. When the result is `requires_action`, Clerk sends the browser
+     * to the provider and the promise never settles, unless `redirect` is `false`.
      */
     reauthorize: (connectionId: string, params: CurrentUserReauthorizeParams) => Promise<CurrentUserConnectResult>;
     disconnect: (connectionId: string) => Promise<CurrentUserConnection>;

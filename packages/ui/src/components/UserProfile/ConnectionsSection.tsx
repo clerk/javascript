@@ -1,24 +1,78 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { AvailableConnector, CurrentUserConnection } from '@clerk/shared/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
+import { Form } from '@/ui/elements/Form';
+import { FormButtons } from '@/ui/elements/FormButtons';
+import { FormContainer } from '@/ui/elements/FormContainer';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { RemoveResourceForm } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Box, Button, Flex, localizationKeys, Text } from '../../customizables';
+import type { LocalizationKey } from '../../customizables';
+import { Badge, Button, Flex, Link, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useFetch } from '../../hooks';
 
 const CONNECT_ERROR_PARAM = 'clerk_connect_error';
+// The connector of the flow this section sent to the provider, so a failure can name it.
+const PENDING_CONNECTOR_KEY = 'clerk_connect_pending_connector';
 
-const readConnectError = () => new URL(window.location.href).searchParams.get(CONNECT_ERROR_PARAM);
+type ConnectFailure = { code: string; connector: string | null };
+
+const readConnectFailure = (): ConnectFailure | null => {
+  const code = new URL(window.location.href).searchParams.get(CONNECT_ERROR_PARAM);
+  let connector: string | null = null;
+  try {
+    // Read only: React can call a state initializer twice, so the key is
+    // removed in an effect after the first render.
+    connector = window.sessionStorage.getItem(PENDING_CONNECTOR_KEY);
+  } catch {
+    // Storage can be unavailable; the message then names no service.
+  }
+  return code ? { code, connector } : null;
+};
+
+const forgetPendingConnector = () => {
+  try {
+    window.sessionStorage.removeItem(PENDING_CONNECTOR_KEY);
+  } catch {
+    // See readConnectFailure.
+  }
+};
+
+const rememberPendingConnector = (connector: string) => {
+  try {
+    window.sessionStorage.setItem(PENDING_CONNECTOR_KEY, connector);
+  } catch {
+    // See readConnectFailure.
+  }
+};
+
+const failureMessages: Record<string, (service: string) => LocalizationKey> = {
+  access_denied: service =>
+    localizationKeys('userProfile.start.connectionsSection.failedAlert__accessDenied', { service }),
+  insufficient_scopes: service =>
+    localizationKeys('userProfile.start.connectionsSection.failedAlert__insufficientScopes', { service }),
+  provider_account_mismatch: service =>
+    localizationKeys('userProfile.start.connectionsSection.failedAlert__providerAccountMismatch', { service }),
+  account_already_connected: service =>
+    localizationKeys('userProfile.start.connectionsSection.failedAlert__accountAlreadyConnected', { service }),
+  authorization_failed: service =>
+    localizationKeys('userProfile.start.connectionsSection.failedAlert__authorizationFailed', { service }),
+  attempt_expired: () => localizationKeys('userProfile.start.connectionsSection.failedAlert__attemptExpired'),
+  attempt_invalid: () => localizationKeys('userProfile.start.connectionsSection.failedAlert__attemptInvalid'),
+};
+
+const failureMessage = (code: string, service: string) =>
+  failureMessages[code]?.(service) ?? localizationKeys('userProfile.start.connectionsSection.failedAlert');
 
 const removeConnectErrorFromUrl = () => {
   const url = new URL(window.location.href);
@@ -55,9 +109,15 @@ export const ConnectionsSection = withCardStateProvider(() => {
   const clerk = useClerk();
   const { user } = useUser();
   const { componentName, mode } = useUserProfileContext();
-  const [failure] = useState(readConnectError);
+  const { t } = useLocalizations();
+  const [failure, setFailure] = useState(readConnectFailure);
+  // The banner is about the last attempt. Any next action, or a success, replaces it.
+  const clearFailure = useCallback(() => setFailure(null), []);
 
-  useEffect(() => queueMicrotask(removeConnectErrorFromUrl), []);
+  useEffect(() => {
+    forgetPendingConnector();
+    queueMicrotask(removeConnectErrorFromUrl);
+  }, []);
   useEffect(() => {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
@@ -83,12 +143,30 @@ export const ConnectionsSection = withCardStateProvider(() => {
   }
 
   const allConnectors = connectors.data ?? [];
-  const allConnections = (connections.data ?? []).filter(
-    connection =>
-      connection.status !== 'disconnected' || allConnectors.some(connector => connector.slug === connection.connector),
-  );
+  const allConnections = connections.data ?? [];
+  // A disconnected connection is reconnected, not counted as another account.
   const hasConnection = (connector: AvailableConnector) =>
-    allConnections.some(connection => connection.connector === connector.slug);
+    allConnections.some(connection => connection.connector === connector.slug && connection.status !== 'disconnected');
+  const disconnectedConnectionOf = (connector: AvailableConnector) =>
+    hasConnection(connector)
+      ? undefined
+      : allConnections.find(
+          connection => connection.connector === connector.slug && connection.status === 'disconnected',
+        );
+  const connectorOf = (connection: CurrentUserConnection) => allConnectors.find(c => c.slug === connection.connector);
+  const displayNameOf = (connection: CurrentUserConnection) =>
+    connection.connectorDisplayName || connectorOf(connection)?.displayName || connection.connector;
+  // A disabled connector is not listed among the available ones, so its connections cannot be reconnected.
+  const isUnavailable = (connection: CurrentUserConnection) =>
+    connection.connectorStatus === 'disabled' || !connectorOf(connection);
+  const failedServiceName = () => {
+    const slug = failure?.connector;
+    const name =
+      allConnectors.find(c => c.slug === slug)?.displayName ??
+      allConnections.find(c => c.connector === slug)?.connectorDisplayName;
+    return name || t(localizationKeys('userProfile.start.connectionsSection.unknownService'));
+  };
+  const apiKeyConnectors = allConnectors.filter(connector => connector.authenticationMethod === 'api_key');
 
   if (!loadFailed && allConnectors.length === 0 && allConnections.length === 0) {
     return null;
@@ -99,9 +177,15 @@ export const ConnectionsSection = withCardStateProvider(() => {
     return mode === 'modal' ? appendModalState({ url, componentName }) : url;
   };
 
-  const startFlow = async (id: string, command: () => Promise<{ status: string; action?: { url: string } }>) => {
+  const startFlow = async (
+    id: string,
+    connector: string,
+    command: () => Promise<{ status: string; action?: { url: string } }>,
+  ) => {
+    clearFailure();
     card.setLoading(id);
     card.setError(undefined);
+    rememberPendingConnector(connector);
     try {
       const result = await command();
       if (result.status === 'requires_action') {
@@ -119,16 +203,23 @@ export const ConnectionsSection = withCardStateProvider(() => {
     }
   };
 
-  const connect = (connector: AvailableConnector) =>
-    startFlow(connector.slug, () =>
+  const reconnect = (connection: CurrentUserConnection) =>
+    startFlow(connection.id, connection.connector, () =>
+      clerk.connect.connections.reauthorize(connection.id, { returnUrl: returnUrl() }),
+    );
+  const connect = (connector: AvailableConnector) => {
+    const disconnected = disconnectedConnectionOf(connector);
+    if (disconnected) {
+      return reconnect(disconnected);
+    }
+    return startFlow(connector.slug, connector.slug, () =>
       clerk.connect.connections.create({
         connector: connector.slug,
         returnUrl: returnUrl(),
         additionalAccount: hasConnection(connector),
       }),
     );
-  const reconnect = (connection: CurrentUserConnection) =>
-    startFlow(connection.id, () => clerk.connect.connections.reauthorize(connection.id, { returnUrl: returnUrl() }));
+  };
 
   return (
     <ProfileSection.Root
@@ -140,8 +231,8 @@ export const ConnectionsSection = withCardStateProvider(() => {
       {failure ? (
         <Text
           colorScheme='danger'
-          data-connect-error={failure}
-          localizationKey={localizationKeys('userProfile.start.connectionsSection.failedAlert')}
+          data-connect-error={failure.code}
+          localizationKey={failureMessage(failure.code, failedServiceName())}
         />
       ) : null}
       {loadFailed ? (
@@ -152,61 +243,261 @@ export const ConnectionsSection = withCardStateProvider(() => {
         />
       ) : null}
       <Action.Root>
+        <ClearOnAction onAction={clearFailure} />
         <ProfileSection.ItemList id='connections'>
           {allConnections.map(connection => (
             <ConnectionItem
               key={connection.id}
               connection={connection}
-              displayName={
-                allConnectors.find(c => c.slug === connection.connector)?.displayName ?? connection.connector
-              }
-              scopeLabels={allConnectors.find(c => c.slug === connection.connector)?.scopeLabels ?? {}}
+              connector={connectorOf(connection)}
+              displayName={displayNameOf(connection)}
+              scopeLabels={connectorOf(connection)?.scopeLabels ?? {}}
               isLoading={card.isLoading}
               isReconnecting={card.loadingMetadata === connection.id}
-              canReconnect={allConnectors.some(c => c.slug === connection.connector)}
+              isUnavailable={isUnavailable(connection)}
               onReconnect={() => void reconnect(connection)}
-              onDisconnected={() => connections.revalidate()}
+              onChanged={() => {
+                clearFailure();
+                connections.revalidate();
+              }}
             />
           ))}
         </ProfileSection.ItemList>
+        {!loadFailed && allConnectors.length > 0 ? (
+          <ConnectorMenu
+            connectors={allConnectors}
+            hasConnection={hasConnection}
+            disconnectedConnectionOf={disconnectedConnectionOf}
+            apiKeyActionFor={connector => apiKeyAction(disconnectedConnectionOf(connector)?.id ?? connector.slug)}
+            isLoading={card.isLoading}
+            loadingKey={card.loadingMetadata}
+            onOpen={clearFailure}
+            onConnect={connector => void connect(connector)}
+          />
+        ) : null}
+        {apiKeyConnectors.map(connector => (
+          <Action.Open
+            key={connector.id}
+            value={apiKeyAction(connector.slug)}
+          >
+            <Action.Card>
+              <ApiKeyScreen
+                connector={connector}
+                additionalAccount={hasConnection(connector)}
+                onSaved={() => {
+                  clearFailure();
+                  connections.revalidate();
+                }}
+              />
+            </Action.Card>
+          </Action.Open>
+        ))}
       </Action.Root>
-      {!loadFailed && allConnectors.length > 0 ? (
-        <ProfileSection.ActionMenu
-          id='connections'
-          triggerLocalizationKey={localizationKeys('userProfile.start.connectionsSection.primaryButton')}
-        >
-          {allConnectors.map(connector => (
-            <ProfileSection.ActionMenuItem
-              key={connector.id}
-              id={connector.slug}
-              variant='ghost'
-              focusRing={false}
-              closeAfterClick={false}
-              data-connector={connector.slug}
-              isDisabled={card.isLoading}
-              isLoading={card.loadingMetadata === connector.slug}
-              localizationKey={
-                hasConnection(connector)
-                  ? localizationKeys('userProfile.start.connectionsSection.actionLabel__additionalAccount', {
-                      connector: connector.displayName,
-                    })
-                  : connector.displayName
-              }
-              onClick={() => void connect(connector)}
-              sx={t => ({ justifyContent: 'start', gap: t.space.$2 })}
-            />
-          ))}
-        </ProfileSection.ActionMenu>
-      ) : null}
     </ProfileSection.Root>
   );
 });
 
-const ConnectionMenu = ({ removeAction }: { removeAction: string }) => {
+const apiKeyAction = (id: string) => `api-key-${id}`;
+
+// Opening a form (replace, disconnect, a key form) is the user's next action.
+const ClearOnAction = ({ onAction }: { onAction: () => void }) => {
+  const { active } = useActionContext();
+  useEffect(() => {
+    if (active) {
+      onAction();
+    }
+  }, [active, onAction]);
+  return null;
+};
+
+const accountLabelOf = (connection: CurrentUserConnection) =>
+  connection.providerAccount?.label ?? connection.apiKeyHint ?? connection.slug;
+
+const ConnectorMenu = (props: {
+  connectors: AvailableConnector[];
+  hasConnection: (connector: AvailableConnector) => boolean;
+  disconnectedConnectionOf: (connector: AvailableConnector) => CurrentUserConnection | undefined;
+  // The key form to open: the disconnected connection's, or a new connection's.
+  apiKeyActionFor: (connector: AvailableConnector) => string;
+  isLoading: boolean;
+  loadingKey: unknown;
+  onOpen: () => void;
+  onConnect: (connector: AvailableConnector) => void;
+}) => {
+  const {
+    connectors,
+    hasConnection,
+    disconnectedConnectionOf,
+    apiKeyActionFor,
+    isLoading,
+    loadingKey,
+    onOpen,
+    onConnect,
+  } = props;
+  const { open, close } = useActionContext();
+  const labelOf = (connector: AvailableConnector) => {
+    if (hasConnection(connector)) {
+      return localizationKeys('userProfile.start.connectionsSection.actionLabel__additionalAccount', {
+        connector: connector.displayName,
+      });
+    }
+    const disconnected = disconnectedConnectionOf(connector);
+    return disconnected
+      ? localizationKeys('userProfile.start.connectionsSection.actionLabel__reconnectAccount', {
+          connector: connector.displayName,
+          account: accountLabelOf(disconnected),
+        })
+      : connector.displayName;
+  };
+  return (
+    <ProfileSection.ActionMenu
+      id='connections'
+      triggerLocalizationKey={localizationKeys('userProfile.start.connectionsSection.primaryButton')}
+      // The menu replaces any open form, so it never sits on top of one.
+      onClick={() => {
+        close();
+        onOpen();
+      }}
+    >
+      {connectors.map(connector => {
+        const usesApiKey = connector.authenticationMethod === 'api_key';
+        return (
+          <ProfileSection.ActionMenuItem
+            key={connector.id}
+            id={connector.slug}
+            variant='ghost'
+            focusRing={false}
+            // An OAuth connect shows its progress in the menu until the redirect.
+            closeAfterClick={usesApiKey}
+            data-connector={connector.slug}
+            isDisabled={isLoading}
+            isLoading={loadingKey === connector.slug}
+            localizationKey={labelOf(connector)}
+            onClick={() => (usesApiKey ? open(apiKeyActionFor(connector)) : onConnect(connector))}
+            sx={t => ({ justifyContent: 'start', gap: t.space.$2 })}
+          />
+        );
+      })}
+    </ProfileSection.ActionMenu>
+  );
+};
+
+const ApiKeyScreen = (props: {
+  connector: AvailableConnector;
+  connection?: CurrentUserConnection;
+  additionalAccount?: boolean;
+  onSaved: () => void;
+}) => {
+  const { close } = useActionContext();
+  return (
+    <ApiKeyForm
+      {...props}
+      onSuccess={() => {
+        close();
+        props.onSaved();
+      }}
+      onReset={close}
+    />
+  );
+};
+
+const ApiKeyForm = withCardStateProvider(
+  (props: {
+    connector: AvailableConnector;
+    connection?: CurrentUserConnection;
+    additionalAccount?: boolean;
+    onSuccess: () => void;
+    onReset: () => void;
+  }) => {
+    const { connector, connection, additionalAccount, onSuccess, onReset } = props;
+    const clerk = useClerk();
+    const card = useCardState();
+    const apiKeyField = useFormControl('apiKey', '', {
+      type: 'password',
+      label: localizationKeys('userProfile.start.connectionsSection.apiKeyForm.label'),
+      placeholder: localizationKeys('userProfile.start.connectionsSection.apiKeyForm.placeholder'),
+      isRequired: true,
+    });
+    const instructions = connector.apiKey?.instructions;
+    const helpUrl = connector.apiKey?.helpUrl;
+
+    const save = async () => {
+      const apiKey = apiKeyField.value.trim();
+      try {
+        if (connection) {
+          await clerk.connect.connections.reauthorize(connection.id, { apiKey });
+        } else {
+          await clerk.connect.connections.create({ connector: connector.slug, apiKey, additionalAccount });
+        }
+        onSuccess();
+      } catch (err) {
+        handleError(err as Error, [apiKeyField], card.setError);
+      }
+    };
+
+    return (
+      <FormContainer
+        headerTitle={localizationKeys(
+          connection
+            ? 'userProfile.start.connectionsSection.apiKeyForm.title__replace'
+            : 'userProfile.start.connectionsSection.apiKeyForm.title',
+          { connector: connector.displayName },
+        )}
+      >
+        {instructions || helpUrl ? (
+          <Flex
+            direction='col'
+            gap={1}
+          >
+            {instructions ? (
+              <Text
+                colorScheme='secondary'
+                data-api-key-instructions
+              >
+                {instructions}
+              </Text>
+            ) : null}
+            {helpUrl ? (
+              <Link
+                href={helpUrl}
+                isExternal
+                data-api-key-help
+                localizationKey={localizationKeys('userProfile.start.connectionsSection.apiKeyForm.helpLink')}
+              />
+            ) : null}
+          </Flex>
+        ) : null}
+        <Form.Root onSubmit={save}>
+          <Form.ControlRow elementId={apiKeyField.id}>
+            <Form.PasswordInput
+              {...apiKeyField.props}
+              autoComplete='off'
+              autoFocus
+            />
+          </Form.ControlRow>
+          <FormButtons
+            isDisabled={apiKeyField.value.trim().length === 0}
+            onReset={onReset}
+          />
+        </Form.Root>
+      </FormContainer>
+    );
+  },
+);
+
+const ConnectionMenu = ({ removeAction, replaceAction }: { removeAction: string; replaceAction?: string }) => {
   const { open } = useActionContext();
   return (
     <ThreeDotsMenu
       actions={[
+        ...(replaceAction
+          ? [
+              {
+                label: localizationKeys('userProfile.start.connectionsSection.actionLabel__replaceApiKey'),
+                onClick: () => open(replaceAction),
+              },
+            ]
+          : []),
         {
           label: localizationKeys('userProfile.start.connectionsSection.destructiveActionTitle'),
           isDestructive: true,
@@ -240,20 +531,68 @@ const DisconnectScreen = (props: { connectionId: string; displayName: string; on
 
 const ConnectionItem = (props: {
   connection: CurrentUserConnection;
+  connector: AvailableConnector | undefined;
   displayName: string;
   scopeLabels: Record<string, string>;
   isLoading: boolean;
   isReconnecting: boolean;
-  canReconnect: boolean;
+  isUnavailable: boolean;
   onReconnect: () => void;
-  onDisconnected: () => void;
+  onChanged: () => void;
 }) => {
-  const { connection, displayName, scopeLabels, isLoading, isReconnecting, canReconnect, onReconnect, onDisconnected } =
-    props;
+  const {
+    connection,
+    connector,
+    displayName,
+    scopeLabels,
+    isLoading,
+    isReconnecting,
+    isUnavailable,
+    onReconnect,
+    onChanged,
+  } = props;
   const grantedScopes = connection.scopes.map(scope => scopeLabels[scope] ?? scope).join(', ');
   const isActive = connection.status === 'active';
-  const label = connection.providerAccount?.label;
+  const isDisconnected = connection.status === 'disconnected';
+  const label = connection.providerAccount?.label ?? connection.apiKeyHint;
   const removeAction = `disconnect-${connection.id}`;
+  // An API key connection reconnects through the key form instead of a redirect.
+  const apiKeyConnector = !isUnavailable && connector?.authenticationMethod === 'api_key' ? connector : undefined;
+  const replaceAction = apiKeyConnector ? apiKeyAction(connection.id) : undefined;
+  const canReconnect = !isActive && !isUnavailable;
+
+  const badge = isUnavailable
+    ? { colorScheme: 'secondary' as const, key: 'userProfile.start.connectionsSection.status__unavailable' as const }
+    : connection.status === 'needs_attention'
+      ? { colorScheme: 'warning' as const, key: 'userProfile.start.connectionsSection.status__needsAttention' as const }
+      : isDisconnected
+        ? {
+            colorScheme: 'secondary' as const,
+            key: 'userProfile.start.connectionsSection.status__disconnected' as const,
+          }
+        : null;
+
+  const reconnectButton = canReconnect ? (
+    replaceAction ? (
+      <Action.Trigger value={replaceAction}>
+        <Button
+          variant='link'
+          isDisabled={isLoading}
+          data-connect-action='reconnect'
+          localizationKey={localizationKeys('userProfile.start.connectionsSection.actionLabel__reconnect')}
+        />
+      </Action.Trigger>
+    ) : (
+      <Button
+        variant='link'
+        isDisabled={isLoading}
+        isLoading={isReconnecting}
+        data-connect-action='reconnect'
+        localizationKey={localizationKeys('userProfile.start.connectionsSection.actionLabel__reconnect')}
+        onClick={onReconnect}
+      />
+    )
+  ) : null;
 
   return (
     <>
@@ -261,6 +600,7 @@ const ConnectionItem = (props: {
         id='connections'
         data-connection-slug={connection.slug}
         data-connection-status={connection.status}
+        data-connector-status={isUnavailable ? 'unavailable' : 'active'}
       >
         <Flex
           align='center'
@@ -275,20 +615,49 @@ const ConnectionItem = (props: {
               colorScheme='secondary'
             >{`• ${label}`}</Text>
           ) : null}
-          {isActive ? null : (
+          {/* The slug tells two accounts of one connector apart, and is what backend code passes. */}
+          <Text
+            as='span'
+            variant='caption'
+            colorScheme='secondary'
+            data-connection-slug-label
+            sx={t => ({ fontFamily: t.fonts.$mono, flexShrink: 0 })}
+          >
+            {connection.slug}
+          </Text>
+          {badge ? (
             <Badge
-              colorScheme={connection.status === 'needs_attention' ? 'warning' : 'secondary'}
-              localizationKey={localizationKeys(
-                connection.status === 'needs_attention'
-                  ? 'userProfile.start.connectionsSection.status__needsAttention'
-                  : 'userProfile.start.connectionsSection.status__disconnected',
-              )}
+              colorScheme={badge.colorScheme}
+              localizationKey={localizationKeys(badge.key)}
             />
-          )}
+          ) : null}
         </Flex>
-        {connection.status === 'disconnected' ? null : <ConnectionMenu removeAction={removeAction} />}
+        {reconnectButton || !isDisconnected ? (
+          <Flex
+            align='center'
+            gap={2}
+            sx={{ flexShrink: 0 }}
+          >
+            {reconnectButton}
+            {isDisconnected ? null : (
+              <ConnectionMenu
+                removeAction={removeAction}
+                replaceAction={replaceAction}
+              />
+            )}
+          </Flex>
+        ) : null}
       </ProfileSection.Item>
-      {connection.status === 'disconnected' || !grantedScopes ? null : (
+      {isUnavailable ? (
+        <Text
+          colorScheme='secondary'
+          variant='caption'
+          data-connection-unavailable
+          sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5}` })}
+          localizationKey={localizationKeys('userProfile.start.connectionsSection.unavailableDescription')}
+        />
+      ) : null}
+      {isDisconnected || !grantedScopes ? null : (
         <Text
           colorScheme='secondary'
           variant='caption'
@@ -299,24 +668,23 @@ const ConnectionItem = (props: {
           })}
         />
       )}
-      {isActive || !canReconnect ? null : (
-        <Box sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5}` })}>
-          <Button
-            variant='link'
-            isDisabled={isLoading}
-            isLoading={isReconnecting}
-            data-connect-action='reconnect'
-            localizationKey={localizationKeys('userProfile.start.connectionsSection.actionLabel__reconnect')}
-            onClick={onReconnect}
-          />
-        </Box>
-      )}
+      {apiKeyConnector && replaceAction ? (
+        <Action.Open value={replaceAction}>
+          <Action.Card>
+            <ApiKeyScreen
+              connector={apiKeyConnector}
+              connection={connection}
+              onSaved={onChanged}
+            />
+          </Action.Card>
+        </Action.Open>
+      ) : null}
       <Action.Open value={removeAction}>
         <Action.Card variant='destructive'>
           <DisconnectScreen
             connectionId={connection.id}
             displayName={displayName}
-            onDisconnected={onDisconnected}
+            onDisconnected={onChanged}
           />
         </Action.Card>
       </Action.Open>

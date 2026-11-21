@@ -762,12 +762,34 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         failedAlert: LocalizationValue;
+        failedAlert__accessDenied: LocalizationValue<'service'>;
+        failedAlert__insufficientScopes: LocalizationValue<'service'>;
+        failedAlert__providerAccountMismatch: LocalizationValue<'service'>;
+        failedAlert__accountAlreadyConnected: LocalizationValue<'service'>;
+        failedAlert__authorizationFailed: LocalizationValue<'service'>;
+        failedAlert__attemptExpired: LocalizationValue;
+        failedAlert__attemptInvalid: LocalizationValue;
+        /**
+         * Stands in for `{{service}}` when the service of a failed connection is not known.
+         */
+        unknownService: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
         actionLabel__reconnect: LocalizationValue;
+        actionLabel__reconnectAccount: LocalizationValue<'connector' | 'account'>;
+        actionLabel__replaceApiKey: LocalizationValue;
         actionLabel__additionalAccount: LocalizationValue<'connector'>;
+        apiKeyForm: {
+          title: LocalizationValue<'connector'>;
+          title__replace: LocalizationValue<'connector'>;
+          label: LocalizationValue;
+          placeholder: LocalizationValue;
+          helpLink: LocalizationValue;
+        };
         grantedScopes: LocalizationValue<'scopes'>;
         status__needsAttention: LocalizationValue;
         status__disconnected: LocalizationValue;
+        status__unavailable: LocalizationValue;
+        unavailableDescription: LocalizationValue;
         loadFailedAlert: LocalizationValue;
         removeResource: {
           title: LocalizationValue;

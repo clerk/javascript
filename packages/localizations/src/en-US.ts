@@ -2553,8 +2553,26 @@ export const enUS: LocalizationResource = {
       connectionsSection: {
         actionLabel__additionalAccount: '{{connector}} (another account)',
         actionLabel__reconnect: 'Reconnect',
+        actionLabel__reconnectAccount: '{{connector}} ({{account}})',
+        actionLabel__replaceApiKey: 'Replace API key',
+        apiKeyForm: {
+          helpLink: 'Where do I find my API key?',
+          label: 'API key',
+          placeholder: 'Paste your API key',
+          title: 'Connect {{connector}}',
+          title__replace: 'Replace {{connector}} API key',
+        },
         destructiveActionTitle: 'Disconnect',
         failedAlert: 'The connection could not be completed. Please try again.',
+        failedAlert__accessDenied: 'You cancelled the request at {{service}}, so nothing was connected.',
+        failedAlert__accountAlreadyConnected: 'You already connected the account you chose at {{service}}.',
+        failedAlert__attemptExpired: 'The connection request expired before it was completed. Please try again.',
+        failedAlert__attemptInvalid: 'The connection request is no longer valid. Please start again from this page.',
+        failedAlert__authorizationFailed: 'The connection could not be completed at {{service}}. Please try again.',
+        failedAlert__insufficientScopes:
+          'You did not approve all the access this application asked for at {{service}}. Connect again and approve every permission.',
+        failedAlert__providerAccountMismatch:
+          'You approved with a different account at {{service}} than the one this connection uses. Reconnect and choose that account, or connect the other one as another account.',
         grantedScopes: 'Access: {{scopes}}',
         loadFailedAlert: 'Your connected services could not be loaded. Please try again later.',
         primaryButton: 'Connect service',
@@ -2565,7 +2583,10 @@ export const enUS: LocalizationResource = {
         },
         status__disconnected: 'Disconnected',
         status__needsAttention: 'Needs attention',
+        status__unavailable: 'Unavailable',
         title: 'Connected services',
+        unavailableDescription: 'This service has been turned off by the application, so it cannot be used right now.',
+        unknownService: 'the service',
       },
       dangerSection: {
         deleteAccountButton: 'Delete account',

@@ -1,4 +1,7 @@
+import { ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
+
 import { joinPaths } from '../../util/path';
+import type { RequestFunction } from '../request';
 import { AbstractAPI } from './AbstractApi';
 
 const PROVIDER_PARAM_KEYS = new Set(['authorization_params', 'token_params', 'authorizationParams', 'tokenParams']);
@@ -24,21 +27,65 @@ const camelize = <T>(value: unknown): T =>
 const snakeize = <T>(value: T): Record<string, unknown> =>
   convertKeys(value, key => key.replace(/[A-Z]/g, c => `_${c.toLowerCase()}`)) as Record<string, unknown>;
 
+/**
+ * Connect errors say how to fix the problem in their `long_message`, so it becomes
+ * `err.message` instead of the HTTP reason ("Conflict", "Not Found").
+ */
+const withClerkErrorMessage =
+  (request: RequestFunction): RequestFunction =>
+  async options => {
+    try {
+      return await request(options);
+    } catch (err) {
+      const first = isClerkAPIResponseError(err) ? err.errors[0] : undefined;
+      const message = first?.longMessage || first?.message;
+      if (!isClerkAPIResponseError(err) || !message) {
+        throw err;
+      }
+      const error = new ClerkAPIResponseError(message, {
+        data: [],
+        status: err.status,
+        clerkTraceId: err.clerkTraceId,
+        retryAfter: err.retryAfter,
+      });
+      error.errors = err.errors;
+      throw error;
+    }
+  };
+
+abstract class AbstractConnectAPI extends AbstractAPI {
+  constructor(request: RequestFunction) {
+    super(withClerkErrorMessage(request));
+  }
+}
+
 export type ConnectConnection = {
   object: 'connection';
   id: string;
   userId: string;
   connector: string;
+  /**
+   * The connector's display name. It is set even when the connector is disabled.
+   */
+  connectorDisplayName: string;
+  /**
+   * The status of the connection's connector. A `disabled` connector issues no credentials.
+   */
+  connectorStatus: 'active' | 'disabled';
   slug: string;
   scopes: string[];
   status: 'active' | 'needs_attention' | 'disconnected';
   providerAccount: { id: string; label: string | null } | null;
+  /**
+   * The masked end of the stored API key, such as `••••abcd`, for an API key connection.
+   */
+  apiKeyHint?: string | null;
   createdAt: number;
   updatedAt: number;
   disconnectedAt: number | null;
 };
 
-export type ConnectConnectionCredential = {
+export type ConnectOAuthConnectionCredential = {
   object: 'connection_credential';
   connectionId: string;
   type: 'oauth';
@@ -47,6 +94,20 @@ export type ConnectConnectionCredential = {
   expiresAt: number | null;
   grantedScopes: string[];
 };
+
+export type ConnectApiKeyConnectionCredential = {
+  object: 'connection_credential';
+  connectionId: string;
+  type: 'api_key';
+  apiKey: string;
+  expiresAt: null;
+  grantedScopes: string[];
+};
+
+/**
+ * The connector decides the type: check `type` before reading `accessToken` or `apiKey`.
+ */
+export type ConnectConnectionCredential = ConnectOAuthConnectionCredential | ConnectApiKeyConnectionCredential;
 
 export type ConnectResult =
   | { status: 'complete'; connection: ConnectConnection }
@@ -57,22 +118,36 @@ export type ConnectUserParams = {
   connector: string;
   slug?: string;
   scopes?: string[];
-  returnUrl: string;
+  /**
+   * Required for OAuth connectors, where the browser returns after authorization.
+   */
+  returnUrl?: string;
   /**
    * Connect another account through the same connector, under the next free slug such as `github-2`.
    */
   additionalAccount?: boolean;
+  /**
+   * Stores this key for a connector whose authentication method is `api_key`.
+   */
+  apiKey?: string;
 };
 
 export type ReauthorizeConnectionParams = {
   scopes?: string[];
-  returnUrl: string;
+  /**
+   * Required for OAuth connections, where the browser returns after authorization.
+   */
+  returnUrl?: string;
+  /**
+   * Replaces the stored key of an API key connection.
+   */
+  apiKey?: string;
 };
 
 export type GetConnectionCredentialParams = {
   userId: string;
   /**
-   * Scopes the credential must cover. Omit it to accept whatever the connection was granted.
+   * Scopes the credential must cover. Omit it to accept whatever the connection was granted. API key connections have no scopes.
    */
   scopes?: string[];
   expiresIn?: number;
@@ -116,13 +191,22 @@ export type ConnectConnectorConfigurationParams = {
   tokenParams?: Record<string, string>;
 };
 
+export type ConnectApiKeyConfigurationParams = {
+  type: 'api_key';
+  /**
+   * Shown to the user next to the key field, such as where to create the key.
+   */
+  instructions?: string;
+  helpUrl?: string;
+};
+
 export type CreateConnectorParams = {
   slug: string;
   provider: string | { type: 'custom' };
   displayName?: string;
   scopes?: string[];
   target?: { url?: string; resourceUris?: string[]; audience?: string };
-  configuration: ConnectConnectorConfigurationParams;
+  configuration: ConnectConnectorConfigurationParams | ConnectApiKeyConfigurationParams;
 };
 
 export type UpdateConnectorParams = Partial<Omit<CreateConnectorParams, 'slug' | 'provider' | 'target'>> & {
@@ -136,6 +220,7 @@ export type ConnectConnector = {
   slug: string;
   displayName: string;
   provider: string | { type: 'custom' };
+  authenticationMethod: 'oauth' | 'api_key';
   scopes: string[];
   status: 'active' | 'disabled';
   callbackUrl: string;
@@ -148,7 +233,7 @@ export type ConnectConnector = {
 /**
  * @experimental Clerk Connect is in development and the API is subject to change.
  */
-export class ConnectConnectorsAPI extends AbstractAPI {
+export class ConnectConnectorsAPI extends AbstractConnectAPI {
   async create(params: CreateConnectorParams) {
     return camelize<ConnectConnector>(
       await this.request({
@@ -198,7 +283,7 @@ export class ConnectConnectorsAPI extends AbstractAPI {
 /**
  * @experimental Clerk Connect is in development and the API is subject to change.
  */
-export class ConnectConnectionsAPI extends AbstractAPI {
+export class ConnectConnectionsAPI extends AbstractConnectAPI {
   async create({ userId, ...bodyParams }: ConnectUserParams) {
     this.requireId(userId);
     return camelize<ConnectResult>(
