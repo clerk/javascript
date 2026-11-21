@@ -1,10 +1,13 @@
 import type {
+  ClerkAPIErrorJSON,
   ClientJSON,
   PhoneCodeChannel,
   SessionJSON,
+  SignInJSON,
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
+  SignUpVerificationJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
@@ -37,7 +40,13 @@ export interface FakeSignUpSeed {
   whatsAppEnabled?: boolean;
   whatsAppQuotaExceeded?: boolean;
   tickets?: Record<string, FakeTicket>;
+  oauth?: Record<string, FakeOAuthAccount>;
 }
+
+export type FakeOAuthAccount =
+  | { emailAddress: string; firstName?: string; lastName?: string }
+  | { existingUser: { emailAddress: string; secondFactor?: boolean } }
+  | { error: { code: string; message: string } };
 
 export type FakeTicket = { emailAddress: string } | 'expired';
 
@@ -56,6 +65,9 @@ export interface FakeSignUpState {
   whatsAppEnabled: boolean;
   whatsAppQuotaExceeded: boolean;
   tickets: Record<string, FakeTicket>;
+  oauth: Record<string, FakeOAuthAccount>;
+  transfers: URLSearchParams[];
+  returnFromOAuth: () => void;
   issuedProtectChecks: number;
   reloads: number;
   proofTokens: string[];
@@ -74,6 +86,11 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     whatsAppEnabled: true,
     whatsAppQuotaExceeded: false,
     tickets: {},
+    oauth: {},
+    transfers: [],
+    returnFromOAuth: () => {
+      throw new Error('The fake FAPI has not started');
+    },
     issuedProtectChecks: 0,
     reloads: 0,
     proofTokens: [],
@@ -118,6 +135,10 @@ function formError(code: string, message: string, paramName?: string, meta: Reco
 
 function rejected(code: string, message: string, paramName?: string, status = 422, meta: Record<string, unknown> = {}) {
   return HttpResponse.json({ errors: [formError(code, message, paramName, meta)] }, { status });
+}
+
+function apiError(code: string, message: string): ClerkAPIErrorJSON {
+  return { code, message, long_message: message, meta: {} };
 }
 
 export function signUpHandlers(
@@ -192,9 +213,14 @@ export function signUpHandlers(
   const settle = (signUp: SignUpJSON): SignUpJSON => {
     const { attributes } = settings();
     const { required_fields, optional_fields } = requirements();
+    const external = signUp.verifications?.external_account;
+    const linked = external?.status === 'verified' ? external.strategy : undefined;
     const provided = (field: SignUpField) => {
       if (field === 'password') {
-        return signUp.has_password;
+        return signUp.has_password || Boolean(linked);
+      }
+      if (field.startsWith('oauth_')) {
+        return field === linked;
       }
       if (field === 'legal_accepted') {
         return signUp.legal_accepted_at !== null;
@@ -273,6 +299,69 @@ export function signUpHandlers(
     });
     state.client = { ...state.client, sessions: [...state.client.sessions, session] };
     return { ...settled, status: 'complete', created_session_id: session.id, created_user_id: user.id };
+  };
+
+  const startOAuth = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
+    const strategy = body.get('strategy') ?? '';
+    if (!body.get('redirect_url')) {
+      return rejected('form_param_missing', 'redirect_url must be included.', 'redirect_url');
+    }
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications,
+        external_account: {
+          ...fapiUnpreparedVerification(),
+          ...fapiVerification(strategy),
+          next_action: '',
+          supported_strategies: [strategy],
+          external_verification_redirect_url: `https://oauth.example/authorize?strategy=${strategy}`,
+        },
+      },
+    };
+  };
+
+  state.signUp.returnFromOAuth = () => {
+    const signUp = state.client.sign_up;
+    const external = signUp?.verifications?.external_account;
+    const account = external ? state.signUp.oauth[external.strategy] : undefined;
+    if (!signUp?.verifications || !external || !account) {
+      throw new Error('No OAuth sign-up to return from');
+    }
+    const withExternal = (changes: Partial<SignUpVerificationJSON>): SignUpJSON => ({
+      ...signUp,
+      verifications: { ...signUp.verifications!, external_account: { ...external, ...changes } },
+    });
+    if ('error' in account) {
+      store(withExternal({ status: 'failed', error: apiError(account.error.code, account.error.message) }));
+      return;
+    }
+    if ('existingUser' in account) {
+      store(
+        withExternal({
+          status: 'transferable',
+          error: apiError('external_account_exists', 'This account already exists. Sign in instead.'),
+        }),
+      );
+      return;
+    }
+    const linked = withExternal({ status: 'verified' });
+    store(
+      settle({
+        ...linked,
+        email_address: account.emailAddress,
+        first_name: account.firstName ?? signUp.first_name,
+        last_name: account.lastName ?? signUp.last_name,
+        verifications: {
+          ...linked.verifications!,
+          email_address: {
+            ...linked.verifications!.email_address,
+            ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
+            next_action: '',
+          },
+        },
+      }),
+    );
   };
 
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
@@ -390,6 +479,49 @@ export function signUpHandlers(
   }
 
   return [
+    http.post(fapiUrl('/v1/client/sign_ins'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const external = state.client.sign_up?.verifications?.external_account;
+      const account = external ? state.signUp.oauth[external.strategy] : undefined;
+      if (
+        body.get('transfer') !== 'true' ||
+        external?.status !== 'transferable' ||
+        !account ||
+        !('existingUser' in account)
+      ) {
+        return rejected('form_param_missing', 'Only sign-up transfers are supported by the fake FAPI.');
+      }
+      state.signUp.transfers.push(body);
+      const { emailAddress, secondFactor = false } = account.existingUser;
+      let createdSessionId: string | null = null;
+      if (!secondFactor) {
+        const session = fapiSession({
+          id: `sess_transferred_${state.signUp.transfers.length}`,
+          user: fapiUser({
+            id: 'user_existing',
+            email_addresses: [fapiEmailAddress({ id: 'email_existing', email_address: emailAddress })],
+          }),
+        });
+        state.client = { ...state.client, sessions: [...state.client.sessions, session] };
+        createdSessionId = session.id;
+      }
+      const signIn = {
+        object: 'sign_in',
+        id: `sia_transfer_${state.signUp.transfers.length}`,
+        status: secondFactor ? 'needs_second_factor' : 'complete',
+        supported_identifiers: [],
+        identifier: emailAddress,
+        user_data: { first_name: null, last_name: null, image_url: '', has_image: false },
+        supported_first_factors: [],
+        supported_second_factors: secondFactor ? [{ strategy: 'totp' }] : [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: createdSessionId,
+        timezone: null,
+      } as unknown as SignInJSON;
+      state.client = { ...state.client, sign_up: null, sign_in: secondFactor ? signIn : null };
+      return envelope(signIn, state.client);
+    }),
     http.post(fapiUrl('/v1/client/sign_ups'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
       state.signUp.creations.push(body);
@@ -434,6 +566,13 @@ export function signUpHandlers(
             },
           },
         };
+      }
+      if (body.get('strategy')?.startsWith('oauth_')) {
+        const started = startOAuth(start, body);
+        if (started instanceof HttpResponse) {
+          return started;
+        }
+        start = started;
       }
       const applied = apply(start, body);
       if (applied instanceof HttpResponse) {
@@ -501,7 +640,11 @@ export function signUpHandlers(
       }
       const body = new URLSearchParams(await request.text());
       state.signUp.updates.push(body);
-      const applied = apply(signUp, body);
+      const started = body.get('strategy')?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+      if (started instanceof HttpResponse) {
+        return started;
+      }
+      const applied = apply(started, body);
       if (applied instanceof HttpResponse) {
         return applied;
       }
