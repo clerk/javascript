@@ -241,6 +241,7 @@
       "outputs": []
     },
     "//#test:integration:ap-flows": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -263,11 +264,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -291,11 +299,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:express": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -318,11 +333,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:fastify": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -345,11 +367,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:hono": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -372,11 +401,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:mosaic": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -400,11 +436,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -427,44 +470,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
-      "outputs": ["integration/playwright-report/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:nextjs:canary": {
-      "env": [
-        "CLEANUP",
-        "CLERK_*",
-        "DEBUG",
-        "E2E_*",
-        "EXPO_PUBLIC_CLERK_*",
-        "INTEGRATION_INSTANCE_KEYS",
-        "NEXT_PUBLIC_CLERK_*",
-        "PLASMO_PUBLIC_CLERK_*",
-        "PUBLIC_CLERK_*",
-        "REACT_APP_CLERK_*",
-        "VITE_CLERK_*"
-      ],
       "inputs": [
         "integration/**",
-        "packages/*/package.json",
-        "packages/*/src/**",
-        "packages/*/tsconfig.json",
-        "packages/*/tsconfig.build.json",
-        "packages/*/tsconfig.declarations.json",
-        "packages/*/tsdown.config.*",
-        "packages/*/tsup.config.*",
-        "packages/*/rspack.config.*",
-        "packages/*/vite.config.*",
-        "!packages/*/src/**/*.test.*",
-        "!packages/*/src/**/__tests__/**",
-        "!packages/*/src/**/__mocks__/**",
-        "!packages/*/src/**/__snapshots__/**"
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -488,11 +505,18 @@
         "VERCEL_AUTOMATION_BYPASS_SECRET",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/astro#build",
         "@clerk/backend#build",
@@ -516,11 +540,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:localhost": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -544,11 +575,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sessions": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -567,108 +605,6 @@
         "INTEGRATION_INSTANCE_KEYS",
         "NEXT_PUBLIC_CLERK_*",
         "NODE_EXTRA_CA_CERTS",
-        "PLASMO_PUBLIC_CLERK_*",
-        "PUBLIC_CLERK_*",
-        "REACT_APP_CLERK_*",
-        "VITE_CLERK_*"
-      ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
-      "outputs": ["integration/playwright-report/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:sessions:staging": {
-      "dependsOn": [
-        "@clerk/backend#build",
-        "@clerk/clerk-js#build",
-        "@clerk/nextjs#build",
-        "@clerk/shared#build",
-        "@clerk/testing#build",
-        "@clerk/ui#build"
-      ],
-      "env": [
-        "CLEANUP",
-        "CLERK_*",
-        "DEBUG",
-        "DISABLE_WEB_SECURITY",
-        "E2E_*",
-        "EXPO_PUBLIC_CLERK_*",
-        "INTEGRATION_INSTANCE_KEYS",
-        "NEXT_PUBLIC_CLERK_*",
-        "NODE_EXTRA_CA_CERTS",
-        "PLASMO_PUBLIC_CLERK_*",
-        "PUBLIC_CLERK_*",
-        "REACT_APP_CLERK_*",
-        "VITE_CLERK_*"
-      ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
-      "outputs": ["integration/playwright-report/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:handshake": {
-      "dependsOn": [
-        "@clerk/backend#build",
-        "@clerk/clerk-js#build",
-        "@clerk/nextjs#build",
-        "@clerk/shared#build",
-        "@clerk/testing#build",
-        "@clerk/ui#build"
-      ],
-      "env": [
-        "CLEANUP",
-        "CLERK_*",
-        "DEBUG",
-        "DISABLE_WEB_SECURITY",
-        "E2E_*",
-        "EXPO_PUBLIC_CLERK_*",
-        "INTEGRATION_INSTANCE_KEYS",
-        "NEXT_PUBLIC_CLERK_*",
-        "NODE_EXTRA_CA_CERTS",
-        "PLASMO_PUBLIC_CLERK_*",
-        "PUBLIC_CLERK_*",
-        "REACT_APP_CLERK_*",
-        "VITE_CLERK_*"
-      ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
-      "outputs": ["integration/playwright-report/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:handshake:staging": {
-      "dependsOn": [
-        "@clerk/backend#build",
-        "@clerk/clerk-js#build",
-        "@clerk/nextjs#build",
-        "@clerk/shared#build",
-        "@clerk/testing#build",
-        "@clerk/ui#build"
-      ],
-      "env": [
-        "CLEANUP",
-        "CLERK_*",
-        "DEBUG",
-        "DISABLE_WEB_SECURITY",
-        "E2E_*",
-        "EXPO_PUBLIC_CLERK_*",
-        "INTEGRATION_INSTANCE_KEYS",
-        "NEXT_PUBLIC_CLERK_*",
-        "NODE_EXTRA_CA_CERTS",
-        "PLASMO_PUBLIC_CLERK_*",
-        "PUBLIC_CLERK_*",
-        "REACT_APP_CLERK_*",
-        "VITE_CLERK_*"
-      ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
-      "outputs": ["integration/playwright-report/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:expo-web": {
-      "env": [
-        "CLEANUP",
-        "CLERK_*",
-        "DEBUG",
-        "E2E_*",
-        "EXPO_PUBLIC_CLERK_*",
-        "INTEGRATION_INSTANCE_KEYS",
-        "NEXT_PUBLIC_CLERK_*",
         "PLASMO_PUBLIC_CLERK_*",
         "PUBLIC_CLERK_*",
         "REACT_APP_CLERK_*",
@@ -676,24 +612,129 @@
       ],
       "inputs": [
         "integration/**",
-        "packages/*/package.json",
-        "packages/*/src/**",
-        "packages/*/tsconfig.json",
-        "packages/*/tsconfig.build.json",
-        "packages/*/tsconfig.declarations.json",
-        "packages/*/tsdown.config.*",
-        "packages/*/tsup.config.*",
-        "packages/*/rspack.config.*",
-        "packages/*/vite.config.*",
-        "!packages/*/src/**/*.test.*",
-        "!packages/*/src/**/__tests__/**",
-        "!packages/*/src/**/__mocks__/**",
-        "!packages/*/src/**/__snapshots__/**"
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:sessions:staging": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
+      "dependsOn": [
+        "@clerk/backend#build",
+        "@clerk/clerk-js#build",
+        "@clerk/nextjs#build",
+        "@clerk/shared#build",
+        "@clerk/testing#build",
+        "@clerk/ui#build"
+      ],
+      "env": [
+        "CLEANUP",
+        "CLERK_*",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
+      ],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:handshake": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
+      "dependsOn": [
+        "@clerk/backend#build",
+        "@clerk/clerk-js#build",
+        "@clerk/nextjs#build",
+        "@clerk/shared#build",
+        "@clerk/testing#build",
+        "@clerk/ui#build"
+      ],
+      "env": [
+        "CLEANUP",
+        "CLERK_*",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
+      ],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
+      "outputs": ["integration/playwright-report/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:handshake:staging": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
+      "dependsOn": [
+        "@clerk/backend#build",
+        "@clerk/clerk-js#build",
+        "@clerk/nextjs#build",
+        "@clerk/shared#build",
+        "@clerk/testing#build",
+        "@clerk/ui#build"
+      ],
+      "env": [
+        "CLEANUP",
+        "CLERK_*",
+        "DEBUG",
+        "DISABLE_WEB_SECURITY",
+        "E2E_*",
+        "EXPO_PUBLIC_CLERK_*",
+        "INTEGRATION_INSTANCE_KEYS",
+        "NEXT_PUBLIC_CLERK_*",
+        "NODE_EXTRA_CA_CERTS",
+        "PLASMO_PUBLIC_CLERK_*",
+        "PUBLIC_CLERK_*",
+        "REACT_APP_CLERK_*",
+        "VITE_CLERK_*"
+      ],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:sso": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
+      "dependsOn": [
+        "@clerk/backend#build",
+        "@clerk/clerk-js#build",
+        "@clerk/react#build",
+        "@clerk/shared#build",
+        "@clerk/testing#build",
+        "@clerk/ui#build"
+      ],
       "env": [
         "CI",
         "CLERK_*",
@@ -708,10 +749,17 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "packages/*/src/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": []
     },
     "//#test:integration:tanstack-react-start": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -734,11 +782,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:vue": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -762,11 +817,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:nuxt": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -790,11 +852,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:react-router": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -817,11 +886,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:billing": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/astro#build",
         "@clerk/backend#build",
@@ -847,11 +923,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:machine": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/astro#build",
         "@clerk/backend#build",
@@ -883,11 +966,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -910,11 +1000,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:cache-components": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -937,11 +1034,18 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:chrome-extension": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/chrome-extension#build",
@@ -966,6 +1070,8 @@
       ],
       "inputs": [
         "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
         "packages/clerk-js/src/test/fixtures.ts",
         "!integration/playwright-report/**",
         "!integration/test-results/**"
@@ -974,6 +1080,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:electron": {
+      "passThroughEnv": ["PLAYWRIGHT_*"],
       "dependsOn": [
         "@clerk/backend#build",
         "@clerk/clerk-js#build",
@@ -996,7 +1103,13 @@
         "REACT_APP_CLERK_*",
         "VITE_CLERK_*"
       ],
-      "inputs": ["integration/**", "!integration/playwright-report/**", "!integration/test-results/**"],
+      "inputs": [
+        "integration/**",
+        ".github/actions/**",
+        ".github/workflows/ci.yml",
+        "!integration/playwright-report/**",
+        "!integration/test-results/**"
+      ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
