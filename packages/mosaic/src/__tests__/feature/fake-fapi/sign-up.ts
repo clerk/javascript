@@ -25,6 +25,8 @@ export interface FakeSignUpSeed {
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   protectChecks?: number;
+  whatsAppEnabled?: boolean;
+  whatsAppQuotaExceeded?: boolean;
 }
 
 export interface FakeSignUpState {
@@ -32,6 +34,8 @@ export interface FakeSignUpState {
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   protectChecks: number;
+  whatsAppEnabled: boolean;
+  whatsAppQuotaExceeded: boolean;
   issuedProtectChecks: number;
   proofTokens: string[];
   creations: URLSearchParams[];
@@ -45,6 +49,8 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     takenEmailAddresses: [],
     sessionTasks: null,
     protectChecks: 0,
+    whatsAppEnabled: true,
+    whatsAppQuotaExceeded: false,
     issuedProtectChecks: 0,
     proofTokens: [],
     creations: [],
@@ -384,7 +390,9 @@ export function signUpHandlers(
       if (!signUp?.verifications) {
         return missing();
       }
-      const strategy = new URLSearchParams(await request.text()).get('strategy') ?? '';
+      const body = new URLSearchParams(await request.text());
+      const strategy = body.get('strategy') ?? '';
+      const channel = body.get('channel');
       const field = STRATEGIES[strategy];
       const attribute = field ? settings().attributes[field] : undefined;
       if (!field || !attribute?.verifications.some(supported => supported === strategy)) {
@@ -405,7 +413,19 @@ export function signUpHandlers(
           400,
         );
       }
-      state.signUp.preparations.push(strategy);
+      const isPhone = field === 'phone_number';
+      if (isPhone && channel && channel !== 'sms' && channel !== 'whatsapp') {
+        return rejected('form_param_value_invalid', `${channel} does not match one of the allowed values.`, 'channel');
+      }
+      if (isPhone && channel === 'whatsapp' && !state.signUp.whatsAppEnabled) {
+        return rejected(
+          'whatsapp_channel_not_enabled',
+          "The 'whatsapp' channel is not available for this instance.",
+          'channel',
+        );
+      }
+      const sentOver = channel === 'whatsapp' && state.signUp.whatsAppQuotaExceeded ? 'sms' : (channel ?? 'sms');
+      state.signUp.preparations.push(isPhone && channel ? `${strategy}:${channel}` : strategy);
       return store({
         ...signUp,
         verifications: {
@@ -414,6 +434,7 @@ export function signUpHandlers(
             ...fapiVerification(strategy),
             next_action: 'needs_attempt',
             supported_strategies: attribute.verifications,
+            ...(isPhone ? { channel: sentOver } : {}),
           }),
         },
       });

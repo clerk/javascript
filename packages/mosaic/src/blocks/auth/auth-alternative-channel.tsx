@@ -62,7 +62,8 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
 }: AuthAlternativeChannelProps<TValues>) {
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
+  const feedback: FieldFeedback | undefined =
+    form.fields.phoneNumber.feedback ?? (errorMessage ? { type: 'error', message: errorMessage } : undefined);
   const provider = channel.name;
 
   return (
@@ -133,6 +134,8 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
         <SubmitButton
           form={form.id}
           fullWidth
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

@@ -342,8 +342,7 @@ export function VerifyPhoneAlternativeChannel() {
         <SignUpVerify
           channel='phone'
           {...verifyScreen(PHONE)}
-          provider='WhatsApp'
-          onCancel={noop}
+          verification={{ ...verifyScreen(PHONE).verification, provider: 'WhatsApp' }}
         />
       }
     />

@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -21,6 +21,25 @@ function environment({ attributes, ...overrides }: FapiEnvironmentOverrides = {}
   return fapiEnvironment({
     attributes: { email_address: { required: true }, password: { required: true }, ...attributes },
     ...overrides,
+  });
+}
+
+function phoneEnvironment(authConfig: FapiEnvironmentOverrides['auth_config'] = {}) {
+  return fapiEnvironment({
+    attributes: {
+      email_address: { enabled: false },
+      password: { enabled: false },
+      phone_number: {
+        enabled: true,
+        required: true,
+        verifications: ['phone_code'],
+        used_for_first_factor: true,
+        first_factors: ['phone_code'],
+        verify_at_sign_up: true,
+        channels: ['sms', 'whatsapp'],
+      },
+    },
+    auth_config: authConfig,
   });
 }
 
@@ -654,6 +673,244 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
     await codeSent();
+  });
+
+  it('sends the phone code by SMS by default', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.type(await screen.findByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    await codeSent();
+    expect(fapi.signUp.preparations).toEqual(['phone_code:sms']);
+  });
+
+  it('sends the phone code over WhatsApp when the user picks it, then signs them up', async () => {
+    const { fapi, user, navigate } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    expect(await screen.findByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
+    await user.type(screen.getByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+    expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp']);
+
+    await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+    await user.keyboard(VERIFICATION_CODE);
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('resends the phone code over WhatsApp from the WhatsApp code screen', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
+    try {
+      await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+      await user.keyboard('12');
+      await act(() => vi.advanceTimersByTimeAsync(30_000));
+      await user.click(await screen.findByRole('button', { name: 'Resend' }));
+
+      await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:whatsapp']));
+      expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveValue('');
+      expect(screen.getByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+      await codeSent();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('shows a rejected phone number on the WhatsApp phone screen', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+    const hold = holdRequests('post', '/v1/client/sign_ups');
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    hold.fail('form_identifier_exists', 'That phone number is taken. Please try another.', 'phone_number');
+
+    expect(await screen.findByText('That phone number is taken. Please try another.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
+    expect(fapi.signUp.preparations).toEqual([]);
+  });
+
+  it("shows FAPI's message when the instance can't send WhatsApp codes", async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment(), signUp: { whatsAppEnabled: false } });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByText("The 'whatsapp' channel is not available for this instance.")).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
+  });
+
+  it('keeps Continue disabled on the WhatsApp phone screen until the phone number is filled', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await screen.findByRole('heading', { name: /with WhatsApp/ });
+    await user.click(continueButton());
+
+    expect(continueButton()).toHaveAttribute('aria-disabled', 'true');
+    expect(fapi.signUp.creations).toHaveLength(0);
+    await user.type(screen.getByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    expect(continueButton()).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('shows the SMS code screen when FAPI sends the code by SMS instead of WhatsApp', async () => {
+    const { user } = await renderSignUp({
+      environment: phoneEnvironment(),
+      signUp: { whatsAppQuotaExceeded: true },
+    });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Send code via SMS instead' })).toBeNull();
+    await codeSent();
+  });
+
+  it('locks the code screen while switching the code to SMS', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+    await user.click(screen.getByRole('button', { name: 'Send code via SMS instead' }));
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+
+    expect(screen.getByRole('button', { name: 'Send code via SMS instead' })).toBeDisabled();
+    hold.release();
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    await codeSent();
+  });
+
+  it('starts the resend countdown after a code fails to send', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+    const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+
+    await user.type(await screen.findByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    hold.fail('verification_code_too_many_requests', 'Too many requests. Please wait before trying again.');
+
+    expect(await screen.findByText('Too many requests. Please wait before trying again.')).toBeInTheDocument();
+    await codeSent();
+  });
+
+  it('returns to the main form when the phone number is edited from the WhatsApp code screen', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    await user.click(screen.getByRole('button', { name: 'Edit phone number' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /with WhatsApp/ })).toBeNull();
+  });
+
+  it('sends a prefilled value the WhatsApp phone screen does not show', async () => {
+    const { fapi, user } = await renderSignUp(
+      {
+        environment: fapiEnvironment({
+          attributes: {
+            email_address: { enabled: false },
+            password: { enabled: false },
+            first_name: { enabled: true, required: false },
+            phone_number: {
+              enabled: true,
+              required: true,
+              verifications: ['phone_code'],
+              used_for_first_factor: true,
+              first_factors: ['phone_code'],
+              verify_at_sign_up: true,
+              channels: ['sms', 'whatsapp'],
+            },
+          },
+        }),
+      },
+      { initialValues: { firstName: 'Ada' } },
+    );
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    await codeSent();
+    expect(fapi.signUp.creations[0].get('first_name')).toBe('Ada');
+  });
+
+  it('offers no WhatsApp on the continue screen and sends a code entered there by SMS', async () => {
+    const fapi = serveFapi({ environment: phoneEnvironment({ preferred_channels: { US: 'whatsapp' } }) });
+    const { clerk } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({}));
+
+    await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /WhatsApp/ })).toBeNull();
+    await user.type(screen.getByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    await codeSent();
+    expect(fapi.signUp.preparations).toEqual(['phone_code:sms']);
+  });
+
+  it('switches the phone code to SMS from the WhatsApp code screen', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await user.click(await screen.findByRole('button', { name: 'Send code via SMS instead' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:sms']);
+    await codeSent();
+  });
+
+  it('returns from the WhatsApp phone screen to the form', async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.click(await screen.findByRole('button', { name: 'Use another method' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Phone number' })).toBeInTheDocument();
+  });
+
+  it("sends the phone code over the channel the instance prefers for the number's country", async () => {
+    const { fapi, user } = await renderSignUp({
+      environment: phoneEnvironment({ preferred_channels: { US: 'whatsapp' } }),
+    });
+
+    await user.type(await screen.findByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+    await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp']));
   });
 
   it('links to sign-in from the form', async () => {

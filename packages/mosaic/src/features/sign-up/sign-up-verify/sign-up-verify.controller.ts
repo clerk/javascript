@@ -1,3 +1,4 @@
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
 
 import { usePendingAction } from '../../../hooks/use-pending-action';
@@ -9,19 +10,26 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
+import type { SignUpVerificationModel } from '../sign-up.model';
 import type { SignUpVerifyScreen } from '../sign-up.types';
 
 interface CodeContext {
-  sendCode: () => Promise<void>;
+  sendCode: SignUpVerificationModel['send'];
+  channel: PhoneCodeChannel | undefined;
   resendAvailableAt: number | undefined;
   error: ErrorDescription | undefined;
 }
 
-type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'ALREADY_SENT' };
+type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'SEND_SMS' } | { type: 'ALREADY_SENT' };
 
 const code = setup<CodeContext, CodeEvent>();
 
-const clearError = code.assign(() => ({ error: undefined }));
+const clearError = code.assign(() => ({ error: undefined, channel: undefined }));
+
+const sendBySms = {
+  target: 'sending' as const,
+  actions: code.assign(() => ({ error: undefined, channel: 'sms' as const })),
+};
 
 const startCooldown = code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) }));
 
@@ -30,25 +38,38 @@ const codeMachine = code.createMachine({
   initial: 'idle',
   context: {
     sendCode: () => Promise.resolve(),
+    channel: undefined,
     resendAvailableAt: undefined,
     error: undefined,
   },
   states: {
     idle: {
-      on: { SEND: 'sending', RESEND: 'sending', ALREADY_SENT: { target: 'sent', actions: startCooldown } },
+      on: {
+        SEND: 'sending',
+        RESEND: 'sending',
+        SEND_SMS: sendBySms,
+        ALREADY_SENT: { target: 'sent', actions: startCooldown },
+      },
     },
     sending: {
-      invoke: code.fromPromise(context => context.sendCode(), {
-        onDone: { target: 'sent', actions: startCooldown },
-        onError: {
-          target: 'sent',
-          actions: code.assign<ErrorInvokeEvent>((_, event) => ({ error: toLocalizableError(event.error) })),
+      invoke: code.fromPromise(
+        context => context.sendCode(context.channel ? { channel: context.channel } : undefined),
+        {
+          onDone: { target: 'sent', actions: startCooldown },
+          onError: {
+            target: 'sent',
+            actions: code.assign<ErrorInvokeEvent>((_, event) => ({
+              error: toLocalizableError(event.error),
+              resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS),
+            })),
+          },
         },
-      }),
+      ),
     },
     sent: {
       on: {
         SEND: { target: 'sending', actions: clearError },
+        SEND_SMS: sendBySms,
         RESEND: {
           target: 'sending',
           guard: context => isResendUnlocked(context.resendAvailableAt),
@@ -78,7 +99,8 @@ export function useSignUpVerifyController({
     send({ type: needsCode ? 'SEND' : 'ALREADY_SENT' });
   }, [needsCode, send]);
 
-  const isPending = actions.isPending || isFlowPending;
+  const isSwitchingToSms = snapshot.value === 'sending' && snapshot.context.channel === 'sms';
+  const isPending = actions.isPending || isFlowPending || isSwitchingToSms;
   const submit = (submitted: string) =>
     void actions.run('code', async () => onNext(await verification.verify(submitted)));
 
@@ -90,7 +112,16 @@ export function useSignUpVerifyController({
     isPending,
     errorMessage: actions.error,
     globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
-    onResend: () => send({ type: 'RESEND' }),
+    onResend: () => {
+      setValue('');
+      send({ type: 'RESEND' });
+    },
+    onSendSms: verification.provider
+      ? () => {
+          setValue('');
+          send({ type: 'SEND_SMS' });
+        }
+      : undefined,
     canResend: actor.can({ type: 'RESEND' }) && !isPending,
     resendRemainingSeconds: resendSeconds || undefined,
   };

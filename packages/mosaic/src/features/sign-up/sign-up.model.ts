@@ -1,3 +1,5 @@
+import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { iconImageUrl } from '@clerk/shared/constants';
 import type { ClerkError } from '@clerk/shared/error';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { actionBlockedDetailsFrom } from '@clerk/shared/internal/clerk-js/actionBlocked';
@@ -15,11 +17,18 @@ import {
   emailOrPhone,
   getInitialActiveIdentifier,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
+import { getPreferredPhoneCodeChannelByCountry } from '@clerk/shared/phone';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
-import type { SessionTask, SignUpField, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import type {
+  PhoneCodeChannel,
+  SessionTask,
+  SignUpField,
+  SignUpFutureResource,
+  SignUpInitialValues,
+} from '@clerk/shared/types';
 import { useMemo } from 'react';
 
-import type { AuthActionBlockedDetails } from '../../blocks/auth';
+import type { AuthActionBlockedDetails, AuthProvider } from '../../blocks/auth';
 import type { FieldFeedback } from '../../components/form';
 import { FormSubmitError } from '../../components/form';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
@@ -86,14 +95,16 @@ export interface SignUpDetailsModel {
   legalConsent?: SignUpLegalConsent;
   continueLegalConsent?: SignUpLegalConsent;
   validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
-  create: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
+  alternativeChannels: Array<AuthProvider & { id: PhoneCodeChannel }>;
+  create: (values: SignUpDetailsValues, options?: { channel?: PhoneCodeChannel }) => Promise<SignUpNextStep>;
   update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
 }
 
 export interface SignUpVerificationModel {
   target: string;
   needsCode: boolean;
-  send: () => Promise<void>;
+  provider?: string;
+  send: (options?: { channel?: PhoneCodeChannel }) => Promise<void>;
   verify: (code: string) => Promise<SignUpNextStep>;
 }
 
@@ -206,6 +217,10 @@ function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier):
     }
   }
   return fields;
+}
+
+function hasExpired(expiresAt: number | undefined): boolean {
+  return expiresAt !== undefined && expiresAt < Date.now();
 }
 
 async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<void> {
@@ -329,6 +344,15 @@ export function useSignUpModel({
     : undefined;
 
   const step = flowStep();
+  const phoneChannel = signUp.verifications.phoneNumber.channel;
+  const preferredPhoneChannel = (): PhoneCodeChannel | undefined => {
+    const { preferredChannels } = environment.authConfig;
+    const preferred =
+      signUp.phoneNumber && preferredChannels
+        ? getPreferredPhoneCodeChannelByCountry(signUp.phoneNumber, preferredChannels)
+        : null;
+    return preferred && preferred !== 'sms' ? preferred : undefined;
+  };
 
   return {
     status: 'ready',
@@ -408,12 +432,22 @@ export function useSignUpModel({
       legalConsent,
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
-      create: async values => {
+      alternativeChannels: userSettings.alternativePhoneCodeChannels.flatMap(channel => {
+        const provider = getAlternativePhoneCodeProviderData(channel);
+        return provider ? [{ id: channel, name: provider.name, iconUrl: iconImageUrl(channel) }] : [];
+      }),
+      create: async (values, { channel } = {}) => {
         await save(
           () => run(() => signUp.create({ ...details(values), password: values.password })),
           DETAILS_FIELDS,
           usernameBounds,
         );
+        const sendOver = signUp.unverifiedFields.includes('phone_number')
+          ? (channel ?? preferredPhoneChannel())
+          : undefined;
+        if (sendOver) {
+          await save(() => run(() => signUp.verifications.sendPhoneCode({ channel: sendOver })), ['phoneNumber']);
+        }
         return next(signUp);
       },
       update: async values => {
@@ -428,7 +462,7 @@ export function useSignUpModel({
         if (!challenge) {
           return next(signUp);
         }
-        if (challenge.expiresAt !== undefined && challenge.expiresAt < Date.now()) {
+        if (hasExpired(challenge.expiresAt)) {
           throw new ClerkRuntimeError('Protect verification expired', { code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT });
         }
         const proofToken = await executeProtectCheck(challenge, container, {
@@ -453,7 +487,8 @@ export function useSignUpModel({
       phone: {
         target: signUp.phoneNumber ?? '',
         needsCode: step.type === 'verify_phone' && !step.sent,
-        send: () => run(() => signUp.verifications.sendPhoneCode()),
+        provider: getAlternativePhoneCodeProviderData(phoneChannel)?.name,
+        send: ({ channel } = {}) => run(() => signUp.verifications.sendPhoneCode({ channel: channel ?? phoneChannel })),
         verify: async code => {
           await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
           return next(signUp);
