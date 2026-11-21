@@ -640,6 +640,7 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    await codeSent();
   });
 
   it('runs a second protect check when Clerk issues another', async () => {
@@ -652,6 +653,7 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
+    await codeSent();
   });
 
   it('links to sign-in from the form', async () => {
