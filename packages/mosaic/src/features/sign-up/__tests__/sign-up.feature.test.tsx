@@ -611,6 +611,51 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
+  it('runs the protect check before verifying the email', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
+
+    await submitStart(user);
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    await codeSent();
+  });
+
+  it('shows a failed protect check and runs it again on Try again', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete. Please try again."),
+    );
+    expect(fapi.signUp.proofTokens).toEqual([]);
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    await codeSent();
+  });
+
+  it('runs a second protect check when Clerk issues another', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 2 } });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']));
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
+    await codeSent();
+  });
+
   it('links to sign-in from the form', async () => {
     const { user, navigate } = await renderSignUp();
 

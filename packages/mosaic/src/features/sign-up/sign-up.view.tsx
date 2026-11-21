@@ -5,7 +5,6 @@ import {
   AuthEmailLinkStatus,
   AuthEnterpriseConnections,
   AuthLoading,
-  AuthProtectCheck,
   AuthStartOver,
   AuthWallets,
 } from '../../blocks/auth';
@@ -218,19 +217,7 @@ export function SignUpView(props: SignUpViewProps) {
             </Flow.Step>
 
             {/* /protect-check */}
-            <Flow.Step ids={['protectCheck']}>
-              {protectCheck ? (
-                <AuthProtectCheck
-                  messages={{ ...m.protectCheck, loading: m.loading }}
-                  challenge={protectCheck.challenge}
-                  logo={logo}
-                  globalErrorMessage={protectCheck.globalErrorMessage}
-                  isPending={protectCheck.isPending}
-                  containerRef={protectCheck.containerRef}
-                  onRetry={protectCheck.onRetry}
-                />
-              ) : null}
-            </Flow.Step>
+            <Flow.Step ids={['protectCheck']}>{protectCheck}</Flow.Step>
           </>
         )}
       </Flow.Root>

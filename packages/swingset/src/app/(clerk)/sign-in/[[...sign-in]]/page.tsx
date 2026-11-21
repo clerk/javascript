@@ -7,7 +7,7 @@ export default function SignInPage() {
     <div className='mx-auto flex w-full max-w-3xl justify-center p-3 sm:p-8'>
       <SignIn
         path='/sign-in'
-        signUpUrl='/sign-up'
+        signUpUrl='/live/authentication/sign-up'
       />
     </div>
   );
