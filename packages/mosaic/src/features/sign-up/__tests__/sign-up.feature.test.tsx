@@ -1168,12 +1168,16 @@ describe('SignUp social sign-up', () => {
     });
   }
 
-  async function startWithGoogle(seed: FakeFapiSeed, options?: Parameters<typeof renderWithClerk>[1]) {
+  async function startWithGoogle(
+    seed: FakeFapiSeed,
+    options?: Parameters<typeof renderWithClerk>[1],
+    provider: RegExp = /Google/,
+  ) {
     const fapi = serveFapi({ environment: socialEnvironment(), ...seed });
     const first = await renderWithClerk(<SignUp />, options);
     const leave = vi.spyOn(first.clerk, '__internal_windowNavigate').mockImplementation(() => {});
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: /Google/ }));
+    await user.click(await screen.findByRole('button', { name: provider }));
     await waitFor(() => expect(leave).toHaveBeenCalled());
     return { fapi, first, leave, user };
   }
@@ -1258,5 +1262,115 @@ describe('SignUp social sign-up', () => {
     expect(await screen.findByText('You did not grant access to your account.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
+  });
+
+  it('starts a new sign-up from start even when an earlier one is still on the client', async () => {
+    const fapi = serveFapi({ environment: socialEnvironment() });
+    const { clerk } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const leave = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const user = userEvent.setup();
+    await submitStart(user);
+    await screen.findByRole('heading', { name: 'Verify your email' });
+    await codeSent();
+
+    await user.click(screen.getByRole('button', { name: 'Open the start route' }));
+    await user.click(await screen.findByRole('button', { name: /Google/ }));
+
+    await waitFor(() => expect(leave).toHaveBeenCalled());
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.creations[1].get('strategy')).toBe('oauth_google');
+    expect(fapi.signUp.updates.filter(update => update.get('strategy'))).toEqual([]);
+  });
+
+  it('offers only the providers on start when the instance signs up with social accounts alone', async () => {
+    await renderSignUp({
+      environment: socialEnvironment({
+        attributes: { email_address: { enabled: false }, password: { enabled: false } },
+        user_settings: {
+          social: { oauth_google: GOOGLE },
+          sign_up: {
+            allowlist_only: false,
+            progressive: true,
+            captcha_enabled: false,
+            mode: 'public',
+            legal_consent_enabled: true,
+          },
+        },
+      }),
+    });
+
+    expect(await screen.findByRole('button', { name: /Google/ })).toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+  });
+
+  it('asks for the required provider after the user signed up with another one', async () => {
+    const github = { ...GOOGLE, strategy: 'oauth_github' as const, name: 'GitHub' };
+    const { fapi, first } = await startWithGoogle(
+      {
+        environment: socialEnvironment({
+          user_settings: { social: { oauth_google: { ...GOOGLE, required: true }, oauth_github: github } },
+        }),
+        signUp: { oauth: { oauth_github: { emailAddress: EMAIL } } },
+      },
+      undefined,
+      /GitHub/,
+    );
+
+    await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Google/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /GitHub/ })).toBeNull();
+  });
+
+  it('offers Start over when the instance requires two providers a sign-up cannot both link', async () => {
+    const github = { ...GOOGLE, strategy: 'oauth_github' as const, name: 'GitHub', required: true };
+    const { user } = await renderSignUp({
+      environment: socialEnvironment({
+        user_settings: { social: { oauth_google: { ...GOOGLE, required: true }, oauth_github: github } },
+      }),
+    });
+
+    await submitStart(user);
+    await enterCode(user);
+
+    expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
+  });
+
+  it('takes a user who signs in instead to their pending task', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: {
+        oauth: { oauth_google: { existingUser: { emailAddress: EMAIL } } },
+        sessionTasks: [{ key: 'choose-organization' }],
+      },
+    });
+
+    const { navigate } = await returnFromGoogle(fapi, first, {
+      signInUrl: '/sign-in',
+      signInFallbackRedirectUrl: '/home',
+    });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('choose-organization')));
+    expect(fapi.signUp.transfers).toHaveLength(1);
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('/home'));
+  });
+
+  it('shows a generic error when Google returns one that is not meant for users', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: {
+        oauth: { oauth_google: { error: { code: 'internal_clerk_error', message: 'Raw server detail.' } } },
+      },
+    });
+
+    await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(screen.queryByText('Raw server detail.')).toBeNull();
   });
 });
