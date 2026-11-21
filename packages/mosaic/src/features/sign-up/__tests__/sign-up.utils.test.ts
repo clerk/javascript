@@ -97,7 +97,12 @@ describe('continue screen rules', () => {
     missingFields: SignUpField[],
     optionalFields: SignUpField[] = [],
     unverifiedFields: SignUpIdentificationField[] = [],
-  ) => ({ missingFields, optionalFields, unverifiedFields });
+  ) => ({
+    missingFields,
+    optionalFields,
+    unverifiedFields,
+    requiredFields: missingFields.filter(field => !optionalFields.includes(field)),
+  });
 
   it.each([
     {

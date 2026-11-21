@@ -80,7 +80,7 @@ export function SignUpDetailsStep({
           {...inertProps(isChallengeShown)}
         >
           <SignUpProviders
-            providers={onlyLegalConsent ? [] : socialProviders}
+            providers={onlyLegalConsent && step.purpose === 'continue' ? [] : socialProviders}
             showDivider={hasFields}
             pendingProviderId={pendingProviderId}
             isDisabled={isDisabled}

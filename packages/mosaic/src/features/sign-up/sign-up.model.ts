@@ -3,6 +3,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { actionBlockedDetailsFrom } from '@clerk/shared/internal/clerk-js/actionBlocked';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { getSignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
@@ -16,6 +17,7 @@ import {
   determineActiveFields,
   emailOrPhone,
   getInitialActiveIdentifier,
+  showFormFields,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { getPreferredPhoneCodeChannelByCountry } from '@clerk/shared/phone';
@@ -25,6 +27,7 @@ import type {
   OAuthStrategy,
   PhoneCodeChannel,
   SessionTask,
+  SetActiveNavigate,
   SignUpFutureResource,
   SignUpInitialValues,
   UserSettingsResource,
@@ -38,7 +41,7 @@ import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
 import { useErrorText, useLocale, useMessages } from '../../localization';
-import { save, SaveError } from '../../utils/errors';
+import { save, SaveError, UNEXPECTED_ERROR } from '../../utils/errors';
 import type { AuthSessionPhase } from '../auth-flow/auth-flow.types';
 import { passwordError } from '../user-profile/user-profile-password-section/user-profile-password-errors';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
@@ -155,6 +158,25 @@ const ABSOLUTE_URL = /^https?:\/\//;
 const RETURN_PARAM = '__clerk_mosaic_sign_up';
 const SSO_RETURN = 'sso-callback';
 const OAUTH_PREFIX = /^oauth_(custom_)?/;
+const SHOWN_RETURN_ERRORS: readonly string[] = [
+  ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP,
+  ERROR_CODES.OAUTH_ACCESS_DENIED,
+  ERROR_CODES.NOT_ALLOWED_ACCESS,
+  ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING,
+  ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML,
+  ERROR_CODES.USER_LOCKED,
+  ERROR_CODES.ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING,
+  ERROR_CODES.ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH,
+  ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH,
+  ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH,
+  ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO,
+  ERROR_CODES.CAPTCHA_INVALID,
+  ERROR_CODES.FRAUD_DEVICE_BLOCKED,
+  ERROR_CODES.FRAUD_ACTION_BLOCKED,
+  ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED,
+  ERROR_CODES.USER_BANNED,
+  ERROR_CODES.USER_DEACTIVATED,
+];
 
 function ssoCallbackUrl(): string {
   const url = new URL(window.location.href);
@@ -174,11 +196,11 @@ function continueProviders<T extends AuthProvider & { id: OAuthStrategy }>(
   signUp: SignUpFutureResource,
   providers: T[],
 ): T[] {
-  if (signUp.verifications.externalAccount.status === 'verified') {
-    return [];
-  }
   const missing = providers.filter(provider => signUp.missingFields.includes(provider.id));
-  return missing.length > 0 ? missing : providers;
+  if (missing.length > 0) {
+    return missing;
+  }
+  return signUp.verifications.externalAccount.status === 'verified' ? [] : providers;
 }
 
 function oauthProvidersFrom(userSettings: UserSettingsResource): Array<AuthProvider & { id: OAuthStrategy }> {
@@ -286,6 +308,7 @@ export function useSignUpModel({
   const canSwitchIdentifier = emailOrPhone(attributes, isProgressiveSignUp);
   const oauthProviders = oauthProvidersFrom(userSettings);
   const providerIds = oauthProviders.map(provider => provider.id);
+  const showForm = showFormFields(userSettings);
 
   const next = (resource: SignUpFutureResource): SignUpNextStep => {
     const step = getSignUpNextStep(resource);
@@ -396,6 +419,25 @@ export function useSignUpModel({
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
 
+  const navigateAfter =
+    (destination: string, { keepsTaskInFlow }: { keepsTaskInFlow: boolean }): SetActiveNavigate =>
+    async ({ session: created, decorateUrl }) => {
+      const task = created.currentTask;
+      if (keepsTaskInFlow && taskInFlow(task)) {
+        return;
+      }
+      if (task) {
+        await router.navigate(taskUrl(task));
+        return;
+      }
+      const decorated = decorateUrl(destination);
+      if (decorated !== destination && ABSOLUTE_URL.test(decorated)) {
+        router.windowNavigate(decorated);
+        return;
+      }
+      await router.navigate(destination);
+    };
+
   const step = next(signUp);
   const phoneChannel = signUp.verifications.phoneNumber.channel;
   const preferredPhoneChannel = (phoneNumber: string | undefined): PhoneCodeChannel | undefined => {
@@ -434,6 +476,10 @@ export function useSignUpModel({
       isReturning: new URL(window.location.href).searchParams.get(RETURN_PARAM) === SSO_RETURN,
       completeReturn: async () => {
         forgetReturn();
+        const step = next(signUp);
+        if (step.type === 'protect') {
+          return step;
+        }
         if (signUp.isTransferable) {
           await run(() => signIn.create({ transfer: true }));
           if (signIn.status !== 'complete') {
@@ -441,54 +487,32 @@ export function useSignUpModel({
             return undefined;
           }
           await run(() =>
-            signIn.finalize({
-              navigate: async ({ decorateUrl }) => {
-                const afterSignInUrl = clerk.buildAfterSignInUrl();
-                const decorated = decorateUrl(afterSignInUrl);
-                if (decorated !== afterSignInUrl && ABSOLUTE_URL.test(decorated)) {
-                  router.windowNavigate(decorated);
-                  return;
-                }
-                await router.navigate(afterSignInUrl);
-              },
-            }),
+            signIn.finalize({ navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }) }),
           );
           return undefined;
         }
         const existingSession = signUp.existingSession?.sessionId;
         if (existingSession) {
-          await clerk.setActive({ session: existingSession, redirectUrl: clerk.buildAfterSignInUrl() });
+          await clerk.setActive({
+            session: existingSession,
+            navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }),
+          });
           return undefined;
         }
         const failure = signUp.verifications.externalAccount.error;
         if (failure) {
           await run(() => signUp.reset());
-          throw new SaveError({ global: { code: failure.code, message: failure.longMessage || failure.message } });
+          throw new SaveError({
+            global: SHOWN_RETURN_ERRORS.includes(failure.code)
+              ? { code: failure.code, message: failure.longMessage || failure.message }
+              : UNEXPECTED_ERROR,
+          });
         }
-        return next(signUp);
+        return step;
       },
       finalize: async () => {
         forgetTicket();
-        await run(() =>
-          signUp.finalize({
-            navigate: async ({ session: created, decorateUrl }) => {
-              const task = created.currentTask;
-              if (taskInFlow(task)) {
-                return;
-              }
-              if (task) {
-                await router.navigate(taskUrl(task));
-                return;
-              }
-              const decorated = decorateUrl(afterSignUpUrl);
-              if (decorated !== afterSignUpUrl && ABSOLUTE_URL.test(decorated)) {
-                router.windowNavigate(decorated);
-                return;
-              }
-              await router.navigate(afterSignUpUrl);
-            },
-          }),
-        );
+        await run(() => signUp.finalize({ navigate: navigateAfter(afterSignUpUrl, { keepsTaskInFlow: true }) }));
       },
       reset: () => {
         forgetTicket();
@@ -519,7 +543,7 @@ export function useSignUpModel({
         }) ?? null,
       canSwitchIdentifier,
       prefill,
-      startFieldsFor: identifier => toViewFields(activeFields(identifier), isShown),
+      startFieldsFor: identifier => (showForm ? toViewFields(activeFields(identifier), isShown) : {}),
       continueFieldsFor: identifier => continueFields(signUp, identifier),
       continueCanSwitchIdentifier: missesEitherIdentifier(signUp),
       startHiddenValuesFor: identifier => {
@@ -533,18 +557,20 @@ export function useSignUpModel({
         }
         return hidden;
       },
-      legalConsent,
+      legalConsent: showForm ? legalConsent : undefined,
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       inTicketSignUp,
       oauthProviders,
       continueOAuthProviders: continueProviders(signUp, oauthProviders),
       sso: async (strategy, { legalAccepted, continueSignUp }) => {
+        let target = signUp;
         if (signUp.id && !continueSignUp && !inTicketSignUp) {
           await run(() => signUp.reset());
+          target = clerk.client?.signUp.__internal_future ?? signUp;
         }
         await run(() =>
-          signUp.sso({
+          target.sso({
             strategy,
             redirectCallbackUrl: ssoCallbackUrl(),
             redirectUrl: clerk.buildAfterSignUpUrl(),
