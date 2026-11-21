@@ -23,6 +23,7 @@ export type FieldId =
   | 'affiliationEmailAddress'
   | 'deleteExistingInvitationsSuggestions'
   | 'legalAccepted'
+  | 'apiKey'
   | 'apiKeyDescription'
   | 'apiKeyExpirationDate'
   | 'apiKeyRevokeConfirmation'
