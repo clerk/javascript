@@ -2,6 +2,7 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { isReact18, lazyNode } from '../../__tests__/lazy';
 import { isRef, mergeProps, useRender } from './use-render';
 
 afterEach(() => {
@@ -286,14 +287,6 @@ describe('useRender', () => {
   });
 });
 
-function lazyNode(payload: unknown): React.ReactElement {
-  const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: payload, _init: (p: unknown) => p };
-  // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
-  return lazy;
-}
-
-const isReact18 = React.version.startsWith('18.');
-
 describe.skipIf(isReact18)('useRender with a lazy render element', () => {
   it('clones the element the lazy node resolves to, with computed props and state attributes', () => {
     function C() {
@@ -365,13 +358,11 @@ describe.skipIf(isReact18)('useRender with a lazy render element', () => {
 
   it('does not resolve the lazy node when enabled is false', () => {
     const init = vi.fn((p: unknown) => p);
-    const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: <article />, _init: init };
     const { result } = renderHook(() =>
       useRender({
         defaultTagName: 'div',
         enabled: false,
-        // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
-        render: lazy,
+        render: lazyNode(<article />, init),
       }),
     );
 
@@ -396,12 +387,10 @@ describe.skipIf(isReact18)('useRender with a lazy render element', () => {
 describe.runIf(isReact18)('useRender with a lazy render element on React 18', () => {
   it('renders the default tag without resolving the lazy node', () => {
     const init = vi.fn((p: unknown) => p);
-    const lazy = { $$typeof: Symbol.for('react.lazy'), _payload: <article />, _init: init };
     function C() {
       return useRender({
         defaultTagName: 'span',
-        // @ts-expect-error -- A Flight lazy node is not typed as a ReactElement, but it reaches `render` in its place
-        render: lazy,
+        render: lazyNode(<article />, init),
         props: { 'data-testid': 'test' },
       });
     }

@@ -2,4 +2,4 @@
 '@clerk/mosaic': patch
 ---
 
-Fix a `render` element written in a React Server Component, such as `<Dialog.Trigger render={<Button />}>`, rendering as a plain unstyled element on the client and causing a hydration mismatch.
+Fix elements passed from a React Server Component in development. A `render` element, such as `<Dialog.Trigger render={<Button />}>`, no longer renders as a plain unstyled element with a hydration mismatch, and an `icons` override on `MosaicProvider` no longer throws `Cannot read properties of undefined (reading 'className')`.
