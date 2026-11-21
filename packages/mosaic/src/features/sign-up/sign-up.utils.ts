@@ -98,11 +98,12 @@ function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists)
 
 const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
 
-export function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
+export function continueCanSatisfy(signUp: SignUpFieldLists, providers: readonly string[]): boolean {
   const asksForIdentifier = missingIdentifiers(signUp).length > 0;
   return signUp.missingFields.every(
     field =>
       field in FORM_FIELDS ||
+      providers.includes(field) ||
       CONTINUE_REQUIREMENTS.includes(field) ||
       (asksForIdentifier && signUp.optionalFields.includes(field)),
   );

@@ -173,7 +173,7 @@ describe('continue screen rules', () => {
       canSatisfy: true,
     },
     {
-      name: 'cannot finish a sign-up that needs a required provider',
+      name: 'cannot finish a sign-up that needs a provider the user cannot sign up with',
       signUp: lists(['username', 'oauth_google']),
       asks: { username: required },
       asksOnPhone: { username: required },
@@ -192,6 +192,6 @@ describe('continue screen rules', () => {
     expect(continueFields(signUp, 'emailAddress')).toEqual(asks);
     expect(continueFields(signUp, 'phoneNumber')).toEqual(asksOnPhone);
     expect(missesEitherIdentifier(signUp)).toBe(canSwitch);
-    expect(continueCanSatisfy(signUp)).toBe(canSatisfy);
+    expect(continueCanSatisfy(signUp, [])).toBe(canSatisfy);
   });
 });
