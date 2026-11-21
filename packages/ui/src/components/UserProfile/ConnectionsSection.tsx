@@ -31,12 +31,21 @@ const readConnectFailure = (): ConnectFailure | null => {
   const code = new URL(window.location.href).searchParams.get(CONNECT_ERROR_PARAM);
   let connector: string | null = null;
   try {
+    // Read only: React can call a state initializer twice, so the key is
+    // removed in an effect after the first render.
     connector = window.sessionStorage.getItem(PENDING_CONNECTOR_KEY);
-    window.sessionStorage.removeItem(PENDING_CONNECTOR_KEY);
   } catch {
     // Storage can be unavailable; the message then names no service.
   }
   return code ? { code, connector } : null;
+};
+
+const forgetPendingConnector = () => {
+  try {
+    window.sessionStorage.removeItem(PENDING_CONNECTOR_KEY);
+  } catch {
+    // See readConnectFailure.
+  }
 };
 
 const rememberPendingConnector = (connector: string) => {
@@ -105,7 +114,10 @@ export const ConnectionsSection = withCardStateProvider(() => {
   // The banner is about the last attempt. Any next action, or a success, replaces it.
   const clearFailure = useCallback(() => setFailure(null), []);
 
-  useEffect(() => queueMicrotask(removeConnectErrorFromUrl), []);
+  useEffect(() => {
+    forgetPendingConnector();
+    queueMicrotask(removeConnectErrorFromUrl);
+  }, []);
   useEffect(() => {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
