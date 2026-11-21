@@ -1119,3 +1119,117 @@ describe('SignUp invitations', () => {
     expect(fapi.signUp.updates[0].get('email_address')).toBeNull();
   });
 });
+
+describe('SignUp social sign-up', () => {
+  const GOOGLE = {
+    enabled: true,
+    required: false,
+    authenticatable: true,
+    strategy: 'oauth_google' as const,
+    name: 'Google',
+    logo_url: null,
+  };
+
+  afterEach(() => {
+    window.history.replaceState(null, '', window.location.pathname);
+  });
+
+  function socialEnvironment(overrides: FapiEnvironmentOverrides = {}) {
+    return environment({
+      ...overrides,
+      user_settings: { social: { oauth_google: GOOGLE }, ...overrides.user_settings },
+    });
+  }
+
+  async function startWithGoogle(seed: FakeFapiSeed, options?: Parameters<typeof renderWithClerk>[1]) {
+    const fapi = serveFapi({ environment: socialEnvironment(), ...seed });
+    const first = await renderWithClerk(<SignUp />, options);
+    const leave = vi.spyOn(first.clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /Google/ }));
+    await waitFor(() => expect(leave).toHaveBeenCalled());
+    return { fapi, first, leave, user };
+  }
+
+  async function returnFromGoogle(
+    fapi: ReturnType<typeof serveFapi>,
+    first: Awaited<ReturnType<typeof renderWithClerk>>,
+    options?: Parameters<typeof renderWithClerk>[1],
+  ) {
+    const callback = new URL(fapi.signUp.creations.at(-1)?.get('redirect_url') ?? '');
+    first.unmount();
+    fapi.signUp.returnFromOAuth();
+    window.history.replaceState(null, '', `${callback.pathname}${callback.search}`);
+    return renderWithClerk(<SignUp />, options);
+  }
+
+  it('starts Google sign-up with a callback URL that brings the user back to sign-up', async () => {
+    const { fapi, leave } = await startWithGoogle({});
+
+    expect(String(leave.mock.calls[0][0])).toBe('https://oauth.example/authorize?strategy=oauth_google');
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.creations[0].get('strategy')).toBe('oauth_google');
+    expect(fapi.signUp.creations[0].get('redirect_url')).toContain('__clerk_mosaic_sign_up=sso-callback');
+    expect(fapi.signUp.creations[0].get('action_complete_redirect_url')).toBeTruthy();
+  });
+
+  it('asks for what Google did not provide after the return, then completes', async () => {
+    const seed: FakeFapiSeed = {
+      environment: socialEnvironment({ attributes: { username: { enabled: true, required: true } } }),
+      signUp: { oauth: { oauth_google: { emailAddress: EMAIL } } },
+    };
+    const { fapi, first } = await startWithGoogle(seed);
+
+    const { navigate } = await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
+    expect(screen.queryByRole('button', { name: /Google/ })).toBeNull();
+    expect(screen.queryByLabelText('Password')).toBeNull();
+
+    const user = userEvent.setup();
+    await user.type(screen.getByRole('textbox', { name: 'Username' }), 'alice');
+    await user.click(continueButton());
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.signUp.updates.at(-1)?.get('username')).toBe('alice');
+    expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('signs in instead when the Google account already belongs to a user', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: { oauth: { oauth_google: { existingUser: { emailAddress: EMAIL } } } },
+    });
+
+    const { navigate } = await returnFromGoogle(fapi, first, { signInFallbackRedirectUrl: '/home' });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/home')));
+    expect(fapi.signUp.transfers).toHaveLength(1);
+    expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('hands a transfer that still needs a second factor to the sign-in page', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: { oauth: { oauth_google: { existingUser: { emailAddress: EMAIL, secondFactor: true } } } },
+    });
+
+    const { navigate } = await returnFromGoogle(fapi, first, { signInUrl: '/sign-in' });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/sign-in')));
+    expect(fapi.client.sessions).toHaveLength(0);
+  });
+
+  it('shows what went wrong at Google on the start form', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: {
+        oauth: { oauth_google: { error: { code: 'oauth_access_denied', message: 'Access was denied.' } } },
+      },
+    });
+
+    await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByText('You did not grant access to your account.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
+  });
+});
