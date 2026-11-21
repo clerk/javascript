@@ -1,6 +1,7 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { useState } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -71,6 +72,12 @@ function RouteProbe() {
         onClick={() => write('/sign-up', ['continue'])}
       >
         Open the continue route
+      </button>
+      <button
+        type='button'
+        onClick={() => write('/sign-up', [])}
+      >
+        Open the start route
       </button>
     </>
   );
@@ -946,5 +953,169 @@ describe('SignUp', () => {
     await user.click(screen.getByRole('button', { name: 'Join waitlist' }));
 
     expect(navigate).toHaveBeenCalledWith(expect.stringContaining('waitlist'));
+  });
+});
+
+describe('SignUp invitations', () => {
+  const INVALID_INVITATION =
+    'This link is no longer valid or has already been used. Please start again or request a new link.';
+
+  afterEach(() => {
+    window.history.replaceState(null, '', window.location.pathname);
+  });
+
+  function openInvitation(param: '__clerk_ticket' | '__clerk_invitation_token', ticket: string) {
+    window.history.replaceState(null, '', `${window.location.pathname}?${param}=${ticket}`);
+  }
+
+  it('redeems an invitation, asks for the password it did not set, and completes', async () => {
+    openInvitation('__clerk_ticket', 'tkt_invite');
+    const { fapi, user, navigate } = await renderSignUp({
+      signUp: { tickets: { tkt_invite: { emailAddress: EMAIL } } },
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.creations[0].get('strategy')).toBe('ticket');
+    expect(fapi.signUp.creations[0].get('ticket')).toBe('tkt_invite');
+    expect(fapi.signUp.preparations).toEqual([]);
+
+    await user.type(passwordField(), PASSWORD);
+    await user.click(continueButton());
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
+    expect(fapi.client.sessions).toHaveLength(1);
+    expect(window.location.search).not.toContain('__clerk_ticket');
+  });
+
+  it('redeems a ticket passed as __clerk_invitation_token', async () => {
+    openInvitation('__clerk_invitation_token', 'tkt_token');
+    const { fapi } = await renderSignUp({ signUp: { tickets: { tkt_token: { emailAddress: EMAIL } } } });
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(fapi.signUp.creations[0].get('ticket')).toBe('tkt_token');
+  });
+
+  it('shows a rejected invitation on the start form once, then signs up normally', async () => {
+    openInvitation('__clerk_ticket', 'tkt_unknown');
+    const { fapi, user } = await renderSignUp();
+
+    expect(await screen.findByText(INVALID_INVITATION)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(window.location.search).not.toContain('__clerk_ticket');
+
+    await submitStart(user);
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.creations[1].get('strategy')).toBeNull();
+    await codeSent();
+  });
+
+  it('clears a rejected invitation error once the user submits the start form', async () => {
+    openInvitation('__clerk_ticket', 'tkt_unknown');
+    const { user } = await renderSignUp();
+    await screen.findByText(INVALID_INVITATION);
+
+    await user.type(emailField(), EMAIL);
+    await user.type(passwordField(), 'a');
+    await user.click(continueButton());
+
+    await waitFor(() => expect(screen.queryByText(INVALID_INVITATION)).toBeNull());
+  });
+
+  it('redeems an invitation when another sign-up is already in progress', async () => {
+    function Reopenable() {
+      const [opened, setOpened] = useState(1);
+      const write = useVirtualWrite();
+      return (
+        <>
+          <SignUp key={opened} />
+          <button
+            type='button'
+            onClick={() => {
+              write('/sign-up', []);
+              setOpened(opened + 1);
+            }}
+          >
+            Reopen sign-up
+          </button>
+        </>
+      );
+    }
+    const fapi = serveFapi({ environment: environment(), signUp: { tickets: { tkt_new: { emailAddress: EMAIL } } } });
+    await renderWithClerk(<Reopenable />);
+    const user = userEvent.setup();
+    await submitStart(user, 'bob@example.com');
+    await screen.findByRole('heading', { name: 'Verify your email' });
+    await codeSent();
+
+    openInvitation('__clerk_ticket', 'tkt_new');
+    await user.click(screen.getByRole('button', { name: 'Reopen sign-up' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.creations[1].get('ticket')).toBe('tkt_new');
+  });
+
+  it('lets an invitee through restricted mode, including back on the start form', async () => {
+    openInvitation('__clerk_ticket', 'tkt_restricted');
+    const fapi = serveFapi({
+      environment: environment({
+        user_settings: {
+          sign_up: {
+            allowlist_only: false,
+            progressive: true,
+            captcha_enabled: false,
+            mode: 'restricted',
+            legal_consent_enabled: false,
+          },
+        },
+      }),
+      signUp: { tickets: { tkt_restricted: { emailAddress: EMAIL } } },
+    });
+    await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Open the start route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Access restricted' })).toBeNull();
+    expect(emailField()).toHaveAttribute('aria-disabled', 'true');
+    expect(fapi.signUp.creations).toHaveLength(1);
+  });
+
+  it('keeps the invitation when the user goes back to the start form', async () => {
+    openInvitation('__clerk_ticket', 'tkt_back');
+    const fapi = serveFapi({ environment: environment(), signUp: { tickets: { tkt_back: { emailAddress: EMAIL } } } });
+    const { navigate } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Fill in missing fields' });
+
+    await user.click(screen.getByRole('button', { name: 'Open the start route' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(emailField()).toHaveValue(EMAIL);
+    expect(emailField()).toHaveAttribute('aria-disabled', 'true');
+    await user.type(passwordField(), PASSWORD);
+    await user.click(continueButton());
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
+    expect(fapi.signUp.updates[0].get('email_address')).toBeNull();
   });
 });
