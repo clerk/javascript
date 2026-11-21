@@ -1,4 +1,7 @@
+import { ClerkAPIResponseError, isClerkAPIResponseError } from '@clerk/shared/error';
+
 import { joinPaths } from '../../util/path';
+import type { RequestFunction } from '../request';
 import { AbstractAPI } from './AbstractApi';
 
 const PROVIDER_PARAM_KEYS = new Set(['authorization_params', 'token_params', 'authorizationParams', 'tokenParams']);
@@ -23,6 +26,38 @@ const camelize = <T>(value: unknown): T =>
 
 const snakeize = <T>(value: T): Record<string, unknown> =>
   convertKeys(value, key => key.replace(/[A-Z]/g, c => `_${c.toLowerCase()}`)) as Record<string, unknown>;
+
+/**
+ * Connect errors say how to fix the problem in their `long_message`, so it becomes
+ * `err.message` instead of the HTTP reason ("Conflict", "Not Found").
+ */
+const withClerkErrorMessage =
+  (request: RequestFunction): RequestFunction =>
+  async options => {
+    try {
+      return await request(options);
+    } catch (err) {
+      const first = isClerkAPIResponseError(err) ? err.errors[0] : undefined;
+      const message = first?.longMessage || first?.message;
+      if (!isClerkAPIResponseError(err) || !message) {
+        throw err;
+      }
+      const error = new ClerkAPIResponseError(message, {
+        data: [],
+        status: err.status,
+        clerkTraceId: err.clerkTraceId,
+        retryAfter: err.retryAfter,
+      });
+      error.errors = err.errors;
+      throw error;
+    }
+  };
+
+abstract class AbstractConnectAPI extends AbstractAPI {
+  constructor(request: RequestFunction) {
+    super(withClerkErrorMessage(request));
+  }
+}
 
 export type ConnectConnection = {
   object: 'connection';
@@ -190,7 +225,7 @@ export type ConnectConnector = {
 /**
  * @experimental Clerk Connect is in development and the API is subject to change.
  */
-export class ConnectConnectorsAPI extends AbstractAPI {
+export class ConnectConnectorsAPI extends AbstractConnectAPI {
   async create(params: CreateConnectorParams) {
     return camelize<ConnectConnector>(
       await this.request({
@@ -240,7 +275,7 @@ export class ConnectConnectorsAPI extends AbstractAPI {
 /**
  * @experimental Clerk Connect is in development and the API is subject to change.
  */
-export class ConnectConnectionsAPI extends AbstractAPI {
+export class ConnectConnectionsAPI extends AbstractConnectAPI {
   async create({ userId, ...bodyParams }: ConnectUserParams) {
     this.requireId(userId);
     return camelize<ConnectResult>(
