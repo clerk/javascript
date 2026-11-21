@@ -17,14 +17,17 @@ import {
   emailOrPhone,
   getInitialActiveIdentifier,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { getPreferredPhoneCodeChannelByCountry } from '@clerk/shared/phone';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
+  OAuthStrategy,
   PhoneCodeChannel,
   SessionTask,
   SignUpFutureResource,
   SignUpInitialValues,
+  UserSettingsResource,
 } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
@@ -75,6 +78,8 @@ export interface SignUpFlowModel {
   leave: () => void;
   ticket: string | undefined;
   redeemTicket: () => Promise<{ result: SignUpCreateResult; emailAddress: string }>;
+  isReturning: boolean;
+  completeReturn: () => Promise<SignUpNextStep | undefined>;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
 }
@@ -105,6 +110,9 @@ export interface SignUpDetailsModel {
   continueLegalConsent?: SignUpLegalConsent;
   validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
   alternativeChannels: Array<AuthProvider & { id: PhoneCodeChannel }>;
+  oauthProviders: Array<AuthProvider & { id: OAuthStrategy }>;
+  continueOAuthProviders: Array<AuthProvider & { id: OAuthStrategy }>;
+  sso: (strategy: OAuthStrategy, options: { legalAccepted?: boolean; continueSignUp: boolean }) => Promise<void>;
   inTicketSignUp: boolean;
   create: (values: SignUpDetailsValues, options?: { channel?: PhoneCodeChannel }) => Promise<SignUpCreateResult>;
   update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
@@ -144,6 +152,36 @@ const DETAILS_FIELDS = [...signUpFieldOrder, 'legalAccepted'] as const;
 const PREFILL_NAMES = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName'] as const;
 
 const ABSOLUTE_URL = /^https?:\/\//;
+const RETURN_PARAM = '__clerk_mosaic_sign_up';
+const SSO_RETURN = 'sso-callback';
+const OAUTH_PREFIX = /^oauth_(custom_)?/;
+
+function ssoCallbackUrl(): string {
+  const url = new URL(window.location.href);
+  url.searchParams.set(RETURN_PARAM, SSO_RETURN);
+  return url.toString();
+}
+
+function forgetReturn(): void {
+  const url = new URL(window.location.href);
+  if (url.searchParams.has(RETURN_PARAM)) {
+    url.searchParams.delete(RETURN_PARAM);
+    window.history.replaceState(window.history.state, '', url);
+  }
+}
+
+function oauthProvidersFrom(userSettings: UserSettingsResource): Array<AuthProvider & { id: OAuthStrategy }> {
+  return userSettings.authenticatableSocialStrategies
+    .flatMap(strategy => {
+      const known = OAUTH_PROVIDERS.find(provider => provider.strategy === strategy);
+      if (known) {
+        return [{ id: strategy, name: known.name, iconUrl: iconImageUrl(known.provider) }];
+      }
+      const custom = strategy.startsWith('oauth_custom_') ? userSettings.social[strategy] : undefined;
+      return custom ? [{ id: strategy, name: custom.name, iconUrl: custom.logo_url || '' }] : [];
+    })
+    .sort((a, b) => a.id.replace(OAUTH_PREFIX, '').localeCompare(b.id.replace(OAUTH_PREFIX, '')));
+}
 
 function toViewFields(
   fields: Partial<Record<string, { required: boolean; disabled?: boolean } | undefined>>,
@@ -192,6 +230,7 @@ export function useSignUpModel({
   const router = useMosaicRouter();
   const supportEmail = useMosaicSupportEmail();
   const { signUp } = __internal_useClerkSignal('signUp');
+  const { signIn } = __internal_useClerkSignal('signIn');
   const { session } = useSession();
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
@@ -263,6 +302,7 @@ export function useSignUpModel({
   const ticket = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || undefined;
   const inTicketSignUp = Boolean(ticket) && signUp.verifications.emailAddress.strategy === 'ticket';
   const phoneCodeChannels = inTicketSignUp ? [] : userSettings.alternativePhoneCodeChannels;
+  const oauthProviders = oauthProvidersFrom(userSettings);
   const forgetTicket = () => {
     removeClerkQueryParam('__clerk_ticket');
     removeClerkQueryParam('__clerk_invitation_token');
@@ -379,6 +419,42 @@ export function useSignUpModel({
         }
         return { result: next(signUp), emailAddress: signUp.emailAddress ?? '' };
       },
+      isReturning: new URL(window.location.href).searchParams.get(RETURN_PARAM) === SSO_RETURN,
+      completeReturn: async () => {
+        forgetReturn();
+        if (signUp.isTransferable) {
+          await run(() => signIn.create({ transfer: true }));
+          if (signIn.status !== 'complete') {
+            await router.navigate(clerk.buildSignInUrl());
+            return undefined;
+          }
+          await run(() =>
+            signIn.finalize({
+              navigate: async ({ decorateUrl }) => {
+                const afterSignInUrl = clerk.buildAfterSignInUrl();
+                const decorated = decorateUrl(afterSignInUrl);
+                if (decorated !== afterSignInUrl && ABSOLUTE_URL.test(decorated)) {
+                  router.windowNavigate(decorated);
+                  return;
+                }
+                await router.navigate(afterSignInUrl);
+              },
+            }),
+          );
+          return undefined;
+        }
+        const existingSession = signUp.existingSession?.sessionId;
+        if (existingSession) {
+          await clerk.setActive({ session: existingSession, redirectUrl: clerk.buildAfterSignInUrl() });
+          return undefined;
+        }
+        const failure = signUp.verifications.externalAccount.error;
+        if (failure) {
+          await run(() => signUp.reset());
+          throw new SaveError({ global: { code: failure.code, message: failure.longMessage || failure.message } });
+        }
+        return next(signUp);
+      },
       finalize: async () => {
         forgetTicket();
         await run(() =>
@@ -449,6 +525,22 @@ export function useSignUpModel({
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       inTicketSignUp,
+      oauthProviders,
+      continueOAuthProviders: signUp.verifications.externalAccount.status === 'verified' ? [] : oauthProviders,
+      sso: async (strategy, { legalAccepted, continueSignUp }) => {
+        if (signUp.id && !continueSignUp && !inTicketSignUp) {
+          await run(() => signUp.reset());
+        }
+        await run(() =>
+          signUp.sso({
+            strategy,
+            redirectCallbackUrl: ssoCallbackUrl(),
+            redirectUrl: clerk.buildAfterSignUpUrl(),
+            unsafeMetadata,
+            legalAccepted: legalAccepted || undefined,
+          }),
+        );
+      },
       alternativeChannels: phoneCodeChannels.flatMap(channel => {
         const provider = getAlternativePhoneCodeProviderData(channel);
         return provider ? [{ id: channel, name: provider.name, iconUrl: iconImageUrl(channel) }] : [];
