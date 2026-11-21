@@ -1,5 +1,5 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
@@ -94,8 +94,10 @@ export function useSignUpController(
   options: MosaicLocationOptions,
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
-  const actions = usePendingAction<'startOver' | 'ticket'>();
+  const actions = usePendingAction<'startOver' | 'ticket' | 'return'>();
   const redeemedTicket = useRef<string | undefined>(undefined);
+  const completedReturn = useRef(false);
+  const [isReturning, setIsReturning] = useState(liveModel.flow.isReturning);
   const errorText = useErrorText();
   const isLeaving = liveModel.flow.step.type === 'leaving';
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
@@ -110,7 +112,10 @@ export function useSignUpController(
   const { flow, app, navigation, verification } = model;
   const isFinishing = finishSnapshot.value !== 'idle';
   const shown = shownRoute(route, flow.step);
-  const screen = actions.pendingKey === 'ticket' ? 'loading' : screenFor(shown, flow);
+  const screen =
+    isReturning || actions.pendingKey === 'ticket' || actions.pendingKey === 'return'
+      ? 'loading'
+      : screenFor(shown, flow);
 
   useRouteGuard({ route, go }, shown);
 
@@ -137,9 +142,28 @@ export function useSignUpController(
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Redeems the invitation once when sign-up opens on start with a ticket in the URL; arriving from the invitation link is not an event a handler could run from. */
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return, or redeems an invitation, once when sign-up opens on start with its marker or ticket in the URL; arriving from a redirect or a link is not an event a handler could run from. */
   useEffect(() => {
-    if (!flow.ticket || flow.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
+    if (isReturning && route === 'start' && !completedReturn.current) {
+      completedReturn.current = true;
+      void actions
+        .run('return', async () => {
+          const step = await flow.completeReturn();
+          if (step) {
+            next(step);
+          }
+        })
+        .then(() => setIsReturning(false));
+      return;
+    }
+    if (
+      isReturning ||
+      actions.isPending ||
+      !flow.ticket ||
+      flow.inTicketSignUp ||
+      route !== 'start' ||
+      redeemedTicket.current === flow.ticket
+    ) {
       return;
     }
     redeemedTicket.current = flow.ticket;

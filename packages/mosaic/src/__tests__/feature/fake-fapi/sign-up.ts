@@ -1,6 +1,8 @@
 import type {
+  ClerkAPIErrorJSON,
   ClientJSON,
   SessionJSON,
+  SignInJSON,
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
@@ -28,7 +30,13 @@ export interface FakeSignUpSeed {
   whatsAppEnabled?: boolean;
   whatsAppQuotaExceeded?: boolean;
   tickets?: Record<string, FakeTicket>;
+  oauth?: Record<string, FakeOAuthAccount>;
 }
+
+export type FakeOAuthAccount =
+  | { emailAddress: string; firstName?: string; lastName?: string }
+  | { existingUser: { emailAddress: string; secondFactor?: boolean } }
+  | { error: { code: string; message: string } };
 
 export type FakeTicket = { emailAddress: string } | 'expired';
 
@@ -40,6 +48,10 @@ export interface FakeSignUpState {
   whatsAppEnabled: boolean;
   whatsAppQuotaExceeded: boolean;
   tickets: Record<string, FakeTicket>;
+  oauth: Record<string, FakeOAuthAccount>;
+  transfers: URLSearchParams[];
+  linkedStrategy?: string;
+  returnFromOAuth: () => void;
   issuedProtectChecks: number;
   proofTokens: string[];
   creations: URLSearchParams[];
@@ -56,6 +68,11 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     whatsAppEnabled: true,
     whatsAppQuotaExceeded: false,
     tickets: {},
+    oauth: {},
+    transfers: [],
+    returnFromOAuth: () => {
+      throw new Error('The fake FAPI has not started');
+    },
     issuedProtectChecks: 0,
     proofTokens: [],
     creations: [],
@@ -106,6 +123,10 @@ function rejected(code: string, message: string, paramName?: string, status = 42
     },
     { status },
   );
+}
+
+function apiError(code: string, message: string): ClerkAPIErrorJSON {
+  return { code, message, long_message: message, meta: {} };
 }
 
 function verification(
@@ -169,7 +190,7 @@ export function signUpHandlers(
       required.push('email_address_or_phone_number');
     }
     for (const provider of Object.values(settings().social)) {
-      if (provider?.enabled && provider.required) {
+      if (sign_up.progressive && provider?.enabled && provider.required) {
         required.push(provider.strategy);
       }
     }
@@ -182,9 +203,14 @@ export function signUpHandlers(
   const settle = (signUp: SignUpJSON): SignUpJSON => {
     const { attributes } = settings();
     const { required_fields, optional_fields } = requirements();
+    const external = signUp.verifications?.external_account;
+    const linked = external?.status === 'verified' ? external.strategy : state.signUp.linkedStrategy;
     const provided = (field: SignUpField) => {
       if (field === 'password') {
-        return signUp.has_password;
+        return signUp.has_password || Boolean(linked);
+      }
+      if (field.startsWith('oauth_')) {
+        return field === linked;
       }
       if (field === 'legal_accepted') {
         return signUp.legal_accepted_at !== null;
@@ -252,6 +278,76 @@ export function signUpHandlers(
     return { ...settled, status: 'complete', created_session_id: session.id, created_user_id: user.id };
   };
 
+  const startOAuth = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
+    const strategy = body.get('strategy') ?? '';
+    const provider = settings().social[strategy as keyof FapiEnvironment['user_settings']['social']];
+    if (!provider?.enabled || !provider.authenticatable) {
+      return rejected('form_param_value_invalid', 'strategy does not match one of the allowed values.', 'strategy');
+    }
+    if (!body.get('redirect_url')) {
+      return rejected('form_conditional_param_missing', 'redirect_url must be included.', 'redirect_url');
+    }
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications,
+        external_account: verification(
+          { verifications: [strategy] },
+          {
+            ...fapiVerification(strategy),
+            next_action: '',
+            external_verification_redirect_url: `https://oauth.example/authorize?strategy=${strategy}`,
+          },
+        ),
+      },
+    };
+  };
+
+  state.signUp.returnFromOAuth = () => {
+    const signUp = state.client.sign_up;
+    const external = signUp?.verifications?.external_account;
+    const account = external ? state.signUp.oauth[external.strategy] : undefined;
+    if (!signUp?.verifications || !external || !account) {
+      throw new Error('No OAuth sign-up to return from');
+    }
+    const withExternal = (changes: Partial<SignUpVerificationJSON>): SignUpJSON => ({
+      ...signUp,
+      verifications: { ...signUp.verifications!, external_account: { ...external, ...changes } },
+    });
+    if ('error' in account) {
+      store(withExternal({ status: 'unverified', error: apiError(account.error.code, account.error.message) }));
+      return;
+    }
+    if ('existingUser' in account) {
+      store(
+        withExternal({
+          status: 'transferable',
+          error: apiError('external_account_exists', 'This account already exists. Sign in instead.'),
+        }),
+      );
+      return;
+    }
+    const linked = withExternal({ status: 'verified' });
+    state.signUp.linkedStrategy = external.strategy;
+    store(
+      settle({
+        ...linked,
+        email_address: signUp.email_address ?? account.emailAddress,
+        first_name: signUp.first_name ?? account.firstName ?? null,
+        last_name: signUp.last_name ?? account.lastName ?? null,
+        verifications: {
+          ...linked.verifications!,
+          email_address: signUp.email_address
+            ? linked.verifications!.email_address
+            : verification(settings().attributes.email_address, {
+                ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
+                next_action: '',
+              }),
+        },
+      }),
+    );
+  };
+
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
     const { attributes, password_settings } = settings();
     let next = signUp;
@@ -307,9 +403,55 @@ export function signUpHandlers(
   };
 
   return [
+    http.post(fapiUrl('/v1/client/sign_ins'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const external = state.client.sign_up?.verifications?.external_account;
+      const account = external ? state.signUp.oauth[external.strategy] : undefined;
+      if (
+        body.get('transfer') !== 'true' ||
+        external?.status !== 'transferable' ||
+        !account ||
+        !('existingUser' in account)
+      ) {
+        return rejected('form_param_missing', 'Only sign-up transfers are supported by the fake FAPI.');
+      }
+      state.signUp.transfers.push(body);
+      const { emailAddress, secondFactor = false } = account.existingUser;
+      let createdSessionId: string | null = null;
+      if (!secondFactor) {
+        const tasks = state.signUp.sessionTasks;
+        const session = fapiSession({
+          ...(tasks?.length ? { status: 'pending' as const, tasks } : {}),
+          id: `sess_transferred_${state.signUp.transfers.length}`,
+          user: fapiUser({
+            id: 'user_existing',
+            email_addresses: [fapiEmailAddress({ id: 'email_existing', email_address: emailAddress })],
+          }),
+        });
+        state.client = { ...state.client, sessions: [...state.client.sessions, session] };
+        createdSessionId = session.id;
+      }
+      const signIn = {
+        object: 'sign_in',
+        id: `sia_transfer_${state.signUp.transfers.length}`,
+        status: secondFactor ? 'needs_second_factor' : 'complete',
+        supported_identifiers: [],
+        identifier: emailAddress,
+        user_data: { first_name: null, last_name: null, image_url: '', has_image: false },
+        supported_first_factors: [],
+        supported_second_factors: secondFactor ? [{ strategy: 'totp' }] : [],
+        first_factor_verification: null,
+        second_factor_verification: null,
+        created_session_id: createdSessionId,
+        timezone: null,
+      } as unknown as SignInJSON;
+      state.client = { ...state.client, sign_up: null, sign_in: secondFactor ? signIn : null };
+      return envelope(signIn, state.client);
+    }),
     http.post(fapiUrl('/v1/client/sign_ups'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
       state.signUp.creations.push(body);
+      state.signUp.linkedStrategy = undefined;
       const mode = settings().sign_up.mode;
       if (mode !== 'public' && body.get('strategy') !== 'ticket') {
         return mode === 'waitlist'
@@ -382,6 +524,13 @@ export function signUpHandlers(
           },
         };
       }
+      if (body.get('strategy')?.startsWith('oauth_')) {
+        const started = startOAuth(start, body);
+        if (started instanceof HttpResponse) {
+          return started;
+        }
+        start = started;
+      }
       const applied = apply(start, body);
       return applied instanceof HttpResponse ? applied : store(settle(issueProtectCheck(applied)));
     }),
@@ -421,7 +570,11 @@ export function signUpHandlers(
       }
       const body = new URLSearchParams(await request.text());
       state.signUp.updates.push(body);
-      const applied = apply(signUp, body);
+      const started = body.get('strategy')?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+      if (started instanceof HttpResponse) {
+        return started;
+      }
+      const applied = apply(started, body);
       return applied instanceof HttpResponse ? applied : store(settle(applied));
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id/prepare_verification'), async ({ params, request }) => {
