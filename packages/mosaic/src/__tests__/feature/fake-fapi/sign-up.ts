@@ -67,6 +67,7 @@ export interface FakeSignUpState {
   tickets: Record<string, FakeTicket>;
   oauth: Record<string, FakeOAuthAccount>;
   transfers: URLSearchParams[];
+  linkedStrategy?: string;
   returnFromOAuth: () => void;
   issuedProtectChecks: number;
   reloads: number;
@@ -200,7 +201,7 @@ export function signUpHandlers(
       required.push('email_address_or_phone_number');
     }
     for (const provider of Object.values(settings().social)) {
-      if (provider?.enabled && provider.required) {
+      if (sign_up.progressive && provider?.enabled && provider.required) {
         required.push(provider.strategy);
       }
     }
@@ -214,7 +215,7 @@ export function signUpHandlers(
     const { attributes } = settings();
     const { required_fields, optional_fields } = requirements();
     const external = signUp.verifications?.external_account;
-    const linked = external?.status === 'verified' ? external.strategy : undefined;
+    const linked = external?.status === 'verified' ? external.strategy : state.signUp.linkedStrategy;
     const provided = (field: SignUpField) => {
       if (field === 'password') {
         return signUp.has_password || Boolean(linked);
@@ -303,8 +304,12 @@ export function signUpHandlers(
 
   const startOAuth = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
     const strategy = body.get('strategy') ?? '';
+    const provider = settings().social[strategy as keyof FapiEnvironment['user_settings']['social']];
+    if (!provider?.enabled || !provider.authenticatable) {
+      return rejected('form_param_value_invalid', 'strategy does not match one of the allowed values.', 'strategy');
+    }
     if (!body.get('redirect_url')) {
-      return rejected('form_param_missing', 'redirect_url must be included.', 'redirect_url');
+      return rejected('form_conditional_param_missing', 'redirect_url must be included.', 'redirect_url');
     }
     return {
       ...signUp,
@@ -333,7 +338,7 @@ export function signUpHandlers(
       verifications: { ...signUp.verifications!, external_account: { ...external, ...changes } },
     });
     if ('error' in account) {
-      store(withExternal({ status: 'failed', error: apiError(account.error.code, account.error.message) }));
+      store(withExternal({ status: 'unverified', error: apiError(account.error.code, account.error.message) }));
       return;
     }
     if ('existingUser' in account) {
@@ -346,19 +351,22 @@ export function signUpHandlers(
       return;
     }
     const linked = withExternal({ status: 'verified' });
+    state.signUp.linkedStrategy = external.strategy;
     store(
       settle({
         ...linked,
-        email_address: account.emailAddress,
-        first_name: account.firstName ?? signUp.first_name,
-        last_name: account.lastName ?? signUp.last_name,
+        email_address: signUp.email_address ?? account.emailAddress,
+        first_name: signUp.first_name ?? account.firstName ?? null,
+        last_name: signUp.last_name ?? account.lastName ?? null,
         verifications: {
           ...linked.verifications!,
-          email_address: {
-            ...linked.verifications!.email_address,
-            ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
-            next_action: '',
-          },
+          email_address: signUp.email_address
+            ? linked.verifications!.email_address
+            : {
+                ...linked.verifications!.email_address,
+                ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
+                next_action: '',
+              },
         },
       }),
     );
@@ -495,7 +503,9 @@ export function signUpHandlers(
       const { emailAddress, secondFactor = false } = account.existingUser;
       let createdSessionId: string | null = null;
       if (!secondFactor) {
+        const tasks = state.signUp.sessionTasks;
         const session = fapiSession({
+          ...(tasks?.length ? { status: 'pending' as const, tasks } : {}),
           id: `sess_transferred_${state.signUp.transfers.length}`,
           user: fapiUser({
             id: 'user_existing',
@@ -525,6 +535,7 @@ export function signUpHandlers(
     http.post(fapiUrl('/v1/client/sign_ups'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
       state.signUp.creations.push(body);
+      state.signUp.linkedStrategy = undefined;
       const mode = settings().sign_up.mode;
       if (mode !== 'public' && body.get('strategy') !== 'ticket') {
         return mode === 'waitlist'
