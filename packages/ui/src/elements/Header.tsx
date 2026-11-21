@@ -1,3 +1,4 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React from 'react';
 
 import {
@@ -16,6 +17,7 @@ import { ArrowLeft } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { ApplicationLogo } from './ApplicationLogo';
 import { VerticalDivider } from './Divider';
+import { useUnsafeModalContext } from './Modal';
 
 export type HeaderProps = PropsOfComponent<typeof Col> & {
   showLogo?: boolean;
@@ -60,12 +62,20 @@ const Root = React.memo(
 );
 
 const Title = React.memo((props: PropsOfComponent<typeof Heading>): JSX.Element => {
-  const { sx, textVariant = 'h2', ...rest } = props;
+  const { sx, textVariant = 'h2', id, ...rest } = props;
+  const generatedId = React.useId();
+  const titleId = id ?? generatedId;
+  const { registerTitle } = useUnsafeModalContext();
+
+  // Inside a modal, the title provides the dialog's accessible name via aria-labelledby.
+  useSafeLayoutEffect(() => registerTitle?.(titleId), [registerTitle, titleId]);
+
   return (
     <Heading
       elementDescriptor={descriptors.headerTitle}
       textVariant={textVariant}
       sx={sx}
+      id={registerTitle ? titleId : id}
       {...rest}
     />
   );
