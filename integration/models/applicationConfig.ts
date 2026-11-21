@@ -156,6 +156,9 @@ export const applicationConfig = () => {
     get pkglabDependencies() {
       return [...dependencies.entries()].filter(([, version]) => version === PKGLAB).map(([name]) => name);
     },
+    get template() {
+      return template;
+    },
     get copyKeylessToEnv() {
       const writer = async (appDir: string) => {
         const CONFIG_PATH = path.join(appDir, '.clerk', '.tmp', 'keyless.json');
