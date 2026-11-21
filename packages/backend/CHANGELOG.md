@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.31.4
+
+### Patch Changes
+
+- Fix `debug()` returning empty values on the auth object you get back when a request's token type doesn't match `acceptsToken`. It now returns the same redacted debug data as the original auth object. ([#10855](https://github.com/clerk/javascript/pull/10855)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `authenticateRequest()` now logs a warning when `acceptsToken` is set to an invalid value. A future major version will throw an error instead. ([#10856](https://github.com/clerk/javascript/pull/10856)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `auth().debug()` in route handlers not redacting its data for requests authenticated with an M2M token, OAuth token or API key. Debug data is now redacted the same way as for session tokens. ([#10872](https://github.com/clerk/javascript/pull/10872)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+
 ## 3.31.3
 
 ### Patch Changes
