@@ -64,6 +64,14 @@ export type ConnectConnection = {
   id: string;
   userId: string;
   connector: string;
+  /**
+   * The connector's display name. It is set even when the connector is disabled.
+   */
+  connectorDisplayName: string;
+  /**
+   * The status of the connection's connector. A `disabled` connector issues no credentials.
+   */
+  connectorStatus: 'active' | 'disabled';
   slug: string;
   scopes: string[];
   status: 'active' | 'needs_attention' | 'disconnected';

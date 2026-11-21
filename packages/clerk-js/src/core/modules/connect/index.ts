@@ -28,6 +28,8 @@ type ConnectorJSON = {
 type ConnectionJSON = {
   id: string;
   connector: string;
+  connector_display_name?: string | null;
+  connector_status?: CurrentUserConnection['connectorStatus'];
   slug: string;
   scopes: string[];
   status: CurrentUserConnection['status'];
@@ -61,6 +63,8 @@ const toConnector = (json: ConnectorJSON): AvailableConnector => ({
 const toConnection = (json: ConnectionJSON): CurrentUserConnection => ({
   id: json.id,
   connector: json.connector,
+  connectorDisplayName: json.connector_display_name ?? null,
+  connectorStatus: json.connector_status ?? 'active',
   slug: json.slug,
   scopes: json.scopes,
   status: json.status,

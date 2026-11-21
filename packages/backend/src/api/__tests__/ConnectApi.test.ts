@@ -213,4 +213,25 @@ describe('ConnectApi', () => {
     expect(error).toMatchObject({ message: 'Missing scopes', status: 403 });
     expect((error as { errors: Array<{ meta: unknown }> }).errors[0].meta).toMatchObject({ missingScopes: ['repo'] });
   });
+
+  it('reads the connector status and display name of a connection', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/connections/con_1',
+        validateHeaders(() =>
+          HttpResponse.json({
+            object: 'connection',
+            id: 'con_1',
+            connector: 'acme',
+            connector_display_name: 'Acme',
+            connector_status: 'disabled',
+          }),
+        ),
+      ),
+    );
+
+    const connection = await apiClient.connect.connections.get('con_1');
+
+    expect(connection).toMatchObject({ connectorDisplayName: 'Acme', connectorStatus: 'disabled' });
+  });
 });

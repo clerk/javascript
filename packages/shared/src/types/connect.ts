@@ -31,6 +31,15 @@ export interface AvailableConnector {
 export interface CurrentUserConnection {
   id: string;
   connector: string;
+  /**
+   * The connector's display name. It is set even when the connector is disabled.
+   */
+  connectorDisplayName: string | null;
+  /**
+   * The status of the connection's connector. A `disabled` connector is turned off by the application:
+   * it is not listed in `connectors.list()` and cannot be connected or reauthorized.
+   */
+  connectorStatus: 'active' | 'disabled';
   slug: string;
   scopes: string[];
   status: ConnectionStatus;
