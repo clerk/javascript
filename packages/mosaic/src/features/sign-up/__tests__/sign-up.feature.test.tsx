@@ -519,7 +519,34 @@ describe('SignUp', () => {
     expect(fapi.signUp.updates[0].get('legal_accepted')).toBe('true');
   });
 
-  it('offers Start over when the sign-up needs a requirement the continue screen cannot ask for', async () => {
+  it('asks only for the provider the sign-up still needs on the continue screen', async () => {
+    const provider = { enabled: true, authenticatable: true, logo_url: null };
+    const { clerk, fapi, user } = await renderSignUp({
+      environment: environment({
+        user_settings: {
+          social: {
+            oauth_google: { ...provider, required: true, strategy: 'oauth_google', name: 'Google' },
+            oauth_github: { ...provider, required: false, strategy: 'oauth_github', name: 'GitHub' },
+          },
+        },
+      }),
+    });
+    const leave = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+
+    await submitStart(user);
+    await enterCode(user);
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /GitHub/ })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /Google/ }));
+
+    await waitFor(() => expect(leave).toHaveBeenCalled());
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.updates.at(-1)?.get('strategy')).toBe('oauth_google');
+  });
+
+  it('offers Start over when the sign-up needs a provider that cannot sign the user in', async () => {
     const { user } = await renderSignUp({
       environment: environment({
         user_settings: {
@@ -527,7 +554,7 @@ describe('SignUp', () => {
             oauth_google: {
               enabled: true,
               required: true,
-              authenticatable: true,
+              authenticatable: false,
               strategy: 'oauth_google',
               name: 'Google',
               logo_url: null,
