@@ -111,7 +111,12 @@ public class ClerkAuthNativeView: ClerkNativeViewHost {
 
   override func makeHostedController() -> UIViewController? {
     let hostBackAction: (() -> Void)? = currentHostBackButton
-      ? { [weak self] in self?.onHostBack([:]) }
+      ? { [weak self] in
+          guard let self else { return }
+          if !self.popEnclosingNavigationRoute() {
+            self.onHostBack([:])
+          }
+      }
       : nil
 
     return ClerkNativeBridge.shared.makeAuthViewController(
