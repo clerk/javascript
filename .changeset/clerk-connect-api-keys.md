@@ -6,4 +6,4 @@
 '@clerk/localizations': minor
 ---
 
-Clerk Connect supports API key connectors. A user pastes a key in `<UserProfile />`, and `clerkClient.connect.connections.getCredential({ userId, key })` returns it as `{ type: 'api_key', apiKey }`.
+Clerk Connect supports API key connectors. A user pastes a key in `<UserProfile />` (or the app calls `clerk.connect.connections.create({ connector, apiKey })`), and `clerkClient.connect.connections.getCredential({ userId, slug })` returns it as `{ type: 'api_key', apiKey }`.
