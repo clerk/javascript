@@ -69,6 +69,8 @@ export * from './WaitlistEntry';
 export * from './Web3Wallet';
 
 export type {
+  ConnectionWebhookEvent,
+  ConnectionWebhookEventJSON,
   EmailWebhookEvent,
   EmailBounceType,
   EmailDeliveryWebhookEvent,

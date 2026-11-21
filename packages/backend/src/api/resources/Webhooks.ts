@@ -146,6 +146,36 @@ export type BillingSubscriptionItemWebhookEvent = Webhook<
   BillingSubscriptionItemWebhookEventJSON
 >;
 
+/**
+ * The Backend API connection object, in its JSON form. It never carries credentials.
+ *
+ * @experimental Clerk Connect is in development and the API is subject to change.
+ */
+export type ConnectionWebhookEventJSON = {
+  object: 'connection';
+  id: string;
+  user_id: string;
+  connector: string;
+  connector_display_name: string;
+  connector_status: 'active' | 'disabled';
+  slug: string;
+  scopes: string[];
+  status: 'active' | 'needs_attention' | 'disconnected';
+  provider_account: { id: string; label: string | null } | null;
+  api_key_hint: string | null;
+  created_at: number;
+  updated_at: number;
+  disconnected_at: number | null;
+};
+
+/**
+ * @experimental Clerk Connect is in development and the API is subject to change.
+ */
+export type ConnectionWebhookEvent = Webhook<
+  'connection.created' | 'connection.updated' | 'connection.deleted',
+  ConnectionWebhookEventJSON
+>;
+
 export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
@@ -164,6 +194,7 @@ export type WebhookEvent =
   | WaitlistEntryWebhookEvent
   | BillingPaymentAttemptWebhookEvent
   | BillingSubscriptionWebhookEvent
-  | BillingSubscriptionItemWebhookEvent;
+  | BillingSubscriptionItemWebhookEvent
+  | ConnectionWebhookEvent;
 
 export type WebhookEventType = WebhookEvent['type'];

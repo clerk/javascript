@@ -191,6 +191,8 @@ export type {
  * Webhooks event types
  */
 export type {
+  ConnectionWebhookEvent,
+  ConnectionWebhookEventJSON,
   EmailWebhookEvent,
   EmailBounceType,
   EmailDeliveryWebhookEvent,
