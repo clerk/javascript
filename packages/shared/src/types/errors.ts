@@ -30,6 +30,12 @@ export interface ClerkAPIErrorJSON {
     link_url?: string;
     link_text?: string;
     data?: Record<string, string | number | boolean>;
+    connection_id?: string;
+    connection_status?: 'active' | 'needs_attention' | 'disconnected';
+    missing_scopes?: string[];
+    scopes_not_allowed?: string[];
+    connector?: string;
+    available_expires_in?: number;
   };
 }
 
@@ -122,6 +128,31 @@ export interface ClerkAPIError {
      * sensitive.
      */
     data?: Record<string, string | number | boolean>;
+    /**
+     * Clerk Connect: the connection the error is about, such as the disconnected connection a
+     * credential request or a `create()` call hit.
+     */
+    connectionId?: string;
+    /**
+     * Clerk Connect: the status of `connectionId`.
+     */
+    connectionStatus?: 'active' | 'needs_attention' | 'disconnected';
+    /**
+     * Clerk Connect: requested scopes the connector has but the user did not grant.
+     */
+    missingScopes?: string[];
+    /**
+     * Clerk Connect: requested scopes the connector does not have.
+     */
+    scopesNotAllowed?: string[];
+    /**
+     * Clerk Connect: the connector slug the error refers to, such as the connector a slug actually belongs to.
+     */
+    connector?: string;
+    /**
+     * Clerk Connect: the longest credential lifetime, in seconds, that is available.
+     */
+    availableExpiresIn?: number;
   };
 }
 
