@@ -1,4 +1,5 @@
 import { useConfirmController } from '../../../blocks/confirm';
+import { useReverificationFlow } from '../../reverification';
 import type { OrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
 import { useOrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section.view';
@@ -32,7 +33,10 @@ function OrganizationDangerZone({
   model: Extract<OrganizationProfileDangerSectionModel, { status: 'ready' }>;
 }) {
   const leave = useConfirmController({ onConfirm: model.leaveOrganization });
-  const destroy = useConfirmController({ onConfirm: async () => model.deleteOrganization?.() });
+  const [deleteOrganizationWithReverification, reverification] = useReverificationFlow(async () =>
+    model.deleteOrganization?.(),
+  );
+  const destroy = useConfirmController({ onConfirm: deleteOrganizationWithReverification, reverification });
 
   return (
     <OrganizationProfileDangerSectionView

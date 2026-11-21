@@ -4,7 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { openDialog } from '../../../../__tests__/feature/dialog';
-import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  holdRequests,
+  serveFapi,
+} from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -166,6 +171,25 @@ describe('OrganizationProfileDangerSection', () => {
 
       await waitFor(() => expect(memberOf(fapi, 'org_1')).toBe(false));
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'));
+    });
+
+    it('verifies the session when deletion demands it, then deletes the organization', async () => {
+      const { fapi, navigate } = await renderSection({
+        ...signedIn(),
+        verification: { secrets: { password: 'hunter2' } },
+      });
+      demandReverificationOnce('/v1/organizations/org_1');
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
+
+      await confirm(user, dialog, 'Delete organization');
+      expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+      await user.type(within(dialog).getByLabelText('Password'), 'hunter2{Enter}');
+
+      await waitFor(() => expect(memberOf(fapi, 'org_1')).toBe(false));
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/after-leave'));
     });
 
     it('holds the dialog open while the delete is in flight', async () => {
