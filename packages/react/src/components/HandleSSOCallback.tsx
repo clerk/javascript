@@ -16,8 +16,9 @@ export interface HandleSSOCallbackProps {
   navigateToSignIn: () => void;
   /**
    * Called when a sign-up needs more information, including when a sign-in is transferred to a sign-up that requires
-   * additional verification. Also called when a Clerk Protect challenge fails during a sign-up, with the error available
-   * on `errors` from `useSignUp()`.
+   * additional verification. Also called when the sign-up failed at the SSO provider, with the error available on
+   * `signUp.verifications.externalAccount.error` from `useSignUp()`, and when a Clerk Protect challenge fails during a
+   * sign-up, with the error available on `errors` from `useSignUp()`.
    */
   navigateToSignUp: () => void;
 }
