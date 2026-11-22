@@ -126,12 +126,7 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
 
   // Handle machine tokens first (from encrypted request data)
   // Machine tokens are passed via x-clerk-request-data header from middleware
-  const machineAuthObject = handleMachineToken(
-    bearerToken,
-    decryptedRequestData.machineAuthObject,
-    acceptsToken,
-    options,
-  );
+  const machineAuthObject = handleMachineToken(bearerToken, decryptedRequestData, acceptsToken, options);
   if (machineAuthObject) {
     return machineAuthObject;
   }
@@ -155,7 +150,7 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
 
 const handleMachineToken = (
   bearerToken: string | undefined,
-  rawAuthObject: AuthObject | undefined,
+  { machineAuthObject: rawAuthObject, machineTokenSignature }: ReturnType<typeof decryptClerkRequestData>,
   acceptsToken: NonNullable<AuthenticateRequestOptions['acceptsToken']>,
   options: Record<string, any>,
 ): MachineAuthObject<MachineTokenType> | null => {
@@ -166,6 +161,9 @@ const handleMachineToken = (
     (Array.isArray(acceptsToken) && acceptsToken.length === 1 && acceptsToken[0] === TokenType.SessionToken);
 
   if (hasMachineToken && rawAuthObject && !acceptsOnlySessionToken) {
+    if (rawAuthObject.isAuthenticated) {
+      assertTokenSignature(bearerToken, options.secretKey, machineTokenSignature);
+    }
     const authObject = getAuthObjectForAcceptedToken({
       authObject: {
         ...rawAuthObject,

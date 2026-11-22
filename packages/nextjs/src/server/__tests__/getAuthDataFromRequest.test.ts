@@ -1,12 +1,17 @@
-import type { MachineAuthObject } from '@clerk/backend';
-import type { AuthenticatedMachineObject, MachineTokenType, SignedOutAuthObject } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
-import { NextRequest } from 'next/server';
+import type { AuthObject, MachineAuthObject } from '@clerk/backend';
+import type {
+  AuthenticatedMachineObject,
+  MachineTokenType,
+  RequestState,
+  SignedOutAuthObject,
+} from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { NextRequest, NextResponse } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { HmacSHA1 } from '../../vendor/crypto-es';
 import { getAuthDataFromRequest } from '../data/getAuthDataFromRequest';
-import { encryptClerkRequestData } from '../utils';
+import { decorateRequest, encryptClerkRequestData } from '../utils';
 
 vi.mock(import('../constants.js'), async importOriginal => {
   const actual = await importOriginal();
@@ -24,10 +29,19 @@ type MockRequestParams = {
   method?: string;
   headers?: Headers;
   machineAuthObject?: Partial<MachineAuthObject<MachineTokenType>>;
+  // The token middleware verified. Defaults to the request's bearer token.
+  machineToken?: string;
 };
 
 const mockRequest = (params: MockRequestParams) => {
-  const { url, appendDevBrowserCookie = false, method = 'GET', headers = new Headers(), machineAuthObject } = params;
+  const {
+    url,
+    appendDevBrowserCookie = false,
+    method = 'GET',
+    headers = new Headers(),
+    machineAuthObject,
+    machineToken = headers.get(constants.Headers.Authorization)?.replace('Bearer ', '') ?? '',
+  } = params;
   const headersWithCookie = new Headers(headers);
 
   if (appendDevBrowserCookie) {
@@ -39,8 +53,11 @@ const mockRequest = (params: MockRequestParams) => {
     const encryptedData = encryptClerkRequestData(
       {}, // requestData
       {}, // keylessModeKeys
-      // @ts-expect-error - mock machine auth object
-      machineAuthObject,
+      {
+        // @ts-expect-error - mock machine auth object
+        authObject: machineAuthObject,
+        tokenSignature: HmacSHA1(machineToken, 'sk_test_xxxxxxxxxxxxxxxxxx').toString(),
+      },
     );
     if (encryptedData) {
       headersWithCookie.set(constants.Headers.ClerkRequestData, encryptedData);
@@ -56,6 +73,54 @@ const createMockMachineAuthObject = <T extends MachineTokenType>(data: Partial<M
 describe('getAuthDataFromRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('rejects a forwarded machine auth object when the bearer token is not the one it was created for', () => {
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({ [constants.Headers.Authorization]: 'Bearer ak_other' }),
+      machineAuthObject: createMockMachineAuthObject({ tokenType: 'api_key', isAuthenticated: true, id: 'ak_id' }),
+      machineToken: 'ak_verified',
+    });
+
+    expect(() => getAuthDataFromRequest(req, { acceptsToken: 'api_key' })).toThrow(/auth_signature_invalid/);
+  });
+
+  it('rejects a forwarded machine auth object without a token signature', () => {
+    const encryptedData = encryptClerkRequestData(
+      {},
+      {},
+      // @ts-expect-error - payload from a build that did not sign the token
+      { authObject: { tokenType: 'api_key', isAuthenticated: true, id: 'ak_id' } },
+    );
+    const req = new NextRequest('https://www.clerk.com/api/protected', {
+      headers: {
+        [constants.Headers.Authorization]: 'Bearer ak_verified',
+        [constants.Headers.ClerkRequestData]: encryptedData!,
+      },
+    });
+
+    expect(() => getAuthDataFromRequest(req, { acceptsToken: 'api_key' })).toThrow(/auth_signature_invalid/);
+  });
+
+  it('returns an unauthenticated machine auth object that middleware forwarded without a token signature', () => {
+    const encryptedData = encryptClerkRequestData(
+      {},
+      {},
+      // @ts-expect-error - mock machine auth object
+      { authObject: { tokenType: 'api_key', isAuthenticated: false, id: null }, tokenSignature: '' },
+    );
+    const req = new NextRequest('https://www.clerk.com/api/protected', {
+      headers: {
+        [constants.Headers.Authorization]: 'Bearer ak_invalid',
+        [constants.Headers.ClerkRequestData]: encryptedData!,
+      },
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'api_key' });
+
+    expect(auth.tokenType).toBe('api_key');
+    expect(auth.isAuthenticated).toBe(false);
   });
 
   it('redacts debug data of a machine auth object', () => {
@@ -383,6 +448,52 @@ describe('getAuthDataFromRequest', () => {
       expect(auth.tokenType).toBe('session_token');
       expect((auth as SignedOutAuthObject).userId).toBeNull();
       expect(auth.isAuthenticated).toBe(false);
+    });
+  });
+
+  describe('machine auth object forwarded by decorateRequest', () => {
+    // Runs the real middleware handoff with a dynamic secret key and returns the request auth() would see.
+    const forwardFromMiddleware = (verifiedToken: string) => {
+      const clerkRequest = createClerkRequest(
+        new Request('https://www.clerk.com/api/protected', {
+          headers: { [constants.Headers.Authorization]: `Bearer ${verifiedToken}` },
+        }),
+      );
+      const res = decorateRequest(
+        clerkRequest,
+        NextResponse.next(),
+        { status: AuthStatus.SignedIn, token: verifiedToken, reason: null, message: null } as unknown as RequestState,
+        { secretKey: 'sk_test_dynamic' },
+        {},
+        { tokenType: 'api_key', isAuthenticated: true, id: 'ak_id' } as unknown as AuthObject,
+      );
+
+      const headers = new Headers();
+      res.headers.forEach((value, key) => {
+        if (key.startsWith('x-middleware-request-')) {
+          headers.set(key.slice('x-middleware-request-'.length), value);
+        }
+      });
+      return headers;
+    };
+
+    it('authenticates the token middleware verified', async () => {
+      const req = new NextRequest('https://www.clerk.com/api/protected', {
+        headers: forwardFromMiddleware('ak_verified'),
+      });
+
+      const auth = getAuthDataFromRequest(req, { acceptsToken: 'api_key' });
+
+      expect(auth.isAuthenticated).toBe(true);
+      expect(await auth.getToken()).toBe('ak_verified');
+    });
+
+    it('rejects a different bearer token', () => {
+      const headers = forwardFromMiddleware('ak_verified');
+      headers.set(constants.Headers.Authorization, 'Bearer ak_other');
+      const req = new NextRequest('https://www.clerk.com/api/protected', { headers });
+
+      expect(() => getAuthDataFromRequest(req, { acceptsToken: 'api_key' })).toThrow(/auth_signature_invalid/);
     });
   });
 });

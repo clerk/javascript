@@ -89,14 +89,19 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData(requestData, keylessMode, machineAuthObject);
+    const tokenSignature = token
+      ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || keylessMode.secretKey || '')
+      : '';
+    const clerkRequestData = encryptClerkRequestData(
+      requestData,
+      keylessMode,
+      machineAuthObject ? { authObject: machineAuthObject, tokenSignature } : null,
+    );
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
-      [constants.Headers.AuthSignature]: token
-        ? createTokenSignature(token, requestData?.secretKey || SECRET_KEY || keylessMode.secretKey || '')
-        : '',
+      [constants.Headers.AuthSignature]: tokenSignature,
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
@@ -209,7 +214,7 @@ const KEYLESS_ENCRYPTION_KEY = 'clerk_keyless_dummy_key';
 export function encryptClerkRequestData(
   requestData: Partial<AuthenticateRequestOptions>,
   keylessModeKeys: Pick<AuthenticateRequestOptions, 'publishableKey' | 'secretKey'>,
-  machineAuthObject: AuthObject | null,
+  machineAuth: { authObject: AuthObject; tokenSignature: string } | null,
 ) {
   const isEmpty = (obj: Record<string, any> | undefined) => {
     if (!obj) {
@@ -218,7 +223,7 @@ export function encryptClerkRequestData(
     return !Object.values(obj).some(v => v !== undefined);
   };
 
-  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuthObject) {
+  if (isEmpty(requestData) && isEmpty(keylessModeKeys) && !machineAuth) {
     return;
   }
 
@@ -231,7 +236,12 @@ export function encryptClerkRequestData(
     : ENCRYPTION_KEY || SECRET_KEY || KEYLESS_ENCRYPTION_KEY;
 
   return AES.encrypt(
-    JSON.stringify({ ...keylessModeKeys, ...requestData, machineAuthObject: machineAuthObject ?? undefined }),
+    JSON.stringify({
+      ...keylessModeKeys,
+      ...requestData,
+      machineAuthObject: machineAuth?.authObject,
+      machineTokenSignature: machineAuth?.tokenSignature,
+    }),
     maybeKeylessEncryptionKey,
   ).toString();
 }
@@ -242,7 +252,7 @@ export function encryptClerkRequestData(
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
-): Partial<AuthenticateRequestOptions> & { machineAuthObject?: AuthObject } {
+): Partial<AuthenticateRequestOptions> & { machineAuthObject?: AuthObject; machineTokenSignature?: string } {
   if (!encryptedRequestData) {
     return {};
   }
