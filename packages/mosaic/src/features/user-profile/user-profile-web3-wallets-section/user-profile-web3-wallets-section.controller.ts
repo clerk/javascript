@@ -62,7 +62,12 @@ export function useUserProfileWeb3WalletsController({
       panelTitle(),
   });
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
-    onConfirm: wallet => removalFocus.remove(wallet.id),
+    onConfirm: async wallet => {
+      await removalFocus.remove(wallet.id);
+      if (errorId === wallet.id) {
+        action.reset();
+      }
+    },
     reverification: removeReverification,
   });
 
