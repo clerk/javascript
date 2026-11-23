@@ -190,6 +190,8 @@ export function NoticeStep({
       return (
         <AuthStartOver
           messages={m.startOver}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
           onStartOver={onStartOver}
         />
       );
