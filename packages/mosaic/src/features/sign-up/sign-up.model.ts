@@ -247,11 +247,13 @@ export function useSignUpModel({
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const legalConsentRequired = userSettings.signUp.legal_consent_enabled;
   const canSwitchIdentifier = emailOrPhone(attributes, isProgressiveSignUp);
-  const verifiesEmailByLink = Boolean(attributes.email_address?.verifications?.includes('email_link'));
 
   const next = (resource: SignUpFutureResource): SignUpNextStep => {
     const step = getSignUpNextStep(resource);
-    if (step.type === 'verify_email' && verifiesEmailByLink) {
+    if (
+      step.type === 'verify_email' &&
+      resource.verifications.emailAddress.supportedStrategies.includes('email_link')
+    ) {
       return { type: 'unknown' };
     }
     return step.type === 'fields' && !continueCanSatisfy(resource) ? { type: 'unknown' } : step;
