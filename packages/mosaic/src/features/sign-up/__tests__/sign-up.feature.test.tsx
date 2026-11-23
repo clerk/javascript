@@ -983,6 +983,25 @@ describe('SignUp invitations', () => {
     window.history.replaceState(null, '', `${window.location.pathname}?${param}=${ticket}`);
   }
 
+  function Reopenable() {
+    const [opened, setOpened] = useState(1);
+    const write = useVirtualWrite();
+    return (
+      <>
+        <SignUp key={opened} />
+        <button
+          type='button'
+          onClick={() => {
+            write('/sign-up', []);
+            setOpened(opened + 1);
+          }}
+        >
+          Reopen sign-up
+        </button>
+      </>
+    );
+  }
+
   it('redeems an invitation, asks for the password it did not set, and completes', async () => {
     openInvitation('__clerk_ticket', 'tkt_invite');
     const { fapi, user, navigate } = await renderSignUp({
@@ -1042,24 +1061,6 @@ describe('SignUp invitations', () => {
   });
 
   it('redeems an invitation when another sign-up is already in progress', async () => {
-    function Reopenable() {
-      const [opened, setOpened] = useState(1);
-      const write = useVirtualWrite();
-      return (
-        <>
-          <SignUp key={opened} />
-          <button
-            type='button'
-            onClick={() => {
-              write('/sign-up', []);
-              setOpened(opened + 1);
-            }}
-          >
-            Reopen sign-up
-          </button>
-        </>
-      );
-    }
     const fapi = serveFapi({ environment: environment(), signUp: { tickets: { tkt_new: { emailAddress: EMAIL } } } });
     await renderWithClerk(<Reopenable />);
     const user = userEvent.setup();
@@ -1073,6 +1074,31 @@ describe('SignUp invitations', () => {
     expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
     expect(fapi.signUp.creations).toHaveLength(2);
     expect(fapi.signUp.creations[1].get('ticket')).toBe('tkt_new');
+  });
+
+  it('starts a new sign-up when a later visit has no ticket in the URL', async () => {
+    openInvitation('__clerk_ticket', 'tkt_abandoned');
+    const fapi = serveFapi({
+      environment: environment(),
+      signUp: { tickets: { tkt_abandoned: { emailAddress: EMAIL } } },
+    });
+    await renderWithClerk(<Reopenable />);
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Fill in missing fields' });
+
+    window.history.replaceState(null, '', window.location.pathname);
+    await user.click(screen.getByRole('button', { name: 'Reopen sign-up' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(emailField()).not.toHaveAttribute('aria-disabled');
+    await user.clear(emailField());
+    await submitStart(user, 'bob@example.com');
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.creations[1].get('email_address')).toBe('bob@example.com');
+    expect(fapi.signUp.updates).toHaveLength(0);
+    await codeSent();
   });
 
   it('lets an invitee through restricted mode, including back on the start form', async () => {
