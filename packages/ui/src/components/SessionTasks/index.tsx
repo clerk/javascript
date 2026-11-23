@@ -19,6 +19,7 @@ import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 import { TaskResetPassword } from './tasks/TaskResetPassword';
 import { TaskSetupMFA } from './tasks/TaskSetupMfa';
+import { TaskVerifyMFA } from './tasks/TaskVerifyMfa';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -107,6 +108,9 @@ function SessionTasksRoutes(): JSX.Element {
           >
             <TaskSetupMFA />
           </TaskSetupMFAContext.Provider>
+        </Route>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['verify-mfa']}>
+          <TaskVerifyMFA />
         </Route>
         <Route index>
           <SessionTasksStart />

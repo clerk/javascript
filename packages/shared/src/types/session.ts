@@ -516,7 +516,7 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization' | 'reset-password' | 'setup-mfa';
+  key: 'choose-organization' | 'reset-password' | 'setup-mfa' | 'verify-mfa';
 }
 
 /** @generateWithEmptyComment */
