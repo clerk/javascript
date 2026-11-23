@@ -3,7 +3,8 @@ import * as BarChartStories from './bar-chart.stories';
 # BarChart
 
 A stacked bar chart over a category or time axis, with values above and below zero. It is a
-**headless** primitive: D3 computes the stacks and scales, Canvas paints the bars, SVG draws the
+**headless** primitive: `BarChart.useBarChart` owns the layout and selection, and the parts render
+from the chart object it returns. D3 computes the stacks and scales, Canvas paints the bars, SVG draws the
 grid, axes and marks, and the primitive handles pointer and keyboard selection. It ships **no
 styles**. Every part, including the Canvas bars, takes its appearance from your CSS.
 
@@ -22,10 +23,10 @@ unstyled, so the bars take the inherited text color and the grid and zero lines 
 ```tsx
 import { BarChart } from '@clerk/mosaic/primitives/bar-chart';
 
-const layout = BarChart.useStackedBarLayout({ data, series, index });
+const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod });
 
 <BarChart.Root
-  layout={layout}
+  chart={chart}
   height={320}
   aria-label='Weekly sign-ups'
 >
@@ -39,7 +40,7 @@ const layout = BarChart.useStackedBarLayout({ data, series, index });
       ))
     }
   </BarChart.Grid>
-  <BarChart.StackedBars isBarActive={isBarActive}>
+  <BarChart.StackedBars>
     <BarChart.Bar className='bar' />
     <BarChart.ProjectionOutline />
     <BarChart.ZeroLine />
@@ -64,7 +65,7 @@ const layout = BarChart.useStackedBarLayout({ data, series, index });
       ))
     }
   </BarChart.XAxis>
-  <BarChart.BarSelection onActivate={openPeriod}>
+  <BarChart.BarSelection>
     <BarChart.Cursor />
     <BarChart.Tooltip>{active => <PeriodSummary row={active.datum} />}</BarChart.Tooltip>
   </BarChart.BarSelection>
@@ -76,18 +77,17 @@ returns each row's unique category key. Memoize `series`, `index` and `isBarActi
 
 ### Dimming bars
 
-`isBarActive` marks every other bar `data-inactive`, so CSS can dim it. This keeps one week's
-positive section at full color:
+`isBarActive` marks every other bar `data-inactive`, so CSS can dim it. Control the selection to
+dim every bar outside the selected section:
 
 ```tsx
+const [selection, setSelection] = useState<BarSelection | null>(null);
 const isBarActive = useCallback(
-  (bar: BarIdentity<Row>) => bar.datum.week === selectedWeek && bar.positive,
-  [selectedWeek],
+  (bar: BarIdentity<Row>) =>
+    !selection || (bar.datum.week === selection.category && bar.positive === (selection.section === 'positive')),
+  [selection],
 );
-
-<BarChart.StackedBars isBarActive={isBarActive}>
-  <BarChart.Bar className='bar' />
-</BarChart.StackedBars>;
+const chart = BarChart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
 ```
 
 ### Projection
@@ -97,7 +97,7 @@ with `BarChart.Bar`'s `data-projection` color, and `BarChart.ProjectionOutline` 
 It is drawn only when `value` is above that category's stack.
 
 ```tsx
-const layout = BarChart.useStackedBarLayout({
+const chart = BarChart.useBarChart({
   data,
   series,
   index,
@@ -107,22 +107,22 @@ const layout = BarChart.useStackedBarLayout({
 
 ## Parts
 
-| Part                         | Default Element | Description                                                         |
-| ---------------------------- | --------------- | ------------------------------------------------------------------- |
-| `BarChart.Root`              | `<div>`         | Measures the container and provides the layout                      |
-| `BarChart.Grid`              | `<svg>`         | Holds the grid lines                                                |
-| `BarChart.GridLine`          | `<line>`        | One line across the plot at a Y tick                                |
-| `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them |
-| `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                          |
-| `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                          |
-| `BarChart.ZeroLine`          | `<line>`        | The line at zero                                                    |
-| `BarChart.YAxis`             | `<svg>`         | Holds the Y tick labels                                             |
-| `BarChart.YTick`             | `<text>`        | One Y tick label                                                    |
-| `BarChart.XAxis`             | `<svg>`         | Holds the category labels                                           |
-| `BarChart.XTick`             | `<text>`        | One category label                                                  |
-| `BarChart.BarSelection`      | `<div>`         | Pointer and keyboard selection                                      |
-| `BarChart.Cursor`            | `<div>`         | Covers the selected category's band                                 |
-| `BarChart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                          |
+| Part                         | Default Element | Description                                                          |
+| ---------------------------- | --------------- | -------------------------------------------------------------------- |
+| `BarChart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
+| `BarChart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
+| `BarChart.GridLine`          | `<line>`        | One line across the plot at a Y tick                                 |
+| `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
+| `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
+| `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
+| `BarChart.ZeroLine`          | `<line>`        | The line at zero                                                     |
+| `BarChart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
+| `BarChart.YTick`             | `<text>`        | One Y tick label                                                     |
+| `BarChart.XAxis`             | `<svg>`         | Holds the category labels                                            |
+| `BarChart.XTick`             | `<text>`        | One category label                                                   |
+| `BarChart.BarSelection`      | `<div>`         | Pointer and keyboard selection                                       |
+| `BarChart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
+| `BarChart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
 
 Every part accepts a `render` prop and the standard attributes of its default element. Every part
 throws outside `BarChart.Root`. `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside
@@ -131,30 +131,33 @@ throws outside `BarChart.Root`. `BarChart.Bar` and `BarChart.ProjectionOutline` 
 
 ## Props
 
-### `BarChart.useStackedBarLayout`
+### `BarChart.useBarChart`
 
-| Prop                     | Type                                                         | Default           | Description                                            |
-| ------------------------ | ------------------------------------------------------------ | ----------------- | ------------------------------------------------------ |
-| <code>data</code>        | <code>readonly TDatum[]</code>                               | — (required)      | The rows                                               |
-| <code>series</code>      | <code>readonly BarSeries&lt;TDatum&gt;[]</code>              | — (required)      | Stack order and each series' value                     |
-| <code>index</code>       | <code>(datum: TDatum, index: number) => string</code>        | — (required)      | A unique, stable category key                          |
-| <code>categoryGap</code> | <code>number</code>                                          | <code>0.28</code> | Fraction of each band left empty                       |
-| <code>projection</code>  | <code>&#123; datumIndex: number; value: number &#125;</code> | —                 | A projected total, drawn when it rises above its stack |
+| Prop                           | Type                                                         | Default                    | Description                                            |
+| ------------------------------ | ------------------------------------------------------------ | -------------------------- | ------------------------------------------------------ |
+| <code>data</code>              | <code>readonly TDatum[]</code>                               | — (required)               | The rows                                               |
+| <code>series</code>            | <code>readonly BarSeries&lt;TDatum&gt;[]</code>              | — (required)               | Stack order and each series' value                     |
+| <code>index</code>             | <code>(datum: TDatum, index: number) => string</code>        | — (required)               | A unique, stable category key                          |
+| <code>categoryGap</code>       | <code>number</code>                                          | <code>0.28</code>          | Fraction of each band left empty                       |
+| <code>margin</code>            | <code>Partial&lt;ChartMargin&gt;</code>                      | <code>8, 16, 36, 52</code> | Space for the axes: top, right, bottom, left           |
+| <code>projection</code>        | <code>&#123; datumIndex: number; value: number &#125;</code> | —                          | A projected total, drawn when it rises above its stack |
+| <code>isBarActive</code>       | <code>(bar: BarIdentity&lt;TDatum&gt;) => boolean</code>     | every bar active           | Returns false for a bar styled through `data-inactive` |
+| <code>selection</code>         | <code>BarSelection \| null</code>                            | uncontrolled               | The selected category and section                      |
+| <code>onSelectionChange</code> | <code>(selection: BarSelection \| null) => void</code>       | —                          | Called when the selection changes                      |
+| <code>onActivate</code>        | <code>(active: ActiveBar&lt;TDatum&gt;) => void</code>       | —                          | Called on click, Enter or Space                        |
+| <code>formatCategory</code>    | <code>(key: string) => string \| null</code>                 | the key                    | Names a period in keyboard announcements               |
+
+The hook returns the chart object: `rootRef`, `size`, `plot`, `scaleY`, `zeroY`, `categories`,
+`yTicks`, `xTicks(options)`, `projection`, `selected`, `announcement`, `select`, `clear` and
+`getInteractionProps()`. Render from it directly to skip the parts.
 
 ### `BarChart.Root`
 
-| Prop                    | Type                                    | Default                    | Description                                       |
-| ----------------------- | --------------------------------------- | -------------------------- | ------------------------------------------------- |
-| <code>layout</code>     | <code>StackedBarLayoutSource</code>     | — (required)               | The result of `BarChart.useStackedBarLayout`      |
-| <code>aria-label</code> | <code>string</code>                     | — (required)               | Labels the bars image and the interaction surface |
-| <code>height</code>     | <code>number \| string</code>           | <code>500</code>           | The container height                              |
-| <code>margin</code>     | <code>Partial&lt;ChartMargin&gt;</code> | <code>8, 16, 36, 52</code> | Space for the axes: top, right, bottom, left      |
-
-### `BarChart.StackedBars`
-
-| Prop                     | Type                                                     | Default          | Description                                            |
-| ------------------------ | -------------------------------------------------------- | ---------------- | ------------------------------------------------------ |
-| <code>isBarActive</code> | <code>(bar: BarIdentity&lt;TDatum&gt;) => boolean</code> | every bar active | Returns false for a bar styled through `data-inactive` |
+| Prop                    | Type                                        | Default          | Description                                       |
+| ----------------------- | ------------------------------------------- | ---------------- | ------------------------------------------------- |
+| <code>chart</code>      | <code>BarChartInstance&lt;TDatum&gt;</code> | — (required)     | The result of `BarChart.useBarChart`              |
+| <code>aria-label</code> | <code>string</code>                         | — (required)     | Labels the bars image and the interaction surface |
+| <code>height</code>     | <code>number \| string</code>               | <code>500</code> | The container height                              |
 
 ### `BarChart.XAxis`
 
@@ -167,14 +170,6 @@ throws outside `BarChart.Root`. `BarChart.Bar` and `BarChart.ProjectionOutline` 
 `BarChart.Grid`, `BarChart.YAxis` and `BarChart.XAxis` take a `children` function that receives
 their items. `BarChart.GridLine` takes `line`, and `BarChart.YTick` and `BarChart.XTick` take
 `tick`.
-
-### `BarChart.BarSelection`
-
-| Prop                        | Type                                                   | Default | Description                                         |
-| --------------------------- | ------------------------------------------------------ | ------- | --------------------------------------------------- |
-| <code>onActiveChange</code> | <code>(active: BarSelection \| null) => void</code>    | —       | Receives the selected category and section, or null |
-| <code>onActivate</code>     | <code>(active: ActiveBar&lt;TDatum&gt;) => void</code> | —       | Called on click, Enter or Space                     |
-| <code>formatCategory</code> | <code>(key: string) => string \| null</code>           | the key | Names a period in keyboard announcements            |
 
 ### `BarChart.Tooltip`
 

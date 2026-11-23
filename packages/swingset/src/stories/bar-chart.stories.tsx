@@ -32,10 +32,10 @@ const series = [
 const getWeek = (row: GrowthRow) => row.week;
 
 export function Default() {
-  const layout = BarChart.useStackedBarLayout({ data: growth, series, index: getWeek });
+  const chart = BarChart.useBarChart({ data: growth, series, index: getWeek });
   return (
     <BarChart.Root
-      layout={layout}
+      chart={chart}
       height={320}
       aria-label='Weekly growth'
       className='w-full'
@@ -74,7 +74,7 @@ export function Default() {
           ))
         }
       </BarChart.XAxis>
-      <BarChart.BarSelection<GrowthRow>>
+      <BarChart.BarSelection>
         <BarChart.Cursor />
         <BarChart.Tooltip<GrowthRow>>
           {({ datum }) => (
