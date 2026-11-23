@@ -5,6 +5,8 @@ export type {
   BarChartBarSelectionProps,
   BarChartCursorProps,
   BarChartGridLineProps,
+  BarChartInstance,
+  BarChartInteractionProps,
   BarChartGridProps,
   BarChartProjectionOutlineProps,
   BarChartRootProps,
@@ -16,8 +18,9 @@ export type {
   BarChartYTickItem,
   BarChartYTickProps,
   BarChartZeroLineProps,
-  StackedBarLayoutOptions,
-  StackedBarLayoutSource,
+  UseBarChartOptions,
+  XTickMode,
+  XTicksOptions,
 } from './parts';
 export type { StackedBarLayout } from './bar-chart-layout';
 export type {

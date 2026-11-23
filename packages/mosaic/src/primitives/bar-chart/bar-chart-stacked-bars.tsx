@@ -12,12 +12,8 @@ import {
 } from './bar-chart-canvas';
 import { hasArea, StackedBarsContext, useBarChartContext } from './bar-chart-context';
 import { fitProjectionToBar, projectStackedBarMarks } from './bar-chart-layout';
-import type { BarIdentity } from './types';
 
-export type BarChartStackedBarsProps<TDatum = unknown> = ComponentProps<'div'> & {
-  /** Returns false for a bar that `BarChart.Bar` styles through `data-inactive`. Default: every bar is active */
-  isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
-};
+export type BarChartStackedBarsProps = ComponentProps<'div'>;
 
 function subscribeToPixelRatio(callback: () => void) {
   let query = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
@@ -49,12 +45,11 @@ function subscribeToRootTheme(onChange: () => void) {
 const getServerSnapshot = () => '';
 const getServerPixelRatio = () => 1;
 
-// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the row type parameter; `isBarActive` only receives rows the chart was given.
 export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStackedBarsProps>(
   function BarChartStackedBars(props, ref) {
-    const { isBarActive, children, render, ...otherProps } = props;
-    const { frame, layout, ariaLabel } = useBarChartContext('StackedBars');
-    const { size } = frame;
+    const { children, render, ...otherProps } = props;
+    const { chart, ariaLabel } = useBarChartContext('StackedBars');
+    const { size, prepared, categories, scaleY, isBarActive, projection: projectedBar } = chart;
     const rootThemeAttributes = React.useSyncExternalStore(
       subscribeToRootTheme,
       getRootThemeAttributes,
@@ -86,11 +81,11 @@ export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStac
       getServerSnapshot,
     );
     const geometry = React.useMemo(() => parseBarGeometry(barGeometry), [barGeometry]);
-    const marks = React.useMemo(() => projectStackedBarMarks(layout, geometry), [geometry, layout]);
-    const projection = React.useMemo(
-      () => fitProjectionToBar(layout.projection, geometry),
-      [geometry, layout.projection],
+    const marks = React.useMemo(
+      () => projectStackedBarMarks({ prepared, categories, scaleY }, geometry),
+      [categories, geometry, prepared, scaleY],
     );
+    const projection = React.useMemo(() => fitProjectionToBar(projectedBar, geometry), [geometry, projectedBar]);
     const stackedBarsContext = React.useMemo(() => ({ setBar, projection }), [projection]);
 
     React.useLayoutEffect(() => {
@@ -141,6 +136,4 @@ export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStac
     }
     return element;
   },
-) as <TDatum = unknown>(
-  props: BarChartStackedBarsProps<TDatum> & { ref?: React.Ref<HTMLDivElement> },
-) => React.ReactElement | null;
+);

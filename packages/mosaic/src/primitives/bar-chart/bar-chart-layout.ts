@@ -165,7 +165,7 @@ function splitNeighbourGap<TDatum>(previous: DraftBarMark<TDatum>, mark: DraftBa
   }
 }
 
-function projectMarksAndPaintInsets<TDatum>(layout: StackedBarLayout<TDatum>, { maxWidth, gap }: BarGeometry) {
+function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWidth, gap }: BarGeometry) {
   const { categories, scaleY } = layout;
   const marks: DraftBarMark<TDatum>[] = [];
   const previousMarkByStack = new Map<string, DraftBarMark<TDatum>>();
@@ -350,10 +350,9 @@ export function projectStackedBars<TDatum>(
 
 export type StackedBarLayout<TDatum> = ReturnType<typeof projectStackedBars<TDatum>>;
 
-export function projectStackedBarMarks<TDatum>(
-  layout: StackedBarLayout<TDatum>,
-  geometry: BarGeometry,
-): BarMark<TDatum>[] {
+type MarkSource<TDatum> = Pick<StackedBarLayout<TDatum>, 'prepared' | 'categories' | 'scaleY'>;
+
+export function projectStackedBarMarks<TDatum>(layout: MarkSource<TDatum>, geometry: BarGeometry): BarMark<TDatum>[] {
   return applyCornerRadii(projectMarksAndPaintInsets(layout, geometry), geometry);
 }
 

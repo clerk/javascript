@@ -13,21 +13,22 @@ export type BarChartGridProps = Omit<ComponentProps<'svg'>, 'children'> & {
 
 export const BarChartGrid = React.forwardRef<SVGSVGElement, BarChartGridProps>(function BarChartGrid(props, ref) {
   const { children, render, ...otherProps } = props;
-  const { frame, layout } = useBarChartContext('Grid');
+  const { chart } = useBarChartContext('Grid');
+  const { size, yTicks } = chart;
 
   const ownProps = {
-    width: frame.size.width,
-    height: frame.size.height,
+    width: size.width,
+    height: size.height,
     'aria-hidden': 'true',
     style: { position: 'absolute', inset: 0, display: 'block', pointerEvents: 'none' },
-    children: children?.(layout.yTicks),
+    children: children?.(yTicks),
   } satisfies DefaultProps<'svg'>;
 
   return useRender({
     defaultTagName: 'svg',
     render,
     ref,
-    enabled: hasArea(frame.size),
+    enabled: hasArea(size),
     props: mergeProps<'svg'>(ownProps, otherProps),
   });
 });

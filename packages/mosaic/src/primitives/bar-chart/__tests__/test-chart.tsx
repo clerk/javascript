@@ -1,55 +1,60 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
 
-import {
-  BarChart,
-  type BarChartBarSelectionProps,
-  type BarChartStackedBarsProps,
-  type StackedBarLayoutOptions,
-} from '../index';
+import { BarChart, type BarChartInstance, type UseBarChartOptions } from '../index';
 import type { ActiveBar } from '../types';
 
-export type TestChartProps<TDatum> = StackedBarLayoutOptions<TDatum> &
-  Pick<BarChartBarSelectionProps<TDatum>, 'onActiveChange' | 'onActivate'> & {
-    ariaLabel: string;
-    formatXTick?: (value: string) => string | null;
-    /** Mounts `BarChart.BarSelection`. Default: true */
-    barSelection?: boolean;
-    renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
-    boundary?: React.RefObject<HTMLElement | null>;
-    height?: number | string;
-    /** Mounts `BarChart.Bar`. Default: true */
-    bar?: boolean;
-    barClassName?: string;
-    isBarActive?: BarChartStackedBarsProps<TDatum>['isBarActive'];
-  };
+export type TestChartProps<TDatum> = Pick<
+  UseBarChartOptions<TDatum>,
+  | 'data'
+  | 'series'
+  | 'index'
+  | 'categoryGap'
+  | 'projection'
+  | 'isBarActive'
+  | 'selection'
+  | 'onSelectionChange'
+  | 'onActivate'
+> & {
+  ariaLabel: string;
+  formatXTick?: (value: string) => string | null;
+  /** Mounts `BarChart.BarSelection`. Default: true */
+  barSelection?: boolean;
+  renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
+  boundary?: RefObject<HTMLElement | null>;
+  height?: number | string;
+  /** Mounts `BarChart.Bar`. Default: true */
+  bar?: boolean;
+  barClassName?: string;
+  /** Receives the chart object after each render. */
+  chartRef?: { current: BarChartInstance<TDatum> | null };
+};
 
 /** Composes every bar chart part from one flat set of test props. */
 export function TestChart<TDatum>({
-  data,
-  series,
-  index,
-  categoryGap,
-  projection,
   ariaLabel,
   formatXTick,
   barSelection = true,
-  onActiveChange,
-  onActivate,
   renderTooltip,
   boundary,
   height,
   bar = true,
   barClassName,
-  isBarActive,
+  chartRef,
+  ...options
 }: TestChartProps<TDatum>) {
-  const layout = BarChart.useStackedBarLayout({ data, series, index, categoryGap, projection });
+  const chart = BarChart.useBarChart({ ...options, formatCategory: formatXTick });
+  useLayoutEffect(() => {
+    if (chartRef) {
+      chartRef.current = chart;
+    }
+  });
   return (
     <BarChart.Root
-      layout={layout}
+      chart={chart}
       height={height}
       aria-label={ariaLabel}
     >
-      <BarChart.StackedBars<TDatum> isBarActive={isBarActive}>
+      <BarChart.StackedBars>
         {bar ? <BarChart.Bar className={barClassName} /> : null}
         <BarChart.ProjectionOutline />
         <BarChart.ZeroLine />
@@ -65,11 +70,7 @@ export function TestChart<TDatum>({
         }
       </BarChart.XAxis>
       {barSelection ? (
-        <BarChart.BarSelection<TDatum>
-          onActiveChange={onActiveChange}
-          onActivate={onActivate}
-          formatCategory={formatXTick}
-        >
+        <BarChart.BarSelection>
           <BarChart.Cursor data-testid='cursor' />
           {renderTooltip ? (
             <BarChart.Tooltip<TDatum>

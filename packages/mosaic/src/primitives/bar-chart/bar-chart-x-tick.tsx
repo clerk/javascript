@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { BarChartActiveCategoryContext, useBarChartContext } from './bar-chart-context';
+import { useBarChartContext } from './bar-chart-context';
 import type { XTick } from './x-ticks';
 
 export type BarChartXTickProps = ComponentProps<'text'> & {
@@ -13,12 +13,12 @@ export type BarChartXTickProps = ComponentProps<'text'> & {
 
 export const BarChartXTick = React.forwardRef<SVGTextElement, BarChartXTickProps>(function BarChartXTick(props, ref) {
   const { tick, render, ...otherProps } = props;
-  const { layout } = useBarChartContext('XTick');
-  const activeCategory = React.useContext(BarChartActiveCategoryContext);
+  const { chart } = useBarChartContext('XTick');
+  const activeCategory = chart.selected?.category ?? null;
 
   const ownProps = {
     x: tick.x,
-    y: layout.plot.y + layout.plot.height + 24,
+    y: chart.plot.y + chart.plot.height + 24,
     textAnchor: tick.textAnchor,
     children: tick.label,
   } satisfies DefaultProps<'text'>;

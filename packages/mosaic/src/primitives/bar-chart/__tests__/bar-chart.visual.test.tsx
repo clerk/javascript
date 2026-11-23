@@ -54,17 +54,19 @@ function GrowthChart({
   projected?: boolean;
 }) {
   const boundary = useRef<HTMLDivElement>(null);
-  const layout = BarChart.useStackedBarLayout({
-    data: growth,
-    series,
-    index: getWeek,
-    projection: projected ? projection : undefined,
-  });
   const isBarActive = useCallback(
     (bar: BarIdentity<GrowthRow>) =>
       !selected || (bar.datum.week === selected.week && bar.positive === selected.positive),
     [selected],
   );
+  const chart = BarChart.useBarChart({
+    data: growth,
+    series,
+    index: getWeek,
+    projection: projected ? projection : undefined,
+    isBarActive,
+    formatCategory: formatWeek,
+  });
   return (
     <div
       ref={boundary}
@@ -72,7 +74,7 @@ function GrowthChart({
       data-testid='chart'
     >
       <BarChart.Root
-        layout={layout}
+        chart={chart}
         height={320}
         aria-label='Weekly growth'
       >
@@ -87,7 +89,7 @@ function GrowthChart({
             ))
           }
         </BarChart.Grid>
-        <BarChart.StackedBars<GrowthRow> isBarActive={isBarActive}>
+        <BarChart.StackedBars>
           <BarChart.Bar className='bar' />
           <BarChart.ProjectionOutline className='projection-outline' />
           <BarChart.ZeroLine className='zero-line' />
@@ -114,7 +116,7 @@ function GrowthChart({
             ))
           }
         </BarChart.XAxis>
-        <BarChart.BarSelection<GrowthRow> formatCategory={formatWeek}>
+        <BarChart.BarSelection>
           <BarChart.Cursor className='cursor' />
           <BarChart.Tooltip<GrowthRow>
             className='tooltip'

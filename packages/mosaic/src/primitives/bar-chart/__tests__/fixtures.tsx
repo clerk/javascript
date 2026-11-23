@@ -2,6 +2,7 @@ import { act, render as renderComponent } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
+import type { BarChartInstance } from '../index';
 import type { BarSelection } from '../types';
 import { TestChart, type TestChartProps } from './test-chart';
 
@@ -36,20 +37,21 @@ export const chartFixture = {
 
 /**
  * Renders the chart with a one-series fixture. Pass `data`, `series` and `index` together to use
- * another row shape. `active()` returns the last published selection.
+ * another row shape. `active()` returns the chart's selected bar.
  */
 export function renderChart<TDatum = ChartRow>(props: Partial<TestChartProps<TDatum>> = {}) {
   // eslint-disable-next-line typescript/consistent-type-assertions -- Callers that change the row type pass their own data, series and index.
   const base = chartFixture as unknown as TestChartProps<TDatum>;
-  const onActiveChange = vi.fn<(active: BarSelection | null) => void>();
-  const chartProps = { ...base, onActiveChange, ...props };
+  const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+  const chartRef: { current: BarChartInstance<TDatum> | null } = { current: null };
+  const chartProps = { ...base, onSelectionChange, chartRef, ...props };
   const view = render(<TestChart {...chartProps} />);
   const name = chartProps.ariaLabel;
   const interaction = view.queryByRole('button', { name }) ?? view.getByRole('group', { name });
   return {
     ...view,
     interaction,
-    active: () => onActiveChange.mock.lastCall?.[0] ?? null,
+    active: () => chartRef.current?.selected ?? null,
     rerenderChart: (next: Partial<TestChartProps<TDatum>>) =>
       view.rerender(
         <TestChart

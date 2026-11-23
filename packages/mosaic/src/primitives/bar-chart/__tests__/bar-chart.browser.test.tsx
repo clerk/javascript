@@ -42,7 +42,7 @@ function Chart({ width = 600, ...props }: Partial<TestChartProps<Row>> & { width
         ariaLabel='Growth'
         height={300}
         barClassName='red'
-        onActiveChange={() => {}}
+        onSelectionChange={() => {}}
         {...props}
       />
     </div>
@@ -133,35 +133,37 @@ describe('resizing', () => {
 
 describe('choosing a period with a pointer', () => {
   it('selects the period under a mouse and clears it when the mouse leaves', async () => {
-    const onActiveChange = vi.fn<(active: BarSelection | null) => void>();
-    await render(<Chart onActiveChange={onActiveChange} />);
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(<Chart onSelectionChange={onSelectionChange} />);
     const { x, y } = centerOfCategory(3);
 
     const plot = surface().getBoundingClientRect();
     await userEvent.hover(surface(), { position: { x: x - plot.left, y: y - plot.top } });
-    await expect.poll(() => onActiveChange.mock.lastCall?.[0]).toMatchObject({ category: 'Apr', section: 'positive' });
+    await expect
+      .poll(() => onSelectionChange.mock.lastCall?.[0])
+      .toMatchObject({ category: 'Apr', section: 'positive' });
     const cursor = screen.getByTestId('cursor').getBoundingClientRect();
     expect(cursor.left).toBeLessThan(x);
     expect(cursor.right).toBeGreaterThan(x);
 
     await userEvent.unhover(surface());
-    await expect.poll(() => onActiveChange.mock.lastCall?.[0]).toBeNull();
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
     expect(screen.queryByTestId('cursor')).toBeNull();
   });
 
   it('selects on touch contact, keeps it after the finger lifts, and dismisses on a touch elsewhere', async () => {
-    const onActiveChange = vi.fn<(active: BarSelection | null) => void>();
-    await render(<Chart onActiveChange={onActiveChange} />);
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(<Chart onSelectionChange={onSelectionChange} />);
     const { x, y } = centerOfCategory(1);
 
     pointer('pointerdown', surface(), x, y, 'touch');
     surface().dispatchEvent(
       new PointerEvent('pointerout', { bubbles: true, pointerType: 'touch', relatedTarget: document.body }),
     );
-    await expect.poll(() => onActiveChange.mock.lastCall?.[0]).toMatchObject({ category: 'Feb' });
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Feb' });
 
     pointer('pointerdown', document.body, 0, 0, 'touch');
-    await expect.poll(() => onActiveChange.mock.lastCall?.[0]).toBeNull();
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
   });
 });
 

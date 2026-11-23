@@ -14,11 +14,11 @@ export type BarChartGridLineProps = ComponentProps<'line'> & {
 export const BarChartGridLine = React.forwardRef<SVGLineElement, BarChartGridLineProps>(
   function BarChartGridLine(props, ref) {
     const { line, render, ...otherProps } = props;
-    const { layout } = useBarChartContext('GridLine');
+    const { chart } = useBarChartContext('GridLine');
 
     const ownProps = {
-      x1: layout.plot.x,
-      x2: layout.plot.x + layout.plot.width,
+      x1: chart.plot.x,
+      x2: chart.plot.x + chart.plot.width,
       y1: line.y,
       y2: line.y,
       vectorEffect: 'non-scaling-stroke',

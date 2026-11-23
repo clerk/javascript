@@ -19,10 +19,10 @@ function StackedChart({
   render?: React.ComponentProps<typeof BarChart.Root>['render'];
   children?: React.ReactNode;
 }) {
-  const layout = BarChart.useStackedBarLayout({ data, series: chartFixture.series, index: chartFixture.index });
+  const chart = BarChart.useBarChart({ data, series: chartFixture.series, index: chartFixture.index });
   return (
     <BarChart.Root
-      layout={layout}
+      chart={chart}
       aria-label='Growth'
       render={renderProp}
     >
@@ -220,7 +220,7 @@ describe('activating a period', () => {
     { name: 'Enter', props: { data: quarter }, keys: ['ArrowRight', 'Enter'] },
     {
       name: 'Enter when the consumer only handles clicks',
-      props: { data: quarter, onActiveChange: undefined },
+      props: { data: quarter, onSelectionChange: undefined },
       keys: ['ArrowRight', 'Enter'],
     },
     {
@@ -284,12 +284,12 @@ describe('activating a period', () => {
       projection: { datumIndex: 0, value: -10 },
     },
   ])('does not activate zero values with an $name projection', ({ projection }) => {
-    const onActiveChange = vi.fn();
+    const onSelectionChange = vi.fn();
     const onActivate = vi.fn();
     const { interaction, getByRole } = renderChart({
       data: [{ period: 'Jan', value: 0 }],
       projection,
-      onActiveChange,
+      onSelectionChange,
       onActivate,
     });
 
@@ -297,7 +297,7 @@ describe('activating a period', () => {
     expect(getByRole('status')).toHaveTextContent('No values for this period');
     fireEvent.keyDown(interaction, { key: 'Enter' });
 
-    expect(onActiveChange).not.toHaveBeenCalledWith(expect.anything());
+    expect(onSelectionChange).not.toHaveBeenCalledWith(expect.anything());
     expect(onActivate).not.toHaveBeenCalled();
   });
 });
@@ -331,7 +331,7 @@ describe('keeping the selection when data changes', () => {
             series={[{ key: 'value', value: datum => datum.value }]}
             index={datum => datum.period}
             ariaLabel='Growth'
-            onActiveChange={setActive}
+            onSelectionChange={setActive}
           />
         </>
       );
@@ -391,5 +391,95 @@ describe('reading the selected period as data changes', () => {
 
     fireEvent.keyDown(interaction, { key: 'Home' });
     expect(getByRole('status')).toHaveTextContent('Feb, positive values');
+  });
+});
+
+describe('controlling the selection', () => {
+  const selectedTick = () => document.querySelector('text[data-active]')?.textContent ?? null;
+
+  it('reports each keyboard move to onSelectionChange', () => {
+    const onSelectionChange = vi.fn();
+    const { interaction } = renderChart({ data: quarter, onSelectionChange });
+
+    press(interaction, 'ArrowRight', 'ArrowRight', 'Escape');
+
+    expect(onSelectionChange.mock.calls).toEqual([
+      [{ category: 'Jan', section: 'positive' }],
+      [{ category: 'Feb', section: 'positive' }],
+      [{ category: 'Mar', section: 'positive' }],
+      [null],
+    ]);
+  });
+
+  it('shows the controlled selection and keeps it until the value changes', () => {
+    const onSelectionChange = vi.fn();
+    const { interaction, getByTestId, queryByTestId, rerenderChart, active } = renderChart({
+      data: quarter,
+      selection: { category: 'Feb', section: 'positive' },
+      onSelectionChange,
+    });
+    expect(selectedTick()).toBe('Feb');
+    expect(getByTestId('cursor')).toBeInTheDocument();
+
+    fireEvent.keyDown(interaction, { key: 'ArrowRight' });
+    expect(onSelectionChange).toHaveBeenLastCalledWith({ category: 'Mar', section: 'positive' });
+    expect(active()).toMatchObject({ category: 'Feb', datumIndex: 1 });
+
+    rerenderChart({ selection: null });
+    expect(selectedTick()).toBeNull();
+    expect(queryByTestId('cursor')).toBeNull();
+  });
+
+  it('reselects a dismissed period on Enter when the consumer holds the selection', () => {
+    const onActivate = vi.fn();
+    function Consumer() {
+      const [selection, setSelection] = useState<BarSelection | null>(null);
+      return (
+        <TestChart
+          {...chartFixture}
+          data={quarter}
+          selection={selection}
+          onSelectionChange={setSelection}
+          onActivate={onActivate}
+        />
+      );
+    }
+    render(<Consumer />);
+    const interaction = screen.getByRole('button', { name: 'Growth' });
+
+    press(interaction, 'End', 'Escape', 'Enter');
+    expect(onActivate).not.toHaveBeenCalled();
+    expect(selectedTick()).toBe('Mar');
+
+    fireEvent.keyDown(interaction, { key: 'Enter' });
+    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ category: 'Mar' }));
+  });
+});
+
+describe('rendering from the chart object', () => {
+  it('selects with the keyboard on a surface that spreads the interaction props', () => {
+    function CustomChart() {
+      const chart = BarChart.useBarChart({ ...chartFixture, data: quarter, onSelectionChange: () => {} });
+      const { rootRef } = chart;
+      return (
+        <div ref={rootRef}>
+          <div
+            {...chart.getInteractionProps()}
+            aria-label='Growth'
+          >
+            {chart.categories.map(category => (
+              <span key={category.key}>{category.key}</span>
+            ))}
+          </div>
+          <output aria-label='Selected period'>{chart.selected?.category}</output>
+        </div>
+      );
+    }
+    render(<CustomChart />);
+    const surface = screen.getByRole('group', { name: 'Growth' });
+
+    press(surface, 'End');
+
+    expect(screen.getByRole('status', { name: 'Selected period' })).toHaveTextContent('Mar');
   });
 });

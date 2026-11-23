@@ -13,10 +13,10 @@ export type BarChartYTickProps = ComponentProps<'text'> & {
 
 export const BarChartYTick = React.forwardRef<SVGTextElement, BarChartYTickProps>(function BarChartYTick(props, ref) {
   const { tick, render, ...otherProps } = props;
-  const { frame } = useBarChartContext('YTick');
+  const { chart } = useBarChartContext('YTick');
 
   const ownProps = {
-    x: frame.margin.left - 12,
+    x: chart.plot.x - 12,
     y: tick.y,
     dy: '0.32em',
     textAnchor: 'end',

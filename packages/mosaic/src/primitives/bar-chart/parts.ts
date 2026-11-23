@@ -17,7 +17,10 @@ export { type BarChartCursorProps, BarChartCursor as Cursor } from './bar-chart-
 export { type BarChartTooltipProps, BarChartTooltip as Tooltip } from './bar-chart-tooltip';
 export { CanvasRenderError } from './bar-chart-canvas';
 export {
-  type StackedBarLayoutOptions,
-  type StackedBarLayoutSource,
-  useStackedBarLayout,
-} from './use-stacked-bar-layout';
+  type BarChartInstance,
+  type BarChartInteractionProps,
+  useBarChart,
+  type UseBarChartOptions,
+  type XTickMode,
+  type XTicksOptions,
+} from './use-bar-chart';

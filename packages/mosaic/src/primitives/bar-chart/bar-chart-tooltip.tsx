@@ -8,7 +8,7 @@ import { Portal } from '../portal';
 import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
 import { getWindow } from '../utils/dom';
 import { parsePlacement } from '../utils/side-offset';
-import { useBarSelectionContext } from './bar-chart-context';
+import { useBarChartContext, useBarSelectionContext } from './bar-chart-context';
 import type { ActiveBar } from './types';
 
 const EDGE = 8;
@@ -47,8 +47,11 @@ function tooltipMiddleware(getBoundary: () => Element | undefined, pinned: boole
 export const BarChartTooltip = React.forwardRef<HTMLDivElement, BarChartTooltipProps>(
   function BarChartTooltip(props, ref) {
     const { children, boundaryRef, render, ...otherProps } = props;
-    const { activeBar, selectedCategory, registerTooltip, plot, chartWidth, chartBoxRef } =
-      useBarSelectionContext('Tooltip');
+    const { registerTooltip, chartBoxRef } = useBarSelectionContext('Tooltip');
+    const { chart } = useBarChartContext('Tooltip');
+    const { plot, selected: activeBar } = chart;
+    const chartWidth = chart.size.width;
+    const selectedCategory = activeBar ? chart.categories[activeBar.datumIndex] : undefined;
     React.useLayoutEffect(registerTooltip, [registerTooltip]);
 
     const content = activeBar && selectedCategory ? children(activeBar) : null;

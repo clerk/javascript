@@ -67,14 +67,16 @@ export type BarCategory = Readonly<{
   projected: boolean;
 }>;
 
+/** A selected category and section. */
 export type BarSelection = Readonly<{
   category: string;
-  datumIndex: number;
   section: BarSection;
 }>;
 
+/** A selected bar resolved against the current data. */
 export type ActiveBar<TDatum> = BarSelection &
   Readonly<{
+    datumIndex: number;
     datum: TDatum;
     hasValues: BarCategory['hasValues'];
     projected: BarCategory['projected'];
