@@ -25,7 +25,6 @@ import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
 import { useLocale, useMessages } from '../../localization';
 import { save } from '../../utils/errors';
-import { useTaskChooseOrganizationReady } from '../task-choose-organization/task-choose-organization';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
 import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
@@ -216,10 +215,6 @@ export function useSignUpModel({
   const signInUrl = () => clerk.buildSignInUrl(returnUrl ? { redirectUrl: returnUrl } : undefined);
   const taskInFlow = (task: SessionTask | undefined): SignUpTaskKey | undefined =>
     task?.key === 'choose-organization' && !clerk.__internal_getOption('taskUrls')?.[task.key] ? task.key : undefined;
-  const isTaskReady = useTaskChooseOrganizationReady({
-    redirectUrlComplete: afterSignUpUrl,
-    enabled: taskInFlow(session?.currentTask) !== undefined,
-  });
   const passwordSettings = environment?.userSettings.passwordSettings;
   const moduleManager = clerk.__internal_moduleManager;
   const validatePassword = useMemo(
@@ -265,7 +260,7 @@ export function useSignUpModel({
     }
     const task = taskInFlow(session?.currentTask);
     if (task) {
-      return isTaskReady ? { type: 'task', key: task } : { type: 'leaving' };
+      return { type: 'task', key: task };
     }
     return session === null ? next(signUp) : { type: 'leaving' };
   };

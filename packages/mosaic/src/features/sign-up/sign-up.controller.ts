@@ -90,12 +90,13 @@ type SignUpControllerResult = Omit<
 
 export function useSignUpController(
   liveModel: SignUpReadyModel,
-  options: MosaicLocationOptions,
+  { isTaskReady, ...options }: MosaicLocationOptions & { isTaskReady: boolean },
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
-  const isLeaving = liveModel.flow.step.type === 'leaving';
+  const liveStep = liveModel.flow.step;
+  const isLeaving = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
 
   // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
