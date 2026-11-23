@@ -26,7 +26,10 @@ export const ChartRoot = React.forwardRef<HTMLDivElement, ChartRootProps>(functi
     return () => setInteractionLayers(count => count - 1);
   }, []);
 
-  const context: ChartContextValue = { chart, ariaLabel, registerInteraction };
+  const context = React.useMemo<ChartContextValue>(
+    () => ({ chart, ariaLabel, registerInteraction }),
+    [chart, ariaLabel, registerInteraction],
+  );
 
   const interactionMode: InteractionMode =
     chart.size.width <= 0
