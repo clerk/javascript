@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.44.4
+
+### Patch Changes
+
+- Fix `<SignIn />` not sending a verification code when switching to a second phone number or email address after a code was already sent to another one. ([#10739](https://github.com/clerk/javascript/pull/10739)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.44.3
 
 ### Patch Changes
