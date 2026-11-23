@@ -8,7 +8,7 @@ import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import type { MosaicMessages } from '../../../localization';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
-import { REDIRECT_HOLD_MS } from '../../user-profile/user-profile.utils';
+import { REDIRECT_HOLD_MS } from '../../../utils/redirect';
 import type { SignUpCreateResult, SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
 import type {
   SignUpAlternativePhoneScreen,

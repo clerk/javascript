@@ -84,6 +84,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
 - A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)
 - A spinner that should not flash or flicker → `useSpinDelay` (`src/hooks/`)
+- Keeping an action pending after it starts a full-page redirect, such as to an OAuth provider → `REDIRECT_HOLD_MS` (`src/utils/redirect.ts`)
 - A placeholder for content that is still loading → `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)
 - A date shown to the user → `formatDate` (`src/utils/format-date.ts`)
 - Any current time read during render → `useNow` (`src/hooks/`), with `until` to stop ticking at a deadline
