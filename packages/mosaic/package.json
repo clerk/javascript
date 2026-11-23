@@ -376,10 +376,20 @@
       "import": "./dist/primitives/autocomplete.js",
       "default": "./dist/primitives/autocomplete.js"
     },
+    "./primitives/bar-chart": {
+      "types": "./dist/primitives/bar-chart.d.ts",
+      "import": "./dist/primitives/bar-chart.js",
+      "default": "./dist/primitives/bar-chart.js"
+    },
     "./primitives/button": {
       "types": "./dist/primitives/button.d.ts",
       "import": "./dist/primitives/button.js",
       "default": "./dist/primitives/button.js"
+    },
+    "./primitives/chart": {
+      "types": "./dist/primitives/chart.d.ts",
+      "import": "./dist/primitives/chart.js",
+      "default": "./dist/primitives/chart.js"
     },
     "./primitives/collapsible": {
       "types": "./dist/primitives/collapsible.d.ts",
