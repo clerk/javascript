@@ -1,0 +1,354 @@
+import * as stylex from '@stylexjs/stylex';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
+
+import { Field } from '../field';
+import { TagInput } from './tag-input';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
+
+const rootOf = (element: HTMLElement) => {
+  const root = element.closest('.cl-tag-input');
+  if (!(root instanceof HTMLElement)) {
+    throw new Error('TagInput root not found');
+  }
+  return root;
+};
+
+describe('Mosaic TagInput', () => {
+  it('renders a tag per value with the slot classes', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveClass('cl-tag-input-input');
+    expect(rootOf(input)).not.toHaveAttribute('data-disabled');
+
+    const tags = screen.getAllByRole('listitem');
+    expect(tags).toHaveLength(2);
+    expect(tags[0]).toHaveClass('cl-tag-input-tag');
+    expect(tags[0]).toHaveTextContent('preston@clerk.dev');
+    expect(screen.getByRole('button', { name: 'Remove nate@clerk.dev' })).toHaveClass('cl-tag-input-tag-remove');
+  });
+
+  it('adds a tag on Enter and reports the new value', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <TagInput
+        aria-label='Email'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Email' }), 'preston@clerk.dev{Enter}');
+
+    expect(onValueChange).toHaveBeenLastCalledWith(['preston@clerk.dev']);
+    expect(screen.getByRole('listitem')).toHaveTextContent('preston@clerk.dev');
+  });
+
+  it('removes a tag from its remove button', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+        onValueChange={onValueChange}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Remove preston@clerk.dev' }));
+
+    expect(onValueChange).toHaveBeenLastCalledWith(['nate@clerk.dev']);
+  });
+
+  it('labels each remove button with removeLabel', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev']}
+        removeLabel={value => `Quitar ${value}`}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Quitar preston@clerk.dev' })).toBeInTheDocument();
+  });
+
+  it('marks tags that fail validation', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate']}
+        validate={value => value.includes('@')}
+      />,
+    );
+
+    const [valid, invalid] = screen.getAllByRole('listitem');
+    expect(valid).not.toHaveAttribute('data-invalid');
+    expect(invalid).toHaveAttribute('data-invalid', '');
+  });
+
+  it('disables the input, tags and remove buttons', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev']}
+        disabled
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(input).toBeDisabled();
+    expect(rootOf(input)).toHaveAttribute('data-disabled', '');
+    expect(screen.getByRole('listitem')).toHaveAttribute('data-disabled', '');
+    expect(screen.getByRole('button', { name: 'Remove preston@clerk.dev' })).toBeDisabled();
+  });
+
+  it('reflects aria-invalid on the input and the root', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        aria-invalid
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(rootOf(input)).toHaveAttribute('data-invalid', '');
+  });
+
+  it('stops requiring typed text once a tag exists', async () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        required
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAttribute('required');
+
+    await userEvent.type(input, 'preston@clerk.dev{Enter}');
+
+    expect(input).not.toHaveAttribute('required');
+    expect(input).toHaveAttribute('aria-required', 'true');
+  });
+
+  it('submits each value under the given name', () => {
+    const { container } = render(
+      <TagInput
+        aria-label='Email'
+        name='emails'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const hidden = container.querySelectorAll('input[type="hidden"][name="emails"]');
+    expect(Array.from(hidden, input => input.getAttribute('value'))).toEqual(['preston@clerk.dev', 'nate@clerk.dev']);
+    expect(screen.getByRole('textbox', { name: 'Email' })).not.toHaveAttribute('name');
+  });
+
+  it('submits to the form named by form', () => {
+    render(
+      <>
+        <form
+          id='invite'
+          data-testid='form'
+        />
+        <TagInput
+          aria-label='Email'
+          name='emails'
+          form='invite'
+          defaultValue={['preston@clerk.dev']}
+        />
+      </>,
+    );
+
+    const form = screen.getByTestId('form');
+    if (!(form instanceof HTMLFormElement)) {
+      throw new Error('expected a form');
+    }
+    expect(new FormData(form).getAll('emails')).toEqual(['preston@clerk.dev']);
+  });
+
+  describe('outside the form named by form', () => {
+    function submitInvite(props: Pick<React.ComponentProps<typeof TagInput>, 'required' | 'defaultValue'>) {
+      const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        return new FormData(event.currentTarget).getAll('emails');
+      });
+      render(
+        <>
+          <form
+            id='invite'
+            data-testid='form'
+            onSubmit={onSubmit}
+          />
+          <TagInput
+            aria-label='Email'
+            name='emails'
+            form='invite'
+            {...props}
+          />
+        </>,
+      );
+      const form = screen.getByTestId('form');
+      if (!(form instanceof HTMLFormElement)) {
+        throw new Error('expected a form');
+      }
+      form.requestSubmit();
+      return onSubmit;
+    }
+
+    it('blocks the submit while required and empty', () => {
+      const onSubmit = submitInvite({ required: true });
+
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('submits a required value once it has a tag', () => {
+      const onSubmit = submitInvite({ required: true, defaultValue: ['preston@clerk.dev'] });
+
+      expect(onSubmit).toHaveReturnedWith(['preston@clerk.dev']);
+    });
+
+    it('submits while optional and empty', () => {
+      const onSubmit = submitInvite({});
+
+      expect(onSubmit).toHaveReturnedWith([]);
+    });
+  });
+
+  it('forwards the ref and native input props to the text input', () => {
+    const ref = React.createRef<HTMLInputElement>();
+    render(
+      <TagInput
+        ref={ref}
+        aria-label='Email'
+        placeholder='Add an email'
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(ref.current).toBe(input);
+    expect(input).toHaveAttribute('placeholder', 'Add an email');
+  });
+
+  it('marks the tags and the input as layout items', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAttribute('data-layout-item', '');
+    for (const tag of screen.getAllByRole('listitem')) {
+      expect(tag).toHaveAttribute('data-layout-item', '');
+    }
+  });
+
+  it('pins an exiting tag inside the root', async () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      />,
+    );
+
+    const tag = screen.getAllByRole('listitem')[0];
+    tag.setAttribute('data-ending-style', '');
+
+    await waitFor(() => expect(tag).toHaveAttribute('data-layout-popped'));
+  });
+
+  it('merges xstyle atoms onto the root', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        xstyle={atoms.spaced}
+      />,
+    );
+
+    expect(rootOf(screen.getByRole('textbox', { name: 'Email' }))).toHaveClass(
+      'cl-tag-input',
+      stylex.props(atoms.spaced).className ?? '',
+    );
+  });
+
+  describe('inside a Field', () => {
+    it('is labelled and described by the field', () => {
+      render(
+        <Field.Root>
+          <Field.Label>Email</Field.Label>
+          <TagInput />
+          <Field.Description>Press enter, comma, or paste to add</Field.Description>
+        </Field.Root>,
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAccessibleDescription(
+        'Press enter, comma, or paste to add',
+      );
+    });
+
+    it('focuses the text input when the label is clicked', async () => {
+      render(
+        <Field.Root>
+          <Field.Label>Email</Field.Label>
+          <TagInput />
+        </Field.Root>,
+      );
+
+      await userEvent.click(screen.getByText('Email'));
+
+      expect(screen.getByRole('textbox', { name: 'Email' })).toHaveFocus();
+    });
+
+    it('stays focusable when the disabled field asks for it', () => {
+      render(
+        <Field.Root
+          disabled
+          focusableWhenDisabled
+        >
+          <Field.Label>Email</Field.Label>
+          <TagInput />
+        </Field.Root>,
+      );
+
+      const input = screen.getByRole('textbox', { name: 'Email' });
+      expect(input).not.toBeDisabled();
+      expect(input).toHaveAttribute('readonly');
+      expect(input).toHaveAttribute('aria-disabled', 'true');
+      expect(rootOf(input)).toHaveAttribute('data-disabled', '');
+    });
+
+    it('takes disabled, required and invalid from the field', () => {
+      render(
+        <Field.Root
+          disabled
+          required
+          invalid
+        >
+          <Field.Label>Email</Field.Label>
+          <TagInput defaultValue={['preston@clerk.dev']} />
+        </Field.Root>,
+      );
+
+      const input = screen.getByRole('textbox', { name: 'Email' });
+      expect(input).toBeDisabled();
+      expect(input).toBeRequired();
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(rootOf(input)).toHaveAttribute('data-disabled', '');
+      expect(rootOf(input)).toHaveAttribute('data-invalid', '');
+      expect(screen.getByRole('button', { name: 'Remove preston@clerk.dev' })).toBeDisabled();
+    });
+  });
+});

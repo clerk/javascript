@@ -22,9 +22,11 @@ import { Checkmark, Clipboard } from '@/icons';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
+import { type IdpCertificateEntry, toIdpCertificateEntries } from '../../../domain/idpCertificates';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { ActiveConnectionAlert } from '../shared/ActiveConnectionAlert';
 import {
   IdentityProviderConfigurationModes,
   type SamlIdpConfigurationMode,
@@ -511,10 +513,10 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
     samlConnection?.idpCertificate ||
     samlConnection?.idpMetadataUrl,
   );
-  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+  const initialCertificates = toIdpCertificateEntries(samlConnection);
 
   const [mode, setMode] = React.useState<SamlIdpConfigurationMode>(hasExistingConfig ? 'manual' : 'metadataUrl');
-  const [certFile, setCertFile] = React.useState<File | null>(null);
+  const [certificates, setCertificates] = React.useState<IdpCertificateEntry[]>(initialCertificates);
   // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
   // parent (this is the terminal nested step) and the parent DEFERS the
   // configure→test advance until the updateConnection revalidate lands. Keeping
@@ -561,7 +563,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
   const trimmedMetadataUrl = metadataUrlField.value.trim();
   const trimmedSignOnUrl = signOnUrlField.value.trim();
   const trimmedIssuer = issuerField.value.trim();
-  const hasCert = certFile !== null || existingCertPresent;
+  const hasCert = certificates.length > 0;
 
   const isValid =
     mode === 'metadataUrl'
@@ -587,9 +589,9 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
             signOnUrlField,
             issuerField,
             certificateField,
-            certFile,
-            onCertFileChange: setCertFile,
-            existingCertPresent,
+            certificates,
+            onCertificatesChange: setCertificates,
+            initialCertificates,
           },
           labels: {
             description: localizationKeys(
@@ -622,7 +624,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
       const saml = await buildSamlConfigurationPayload({
         mode,
         metadataUrl: { value: metadataUrlField.value },
-        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
+        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certificates, initialCertificates },
       });
       await updateConnection(enterpriseConnection.id, { saml });
       // `goNext` bubbles to the parent, which DEFERS the advance to `test` until
@@ -674,6 +676,7 @@ const SamlOktaIdentityProviderMetadataStep = (): JSX.Element => {
             }}
           />
           <IdentityProviderConfigurationForm {...formProps} />
+          <ActiveConnectionAlert />
         </Step.Section>
       </Step.Body>
 

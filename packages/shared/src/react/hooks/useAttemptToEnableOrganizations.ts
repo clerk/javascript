@@ -7,13 +7,16 @@ import { useClerk } from './useClerk';
  *
  * @internal
  */
-export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'useOrganizationList') {
+export function useAttemptToEnableOrganizations(
+  caller: 'useOrganization' | 'useOrganizationList',
+  { enabled = true }: { enabled?: boolean } = {},
+) {
   const clerk = useClerk();
   const hasAttempted = useRef(false);
 
   useEffect(() => {
     // Guard to not run this effect twice on Clerk resource update
-    if (hasAttempted.current) {
+    if (!enabled || hasAttempted.current) {
       return;
     }
 
@@ -23,5 +26,5 @@ export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'use
       for: 'organizations',
       caller,
     });
-  }, [clerk, caller]);
+  }, [clerk, caller, enabled]);
 }

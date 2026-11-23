@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';
 
+import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Client } from '../internal';
 
 const FIXED_DATE = new Date('2025-01-01T00:00:00Z');
@@ -145,6 +146,104 @@ describe('Client Singleton', () => {
     expect(BaseResource._fetch).toHaveBeenCalledWith({
       method: 'DELETE',
       path: `/client`,
+    });
+  });
+
+  it('moves the client revision on every write of the singleton', async () => {
+    const clientObjectJSON = {
+      object: 'client',
+      id: 'test_id',
+      sessions: [],
+      sign_in: null,
+      sign_up: null,
+      last_active_session_id: null,
+      created_at: Date.now(),
+      updated_at: Date.now(),
+    } as unknown as ClientJSON;
+    // @ts-expect-error This is a private method that we are mocking
+    BaseResource._fetch = vi.fn().mockResolvedValue(null);
+
+    const client = Client.getOrCreateInstance();
+    let revision = Client.getRevision();
+
+    client.fromJSON(null);
+    expect(Client.getRevision()).toBe(revision);
+
+    client.fromJSON(clientObjectJSON);
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
+
+    await client.destroy();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+    revision = Client.getRevision();
+
+    Client.clearInstance();
+    expect(Client.getRevision()).toBeGreaterThan(revision);
+  });
+
+  describe('__internal_signOut', () => {
+    it('returns the response URL and clears sessions while retaining the client', async () => {
+      const user = createUser({ id: 'user_1' });
+      const initial: ClientJSON = {
+        object: 'client',
+        id: 'client_before',
+        sessions: [createSession({ id: 'session_1' }, user)],
+        sign_in: createSignIn({ id: 'sign_in_before' }, user),
+        sign_up: createSignUp({ id: 'sign_up_before' }),
+        last_active_session_id: 'session_1',
+        last_authentication_strategy: 'password',
+        cookie_expires_at: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        created_at: Date.now() - 1000,
+        updated_at: Date.now(),
+      };
+      const response = { ...initial, id: 'client_after', sessions: [], last_active_session_id: null };
+      const request = vi.fn().mockResolvedValue({ response, sign_out_url: 'https://primary.test/sign-out' });
+      BaseResource._fetch = request;
+      const clearCache = vi.spyOn(SessionTokenCache, 'clear');
+      const client = Client.getOrCreateInstance().fromJSON(initial);
+      const result = await client.__internal_signOut({
+        redirectUrl: 'https://satellite.test/after?tab=security#settings',
+      });
+
+      expect(request).toHaveBeenCalledWith({
+        method: 'DELETE',
+        path: '/client/sessions',
+        search: { sign_out_redirect_url: 'https://satellite.test/after?tab=security#settings' },
+      });
+      expect(result).toEqual({ signOutUrl: 'https://primary.test/sign-out' });
+      expect(clearCache).toHaveBeenCalledOnce();
+      expect(client.sessions).toEqual([]);
+      expect(client.id).toBe('client_after');
+      expect(client.signIn.id).toBe('sign_in_before');
+      expect(client.signUp.id).toBe('sign_up_before');
+      expect(client.lastActiveSessionId).toBeNull();
+      expect(client.lastAuthenticationStrategy).toBe('password');
+      expect(client.cookieExpiresAt).toEqual(new Date(initial.cookie_expires_at!));
+      expect(client.createdAt).toEqual(new Date(initial.created_at!));
+      expect(client.updatedAt).toEqual(new Date(initial.updated_at!));
+      clearCache.mockRestore();
+    });
+
+    it.each([null, { response: null }])('accepts a response without a sign-out URL', async response => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(response);
+      const result = await Client.getOrCreateInstance().__internal_signOut({
+        redirectUrl: 'https://satellite.test/',
+      });
+      expect(result).toEqual({ signOutUrl: undefined });
+    });
+
+    it('does not reuse the URL from an earlier request', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce({ response: null, sign_out_url: 'https://primary.test/sign-out' })
+        .mockResolvedValueOnce(null);
+      const client = Client.getOrCreateInstance();
+      expect(await client.__internal_signOut({ redirectUrl: 'https://satellite.test/' })).toEqual({
+        signOutUrl: 'https://primary.test/sign-out',
+      });
+      expect(await client.__internal_signOut({ redirectUrl: 'https://satellite.test/' })).toEqual({
+        signOutUrl: undefined,
+      });
     });
   });
 

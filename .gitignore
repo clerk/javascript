@@ -2,7 +2,6 @@
 
 # compiled output
 dist
-dist-mosaic
 tmp
 out-tsc
 out
@@ -60,6 +59,7 @@ Thumbs.db
 
 lerna-debug.log
 .next
+next-env.d.ts
 .dev.vars
 .env.local
 
@@ -93,6 +93,7 @@ yalc.lock
 # Workflow Outputs
 /packages/*/*.tgz
 /packages/*/tsconfig*.vitest-temp.json
+/packages/*/.vitest/
 /packages/*/tsup.config.bundled_*
 
 # Scripts

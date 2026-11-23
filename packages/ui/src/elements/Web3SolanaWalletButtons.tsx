@@ -1,8 +1,6 @@
-import { WalletReadyState } from '@solana/wallet-adapter-base';
-import { ConnectionProvider, useWallet, WalletProvider } from '@solana/wallet-adapter-react';
-import { MAINNET_ENDPOINT } from '@solana/wallet-standard';
+import { getWallets, type Wallet } from '@wallet-standard/core';
 import type { Ref } from 'react';
-import React, { forwardRef, isValidElement, useMemo } from 'react';
+import React, { forwardRef, isValidElement, useEffect, useMemo, useState } from 'react';
 
 import { WalletInitialIcon } from '@/ui/common/WalletInitialIcon';
 import {
@@ -33,26 +31,38 @@ const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
 
-const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
-  const card = useCardState();
-  const { wallets } = useWallet();
-  const { t } = useLocalizations();
+const isSolanaSignInWallet = (wallet: Wallet) =>
+  wallet.chains.some(chain => chain.startsWith('solana:')) &&
+  'standard:connect' in wallet.features &&
+  'solana:signMessage' in wallet.features;
 
-  // Filter to only show installed wallets
-  const installedWallets = React.useMemo(
-    () =>
-      wallets
-        .filter(w => {
-          return w.readyState === WalletReadyState.Installed;
-        })
-        .map(wallet => {
-          return {
-            name: wallet.adapter.name,
-            icon: wallet.adapter.icon,
-          };
-        }),
+const getRegisteredWallets = () => (typeof window === 'undefined' ? [] : getWallets().get());
+
+const useInstalledSolanaWallets = () => {
+  const [wallets, setWallets] = useState<readonly Wallet[]>(getRegisteredWallets);
+
+  useEffect(() => {
+    const registry = getWallets();
+    const update = () => setWallets(registry.get());
+    update();
+    const offRegister = registry.on('register', update);
+    const offUnregister = registry.on('unregister', update);
+    return () => {
+      offRegister();
+      offUnregister();
+    };
+  }, []);
+
+  return useMemo(
+    () => wallets.filter(isSolanaSignInWallet).map(wallet => ({ name: wallet.name, icon: wallet.icon })),
     [wallets],
   );
+};
+
+export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
+  const card = useCardState();
+  const installedWallets = useInstalledSolanaWallets();
+  const { t } = useLocalizations();
 
   const startWeb3AuthFlow = (walletName: string) => async () => {
     card.setLoading(walletName);
@@ -113,7 +123,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
               gridTemplateColumns: shouldForceSingleColumnOnMobile ? 'repeat(1, minmax(0, 1fr))' : undefined,
             },
             gridTemplateColumns:
-              wallets.length < 1
+              installedWallets.length < 1
                 ? `repeat(1, minmax(0, 1fr))`
                 : `repeat(${row.length}, ${
                     rowIndex === 0
@@ -262,20 +272,3 @@ const WalletButtonBlock = forwardRef((props: WalletButtonProps, ref: Ref<HTMLBut
     </SimpleButton>
   );
 });
-
-export const Web3SolanaWalletButtons = (props: Web3WalletButtonsProps) => {
-  const network = MAINNET_ENDPOINT;
-  const wallets = useMemo(() => [], [network]);
-  return (
-    <ConnectionProvider endpoint={network}>
-      <WalletProvider
-        wallets={wallets}
-        onError={err => {
-          console.error(err);
-        }}
-      >
-        <Web3SolanaWalletButtonsInner web3AuthCallback={props.web3AuthCallback} />
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-};

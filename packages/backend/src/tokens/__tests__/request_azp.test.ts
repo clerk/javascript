@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 
 import { decodeJwt } from '../../jwt/verifyJwt';
+import { JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 import { authenticateRequest } from '../request';
 import { verifyToken } from '../verify';
 
@@ -31,7 +32,7 @@ describe('authenticateRequest with cookie token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: JWT_CATEGORY_SESSION_TOKEN }, payload } as any,
       errors: undefined,
     });
 
@@ -79,7 +80,7 @@ describe('authenticateRequest with cookie token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: JWT_CATEGORY_SESSION_TOKEN }, payload } as any,
       errors: undefined,
     });
 
@@ -121,7 +122,7 @@ describe('authenticateRequest with header token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: JWT_CATEGORY_SESSION_TOKEN }, payload } as any,
       errors: undefined,
     });
 

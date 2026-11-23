@@ -1,6 +1,7 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
+import type { DeletedObject } from '../resources/DeletedObject';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { InvitationStatus } from '../resources/Enums';
 import type { Invitation } from '../resources/Invitation';
@@ -130,6 +131,23 @@ export class InvitationAPI extends AbstractAPI {
     return this.request<Invitation>({
       method: 'POST',
       path: joinPaths(basePath, invitationId, 'revoke'),
+    });
+  }
+
+  /**
+   * Permanently deletes the given invitation and the copies of the invitation email Clerk stored for its recipient.
+   *
+   * Unlike revoking, deleting removes the invitation record itself, which helps honor a data erasure request from someone who was invited but never signed up. Other records that contain the same email address, such as users or organization invitations, are not affected.
+   *
+   * Invitations of any status can be deleted.
+   * @param invitationId - The ID of the invitation to delete.
+   * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
+   */
+  public async deleteInvitation(invitationId: string): Promise<DeletedObject> {
+    this.requireId(invitationId);
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, invitationId),
     });
   }
 }

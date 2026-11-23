@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.29.2",
+  "version": "6.46.3",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -53,10 +53,13 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "no-rhc"
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
+    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs && node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.js",
     "build:analyze": "rspack build --config rspack.config.mjs --env production --env variant=\"clerk.browser\" --env analysis",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.mjs --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
@@ -74,7 +77,6 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports --ignore-rules false-cjs",
     "lint:publint": "publint || true",
-    "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
     "test:sandbox:integration": "playwright test",
     "test:sandbox:integration:ui": "playwright test --ui",
@@ -86,9 +88,6 @@
     "@base-org/account": "catalog:module-manager",
     "@clerk/shared": "workspace:^",
     "@coinbase/wallet-sdk": "catalog:module-manager",
-    "@solana/wallet-adapter-base": "catalog:module-manager",
-    "@solana/wallet-adapter-react": "catalog:module-manager",
-    "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "catalog:repo",
     "@tanstack/query-core": "catalog:repo",
@@ -105,16 +104,15 @@
     "@clerk/msw": "workspace:^",
     "@clerk/testing": "workspace:^",
     "@emotion/react": "11.14.0",
-    "@rsdoctor/rspack-plugin": "^1.5.9",
+    "@rsdoctor/rspack-plugin": "^1.6.2",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
     "@rspack/dev-server": "catalog:rspack",
     "@rspack/plugin-react-refresh": "catalog:rspack",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.2",
-    "jsdom": "26.1.0",
-    "minimatch": "^10.2.5",
+    "jsdom": "27.0.0",
+    "minimatch": "^10.2.6",
     "webpack-merge": "^5.10.0"
   },
   "engines": {

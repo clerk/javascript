@@ -8,8 +8,23 @@ import type { Environment } from './resources';
 export class Protect {
   #initialized: boolean = false;
   #session?: ProtectSession;
+  #challengeLoadTimeoutMs?: number;
 
-  load(env: Environment): void {
+  /**
+   * The verification-module LOAD timeout asked for by the loader this browser was assigned, or
+   * undefined when none asked for one — in which case the caller falls back to the instance-wide
+   * value and then to the SDK default.
+   *
+   * Resolved from the APPLIED loaders rather than from the config, because rollout is decided by
+   * a random draw per page load: a loader being ramped can carry its own value without changing
+   * anything for browsers still on the loader it replaces, and which one a browser got cannot be
+   * recomputed afterwards.
+   */
+  get challengeLoadTimeoutMs(): number | undefined {
+    return this.#challengeLoadTimeoutMs;
+  }
+
+  load(env: Environment, frontendApi: string): void {
     const config = env?.protectConfig;
 
     if (!config?.loaders || !Array.isArray(config.loaders) || config.loaders.length === 0) {
@@ -29,21 +44,31 @@ export class Protect {
     // The config is server-controlled and cached, so nothing it can contain may take `Clerk.load()`
     // down with it.
     try {
-      this.#apply(config.loaders, config.tokens_invalid_before);
+      this.#apply(config.loaders, frontendApi, config.tokens_invalid_before);
     } catch (error) {
       logger.warnOnce(`[protect] failed to load: ${error}`);
     }
   }
 
-  #apply(configured: ProtectLoader[], tokensInvalidBefore?: number): void {
+  #apply(configured: ProtectLoader[], frontendApi: string, tokensInvalidBefore?: number): void {
     // Rollout is decided before anything else, because the session is only meaningful for the
     // loaders we are actually going to apply.
     const loaders = configured.filter(loader => isLoader(loader) && inRollout(loader));
 
+    // Load timeout applies to a single event and we only need one, so we pick the first valid one.
+    // This happens before applying the loaders since we want to use the value even if the loader
+    // later fails to apply.
+    this.#challengeLoadTimeoutMs = loaders.find(
+      loader =>
+        typeof loader.challenge_load_timeout_ms === 'number' &&
+        Number.isFinite(loader.challenge_load_timeout_ms) &&
+        loader.challenge_load_timeout_ms > 0,
+    )?.challenge_load_timeout_ms;
+
     // Only an instance whose loaders reference the correlation id gets a session, so an instance
     // not using it is unaffected and stores nothing in the browser.
     const applyLoader: ApplyLoader = (loader, placeholders) => this.applyLoader(loader, placeholders);
-    this.#session = ProtectSession.create(loaders, applyLoader, tokensInvalidBefore);
+    this.#session = ProtectSession.create(loaders, applyLoader, frontendApi, tokensInvalidBefore);
 
     for (const loader of loaders) {
       // The session injects this one itself, under the acquisition lock, so exactly one tab per

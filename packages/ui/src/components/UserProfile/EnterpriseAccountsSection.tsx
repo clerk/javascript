@@ -1,6 +1,6 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { __internal_useUserEnterpriseConnections, useClerk, useReverification, useUser } from '@clerk/shared/react';
-import type { EnterpriseAccountResource, EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
+import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 import { Fragment, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -10,7 +10,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/ui/utils/sleep';
 import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
-import { ProviderIcon } from '../../common';
+import { getEnterpriseProviderIconId, ProviderIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
@@ -52,7 +52,7 @@ const EnterpriseConnectMenuButton = (props: { connection: EnterpriseConnectionRe
       });
   };
 
-  const providerIconId = connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
+  const providerIconId = getEnterpriseProviderIconId(connection.provider);
   const providerIconUrl = connection.logoPublicUrl?.trim() || '';
 
   return (
@@ -214,7 +214,7 @@ const EnterpriseAccount = ({ account }: { account: EnterpriseAccountResource }) 
 const EnterpriseAccountProviderIcon = ({ account }: { account: EnterpriseAccountResource }) => {
   const { provider, enterpriseConnection } = account;
 
-  const providerWithoutPrefix = provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
+  const providerWithoutPrefix = getEnterpriseProviderIconId(provider);
   const connectionName = enterpriseConnection?.name ?? providerWithoutPrefix;
 
   return (

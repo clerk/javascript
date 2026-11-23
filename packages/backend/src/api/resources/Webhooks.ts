@@ -2,7 +2,10 @@ import type {
   BillingPaymentAttemptWebhookEventJSON,
   BillingSubscriptionItemWebhookEventJSON,
   BillingSubscriptionWebhookEventJSON,
+  DeletedDirectoryGroupMembershipWebhookEventJSON,
   DeletedObjectJSON,
+  DirectoryGroupMembershipWebhookEventJSON,
+  DirectoryGroupWebhookEventJSON,
   EmailJSON,
   OrganizationDomainJSON,
   OrganizationInvitationAcceptedJSON,
@@ -15,6 +18,7 @@ import type {
   SMSMessageJSON,
   UserDeletedJSON,
   UserJSON,
+  UserMergedJSON,
   WaitlistEntryJSON,
 } from './JSON';
 
@@ -25,15 +29,73 @@ type WebhookEventAttributes = {
   };
 };
 
-type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data; event_attributes: WebhookEventAttributes };
+type Webhook<EvtType, Data> = {
+  type: EvtType;
+  object: 'event';
+  data: Data;
+  event_attributes: WebhookEventAttributes;
+  timestamp: number;
+  instance_id: string;
+};
+
+/**
+ * `user.merged` carries two users instead of one resource, so its data has no `id` of its own.
+ * Declaring `id` as absent keeps `event.data.id` readable on a `WebhookEvent` that has not been narrowed by `type`.
+ */
+type UserMergedWebhookEventJSON = UserMergedJSON & { id?: never };
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
-  | Webhook<'user.deleted', UserDeletedJSON>;
+  | Webhook<'user.deleted', UserDeletedJSON>
+  | Webhook<'user.merged', UserMergedWebhookEventJSON>;
 
 export type EmailWebhookEvent = Webhook<'email.created', EmailJSON>;
 
+export type EmailBounceType = 'Permanent' | 'Transient' | 'Undetermined';
+
+type EmailOutcomeWebhook<Type, Details = unknown> = {
+  object: 'event';
+  type: Type;
+  timestamp: number;
+  instance_id: string;
+  event_attributes: WebhookEventAttributes;
+  data: { id: string; to: [string] } & Details;
+};
+
+export type EmailDeliveryWebhookEvent =
+  | EmailOutcomeWebhook<'email.delivered' | 'email.delivery_delayed' | 'email.complained'>
+  | EmailOutcomeWebhook<'email.bounced', { bounce: { type: EmailBounceType; message: string } }>
+  | EmailOutcomeWebhook<
+      'email.failed',
+      { failed: { reason: 'provider_rejected' | 'delivery_retry_exhausted' | 'send_retry_exhausted' } }
+    >
+  | EmailOutcomeWebhook<
+      'email.suppressed',
+      {
+        suppressed:
+          | { type: 'OnProviderSuppressionList'; message: string }
+          | {
+              type: 'ClerkPolicy';
+              reason:
+                | 'unverified_email_dns'
+                | 'provider_domain_restriction'
+                | 'application_communication_lock'
+                | 'transactional_email_blocked';
+              message: string;
+            };
+      }
+    >;
+
 export type SMSWebhookEvent = Webhook<'sms.created', SMSMessageJSON>;
+
+export type DirectoryGroupWebhookEvent = Webhook<
+  'directoryGroup.created' | 'directoryGroup.updated' | 'directoryGroup.synced' | 'directoryGroup.deleted',
+  DirectoryGroupWebhookEventJSON
+>;
+
+export type DirectoryGroupMembershipWebhookEvent =
+  | Webhook<'directoryGroupMembership.created', DirectoryGroupMembershipWebhookEventJSON>
+  | Webhook<'directoryGroupMembership.deleted', DeletedDirectoryGroupMembershipWebhookEventJSON>;
 
 export type SessionWebhookEvent = Webhook<
   'session.created' | 'session.ended' | 'session.removed' | 'session.revoked',
@@ -100,7 +162,10 @@ export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
   | EmailWebhookEvent
+  | EmailDeliveryWebhookEvent
   | SMSWebhookEvent
+  | DirectoryGroupWebhookEvent
+  | DirectoryGroupMembershipWebhookEvent
   | OrganizationWebhookEvent
   | OrganizationDomainWebhookEvent
   | OrganizationMembershipWebhookEvent

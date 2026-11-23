@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ProtectCheckResource } from '@/types';
 
-import { executeProtectCheck } from '../protectCheck';
+import { DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS, executeProtectCheck } from '../protectCheck';
 
 const fakeContainer = (): HTMLDivElement => ({}) as HTMLDivElement;
 
@@ -197,6 +197,133 @@ describe('executeProtectCheck', () => {
         code: 'protect_check_execution_failed',
         message: expect.stringContaining('script went boom'),
       });
+    });
+  });
+
+  describe('the load bound covers the handoff and nothing after it', () => {
+    beforeEach(() => {
+      // Fake only the timer functions under test. Faking the whole clock also stalls the
+      // machinery that settles a dynamic import, so the module would never finish loading.
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    // A network that accepts the connection and then never answers is the one load failure that
+    // cannot report itself — every other one rejects the import on its own.
+    it('rejects as a load failure when the module never arrives', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs.js', () => new Promise(() => {}));
+
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs.js' }),
+        fakeContainer(),
+      );
+      const assertion = expect(running).rejects.toMatchObject({ code: 'protect_check_script_load_failed' });
+
+      await vi.advanceTimersByTimeAsync(DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS + 1);
+      await assertion;
+    });
+
+    it('honours a per-instance loadTimeoutMs override instead of the default', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs-2.js', () => new Promise(() => {}));
+
+      // Expressed relative to the default, and LONGER than it, so that outliving the default is
+      // itself the proof the override replaced it rather than racing alongside it.
+      const override = DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS * 2;
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs-2.js' }),
+        fakeContainer(),
+        { loadTimeoutMs: override },
+      );
+      let settled = false;
+      const watch = running.then(
+        () => (settled = true),
+        () => (settled = true),
+      );
+
+      await vi.advanceTimersByTimeAsync(DEFAULT_PROTECT_CHECK_LOAD_TIMEOUT_MS + 1);
+      expect(settled).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(override);
+      await watch;
+      expect(settled).toBe(true);
+    });
+
+    // An abort mid-load has to settle the operation, not leave it pending for the whole bound
+    // holding its closures and timer, and it is a cancellation rather than a load failure.
+    it('settles as an abort when the caller aborts during a stalled load', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs-3.js', () => new Promise(() => {}));
+
+      const controller = new AbortController();
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs-3.js' }),
+        fakeContainer(),
+        { signal: controller.signal },
+      );
+      const assertion = expect(running).rejects.toMatchObject({ code: 'protect_check_aborted' });
+
+      controller.abort();
+      // No timer advanced: the abort alone must settle it, well before the load bound.
+      await assertion;
+    });
+
+    // setTimeout stores its delay in a signed 32-bit int, so an oversized value overflows and
+    // fires immediately — failing every load instantly, the opposite of what was configured.
+    it('clamps an oversized loadTimeoutMs instead of overflowing the timer', async () => {
+      vi.doMock('https://protect.example.com/sdk-hangs-4.js', () => new Promise(() => {}));
+
+      const running = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-hangs-4.js' }),
+        fakeContainer(),
+        { loadTimeoutMs: 2_147_483_648 },
+      );
+      let settled = false;
+      const watch = running.then(
+        () => (settled = true),
+        () => (settled = true),
+      );
+
+      // An overflowed timer would already have fired by now.
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(settled).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(600_000);
+      await watch;
+      expect(settled).toBe(true);
+    });
+
+    // The point of the whole change: the challenge owns its own duration. A challenge running far
+    // longer than any load bound must still resolve — proof-of-transfer moves a server-chosen
+    // number of bytes, and a host-side wall would abort it as a "timeout".
+    it('never bounds the challenge once the module has taken control', async () => {
+      let running = false;
+      let finish!: (proofToken: string) => void;
+      vi.doMock('https://protect.example.com/sdk-slow.js', () => ({
+        default: () => {
+          running = true;
+          return new Promise<string>(resolve => (finish = resolve));
+        },
+      }));
+
+      const loadTimeoutMs = 5_000;
+      const execution = executeProtectCheck(
+        protectCheck({ sdkUrl: 'https://protect.example.com/sdk-slow.js' }),
+        fakeContainer(),
+        { loadTimeoutMs },
+      );
+      const assertion = expect(execution).resolves.toBe('proof-after-ages');
+
+      // Wait on the real event loop until the module has taken control, so what follows is
+      // unambiguously time spent in the CHALLENGE rather than in the load.
+      while (!running) {
+        await new Promise(resolve => setImmediate(resolve));
+      }
+
+      // Burn far more time than the load bound. Nothing may abort the challenge for it.
+      await vi.advanceTimersByTimeAsync(360 * loadTimeoutMs);
+      finish('proof-after-ages');
+      await assertion;
     });
   });
 });

@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { AppState, Platform } from 'react-native';
 
 import type { TokenCache } from '../cache';
 import { isNative } from '../utils';
@@ -19,10 +20,14 @@ const createTokenCache = (): TokenCache => {
 
   return {
     getToken: async (key: string) => {
+      const startedWhileActive = AppState.currentState === 'active';
       try {
         const item = await SecureStore.getItemAsync(key, secureStoreOpts);
         return item;
-      } catch {
+      } catch (error) {
+        if (Platform.OS === 'ios' && (!startedWhileActive || AppState.currentState !== 'active')) {
+          throw error;
+        }
         await SecureStore.deleteItemAsync(key, secureStoreOpts);
         return null;
       }

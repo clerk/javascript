@@ -58,6 +58,37 @@ describe('SignInSocialButtons', () => {
     openSpy.mockRestore();
   });
 
+  it('with virtual routing and withSignUp, redirects back to the sign-in sso-callback route', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withSocialProvider({ provider: 'google' });
+    });
+    props.setProps({ routing: 'virtual', withSignUp: true, oauthFlow: 'redirect' } as any);
+    fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+    const { userEvent } = render(
+      <CardStateProvider>
+        <SignInSocialButtons
+          enableOAuthProviders
+          enableWeb3Providers={false}
+          enableAlternativePhoneCodeProviders={false}
+        />
+      </CardStateProvider>,
+      { wrapper },
+    );
+
+    await userEvent.click(screen.getByText('Continue with Google'));
+
+    await waitFor(() => {
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+    });
+    expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://dashboard.clerk.com/sign-in#/sso-callback',
+      }),
+    );
+  });
+
   it('with a transport registered, clears loading when authenticateWithRedirect rejects', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withSocialProvider({ provider: 'google' });

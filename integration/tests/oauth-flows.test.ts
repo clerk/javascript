@@ -1,50 +1,84 @@
 import { createClerkClient } from '@clerk/backend';
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { withRetry } from '../testUtils/retryableClerkClient';
+import { isOAuthCallbackPath } from '../testUtils/setupTestingTokens';
 import { createUserService } from '../testUtils/usersService';
+
+const grantOAuthConsent = async (page: Page) => {
+  const allowAccessButton = page.getByRole('button', { name: 'Allow' });
+  await expect(allowAccessButton).toBeVisible();
+  const [callback] = await Promise.all([
+    page.waitForRequest(request => isOAuthCallbackPath(new URL(request.url()).pathname)),
+    allowAccessButton.click(),
+  ]);
+  expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
+};
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeUser: FakeUser;
+  let modalSignUpUser: FakeUser;
 
   test.beforeAll(async () => {
     // Create a clerkClient for the OAuth provider instance.
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
-    const users = createUserService(client);
+    const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, {
+      withUsername: true,
+    });
+    modalSignUpUser = users.createFakeUser(test, {
       withUsername: true,
     });
     // Create the user on the OAuth provider instance so we do not need to sign up twice.
     await users.createBapiUser(fakeUser);
+    await users.createBapiUser(modalSignUpUser);
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     // Delete the user on the OAuth provider instance.
     await fakeUser.deleteIfExists();
+    await modalSignUpUser.deleteIfExists();
     // Delete the user on the app instance.
     await u.services.users.deleteIfExists({ email: fakeUser.email });
+    await u.services.users.deleteIfExists({ email: modalSignUpUser.email });
     await app.teardown();
   });
 
   test('sign up with custom oauth provider', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
+    const providerKeys = await resolveInstanceKeys('oauth-provider');
+    await createTestUtils({
+      app: {
+        ...app,
+        env: environmentConfig()
+          .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+          .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+      },
+      page,
+      context,
+    });
     await u.po.signUp.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+
+    await grantOAuthConsent(u.page);
 
     // We can't use our `expect.toBeSignedIn` first because that would result in `true` on the OAuth provider instance.
     // We want to assert that we're signed in on our app instance, which will render the text 'SignedIn'.
@@ -53,15 +87,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign in with custom oauth provider', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     // We can't use our `expect.toBeSignedIn` first because that would result in `true` on the OAuth provider instance.
     // We want to assert that we're signed in on our app instance, which will render the text 'SignedIn'.
@@ -70,7 +105,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign in modal', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -80,19 +115,47 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     await u.page.waitForAppUrl('/protected');
 
     await u.po.expect.toBeSignedIn();
   });
 
+  test('openSignIn with withSignUp signs up a new user with custom oauth provider', async ({ page, context }) => {
+    const u = await createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.evaluate(() => {
+      (window as any).Clerk.openSignIn({
+        withSignUp: true,
+        forceRedirectUrl: '/protected',
+        signUpForceRedirectUrl: '/protected',
+      });
+    });
+    await u.po.signIn.waitForModal();
+    await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+    await u.po.signIn.setIdentifier(modalSignUpUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
+
+    await u.page.waitForAppUrl('/protected');
+    await u.po.expect.toBeSignedIn();
+  });
+
   test('openSignIn OAuth uses ClerkProvider.signInUrl for sso-callback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -128,7 +191,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   });
 
   test('sign up modal', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     // The SignUpModal will only redirect to its provided forceRedirectUrl if the user is signing up; it will not
     // redirect if the sign up is transferred to a sign in.
     await u.services.users.deleteIfExists({ email: fakeUser.email });
@@ -141,17 +204,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signUp.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     await u.page.waitForAppUrl('/protected');
   });
 
   test('sign in modal to sign up modal to transfer respects original forceRedirectUrl', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // The user already exists on the OAuth provider instance, but we want to make sure that the user is created on the
     // app instance as well so that their sign up is transferred to a sign in.
@@ -176,12 +240,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     // Use OAuth provider
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     // Sign in with existing account
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
+    await grantOAuthConsent(u.page);
 
     // Should redirect to the sign in redirect URL since we already had an account
     await u.page.waitForAppUrl('/?from=signin');
@@ -190,7 +255,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
   test.describe('authenticateWithPopup', () => {
     test('SignIn with oauthFlow=popup opens popup', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/buttons');
       await u.page.waitForClerkJsLoaded();
@@ -203,12 +268,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
       await popupUtils.po.signIn.continue();
       await popupUtils.po.signIn.enterTestOtpCode();
+      await grantOAuthConsent(popupUtils.page);
 
       await u.page.waitForAppUrl('/protected');
 
@@ -224,8 +290,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     await app.teardown();
   });
 
-  test('openSignIn OAuth in combined flow targets /sign-in#/create/sso-callback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+  test('openSignIn OAuth in combined flow targets /sign-in#/sso-callback', async ({ page, context }) => {
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/buttons');
     await u.page.waitForClerkJsLoaded();
@@ -248,13 +314,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpFlow] })('oauth
     expect(redirectUrl).toBeTruthy();
 
     // Combined flow (CLERK_SIGN_UP_URL is unset in this env): the sso-callback must anchor to
-    // ClerkProvider.signInUrl and carry the combined-flow /create segment, since the
-    // create/sso-callback route is mounted under the SignIn tree — not SignUp.
+    // ClerkProvider.signInUrl. The modal cannot know whether the SignIn mounted at that URL has the
+    // combined-flow `create/*` routes, so it targets `sso-callback`, which every SignIn mounts and
+    // whose handler transfers new users into a sign-up itself.
     const parsed = new URL(redirectUrl!);
     const appOrigin = new URL(app.serverUrl).origin;
     expect(parsed.origin).toBe(appOrigin);
     expect(parsed.pathname).toBe('/sign-in');
-    expect(parsed.hash).toMatch(/^#\/create\/sso-callback/);
+    expect(parsed.hash).toMatch(/^#\/sso-callback/);
   });
 });
 
@@ -267,10 +334,10 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
@@ -278,14 +345,14 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await fakeUser.deleteIfExists();
       await u.services.users.deleteIfExists({ email: fakeUser.email });
       await app.teardown();
     });
 
     test('popup OAuth navigates through sso-callback with path-based routing', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in-popup');
       await u.page.waitForClerkJsLoaded();
@@ -294,8 +361,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -324,10 +391,10 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
@@ -335,14 +402,14 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await fakeUser.deleteIfExists();
       await u.services.users.deleteIfExists({ email: fakeUser.email });
       await app.teardown();
     });
 
     test('popup OAuth navigates through sso-callback with hash-based routing', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.page.goToRelative('/sign-in-hash-popup');
       await u.page.waitForClerkJsLoaded();
@@ -351,8 +418,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       const popupPromise = context.waitForEvent('page');
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
-      const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      const popupUtils = await createTestUtils({ app, page: popup, context });
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -385,10 +452,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     test.beforeAll(async () => {
       // Create a clerkClient for the OAuth provider instance.
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
         withUsername: true,
       });
@@ -397,7 +464,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       // Delete the user on the OAuth provider instance.
       await fakeUser.deleteIfExists();
       // Delete the user on the app instance.
@@ -406,11 +473,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('sign up via transfer with custom oauth provider', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -427,7 +494,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     });
 
     test('sign up via transfer modal', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.services.users.deleteIfExists({ email: fakeUser.email });
 
       await u.page.goToRelative('/buttons');
@@ -438,7 +505,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       await u.po.signIn.waitForModal();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -456,7 +523,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       context,
       browser,
     }) => {
-      const u = createTestUtils({ app, page, context, browser });
+      const u = await createTestUtils({ app, page, context, browser });
 
       // Open sign-in page in both tabs before signing in
       await u.po.signIn.goTo();
@@ -469,7 +536,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       // Sign in via OAuth on the first tab
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();
@@ -482,5 +549,160 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       // Should redirect and be signed in without error
       await secondTabUtils.po.expect.toBeSignedIn();
     });
+
+    test('sends a single sign-up transfer when SignIn remounts while the transfer is in flight', async ({
+      page,
+      context,
+    }) => {
+      const providerKeys = await resolveInstanceKeys('oauth-provider');
+      const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+      const users = createUserService(withRetry(providerClient));
+      const newUser = users.createFakeUser(test, { withUsername: true });
+      await users.createBapiUser(newUser);
+
+      const u = await createTestUtils({ app, page, context });
+
+      const transferStatuses: number[] = [];
+      let callbackCalledAgain = false;
+      let onSecondTransfer: () => void = () => {};
+      const secondTransfer = new Promise<void>(resolve => {
+        onSecondTransfer = resolve;
+      });
+      let onFirstTransferResponded: () => void = () => {};
+      const firstTransferResponded = new Promise<void>(resolve => {
+        onFirstTransferResponded = resolve;
+      });
+
+      await page.route('**/v1/client/sign_ups*', async route => {
+        const request = route.request();
+        const isTransfer =
+          request.method() === 'POST' &&
+          (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+            request.postData()?.includes('transfer=true'));
+        if (!isTransfer) {
+          return route.continue();
+        }
+
+        const isFirst = transferStatuses.length === 0;
+        transferStatuses.push(0);
+        const index = transferStatuses.length - 1;
+
+        if (isFirst) {
+          await page.evaluate(() => {
+            const clerk = window.Clerk as any;
+            const handleRedirectCallback = clerk.handleRedirectCallback;
+            clerk.handleRedirectCallback = (...args: unknown[]) => {
+              (window as any).__e2eCallbackCalledAgain = true;
+              return handleRedirectCallback(...args);
+            };
+            window.dispatchEvent(new Event('e2e:resuspend'));
+          });
+          callbackCalledAgain = await page
+            .waitForFunction(() => (window as any).__e2eCallbackCalledAgain === true, undefined, { timeout: 3000 })
+            .then(() => true)
+            .catch(() => false);
+          await Promise.race([secondTransfer, new Promise(resolve => setTimeout(resolve, 1000))]);
+        } else {
+          onSecondTransfer();
+        }
+
+        await route.continue();
+        const response = await request.response();
+        transferStatuses[index] = response?.status() ?? 0;
+
+        if (isFirst) {
+          onFirstTransferResponded();
+        }
+      });
+
+      try {
+        await u.page.goToRelative('/sign-in-resuspend');
+        await u.po.signIn.waitForMounted();
+        await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+        await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+        await u.po.signIn.setIdentifier(newUser.email);
+        await u.po.signIn.continue();
+        await u.po.signIn.enterTestOtpCode();
+
+        await firstTransferResponded;
+
+        expect(callbackCalledAgain).toBe(true);
+        expect(transferStatuses).toEqual([200]);
+        await u.page.getByRole('heading', { name: 'Legal consent' }).waitFor();
+      } finally {
+        await newUser.deleteIfExists();
+        await u.services.users.deleteIfExists({ email: newUser.email });
+      }
+    });
+
+    const blockedTransferResponses = [
+      {
+        name: 'a non-Clerk HTML response',
+        response: { status: 429, contentType: 'text/html', body: '<html><body>Blocked</body></html>' },
+        error: /Unable to complete action at this time/,
+      },
+      {
+        name: 'a Clerk-shaped WAF response',
+        response: {
+          status: 429,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            errors: [{ code: 'too_many_requests', message: 'Too many requests. Please try again in a bit.' }],
+          }),
+        },
+        error: /Too many requests\. Please try again in a bit\./,
+      },
+    ];
+
+    for (const { name, response, error } of blockedTransferResponses) {
+      test(`keeps the transfer error on the start screen when the sign-up transfer is blocked by ${name}`, async ({
+        page,
+        context,
+      }) => {
+        const providerKeys = await resolveInstanceKeys('oauth-provider');
+        const providerClient = createClerkClient({ secretKey: providerKeys.sk, publishableKey: providerKeys.pk });
+        const users = createUserService(withRetry(providerClient));
+        const newUser = users.createFakeUser(test, { withUsername: true });
+        await users.createBapiUser(newUser);
+
+        const u = await createTestUtils({ app, page, context });
+
+        await page.route('**/v1/client/sign_ups*', route => {
+          const request = route.request();
+          const isTransfer =
+            request.method() === 'POST' &&
+            (new URL(request.url()).searchParams.get('transfer') === 'true' ||
+              request.postData()?.includes('transfer=true'));
+          if (!isTransfer) {
+            return route.continue();
+          }
+          return route.fulfill(response);
+        });
+
+        try {
+          await u.po.signIn.goTo();
+          await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+          await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
+
+          await u.po.signIn.setIdentifier(newUser.email);
+          await u.po.signIn.continue();
+          await u.po.signIn.enterTestOtpCode();
+
+          const transferError = u.page.getByText(error);
+          await transferError.waitFor();
+          await u.page.waitForURL(url => url.pathname === '/sign-in');
+          await u.po.signIn.waitForMounted();
+
+          await expect(transferError).toBeVisible();
+          await expect(
+            u.page.getByText(/Account not found\. Please sign up or try signing in to a different account\./),
+          ).toBeHidden();
+        } finally {
+          await newUser.deleteIfExists();
+          await u.services.users.deleteIfExists({ email: newUser.email });
+        }
+      });
+    }
   },
 );

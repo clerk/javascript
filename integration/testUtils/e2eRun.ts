@@ -8,13 +8,30 @@ type E2EUserRecord = {
   privateMetadata: Record<string, unknown>;
 };
 
-export const getE2ERunMarker = (runKey = process.env.INTEGRATION_TEST_RUN_KEY): string | undefined => {
+const encodeHexAsLetters = (hex: string): string =>
+  Array.from(hex, character => String.fromCharCode(97 + Number.parseInt(character, 16))).join('');
+
+export const getE2ERunToken = (runKey = process.env.INTEGRATION_TEST_RUN_KEY): string | undefined => {
   if (!runKey) {
     return;
   }
 
   const digest = createHash('sha256').update(runKey).digest('hex').slice(0, 20);
-  return `e2e_${digest}`;
+  return encodeHexAsLetters(digest);
+};
+
+export const getE2ERunMarker = (runKey = process.env.INTEGRATION_TEST_RUN_KEY): string | undefined => {
+  const runToken = getE2ERunToken(runKey);
+  if (!runToken) {
+    return;
+  }
+
+  return `e2e_${runToken}`;
+};
+
+export const getE2EApplicationRunMarker = (runKey = process.env.INTEGRATION_TEST_RUN_KEY): string | undefined => {
+  const runToken = getE2ERunToken(runKey);
+  return runToken ? `run-${runToken}` : undefined;
 };
 
 export const userMatchesE2ERun = (user: E2EUserRecord, marker: string): boolean =>

@@ -1,4 +1,4 @@
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -14,41 +14,54 @@ type SavedCredential = {
   publicKey: string;
 };
 
+// Any valid base32 secret works — no test ever generates a code from it.
+const TOTP_SECRET = 'JBSWY3DPEHPK3PXP';
+
 // clerk-js gates WebAuthn behind isValidBrowser(), which bails when
-// navigator.webdriver is true, so mask it before installing the virtual authenticator.
-const installVirtualAuthenticator = async (context: BrowserContext) => {
-  await context.addInitScript(() => {
-    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
-  });
+// navigator.webdriver is true, so mask it before Clerk loads.
+const installVirtualAuthenticator = async (context: BrowserContext, { autofill = false } = {}) => {
   await context.credentials.install();
+  await context.addInitScript(autofill => {
+    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
+    if (!autofill) {
+      PublicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(false);
+    }
+  }, autofill);
 };
+
+let app: Application;
+
+test.beforeAll(async () => {
+  app = await appConfigs.next.appRouter.commit();
+  await app.setup();
+  await app.withEnv(appConfigs.envs.withPasskeys);
+  await app.dev();
+});
+
+test.afterAll(async () => {
+  await app.teardown();
+});
 
 test.describe('passkeys @generic', () => {
   test.describe.configure({ mode: 'serial' });
 
-  let app: Application;
   let fakeUser: FakeUser;
   let savedCredential: SavedCredential;
 
   test.beforeAll(async () => {
-    app = await appConfigs.next.appRouter.commit();
-    await app.setup();
-    await app.withEnv(appConfigs.envs.withPasskeys);
-    await app.dev();
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: true, withPassword: true });
     await u.services.users.createBapiUser(fakeUser);
   });
 
   test.afterAll(async () => {
     await fakeUser.deleteIfExists();
-    await app.teardown();
   });
 
   test('registers a passkey through UserProfile', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email!, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
@@ -66,9 +79,9 @@ test.describe('passkeys @generic', () => {
 
   test('signs in with passkey via conditional UI autofill', async ({ page, context }) => {
     await context.credentials.create(savedCredential.rpId, savedCredential);
-    await installVirtualAuthenticator(context);
+    await installVirtualAuthenticator(context, { autofill: true });
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     // The start page requests the passkey with mediation: 'conditional' and the
@@ -79,14 +92,12 @@ test.describe('passkeys @generic', () => {
   test('signs in with passkey via identifier-first flow', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email!);
     await u.po.signIn.continue();
 
     await expect(u.page.getByText('Use your passkey')).toBeVisible();
-    // Seed only now: the start page's conditional-UI autofill is answered
-    // instantly by the virtual authenticator and would preempt this flow.
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await u.po.signIn.continue();
 
@@ -96,14 +107,99 @@ test.describe('passkeys @generic', () => {
   test('signs in with a seeded passkey', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     const usePasskeyLink = u.page.getByRole('link', { name: /use passkey instead/i });
     await expect(usePasskeyLink).toBeVisible();
-    // Seed after load for the same autofill-preemption reason as above.
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await usePasskeyLink.click();
+
+    await u.po.expect.toBeSignedIn();
+  });
+});
+
+test.describe('passkeys as a second factor @generic', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  let fakeUser: FakeUser;
+  let userId: string;
+  let savedCredential: SavedCredential;
+
+  test.beforeAll(async () => {
+    const u = await createTestUtils({ app });
+    fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: true, withPassword: true });
+    const user = await u.services.users.createBapiUser(fakeUser);
+    userId = user.id;
+  });
+
+  test.afterAll(async () => {
+    await fakeUser.deleteIfExists();
+  });
+
+  const signInToSecondFactor = async (page: Page, context: BrowserContext) => {
+    const u = await createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({
+      email: fakeUser.email!,
+      password: fakeUser.password,
+      waitForSession: false,
+    });
+    await u.page.waitForURL(/\/sign-in\/factor-two/);
+    return u;
+  };
+
+  test('registers a passkey, then enrolls the user in two-factor', async ({ page, context }) => {
+    await installVirtualAuthenticator(context);
+
+    const u = await createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email!, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.switchToSecurityTab();
+    await u.page.getByRole('button', { name: /add a passkey/i }).click();
+
+    await expect(u.page.locator('.cl-profileSectionItem__passkeys')).toBeVisible();
+
+    const credentials = await context.credentials.get();
+    expect(credentials).toHaveLength(1);
+    savedCredential = credentials[0];
+
+    // A passkey on its own never creates a 2FA requirement, so enroll TOTP to park
+    // later sign-ins at needs_second_factor. It has to happen after the passkey is
+    // registered, since the remaining tests never enter a TOTP code.
+    await u.services.clerk.users.updateUser(userId, { totpSecret: TOTP_SECRET });
+  });
+
+  test('offers the passkey as the starting second factor', async ({ page, context }) => {
+    await installVirtualAuthenticator(context);
+
+    const u = await signInToSecondFactor(page, context);
+
+    // Passkey outranks the enrolled authenticator app once the backend advertises it.
+    await expect(u.page.getByText('Use your passkey')).toBeVisible();
+    await context.credentials.create(savedCredential.rpId, savedCredential);
+    await u.po.signIn.continue();
+
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('lists the passkey under "Use another method"', async ({ page, context }) => {
+    await installVirtualAuthenticator(context);
+
+    const u = await signInToSecondFactor(page, context);
+
+    await u.po.signIn.getUseAnotherMethodLink().click();
+
+    const passkeyButton = u.page.getByRole('button', { name: /sign in with your passkey/i });
+    await expect(passkeyButton).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /use your authenticator app/i })).toBeVisible();
+
+    await context.credentials.create(savedCredential.rpId, savedCredential);
+    await passkeyButton.click();
+    await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();
   });

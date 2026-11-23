@@ -1,3 +1,0 @@
-import { defineWorkspace } from 'vitest/config';
-
-export default defineWorkspace(['./packages/*/vitest.config.{mts,mjs,js,ts}', './scripts/vitest.config.mjs']);

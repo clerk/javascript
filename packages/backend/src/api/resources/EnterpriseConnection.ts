@@ -4,7 +4,26 @@ import type {
   EnterpriseConnectionOauthConfigJSON,
   EnterpriseConnectionSamlConnectionJSON,
   EnterpriseConnectionSamlConnectionLoginHintJSON,
+  SamlConnectionIdpCertificateJSON,
 } from './JSON';
+
+/**
+ * One of the Identity Provider (IdP) signing certificates a SAML connection trusts.
+ */
+export class SamlConnectionIdpCertificate {
+  constructor(
+    /** The X.509 certificate, as base64-encoded DER without PEM armor. */
+    readonly certificate: string,
+    /** The Unix timestamp (milliseconds) when the certificate becomes valid, or `null` if unknown. */
+    readonly issuedAt: number | null,
+    /** The Unix timestamp (milliseconds) when the certificate expires, or `null` if unknown. */
+    readonly expiresAt: number | null,
+  ) {}
+
+  static fromJSON(data: SamlConnectionIdpCertificateJSON): SamlConnectionIdpCertificate {
+    return new SamlConnectionIdpCertificate(data.certificate, data.issued_at, data.expires_at);
+  }
+}
 
 /**
  * The `login_hint` configuration included on a Backend API {@link EnterpriseConnectionSamlConnection} response.
@@ -97,6 +116,8 @@ export class EnterpriseConnectionSamlConnection {
     readonly forceAuthn: boolean,
     /** The `login_hint` configuration of the SAML connection. */
     readonly loginHint: EnterpriseConnectionSamlConnectionLoginHint,
+    /** Every Identity Provider (IdP) signing certificate the connection trusts. The first entry is the primary, also returned as `idpCertificate`. */
+    readonly idpCertificates: SamlConnectionIdpCertificate[],
   ) {}
 
   static fromJSON(data: EnterpriseConnectionSamlConnectionJSON): EnterpriseConnectionSamlConnection {
@@ -119,6 +140,7 @@ export class EnterpriseConnectionSamlConnection {
       data.active,
       data.force_authn,
       EnterpriseConnectionSamlConnectionLoginHint.fromJSON(data.login_hint),
+      (data.idp_certificates ?? []).map(certificate => SamlConnectionIdpCertificate.fromJSON(certificate)),
     );
   }
 }

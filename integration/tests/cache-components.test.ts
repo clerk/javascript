@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('home page loads with navigation', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
       await expect(u.page.getByText('Next.js Cache Components Test App')).toBeVisible();
       await expect(u.page.getByRole('link', { name: 'auth() in Server Component' })).toBeVisible();
@@ -33,14 +33,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('auth() in server component works when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/auth-server-component');
       await expect(u.page.getByText('auth() in Server Component')).toBeVisible();
-      await expect(u.page.getByTestId('user-id')).toContainText('Not signed in');
+      await expect(u.page.getByTestId('user-id').filter({ visible: true })).toContainText('Not signed in');
     });
 
     test('auth() in server component works when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -55,21 +55,21 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText('auth() in Server Component')).toBeVisible();
 
       // Should show user ID (starts with 'user_')
-      const userIdElement = u.page.getByTestId('user-id');
+      const userIdElement = u.page.getByTestId('user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
     });
 
     test('currentUser() in server component works when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/current-user-server-component');
       await expect(u.page.getByText('currentUser() in Server Component')).toBeVisible();
-      await expect(u.page.getByTestId('current-user-id')).toContainText('Not signed in');
+      await expect(u.page.getByTestId('current-user-id').filter({ visible: true })).toContainText('Not signed in');
     });
 
     test('currentUser() in server component works when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -84,20 +84,20 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       await expect(u.page.getByText('currentUser() in Server Component')).toBeVisible();
 
       // Should show user ID (starts with 'user_')
-      const userIdElement = u.page.getByTestId('current-user-id');
+      const userIdElement = u.page.getByTestId('current-user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
 
       // Should also show the email
-      const emailElement = u.page.getByTestId('current-user-email');
+      const emailElement = u.page.getByTestId('current-user-email').filter({ visible: true });
       await expect(emailElement).toBeVisible();
       const email = await emailElement.textContent();
       expect(email).toContain('@');
     });
 
     test('auth() in server action works', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -121,7 +121,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('auth() in API route works', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -141,7 +141,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('"use cache" correct pattern with auth() works when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Navigate to correct pattern page without signing in
       await u.page.goToRelative('/use-cache-correct');
@@ -152,7 +152,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('"use cache" correct pattern with auth() works when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -174,7 +174,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('"use cache" correct pattern with currentUser() works when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Navigate to correct pattern page without signing in
       await u.page.goToRelative('/current-user-cache-correct');
@@ -187,7 +187,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     // TODO: clerkClient() also calls headers() internally, so it fails inside "use cache".
     // Re-enable once clerkClient() is fixed to fall through to env-based config.
     test.skip('"use cache" correct pattern with currentUser() works when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -208,14 +208,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
       expect(profileText).toContain('userId');
 
       // Should also show the user ID
-      const userIdElement = u.page.getByTestId('current-user-id');
+      const userIdElement = u.page.getByTestId('current-user-id').filter({ visible: true });
       await expect(userIdElement).toBeVisible();
       const userId = await userIdElement.textContent();
       expect(userId).toMatch(/^user_/);
     });
 
     test('PPR with auth() renders correctly when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Navigate to PPR page without signing in
       await u.page.goToRelative('/ppr-auth');
@@ -229,7 +229,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('PPR with auth() renders correctly when signed in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -251,7 +251,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('protected route requires authentication', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Try to access protected route without signing in
       // Should redirect to sign-in
@@ -262,14 +262,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('dynamic route renders correctly via direct navigation', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/dynamic-route/test-123');
       await expect(u.page.getByText('Dynamic Route')).toBeVisible();
       await expect(u.page.getByTestId('route-id')).toContainText('test-123');
     });
 
     test('client-side navigation to dynamic route works', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
       await expect(u.page.getByText('Next.js Cache Components Test App')).toBeVisible();
 
@@ -280,7 +280,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
     });
 
     test('protected route accessible when authenticated', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in first
       await u.po.signIn.goTo();
@@ -303,7 +303,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
 
     // TODO: Flaky — toBeSignedOut() times out in CI. Needs investigation.
     test.skip('sign out completes and navigation promise resolves', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in
       await u.po.signIn.goTo();
@@ -333,7 +333,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern:
 
     // TODO: Flaky — signOut()/toBeSignedOut() times out in CI. Same issue as above.
     test.skip('protected route redirects to sign-in after sign out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in and access protected route
       await u.po.signIn.goTo();

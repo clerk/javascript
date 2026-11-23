@@ -33,6 +33,8 @@ export const ObjectType = {
   BlocklistIdentifier: 'blocklist_identifier',
   Client: 'client',
   Cookies: 'cookies',
+  DirectoryGroup: 'directory_group',
+  DirectoryGroupMembership: 'directory_group_membership',
   Domain: 'domain',
   Email: 'email',
   EnterpriseAccount: 'enterprise_account',
@@ -197,6 +199,7 @@ export interface EmailJSON extends ClerkResourceJSON {
   status?: string;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
+  suppression_reason?: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -693,6 +696,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_sign_in_at: number | null;
   banned: boolean;
   locked: boolean;
+  deprovisioned: boolean;
   lockout_expires_in_seconds: number | null;
   verification_attempts_remaining: number | null;
   created_at: number;
@@ -706,6 +710,10 @@ export interface UserJSON extends ClerkResourceJSON {
    * The locale of the user in BCP-47 format.
    */
   locale: string | null;
+  /**
+   * The timezone of the user.
+   */
+  timezone: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -755,6 +763,67 @@ export interface UserDeletedJSON extends DeletedObjectJSON {
   external_id?: string;
 }
 
+/**
+ * The result of merging one user into another.
+ * Used for `user.merged` webhook events and the response of the merge user endpoint.
+ */
+export interface UserMergedJSON {
+  /**
+   * The user that remains, as it is after the merge.
+   */
+  user: UserJSON;
+  /**
+   * The merged user as it was before it was deleted.
+   */
+  deleted_user: UserJSON;
+}
+
+/**
+ * Directory group webhook event payload: a group as the identity provider reported it to a directory.
+ * Used for `directoryGroup.created`, `directoryGroup.updated`, `directoryGroup.synced` and `directoryGroup.deleted` webhook events.
+ */
+export interface DirectoryGroupWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroup;
+  /**
+   * The group ID, as assigned by the directory.
+   */
+  id: string;
+  directory_id: string;
+  display_name: string;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership webhook event payload: one user's membership in a directory group.
+ * `user_id` is null until the member has been provisioned into Clerk.
+ * Used for `directoryGroupMembership.created` webhook events.
+ */
+export interface DirectoryGroupMembershipWebhookEventJSON {
+  object: typeof ObjectType.DirectoryGroupMembership;
+  /**
+   * Never set: the payload has no ID. Declared so `event.data.id` keeps the same type across every `WebhookEvent`.
+   */
+  id?: never;
+  directory_id: string;
+  group: {
+    object: typeof ObjectType.DirectoryGroup;
+    id: string;
+    display_name: string;
+  };
+  directory_user_id: string;
+  user_id: string | null;
+  updated_at: number;
+}
+
+/**
+ * Directory group membership deletion webhook event payload that extends `DirectoryGroupMembershipWebhookEventJSON`
+ * with `cause`: `group_deleted` when the whole group is gone, `member_removed` when the identity provider took this
+ * user out of it. Used for `directoryGroupMembership.deleted` webhook events.
+ */
+export interface DeletedDirectoryGroupMembershipWebhookEventJSON extends DirectoryGroupMembershipWebhookEventJSON {
+  cause: 'group_deleted' | 'member_removed';
+}
+
 export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
@@ -773,6 +842,12 @@ export interface EnterpriseConnectionCustomAttributeJSON {
   multi_valued: boolean;
 }
 
+export interface SamlConnectionIdpCertificateJSON {
+  certificate: string;
+  issued_at: number | null;
+  expires_at: number | null;
+}
+
 export interface EnterpriseConnectionSamlConnectionJSON {
   id: string;
   name: string;
@@ -781,6 +856,7 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   idp_certificate?: string;
   idp_certificate_issued_at?: number;
   idp_certificate_expires_at?: number;
+  idp_certificates?: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url?: string;
   /** @deprecated The Backend API does not return this field. */
   idp_metadata?: string;
@@ -843,6 +919,7 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_certificate: string;
   idp_certificate_issued_at: number;
   idp_certificate_expires_at: number;
+  idp_certificates: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -962,6 +1039,14 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenActorJSON {
+  iss?: string;
+  sub: string;
+  act?: IdPOAuthAccessTokenActorJSON;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

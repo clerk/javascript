@@ -49,9 +49,10 @@ vi.mock('react-native', () => {
 vi.mock('../../specs/NativeClerkModule', () => {
   return {
     default: {
-      configure: vi.fn(),
-      getClientToken: vi.fn(),
-      syncClientStateFromJs: vi.fn(),
+      configureNative: vi.fn(),
+      getDeviceToken: vi.fn(),
+      setDeviceToken: vi.fn(),
+      refreshClient: vi.fn(),
     },
   };
 });
@@ -127,13 +128,6 @@ describe('useSignInWithGoogle', () => {
   });
 
   describe('startGoogleAuthenticationFlow', () => {
-    test('should return the hook with startGoogleAuthenticationFlow function', () => {
-      const { result } = renderHook(() => useSignInWithGoogle());
-
-      expect(result.current).toHaveProperty('startGoogleAuthenticationFlow');
-      expect(typeof result.current.startGoogleAuthenticationFlow).toBe('function');
-    });
-
     test('should successfully sign in existing user', async () => {
       const mockIdToken = 'mock-id-token';
       mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({

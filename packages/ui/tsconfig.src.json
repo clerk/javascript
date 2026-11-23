@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "preserveWatchOutput": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "node_modules/.cache/tsconfig-src",
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig-src.tsbuildinfo",
+    "types": ["@rspack/core/module"]
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "./src/test/**"
+  ],
+  "include": ["src", "src/global.d.ts"]
+}

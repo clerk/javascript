@@ -1,7 +1,6 @@
 import {
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
-  disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
@@ -88,7 +87,7 @@ export const createOrganizationProfileCustomPages = (
   clerk: LoadedClerk,
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
-  shouldShowSelfServeSSO = false,
+  shouldShowSecurityPage = false,
   shouldShowAccessOnboarding = false,
 ) => {
   return createCustomPages(
@@ -102,7 +101,7 @@ export const createOrganizationProfileCustomPages = (
     shouldShowBilling,
     environment,
     true,
-    shouldShowSelfServeSSO,
+    shouldShowSecurityPage,
     shouldShowAccessOnboarding,
   );
 };
@@ -113,7 +112,7 @@ const createCustomPages = (
   shouldShowBilling: boolean,
   environment?: EnvironmentResource,
   organization?: boolean,
-  shouldShowSelfServeSSO = false,
+  shouldShowSecurityPage = false,
   shouldShowAccessOnboarding = false,
 ) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes({
@@ -123,7 +122,7 @@ const createCustomPages = (
     apiKeys: organization
       ? !disabledOrganizationAPIKeysFeature(clerk, environment)
       : !disabledUserAPIKeysFeature(clerk, environment),
-    security: organization ? shouldShowSelfServeSSO && !disabledSelfServeSSOFeature(clerk, environment) : false,
+    security: organization ? shouldShowSecurityPage : false,
     accessOnboarding: organization ? shouldShowAccessOnboarding : false,
   });
 

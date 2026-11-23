@@ -35,11 +35,16 @@ export class ExternalAccount extends BaseResource implements ExternalAccountReso
   }
 
   reauthorize = (params: ReauthorizeExternalAccountParams): Promise<ExternalAccountResource> => {
-    const { additionalScopes, redirectUrl } = params || {};
+    const { additionalScopes, redirectUrl, oidcPrompt, oidcLoginHint } = params || {};
 
     return this._basePatch({
       action: 'reauthorize',
-      body: { additional_scope: additionalScopes, redirect_url: redirectUrl },
+      body: {
+        additional_scope: additionalScopes,
+        redirect_url: redirectUrl,
+        oidc_prompt: oidcPrompt,
+        oidc_login_hint: oidcLoginHint,
+      },
     });
   };
   destroy = (): Promise<void> => this._baseDelete();

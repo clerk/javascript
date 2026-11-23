@@ -13,6 +13,7 @@ import {
   getSeatUnitPrice,
   organizationAndInvitationsExceedsPurchasedSeats,
 } from '@/ui/utils/billingPlanSeats';
+import { isEmail } from '@/ui/utils/emailUtils';
 import { handleError } from '@/ui/utils/errorHandler';
 import { getClosestProfileScrollBoxFromElement } from '@/ui/utils/getClosestProfileScrollBox';
 import { createListFormat } from '@/ui/utils/passwordUtils';
@@ -25,8 +26,6 @@ import type { LocalizationKey } from '../../localization';
 import { localizationKeys, useLocalizations } from '../../localization';
 import { mqu } from '../../styledSystem';
 import { RoleSelect } from './MemberListTable';
-
-const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
 type InviteMembersFormProps = {
   onSuccess?: () => void;

@@ -28,6 +28,10 @@ describe('SamlConnectionAPI', () => {
     idp_certificate: 'cert_data',
     idp_certificate_issued_at: 1672531200000,
     idp_certificate_expires_at: 1704067200000,
+    idp_certificates: [
+      { certificate: 'cert_data', issued_at: 1672531200000, expires_at: 1704067200000 },
+      { certificate: 'next_cert_data', issued_at: null, expires_at: null },
+    ],
     idp_metadata_url: null,
     idp_metadata: null,
     attribute_mapping: {
@@ -90,6 +94,7 @@ describe('SamlConnectionAPI', () => {
               name: 'Test Connection',
               provider: 'saml_custom',
               domain: 'test.example.com',
+              idp_certificates: ['cert_data', 'next_cert_data'],
               attribute_mapping: {
                 user_id: 'userId',
                 email_address: 'email',
@@ -107,6 +112,7 @@ describe('SamlConnectionAPI', () => {
         name: 'Test Connection',
         provider: 'saml_custom',
         domain: 'test.example.com',
+        idpCertificates: ['cert_data', 'next_cert_data'],
         attributeMapping: {
           userId: 'userId',
           emailAddress: 'email',
@@ -120,6 +126,10 @@ describe('SamlConnectionAPI', () => {
       expect(response.organizationId).toBe('org_123');
       expect(response.idpCertificateIssuedAt).toBe(1672531200000);
       expect(response.idpCertificateExpiresAt).toBe(1704067200000);
+      expect(response.idpCertificates).toEqual([
+        { certificate: 'cert_data', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+        { certificate: 'next_cert_data', issuedAt: null, expiresAt: null },
+      ]);
     });
   });
 

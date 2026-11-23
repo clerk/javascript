@@ -24,7 +24,7 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
     test.setTimeout(90_000); // Wait for apps to be ready
     apps = await Promise.all([prepareApplication('sessions-dev-1'), prepareApplication('sessions-dev-1')]);
 
-    const u = apps.map(a => createTestUtils({ app: a.app }));
+    const u = await Promise.all(apps.map(a => createTestUtils({ app: a.app })));
     fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser(test)));
     await Promise.all([
       await u[0].services.users.createBapiUser(fakeUsers[0]),
@@ -40,8 +40,8 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
   test('the cookies are aligned for the root and sub domains', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+      await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
     await u[0].po.signIn.goTo();
@@ -82,8 +82,8 @@ test.describe('multiple apps running on localhost using same Clerk instance @loc
   test('signing out from the root domain affects the sub domain', async ({ context }) => {
     const pages = await Promise.all([context.newPage(), context.newPage()]);
     const u = [
-      createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-      createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+      await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+      await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
     ];
 
     // sign tab0

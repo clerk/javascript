@@ -1,0 +1,90 @@
+'use client';
+
+import React from 'react';
+
+import { readingDirectionKeys, useDirection } from '../direction-provider';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { useTagInputContext } from './tag-input-context';
+import { splitTags } from './tag-input-utils';
+
+export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue'>;
+
+export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputProps>(
+  function TagInputInput(props, forwardedRef) {
+    const { render, ...otherProps } = props;
+    const {
+      value,
+      inputValue: text,
+      setInputValue: setText,
+      delimiters,
+      disabled,
+      focusableWhenDisabled,
+      add,
+      focusTag,
+      registerInput,
+    } = useTagInputContext();
+    const { previousKey } = readingDirectionKeys(useDirection());
+
+    const commit = () => {
+      if (disabled) {
+        return;
+      }
+      add([text]);
+      setText('');
+    };
+
+    const defaultProps = {
+      type: 'text',
+      value: text,
+      disabled: disabled && !focusableWhenDisabled,
+      ...(disabled && focusableWhenDisabled ? { readOnly: true, 'aria-disabled': true } : null),
+      autoComplete: 'off',
+      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+        const parts = splitTags(event.currentTarget.value, delimiters);
+        const pending = parts.pop() ?? '';
+        add(parts);
+        setText(pending);
+      },
+      onPaste: (event: React.ClipboardEvent<HTMLInputElement>) => {
+        if (disabled) {
+          return;
+        }
+        const parts = splitTags(event.clipboardData.getData('text'), delimiters);
+        if (parts.length < 2) {
+          return;
+        }
+        event.preventDefault();
+        add([text, ...parts]);
+        setText('');
+      },
+      onBlur: commit,
+      onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          // eslint-disable-next-line typescript/no-deprecated -- Safari can report composition Enter as keyCode 229 while isComposing is false.
+          if (event.nativeEvent.isComposing || event.keyCode === 229) {
+            return;
+          }
+          if (text.trim()) {
+            event.preventDefault();
+            commit();
+          }
+          return;
+        }
+
+        const { selectionStart, selectionEnd } = event.currentTarget;
+        const caretAtStart = selectionStart === 0 && selectionEnd === 0;
+        if ((event.key === 'Backspace' || event.key === previousKey) && caretAtStart && value.length > 0) {
+          event.preventDefault();
+          focusTag(value[value.length - 1]);
+        }
+      },
+    } satisfies DefaultProps<'input'>;
+
+    return useRender({
+      defaultTagName: 'input',
+      render,
+      ref: [registerInput, forwardedRef],
+      props: mergeProps<'input'>(defaultProps, otherProps),
+    });
+  },
+);

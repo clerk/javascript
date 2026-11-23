@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
 import * as path from 'path';
 
-config({ path: path.resolve(__dirname, '.env.local') });
+config({ path: path.resolve(import.meta.dirname, '.env.local') });
 
 export const common: PlaywrightTestConfig = {
   testDir: './tests',

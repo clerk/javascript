@@ -2,11 +2,14 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateDirectorySyncParams,
   CreateOrganizationDomainParams,
   CreateOrganizationEnterpriseConnectionParams,
   CreateOrganizationParams,
   DeletedObjectJSON,
   DeletedObjectResource,
+  DirectorySyncJSON,
+  DirectorySyncResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitJSON,
@@ -37,6 +40,7 @@ import type {
   OrganizationResource,
   RoleJSON,
   SetOrganizationLogoParams,
+  SSOBypassAllowlistResource,
   UpdateMembershipParams,
   UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
@@ -49,6 +53,7 @@ import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '..
 import {
   BaseResource,
   DeletedObject,
+  DirectorySync,
   EnterpriseConnection,
   EnterpriseConnectionTestRun,
   OrganizationInvitation,
@@ -57,9 +62,12 @@ import {
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
+import { SSOBypassAllowlist } from './SSOBypassAllowlist';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
+
+  ssoBypassAllowlist: SSOBypassAllowlistResource = new SSOBypassAllowlist(this);
 
   id!: string;
   name!: string;
@@ -74,6 +82,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
   selfServeSSOEnabled = false;
+  selfServeDirectorySyncEnabled = false;
   exclusiveMembership = false;
 
   constructor(data: OrganizationJSON | OrganizationJSONSnapshot) {
@@ -111,16 +120,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   getRoles = async (getRolesParams?: GetRolesParams) => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/roles`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(getRolesParams),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/roles`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getRolesParams),
+    }).then(res => {
       const {
         data: roles,
         total_count,
@@ -144,16 +148,11 @@ export class Organization extends BaseResource implements OrganizationResource {
       search.set('enrollment_mode', enrollmentMode);
     }
 
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/domains`,
-        method: 'GET',
-        search,
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/domains`,
+      method: 'GET',
+      search,
+    }).then(res => {
       const { data: invites, total_count } = res?.response as unknown as ClerkPaginatedResponse<OrganizationDomainJSON>;
 
       return {
@@ -274,6 +273,32 @@ export class Organization extends BaseResource implements OrganizationResource {
     };
   };
 
+  getDirectorySync = async (enterpriseConnectionId: string): Promise<DirectorySyncResource> => {
+    const json = (
+      await BaseResource._fetch<DirectorySyncJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
+        method: 'GET',
+      })
+    )?.response as unknown as DirectorySyncJSON;
+
+    return new DirectorySync(json, this.id);
+  };
+
+  createDirectorySync = async (
+    enterpriseConnectionId: string,
+    params?: CreateDirectorySyncParams,
+  ): Promise<DirectorySyncResource> => {
+    const json = (
+      await BaseResource._fetch<DirectorySyncJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
+        method: 'POST',
+        body: { name: params?.name } as any,
+      })
+    )?.response as unknown as DirectorySyncJSON;
+
+    return new DirectorySync(json, this.id);
+  };
+
   getMembershipRequests = async (
     getRequestParam?: GetMembershipRequestParams,
   ): Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>> => {
@@ -316,16 +341,11 @@ export class Organization extends BaseResource implements OrganizationResource {
     domainIds: string[],
   ): Promise<OrganizationDomainsBulkOwnershipVerificationResource> => {
     const { data, errors } = (
-      await BaseResource._fetch(
-        {
-          path: `/organizations/${this.id}/domains/${action}/bulk`,
-          method: 'POST',
-          body: { organization_domain_ids: domainIds } as any,
-        },
-        {
-          forceUpdateClient: true,
-        },
-      )
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/domains/${action}/bulk`,
+        method: 'POST',
+        body: { organization_domain_ids: domainIds } as any,
+      })
     )?.response as unknown as OrganizationDomainsBulkOwnershipVerificationJSON;
 
     return {
@@ -355,16 +375,11 @@ export class Organization extends BaseResource implements OrganizationResource {
   getInvitations = async (
     getInvitationsParams?: GetInvitationsParams,
   ): Promise<ClerkPaginatedResponse<OrganizationInvitationResource>> => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/invitations`,
-        method: 'GET',
-        search: convertPageToOffsetSearchParams(getInvitationsParams),
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/invitations`,
+      method: 'GET',
+      search: convertPageToOffsetSearchParams(getInvitationsParams),
+    }).then(res => {
       const { data: requests, total_count } =
         res?.response as unknown as ClerkPaginatedResponse<OrganizationInvitationJSON>;
 
@@ -475,6 +490,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.maxAllowedMemberships = data.max_allowed_memberships || 0;
     this.adminDeleteEnabled = data.admin_delete_enabled || false;
     this.selfServeSSOEnabled = data.self_serve_sso_enabled || false;
+    this.selfServeDirectorySyncEnabled = data.self_serve_directory_sync_enabled || false;
     this.exclusiveMembership = data.exclusive_membership || false;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
@@ -495,6 +511,7 @@ export class Organization extends BaseResource implements OrganizationResource {
       max_allowed_memberships: this.maxAllowedMemberships,
       admin_delete_enabled: this.adminDeleteEnabled,
       self_serve_sso_enabled: this.selfServeSSOEnabled,
+      self_serve_directory_sync_enabled: this.selfServeDirectorySyncEnabled,
       exclusive_membership: this.exclusiveMembership,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),

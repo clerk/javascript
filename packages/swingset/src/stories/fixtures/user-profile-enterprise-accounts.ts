@@ -1,0 +1,72 @@
+import type {
+  UserProfileEnterpriseAccount,
+  UserProfileEnterpriseConnection,
+} from '@clerk/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
+import { useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosCompany, chaosEmail } from '@/lib/chaos';
+
+export const accounts: UserProfileEnterpriseAccount[] = [
+  {
+    id: 'account_okta',
+    name: 'Acme Okta',
+    emailAddress: 'alex@acme.com',
+    iconUrl: 'https://img.clerk.com/static/okta.svg',
+    monochromeIcon: true,
+  },
+  { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com' },
+];
+const connections: UserProfileEnterpriseConnection[] = [
+  { id: 'connection_google', name: 'Google Workspace', iconUrl: 'https://img.clerk.com/static/google.svg' },
+  { id: 'connection_saml', name: 'Partner SAML' },
+];
+
+export function useEnterpriseAccountsFixture({
+  initialAccounts = accounts,
+  initialError,
+}: {
+  initialAccounts?: UserProfileEnterpriseAccount[];
+  initialError?: string;
+} = {}) {
+  const seedAccounts = useChaosFixture(initialAccounts, items =>
+    items.map((account, index) => ({
+      ...account,
+      name: `${chaosCompany(index)} Okta`,
+      emailAddress: chaosEmail(index),
+    })),
+  );
+  const seedConnections = useChaosFixture(connections, items =>
+    items.map((connection, index) => ({ ...connection, name: `${chaosCompany(index + 2)} SAML` })),
+  );
+  const [linkedAccounts, setLinkedAccounts] = useState(seedAccounts);
+  const [availableConnections, setAvailableConnections] = useState(
+    seedConnections.map((connection, index) => ({
+      ...connection,
+      connectError: index === 0 ? initialError : undefined,
+    })),
+  );
+  const [pendingId, setPendingId] = useState<string>();
+
+  return {
+    accounts: linkedAccounts,
+    connections: availableConnections,
+    pendingId,
+    onConnect: (id: string) => {
+      const connection = availableConnections.find(item => item.id === id);
+      if (!connection || pendingId) {
+        return;
+      }
+      setPendingId(id);
+      setAvailableConnections(current => current.map(item => ({ ...item, connectError: undefined })));
+      setTimeout(() => {
+        setLinkedAccounts(current => [
+          ...current,
+          { ...connection, id: `account_${id}`, connectError: undefined, emailAddress: 'alex@acme.com' },
+        ]);
+        setAvailableConnections(current => current.filter(item => item.id !== id));
+        setPendingId(undefined);
+      }, 1500);
+    },
+  };
+}

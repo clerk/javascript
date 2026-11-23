@@ -1,8 +1,15 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import type { CardProps } from '@clerk/ui/mosaic/components/card';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Button } from '@clerk/mosaic/components/button';
+import type { CardProps } from '@clerk/mosaic/components/card';
+import { Card } from '@clerk/mosaic/components/card';
+import { Field } from '@clerk/mosaic/components/field';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Input } from '@clerk/mosaic/components/input';
+import { Application2 } from '@clerk/mosaic/icons/glyphs/application-2';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,20 +17,52 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './card.component.stories?raw';
 
+const CLERK_LOGO_SRC = 'https://avatars.githubusercontent.com/u/49538330?v=4';
+
+const styles = stylex.create({
+  connection: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: space['2'],
+  },
+  appLogo: {
+    alignItems: 'center',
+    borderColor: colorVars['--cl-color-border'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  connector: {
+    alignItems: 'center',
+    color: colorVars['--cl-color-foreground-secondary'],
+    display: 'flex',
+    gap: space['2'],
+    width: space['32'],
+  },
+  line: {
+    borderBlockStartColor: colorVars['--cl-color-foreground-secondary'],
+    borderBlockStartStyle: 'dashed',
+    borderBlockStartWidth: '1px',
+    flexGrow: 1,
+  },
+});
+
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Card',
-  source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  source: 'packages/mosaic/src/components/card/card.tsx',
   styles: {
     _variants: {
-      alignment: { start: {}, center: {} },
       elevation: { card: {}, flush: {}, overlay: {} },
       renderBranding: { true: {}, false: {} },
+      size: { md: {}, lg: {} },
     },
     _defaultVariants: {
-      alignment: 'start',
       elevation: 'card',
       renderBranding: true,
+      size: 'md',
     },
   },
 };
@@ -34,35 +73,114 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card.Root
-      {...knobsAsProps(props)}
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root {...knobsAsProps(props)}>
       <Card.Header>
-        <Heading>Login to your account</Heading>
-        <Text>Enter your email below to login to your account</Text>
+        <Card.Title>Login to your account</Card.Title>
+        <Card.Description>Enter your email below to login to your account</Card.Description>
       </Card.Header>
-      <Card.Content>Card body content goes here.</Card.Content>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Email address</Field.Label>
+          <Input />
+        </Field.Root>
+      </Card.Content>
       <Card.Footer>
-        <Button fullWidth>Continue</Button>
+        <Button>Continue</Button>
       </Card.Footer>
     </Card.Root>
   );
 }
 
-export function Centered() {
+export function WithMedia() {
   return (
-    <Card.Root
-      alignment='center'
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root>
       <Card.Header>
-        <Heading>Verify your email</Heading>
-        <Text>We sent a verification code to your email address</Text>
+        <Card.Media>
+          <Avatar.Root size='lg'>
+            <Avatar.Image
+              src={CLERK_LOGO_SRC}
+              alt='Clerk'
+            />
+            <Avatar.Fallback />
+          </Avatar.Root>
+        </Card.Media>
+        <Card.Title>Join Clerk</Card.Title>
+        <Card.Description>You have been invited to this organization.</Card.Description>
       </Card.Header>
-      <Card.Content>Enter the code below to continue.</Card.Content>
       <Card.Footer>
-        <Button fullWidth>Verify</Button>
+        <Button>Accept invitation</Button>
+      </Card.Footer>
+    </Card.Root>
+  );
+}
+
+export function OAuthConsent() {
+  return (
+    <Card.Root align='center'>
+      <Card.Header>
+        <Card.Media xstyle={styles.connection}>
+          <Avatar.Root
+            shape='square'
+            size='lg'
+            xstyle={styles.appLogo}
+          >
+            <Icon glyph={Application2} />
+          </Avatar.Root>
+          <div
+            aria-hidden
+            {...stylex.props(styles.connector)}
+          >
+            <span {...stylex.props(styles.line)} />
+            <Icon glyph={ShieldCheck} />
+            <span {...stylex.props(styles.line)} />
+          </div>
+          <Avatar.Root size='lg'>
+            <Avatar.Image
+              src={CLERK_LOGO_SRC}
+              alt='Clerk'
+            />
+            <Avatar.Fallback />
+          </Avatar.Root>
+        </Card.Media>
+        <Card.Title>Authorize Acme</Card.Title>
+        <Card.Description>Acme wants to access your Clerk account.</Card.Description>
+      </Card.Header>
+      <Card.Footer>
+        <Button variant='outline'>Cancel</Button>
+        <Button>Allow</Button>
+      </Card.Footer>
+    </Card.Root>
+  );
+}
+
+export function WithBanner() {
+  const [error, setError] = useState<string | undefined>();
+  return (
+    <Card.Root>
+      <Card.Header>
+        <Card.Title>Change password</Card.Title>
+        <Card.Description>Enter your current password and a new one.</Card.Description>
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {error}
+      </Card.Banner>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Current password</Field.Label>
+          <Input type='password' />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Button
+          variant='outline'
+          onClick={() => setError(undefined)}
+        >
+          Clear
+        </Button>
+        <Button onClick={() => setError('Incorrect password. Try again.')}>Fail</Button>
       </Card.Footer>
     </Card.Root>
   );

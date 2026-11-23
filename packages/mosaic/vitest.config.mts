@@ -1,0 +1,165 @@
+import { resolve } from 'node:path';
+
+import stylex from '@stylexjs/unplugin/vite';
+import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
+
+import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
+
+const mosaicPath = resolve(import.meta.dirname, 'src');
+const featureTests = 'src/**/*.feature.test.tsx';
+const visualTests = 'src/**/*.visual.test.tsx';
+const webkitTests = 'src/**/*.webkit.test.tsx';
+const browserTests = 'src/**/*.browser.test.tsx';
+const browserDependencies = [
+  '@clerk/clerk-js',
+  '@wallet-standard/core',
+  '@testing-library/jest-dom/matchers',
+  '@testing-library/react',
+  '@testing-library/user-event',
+  'msw',
+  'msw/browser',
+];
+
+export default defineConfig({
+  plugins: [
+    stylex({
+      dev: true,
+      unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath },
+      lightningcssOptions: { targets: mosaicLightningCssTargets },
+    }),
+    react({ jsxRuntime: 'automatic' }),
+  ],
+  test: {
+    watch: false,
+    environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
+    globals: false,
+    restoreMocks: true,
+    unstubGlobals: true,
+    exclude: ['node_modules/**', 'dist/**'],
+    testTimeout: 5000,
+    // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they
+    // never picked up the requestAnimationFrame mock in the Mosaic setup (it changes floating-ui's
+    // focus-on-open timing). Keeping them on their own project here, instead of folding them into
+    // the jsdom project, preserves that behavior post-move.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'primitives',
+          environment: 'happy-dom',
+          include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: [webkitTests, browserTests, visualTests],
+          setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'lint-rules',
+          environment: 'node',
+          include: ['lint/**/*.test.ts'],
+          setupFiles: ['./lint/vitest.setup.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'mosaic',
+          include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: ['lint/**', 'src/primitives/**', featureTests, webkitTests, browserTests, visualTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        server: {
+          warmup: {
+            clientFiles: ['./src/**/*.modal-content.tsx'],
+          },
+        },
+        optimizeDeps: {
+          include: browserDependencies,
+        },
+        test: {
+          name: 'feature',
+          include: [featureTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        optimizeDeps: { include: [...browserDependencies, 'qrcode.react'] },
+        test: {
+          name: 'visual',
+          include: [visualTests],
+          setupFiles: [
+            resolve(import.meta.dirname, 'vitest.setup.browser.mts'),
+            resolve(import.meta.dirname, 'vitest.setup.visual.mts'),
+          ],
+          browser: {
+            enabled: true,
+            headless: true,
+            viewport: { width: 1280, height: 900 },
+            provider: playwright({
+              contextOptions: {
+                colorScheme: 'light',
+                deviceScaleFactor: 1,
+                locale: 'en-US',
+                timezoneId: 'UTC',
+                reducedMotion: 'reduce',
+              },
+            }),
+            instances: [{ browser: 'chromium' }],
+            expect: {
+              toMatchScreenshot: {
+                comparatorName: 'pixelmatch',
+                comparatorOptions: { threshold: 0, allowedMismatchedPixelRatio: 0 },
+              },
+            },
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'webkit',
+          include: [webkitTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'webkit' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          include: [browserTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
+  },
+});

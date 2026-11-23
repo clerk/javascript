@@ -2,8 +2,6 @@ import * as ButtonStories from './button.stories';
 
 # Button
 
-Button is the primary action element in Mosaic, used for form submissions and discrete user-triggered actions.
-
 ## Playground
 
 <Preview
@@ -25,7 +23,7 @@ Button is the primary action element in Mosaic, used for form submissions and di
 
 <Usage
   component='Button'
-  module='@clerk/ui/mosaic/components/button'
+  module='@clerk/mosaic/components/button'
 >
   Click me
 </Usage>
@@ -62,7 +60,7 @@ it to show. Every combination below is the same two props.
 
 Hover and focus are part of the matrix — hover a cell, or tab through it, to see them. `filled`
 shifts its fill and `link` underlines. `outline` and `ghost` share the same neutral hover fill,
-except `ghost` under `negative`, which is the one cell that tints by color. The focus ring is
+except under `negative`, where both tint by color. The focus ring is
 the same for every cell.
 
 <Story
@@ -79,9 +77,13 @@ the same for every cell.
 
 ### Icons
 
-An icon is a child, not a prop. Give it a `placement` and `Icon` reflects that as `data-icon`,
-which the button selects on to tighten the padding on that edge — pass icons on either side, or
-both, with nothing to declare on the button itself.
+An icon is a child, not a prop. The button tightens the padding on whichever side an `Icon` sits,
+read from its position beside the label — pass icons on either side, or both, with nothing to
+declare on the icon or the button. An icon inside a wrapper element doesn't count as leading or
+trailing, so the button keeps its text padding.
+
+The text beside the icon renders in a span with the class `cl-button-label`, so it can be targeted
+directly.
 
 <Story
   name='Icons'
@@ -90,7 +92,7 @@ both, with nothing to declare on the button itself.
 
 The tightened value isn't chosen by eye. An icon is centered in the button, so it already has
 `(height − icon size) / 2` of space above and below it; matching the inline side to that puts it
-in a square cell — 8px at every size, against 12px of text padding at `md` and `lg`, 10px at `sm`.
+in a square cell. Text padding steps from 8px at `xs`, to 10px at `sm`, and 12px at `md` and `lg`.
 The text side keeps the larger inset, since a run of text ends in a stem where an icon trails off.
 The middle button in each row below carries no icon, for comparison.
 

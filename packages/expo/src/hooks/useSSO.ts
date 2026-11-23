@@ -9,9 +9,12 @@ import type {
 import type * as WebBrowser from 'expo-web-browser';
 
 import { errorThrower } from '../utils/errors';
+import { loadSSODependencies } from './ssoDependencies';
 
 export type StartSSOFlowParams = {
   redirectUrl?: string;
+  oidcPrompt?: string;
+  oidcLoginHint?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   authSessionOptions?: Pick<WebBrowser.AuthSessionOpenOptions, 'showInRecents'>;
 } & (
@@ -66,26 +69,9 @@ export function useSSO() {
       };
     }
 
-    // Load via synchronous require() instead of import(): Metro inlines require() into the main
-    // bundle, while import() emits an async chunk that fails to resolve without @expo/metro-runtime.
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- type-only annotation for optional dependency
-    let AuthSession: typeof import('expo-auth-session');
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- type-only annotation for optional dependency
-    let WebBrowserModule: typeof import('expo-web-browser');
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      AuthSession = require('expo-auth-session');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      WebBrowserModule = require('expo-web-browser');
-    } catch (err) {
-      return errorThrower.throw(
-        `Unable to load expo-auth-session and expo-web-browser, which are required for SSO: ${
-          err instanceof Error ? err.message : 'Unknown error'
-        }. If they are not installed, run: npx expo install expo-auth-session expo-web-browser`,
-      );
-    }
+    const { AuthSession, WebBrowser: WebBrowserModule } = loadSSODependencies();
 
-    const { strategy, unsafeMetadata, authSessionOptions } = startSSOFlowParams ?? {};
+    const { strategy, oidcPrompt, oidcLoginHint, unsafeMetadata, authSessionOptions } = startSSOFlowParams ?? {};
 
     /**
      * Creates a redirect URL based on the application platform
@@ -102,6 +88,8 @@ export function useSSO() {
     await signIn.create({
       strategy,
       redirectUrl,
+      oidcPrompt,
+      oidcLoginHint,
       ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
     });
 

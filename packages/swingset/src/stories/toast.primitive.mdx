@@ -1,0 +1,258 @@
+import * as ToastStories from './toast.primitive.stories';
+
+# Toast
+
+Transient notifications stacked in a viewport. It is a
+**headless** primitive: it supplies the toast list, timers that pause on hover and
+focus, the queue beyond a limit, keyboard handling, screen reader announcements and
+the exit animation lifecycle, but ships **no styles** — you bring your own CSS by
+targeting the `data-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled — it renders the raw primitive so you can see
+its behavior and ARIA wiring. Toasts auto-dismiss after five seconds; hover the list or
+press `F6` to pause them.
+
+<Story
+  name='Default'
+  storyModule={ToastStories}
+/>
+
+Anchored toasts sit next to the element that triggered them.
+
+<Story
+  name='Anchored'
+  storyModule={ToastStories}
+/>
+
+## Usage
+
+```tsx
+import { Toast } from '@clerk/mosaic/primitives/toast';
+
+function App() {
+  return (
+    <Toast.Provider>
+      <SaveButton />
+      <Toast.Portal>
+        <Toast.Viewport>
+          <ToastList />
+        </Toast.Viewport>
+      </Toast.Portal>
+    </Toast.Provider>
+  );
+}
+
+function ToastList() {
+  const { toasts } = Toast.useToastManager();
+  return toasts.map(toast => (
+    <Toast.Root
+      key={toast.id}
+      toast={toast}
+    >
+      <Toast.Title />
+      <Toast.Description />
+      <Toast.Action />
+      <Toast.Close aria-label='Close' />
+    </Toast.Root>
+  ));
+}
+
+function SaveButton() {
+  const manager = Toast.useToastManager();
+  return (
+    <button
+      type='button'
+      onClick={() => manager.add({ title: 'Saved' })}
+    >
+      Save
+    </button>
+  );
+}
+```
+
+### Promise
+
+```tsx
+manager.promise(saveProfile(), {
+  loading: 'Saving…',
+  success: 'Profile saved',
+  error: error => (error instanceof Error ? error.message : 'Could not save'),
+});
+```
+
+### Outside React
+
+```tsx
+const toastManager = Toast.createToastManager();
+
+<Toast.Provider toastManager={toastManager}>…</Toast.Provider>;
+
+toastManager.add({ title: 'Signed out' });
+```
+
+### Anchored
+
+A toast can sit next to the element that caused it, such as a "Copied" confirmation beside a copy button. Give anchored toasts their own provider and manager so they don't stack with the others, wrap each root in `Toast.Positioner`, and pass the anchor through `positionerProps`.
+
+```tsx
+const anchoredToastManager = Toast.createToastManager();
+
+<Toast.Provider toastManager={anchoredToastManager}>
+  <Toast.Portal>
+    <Toast.Viewport>
+      <AnchoredToasts />
+    </Toast.Viewport>
+  </Toast.Portal>
+</Toast.Provider>;
+
+function AnchoredToasts() {
+  const { toasts } = Toast.useToastManager();
+  return toasts.map(toast => (
+    <Toast.Positioner
+      key={toast.id}
+      toast={toast}
+    >
+      <Toast.Root toast={toast}>
+        <Toast.Arrow />
+        <Toast.Description />
+      </Toast.Root>
+    </Toast.Positioner>
+  ));
+}
+
+function CopyButton() {
+  const buttonRef = React.useRef<HTMLButtonElement | null>(null);
+
+  function handleCopy() {
+    anchoredToastManager.add({
+      description: 'Copied',
+      timeout: 1500,
+      positionerProps: { anchor: buttonRef.current, sideOffset: 8 },
+    });
+  }
+
+  return (
+    <button
+      ref={buttonRef}
+      type='button'
+      onClick={handleCopy}
+    >
+      Copy
+    </button>
+  );
+}
+```
+
+## Parts
+
+| Part                | Default Element | Description                                                                      |
+| ------------------- | --------------- | -------------------------------------------------------------------------------- |
+| `Toast.Provider`    | —               | Owns the toast list, timers, and the queue.                                      |
+| `Toast.Portal`      | —               | Renders its children into `document.body` (or `root`).                           |
+| `Toast.Viewport`    | `<div>`         | Landmark region that holds the toasts. Hover or focus inside pauses every timer. |
+| `Toast.Positioner`  | `<div>`         | Positions one toast against an anchor element. Optional; wraps `Toast.Root`.     |
+| `Toast.Root`        | `<div>`         | One toast. Focusable, closes on Escape, drives the exit transition.              |
+| `Toast.Arrow`       | `<svg>`         | Arrow pointing at the anchor. Must sit inside `Toast.Positioner`.                |
+| `Toast.Content`     | `<div>`         | Layout wrapper. Carries `data-behind` for stacked toasts.                        |
+| `Toast.Title`       | `<h2>`          | Labels the root. Defaults to `toast.title`.                                      |
+| `Toast.Description` | `<p>`           | Describes the root. Defaults to `toast.description`.                             |
+| `Toast.Action`      | `<button>`      | Merges `toast.actionProps`, then closes the toast.                               |
+| `Toast.Close`       | `<button>`      | Closes the toast.                                                                |
+
+Element-rendering parts accept a `render` prop. Every part throws outside `Toast.Provider`, and the
+parts inside a toast throw outside `Toast.Root`.
+
+`F6` moves focus to the newest toast from anywhere, and back again from inside the viewport. `Escape`
+closes the focused toast; focus moves to the next toast, else to where it came from.
+
+## Props
+
+### `Toast.Provider`
+
+| Prop           | Type                   | Default | Description                                                  |
+| -------------- | ---------------------- | ------- | ------------------------------------------------------------ |
+| `timeout`      | `number`               | `5000`  | Default auto-dismiss delay in ms. `0` disables auto-dismiss. |
+| `limit`        | `number`               | `3`     | Maximum toasts shown at once. Older ones are `limited`.      |
+| `toastManager` | `ExternalToastManager` | —       | A manager from `createToastManager()`.                       |
+
+### `Toast.Portal`
+
+| Prop   | Type                                                    | Default         | Description       |
+| ------ | ------------------------------------------------------- | --------------- | ----------------- |
+| `root` | `HTMLElement \| null \| RefObject<HTMLElement \| null>` | `document.body` | Portal container. |
+
+### `Toast.Positioner`
+
+| Prop          | Type                                     | Default      | Description                                     |
+| ------------- | ---------------------------------------- | ------------ | ----------------------------------------------- |
+| `toast`       | `ToastObject`                            | — (required) | The toast from `useToastManager()`.             |
+| `anchor`      | `Element \| null`                        | —            | The element the toast is positioned against.    |
+| `side`        | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`      | Side of the anchor. Flips when there's no room. |
+| `align`       | `'start' \| 'center' \| 'end'`           | `'center'`   | Alignment along that side.                      |
+| `sideOffset`  | `number`                                 | `0`          | Gap between the anchor and the toast, in px.    |
+| `alignOffset` | `number`                                 | `0`          | Shift along the alignment axis, in px.          |
+
+Fields in `toast.positionerProps` override these props.
+
+### `Toast.Root`
+
+| Prop    | Type          | Default      | Description                         |
+| ------- | ------------- | ------------ | ----------------------------------- |
+| `toast` | `ToastObject` | — (required) | The toast from `useToastManager()`. |
+
+### `useToastManager()`
+
+Returns `{ toasts, add, close, update, promise }`.
+
+| Method    | Signature                                                                            | Description                                                        |
+| --------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `add`     | `(options: ToastAddOptions) => string`                                               | Adds a toast at the front of the list and returns its id.          |
+| `close`   | `(id?: string) => void`                                                              | Closes one toast, or every toast without an id.                    |
+| `update`  | `(id: string, options: ToastUpdateOptions \| (toast) => ToastUpdateOptions) => void` | Merges new fields into a toast. A function gets the current toast. |
+| `promise` | `(promise: Promise<T>, options: ToastPromiseOptions<T>) => Promise<T>`               | Loading, then success or error. Re-throws on rejection.            |
+
+## Styling
+
+| Attribute             | Applies To              | Description                                                                 |
+| --------------------- | ----------------------- | --------------------------------------------------------------------------- |
+| `data-expanded`       | Viewport, Root, Content | Present while the viewport is hovered or holds focus. Timers are paused.    |
+| `data-type`           | Root                    | The toast `type`.                                                           |
+| `data-limited`        | Root                    | Present while the toast is queued beyond `limit`. The root is also `inert`. |
+| `data-behind`         | Content                 | Present on every toast stacked behind the frontmost one.                    |
+| `data-starting-style` | Root                    | Present on the first frame after mount.                                     |
+| `data-ending-style`   | Root                    | Present from `close` until the exit animations finish.                      |
+| `data-side`           | Positioner, Arrow       | The side the toast ended up on after flipping.                              |
+| `data-align`          | Positioner              | `start`, `center`, or `end`.                                                |
+| `data-anchor-hidden`  | Positioner              | Present while the anchor is scrolled out of view.                           |
+
+`Toast.Root` sets custom properties for stacking. `Toast.Viewport` also carries `--toast-frontmost-height`.
+
+| Property                   | Value                                                    |
+| -------------------------- | -------------------------------------------------------- |
+| `--toast-index`            | Position in the list; `0` is the newest.                 |
+| `--toast-offset-y`         | Sum of the heights of the toasts before this one, in px. |
+| `--toast-height`           | Measured height of this toast, in px.                    |
+| `--toast-frontmost-height` | Measured height of the frontmost toast, in px.           |
+
+```css
+.toast {
+  position: absolute;
+  bottom: 0;
+  transition:
+    transform 300ms,
+    opacity 300ms;
+  transform: translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * 8px));
+}
+.toast[data-starting-style],
+.toast[data-ending-style] {
+  opacity: 0;
+}
+.toast[data-limited] {
+  display: none;
+}
+```
+
+Swipe to dismiss is not part of this primitive yet. The full API, including the
+`ToastObject` fields and the ARIA contract, is in `packages/mosaic/src/primitives/toast/README.md`.

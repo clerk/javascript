@@ -1,0 +1,325 @@
+'use client';
+
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
+import { X } from '../../icons/glyphs/x';
+import { useFlowStepActive } from '../../primitives/flow/flow-step-context';
+import { useTransition } from '../../primitives/hooks';
+import { useRender } from '../../primitives/utils';
+import type { MosaicComponentProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../styles/reset.styles';
+import { hasMessage, useHeldMessage } from '../../utils/feedback';
+import type { BannerRootProps } from '../banner';
+import { Banner } from '../banner';
+import { Branding } from '../branding';
+import { Button } from '../button';
+import { ButtonContext } from '../button/button.context';
+import type { DialogContextValue } from '../dialog';
+import { Dialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
+import { Icon } from '../icon';
+import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
+import * as slots from './card.styles';
+
+type CardElevation = 'card' | 'flush' | 'overlay';
+
+export type CardSize = keyof typeof slots.sizes;
+
+export type CardAlign = keyof typeof slots.headerAlign;
+
+const DEFAULT_ELEVATION: CardElevation = 'card';
+
+// The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
+// dialog opened from inside another card is still the dialog's outermost one.
+const CardContext = React.createContext<{
+  elevation: CardElevation;
+  align: CardAlign;
+  dialog: DialogContextValue | null;
+} | null>(null);
+
+function CardBranding() {
+  return (
+    <div {...stylex.props(reset.base, slots.branding.base)}>
+      <Branding />
+    </div>
+  );
+}
+
+export interface CardProps extends MosaicComponentProps<'div'> {
+  /** Surface treatment applied to the card. @default 'overlay' inside a dialog, otherwise 'card' */
+  elevation?: CardElevation;
+  /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
+  size?: CardSize;
+  /** Aligns the content of every `Card.Header` in the card. @default 'start' */
+  align?: CardAlign;
+  /**
+   * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
+   * carries none of it, so a connected surface passes `displayConfig.branded` here.
+   *
+   * @default true
+   */
+  renderBranding?: boolean;
+}
+
+const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
+  { elevation: elevationProp, size = 'md', align = 'start', renderBranding = true, render, xstyle, children, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  const elevation = elevationProp ?? (isInDialog(dialog) ? 'overlay' : DEFAULT_ELEVATION);
+  const enclosing = React.useContext(CardContext);
+  const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
+  const context = React.useMemo(() => ({ elevation, align, dialog }), [elevation, align, dialog]);
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-root', { elevation, size, align }),
+        stylex.props(
+          reset.base,
+          slots.root.base,
+          slots.root[elevation],
+          slots.sizes[size],
+          isSurface && slots.surface.root,
+          xstyle,
+        ),
+        rest,
+      ),
+      children: (
+        <>
+          {children}
+          {renderBranding ? <CardBranding /> : null}
+        </>
+      ),
+    },
+  });
+
+  return <CardContext.Provider value={context}>{element}</CardContext.Provider>;
+});
+
+/**
+ * Dismisses the dialog from inside the header, in flow, so the header reserves the width it takes
+ * and a long title cannot run under it. `Dialog.CloseButton` stays the corner affordance, for the
+ * `Profile`, which anchors its own.
+ */
+function HeaderCloseButton() {
+  return (
+    <Dialog.Close
+      aria-label='Close'
+      render={props => (
+        <Button
+          color='neutral'
+          variant='ghost'
+          shape='circle'
+          size='sm'
+          {...props}
+        />
+      )}
+    >
+      <Icon glyph={X} />
+    </Dialog.Close>
+  );
+}
+
+const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
+  { render, xstyle, children, ...rest },
+  ref,
+) {
+  const align = React.useContext(CardContext)?.align ?? 'start';
+  const dialog = React.useContext(DialogContext);
+  const hasCloseButton = isInDialog(dialog) && dialog.showCloseButton;
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
+      children: (
+        <>
+          {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
+              focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
+              Not outside a dialog, where there is nothing to close, and not where the dialog's
+              `showCloseButton` is off, which is the default for an alert dialog. */}
+          {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
+              without answering one. The cancel action in the footer is the way out. */}
+          {hasCloseButton ? <HeaderCloseButton /> : null}
+          <div
+            {...mergeStyleProps(
+              themeProps('card-header-content'),
+              stylex.props(
+                reset.base,
+                slots.header.content,
+                slots.headerAlign[align],
+                hasCloseButton && align === 'center' && slots.header.contentBesideCloseButton,
+              ),
+            )}
+          >
+            {children}
+          </div>
+        </>
+      ),
+    },
+  });
+});
+
+const Media = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const align = React.useContext(CardContext)?.align ?? 'start';
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-media'),
+        stylex.props(reset.base, slots.header.media, slots.mediaAlign[align], xstyle),
+        rest,
+      ),
+    },
+  });
+});
+
+/**
+ * Names the card. Renders an `<h2>`, and inside a dialog takes the id the popup points
+ * `aria-labelledby` at, so the card names the dialog without knowing it is in one.
+ */
+const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(function CardTitle(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
+  return useRender({
+    defaultTagName: 'h2',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title, xstyle), rest),
+      // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
+      // that displaced it would leave the dialog with no accessible name.
+      ...(dialog && stepActive && { id: dialog.labelId }),
+    },
+  });
+});
+
+/** Describes the card. The `aria-describedby` counterpart to {@link Title}. */
+const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<'p'>>(function CardDescription(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
+  return useRender({
+    defaultTagName: 'p',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-description'),
+        stylex.props(reset.base, slots.header.description, xstyle),
+        rest,
+      ),
+      ...(dialog && stepActive && { id: dialog.descriptionId }),
+    },
+  });
+});
+
+export interface CardBannerProps extends MosaicComponentProps<'div'> {
+  /** Semantic color of the banner. @default 'neutral' */
+  color?: BannerRootProps['color'];
+}
+
+const CardBanner = React.forwardRef<HTMLDivElement, CardBannerProps>(function CardBanner(
+  { color, render, xstyle, children, ...rest },
+  ref,
+) {
+  const open = hasMessage(children);
+  const element = React.useRef<HTMLElement | null>(null);
+  const { mounted, transitionProps } = useTransition({ open, ref: element });
+  const message = useHeldMessage(children, open);
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref: [ref, element],
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-banner'),
+        stylex.props(reset.base, slots.banner.collapse, xstyle),
+        { ...transitionProps },
+        rest,
+      ),
+      children: (
+        <div {...stylex.props(reset.base, slots.banner.clip)}>
+          {mounted ? (
+            <Banner.Root
+              color={color}
+              xstyle={slots.banner.surface}
+              aria-hidden={open ? undefined : true}
+              {...transitionProps}
+            >
+              <Banner.Label>{message}</Banner.Label>
+            </Banner.Root>
+          ) : null}
+        </div>
+      ),
+    },
+  });
+});
+
+const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardContent(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-content'),
+        stylex.props(reset.base, slots.content.base, cardContentMarker, xstyle),
+        rest,
+      ),
+    },
+  });
+});
+
+const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardFooter(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
+  const parentButtonDefaults = React.useContext(ButtonContext);
+  const buttonDefaults = React.useMemo(() => ({ ...parentButtonDefaults, fullWidth: true }), [parentButtonDefaults]);
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-footer', { elevation }),
+        stylex.props(reset.base, slots.footer.base, cardFooterMarker, xstyle),
+        rest,
+      ),
+    },
+  });
+
+  return <ButtonContext.Provider value={buttonDefaults}>{element}</ButtonContext.Provider>;
+});
+
+export {
+  Root as CardRoot,
+  Header as CardHeader,
+  Media as CardMedia,
+  Title as CardTitle,
+  Description as CardDescription,
+  CardBanner,
+  Content as CardContent,
+  Footer as CardFooter,
+};

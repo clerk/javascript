@@ -9,7 +9,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('navigati
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test);
     await m.services.users.createBapiUser(fakeUser);
   });
@@ -20,7 +20,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('navigati
   });
 
   test('sign in with path routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
 
@@ -35,7 +35,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('navigati
   });
 
   test('sign in with hash routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/hash/sign-in');
     await u.po.signIn.waitForMounted();
@@ -50,7 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('navigati
   });
 
   test('sign in with path routing navigates to previous page', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
 
@@ -64,7 +64,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('navigati
   });
 
   test('user profile uses path routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });

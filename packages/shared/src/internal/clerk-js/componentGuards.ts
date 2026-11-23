@@ -50,6 +50,14 @@ export const disabledSelfServeSSOFeature: ComponentGuard = (clerk, environment) 
   return !environment?.userSettings.enterpriseSSO.self_serve_sso || !clerk.organization?.selfServeSSOEnabled;
 };
 
+export const disabledSelfServeDirectorySyncFeature: ComponentGuard = (clerk, environment) => {
+  return (
+    !environment?.userSettings.enterpriseSSO.self_serve_sso ||
+    !environment?.userSettings.enterpriseSSO.self_serve_directory_sync ||
+    !clerk.organization?.selfServeDirectorySyncEnabled
+  );
+};
+
 export const disabledEmailAddressAttribute: ComponentGuard = (_, environment) => {
   return !environment?.userSettings.attributes.email_address?.enabled;
 };

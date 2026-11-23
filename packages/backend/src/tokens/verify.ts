@@ -14,7 +14,7 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
-import { JWT_CATEGORY_M2M_TOKEN } from './jwtCategories';
+import { isNonSessionJwtCategory, JWT_CATEGORY_JWT_TEMPLATE } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
@@ -35,7 +35,7 @@ export type VerifyTokenOptions = Simplify<
   Omit<VerifyJwtOptions, 'key'> &
     Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
       /**
-       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
+       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/~/api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
        */
       jwtKey?: string;
     }
@@ -120,9 +120,10 @@ export async function verifyToken(
   const { header } = decodedResult;
   const { kid } = header;
 
-  // Reject machine JWTs (e.g. M2M) tagged with a non-session category but signed by the same
-  // instance key, regardless of transport. Reciprocal of the machine verifier's `cat` check.
-  if (header.cat === JWT_CATEGORY_M2M_TOKEN) {
+  // Reject JWTs signed by the same instance key that are not session tokens: machine JWTs
+  // (reciprocal of the machine verifier's `cat` check) and uncategorized tokens such as OIDC
+  // `id_token`s (AISEC-21). JWT-template tokens stay verifiable here for direct callers.
+  if (header.cat !== JWT_CATEGORY_JWT_TEMPLATE && isNonSessionJwtCategory(header.cat)) {
     return {
       errors: [
         new TokenVerificationError({
@@ -227,9 +228,21 @@ async function verifyOAuthToken(
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken, { audience: options.audience });
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
+    if (err instanceof TokenVerificationError) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: err.message,
+          }),
+        ],
+      };
+    }
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
 }

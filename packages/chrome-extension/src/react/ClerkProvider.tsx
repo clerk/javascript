@@ -9,7 +9,7 @@ import type { StorageCache } from '../internal/utils/storage';
 
 type ChromeExtensionClerkProviderProps = Omit<ClerkReactProviderProps, 'publishableKey'> & {
   /**
-   * Your Clerk Publishable Key, available in the [Clerk Dashboard](https://dashboard.clerk.com/last-active?path=api-keys).
+   * Your Clerk Publishable Key, available in the [Clerk Dashboard](https://dashboard.clerk.com/~/api-keys).
    * Required for Chrome Extensions, which cannot use `@clerk/react`'s environment-variable fallback.
    */
   publishableKey: string;

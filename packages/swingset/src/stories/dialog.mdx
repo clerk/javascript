@@ -2,8 +2,8 @@ import * as DialogStories from './dialog.stories';
 
 # Dialog
 
-A modal window that overlays the page and traps focus until dismissed, from
-`@clerk/headless`. It is a **headless** primitive: it supplies open state, portalling, an
+A modal window that overlays the page and traps focus until dismissed. It is a
+**headless** primitive: it supplies open state, portalling, an
 overlay surface, a centering viewport with optional body scroll lock, focus management,
 dismissal (outside press / Escape), and ARIA wiring, but ships **no styles** — you bring
 your own CSS by targeting the `data-*` state attributes each part emits.
@@ -21,7 +21,7 @@ behavior and ARIA wiring. Open it, then press Escape or click outside the popup 
 ## Usage
 
 ```tsx
-import { Dialog } from '@clerk/headless/dialog';
+import { Dialog } from '@clerk/mosaic/primitives/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger>Open</Dialog.Trigger>
@@ -70,13 +70,13 @@ keyboard exit, so it breaks the usual expectation that Escape dismisses a modal.
 
 ### Detached triggers
 
-A trigger does not have to be nested inside its root. `Dialog.createHandle()` returns a
+A trigger does not have to be nested inside its root. `Dialog.createDialogHandle()` returns a
 handle; pass the same handle to both, and the trigger drives the root from anywhere in the
 tree. The handle also exposes imperative `open()` / `close()` / `isOpen`; calls made while no
 root is mounted are ignored.
 
 ```tsx
-const feedbackDialog = Dialog.createHandle();
+const feedbackDialog = Dialog.createDialogHandle();
 
 <Dialog.Trigger handle={feedbackDialog}>Give feedback</Dialog.Trigger>;
 
@@ -87,10 +87,10 @@ const feedbackDialog = Dialog.createHandle();
 
 Each trigger can carry an `id` and a `payload`, and the root's children can be a function of
 the active trigger's payload — one dialog, per-trigger content. Type the payload through the
-handle: `Dialog.createHandle<Payload>()`.
+handle: `Dialog.createDialogHandle<Payload>()`, and every trigger on that handle must pass one.
 
 ```tsx
-const memberDialog = Dialog.createHandle<{ name: string }>();
+const memberDialog = Dialog.createDialogHandle<{ name: string }>();
 
 <Dialog.Trigger handle={memberDialog} id='alice' payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
 <Dialog.Trigger handle={memberDialog} id='bob' payload={{ name: 'Bob' }}>Bob</Dialog.Trigger>
@@ -177,7 +177,7 @@ for centered, scroll-locked modal behavior nest `Dialog.Popup` inside `Dialog.Vi
 | <code>onOpenChange</code> | <code>(open: boolean, details: DialogOpenChangeDetails) => void</code> | —                  | Called when the open state changes; `details` names the trigger behind it |
 | <code>modal</code>        | <code>boolean</code>                                                   | <code>true</code>  | Trap focus and make the rest of the page inert                            |
 | <code>closedBy</code>     | <code>'any' \| 'closerequest' \| 'none'</code>                         | <code>'any'</code> | Which gestures dismiss the dialog                                         |
-| <code>handle</code>       | <code>DialogHandle</code>                                              | —                  | Connects detached triggers (see `Dialog.createHandle()`)                  |
+| <code>handle</code>       | <code>DialogHandle</code>                                              | —                  | Connects detached triggers (see `Dialog.createDialogHandle()`)            |
 | <code>triggerId</code>    | <code>string \| null</code>                                            | tracked            | Controls which trigger the open is attributed to                          |
 | <code>children</code>     | <code>ReactNode \| (\{ payload \}) => ReactNode</code>                 | —                  | Content, or a render function of the active trigger's payload             |
 
@@ -206,11 +206,11 @@ dismisses but Escape does not — stays unrepresentable.
 
 ### `Dialog.Trigger`
 
-| Prop                 | Type                      | Default | Description                                              |
-| -------------------- | ------------------------- | ------- | -------------------------------------------------------- |
-| <code>handle</code>  | <code>DialogHandle</code> | —       | Drives a root elsewhere in the tree (detached trigger)   |
-| <code>id</code>      | <code>string</code>       | auto    | Names this trigger for the root's <code>triggerId</code> |
-| <code>payload</code> | <code>Payload</code>      | —       | Delivered to the root's children render function on open |
+| Prop                 | Type                      | Default | Description                                                                                                |
+| -------------------- | ------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| <code>handle</code>  | <code>DialogHandle</code> | —       | Drives a root elsewhere in the tree (detached trigger)                                                     |
+| <code>id</code>      | <code>string</code>       | auto    | Names this trigger for the root's <code>triggerId</code>                                                   |
+| <code>payload</code> | <code>Payload</code>      | —       | Delivered to the root's children render function on open; required when the handle is typed with a payload |
 
 ### `Dialog.Popup`
 

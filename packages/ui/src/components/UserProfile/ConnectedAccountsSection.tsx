@@ -18,7 +18,11 @@ import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
-import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
+import {
+  getExternalVerificationRedirectURL,
+  openOAuthTransportWithClerkErrors,
+  reloadUserAfterOAuthCallback,
+} from './oauthTransport';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -109,7 +113,10 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
   const shouldDisplayReconnect =
     errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
-  const strategy = (account.verification?.strategy || `oauth_${account.provider}`) as OAuthStrategy;
+  const verificationStrategy = account.verification?.strategy;
+  const strategy = (
+    verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy || `oauth_${account.provider}`
+  ) as OAuthStrategy;
 
   const createExternalAccount = useReverification((redirectUrl: string) =>
     user?.createExternalAccount({
@@ -142,7 +149,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
 
       const url = getExternalVerificationRedirectURL(response);
       if (transport) {
-        const { callbackUrl } = await transport.open(url);
+        const { callbackUrl } = await openOAuthTransportWithClerkErrors(transport, url);
         await reloadUserAfterOAuthCallback(user, callbackUrl);
         return;
       }

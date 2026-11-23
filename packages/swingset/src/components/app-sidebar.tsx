@@ -1,27 +1,68 @@
 'use client';
 
+import { FlaskConicalIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { type NavigationGroup, SidebarNavigation } from '@/components/sidebar-navigation';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { getSidebarGroups } from '@/lib/registry';
+import { getSidebarCategories } from '@/lib/sidebar-navigation';
 
 const groups = getSidebarGroups();
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  onSearchOpen,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { onSearchOpen: () => void }) {
   const pathname = usePathname();
+  const [isMac, setIsMac] = React.useState(false);
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react/set-state-in-effect -- Read the client platform only after hydration
+    setIsMac(navigator.platform.toLowerCase().includes('mac'));
+  }, []);
+
+  const navigationGroups: NavigationGroup[] = groups.map(({ group, groupSlug, components }) => ({
+    label: group,
+    separatorBefore: group === 'Blocks',
+    categories: getSidebarCategories(components).map(({ category, components }) => ({
+      label: category,
+      items: components.map(({ mod, componentSlug }) => {
+        const href = `/${groupSlug}/${componentSlug}`;
+        // How an entry is USED differs by layer, so the label follows the layer rather
+        // than a guess at the title: hooks are called, atomic styles are a set of
+        // exports with no single call form worth privileging, localization is a prop rather
+        // than a component, and everything else is a component rendered as JSX.
+        const usage =
+          mod.meta.group === 'Hooks'
+            ? `${mod.meta.title}()`
+            : mod.meta.group === 'Styles' || mod.meta.group === 'Localization'
+              ? mod.meta.title
+              : `<${mod.meta.title} />`;
+        return {
+          href,
+          usage,
+          isActive: pathname === href,
+          status: mod.meta.status,
+          substatus: mod.meta.substatus,
+        };
+      }),
+    })),
+  }));
 
   return (
     <Sidebar {...props}>
@@ -57,49 +98,48 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </svg>
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
+      <div className='border-b px-2 py-2'>
+        <button
+          type='button'
+          onClick={onSearchOpen}
+          aria-label='Search components'
+          className='border-input bg-background text-sidebar-foreground/50 hover:bg-accent/50 flex h-8 w-full items-center gap-2 rounded-md border px-2 text-xs shadow-none'
+        >
+          <SearchIcon className='size-3.5 shrink-0' />
+          <span>Search…</span>
+          <kbd className='bg-muted ml-auto flex shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 font-mono text-[10px]'>
+            {isMac ? (
+              <>
+                <span className='text-[11px]'>⌘</span>K
+              </>
+            ) : (
+              'Ctrl K'
+            )}
+          </kbd>
+        </button>
+      </div>
       <SidebarContent className='gap-0'>
-        {groups.map(({ group, groupSlug, components }) => (
-          <SidebarGroup
-            key={group}
-            className='py-1'
-            data-section={group}
-          >
-            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-              {group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {components.map(({ mod, componentSlug }) => {
-                  const href = `/${groupSlug}/${componentSlug}`;
-                  // How an entry is USED differs by layer, so the label follows the layer rather
-                  // than a guess at the title: hooks are called, atomic styles are a set of
-                  // exports with no single call form worth privileging, and everything else is a
-                  // component rendered as JSX.
-                  const usage =
-                    mod.meta.group === 'Hooks'
-                      ? `${mod.meta.title}()`
-                      : mod.meta.group === 'Styles'
-                        ? mod.meta.title
-                        : `<${mod.meta.title} />`;
-                  return (
-                    <SidebarMenuItem key={mod.meta.title}>
-                      <SidebarMenuButton
-                        className='h-auto items-start py-1 text-xs leading-relaxed'
-                        isActive={pathname === href}
-                        render={<Link href={href} />}
-                      >
-                        <span className='whitespace-normal! break-all font-mono text-[10px] leading-relaxed'>
-                          {usage}
-                        </span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <SidebarNavigation groups={navigationGroups} />
       </SidebarContent>
+      <SidebarFooter className='gap-0 p-0'>
+        <SidebarSeparator className='data-horizontal:w-auto my-1' />
+        <SidebarGroup className='py-1'>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname.startsWith('/live')}
+                  render={<Link href='/live' />}
+                >
+                  <FlaskConicalIcon className='size-3.5!' />
+                  Live Sandbox
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

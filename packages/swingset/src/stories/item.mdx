@@ -4,7 +4,7 @@ import * as ItemStories from './item.stories';
 
 Item is a flexible row for lists of accounts, organizations, and settings in Mosaic. It's composed from parts via dot syntax (`Item.Root`, `Item.Media`, `Item.Content`, `Item.Label`, …). `Item.Root` renders as a `<div>` by default; pass it a `render` prop to make a row an interactive link or button, which adds hover and cursor affordances.
 
-Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's height and gap, and `Item.Media` picks the matching column width up from context rather than taking a size of its own.
+Every row is bordered, so it reads as its own card. Rows have no fixed height: they size to their content with even padding.
 
 ## Example
 
@@ -20,52 +20,20 @@ Set `size` once on `Item.Root` and the row scales as a unit: it fixes the row's 
   storyModule={ItemStories}
 />
 
-### Sizes
-
-<Story
-  name='Sizes'
-  storyModule={ItemStories}
-/>
-
 ### Group
+
+`Item.Group` stacks rows 8px apart. It's layout only; the rows carry their own semantics.
 
 <Story
   name='Group'
   storyModule={ItemStories}
 />
 
-### Scrolling
-
-`Item.Group` is the canonical scroll surface in Mosaic: cap its height, spread the scroll-area atoms
-onto it, and it fades its content at whichever edge still has something to reveal.
-
-<Story
-  name='Scrolling'
-  storyModule={ItemStories}
-/>
-
-```tsx
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import * as stylex from '@stylexjs/stylex';
-
-<div
-  {...stylex.props(scrollAreaRoot)}
-  style={{ height: 260 }}
->
-  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
-</div>;
-```
-
-The atoms aren't specific to `Item` — they go on anything that scrolls, and they carry the edge
-fades, the scrollbar, the gutter, and the theming tokens with them. See
-[Scroll Area](/styles/scroll-area) for the full surface: the gutter argument, what happens when
-there is nothing to scroll, the token table, and how to replace the fade entirely.
-
 ## Usage
 
 ```tsx
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Item } from '@clerk/ui/mosaic/components/item';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Item } from '@clerk/mosaic/components/item';
 
 <Item.Group>
   <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>
@@ -86,31 +54,30 @@ import { Item } from '@clerk/ui/mosaic/components/item';
 </Item.Group>;
 ```
 
-Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='secondary'`:
+Media sizes itself from the row, so give it a child that fills its column — an `Avatar.Root` with `size='fit'`, or an `Icon`. A row whose text _is_ the row, rather than naming a subject, uses `Item.Label` with `variant='interactive'`:
 
 ```tsx
-<Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
+<Item.Root render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
   <Item.Media>
-    <Icon name='log-out' size='sm' />
+    <Icon glyph={LogOut} />
   </Item.Media>
   <Item.Content>
-    <Item.Label variant='secondary'>Sign out of all accounts</Item.Label>
+    <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>
   </Item.Content>
 </Item.Root>;
 ```
 
 ## Parts
 
-| Part               | Class                 | Description                                                                |
-| ------------------ | --------------------- | -------------------------------------------------------------------------- |
-| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.             |
-| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar. Sized by the root's `size`. |
-| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions.       |
-| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                               |
-| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.              |
-| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                       |
-| `Item.Group`       | `cl-item-group`       | Vertical wrapper around a set of rows (layout only, no role).              |
-| `Item.Separator`   | `cl-item-separator`   | Thin divider (`<hr>`) between rows.                                        |
+| Part               | Class                 | Description                                                          |
+| ------------------ | --------------------- | -------------------------------------------------------------------- |
+| `Item.Root`        | `cl-item`             | Root row. Renders a `<div>`, or a custom element via `render`.       |
+| `Item.Media`       | `cl-item-media`       | Square leading column: icon, image, or avatar.                       |
+| `Item.Content`     | `cl-item-content`     | Vertical stack that grows to fill the row between media and actions. |
+| `Item.Label`       | `cl-item-label`       | The row's label. Truncates to a single line.                         |
+| `Item.Description` | `cl-item-description` | Secondary text beneath the label. Truncates to a single line.        |
+| `Item.Actions`     | `cl-item-actions`     | Trailing controls (buttons, badges).                                 |
+| `Item.Group`       | `cl-item-group`       | Vertical stack of rows, spaced apart.                                |
 
 Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
@@ -118,31 +85,23 @@ Every part accepts a `render` prop for element polymorphism and forwards a ref.
 
 The row carries the text color and, through `--_cl-icon-color`, the strength of any `Icon` inside it: faded at rest, full-strength while hovered. Only interactive rows promote — a static row isn't pointing at anything, so its icon holds its resting color. A `Button` in `Item.Actions` sets its own icon color and is unaffected.
 
-`Item.Label` chooses whether it joins that promotion. `variant='primary'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='secondary'` sets none and inherits the row's, so it fades and brightens with the row:
+`Item.Label` chooses whether it joins that promotion. `variant='default'` sets its own color and holds it, so a subject the row names reads at full strength either way. `variant='interactive'` sets none and inherits the row's, so it fades and brightens with the row:
 
-| Prop      | Attribute      | Values                   | Default   |
-| --------- | -------------- | ------------------------ | --------- |
-| `variant` | `data-variant` | `primary` \| `secondary` | `primary` |
+| Prop      | Attribute      | Values                     | Default   |
+| --------- | -------------- | -------------------------- | --------- |
+| `variant` | `data-variant` | `default` \| `interactive` | `default` |
 
 The root reflects its state as `data-*` attributes on `.cl-item`, so consumers can scope overrides without touching StyleX's hashed atoms:
 
 | Prop     | Attribute          | Values                              | Default |
 | -------- | ------------------ | ----------------------------------- | ------- |
-| `size`   | `data-size`        | `xs` \| `md`                        | `md`    |
 | `render` | `data-interactive` | present when a `render` is provided | —       |
-
-`size` fixes the row's height and gap. `Item.Media` reflects the same value as `data-size` and takes its width from it, so the two stay in step without being set twice:
 
 ```css
 /* Re-theme interactive rows */
 .cl-item[data-interactive] {
-  background-color: var(--cl-color-card);
-}
-
-/* Widen the media column on compact rows */
-.cl-item-media[data-size='xs'] {
-  width: 1.5rem;
+  background-color: var(--cl-color-surface);
 }
 ```
 
-`Item.Media` is a square that centers its child. Because the column is sized by the row, give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an `Icon` — rather than a fixed pixel size that won't track `size`. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).
+`Item.Media` is a square that centers its child. Give it a child that fills it — an `Avatar.Root` with `size='fit'`, or an `Icon` — rather than a fixed pixel size. Colors, radii, and spacing all resolve from the Mosaic tokens (`--cl-color-*`, `--cl-radius-*`, `--cl-spacing`).

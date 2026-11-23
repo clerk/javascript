@@ -23,12 +23,14 @@ export type SignInFactorOneCodeCard = Pick<
 > & {
   factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
+  isInitialFactor: boolean;
   onFactorPrepare: () => void;
 };
 
 export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
+  cardNotice?: LocalizationKey;
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
   identityPreviewEditButtonAriaLabel: LocalizationKey;
@@ -49,6 +51,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
   const normalizedVerificationChannel =
     signIn.firstFactorVerification.channel === 'sms' ? undefined : signIn.firstFactorVerification.channel;
   const hasPendingFactorVerification =
+    (props.factorAlreadyPrepared || props.isInitialFactor) &&
     signIn.firstFactorVerification.status === 'unverified' &&
     signIn.firstFactorVerification.strategy === props.factor.strategy &&
     normalizedFactorChannel === normalizedVerificationChannel;
@@ -169,6 +172,7 @@ export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => 
     <VerificationCodeCard
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
+      cardNotice={props.cardNotice}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
       onCodeEntryFinishedAction={action}

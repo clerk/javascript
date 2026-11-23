@@ -46,6 +46,9 @@ describe('EnterpriseConnectionAPI', () => {
       idp_certificate: '-----BEGIN CERTIFICATE-----',
       idp_certificate_issued_at: 1672531200000,
       idp_certificate_expires_at: 1704067200000,
+      idp_certificates: [
+        { certificate: '-----BEGIN CERTIFICATE-----', issued_at: 1672531200000, expires_at: 1704067200000 },
+      ],
       idp_metadata_url: 'https://idp.example.com/metadata',
       acs_url: 'https://clerk.example.com/v1/saml/acs',
       sp_entity_id: 'https://clerk.example.com',
@@ -90,6 +93,7 @@ describe('EnterpriseConnectionAPI', () => {
               idp_entity_id: 'xxx',
               idp_metadata_url: 'https://oauth.devsuccess.app/metadata',
               idp_sso_url: 'https://oauth.devsuccess.app/sso',
+              idp_certificates: ['cert_a', 'cert_b'],
             });
 
             return HttpResponse.json(mockEnterpriseConnectionResponse);
@@ -105,6 +109,7 @@ describe('EnterpriseConnectionAPI', () => {
           idpEntityId: 'xxx',
           idpMetadataUrl: 'https://oauth.devsuccess.app/metadata',
           idpSsoUrl: 'https://oauth.devsuccess.app/sso',
+          idpCertificates: ['cert_a', 'cert_b'],
         },
       });
     });
@@ -370,6 +375,9 @@ describe('EnterpriseConnectionAPI', () => {
       expect(response.samlConnection?.idpEntityId).toBe('https://idp.example.com');
       expect(response.samlConnection?.idpCertificateIssuedAt).toBe(1672531200000);
       expect(response.samlConnection?.idpCertificateExpiresAt).toBe(1704067200000);
+      expect(response.samlConnection?.idpCertificates).toEqual([
+        { certificate: '-----BEGIN CERTIFICATE-----', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+      ]);
       expect(response.samlConnection?.active).toBe(true);
       expect(response.samlConnection?.forceAuthn).toBe(false);
       expect(response.samlConnection?.loginHint).toEqual({

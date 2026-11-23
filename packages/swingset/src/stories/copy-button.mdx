@@ -1,0 +1,45 @@
+import * as Stories from './copy-button.stories';
+
+# CopyButton
+
+Puts a value on the clipboard and confirms it in a toast anchored to the button, which settles after
+`resetAfter`. A toast rather than a tooltip because the confirmation is an event, not a description
+of the control: it announces itself, `F6` reaches it and `Escape` dismisses it.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[{ name: 'Button', href: '/components/button', layer: 'Components' }]}
+/>
+
+## Props
+
+<PropTable
+  meta={Stories.meta}
+  extra={[
+    { name: 'value', type: 'string' },
+    { name: 'label', type: 'string', default: 'Copy' },
+    { name: 'copiedLabel', type: 'string', default: 'Copied' },
+    { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: 'top' },
+    { name: 'resetAfter', type: 'number', default: '2000' },
+    { name: 'onCopy', type: '(value: string) => void | Promise<void>' },
+    { name: 'onCopyError', type: '(error: unknown) => void' },
+  ]}
+/>
+
+## Inline with the value
+
+<Story
+  name='Inline'
+  storyModule={Stories}
+/>
+
+## Naming what it copies
+
+The button keeps its name while the copy is fresh; the confirmation is announced by the toast's own
+live region, from a landmark the `label` names.
+
+<Story
+  name='Labelled'
+  storyModule={Stories}
+/>

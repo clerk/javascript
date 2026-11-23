@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nlBE: LocalizationResource = {
   locale: 'nl-BE',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -225,6 +230,145 @@ export const nlBE: LocalizationResource = {
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
     years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__replaceKey: undefined,
+      actionLabel__retry: undefined,
+      actionLabel__uploadKey: undefined,
+      badge__credentialsConfigured: undefined,
+      badge__credentialsMissing: undefined,
+      domainsLabel: undefined,
+      error__invalidKeyFile: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldHint__subjectEmail: undefined,
+      formFieldInputPlaceholder__subjectEmail: undefined,
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__serviceAccountKey: undefined,
+      formFieldLabel__subjectEmail: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        google: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      roles: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      actionLabel__syncNow: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      description__pull: undefined,
+      empty__noUsersProvisioned: undefined,
+      empty__waitingForFirstSync: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__lastSyncFailed: undefined,
+      error__loadUsers: undefined,
+      error__syncFailed: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      syncRow: {
+        neverSynced: undefined,
+        title: undefined,
+      },
+      syncStatus__cancelled: undefined,
+      syncStatus__failed: undefined,
+      syncStatus__running: undefined,
+      syncStatus__succeeded: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -715,6 +859,12 @@ export const nlBE: LocalizationResource = {
         title: undefined,
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Neem contact op met de beheerder van uw organisatie om uw rechten uit te breiden.',
       title: 'U hebt geen toestemming om single sign-on (SSO) te beheren',
@@ -724,9 +874,11 @@ export const nlBE: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'Niet geverifieerd',
         badge__verified: 'Geverifieerd',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -781,6 +933,17 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Selecteer de provider waarvoor je SSO gaat instellen.',
       title: 'Provider selecteren',
       warning: 'Zodra een provider is geselecteerd, kun je deze niet meer wijzigen totdat de configuratie is voltooid',
+    },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
@@ -871,6 +1034,8 @@ export const nlBE: LocalizationResource = {
   formButtonPrimary: 'Doorgaan',
   formButtonPrimary__verify: 'Verifieer',
   formFieldAction__forgotPassword: 'Wachtwoord vergeten?',
+  formFieldAction__hidePassword: 'Wachtwoord verbergen',
+  formFieldAction__showPassword: 'Wachtwoord tonen',
   formFieldError__matchingPasswords: 'Wachtwoorden matchen.',
   formFieldError__notMatchingPasswords: 'Wachtwoorden komen niet overeen.',
   formFieldError__verificationLinkExpired: 'De verificatielink is verlopen. Vraag een nieuwe link aan.',
@@ -938,6 +1103,10 @@ export const nlBE: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -951,6 +1120,47 @@ export const nlBE: LocalizationResource = {
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Creëer organisatie',
@@ -1165,9 +1375,139 @@ export const nlBE: LocalizationResource = {
       title: 'Domein verwijderen',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__configure: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
         title: undefined,
       },
       ssoSection: {
@@ -1178,9 +1518,12 @@ export const nlBE: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
+        primaryButton__configure: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1239,12 +1582,14 @@ export const nlBE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lijst van alle accounts',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
+    membershipListLabel: 'Lijst van alle organisatielidmaatschappen',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
     suggestionsAcceptedLabel: 'In behandeling',
@@ -1292,10 +1637,23 @@ export const nlBE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gebruik een andere methode',
       subtitle: 'Voer het wachtwoord in dat bij je account hoort',
       title: 'Voer je wachtwoord in',
+    },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatiecode',
@@ -1308,6 +1666,22 @@ export const nlBE: LocalizationResource = {
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Controleer je telefoon',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',
@@ -1414,6 +1788,9 @@ export const nlBE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -1437,6 +1814,10 @@ export const nlBE: LocalizationResource = {
     passkey: {
       subtitle: 'Gebruik je toegangssleutel voor authenticatie.',
       title: 'Authenticatie met toegangssleutel',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gebruik een andere methode',
@@ -1478,6 +1859,15 @@ export const nlBE: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Voor veiligheidsredenen is het vereist om je wachtwoord te resetten.',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registreren',
@@ -1729,6 +2119,7 @@ export const nlBE: LocalizationResource = {
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
+    external_account_not_found: undefined,
     form_code_incorrect: 'De ingevoerde code is incorrect.',
     form_email_address_blocked:
       'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
@@ -1797,10 +2188,18 @@ export const nlBE: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Je bent al ingelogd.',
+    signup_rate_limit_exceeded: undefined,
+    something_went_wrong: undefined,
+    sso_bypass_domain_not_served: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
+    too_many_requests: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
       'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',
@@ -1971,7 +2370,7 @@ export const nlBE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint: 'Een mail met daarin een verificatiecode is verstuurd naar dit adres.',
+        formHint: 'Een mail met daarin een verificatiecode zal worden verstuurd naar dit adres.',
         formSubtitle: 'Voer de verificatiecode in die verstuurd is naar {{identifier}}',
         formTitle: 'Verificatiecode',
         resendButton: 'Verstuur code opnieuw',
@@ -2080,7 +2479,7 @@ export const nlBE: LocalizationResource = {
       title__update: 'Wachtwoord wijzigen',
     },
     phoneNumberPage: {
-      infoText: 'Een SMS met daarin een verificatiecode is verstuurd naar dit nummer.',
+      infoText: 'Een SMS met daarin een verificatiecode zal worden verstuurd naar dit nummer.',
       removeResource: {
         messageLine1: '{{identifier}} zal van dit account verwijderd worden.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit telefoonnummer.',

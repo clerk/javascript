@@ -7,6 +7,7 @@ import { Route, Switch } from '../../router';
 import { ScenarioPicker } from './AccessOnboarding/ScenarioPicker';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
+import { useSecurityRouteAccess } from './useSecurityRouteAccess';
 
 const OrganizationBillingPage = lazy(() =>
   import(/* webpackChunkName: "op-billing-page"*/ './OrganizationBillingPage').then(module => ({
@@ -69,10 +70,13 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     isAPIKeysPageRoot,
     isSecurityPageRoot,
     shouldShowBilling,
-    shouldShowSelfServeSSO,
+    shouldShowSecurityPage,
     shouldShowAccessOnboarding,
     apiKeysProps,
   } = useOrganizationProfileContext();
+
+  const securityRouteAccess = useSecurityRouteAccess();
+  const allowSecurityRoute = securityRouteAccess.allowed || securityRouteAccess.pending;
 
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
@@ -93,116 +97,112 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
   });
 
   return (
-    <>
-      {shouldShowAccessOnboarding ? <ScenarioPicker /> : null}
-      <Switch>
-        {customPageRoutesWithContents}
-        <Route>
-          <Route path={isGeneralPageRoot ? undefined : 'organization-general'}>
-            <Switch>
-              <Route index>
-                <OrganizationGeneralPage />
-              </Route>
-            </Switch>
-          </Route>
-          <Route path={isMembersPageRoot ? undefined : 'organization-members'}>
-            <Switch>
-              <Route index>
-                <Protect
-                  condition={has =>
-                    has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
-                  }
-                  redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
-                >
-                  <OrganizationMembers />
-                </Protect>
-              </Route>
-            </Switch>
-          </Route>
-          {commerceSettings.billing.organization.enabled && shouldShowBilling ? (
-            <Protect
-              condition={has =>
-                has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
-              }
-            >
-              <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
-                <Switch>
-                  <Route index>
-                    <Suspense fallback={''}>
-                      <OrganizationBillingPage />
-                    </Suspense>
-                  </Route>
-                  {commerceSettings.billing.organization.hasPaidPlans ? (
-                    <Route path='plans'>
-                      <Suspense fallback={''}>
-                        <OrganizationPlansPage />
-                      </Suspense>
-                    </Route>
-                  ) : null}
-                  <Route path='statement/:statementId'>
-                    <Suspense fallback={''}>
-                      <OrganizationStatementPage />
-                    </Suspense>
-                  </Route>
-                  <Route path='payment-attempt/:paymentAttemptId'>
-                    <Suspense fallback={''}>
-                      <OrganizationPaymentAttemptPage />
-                    </Suspense>
-                  </Route>
-                  <Route path='credit-history'>
-                    <Suspense fallback={''}>
-                      <CreditHistoryPage />
-                    </Suspense>
-                  </Route>
-                </Switch>
-              </Route>
-            </Protect>
-          ) : null}
-          {apiKeysSettings.orgs_api_keys_enabled && !apiKeysProps?.hide && (
-            <Protect
-              condition={has =>
-                has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
-              }
-            >
-              <Route path={isAPIKeysPageRoot ? undefined : 'organization-api-keys'}>
-                <Switch>
-                  <Route index>
-                    <Suspense fallback={''}>
-                      <OrganizationAPIKeysPage />
-                    </Suspense>
-                  </Route>
-                </Switch>
-              </Route>
-            </Protect>
-          )}
-          {shouldShowSelfServeSSO ? (
-            <Protect condition={has => has({ permission: 'org:sys_entconns:manage' })}>
-              <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
-                <Switch>
-                  <Route index>
-                    <Suspense fallback={''}>
-                      <OrganizationSecurityPage contentRef={contentRef} />
-                    </Suspense>
-                  </Route>
-                </Switch>
-              </Route>
-            </Protect>
-          ) : null}
-          {shouldShowAccessOnboarding ? (
-            <Protect condition={has => has({ permission: 'org:sys_domains:manage' })}>
-              <Route path='organization-access'>
-                <Switch>
-                  <Route index>
-                    <Suspense fallback={''}>
-                      <AccessOnboardingPage contentRef={contentRef} />
-                    </Suspense>
-                  </Route>
-                </Switch>
-              </Route>
-            </Protect>
-          ) : null}
+    <Switch>
+      {customPageRoutesWithContents}
+      <Route>
+        {shouldShowAccessOnboarding ? <ScenarioPicker /> : null}
+        <Route path={isGeneralPageRoot ? undefined : 'organization-general'}>
+          <Switch>
+            <Route index>
+              <OrganizationGeneralPage />
+            </Route>
+          </Switch>
         </Route>
-      </Switch>
-    </>
+        <Route path={isMembersPageRoot ? undefined : 'organization-members'}>
+          <Switch>
+            <Route index>
+              <Protect
+                condition={has =>
+                  has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
+                }
+                redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
+              >
+                <OrganizationMembers />
+              </Protect>
+            </Route>
+          </Switch>
+        </Route>
+        {commerceSettings.billing.organization.enabled && shouldShowBilling ? (
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
+            }
+          >
+            <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationBillingPage />
+                  </Suspense>
+                </Route>
+                {commerceSettings.billing.organization.hasPaidPlans ? (
+                  <Route path='plans'>
+                    <Suspense fallback={''}>
+                      <OrganizationPlansPage />
+                    </Suspense>
+                  </Route>
+                ) : null}
+                <Route path='statement/:statementId'>
+                  <Suspense fallback={''}>
+                    <OrganizationStatementPage />
+                  </Suspense>
+                </Route>
+                <Route path='payment-attempt/:paymentAttemptId'>
+                  <Suspense fallback={''}>
+                    <OrganizationPaymentAttemptPage />
+                  </Suspense>
+                </Route>
+                <Route path='credit-history'>
+                  <Suspense fallback={''}>
+                    <CreditHistoryPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
+        ) : null}
+        {apiKeysSettings.orgs_api_keys_enabled && !apiKeysProps?.hide && (
+          <Protect
+            condition={has =>
+              has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })
+            }
+          >
+            <Route path={isAPIKeysPageRoot ? undefined : 'organization-api-keys'}>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <OrganizationAPIKeysPage />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
+        )}
+        {shouldShowSecurityPage && allowSecurityRoute ? (
+          <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
+            <Switch>
+              <Route index>
+                <Suspense fallback={''}>
+                  <OrganizationSecurityPage contentRef={contentRef} />
+                </Suspense>
+              </Route>
+            </Switch>
+          </Route>
+        ) : null}
+        {shouldShowAccessOnboarding ? (
+          <Protect condition={has => has({ permission: 'org:sys_domains:manage' })}>
+            <Route path='organization-access'>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <AccessOnboardingPage contentRef={contentRef} />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
+        ) : null}
+      </Route>
+    </Switch>
   );
 };

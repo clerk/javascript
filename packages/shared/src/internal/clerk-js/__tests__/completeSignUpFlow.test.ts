@@ -175,7 +175,7 @@ describe('completeSignUpFlow', () => {
     expect(mockNavigate).toHaveBeenCalledWith('verify-email', { searchParams: new URLSearchParams() });
   });
 
-  it('prioritizes enterprise_sso over protect_check', async () => {
+  it('prioritizes protect_check over enterprise_sso', async () => {
     const mockSignUp = {
       status: 'missing_requirements',
       missingFields: ['enterprise_sso', 'protect_check'] as SignUpField[],
@@ -185,6 +185,45 @@ describe('completeSignUpFlow', () => {
     await completeSignUpFlow({
       signUp: mockSignUp,
       protectCheckPath: 'protect-check',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+      redirectUrl: 'https://example.com/acs',
+      redirectUrlComplete: 'https://example.com/done',
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('protect-check', { searchParams: new URLSearchParams() });
+    expect(mockAuthenticateWithRedirect).not.toHaveBeenCalled();
+  });
+
+  it('hands off to the connection once no challenge is left', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'] as SignUpField[],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
+      protectCheckPath: 'protect-check',
+      handleComplete: mockHandleComplete,
+      navigate: mockNavigate,
+      redirectUrl: 'https://example.com/acs',
+      redirectUrlComplete: 'https://example.com/done',
+    });
+
+    expect(mockAuthenticateWithRedirect).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('still hands off to the connection when the caller has no challenge route', async () => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso', 'protect_check'] as SignUpField[],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    await completeSignUpFlow({
+      signUp: mockSignUp,
       handleComplete: mockHandleComplete,
       navigate: mockNavigate,
       redirectUrl: 'https://example.com/acs',
@@ -237,6 +276,33 @@ describe('completeSignUpFlow', () => {
       redirectUrlComplete,
       continueSignUp: true,
     });
+  });
+
+  it.each([
+    ['redirectUrl is missing', { redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is missing', { redirectUrl: 'https://example.com/acs' }],
+    ['both are missing', {}],
+    ['redirectUrl is empty', { redirectUrl: '', redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is empty', { redirectUrl: 'https://example.com/acs', redirectUrlComplete: '' }],
+  ])('throws rather than starting an Enterprise SSO flow when %s', (_label, urls) => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    expect(() =>
+      completeSignUpFlow({
+        signUp: mockSignUp,
+        handleComplete: mockHandleComplete,
+        navigate: mockNavigate,
+        ...urls,
+      }),
+    ).toThrow(/redirectUrl/);
+
+    expect(mockAuthenticateWithRedirect).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockHandleComplete).not.toHaveBeenCalled();
   });
 
   it('forwards clerk ticket and status query params when navigating to verify email', async () => {

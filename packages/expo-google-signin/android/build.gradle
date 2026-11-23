@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+// AGP 9+ registers the `kotlin` extension itself, and applying kotlin-android on top of that fails configuration.
+if (project.extensions.findByName('kotlin') == null) {
+  apply plugin: 'kotlin-android'
+}
+
 apply plugin: 'maven-publish'
 
 group = 'expo.modules.clerk.googlesignin'

@@ -77,7 +77,7 @@ const undefinedPaginatedResource = {
 export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (e.g., when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Indicates whether Clerk has loaded the current authentication state and there is an authenticated user. Initially `false`, becomes `true` once Clerk loads with a user, and can revert to `false` while auth state is updating (e.g., when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#setactive)).
        */
       isLoaded: false;
       /**
@@ -253,7 +253,10 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
-  useAttemptToEnableOrganizations('useOrganizationList');
+  // No list keys means this call is not using Organizations; the prompt is for the lists.
+  useAttemptToEnableOrganizations('useOrganizationList', {
+    enabled: userMemberships !== undefined || userInvitations !== undefined || userSuggestions !== undefined,
+  });
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,

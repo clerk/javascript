@@ -2,6 +2,12 @@ import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from './types';
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
+    provider: 'chatgpt',
+    strategy: 'oauth_chatgpt',
+    name: 'ChatGPT',
+    docsUrl: 'https://developers.openai.com/siwc/website',
+  },
+  {
     provider: 'google',
     strategy: 'oauth_google',
     name: 'Google',
@@ -173,6 +179,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_vercel',
     name: 'Vercel',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/vercel',
+  },
+  {
+    provider: 'agentid',
+    strategy: 'oauth_agentid',
+    name: 'AgentID',
+    docsUrl: 'https://clerk.com/docs/guides/configure/auth-strategies/social-connections/agentid',
   },
 ];
 

@@ -14,7 +14,7 @@ export default defineConfig(overrideOptions => {
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}'],
     bundle: true,
     clean: true,
-    dts: true,
+    dts: { sourcemap: true },
     minify: false,
     sourcemap: true,
     onSuccess: shouldPublish ? 'pkglab pub --ping' : undefined,

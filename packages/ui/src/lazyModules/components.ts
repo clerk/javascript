@@ -16,6 +16,7 @@ const componentImportPaths = {
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
   GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
+  ProtectCheckModal: () => import(/* webpackChunkName: "protectcheck" */ './../components/ProtectCheckModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/devPrompts/KeylessPrompt'),
@@ -31,7 +32,15 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   ConfigureSSO: () => import(/* webpackChunkName: "configureSSO" */ '../components/ConfigureSSO/ConfigureSSO'),
+  ConfigureDirectorySync: () =>
+    import(
+      /* webpackChunkName: "configureDirectorySync" */ '../components/ConfigureDirectorySync/ConfigureDirectorySync'
+    ),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  OAuthDeviceVerification: () =>
+    import(
+      /* webpackChunkName: "oauthDeviceVerification" */ '../components/OAuthDeviceVerification/OAuthDeviceVerification'
+    ),
   EnableOrganizationsPrompt: () =>
     import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
@@ -113,6 +122,10 @@ export const BlankCaptchaModal = lazy(() =>
   componentImportPaths.BlankCaptchaModal().then(module => ({ default: module.BlankCaptchaModal })),
 );
 
+export const ProtectCheckModal = lazy(() =>
+  componentImportPaths.ProtectCheckModal().then(module => ({ default: module.ProtectCheckModal })),
+);
+
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
@@ -128,6 +141,10 @@ export const APIKeys = lazy(() => componentImportPaths.APIKeys().then(module => 
 
 export const ConfigureSSO = lazy(() =>
   componentImportPaths.ConfigureSSO().then(module => ({ default: module.ConfigureSSO })),
+);
+
+export const ConfigureDirectorySync = lazy(() =>
+  componentImportPaths.ConfigureDirectorySync().then(module => ({ default: module.ConfigureDirectorySync })),
 );
 
 export const Checkout = lazy(() => componentImportPaths.Checkout().then(module => ({ default: module.Checkout })));
@@ -154,6 +171,10 @@ export const SubscriptionDetails = lazy(() =>
 
 export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
+);
+
+export const OAuthDeviceVerification = lazy(() =>
+  componentImportPaths.OAuthDeviceVerification().then(module => ({ default: module.OAuthDeviceVerification })),
 );
 
 export const SessionTasks = lazy(() =>
@@ -187,12 +208,15 @@ export const ClerkComponents = {
   Waitlist,
   WaitlistModal,
   BlankCaptchaModal,
+  ProtectCheckModal,
   PricingTable,
   Checkout,
   PlanDetails,
   APIKeys,
   ConfigureSSO,
+  ConfigureDirectorySync,
   OAuthConsent,
+  OAuthDeviceVerification,
   SubscriptionDetails,
   TaskChooseOrganization,
   TaskResetPassword,

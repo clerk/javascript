@@ -1,7 +1,7 @@
 import { clerkCoreErrorContextProviderNotFound } from '@clerk/shared/internal/clerk-js/errors';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
-import { createDynamicParamParser } from '../utils/dynamicParamParser';
+export { populateParamFromObject } from '@clerk/shared/url';
 
 export function assertContextExists(contextVal: unknown, providerName: string): asserts contextVal {
   if (!contextVal) {
@@ -20,5 +20,3 @@ export function getInitialValuesFromQueryParams(queryString: string, params: str
 
   return props;
 }
-
-export const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });

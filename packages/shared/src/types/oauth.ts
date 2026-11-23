@@ -68,6 +68,10 @@ export type HuggingfaceOAuthProvider = 'huggingface';
 /** @inline */
 export type VercelOauthProvider = 'vercel';
 /** @inline */
+export type AgentIDOauthProvider = 'agentid';
+/** @inline */
+export type ChatGPTOauthProvider = 'chatgpt';
+/** @inline */
 export type CustomOauthProvider = `custom_${string}`;
 
 /** Represents the available OAuth providers. */
@@ -101,4 +105,6 @@ export type OAuthProvider =
   | EnstallOauthProvider
   | HuggingfaceOAuthProvider
   | VercelOauthProvider
+  | AgentIDOauthProvider
+  | ChatGPTOauthProvider
   | CustomOauthProvider;

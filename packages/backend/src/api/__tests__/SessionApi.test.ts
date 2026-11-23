@@ -16,6 +16,31 @@ describe('SessionAPI', () => {
     jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.token',
   };
 
+  describe('updateSession', () => {
+    it('calls PATCH /sessions/{id} with expire_at as an RFC 3339 timestamp', async () => {
+      const expireAt = new Date('2030-10-20T10:00:27.645Z');
+      server.use(
+        http.patch(
+          `https://api.clerk.test/v1/sessions/${sessionId}`,
+          validateHeaders(async ({ request }) => {
+            expect(await request.json()).toEqual({ expire_at: '2030-10-20T10:00:27.645Z' });
+            return HttpResponse.json({ object: 'session', id: sessionId, expire_at: expireAt.getTime() });
+          }),
+        ),
+      );
+
+      const response = await apiClient.sessions.updateSession(sessionId, { expireAt });
+      expect(response.id).toBe(sessionId);
+      expect(response.expireAt).toBe(expireAt.getTime());
+    });
+
+    it('requires a session ID', async () => {
+      await expect(apiClient.sessions.updateSession('', { expireAt: new Date() })).rejects.toThrow(
+        'A valid resource ID is required.',
+      );
+    });
+  });
+
   describe('getToken', () => {
     it('creates a session token without template', async () => {
       server.use(

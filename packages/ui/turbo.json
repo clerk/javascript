@@ -6,27 +6,6 @@
       "dependsOn": ["build"],
       "persistent": true
     },
-    "build": {
-      "inputs": [
-        "*.d.ts",
-        "src/**",
-        "tsconfig.json",
-        "tsconfig.mosaic.json",
-        "rspack.config.js",
-        "tsdown.mosaic.config.mts",
-
-        "!**/*.test.*",
-        "!**/test/**",
-        "!**/tests/**",
-        "!**/__tests__/**",
-        "!**/__mocks__/**",
-        "!**/__snapshots__/**",
-        "!coverage/**",
-        "!examples/**",
-        "!node_modules/**"
-      ],
-      "outputs": ["*/package.json", "dist/**", "dist-mosaic/**", "scripts/**"]
-    },
     "test": {
       "inputs": [
         "*.d.ts",
@@ -35,7 +14,7 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "rspack.config.js",
-
+        "vitest.*.mts",
         "!**/__snapshots__/**",
         "!coverage/**",
         "!examples/**",

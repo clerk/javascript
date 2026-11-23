@@ -5,8 +5,8 @@ import { Geist } from 'next/font/google';
 import Script from 'next/script';
 import type React from 'react';
 
-import { ClientRoot } from '@/components/ClientRoot';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { THEME_STYLE_INIT_SCRIPT } from '@/components/useThemeStyle';
 import { cn } from '@/lib/utils';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
@@ -23,18 +23,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={cn('font-sans', geist.variable)}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_STYLE_INIT_SCRIPT }} />
         {process.env.NODE_ENV === 'development' && (
-          <Script
-            src='//unpkg.com/react-grab/dist/index.global.js'
-            crossOrigin='anonymous'
-            strategy='beforeInteractive'
-          />
+          <>
+            <Script
+              src='//unpkg.com/react-scan/dist/auto.global.js'
+              crossOrigin='anonymous'
+              strategy='beforeInteractive'
+            />
+            <Script
+              src='//unpkg.com/react-grab/dist/index.global.js'
+              crossOrigin='anonymous'
+              strategy='beforeInteractive'
+            />
+          </>
         )}
       </head>
       <body className='antialiased'>
-        <ThemeProvider>
-          <ClientRoot>{children}</ClientRoot>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -34,7 +34,9 @@ const AVAILABLE_COMPONENTS = [
   'pricingTable',
   'apiKeys',
   'configureSSO',
+  'configureDirectorySync',
   'oauthConsent',
+  'oauthDeviceVerification',
   'taskChooseOrganization',
   'taskResetPassword',
   'taskSetupMFA',
@@ -156,7 +158,9 @@ const componentControls: Record<AvailableComponent, ComponentPropsControl> = {
   pricingTable: buildComponentControls('pricingTable'),
   apiKeys: buildComponentControls('apiKeys'),
   configureSSO: buildComponentControls('configureSSO'),
+  configureDirectorySync: buildComponentControls('configureDirectorySync'),
   oauthConsent: buildComponentControls('oauthConsent'),
+  oauthDeviceVerification: buildComponentControls('oauthDeviceVerification'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
   taskResetPassword: buildComponentControls('taskResetPassword'),
   taskSetupMFA: buildComponentControls('taskSetupMFA'),
@@ -428,6 +432,14 @@ void (async () => {
     '/pricing-table': { mount: 'mountPricingTable', component: 'pricingTable' },
     '/api-keys': { mount: 'mountAPIKeys', component: 'apiKeys' },
     '/configure-sso': { mount: '__internal_mountConfigureSSO', component: 'configureSSO' },
+    '/oauth-device-verification': {
+      mount: '__internal_mountOAuthDeviceVerification',
+      component: 'oauthDeviceVerification',
+    },
+    '/configure-directory-sync': {
+      mount: '__internal_mountConfigureDirectorySync',
+      component: 'configureDirectorySync',
+    },
     '/task-choose-organization': {
       mount: 'mountTaskChooseOrganization',
       component: 'taskChooseOrganization',
@@ -457,11 +469,19 @@ void (async () => {
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
-      const scopes = (searchParams.get('scope')?.split(',') ?? []).map(scope => ({
-        scope,
-        description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
-        requires_consent: true,
-      }));
+      const scopes = [
+        ...(searchParams.get('scope')?.split(',') ?? []).map(scope => ({
+          scope,
+          description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
+          requires_consent: true,
+        })),
+        {
+          scope: 'sandbox:long_description',
+          description:
+            'Grants access to read and update your profile, connected accounts, and organization memberships across every workspace you belong to',
+          requires_consent: true,
+        },
+      ];
       Clerk.mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {

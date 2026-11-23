@@ -123,14 +123,6 @@ describe('experimental useSSO', () => {
     expect(experimentalUseSSO).toBe(useSSO);
   });
 
-  test('returns the startSSOFlow function', () => {
-    const { result } = renderHook(() => useSSO());
-
-    expect(typeof result.current.startSSOFlow).toBe('function');
-    expect(mocks.useSignIn).toHaveBeenCalled();
-    expect(mocks.useSignUp).toHaveBeenCalled();
-  });
-
   test('returns early without starting the flow when Clerk is not loaded', async () => {
     mocks.useClerk.mockReturnValue({
       loaded: false,
@@ -200,6 +192,25 @@ describe('experimental useSSO', () => {
     expect(mockSignIn.finalize).not.toHaveBeenCalled();
     expect(response.createdSessionId).toBe('sess_reloaded');
     expect(response.signIn).toBe(reloadedSignIn);
+  });
+
+  test.each([
+    { strategy: 'oauth_google', oidcPrompt: 'select_account', oidcLoginHint: 'user@example.com' },
+    {
+      strategy: 'enterprise_sso',
+      identifier: 'user@example.com',
+      oidcPrompt: 'consent',
+      oidcLoginHint: 'user@example.com',
+    },
+  ] as const)('forwards SSO options to sign-in creation: %j', async params => {
+    const { result } = renderHook(() => useSSO());
+
+    await result.current.startSSOFlow(params);
+
+    expect(mockSignIn.create).toHaveBeenCalledWith({
+      ...params,
+      redirectUrl: 'myapp://sso-callback',
+    });
   });
 
   test('ignores a session retained by an unrelated sign-up resource', async () => {

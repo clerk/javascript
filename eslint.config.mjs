@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -7,7 +10,6 @@ import pluginJsxA11y from 'eslint-plugin-jsx-a11y';
 import pluginPlaywright from 'eslint-plugin-playwright';
 import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
-import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
@@ -17,10 +19,43 @@ import tseslint from 'typescript-eslint';
 
 import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
 
+const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
-  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+  // turbo lint runs `eslint src` from each package cwd; these must be repo-absolute
+  IMPORT_RESOLVER_TSCONFIGS = [`${REPO_ROOT}/integration/tsconfig.json`],
+  IMPORT_RESOLVER_TSCONFIG_NAMES = ['tsconfig.json', 'tsconfig.src.json', 'tsconfig.test.json', 'tsconfig.mosaic.json'];
+
+// Each package must see only its own tsconfigs. Several packages define `@/*`, and a
+// shared project list lets the resolver apply clerk-js's alias to UI or shared files.
+const PACKAGE_IMPORT_RESOLVER_CONFIGS = fs
+  .readdirSync(path.join(REPO_ROOT, 'packages'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(REPO_ROOT, 'packages', entry.name, 'package.json')))
+  .flatMap(entry => {
+    const project = IMPORT_RESOLVER_TSCONFIG_NAMES.map(name =>
+      path.join(REPO_ROOT, 'packages', entry.name, name),
+    ).filter(file => fs.existsSync(file));
+    if (project.length === 0) {
+      return [];
+    }
+    return [
+      {
+        name: `packages/${entry.name}/import-resolver`,
+        files: [`packages/${entry.name}/**/*.{ts,tsx,js,jsx,mts,cts}`],
+        settings: {
+          'import/resolver': {
+            node: true,
+            typescript: {
+              alwaysTryTypes: true,
+              project,
+            },
+          },
+        },
+      },
+    ];
+  });
 
 const noNavigateUseClerk = {
   meta: {
@@ -173,6 +208,30 @@ const noUnstableMethods = {
   },
 };
 
+const noRawInert = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow the raw `inert` JSX attribute',
+      recommended: false,
+    },
+    messages: {
+      useInertProps:
+        "Use `{...inertProps(active)}` from '@clerk/shared/inert' instead of a raw `inert` attribute. React 18 and 19 need different `inert` values.",
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      JSXAttribute(node) {
+        if (node.name.type === 'JSXIdentifier' && node.name.name === 'inert') {
+          context.report({ node, messageId: 'useInertProps' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -264,6 +323,7 @@ export default tseslint.config([
       '**/build/*',
       '**/coverage/*',
       '**/dist/*',
+      '**/integration/expo-native/**/*',
       '**/integration/templates/**/*',
       '**/node_modules/**',
       '*.snap',
@@ -274,6 +334,8 @@ export default tseslint.config([
       'eslint.config.mjs',
       'typedoc.config.mjs',
       'vitest.workspace.mjs',
+      'packages/mosaic/**',
+      'packages/swingset/**',
       // package specific ignores
       'packages/astro/src/astro-components/**/*.ts',
       'packages/backend/src/runtime/**/*',
@@ -327,6 +389,7 @@ export default tseslint.config([
           'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'no-raw-inert': noRawInert,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -339,12 +402,13 @@ export default tseslint.config([
         node: true,
         typescript: {
           alwaysTryTypes: true,
-          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+          project: IMPORT_RESOLVER_TSCONFIGS,
         },
       },
     },
     rules: {
       'custom-rules/no-unstable-methods': 'error',
+      'custom-rules/no-raw-inert': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -518,6 +582,14 @@ export default tseslint.config([
     },
   },
   {
+    name: 'repo/react-hooks/test',
+    files: TEST_FILES,
+    rules: {
+      'react-hooks/globals': 'off',
+    },
+  },
+  ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
+  {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
     rules: {
@@ -534,56 +606,6 @@ export default tseslint.config([
       'custom-rules/no-physical-css-properties': 'error',
       'custom-rules/no-navigate-useClerk': 'error',
       'custom-rules/no-unstable-methods': 'error',
-    },
-  },
-  {
-    name: 'packages/ui/mosaic',
-    files: ['packages/ui/src/mosaic/**/*'],
-    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
-    plugins: {
-      '@stylexjs': pluginStylex,
-    },
-    rules: {
-      '@stylexjs/enforce-extension': 'error',
-      '@stylexjs/no-legacy-contextual-styles': 'error',
-      '@stylexjs/no-lookahead-selectors': 'error',
-      '@stylexjs/no-nonstandard-styles': 'error',
-      '@stylexjs/no-conflicting-props': 'error',
-      '@stylexjs/no-unused': 'error',
-      '@stylexjs/sort-keys': 'error',
-      '@stylexjs/valid-shorthands': 'error',
-      '@stylexjs/valid-styles': 'error',
-      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
-      // the outer component. Both rules only see the empty inner element and always report.
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: "Property > Literal.key[value='&:hover']",
-          message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
-        },
-        {
-          selector: "Property > Literal.key[value='@media (hover: hover)']",
-          message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
-        },
-        {
-          selector: "Property > Literal.key[value='@media (prefers-reduced-motion: no-preference)']",
-          message:
-            "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
-        },
-      ],
-    },
-  },
-  {
-    // StyleX `create()` files author conditions raw (`@media (hover: hover)`, `:hover`) — StyleX
-    // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
-    // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
-    // `@stylexjs/*` rules from the mosaic block still cover these files.
-    name: 'packages/ui/mosaic - stylex styles',
-    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
-    rules: {
-      'no-restricted-syntax': 'off',
     },
   },
   {

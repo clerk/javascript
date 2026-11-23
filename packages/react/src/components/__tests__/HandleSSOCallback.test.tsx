@@ -18,6 +18,7 @@ const mockSignUpFinalize = vi.fn().mockImplementation(async ({ navigate }) => {
   return { error: null };
 });
 const mockSignUpCreate = vi.fn().mockResolvedValue({ error: null });
+const mockResolvePendingProtectCheck = vi.fn().mockResolvedValue(undefined);
 const mockSetActive = vi.fn().mockImplementation(async ({ navigate }) => {
   await navigate({ session: { id: 'sess_existing' }, decorateUrl: (url: string) => url });
 });
@@ -30,22 +31,26 @@ vi.mock('../../../src/hooks', () => ({
   useClerk: () => ({
     loaded: mockClerkLoaded,
     setActive: mockSetActive,
+    __internal_resolvePendingProtectCheck: mockResolvePendingProtectCheck,
   }),
   useSignIn: () => ({
     signIn: {
       finalize: mockSignInFinalize,
       create: mockSignInCreate,
       get status() {
-        return mockSignIn.status;
+        return mockSignIn.status ?? 'needs_identifier';
       },
       get isTransferable() {
         return mockSignIn.isTransferable;
       },
       get supportedFirstFactors() {
-        return mockSignIn.supportedFirstFactors;
+        return mockSignIn.supportedFirstFactors ?? [];
       },
       get existingSession() {
         return mockSignIn.existingSession;
+      },
+      get protectCheck() {
+        return mockSignIn.protectCheck;
       },
     },
   }),
@@ -53,14 +58,23 @@ vi.mock('../../../src/hooks', () => ({
     signUp: {
       finalize: mockSignUpFinalize,
       create: mockSignUpCreate,
+      get id() {
+        return mockSignUp.id;
+      },
       get status() {
-        return mockSignUp.status;
+        return mockSignUp.status ?? 'missing_requirements';
       },
       get isTransferable() {
         return mockSignUp.isTransferable;
       },
       get existingSession() {
         return mockSignUp.existingSession;
+      },
+      get verifications() {
+        return { externalAccount: { status: mockSignUp.externalAccountStatus ?? null } };
+      },
+      get protectCheck() {
+        return mockSignUp.protectCheck;
       },
     },
   }),
@@ -82,6 +96,7 @@ describe('<HandleSSOCallback />', () => {
     mockClerkLoaded = true;
     mockSignIn = {};
     mockSignUp = {};
+    mockResolvePendingProtectCheck.mockResolvedValue(undefined);
   });
 
   it('renders captcha element by default', () => {
@@ -114,6 +129,131 @@ describe('<HandleSSOCallback />', () => {
       expect(mockNavigateToSignIn).not.toHaveBeenCalled();
       expect(mockNavigateToSignUp).not.toHaveBeenCalled();
     });
+  });
+
+  it('resolves a Protect gate carried by the client before routing', async () => {
+    mockSignIn = { status: 'needs_protect_check' };
+    mockResolvePendingProtectCheck.mockImplementation(async () => {
+      mockSignIn = { status: 'complete' };
+    });
+
+    render(
+      <HandleSSOCallback
+        navigateToApp={mockNavigateToApp}
+        navigateToSignIn={mockNavigateToSignIn}
+        navigateToSignUp={mockNavigateToSignUp}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockSignInFinalize).toHaveBeenCalled();
+    });
+    expect(mockResolvePendingProtectCheck).toHaveBeenCalledTimes(1);
+    expect(mockResolvePendingProtectCheck.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSignInFinalize.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('scopes the Protect gate to the intent carried by the callback URL', async () => {
+    const href = window.location.href;
+    window.history.replaceState(null, '', '/sso-callback?intent=signUp');
+    mockSignUp = { status: 'missing_requirements' };
+
+    try {
+      render(
+        <HandleSSOCallback
+          navigateToApp={mockNavigateToApp}
+          navigateToSignIn={mockNavigateToSignIn}
+          navigateToSignUp={mockNavigateToSignUp}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(mockResolvePendingProtectCheck).toHaveBeenCalledWith('signUp');
+      });
+    } finally {
+      window.history.replaceState(null, '', href);
+    }
+  });
+
+  it('navigates to sign-in when Protect blocks the attempt', async () => {
+    mockSignIn = { status: 'needs_protect_check' };
+    mockResolvePendingProtectCheck.mockRejectedValue(new Error('blocked'));
+
+    render(
+      <HandleSSOCallback
+        navigateToApp={mockNavigateToApp}
+        navigateToSignIn={mockNavigateToSignIn}
+        navigateToSignUp={mockNavigateToSignUp}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockNavigateToSignIn).toHaveBeenCalled();
+    });
+    expect(mockNavigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('navigates to sign-up when Protect blocks a sign-up', async () => {
+    mockSignUp = { status: 'missing_requirements', protectCheck: { token: 'tok' } };
+    mockResolvePendingProtectCheck.mockRejectedValue(new Error('blocked'));
+
+    render(
+      <HandleSSOCallback
+        navigateToApp={mockNavigateToApp}
+        navigateToSignIn={mockNavigateToSignIn}
+        navigateToSignUp={mockNavigateToSignUp}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockNavigateToSignUp).toHaveBeenCalled();
+    });
+    expect(mockNavigateToSignIn).not.toHaveBeenCalled();
+  });
+
+  it('navigates to sign-in when Protect blocks a sign-in and a sign-up gate is also pending', async () => {
+    mockSignIn = { status: 'needs_protect_check', protectCheck: { token: 'tok' } };
+    mockSignUp = { status: 'missing_requirements', protectCheck: { token: 'tok' } };
+    mockResolvePendingProtectCheck.mockRejectedValue(new Error('blocked'));
+
+    render(
+      <HandleSSOCallback
+        navigateToApp={mockNavigateToApp}
+        navigateToSignIn={mockNavigateToSignIn}
+        navigateToSignUp={mockNavigateToSignUp}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(mockNavigateToSignIn).toHaveBeenCalled();
+    });
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+  });
+
+  it('navigates to sign-up when Protect blocks a callback scoped to sign-up', async () => {
+    const href = window.location.href;
+    window.history.replaceState(null, '', '/sso-callback?intent=signUp');
+    mockSignIn = { status: 'needs_protect_check', protectCheck: { token: 'tok' } };
+    mockSignUp = { status: 'missing_requirements', protectCheck: { token: 'tok' } };
+    mockResolvePendingProtectCheck.mockRejectedValue(new Error('blocked'));
+
+    try {
+      render(
+        <HandleSSOCallback
+          navigateToApp={mockNavigateToApp}
+          navigateToSignIn={mockNavigateToSignIn}
+          navigateToSignUp={mockNavigateToSignUp}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(mockNavigateToSignUp).toHaveBeenCalled();
+      });
+      expect(mockNavigateToSignIn).not.toHaveBeenCalled();
+    } finally {
+      window.history.replaceState(null, '', href);
+    }
   });
 
   it('finalizes sign-in and navigates to app when signIn.status is complete', async () => {
@@ -345,6 +485,153 @@ describe('<HandleSSOCallback />', () => {
         navigate: expect.any(Function),
       });
       expect(mockNavigateToApp).toHaveBeenCalled();
+    });
+  });
+
+  const renderCallback = () =>
+    render(
+      <HandleSSOCallback
+        navigateToApp={mockNavigateToApp}
+        navigateToSignIn={mockNavigateToSignIn}
+        navigateToSignUp={mockNavigateToSignUp}
+      />,
+    );
+
+  const withCallbackUrl = async (url: string, run: () => Promise<void>) => {
+    const href = window.location.href;
+    window.history.replaceState(null, '', url);
+    try {
+      await run();
+    } finally {
+      window.history.replaceState(null, '', href);
+    }
+  };
+
+  const settle = async () => {
+    await waitFor(() => {
+      expect(mockResolvePendingProtectCheck).toHaveBeenCalled();
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+  };
+
+  it('navigates to sign-up when a verified SSO sign-up returns with missing requirements', async () => {
+    mockSignUp = { id: 'sua_123', status: 'missing_requirements', externalAccountStatus: 'verified' };
+
+    renderCallback();
+
+    await waitFor(() => {
+      expect(mockNavigateToSignUp).toHaveBeenCalledTimes(1);
+    });
+    expect(mockNavigateToSignIn).not.toHaveBeenCalled();
+    expect(mockNavigateToApp).not.toHaveBeenCalled();
+    expect(mockSignUpCreate).not.toHaveBeenCalled();
+    expect(mockSignInCreate).not.toHaveBeenCalled();
+  });
+
+  it('navigates to sign-up when the SSO sign-up failed at the provider', async () => {
+    mockSignUp = { id: 'sua_123', status: 'missing_requirements', externalAccountStatus: 'failed' };
+
+    renderCallback();
+
+    await waitFor(() => {
+      expect(mockNavigateToSignUp).toHaveBeenCalledTimes(1);
+    });
+    expect(mockNavigateToSignIn).not.toHaveBeenCalled();
+    expect(mockNavigateToApp).not.toHaveBeenCalled();
+  });
+
+  it('waits for the Protect gate before navigating to sign-up', async () => {
+    let resolveGate: () => void = () => {};
+    mockSignUp = {
+      id: 'sua_123',
+      status: 'missing_requirements',
+      externalAccountStatus: 'verified',
+      protectCheck: { token: 'tok' },
+    };
+    mockResolvePendingProtectCheck.mockImplementation(
+      () =>
+        new Promise<void>(resolve => {
+          resolveGate = () => {
+            mockSignUp = { id: 'sua_123', status: 'missing_requirements', externalAccountStatus: 'verified' };
+            resolve();
+          };
+        }),
+    );
+
+    renderCallback();
+
+    await waitFor(() => {
+      expect(mockResolvePendingProtectCheck).toHaveBeenCalled();
+    });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+
+    resolveGate();
+
+    await waitFor(() => {
+      expect(mockNavigateToSignUp).toHaveBeenCalledTimes(1);
+    });
+    expect(mockNavigateToSignIn).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate to sign-up when no sign-up has been started', async () => {
+    mockSignIn = { status: 'needs_first_factor', supportedFirstFactors: [{ strategy: 'enterprise_sso' }] };
+    mockSignUp = { externalAccountStatus: 'verified' };
+
+    renderCallback();
+    await settle();
+
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate to sign-up when a leftover sign-up never used SSO', async () => {
+    mockSignIn = { id: 'sia_123', status: 'needs_client_trust' };
+    mockSignUp = { id: 'sua_stale', status: 'missing_requirements' };
+
+    renderCallback();
+    await settle();
+
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate to sign-up when the sign-up was abandoned', async () => {
+    mockSignUp = { id: 'sua_123', status: 'abandoned', externalAccountStatus: 'verified' };
+
+    renderCallback();
+    await settle();
+
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+  });
+
+  it('activates an existing session before falling back to sign-up', async () => {
+    mockSignUp = {
+      id: 'sua_123',
+      status: 'missing_requirements',
+      externalAccountStatus: 'verified',
+      existingSession: { sessionId: 'sess_existing_3' },
+    };
+
+    renderCallback();
+
+    await waitFor(() => {
+      expect(mockSetActive).toHaveBeenCalledWith({ session: 'sess_existing_3', navigate: expect.any(Function) });
+      expect(mockNavigateToApp).toHaveBeenCalled();
+    });
+    expect(mockNavigateToSignUp).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate to sign-up from a callback scoped to sign-in', async () => {
+    await withCallbackUrl('/sso-callback?intent=signIn', async () => {
+      mockSignIn = { status: 'needs_first_factor', supportedFirstFactors: [{ strategy: 'enterprise_sso' }] };
+      mockSignUp = { id: 'sua_stale', status: 'missing_requirements', externalAccountStatus: 'verified' };
+
+      renderCallback();
+
+      await waitFor(() => {
+        expect(mockResolvePendingProtectCheck).toHaveBeenCalledWith('signIn');
+      });
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(mockNavigateToSignUp).not.toHaveBeenCalled();
     });
   });
 

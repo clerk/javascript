@@ -9,5 +9,12 @@
     "skipLibCheck": true,
     "sourceMap": false
   },
-  "exclude": ["node_modules", "dist", "/src/runtime/*", "src/**/__tests__/*.test.ts", "src/tests"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "/src/runtime/*",
+    "src/**/__tests__/*.test.ts",
+    "src/**/__tests__/*.test-d.ts",
+    "src/tests"
+  ]
 }

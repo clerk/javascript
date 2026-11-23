@@ -26,10 +26,16 @@ export type BuildClerkOptions = {
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_passkeys?: {
+    /**
+     * Requests a native passkey assertion. This adapter is shared by first-factor sign-in,
+     * second-factor sign-in, and session reverification flows.
+     */
     get: ({
       publicKeyOptions,
+      preferImmediatelyAvailableCredentials,
     }: {
       publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+      preferImmediatelyAvailableCredentials?: boolean;
     }) => Promise<CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>>;
     create: (
       publicKeyCredential: PublicKeyCredentialCreationOptionsWithoutExtensions,

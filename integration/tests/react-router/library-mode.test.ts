@@ -19,7 +19,7 @@ test.describe('Library Mode basic tests for @react-router', () => {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
@@ -33,13 +33,13 @@ test.describe('Library Mode basic tests for @react-router', () => {
   });
 
   test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.signOut();
     await u.page.context().clearCookies();
   });
 
   test('should log in successfully', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToAppHome();
     await u.po.expect.toBeSignedOut();

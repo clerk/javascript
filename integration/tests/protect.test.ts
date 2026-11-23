@@ -15,7 +15,7 @@ testAgainstRunningApps({
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
@@ -36,14 +36,12 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `admin`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
-    const jwtVersion = await page.evaluate(() => window.Clerk.session?.lastActiveToken?.jwt?.claims?.v);
-    expect(jwtVersion).toBe(app.env.id === 'withBillingStaging' ? 2 : undefined);
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();
@@ -81,7 +79,7 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `signed-out user`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     /**
      * Soft navigations
@@ -119,7 +117,7 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `viewer`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();

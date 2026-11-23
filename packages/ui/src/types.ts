@@ -10,6 +10,7 @@ import type {
   GoogleOneTapProps,
   NewSubscriptionRedirectUrl,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -34,6 +35,7 @@ import type { WithInternalRouting } from './internal';
 
 export type {
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   __internal_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
@@ -67,6 +69,7 @@ export type AvailableComponentProps =
   | APIKeysProps
   | ConfigureSSOProps
   | OAuthConsentProps
+  | OAuthDeviceVerificationProps
   | TaskChooseOrganizationProps
   | TaskResetPasswordProps
   | TaskSetupMFAProps;
@@ -152,13 +155,18 @@ export type ConfigureSSOCtx = ConfigureSSOProps & {
   mode?: ComponentMode;
 };
 
+export type ConfigureDirectorySyncCtx = ConfigureSSOProps & {
+  componentName: 'ConfigureDirectorySync';
+  mode?: ComponentMode;
+};
+
 export type CheckoutCtx = __internal_CheckoutProps & {
   componentName: 'Checkout';
 } & NewSubscriptionRedirectUrl;
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
-  redirectOnActiveSession?: MutableRefObject<boolean>;
+  redirectOnActiveSessionRef?: MutableRefObject<boolean>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
@@ -227,6 +235,10 @@ export type OAuthConsentCtx = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type OAuthDeviceVerificationCtx = OAuthDeviceVerificationProps & {
+  componentName: 'OAuthDeviceVerification';
+};
+
 export type SubscriptionDetailsCtx = __internal_SubscriptionDetailsProps & {
   componentName: 'SubscriptionDetails';
 };
@@ -252,7 +264,9 @@ export type AvailableComponentCtx =
   | CheckoutCtx
   | APIKeysCtx
   | ConfigureSSOCtx
+  | ConfigureDirectorySyncCtx
   | OAuthConsentCtx
+  | OAuthDeviceVerificationCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
   | TaskChooseOrganizationCtx

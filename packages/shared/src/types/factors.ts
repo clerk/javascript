@@ -1,3 +1,4 @@
+import type { TrustedDeviceAlgorithm } from './biometricCredential';
 import type { PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type {
@@ -12,6 +13,7 @@ import type {
   ResetPasswordEmailCodeStrategy,
   ResetPasswordPhoneCodeStrategy,
   TOTPStrategy,
+  TrustedDeviceStrategy,
   Web3Strategy,
 } from './strategies';
 
@@ -126,14 +128,28 @@ export type EnterpriseSSOFactor = {
   strategy: EnterpriseSSOStrategy;
   /**
    * The ID of the enterprise connection.
+   *
    * @experimental
    */
   enterpriseConnectionId?: string;
   /**
    * The name of the enterprise connection.
+   *
    * @experimental
    */
   enterpriseConnectionName?: string;
+  /**
+   * The public URL of the enterprise connection logo.
+   *
+   * @experimental
+   */
+  enterpriseConnectionLogoPublicUrl?: string | null;
+  /**
+   * The provider of the enterprise connection.
+   *
+   * @experimental
+   */
+  enterpriseConnectionProvider?: string;
 };
 
 /** @inline */
@@ -243,11 +259,13 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   oidcPrompt?: string;
   /**
    * The ID of the email address used for the enterprise SSO factor.
+   *
    * @experimental
    */
   emailAddressId?: string;
   /**
    * The ID of the enterprise connection used for the enterprise SSO factor.
+   *
    * @experimental
    */
   enterpriseConnectionId?: string;
@@ -323,6 +341,46 @@ export type PasskeyAttempt = {
   publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse;
 };
 
+/**
+ * @experimental
+ */
+export type TrustedDeviceConfig = {
+  /**
+   * The strategy type.
+   */
+  strategy: TrustedDeviceStrategy;
+  /**
+   * The ID of the trusted device (biometric credential) to verify with.
+   */
+  trustedDeviceId: string;
+};
+
+/**
+ * @experimental
+ */
+export type TrustedDeviceAttempt = {
+  /**
+   * The strategy type.
+   */
+  strategy: TrustedDeviceStrategy;
+  /**
+   * The ID of the trusted device (biometric credential) used to sign in or reverify the session.
+   */
+  trustedDeviceId: string;
+  /**
+   * The `clientData` string from the verification's `trustedDeviceChallenge`.
+   */
+  clientData: string;
+  /**
+   * The base64url-encoded raw (r||s) signature of `clientData`.
+   */
+  signature: string;
+  /**
+   * The signing algorithm.
+   */
+  algorithm: TrustedDeviceAlgorithm;
+};
+
 /** @generateWithEmptyComment */
 export type Web3Attempt = {
   /**
@@ -389,4 +447,25 @@ export type ResetPasswordEmailCodeAttempt = {
    * The password provided by the user.
    */
   password?: string;
+};
+
+/** @generateWithEmptyComment */
+export type SessionVerifyResetPasswordAttempt = {
+  /**
+   * The strategy type.
+   */
+  strategy: ResetPasswordEmailCodeStrategy | ResetPasswordPhoneCodeStrategy;
+  /**
+   * The one-time code sent to the user's email address or phone number.
+   */
+  code: string;
+  /**
+   * The new password, which replaces the current one. Unlike a sign-in's reset
+   * attempt, it's required: the code only counts together with it.
+   */
+  password: string;
+  /**
+   * Whether to sign the user out of their other sessions once the new password is set.
+   */
+  signOutOfOtherSessions?: boolean;
 };

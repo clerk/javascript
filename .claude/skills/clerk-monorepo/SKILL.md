@@ -11,8 +11,7 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 24 packages (21 published `@clerk/*` plus the private
-`@clerk/msw`, `@clerk/headless`, and `@clerk/swingset`) managed with pnpm
+This is Clerk's JavaScript SDK monorepo: the `@clerk/*` packages under `packages/`, managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
 
@@ -27,7 +26,7 @@ The order matters more than the commands. Do them in sequence:
 1. **Node `>=24.15.0`** (pinned in `.nvmrc`). `nvm use` if you have nvm. Wrong Node version is the
    single most common cause of cryptic "cannot find module @clerk/..." build errors.
 2. **`corepack enable`** before installing. The `preinstall` hook runs `only-allow pnpm`; npm/yarn
-   are hard-blocked. Corepack pins the right pnpm (`>=10.33.0`).
+   are hard-blocked. Corepack pins the right pnpm (`engines` in `package.json`).
 3. **`pnpm install` from the repo root** (never a subdirectory). It is a workspace; installing from
    a package dir leaves cross-package links broken.
 4. **`pnpm build`** before anything else. Packages depend on each other's built `dist/` + `.d.ts`.
@@ -39,7 +38,7 @@ Full sequence, the 11 footguns, and the internal integration-test / 1Password se
 
 ## Package map: where does X live?
 
-The ~10 packages people touch most. Full 24-package table, the dependency pyramid, and the complete
+The ~10 packages people touch most. How to list every package, the dependency pyramid, and the complete
 "change X, touch Y" routing are in [`references/package-map.md`](references/package-map.md).
 
 | Package                | You change it when...                                                                                                                                       |
@@ -48,6 +47,7 @@ The ~10 packages people touch most. Full 24-package table, the dependency pyrami
 | `@clerk/backend`       | Server-side: JWT verification, the Backend API REST client, webhooks. Used by every framework adapter.                                                      |
 | `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backwards-compat sensitive** (see rules).                                                                   |
 | `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backwards-compat sensitive**.                                                           |
+| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                              |
 | `@clerk/react`         | Shared React hooks/context (`useAuth`, `useUser`, ...) consumed by the React-based adapters.                                                                |
 | `@clerk/nextjs`        | Next.js SDK: middleware, route handlers, server components.                                                                                                 |
 | `@clerk/express`       | Express middleware and server helpers.                                                                                                                      |
@@ -108,13 +108,29 @@ Repo/tooling-only or private-package-only change — the file is exactly two del
 ---
 ```
 
-`@clerk/swingset`, `@clerk/msw`, and `@clerk/headless` are private and never appear in a changeset;
+`@clerk/swingset` and `@clerk/msw` are private and never appear in a changeset;
 every other `packages/*` entry publishes, **including `@clerk/ui` and `@clerk/clerk-js`**. Bump
 selection, which packages to list, body-writing rules, and the major-version gate are in
 [`references/changesets.md`](references/changesets.md).
 
 Test runner differs by package (`shared`, `clerk-js`, most adapters use vitest; `backend` runs a
 multi-runtime suite), but the `pnpm --filter <name> test` invocation is uniform.
+
+If the `bundlewatch` CI job fails, a built file in `@clerk/clerk-js` or `@clerk/ui` exceeds its
+`maxSize` in that package's `bundlewatch.config.json` (often after a rebase on `main`). If the growth
+is expected, raise the limits; if it is larger than the change explains, investigate instead:
+
+```bash
+pnpm turbo build --filter=@clerk/clerk-js       # measures dist/, so build first
+pnpm --filter @clerk/clerk-js bundlewatch:fix   # failing maxSize -> current size + 1KB, rounded up
+```
+
+Same commands with `@clerk/ui` for the UI package. Commit the updated `bundlewatch.config.json` and
+call out the bump in the PR description; never raise limits silently.
+
+Check the printed diff: if any file's `maxSize` goes up by more than 10KB, stop before committing and
+flag it to the user, listing each file with its old and new limit. Only commit the bump once they
+confirm the growth is expected.
 
 If the editor or a build reports stale types from `@clerk/shared`, rebuild the foundations:
 `pnpm turbo build --filter=@clerk/shared`.
@@ -126,8 +142,8 @@ see [`references/setup-and-footguns.md`](references/setup-and-footguns.md) and `
 
 Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
 
-- **pnpm only, Node `>=24.15`, pnpm `>=10.33`.** (`preinstall` blocks npm/yarn; `engines` in
-  `package.json`.)
+- **pnpm only, at the Node and pnpm versions in `engines` in `package.json`.** (`preinstall` blocks
+  npm/yarn.)
 - **Every PR needs a changeset.** Write the file directly; the `pnpm changeset` /
   `pnpm changeset:empty` scripts are interactive prompts an agent cannot drive. A changeset is a
   changelog entry for users upgrading, not a summary of the diff. See
@@ -185,8 +201,6 @@ Full decision matrix:
 - `docs/PUBLISH.md`: release process (stable, canary, snapshot, backport, `!allow-major`).
 - `docs/CICD.md`: CI/CD pipeline and automated releases.
 - `docs/SECURITY.md`: vulnerability reporting (do **not** open public issues).
-- `references/theming-architecture.md` (repo root, not this skill's `references/`): deep dive on the
-  `@clerk/ui` appearance/theming system.
 - Bundled: [`setup-and-footguns.md`](references/setup-and-footguns.md),
   [`package-map.md`](references/package-map.md),
   [`breaking-changes.md`](references/breaking-changes.md),

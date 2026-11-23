@@ -2,8 +2,7 @@ import * as Stories from './user-profile-web3-wallets-section.stories';
 
 # UserProfileWeb3WalletsSection
 
-Supported Web3 wallet providers with per-provider connection actions, connected identities, verification state,
-primary status, and wallet actions.
+Wallets and available providers are supplied separately. These examples simulate state through props without connecting to browser extensions. Reload to reset them. Solana wallet selection is a separate flow.
 
 <Story
   name='Default'
@@ -11,5 +10,49 @@ primary status, and wallet actions.
   composition={[
     { name: 'Section', href: '/components/section', layer: 'Components' },
     { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   ]}
 />
+
+## Connected Wallets
+
+Only verified, non-primary wallets offer Set as primary. Removing a wallet makes its provider available to connect again.
+
+<Story name='ConnectedWallets' storyModule={Stories} />
+
+## Connect Only
+
+<Story name='ConnectOnly' storyModule={Stories} />
+
+## Unverified Wallet
+
+An unverified wallet offers Remove. After removal, the provider can be connected again.
+
+<Story name='UnverifiedWallet' storyModule={Stories} />
+
+## Connection Error
+
+Retry Connect to clear the error and connect the wallet.
+
+<Story name='ConnectionError' storyModule={Stories} />
+
+## Primary Error
+
+Choose Set as primary on Coinbase Wallet to show an error. Retry succeeds.
+
+<Story name='PrimaryError' storyModule={Stories} />
+
+## Removal Pending
+
+Choose Remove wallet, then confirm. The confirmation stays open until removal completes after a short delay.
+
+<Story name='RemovalPending' storyModule={Stories} />
+
+## Removal Error
+
+The first removal attempt shows an error inside the dialog. Retry succeeds.
+
+<Story name='RemovalError' storyModule={Stories} />

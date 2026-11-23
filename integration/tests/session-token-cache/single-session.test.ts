@@ -19,7 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test, {
         withPhoneNumber: true,
         withUsername: true,
@@ -56,7 +56,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await page1.waitForFunction(() => (window as any).Clerk?.loaded);
       await page2.waitForFunction(() => (window as any).Clerk?.loaded);
 
-      const u1 = createTestUtils({ app, page: page1 });
+      const u1 = await createTestUtils({ app, page: page1 });
       await u1.po.signIn.goTo();
       await u1.po.signIn.setIdentifier(fakeUser.email);
       await u1.po.signIn.continue();
@@ -70,7 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await page2.reload();
       await page2.waitForFunction(() => (window as any).Clerk?.loaded);
 
-      const u2 = createTestUtils({ app, page: page2 });
+      const u2 = await createTestUtils({ app, page: page2 });
       await u2.po.expect.toBeSignedIn();
 
       const page1SessionInfo = await page1.evaluate(() => {

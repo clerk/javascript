@@ -108,6 +108,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   enterpriseSSO: EnterpriseSSOSettings = {
     enabled: false,
     self_serve_sso: false,
+    self_serve_directory_sync: false,
   };
   passkeySettings: PasskeySettingsData = {
     allow_autofill: false,
@@ -225,7 +226,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
           this.attackProtection.enumeration_protection.enabled,
       },
     };
-    this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
+    this.enterpriseSSO = {
+      ...this.withDefault(data.enterprise_sso, this.enterpriseSSO),
+      self_serve_directory_sync: data.enterprise_sso?.self_serve_directory_sync ?? false,
+    };
     this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);
     this.passwordSettings = data.password_settings
       ? {

@@ -32,7 +32,7 @@
 ### Prerequisites
 
 - React 18 or later
-- Expo 53 or later
+- Expo 54 to 58
 - React Native 0.73 or later
 - Node.js `>=20.9.0` or later
 - An existing Expo application
@@ -47,47 +47,6 @@ You'll learn how to create an Expo application, install `@clerk/expo`, set up yo
 ## Usage
 
 For further information, guides, and examples visit the [Expo reference documentation](https://clerk.com/docs/references/expo/overview?utm_source=github&utm_medium=clerk_expo).
-
-### Biometric trusted devices
-
-Biometric trusted-device enrollment and sign-in are supported in development builds on iOS and Android. Android requires Android 9 (API 28) or later and an enrolled Class 3 biometric.
-
-Trusted-device operations preserve Clerk API and native biometric error codes. Use `isTrustedDeviceError(error)` to safely inspect `error.code`; unrecognized error codes remain available for forward compatibility, while unfamiliar platform and status values are normalized to `unknown`.
-
-#### Face ID on iOS
-
-Apps that use Face ID for trusted-device enrollment or sign-in must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
-
-```json
-{
-  "expo": {
-    "plugins": [
-      [
-        "@clerk/expo",
-        {
-          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID for secure sign-in."
-        }
-      ]
-    ]
-  }
-}
-```
-
-The plugin only adds the permission when `faceIDPermission` is provided and does not overwrite `ios.infoPlist.NSFaceIDUsageDescription` if your app already defines it.
-
-You can also configure the key directly:
-
-```json
-{
-  "expo": {
-    "ios": {
-      "infoPlist": {
-        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to use Face ID for secure sign-in."
-      }
-    }
-  }
-}
-```
 
 ## Support
 

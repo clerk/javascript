@@ -24,12 +24,6 @@ export const TimerButton = (props: TimerButtonProps) => {
   const [remainingSeconds, setRemainingSeconds] = React.useState(0);
   const intervalIdRef = React.useRef<number | undefined>(undefined);
 
-  useSafeLayoutEffect(() => {
-    if (startDisabled) {
-      disable();
-    }
-  }, []);
-
   useEffect(() => {
     return () => clearInterval(intervalIdRef.current);
   }, []);
@@ -53,6 +47,12 @@ export const TimerButton = (props: TimerButtonProps) => {
     onClickProp?.(e);
     disable();
   };
+
+  useSafeLayoutEffect(() => {
+    if (startDisabled) {
+      disable();
+    }
+  }, []);
 
   return (
     <Button

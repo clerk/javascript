@@ -12,7 +12,7 @@ integration-test setup. The short happy path is in `SKILL.md`; this is the full 
    `Cannot find module '@clerk/shared'` or missing-type errors downstream.
 2. **`corepack enable`** before installing. `package.json` has `preinstall: only-allow pnpm`, so
    npm and yarn are blocked outright. Corepack reads `packageManager` and uses the pinned pnpm
-   (`>=10.33.0`). Without it you may run a mismatched global pnpm.
+   (`engines` in `package.json`). Without it you may run a mismatched global pnpm.
 3. **`git clone` and `cd` into the repo root.**
 4. **`pnpm install` from the root.** This is a pnpm workspace; the root install links all packages
    together. Installing from a package subdirectory leaves workspace links broken. First install

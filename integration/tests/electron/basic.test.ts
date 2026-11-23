@@ -10,6 +10,7 @@ type ElectronWindow = Window & {
     tokenCache?: Partial<Record<'clearToken' | 'getToken' | 'saveToken', unknown>>;
     oauthTransport?: Partial<Record<'getRedirectUrl' | 'open', unknown>>;
   };
+  __hardNavigations?: string[];
 };
 
 test.describe('electron basic auth @electron', () => {
@@ -18,7 +19,7 @@ test.describe('electron basic auth @electron', () => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async ({ electronTestApp }) => {
-    const u = createTestUtils({ app: electronTestApp });
+    const u = await createTestUtils({ app: electronTestApp });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -73,5 +74,48 @@ test.describe('electron basic auth @electron', () => {
 
   test('keeps the signed-out state after relaunch', async ({ electronPage }) => {
     await expect(electronPage.locator('.cl-signIn-root')).toBeVisible({ timeout: 30_000 });
+  });
+
+  test('never hard navigates the renderer during sign-in', async ({ electronPage }) => {
+    const { signIn } = createPageObjects({ page: electronPage, useTestingToken: false });
+
+    await electronPage.evaluate(() => {
+      (window as ElectronWindow).__hardNavigations = [];
+      addEventListener('clerk:beforeunload', () => {
+        (window as ElectronWindow).__hardNavigations?.push(location.href);
+      });
+    });
+
+    await signIn.waitForMounted();
+    await signIn.setIdentifier(fakeUser.email!);
+    await signIn.continue();
+    await signIn.setPassword(fakeUser.password);
+    await signIn.continue();
+
+    await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
+    await expect(electronPage.evaluate(() => (window as ElectronWindow).__hardNavigations)).resolves.toEqual([]);
+  });
+
+  test('recovers the connect account button when the browser cannot open', async ({
+    electronApplication,
+    electronPage,
+  }) => {
+    const { userButton } = createPageObjects({ page: electronPage, useTestingToken: false });
+
+    await expect(electronPage.locator('[data-testid="user-id"]')).toHaveText(/^user_/, { timeout: 30_000 });
+    await electronApplication.evaluate(({ shell }) => {
+      shell.openExternal = async () => {
+        throw new Error('No application is registered to open this URL');
+      };
+    });
+
+    await userButton.toggleTrigger();
+    await userButton.triggerManageAccount();
+    await electronPage.getByText(/^connect account$/i).click();
+    const connectGoogle = electronPage.getByRole('menuitem', { name: /connect google account/i });
+    await connectGoogle.click();
+
+    await expect(electronPage.getByText('Something went wrong. Please try again.')).toBeVisible();
+    await expect(connectGoogle).toBeEnabled();
   });
 });

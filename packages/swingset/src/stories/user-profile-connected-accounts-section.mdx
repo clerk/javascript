@@ -2,14 +2,40 @@ import * as Stories from './user-profile-connected-accounts-section.stories';
 
 # UserProfileConnectedAccountsSection
 
-Connected and available external identity providers with provider-specific actions.
+Linked accounts and available providers are supplied separately. Removal uses one shared confirmation per section, which awaits the removal callback and displays failures. These examples simulate actions; they do not start OAuth or mutate a user. Reload to reset interactive examples.
 
-<Story
-  name='Default'
-  storyModule={Stories}
-  composition={[
-    { name: 'Section', href: '/components/section', layer: 'Components' },
-    { name: 'Button', href: '/components/button', layer: 'Components' },
-    { name: 'Icon', href: '/components/icon', layer: 'Components' },
-  ]}
-/>
+<Story name='Default' storyModule={Stories} />
+
+## Linked Accounts
+
+<Story name='LinkedAccounts' storyModule={Stories} />
+
+## Connect Only
+
+<Story name='ConnectOnly' storyModule={Stories} />
+
+## Reconnect Required
+
+Recoverable verification errors and additional scope requirements show a Disconnected badge. Choose Reconnect from the account menu to restore the connection.
+
+<Story name='ReconnectRequired' storyModule={Stories} />
+
+## Verification Error
+
+<Story name='VerificationError' storyModule={Stories} />
+
+## Connection Error
+
+<Story name='ConnectionError' storyModule={Stories} />
+
+## Removal Pending
+
+Choose Remove from the row menu, then confirm. The dialog shows pending for a short delay, then the account becomes available to connect again.
+
+<Story name='RemovalPending' storyModule={Stories} />
+
+## Removal Error
+
+The first removal attempt shows an error inside the dialog. Retry succeeds.
+
+<Story name='RemovalError' storyModule={Stories} />

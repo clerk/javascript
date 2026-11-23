@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { CLERK_MODAL_STATE } from '@clerk/shared/internal/clerk-js/constants';
 import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
@@ -195,6 +196,33 @@ describe('ConnectedAccountsSection ', () => {
       expect(reload).toHaveBeenCalledWith({ rotatingTokenNonce: 'abc' });
     });
 
+    it('re-enables the connect buttons when the OAuth transport rejects', async () => {
+      const { wrapper, fixtures } = await createFixtures(withoutConnections);
+
+      Object.defineProperty(fixtures.clerk, '__internal_oauthTransport', {
+        configurable: true,
+        value: {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi
+            .fn()
+            .mockRejectedValue(
+              new Error("Error invoking remote method 'clerk:oauth:open': Error: Clerk: OAuth callback timed out."),
+            ),
+        },
+      });
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
+      } as ExternalAccountResource);
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
+
+      expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: /connect google account/i })).toBeEnabled();
+    });
+
     it('shows an error when the provider verification URL is missing', async () => {
       const { wrapper, fixtures } = await createFixtures(withoutConnections);
 
@@ -241,6 +269,73 @@ describe('ConnectedAccountsSection ', () => {
       });
       expect(await screen.findByText(/OAuth flow did not receive a verification URL./i)).toBeInTheDocument();
     });
+
+    it('shows an error when the OAuth transport rejects during reconnection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withReconnectableConnection);
+
+      Object.defineProperty(fixtures.clerk, '__internal_oauthTransport', {
+        configurable: true,
+        value: {
+          getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
+          open: vi
+            .fn()
+            .mockRejectedValue(
+              new Error("Error invoking remote method 'clerk:oauth:open': Error: Clerk: OAuth callback timed out."),
+            ),
+        },
+      });
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
+      } as ExternalAccountResource);
+      const { userEvent, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      await userEvent.click(getByRole('button', { name: /reconnect/i }));
+
+      expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    });
+
+    it.each(['google_one_tap', 'oauth_google'] as const)(
+      'reconnects a %s account using Google OAuth after reverification',
+      async strategy => {
+        const { wrapper, fixtures } = await createFixtures(withReconnectableConnection);
+        fixtures.clerk.user!.externalAccounts[0].verification!.strategy = strategy;
+        const createExternalAccount = fixtures.clerk.user!.createExternalAccount;
+        createExternalAccount
+          .mockRejectedValueOnce(
+            new ClerkAPIResponseError('Reverification required', {
+              status: 403,
+              data: [{ code: 'session_reverification_required', message: 'Reverification required' }],
+            }),
+          )
+          .mockResolvedValueOnce({
+            verification: { externalVerificationRedirectURL: new URL('https://provider.example/auth') },
+          } as ExternalAccountResource);
+        const openReverification = vi
+          .spyOn(fixtures.clerk, '__internal_openReverification')
+          .mockImplementation(() => {});
+        const { userEvent, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+        await userEvent.click(getByRole('button', { name: /reconnect/i }));
+
+        await waitFor(() => expect(openReverification).toHaveBeenCalledTimes(1));
+        const expectedParams = {
+          strategy: 'oauth_google',
+          redirectUrl: window.location.href,
+          additionalScopes: [],
+        };
+        expect(createExternalAccount).toHaveBeenCalledTimes(1);
+        expect(createExternalAccount).toHaveBeenNthCalledWith(1, expectedParams);
+        expect(fixtures.router.navigate).not.toHaveBeenCalled();
+
+        await act(() => {
+          openReverification.mock.calls[0][0].afterVerification();
+        });
+
+        expect(createExternalAccount).toHaveBeenCalledTimes(2);
+        expect(createExternalAccount).toHaveBeenNthCalledWith(2, expectedParams);
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('https://provider.example/auth');
+      },
+    );
 
     it('Additional scopes need reconnection', async () => {
       const { wrapper, fixtures, props } = await createFixtures(withReconnectableConnectionAdditionalScopes);
@@ -385,8 +480,9 @@ describe('ConnectedAccountsSection ', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
-      // The cancel button should be clickable
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument(),
+      );
     });
   });
 

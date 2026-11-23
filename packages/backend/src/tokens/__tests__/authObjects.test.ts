@@ -1,13 +1,16 @@
-import type { JwtPayload } from '@clerk/shared/types';
-import { describe, expect, it, vi } from 'vitest';
+import type { AgentActClaim, JwtPayload } from '@clerk/shared/types';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { createBackendApiClient } from '../../api/factory';
+import { createJwt, mockJwtPayload } from '../../fixtures';
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
+import { decodeJwt } from '../../jwt';
 import type { AuthenticateContext } from '../authenticateContext';
 import type { InvalidTokenAuthObject, UnauthenticatedMachineObject } from '../authObjects';
 import {
   authenticatedMachineObject,
   getAuthObjectForAcceptedToken,
+  getAuthObjectFromJwt,
   makeAuthObjectSerializable,
   signedInAuthObject,
   signedOutAuthObject,
@@ -31,6 +34,71 @@ describe('makeAuthObjectSerializable', () => {
 });
 
 describe('signedInAuthObject', () => {
+  it.each([
+    { name: 'ordinary Session has no agent', claims: {}, expected: undefined },
+    {
+      name: 'impersonation remains actor attribution',
+      claims: { act: { sub: 'impersonator' } },
+      expected: undefined,
+    },
+    {
+      name: 'agent-task Session uses the existing Session agent shape',
+      claims: { agt: { id: 'agent_123', tsk: 'agtsk_123', reg: 'https://clerk.com' } },
+      expected: { type: 'agent', sub: 'agent_123', task_id: 'agtsk_123' },
+    },
+    {
+      name: 'Poppy Session uses the existing Session agent shape',
+      claims: { agt: { id: 'https://agent.example', poppy: { session_id: 'protocol-session' } } },
+      expected: { type: 'agent', sub: 'https://agent.example' },
+    },
+    {
+      name: 'malformed agent claim is not exposed',
+      claims: { agt: { id: 123, tsk: 'agtsk_123' } },
+      expected: undefined,
+    },
+  ])('$name', ({ claims, expected }) => {
+    const auth = signedInAuthObject({}, 'token', {
+      ...mockJwtPayload,
+      __raw: 'token',
+      ...claims,
+      sub: 'user_123',
+      sid: 'sess_123',
+    });
+
+    expect(auth.agent).toEqual(expected);
+    expectTypeOf(auth.agent).toEqualTypeOf<AgentActClaim | undefined>();
+    expect(auth.userId).toBe('user_123');
+    expect(auth.actor).toEqual('act' in claims ? claims.act : undefined);
+    expect(auth).not.toHaveProperty('poppy');
+  });
+
+  it('omits agent attribution from signed-out auth', async () => {
+    const auth = signedOutAuthObject();
+
+    expect(auth).not.toHaveProperty('agent');
+    expect(auth.userId).toBeNull();
+    expect(auth.sessionId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
+    expect(auth.has({ permission: 'org:admin' })).toBe(false);
+    expect(await auth.getToken()).toBeNull();
+  });
+
+  it('omits agent attribution when a pending Clerk Session is treated as signed out', () => {
+    const auth = getAuthObjectFromJwt(
+      decodeJwt(
+        createJwt({
+          payload: { sub: 'user_123', sid: 'sess_123', sts: 'pending', agt: { id: 'https://agent.example' } },
+        }),
+      ),
+      {},
+    );
+
+    expect(auth).not.toHaveProperty('agent');
+    expect(auth.isAuthenticated).toBe(false);
+    expect(auth.userId).toBeNull();
+    expect(auth.sessionStatus).toBe('pending');
+  });
+
   it('getToken returns the token passed in', async () => {
     const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
     const authObject = signedInAuthObject(mockAuthenticateContext, 'token', {
@@ -462,6 +530,30 @@ describe('getAuthObjectForAcceptedToken', () => {
     const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'm2m_token' });
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).tokenType).toBe('m2m_token');
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).id).toBeNull();
+  });
+
+  it('keeps redacted debug data when a single machine token type does not match', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'm2m_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
+  });
+
+  it('keeps redacted debug data when a machine token is not accepted as a session token', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'session_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
   });
 });
 

@@ -71,6 +71,23 @@ function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext
   }
 }
 
+const TOKEN_TYPES: readonly unknown[] = Object.values(TokenType);
+
+function warnOnInvalidAcceptsToken(acceptsToken: unknown) {
+  const isValid =
+    acceptsToken === 'any' ||
+    TOKEN_TYPES.includes(acceptsToken) ||
+    (Array.isArray(acceptsToken) && acceptsToken.every(tokenType => TOKEN_TYPES.includes(tokenType)));
+
+  if (!isValid) {
+    logger.warnOnce(
+      `Clerk: Invalid acceptsToken: ${JSON.stringify(acceptsToken)}. ` +
+        `Use 'any', one of ${TOKEN_TYPES.map(tokenType => `'${tokenType}'`).join(', ')}, or an array of them. ` +
+        'In a future version of Clerk, this will throw an error.',
+    );
+  }
+}
+
 function isRequestEligibleForRefresh(
   err: TokenVerificationError,
   authenticateContext: { refreshTokenInCookie?: string },
@@ -154,6 +171,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
+  warnOnInvalidAcceptsToken(acceptsToken);
 
   // machine-to-machine tokens can accept a machine secret or a secret key
   if (acceptsToken !== TokenType.M2MToken) {
@@ -420,10 +438,11 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // Reject JWTs of another class (machine tokens, JWT templates) presented where a session
-    // token is expected. They are validly signed by the same instance key and pass
-    // verifyToken(), but a JWT-template token carries no `sid` and outlives revocation of the
-    // session that minted it (SEC-340).
+    // Reject JWTs of another class (machine tokens, JWT templates, uncategorized tokens such as
+    // OIDC id_tokens) presented where a session token is expected. They are validly signed by
+    // the same instance key, but a JWT-template token carries no `sid` and outlives revocation
+    // of the session that minted it (SEC-340), and an id_token is a delegation to a third-party
+    // OAuth client, not a session (AISEC-21).
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (isMachineJwt(tokenInHeader!) || hasNonSessionJwtCategory(tokenInHeader!)) {
       return signedOut({
@@ -633,7 +652,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
-    // Machine JWTs and JWT-template tokens pass verifyToken() but must not be accepted as
+    // Machine JWTs, JWT-template tokens and uncategorized tokens must not be accepted as
     // session tokens (mirrors header path).
     if (
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -864,7 +883,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    // Handle as a regular session token
+    // Handle as a regular session token. Mirrors the session-only header path (SEC-340).
+    if (hasNonSessionJwtCategory(tokenInHeader)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleSessionTokenError(errors[0], 'header');

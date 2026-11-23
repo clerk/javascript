@@ -1,3 +1,4 @@
+import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
 import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
@@ -10,14 +11,20 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { HavingTrouble } from '../SignIn/HavingTrouble';
+import type { PasswordErrorCode } from '../SignIn/SignInFactorOnePasswordCard';
 import { useAfterVerification } from './use-after-verification';
 
 type UserVerificationFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
+  /**
+   * Called when the password is rejected as breached or compromised. Without
+   * it, the error only shows on the card.
+   */
+  onPasswordError?: (errorCode: PasswordErrorCode) => void;
 };
 
 export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
-  const { onShowAlternativeMethodsClick } = props;
+  const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const { session } = useSession();
 
   const { handleVerificationResponse } = useAfterVerification();
@@ -40,7 +47,23 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
         password: passwordControl.value,
       })
       .then(handleVerificationResponse)
-      .catch(err => handleError(err, [passwordControl], card.setError));
+      .catch(err => {
+        if (onPasswordError) {
+          if (isPasswordPwnedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+            onPasswordError('pwned');
+            return;
+          }
+
+          if (isPasswordCompromisedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
+            onPasswordError('compromised');
+            return;
+          }
+        }
+
+        handleError(err, [passwordControl], card.setError);
+      });
   };
 
   if (showHavingTrouble) {
