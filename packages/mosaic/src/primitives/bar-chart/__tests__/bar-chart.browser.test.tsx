@@ -1,8 +1,9 @@
 import { cleanup, render as renderComponent, screen } from '@testing-library/react';
+import type {} from '@vitest/browser-playwright';
 import type { ReactElement } from 'react';
 import { useRef } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 
 import type { BarSelection } from '../types';
 import { TestChart, type TestChartProps } from './test-chart';
@@ -20,6 +21,7 @@ beforeAll(async () => {
     .red { color: rgb(255, 0, 0); }
     .blue { color: rgb(0, 0, 255); }
     .series [data-series='value'], .series[data-series='value'] { color: rgb(0, 128, 0); }
+    html.dark .themed { color: rgb(0, 0, 255); }
   `;
   document.head.append(style);
 });
@@ -106,6 +108,58 @@ describe('painting', () => {
     rerender(<Chart barClassName='blue' />);
 
     await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+  });
+
+  it('repaints when the theme on <html> changes', async () => {
+    await render(<Chart barClassName='red themed' />);
+    const { x, y } = insideLastBar();
+    await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+
+    document.documentElement.classList.add('dark');
+    try {
+      await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+    } finally {
+      document.documentElement.classList.remove('dark');
+    }
+  });
+
+  it('repaints at the new pixel ratio, capped at 2', async () => {
+    const resolutionQueries: MediaQueryList[] = [];
+    const matchMedia = window.matchMedia.bind(window);
+    vi.spyOn(window, 'matchMedia').mockImplementation(query => {
+      const list = matchMedia(query);
+      if (query.includes('resolution')) {
+        resolutionQueries.push(list);
+      }
+      return list;
+    });
+    await render(<Chart />);
+    const canvas = screen.getByRole('img', { name: 'Growth' });
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('The chart image is not a canvas');
+    }
+    const { x, y } = insideLastBar();
+    await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+    const cssWidth = canvas.getBoundingClientRect().width;
+    expect(canvas.width).toBe(cssWidth);
+
+    await cdp().send('Emulation.setDeviceMetricsOverride', {
+      width: 0,
+      height: 0,
+      deviceScaleFactor: 3,
+      mobile: false,
+    });
+    try {
+      // Chromium's device emulation changes devicePixelRatio without firing the resolution query's
+      // change event, so send the event that moving to another display sends.
+      for (const list of [...resolutionQueries]) {
+        list.dispatchEvent(new MediaQueryListEvent('change', { media: list.media, matches: list.matches }));
+      }
+      await expect.poll(() => canvas.width).toBe(cssWidth * 2);
+      await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+    } finally {
+      await cdp().send('Emulation.clearDeviceMetricsOverride');
+    }
   });
 
   it('paints nothing without BarChart.Bar', async () => {
