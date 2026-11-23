@@ -136,7 +136,7 @@ export default {
     },
     'Chart.Bar': {
       description:
-        'The hidden element the Canvas reads. Its `color` is the series color, an opaque 40% mix toward `--cl-color-surface` under `data-inactive`; its `max-width`, `row-gap` and corner radii set the bar geometry.',
+        'The hidden element the Canvas reads. Its `color` is the series color, an opaque mix toward `--cl-color-surface` under `data-inactive` that keeps `--cl-chart-inactive-mix` (40%) of it; its `max-width`, `row-gap` and corner radii set the bar geometry.',
       slot: 'cl-chart-bar',
     },
     'Chart.ProjectionOutline': {

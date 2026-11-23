@@ -218,6 +218,7 @@ export { UserButton } from '../features/user-button/user-button';
 export { Waitlist } from '../features/waitlist/waitlist';
 
 import {
+  chartVars,
   colorVars,
   durationVars,
   easingVars,
@@ -235,6 +236,7 @@ import {
 } from '../tokens.stylex';
 
 export {
+  chartVars,
   colorVars,
   durationVars,
   easingVars,
@@ -254,6 +256,7 @@ export {
 // Derived here, not in `tokens.stylex.ts`: `@stylexjs/enforce-extension` requires a
 // `.stylex.ts` file to export nothing but its `defineVars` results. The vars are keyed
 // by the same `--cl-*` names, so `keyof typeof …Vars` reproduces each token union.
+export type ChartVarName = keyof typeof chartVars;
 export type ColorVarName = keyof typeof colorVars;
 export type DurationVarName = keyof typeof durationVars;
 export type EasingVarName = keyof typeof easingVars;

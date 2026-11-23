@@ -84,6 +84,9 @@ html[data-swingset-theme='clerk'] {
   --cl-color-chart-4: light-dark(#6c47ff, #4d06d1);
   --cl-color-chart-5: light-dark(#c7c7cf, #4c4c5c);
   --cl-color-chart-6: light-dark(#90909d, #767684);
+  --cl-color-chart-grid: light-dark(#dbdbe0, #3d3d4a);
+  --cl-color-chart-tooltip: light-dark(#ffffff, #111113);
+  --cl-chart-inactive-mix: 50%;
 }
 
 html[data-swingset-theme='clerk']:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
@@ -99,16 +102,12 @@ html[data-swingset-theme='clerk']:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):n
     width: 0.375rem;
   }
 
-  & .cl-chart-grid-line {
-    stroke: light-dark(#dbdbe0, #3d3d4a);
-  }
-
   & .cl-chart-y-line {
     stroke: light-dark(#2b2b34, #adadb7);
   }
 
   & :is(.cl-chart-y-tick, .cl-chart-x-tick) {
-    fill: var(--cl-color-foreground-secondary);
+    fill: var(--cl-color-chart-label);
     font-size: 0.6875rem;
   }
 
@@ -127,7 +126,6 @@ html[data-swingset-theme='clerk']:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):n
   }
 
   & .cl-chart-tooltip {
-    background-color: light-dark(#ffffff, #111113);
     box-shadow:
       0 0 0 1px rgb(25 28 33 / 0.06),
       0 32px 72px -12px rgb(0 0 0 / 0.2),

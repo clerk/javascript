@@ -105,12 +105,17 @@ tooltip rows carry `data-series` with the series key, and swatches (`.cl-chart-s
 `data-swatch`: `square`, `line` or `dashed`. A legend item with a description carries
 `data-described`. Ticks carry `data-active` while their period is selected.
 
-The palette is `--cl-color-chart-1` to `--cl-color-chart-6`. Dimmed bars mix their color 40% with
-`--cl-color-surface`, so they stay opaque over the grid.
+The palette is `--cl-color-chart-1` to `--cl-color-chart-6`. Dimmed bars keep
+`--cl-chart-inactive-mix` (40%) of their color, mixed with `--cl-color-surface`, so they stay opaque
+over the grid. `--cl-color-chart-grid`, `--cl-color-chart-label` and `--cl-color-chart-tooltip` color
+the grid lines, the tick labels and the tooltip background. They default to `--cl-color-border`,
+`--cl-color-foreground-secondary` and `--cl-color-surface`.
 
 ```css
 .cl-chart {
   --cl-color-chart-1: oklch(0.55 0.2 160);
+  --cl-color-chart-grid: oklch(0.9 0 0);
+  --cl-chart-inactive-mix: 50%;
 }
 .cl-chart-grid-line {
   stroke-dasharray: none;

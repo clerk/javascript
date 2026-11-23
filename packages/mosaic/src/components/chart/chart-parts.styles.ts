@@ -4,7 +4,7 @@ import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } fr
 
 export const partStyles = stylex.create({
   gridLine: {
-    stroke: colorVars['--cl-color-border'],
+    stroke: colorVars['--cl-color-chart-grid'],
     strokeDasharray: '1 3',
     strokeLinecap: 'round',
     strokeWidth: 1,
@@ -15,7 +15,7 @@ export const partStyles = stylex.create({
   },
   tick: {
     fill: {
-      default: colorVars['--cl-color-foreground-secondary'],
+      default: colorVars['--cl-color-chart-label'],
       ':where([data-active])': colorVars['--cl-color-foreground'],
     },
     fontVariantNumeric: 'tabular-nums',
@@ -33,7 +33,7 @@ export const partStyles = stylex.create({
   tooltip: {
     padding: space['3'],
     borderRadius: radiusVars['--cl-radius-lg'],
-    backgroundColor: colorVars['--cl-color-surface'],
+    backgroundColor: colorVars['--cl-color-chart-tooltip'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {

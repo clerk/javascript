@@ -157,6 +157,36 @@ describe('Chart parts', () => {
     expect(near(canvasPixel(segmentCenter(1, 0)), VIOLET)).toBe(true);
   });
 
+  it('restyles the grid, labels, tooltip and dimming from the chart tokens', async () => {
+    const root = document.documentElement.style;
+    const tokens = {
+      '--cl-color-chart-grid': 'rgb(255, 0, 0)',
+      '--cl-color-chart-label': 'rgb(0, 128, 0)',
+      '--cl-color-chart-tooltip': 'rgb(0, 0, 255)',
+      '--cl-chart-inactive-mix': '100%',
+    };
+    for (const [name, value] of Object.entries(tokens)) {
+      root.setProperty(name, value);
+    }
+    try {
+      await renderChart(<GrowthChart highlight={{ category: 'B' }} />);
+
+      expect(getComputedStyle(document.querySelector('.cl-chart-grid-line') as Element).stroke).toBe('rgb(255, 0, 0)');
+      expect(getComputedStyle(document.querySelector('.cl-chart-y-tick') as Element).fill).toBe('rgb(0, 128, 0)');
+      await expect.poll(() => near(canvasPixel(segmentCenter(0, 0)), VIOLET)).toBe(true);
+
+      hover(segmentCenter(1, 1));
+      await expect.poll(() => document.querySelector('.cl-chart-tooltip')).toBeTruthy();
+      expect(getComputedStyle(document.querySelector('.cl-chart-tooltip') as Element).backgroundColor).toBe(
+        'rgb(0, 0, 255)',
+      );
+    } finally {
+      for (const name of Object.keys(tokens)) {
+        root.removeProperty(name);
+      }
+    }
+  });
+
   it('does not dim on hover without a highlight, and draws the hover band behind the bars', async () => {
     await renderChart(<GrowthChart />);
     const bar = segmentCenter(1, 0);
