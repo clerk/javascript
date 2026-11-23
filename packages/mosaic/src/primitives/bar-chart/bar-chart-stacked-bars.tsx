@@ -32,15 +32,41 @@ function getPixelRatio() {
   return Math.min(window.devicePixelRatio || 1, 2);
 }
 
-function getRootThemeAttributes() {
-  const root = document.documentElement;
-  return JSON.stringify([root.getAttribute('class'), root.getAttribute('style'), root.getAttribute('data-theme')]);
+const THEME_ATTRIBUTES = ['class', 'style', 'data-theme'];
+const PREFERS_DARK = '(prefers-color-scheme: dark)';
+
+function getAncestors(element: Element) {
+  const ancestors: Element[] = [];
+  for (let node = element.parentElement; node; node = node.parentElement) {
+    ancestors.push(node);
+  }
+  return ancestors;
 }
 
-function subscribeToRootTheme(onChange: () => void) {
+function getThemeSnapshot(bar: Element | null) {
+  if (!bar) {
+    return '';
+  }
+  return JSON.stringify([
+    window.matchMedia(PREFERS_DARK).matches,
+    ...getAncestors(bar).flatMap(element => THEME_ATTRIBUTES.map(name => element.getAttribute(name))),
+  ]);
+}
+
+function subscribeToTheme(bar: Element | null, onChange: () => void) {
+  if (!bar) {
+    return () => {};
+  }
   const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style', 'data-theme'] });
-  return () => observer.disconnect();
+  for (const element of getAncestors(bar)) {
+    observer.observe(element, { attributes: true, attributeFilter: THEME_ATTRIBUTES });
+  }
+  const query = window.matchMedia(PREFERS_DARK);
+  query.addEventListener('change', onChange);
+  return () => {
+    observer.disconnect();
+    query.removeEventListener('change', onChange);
+  };
 }
 
 const getServerSnapshot = () => '';
@@ -52,11 +78,6 @@ export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStac
     const { chart, layout, ariaLabel } = useBarChartContext('StackedBars');
     const { size, categories, scaleY } = chart;
     const { prepared, isBarActive, projection: projectedBar } = layout;
-    const rootThemeAttributes = React.useSyncExternalStore(
-      subscribeToRootTheme,
-      getRootThemeAttributes,
-      getServerSnapshot,
-    );
     const pixelRatio = React.useSyncExternalStore(subscribeToPixelRatio, getPixelRatio, getServerPixelRatio);
     const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
     const [canvasError, setCanvasError] = React.useState<CanvasRenderError | null>(null);
@@ -71,6 +92,11 @@ export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStac
         return () => observer.disconnect();
       },
       [bar],
+    );
+    const theme = React.useSyncExternalStore(
+      React.useCallback((onChange: () => void) => subscribeToTheme(bar, onChange), [bar]),
+      () => getThemeSnapshot(bar),
+      getServerSnapshot,
     );
     const barClass = React.useSyncExternalStore(
       subscribeToBarClass,
@@ -100,8 +126,8 @@ export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStac
       };
       canvas.addEventListener('contextlost', onContextLost);
       return () => canvas.removeEventListener('contextlost', onContextLost);
-      // `barClass` and `rootThemeAttributes` are not read here: they change the computed colors the paint reads from the DOM.
-    }, [bar, barClass, canvas, isBarActive, marks, pixelRatio, projection, rootThemeAttributes, size]);
+      // `barClass` and `theme` are not read here: they change the computed colors the paint reads from the DOM.
+    }, [bar, barClass, canvas, isBarActive, marks, pixelRatio, projection, size, theme]);
 
     const ownProps = {
       style: { position: 'absolute', inset: 0 },

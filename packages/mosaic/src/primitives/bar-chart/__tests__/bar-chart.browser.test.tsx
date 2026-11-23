@@ -22,6 +22,8 @@ beforeAll(async () => {
     .blue { color: rgb(0, 0, 255); }
     .series [data-series='value'], .series[data-series='value'] { color: rgb(0, 128, 0); }
     html.dark .themed { color: rgb(0, 0, 255); }
+    .scheme { color-scheme: light dark; color: light-dark(rgb(255, 0, 0), rgb(0, 0, 255)); }
+    .dark-scope .scoped { color: rgb(0, 0, 255); }
   `;
   document.head.append(style);
 });
@@ -120,6 +122,35 @@ describe('painting', () => {
       await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
     } finally {
       document.documentElement.classList.remove('dark');
+    }
+  });
+
+  it('repaints when the theme on an ancestor element changes', async () => {
+    await render(
+      <div data-testid='scope'>
+        <Chart barClassName='red scoped' />
+      </div>,
+    );
+    const { x, y } = insideLastBar();
+    await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+
+    screen.getByTestId('scope').classList.add('dark-scope');
+
+    await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+  });
+
+  it('repaints when the preferred color scheme changes', async () => {
+    await cdp().send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
+    try {
+      await render(<Chart barClassName='scheme' />);
+      const { x, y } = insideLastBar();
+      await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+
+      await cdp().send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
+
+      await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+    } finally {
+      await cdp().send('Emulation.setEmulatedMedia', { features: [] });
     }
   });
 

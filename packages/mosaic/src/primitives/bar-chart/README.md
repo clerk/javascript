@@ -178,7 +178,15 @@ Tailwind reads `_` inside `data-[…]` as a space, so a key such as `first_activ
 
 The geometry is paint only. Selection, the cursor and the scales use the category band. `BarChart.ProjectionOutline` takes its width and corner radius from the same geometry.
 
-The Canvas repaints in the same frame when `BarChart.Bar` mounts, unmounts or changes `class`, when `<html>` changes `class`, `style` or `data-theme`, when the pixel ratio changes (capped at 2), and when the layout or the props of `BarChart.StackedBars` change. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
+The Canvas repaints in the same frame when:
+
+- `BarChart.Bar` mounts, unmounts or changes `class`
+- any ancestor of `BarChart.Bar`, up to `<html>`, changes `class`, `style` or `data-theme`, so a theme class or `color-scheme` set on a wrapper repaints the bars
+- `prefers-color-scheme` changes, so `light-dark()` colors under `color-scheme: light dark` follow the OS
+- the pixel ratio changes (capped at 2)
+- the layout or the props of `BarChart.StackedBars` change
+
+Other changes to the computed color do not repaint: a stylesheet added or removed, another media query such as `prefers-contrast`, or an attribute other than those three on an ancestor. Change the class of `BarChart.Bar` to repaint after one. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
 
 ## Paint order
 
