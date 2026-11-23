@@ -7,6 +7,8 @@ export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
+export { BarChart } from '../components/bar-chart';
+export type { BarChartHighlight, BarChartProjection, BarChartProps, BarChartTooltip } from '../components/bar-chart';
 export { Banner } from '../components/banner';
 export { Branding } from '../components/branding';
 export type { BrandingProps } from '../components/branding';
