@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { type ReactNode, useId } from 'react';
 
 import { Badge } from '../../components/badge';
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Checkbox } from '../../components/checkbox';
@@ -24,6 +25,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { styles } from './oauth-consent.styles';
 import type {
+  OAuthConsentClientIdentity,
   OAuthConsentOrganization,
   OAuthConsentOrganizationSelection,
   OAuthConsentScopeItem,
@@ -64,6 +66,13 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           />
         }
       >
+        {props.clientIdentity ? (
+          <ClientIdentityBanner
+            messages={m}
+            identity={props.clientIdentity}
+            name={oauthApplicationName || props.applicationName}
+          />
+        ) : null}
         {props.organizations.length > 0 && props.organizationSelection ? (
           <OrganizationAccess
             messages={m}
@@ -104,19 +113,12 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
                   key={item.scope}
                   {...stylex.props(styles.scopeRow)}
                 >
-                  {props.scopeSelection ? (
-                    <ScopeOption
-                      item={item}
-                      selection={props.scopeSelection}
-                      disabled={props.pendingAction !== undefined}
-                      requiredLabel={m.required}
-                    />
-                  ) : (
-                    <ScopeText
-                      item={item}
-                      requiredLabel={m.required}
-                    />
-                  )}
+                  <ScopeOption
+                    item={item}
+                    selection={props.scopeSelection}
+                    disabled={props.pendingAction !== undefined}
+                    requiredLabel={m.required}
+                  />
                 </li>
               ))}
             </ul>
@@ -130,6 +132,11 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
             value={value}
           />
         ))}
+        <input
+          type='hidden'
+          name='scope'
+          value={props.scope}
+        />
         {postedOrganizationIds.map(id => (
           <input
             key={id}
@@ -377,22 +384,25 @@ function ScopeOption({
   );
 }
 
-function ScopeText({ item, requiredLabel }: { item: OAuthConsentScopeItem; requiredLabel: string }) {
-  return (
-    <div {...stylex.props(styles.scopeText)}>
-      <div {...stylex.props(styles.scopeLabel)}>
-        <Text>{item.label}</Text>
-        {item.required ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
-      </div>
-      {item.description ? (
-        <Text
-          size='xs'
-          color='foreground-secondary'
-        >
-          {item.description}
-        </Text>
-      ) : null}
-    </div>
+function ClientIdentityBanner({
+  messages: m,
+  identity,
+  name,
+}: {
+  messages: OAuthConsentViewProps['messages'];
+  identity: OAuthConsentClientIdentity;
+  name: string;
+}) {
+  return identity.registration === 'dynamic' ? (
+    <Banner.Root color='warning'>
+      <Banner.Description>{fill(m.clientIdentity.dynamic, { oauthApplicationName: name })}</Banner.Description>
+    </Banner.Root>
+  ) : (
+    <Banner.Root color='neutral'>
+      <Banner.Description>
+        {fill(m.clientIdentity.metadataDocument, { metadataHost: identity.metadataHost })}
+      </Banner.Description>
+    </Banner.Root>
   );
 }
 

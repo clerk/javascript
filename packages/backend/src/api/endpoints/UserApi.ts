@@ -12,7 +12,7 @@ import type {
   PhoneNumber,
 } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
-import type { UserMergedJSON } from '../resources/JSON';
+import type { PaginationCursorJSON, UserMergedJSON } from '../resources/JSON';
 import { User } from '../resources/User';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
@@ -90,6 +90,84 @@ export type UserListParams = ClerkPaginationRequest<{
   /** Filters users who are members of the specified Organizations. Accepts up to 100 Organization IDs. */
   organizationId?: string[];
 }>;
+
+/**
+ * A filter on user metadata. A user matches when the filter's `match` holds for the value at `key` in the metadata named by `scope`.
+ */
+export type UserSearchMetadataFilter = {
+  /** The metadata to match against. */
+  scope: 'public' | 'private' | 'unsafe';
+  /** A dot-separated path into the metadata, for example `settings.theme`. Escape a literal dot in a key as `\.`. */
+  key: string;
+  /** `exists` matches users that hold the key, whether it holds a value or nested keys. `equals` matches the whole value, case-insensitively. */
+  match: 'exists' | 'equals';
+  /** The value to compare against. Required for `equals` and not allowed for `exists`. */
+  value?: string;
+  /** If `true`, returns the users the filter does not match instead. */
+  negate?: boolean;
+};
+
+/** @generateWithEmptyComment */
+export type UserSearchParams = Omit<UserListParams, 'limit' | 'offset' | 'startingAfter' | 'last_active_at_since'> & {
+  /** Maximum number of users returned per page. Must be an integer greater than zero and less than `501`. Defaults to `10`. */
+  limit?: number;
+  /** The `cursor.startingAfter` of the previous page. Omit it for the first page, and keep every other parameter the same across pages. */
+  startingAfter?: string;
+  /** The `cursor.endingBefore` of a previous page. Returns the page before that one. It cannot be combined with `startingAfter`. A page read backward can hold fewer users than `limit` even when more users exist. */
+  endingBefore?: string;
+  /**
+   * Also counts the users from the start of this page onward, this page included. On the first page that is every user the request matches.
+   *
+   * A number counts up to that many: the response's cursor carries `remainingCountExact` when there are fewer users than the number, and otherwise `remainingCountAtLeast`, set to that number. `'exact'` counts them all, with no limit. It takes longer the more users match, and the request fails if the count does not finish in time.
+   *
+   * The count is computed separately from the page. Treat it as a close estimate: it can differ slightly from the number of users that paging through the results returns.
+   */
+  remainingCount?: 100 | 1000 | 10000 | 'exact';
+  /** Filters users with emails that match the given query, via case-insensitive partial match. For example, `emailAddressQuery=ello` will match a user with the email `HELLO@example.com`. */
+  emailAddressQuery?: string;
+  /** Filters users with phone numbers that match the given query, via case-insensitive partial match. For example, `phoneNumberQuery=555` will match a user with the phone number `+1555xxxxxxx`. */
+  phoneNumberQuery?: string;
+  /** Filters users with usernames that match the given query, via case-insensitive partial match. For example, `usernameQuery=CoolUser` will match a user with the username `SomeCoolUser`. */
+  usernameQuery?: string;
+  /** Filters users with names that match the given query, via case-insensitive partial match. */
+  nameQuery?: string;
+  /** Filters users that have an external account with the specified provider, for example `oauth_google`. Must be used together with `providerUserId`. */
+  provider?: string;
+  /** Filters users with the specified provider user IDs for the given `provider`. Must be used together with `provider`. Accepts up to 100 provider user IDs. */
+  providerUserId?: string[];
+  /** Filters users that are banned (`true`) or not banned (`false`). */
+  banned?: boolean;
+  /** Filters users that are deprovisioned (`true`) or not deprovisioned (`false`). */
+  deprovisioned?: boolean;
+  /** Filters users that match every one of the given metadata filters. Accepts up to 10 filters. */
+  metadata?: UserSearchMetadataFilter[];
+};
+
+/**
+ * The position of a page of users returned by `searchUsers()`.
+ */
+export type UserSearchCursor = {
+  /** The value to pass as `startingAfter` to get the next page, or `null` if this is the last page. */
+  startingAfter: string | null;
+  /** The value to pass as `endingBefore` to get the page before this one. It is also set on pages read forward, and is `null` if there is no earlier page. */
+  endingBefore: string | null;
+  /** Whether there are more users after this page. */
+  hasNextPage: boolean;
+  /** The number of users from the start of this page onward. Present when `remainingCount` was passed and the count did not reach its limit. */
+  remainingCountExact?: number;
+  /** A lower bound on the number of users from the start of this page onward. Present when `remainingCount` was a number and at least that many users remain. */
+  remainingCountAtLeast?: number;
+};
+
+/**
+ * The response of `searchUsers()`.
+ */
+export type UserSearchResponse = {
+  /** The users on this page. */
+  data: User[];
+  /** The cursor to the next and previous pages, with the count if one was requested. */
+  cursor: UserSearchCursor;
+};
 
 /** @inline */
 export type UserMetadataParams = {
@@ -500,13 +578,59 @@ export class UserAPI extends AbstractAPI {
     const countRequest = this.getCount(userCountParams);
     // The count is not awaited when the page shows the total, so a failure must not go unhandled.
     countRequest.catch(() => {});
+    const { data } = await this.getUserListWithoutCount(params);
+    const totalCount = totalCountFromLastPage(data.length, { limit, offset, startingAfter }) ?? (await countRequest);
+    return { data, totalCount } as PaginatedResourceResponse<User[]>;
+  }
+
+  /**
+   * Retrieves the list of users in your instance without their total count. It takes the same parameters as `getUserList()` and returns the same users, but makes no request to count them, which can be slow for a search over many users. By default, the list is returned in descending order by creation date (newest first).
+   *
+   * There is no total, so page until a page holds fewer users than its `limit`.
+   * @returns An object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects.
+   */
+  public async getUserListWithoutCount(params: UserListParams = {}): Promise<{ data: User[] }> {
     const data = await this.request<User[]>({
       method: 'GET',
       path: basePath,
       queryParams: params,
     });
-    const totalCount = totalCountFromLastPage(data.length, { limit, offset, startingAfter }) ?? (await countRequest);
-    return { data, totalCount } as PaginatedResourceResponse<User[]>;
+    return { data };
+  }
+
+  /**
+   * Retrieves one page of the users in your instance that match the given filters, or of all users when none are given. By default, the page is returned in descending order by creation date (newest first).
+   *
+   * Pages are linked by the `cursor` in the response. Pass `cursor.startingAfter` as `startingAfter` to get the next page, until it is `null`, or `cursor.endingBefore` as `endingBefore` to get the previous page. Paging by cursor works with every `orderBy` and does not slow down on later pages.
+   *
+   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count. To read a user right after you change them, get them by ID with `getUser()`.
+   * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
+   */
+  public async searchUsers(params: UserSearchParams = {}): Promise<UserSearchResponse> {
+    const { metadata, banned, deprovisioned, ...queryParams } = params;
+    const { data, cursor } = await this.request<{ data: User[]; cursor: PaginationCursorJSON }>({
+      method: 'GET',
+      path: basePath,
+      queryParams: {
+        ...queryParams,
+        // The request drops falsy query params, so `false` is sent as a string.
+        banned: banned?.toString(),
+        deprovisioned: deprovisioned?.toString(),
+        metadata: metadata?.map(filter => JSON.stringify(filter)),
+        // GET /v1/users returns a cursor only in this mode.
+        pagination: 'cursor',
+      },
+    });
+    return {
+      data,
+      cursor: {
+        startingAfter: cursor.starting_after,
+        endingBefore: cursor.ending_before,
+        hasNextPage: cursor.has_next_page,
+        remainingCountExact: cursor.remaining_count_exact,
+        remainingCountAtLeast: cursor.remaining_count_at_least,
+      },
+    };
   }
 
   /**
@@ -848,7 +972,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Protections**](https://dashboard.clerk.com/~/protect/protections) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
+   * Locks the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), which means that they are not allowed to sign in again until the lock expires or is manually unlocked. By default, lockout duration is 1 hour, but it can be configured on the application's [**Sign-in security**](https://dashboard.clerk.com/~/protect/sign-in-security) page under **Protect**. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to lock.
    */
   public async lockUser(userId: string) {

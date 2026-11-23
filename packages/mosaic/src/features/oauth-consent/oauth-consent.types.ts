@@ -11,8 +11,13 @@ export interface OAuthConsentOrganization extends SelectItem {
   imageUrl?: string;
 }
 
+export type OAuthConsentClientIdentity =
+  | { registration: 'dynamic' }
+  | { registration: 'metadata_document'; metadataHost: string };
+
 export interface OAuthConsentData {
   oauthApplicationName: string;
+  clientIdentity: OAuthConsentClientIdentity | null;
   scopes: OAuthConsentScopeRecord[];
   hasOfflineAccess: boolean;
   applicationName: string;
@@ -59,10 +64,12 @@ export interface OAuthConsentOrganizationSelection {
 export interface OAuthConsentViewProps {
   messages: OAuthConsentMessages;
   oauthApplicationName: string;
+  clientIdentity: OAuthConsentClientIdentity | null;
   identifier: string;
   applicationName: string;
   scopes: OAuthConsentScopeItem[];
-  scopeSelection?: OAuthConsentScopeSelection;
+  scopeSelection: OAuthConsentScopeSelection;
+  scope: string;
   hasOfflineAccess: boolean;
   organizations: OAuthConsentOrganization[];
   organizationId: string | null;
