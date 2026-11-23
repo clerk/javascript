@@ -20,7 +20,6 @@ export default defineConfig({
     'components/avatar': './src/components/avatar/index.ts',
     'components/badge': './src/components/badge/index.ts',
     'components/banner': './src/components/banner/index.ts',
-    'components/bar-chart': './src/components/bar-chart/index.ts',
     'components/button': './src/components/button/index.ts',
     'components/card': './src/components/card/index.ts',
     'components/chart': './src/components/chart/index.ts',

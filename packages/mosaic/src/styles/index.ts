@@ -7,8 +7,6 @@ export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
-export { BarChart } from '../components/bar-chart';
-export type { BarChartHighlight, BarChartProjection, BarChartProps, BarChartTooltip } from '../components/bar-chart';
 export { Banner } from '../components/banner';
 export { Branding } from '../components/branding';
 export type { BrandingProps } from '../components/branding';
@@ -20,13 +18,18 @@ export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
 export { Chart } from '../components/chart';
 export type {
+  BarChartHighlight,
+  BarChartProjection,
   ChartColor,
   ChartLegendItem,
   ChartLegendProps,
+  ChartRootProps,
   ChartSeries,
   ChartTooltipContentProps,
+  ChartTooltipData,
   ChartTooltipMetric,
   ChartTooltipRow,
+  UseBarChartOptions,
 } from '../components/chart';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';

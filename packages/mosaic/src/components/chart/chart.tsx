@@ -2,6 +2,7 @@
 
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -17,6 +18,7 @@ import {
   type ChartTooltipRow,
   resolveChartColor,
 } from './chart-series';
+import { ChartStyleContext } from './internal/chart-style';
 
 function Swatch({ color, swatch }: Readonly<{ color: ChartColor; swatch: ChartSwatch }>) {
   return (
@@ -31,31 +33,38 @@ function Swatch({ color, swatch }: Readonly<{ color: ChartColor; swatch: ChartSw
 }
 
 export interface ChartLegendProps extends Omit<MosaicElementProps<'ul'>, 'children'> {
-  /** The entries, in order. Pass the chart's `series` array as is. */
-  items: readonly ChartLegendItem[];
+  /** The entries, in order. Default: the chart's series, then a labelled projection */
+  items?: readonly ChartLegendItem[];
+  /** Renders an item's label. The swatch stays. Default: `item.label` */
+  children?: (item: ChartLegendItem) => React.ReactNode;
 }
 
 /**
- * A row of swatch and label pairs. It reads no context, so it renders anywhere: above a chart, in a
- * card header beside an action, or next to a skeleton.
+ * A row of swatch and label pairs. Inside `Chart.Root` it reads the chart's series and renders
+ * above the plot. Elsewhere it takes `items`, so it renders in a card header or beside a skeleton.
  */
 export const ChartLegend = React.forwardRef<HTMLUListElement, ChartLegendProps>(function ChartLegend(
-  { items, xstyle, ...rest },
+  { items, children, xstyle, ...rest },
   ref,
 ) {
-  return (
+  const chart = React.useContext(ChartStyleContext);
+  const entries = items ?? chart?.style.legend;
+  if (!entries) {
+    throw new Error('<Chart.Legend> needs `items` outside <Chart.Root>');
+  }
+  const legend = (
     <ul
       ref={ref}
       {...mergeStyleProps(themeProps('chart-legend'), stylex.props(reset.base, legendStyles.root, xstyle), rest)}
     >
-      {items.map(item => {
+      {entries.map(item => {
         const content = (
           <>
             <Swatch
               color={item.color}
               swatch={item.swatch ?? 'square'}
             />
-            {item.label}
+            {children ? children(item) : item.label}
           </>
         );
         return (
@@ -85,6 +94,11 @@ export const ChartLegend = React.forwardRef<HTMLUListElement, ChartLegendProps>(
       })}
     </ul>
   );
+  if (!chart) {
+    return legend;
+  }
+  // Rendered from inside the plot, but placed above it: the plot's layers cover the whole plot box.
+  return chart.legendHost ? createPortal(legend, chart.legendHost) : null;
 });
 
 export interface ChartTooltipContentProps extends Omit<MosaicElementProps<'div'>, 'children'> {

@@ -1,7 +1,8 @@
-import type { ActiveBar, BarIdentity, BarSection } from '../../primitives/chart';
-import type { ChartSeries, ChartTooltipMetric, ChartTooltipRow } from '../chart';
-import type { SeriesBridge } from '../chart/internal/series-bridge';
-import type { ChartFormat } from '../chart/internal/use-chart-format';
+import type { ActiveBar, BarIdentity, BarSection } from '../../../primitives/chart';
+import type { ChartSeries } from '../chart-series';
+import type { ChartTooltipData } from '../internal/chart-style';
+import type { SeriesBridge } from '../internal/series-bridge';
+import type { ChartFormat } from '../internal/use-chart-format';
 
 /** The bars that keep full strength. A bar is active when it matches every field given. */
 export type BarChartHighlight = Readonly<{
@@ -40,17 +41,6 @@ export interface BarChartProjection {
   description?: string;
 }
 
-/** What `renderTooltip` receives. Everything but `active` spreads into `Chart.TooltipContent`. */
-export interface BarChartTooltip<TDatum> {
-  active: ActiveBar<TDatum>;
-  /** The category through `formatCategory(key, 'tooltip')`. */
-  heading: string;
-  /** The projection row, when the selected bar shows one and `projection.label` is set. */
-  metrics: readonly ChartTooltipMetric[];
-  /** The selected section's series with a nonzero value, top of the stack first. */
-  rows: readonly ChartTooltipRow[];
-}
-
 /** Returns null when the period has no rows and no projection, which hides the tooltip. */
 export function barTooltip<TDatum>({
   active,
@@ -62,7 +52,7 @@ export function barTooltip<TDatum>({
   series: readonly ChartSeries<TDatum>[];
   projection: BarChartProjection | undefined;
   format: ChartFormat;
-}>): BarChartTooltip<TDatum> | null {
+}>): ChartTooltipData<ActiveBar<TDatum>> | null {
   const positive = active.section === 'positive';
   const inSection = series.flatMap(entry => {
     const value = entry.value(active.datum);

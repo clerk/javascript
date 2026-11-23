@@ -1,8 +1,9 @@
-import { act, cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, render, renderHook, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { Chart, type ChartSeries } from '..';
 import { bridgeSeries } from '../internal/series-bridge';
+import { useChartFormat } from '../internal/use-chart-format';
 
 afterEach(() => cleanup());
 
@@ -42,6 +43,12 @@ describe('Chart.Legend', () => {
     );
 
     expect(screen.getByRole('listitem').querySelector('.cl-chart-swatch')).toHaveAttribute('data-swatch', 'dashed');
+  });
+});
+
+describe('Chart parts outside a root', () => {
+  it('throws, naming the part', () => {
+    expect(() => render(<Chart.Grid />)).toThrow('<Chart.Grid> must be used within <Chart.Root>');
   });
 });
 
@@ -89,5 +96,23 @@ describe('series boundary', () => {
     const many = Array.from({ length: 9 }, (_, i): ChartSeries<Row> => ({ ...signups, key: `s${i}` }));
 
     expect(() => bridgeSeries(many)).toThrow(/at most 8 series, and got 9. Fold the smallest into one "Other" series/);
+  });
+});
+
+describe('default formatting', () => {
+  it('formats a UTC date key as a date in UTC, and any other key as is', () => {
+    const { result } = renderHook(() => useChartFormat({}));
+
+    expect(result.current.category('2026-01-05', 'axis')).toBe('Jan 5');
+    expect(result.current.category('2026-01-05T00:00:00Z', 'tooltip')).toBe('Jan 5, 2026');
+    expect(result.current.category('Week 2', 'tooltip')).toBe('Week 2');
+    expect(result.current.category('2026-13-45', 'axis')).toBe('2026-13-45');
+  });
+
+  it('formats values compactly on the axis and in full in the tooltip', () => {
+    const { result } = renderHook(() => useChartFormat({}));
+
+    expect(result.current.value(12_500, 'axis')).toBe('13K');
+    expect(result.current.value(12_500, 'tooltip')).toBe('12,500');
   });
 });

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ActiveBar } from '../../../primitives/chart';
-import type { ChartSeries } from '../../chart';
-import type { ChartFormat } from '../../chart/internal/use-chart-format';
-import { barTooltip } from '../bar-chart-series';
+import type { ActiveBar } from '../../../../primitives/chart';
+import type { ChartSeries } from '../../chart-series';
+import type { ChartFormat } from '../../internal/use-chart-format';
+import { barTooltip } from '../bar-tooltip';
 
 type Row = { week: string; signups: number; returning: number; churned: number };
 

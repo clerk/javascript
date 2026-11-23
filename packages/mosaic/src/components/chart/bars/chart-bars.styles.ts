@@ -1,12 +1,18 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, space } from '../../tokens.stylex';
+import { colorVars } from '../../../tokens.stylex';
 
 const mark = 'var(--_cl-chart-mark)';
 
-// `BarChart.Bar` is hidden; the Canvas paints every bar from its computed color and geometry.
+// `Chart.Bar` is hidden; the Canvas paints every bar from its computed color and geometry.
 // Dimmed and projection fills are opaque mixes with the surface, so grid lines never show through.
 export const barStyles = stylex.create({
+  // Above the cursor, so the hover band shows only in the gaps and bar colors stay exact. The
+  // interaction surface below still takes the pointer, because nothing here does.
+  stackedBars: {
+    pointerEvents: 'none',
+    zIndex: 1,
+  },
   bar: {
     color: {
       default: mark,
@@ -25,13 +31,5 @@ export const barStyles = stylex.create({
     stroke: colorVars['--cl-color-foreground-secondary'],
     strokeDasharray: '3 3',
     strokeWidth: 1,
-  },
-  error: {
-    gap: space['3'],
-    alignItems: 'center',
-    color: colorVars['--cl-color-foreground-secondary'],
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'center',
   },
 });

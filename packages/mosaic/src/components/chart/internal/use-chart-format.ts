@@ -12,15 +12,17 @@ export interface ChartFormat {
 export interface ChartFormatOptions {
   formatValue?: (value: number, place: ChartFormatPlace) => string;
   formatCategory?: (key: string, place: ChartFormatPlace) => string;
-  xTicks: 'category' | 'calendar';
 }
 
+/** A UTC date key, as `Chart.XAxis ticks='calendar'` requires: `2026-01-05` or a full ISO string in UTC. */
+const UTC_DATE_KEY = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?Z)?$/;
+
 /**
- * Defaults come from the Mosaic locale. Values use `Intl.NumberFormat`, compact on the axis. Under
- * `calendar`, categories are UTC dates, so they format in UTC rather than local time, which would
- * show the previous day west of Greenwich.
+ * Defaults come from the Mosaic locale. Values use `Intl.NumberFormat`, compact on the axis. A key
+ * that is a UTC date formats in UTC rather than local time, which would show the previous day west
+ * of Greenwich. Any other key shows as is.
  */
-export function useChartFormat({ formatValue, formatCategory, xTicks }: ChartFormatOptions): ChartFormat {
+export function useChartFormat({ formatValue, formatCategory }: ChartFormatOptions): ChartFormat {
   const locale = useLocale();
   const defaults = React.useMemo(() => {
     const number = new Intl.NumberFormat(locale);
@@ -30,14 +32,14 @@ export function useChartFormat({ formatValue, formatCategory, xTicks }: ChartFor
     return {
       value: (value: number, place: ChartFormatPlace) => (place === 'axis' ? compact : number).format(value),
       category: (key: string, place: ChartFormatPlace) => {
-        const date = xTicks === 'calendar' ? new Date(key) : null;
+        const date = UTC_DATE_KEY.test(key) ? new Date(key) : null;
         if (!date || Number.isNaN(date.getTime())) {
           return key;
         }
         return (place === 'axis' ? shortDate : longDate).format(date);
       },
     };
-  }, [locale, xTicks]);
+  }, [locale]);
   return React.useMemo(
     () => ({ value: formatValue ?? defaults.value, category: formatCategory ?? defaults.category }),
     [defaults, formatCategory, formatValue],

@@ -3,8 +3,7 @@ import type {} from '@vitest/browser-playwright';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
 
-import type { ChartSeries } from '../../chart';
-import { BarChart, type BarChartProps } from '../bar-chart';
+import { type ActiveBar, Chart, type ChartSeries } from '..';
 
 type Row = { period: string; a: number; b: number; c: number };
 
@@ -40,16 +39,30 @@ afterEach(async () => {
   await cdp().send('Emulation.setEmulatedMedia', { features: [] });
 });
 
-function Chart(props: Partial<BarChartProps<Row>>) {
+function GrowthChart({
+  series: growthSeries = series,
+  highlight,
+  onRenderError,
+}: Readonly<{
+  series?: ChartSeries<Row>[];
+  highlight?: { category: string };
+  onRenderError?: (error: Error) => void;
+}>) {
+  const chart = Chart.useBarChart({ data: rows, index, series: growthSeries, highlight });
   return (
     <div style={{ width: 640, colorScheme: 'light dark' }}>
-      <BarChart
+      <Chart.Root
+        chart={chart}
         aria-label='Growth'
-        data={rows}
-        index={index}
-        series={series}
-        {...props}
-      />
+        onRenderError={onRenderError}
+      >
+        <Chart.Legend />
+        <Chart.Grid />
+        <Chart.StackedBars />
+        <Chart.YAxis />
+        <Chart.XAxis />
+        <Chart.Selection />
+      </Chart.Root>
     </div>
   );
 }
@@ -117,9 +130,9 @@ function hover({ x, y }: { x: number; y: number }) {
   );
 }
 
-describe('BarChart', () => {
+describe('Chart parts', () => {
   it('paints each series in its palette slot', async () => {
-    await renderChart(<Chart />);
+    await renderChart(<GrowthChart />);
     expect(document.querySelector('.cl-chart')).toHaveAttribute('data-state', 'ready');
 
     for (const [position, color] of [VIOLET, SKY, ORANGE].entries()) {
@@ -128,7 +141,7 @@ describe('BarChart', () => {
   });
 
   it('dims the bars outside the highlight with an opaque mix that hides the grid line', async () => {
-    await renderChart(<Chart highlight={{ category: 'B' }} />);
+    await renderChart(<GrowthChart highlight={{ category: 'B' }} />);
     const gridLine = [...document.querySelectorAll('.cl-chart-grid-line')].find(line => {
       const y = line.getBoundingClientRect().top;
       const bottom = plot().bottom;
@@ -145,7 +158,7 @@ describe('BarChart', () => {
   });
 
   it('does not dim on hover without a highlight, and draws the hover band behind the bars', async () => {
-    await renderChart(<Chart />);
+    await renderChart(<GrowthChart />);
     const bar = segmentCenter(1, 0);
     await expect.poll(() => near(canvasPixel(bar), VIOLET)).toBe(true);
     const besideBar = { x: bar.x + 40, y: bar.y };
@@ -161,7 +174,7 @@ describe('BarChart', () => {
   });
 
   it('opens a tooltip with the period and one row per series, top of the stack first', async () => {
-    await renderChart(<Chart />);
+    await renderChart(<GrowthChart />);
 
     hover(segmentCenter(1, 1));
 
@@ -177,7 +190,7 @@ describe('BarChart', () => {
 
   it('repaints when the preferred color scheme flips to dark', async () => {
     await cdp().send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
-    await renderChart(<Chart />);
+    await renderChart(<GrowthChart />);
     const bar = segmentCenter(1, 0);
     await expect.poll(() => near(canvasPixel(bar), VIOLET)).toBe(true);
 
@@ -191,7 +204,7 @@ describe('BarChart', () => {
     const errors: Error[] = [];
     HTMLCanvasElement.prototype.getContext = () => null;
     try {
-      render(<Chart onRenderError={error => errors.push(error)} />);
+      render(<GrowthChart onRenderError={error => errors.push(error)} />);
       await expect.poll(() => screen.queryByText('The chart could not be displayed.')).toBeTruthy();
       expect(document.querySelector('.cl-chart')).toHaveAttribute('data-state', 'error');
       expect(errors.map(error => error.name)).toEqual(['CanvasRenderError']);
@@ -207,95 +220,92 @@ describe('BarChart', () => {
   });
 
   it('repaints when a series changes color', async () => {
-    const { rerender } = await renderChart(<Chart />);
+    const { rerender } = await renderChart(<GrowthChart />);
     const bar = segmentCenter(1, 0);
     await expect.poll(() => near(canvasPixel(bar), VIOLET)).toBe(true);
 
-    rerender(<Chart series={series.map(entry => (entry.key === 'a' ? { ...entry, color: 3 } : entry))} />);
+    rerender(<GrowthChart series={series.map(entry => (entry.key === 'a' ? { ...entry, color: 3 } : entry))} />);
 
     await expect.poll(() => near(canvasPixel(bar), ORANGE)).toBe(true);
   });
 });
 
-type Growth = { week: string; signups: number; returning: number; churned: number };
+type Week = { week: string; signups: number; returning: number };
 
-const growth: Growth[] = [{ week: '2026-01-05', signups: 40, returning: 22, churned: -14 }];
+const weeks: Week[] = [{ week: '2026-01-05', signups: 40, returning: 22 }];
 
-const growthSeries: ChartSeries<Growth>[] = [
+const weekSeries: ChartSeries<Week>[] = [
   { key: 'signups', label: 'Sign-ups', color: 1, value: row => row.signups },
   { key: 'returning', label: 'Returning', color: 2, value: row => row.returning },
-  { key: 'churned', label: 'Churned', color: 3, value: row => row.churned },
 ];
 
-const growthIndex = (row: Growth) => row.week;
+const getWeek = (row: Week) => row.week;
 
-function legendLabels() {
-  return screen.queryAllByRole('listitem').map(item => item.textContent);
+function WeekChart({
+  data = weeks,
+  projection,
+  renderEmptyState,
+  children = <Chart.Legend />,
+}: Readonly<{
+  data?: Week[];
+  projection?: { datumIndex: number; value: number; label?: string };
+  renderEmptyState?: () => React.ReactNode;
+  children?: React.ReactNode;
+}>) {
+  const chart = Chart.useBarChart({ data, index: getWeek, series: weekSeries, projection });
+  return (
+    <Chart.Root
+      chart={chart}
+      aria-label='Growth'
+      renderEmptyState={renderEmptyState}
+    >
+      {children}
+    </Chart.Root>
+  );
 }
 
-describe('BarChart legend', () => {
-  it('shows a legend for two or more series', () => {
-    render(
-      <BarChart
-        aria-label='Growth'
-        data={growth}
-        index={growthIndex}
-        series={growthSeries}
-      />,
-    );
+describe('Chart.Legend in a chart', () => {
+  it('reads the series from the chart and sits above the plot', () => {
+    render(<WeekChart />);
 
-    expect(legendLabels()).toEqual(['Sign-ups', 'Returning', 'Churned']);
-  });
-
-  it('leaves the legend out for a single series unless asked', () => {
-    const { rerender } = render(
-      <BarChart
-        aria-label='Growth'
-        data={growth}
-        index={growthIndex}
-        series={growthSeries.slice(0, 1)}
-      />,
-    );
-    expect(legendLabels()).toEqual([]);
-
-    rerender(
-      <BarChart
-        aria-label='Growth'
-        data={growth}
-        index={growthIndex}
-        series={growthSeries.slice(0, 1)}
-        showLegend
-      />,
-    );
-    expect(legendLabels()).toEqual(['Sign-ups']);
+    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual(['Sign-ups', 'Returning']);
+    const legend = document.querySelector('.cl-chart-legend');
+    const plot = document.querySelector('.cl-chart-plot');
+    expect(legend?.closest('.cl-chart-plot')).toBeNull();
+    expect(legend && plot && legend.compareDocumentPosition(plot) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('adds a labelled projection as a dashed entry', () => {
-    render(
-      <BarChart
-        aria-label='Growth'
-        data={growth}
-        index={growthIndex}
-        series={growthSeries.slice(0, 1)}
-        projection={{ datumIndex: 0, value: 80, label: 'Projected' }}
-      />,
-    );
+    render(<WeekChart projection={{ datumIndex: 0, value: 80, label: 'Projected' }} />);
 
-    expect(legendLabels()).toEqual(['Sign-ups', 'Projected']);
+    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual([
+      'Sign-ups',
+      'Returning',
+      'Projected',
+    ]);
     expect(screen.getByText('Projected').querySelector('.cl-chart-swatch')).toHaveAttribute('data-swatch', 'dashed');
+  });
+
+  it('renders each label through its children and keeps the swatch', () => {
+    render(<WeekChart>{<Chart.Legend>{item => `${item.label} (weekly)`}</Chart.Legend>}</WeekChart>);
+
+    const items = screen.getAllByRole('listitem');
+    expect(items.map(item => item.textContent)).toEqual(['Sign-ups (weekly)', 'Returning (weekly)']);
+    expect(items[0]?.querySelector('.cl-chart-swatch')).toHaveAttribute('data-swatch', 'square');
   });
 });
 
-describe('BarChart empty state', () => {
+describe('Chart.Root states', () => {
+  it('is ready with rows', () => {
+    render(<WeekChart />);
+
+    expect(document.querySelector('.cl-chart')).toHaveAttribute('data-state', 'ready');
+    expect(document.querySelector('.cl-chart')).toHaveAttribute('data-chart', 'bar');
+    expect(screen.queryByText('No data to show')).toBeNull();
+  });
+
   it('shows the default empty state without rows', () => {
-    render(
-      <BarChart
-        aria-label='Growth'
-        data={[]}
-        index={growthIndex}
-        series={growthSeries}
-      />,
-    );
+    render(<WeekChart data={[]} />);
 
     expect(screen.getByText('No data to show')).toBeInTheDocument();
     expect(document.querySelector('.cl-chart')).toHaveAttribute('data-state', 'empty');
@@ -303,16 +313,45 @@ describe('BarChart empty state', () => {
 
   it('renders the caller empty state instead', () => {
     render(
-      <BarChart
-        aria-label='Growth'
+      <WeekChart
         data={[]}
-        index={growthIndex}
-        series={growthSeries}
         renderEmptyState={() => <p>Connect a data source</p>}
       />,
     );
 
     expect(screen.getByText('Connect a data source')).toBeInTheDocument();
     expect(screen.queryByText('No data to show')).toBeNull();
+  });
+});
+
+function CustomTooltipChart() {
+  const chart = Chart.useBarChart({ data: rows, index, series });
+  return (
+    <div style={{ width: 640 }}>
+      <Chart.Root
+        chart={chart}
+        aria-label='Growth'
+      >
+        <Chart.StackedBars />
+        <Chart.Selection>
+          <Chart.Tooltip<ActiveBar<Row>>>
+            {({ heading, active }) => (
+              <p className='custom-tooltip'>{`${heading}: ${active.datum.a + active.datum.b}`}</p>
+            )}
+          </Chart.Tooltip>
+        </Chart.Selection>
+      </Chart.Root>
+    </div>
+  );
+}
+
+describe('Chart.Tooltip', () => {
+  it('renders its children with the selected period instead of the default rows', async () => {
+    await renderChart(<CustomTooltipChart />);
+
+    hover(segmentCenter(1, 1));
+
+    await expect.poll(() => document.querySelector('.custom-tooltip')?.textContent).toBe('B: 20');
+    expect(document.querySelector('.cl-chart-tooltip-content')).toBeNull();
   });
 });

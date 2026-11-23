@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
-import type { ChartSeries } from '../../chart';
-import { BarChart } from '../bar-chart';
+import { Chart, type ChartSeries } from '..';
 
 const weeks = [
   { week: '2026-01-05', signups: 40, returning: 22, churned: -14 },
@@ -28,38 +27,60 @@ afterEach(() => {
   document.documentElement.style.colorScheme = '';
 });
 
+function WeeklyGrowth() {
+  const chart = Chart.useBarChart({
+    data: weeks,
+    index: getWeek,
+    series,
+    highlight: { category: '2026-01-26' },
+    projection: { datumIndex: 5, value: 120, label: 'Projected' },
+  });
+  return (
+    <Chart.Root
+      chart={chart}
+      aria-label='Weekly growth'
+    >
+      <Chart.Legend />
+      <Chart.Grid />
+      <Chart.StackedBars>
+        <Chart.Bar />
+        <Chart.ProjectionOutline />
+        <Chart.YLine value={0} />
+      </Chart.StackedBars>
+      <Chart.YAxis />
+      <Chart.XAxis ticks='calendar' />
+      <Chart.Selection>
+        <Chart.Cursor />
+        <Chart.Tooltip />
+      </Chart.Selection>
+    </Chart.Root>
+  );
+}
+
 async function renderChart() {
   render(
     <div
       data-testid='frame'
       style={{ width: 640, padding: 16, background: 'var(--cl-color-surface)' }}
     >
-      <BarChart
-        aria-label='Weekly growth'
-        data={weeks}
-        index={getWeek}
-        series={series}
-        xTicks='calendar'
-        highlight={{ category: '2026-01-26' }}
-        projection={{ datumIndex: 5, value: 120, label: 'Projected' }}
-      />
+      <WeeklyGrowth />
     </div>,
   );
   await screen.findByRole('img', { name: 'Weekly growth' });
   return screen.getByTestId('frame');
 }
 
-describe('BarChart visual states', () => {
+describe('Chart visual states', () => {
   it('draws the palette, a dimmed highlight and a projection in light mode', async () => {
     const chart = await renderChart();
 
-    await expect(page.elementLocator(chart)).toMatchScreenshot('bar-chart-light');
+    await expect(page.elementLocator(chart)).toMatchScreenshot('chart-light');
   });
 
   it('draws the palette, a dimmed highlight and a projection in dark mode', async () => {
     document.documentElement.style.colorScheme = 'dark';
     const chart = await renderChart();
 
-    await expect(page.elementLocator(chart)).toMatchScreenshot('bar-chart-dark');
+    await expect(page.elementLocator(chart)).toMatchScreenshot('chart-dark');
   });
 });

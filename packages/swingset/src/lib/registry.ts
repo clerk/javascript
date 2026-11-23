@@ -35,19 +35,19 @@ import {
   LabelOnly as BannerLabelOnly,
   meta as bannerMeta,
 } from '../stories/banner.stories';
-import {
-  DarkMode as BarChartComponentDarkMode,
-  Empty as BarChartComponentEmpty,
-  Highlight as BarChartComponentHighlight,
-  meta as barChartComponentMeta,
-  Palette as BarChartComponentPalette,
-  Playground as BarChartComponentPlayground,
-  Projection as BarChartComponentProjection,
-  RenderError as BarChartComponentRenderError,
-} from '../stories/bar-chart.component.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import {
+  DarkMode as ChartComponentDarkMode,
+  Default as ChartComponentDefault,
+  Empty as ChartComponentEmpty,
+  Highlight as ChartComponentHighlight,
+  meta as chartComponentMeta,
+  Palette as ChartComponentPalette,
+  Projection as ChartComponentProjection,
+  RenderError as ChartComponentRenderError,
+} from '../stories/chart.component.stories';
 import { meta as chartMeta } from '../stories/chart.stories';
 import {
   Default as CheckboxDefault,
@@ -813,15 +813,15 @@ const badgeModule: StoryModule = {
   WithIcon: BadgeWithIcon,
 };
 
-const barChartComponentModule: StoryModule = {
-  meta: barChartComponentMeta,
-  Playground: BarChartComponentPlayground,
-  Palette: BarChartComponentPalette,
-  Highlight: BarChartComponentHighlight,
-  Projection: BarChartComponentProjection,
-  Empty: BarChartComponentEmpty,
-  RenderError: BarChartComponentRenderError,
-  DarkMode: BarChartComponentDarkMode,
+const chartComponentModule: StoryModule = {
+  meta: chartComponentMeta,
+  Default: ChartComponentDefault,
+  Palette: ChartComponentPalette,
+  Highlight: ChartComponentHighlight,
+  Projection: ChartComponentProjection,
+  Empty: ChartComponentEmpty,
+  RenderError: ChartComponentRenderError,
+  DarkMode: ChartComponentDarkMode,
 };
 
 const bannerModule: StoryModule = {
@@ -1555,12 +1555,12 @@ export const registry: StoryModule[] = [
   actionBarModule,
   avatarModule,
   badgeModule,
-  barChartComponentModule,
   skeletonModule,
   bannerModule,
   buttonModule,
   linkModule,
   cardComponentModule,
+  chartComponentModule,
   checkboxModule,
   comboboxModule,
   copyButtonModule,
