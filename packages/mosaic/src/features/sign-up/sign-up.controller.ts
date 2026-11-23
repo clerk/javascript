@@ -170,9 +170,9 @@ export function useSignUpController(
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return, or redeems an invitation, once when sign-up opens on start with its marker or ticket in the URL; arriving from a redirect or a link is not an event a handler could run from. */
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return once when sign-up opens with its marker in the URL, on any route, or redeems an invitation once when it opens on start with its ticket; arriving from a redirect or a link is not an event a handler could run from. */
   useEffect(() => {
-    if (isReturning && route === 'start' && !completedReturn.current) {
+    if (isReturning && !completedReturn.current) {
       completedReturn.current = true;
       void actions
         .run('return', async () => {
