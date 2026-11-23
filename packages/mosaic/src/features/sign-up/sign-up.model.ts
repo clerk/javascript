@@ -262,7 +262,7 @@ export function useSignUpModel({
     showOptionalFields || required || (canSwitchIdentifier && (name === 'emailAddress' || name === 'phoneNumber'));
 
   const ticket = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || undefined;
-  const inTicketSignUp = signUp.verifications.emailAddress.strategy === 'ticket';
+  const inTicketSignUp = Boolean(ticket) && signUp.verifications.emailAddress.strategy === 'ticket';
   const forgetTicket = () => {
     removeClerkQueryParam('__clerk_ticket');
     removeClerkQueryParam('__clerk_invitation_token');
