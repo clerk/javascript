@@ -142,6 +142,27 @@ describe('StateProxy', () => {
     expect(emptySignUp.finalize).not.toHaveBeenCalled();
   });
 
+  it('forwards signUp.reload to the active sign-up attempt once loaded', async () => {
+    const activeSignUp = { reload: vi.fn(() => Promise.resolve({ error: null })) };
+    const loadedCallbacks: Array<() => void> = [];
+    const isomorphicClerk = {
+      loaded: false,
+      client: { signUp: { __internal_future: activeSignUp } },
+      __internal_state: { signUpSignal: () => ({ signUp: activeSignUp }) },
+      addOnLoaded: vi.fn((callback: () => void) => loadedCallbacks.push(callback)),
+    };
+    const signUp = new StateProxy(isomorphicClerk as any).signUpSignal().signUp as SignUpFutureResource;
+
+    const reloadPromise = signUp.reload();
+    expect(activeSignUp.reload).not.toHaveBeenCalled();
+
+    isomorphicClerk.loaded = true;
+    loadedCallbacks.forEach(callback => callback());
+
+    await expect(reloadPromise).resolves.toEqual({ error: null });
+    expect(activeSignUp.reload).toHaveBeenCalledOnce();
+  });
+
   it('falls back to the client sign-in when the state signal is empty', async () => {
     const clientSignIn = {
       status: 'needs_first_factor',

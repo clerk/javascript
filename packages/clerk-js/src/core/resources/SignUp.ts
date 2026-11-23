@@ -972,6 +972,12 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
+  async reload(): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.reload();
+    });
+  }
+
   async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       const body: Record<string, unknown> = {

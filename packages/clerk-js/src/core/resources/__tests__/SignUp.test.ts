@@ -711,6 +711,46 @@ describe('SignUp', () => {
       });
     });
 
+    describe('reload', () => {
+      afterEach(() => {
+        vi.clearAllMocks();
+        BaseResource._fetch = resourceFetch;
+      });
+
+      it('fetches the sign up and exposes the refreshed state on the future', async () => {
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements', protect_check: null },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const signUp = new SignUp({
+          id: 'signup_123',
+          status: 'missing_requirements',
+          protect_check: { status: 'pending', token: 'expired-token', sdk_url: 'https://example.com/sdk.js' },
+        } as any);
+        const result = await signUp.__internal_future.reload();
+
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({ method: 'GET', path: '/client/sign_ups/signup_123' }),
+          expect.anything(),
+        );
+        expect(result).toEqual({ error: null });
+        expect(signUp.__internal_future.protectCheck).toBeNull();
+      });
+
+      it('returns the error instead of throwing when the request fails', async () => {
+        const failure = new Error('network down');
+        BaseResource._fetch = vi.fn().mockRejectedValue(failure);
+
+        const signUp = new SignUp({ id: 'signup_123' } as any);
+        const result = await signUp.__internal_future.reload();
+
+        expect(result.error).toBe(failure);
+      });
+    });
+
     describe('sendPhoneCode', () => {
       afterEach(() => {
         vi.clearAllMocks();

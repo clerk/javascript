@@ -547,6 +547,11 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
+   * Fetches the latest state of the current sign-up attempt from Clerk and updates the sign-up with it.
+   */
+  reload: () => Promise<{ error: ClerkError | null }>;
+
+  /**
    * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-up methods resolve the challenge in a modal before they return. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead.
    */
   submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
