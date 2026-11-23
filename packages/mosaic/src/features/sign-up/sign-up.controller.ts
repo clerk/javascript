@@ -19,7 +19,7 @@ import { useSignUpDetailsController } from './sign-up-details/sign-up-details.co
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
-  isLeaving: boolean;
+  isNextScreenLoading: boolean;
   error: ErrorDescription | undefined;
 }
 
@@ -39,7 +39,7 @@ const finishMachine = finish.createMachine({
   initial: 'idle',
   context: {
     frozenModel: null,
-    isLeaving: false,
+    isNextScreenLoading: false,
     error: undefined,
   },
   states: {
@@ -60,7 +60,7 @@ const finishMachine = finish.createMachine({
     },
     handingOff: {
       always: {
-        guard: context => !context.isLeaving,
+        guard: context => !context.isNextScreenLoading,
         target: 'finished',
         actions: finish.assign(() => ({ frozenModel: null })),
       },
@@ -104,8 +104,8 @@ export function useSignUpController(
   const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
   const liveStep = liveModel.flow.step;
-  const isLeaving = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
-  const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
+  const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
+  const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
   const [arrivedSignedIn] = useState(liveStep.type === 'signed_in');
   const [leaveOnArrival] = useState(() => (liveStep.type === 'signed_in' ? liveModel.flow.leave : undefined));
 
@@ -115,7 +115,7 @@ export function useSignUpController(
   // `useMachine`, in its own PR, so both controllers drop this effect.
   useLayoutEffect(() => {
     finishActor.recheck();
-  }, [isLeaving, finishActor]);
+  }, [isNextScreenLoading, finishActor]);
 
   const model = finishSnapshot.context.frozenModel ?? liveModel;
   const { flow, app, navigation, verification } = model;
