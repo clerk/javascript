@@ -35,6 +35,7 @@ describe('SignInFactorOneCodeForm', () => {
       safeIdentifier: '+1234567890',
     },
     factorAlreadyPrepared: false,
+    isInitialFactor: true,
     onFactorPrepare: vi.fn(),
     cardTitle: localizationKeys('signIn.phoneCode.title'),
     cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
@@ -80,6 +81,7 @@ describe('SignInFactorOneCodeForm', () => {
           channel: 'whatsapp' as const,
         },
         factorAlreadyPrepared: false,
+        isInitialFactor: true,
         onFactorPrepare: vi.fn(),
         cardTitle: localizationKeys('signIn.phoneCode.title'),
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
@@ -120,6 +122,7 @@ describe('SignInFactorOneCodeForm', () => {
           safeIdentifier: '+1234567890',
         },
         factorAlreadyPrepared: false,
+        isInitialFactor: true,
         onFactorPrepare: vi.fn(),
         cardTitle: localizationKeys('signIn.phoneCode.title'),
         cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
@@ -129,6 +132,52 @@ describe('SignInFactorOneCodeForm', () => {
       };
 
       renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
+
+      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(undefined, expect.any(Object), expect.any(Object));
+    });
+
+    it('prepares a factor switched to while another factor with the same strategy has a pending verification', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+      fixtures.signIn.firstFactorVerification.status = 'unverified';
+      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+      fixtures.signIn.firstFactorVerification.channel = 'sms';
+
+      const props = {
+        ...defaultProps,
+        factor: {
+          strategy: 'phone_code' as const,
+          phoneNumberId: 'idn_B',
+          safeIdentifier: '+15555550199',
+        },
+        factorAlreadyPrepared: false,
+        isInitialFactor: false,
+      };
+
+      renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
+
+      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), expect.any(Object));
+    });
+
+    it('skips automatic prepare when switching back to the factor whose verification is pending', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+      fixtures.signIn.firstFactorVerification.status = 'unverified';
+      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+      fixtures.signIn.firstFactorVerification.channel = 'sms';
+
+      renderWithProviders(
+        <SignInFactorOneCodeForm
+          {...defaultProps}
+          factorAlreadyPrepared
+          isInitialFactor={false}
+        />,
+        { wrapper },
+      );
 
       expect(vi.mocked(useFetch)).toHaveBeenCalledWith(undefined, expect.any(Object), expect.any(Object));
     });
@@ -255,6 +304,7 @@ describe('SignInFactorOneCodeForm', () => {
           safeIdentifier: 'test@example.com',
         },
         factorAlreadyPrepared: false,
+        isInitialFactor: true,
         onFactorPrepare: vi.fn(),
         cardTitle: localizationKeys('signIn.emailCode.title'),
         cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
