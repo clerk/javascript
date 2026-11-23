@@ -32,7 +32,7 @@ export interface FakeSignUpSeed {
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
   protectChecks?: number;
-  protectCheckOn?: 'create' | 'update';
+  protectCheckOn?: ProtectCheckOn;
   protectCheckExpired?: boolean;
   protectCheckResolvedElsewhere?: boolean;
   protectCheckBlocked?: Record<string, string>;
@@ -46,9 +46,10 @@ export interface FakeSignUpSeed {
 export type FakeOAuthAccount =
   | { emailAddress: string; firstName?: string; lastName?: string }
   | { existingUser: { emailAddress: string; secondFactor?: boolean } }
-  /** The account is already signed in on this client, in the session with this id. */
   | { signedInSession: string }
   | { error: { code: string; message: string } };
+
+type ProtectCheckOn = 'create' | 'update' | 'oauth_callback';
 
 export type FakeTicket = { emailAddress: string } | 'expired';
 
@@ -59,7 +60,7 @@ export interface FakeSignUpState {
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
   protectChecks: number;
-  protectCheckOn?: 'create' | 'update';
+  protectCheckOn?: ProtectCheckOn;
   protectCheckExpired?: boolean;
   protectCheckResolvedElsewhere?: boolean;
   protectCheckBlocked?: Record<string, string>;
@@ -160,7 +161,7 @@ export function signUpHandlers(
       ...(expired ? { expires_at: 1 } : {}),
     };
   };
-  const issueProtectCheck = (signUp: SignUpJSON, on: 'create' | 'update' = 'create'): SignUpJSON => {
+  const issueProtectCheck = (signUp: SignUpJSON, on: ProtectCheckOn = 'create'): SignUpJSON => {
     if (
       (state.signUp.protectCheckOn ?? 'create') !== on ||
       state.signUp.issuedProtectChecks >= state.signUp.protectChecks
@@ -171,6 +172,8 @@ export function signUpHandlers(
   };
   const isExpired = (check: NonNullable<SignUpJSON['protect_check']>) =>
     check.expires_at !== undefined && check.expires_at < Date.now();
+  const runProtectCheck = (signUp: SignUpJSON, on: ProtectCheckOn): SignUpJSON =>
+    signUp.protect_check && !isExpired(signUp.protect_check) ? signUp : issueProtectCheck(signUp, on);
 
   const clientError = async (response: Response) => {
     const body = (await response.json()) as object;
@@ -367,22 +370,27 @@ export function signUpHandlers(
     const linked = withExternal({ status: 'verified' });
     state.signUp.linkedStrategy = external.strategy;
     store(
-      settle({
-        ...linked,
-        email_address: signUp.email_address ?? account.emailAddress,
-        first_name: signUp.first_name ?? account.firstName ?? null,
-        last_name: signUp.last_name ?? account.lastName ?? null,
-        verifications: {
-          ...linked.verifications!,
-          email_address: signUp.email_address
-            ? linked.verifications!.email_address
-            : {
-                ...linked.verifications!.email_address,
-                ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
-                next_action: '',
-              },
-        },
-      }),
+      settle(
+        runProtectCheck(
+          {
+            ...linked,
+            email_address: signUp.email_address ?? account.emailAddress,
+            first_name: signUp.first_name ?? account.firstName ?? null,
+            last_name: signUp.last_name ?? account.lastName ?? null,
+            verifications: {
+              ...linked.verifications!,
+              email_address: signUp.email_address
+                ? linked.verifications!.email_address
+                : {
+                    ...fapiUnpreparedVerification(),
+                    ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
+                    next_action: '',
+                  },
+            },
+          },
+          'oauth_callback',
+        ),
+      ),
     );
   };
 
@@ -673,8 +681,7 @@ export function signUpHandlers(
       if (applied instanceof HttpResponse) {
         return applied;
       }
-      const pending = applied.protect_check && !isExpired(applied.protect_check);
-      return store(settle(pending ? applied : issueProtectCheck(applied, 'update')));
+      return store(settle(runProtectCheck(applied, 'update')));
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id/prepare_verification'), async ({ params, request }) => {
       const signUp = current(params.id);
