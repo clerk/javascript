@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Dialog, DialogContext } from '../components/dialog';
+import { Dialog } from '../components/dialog';
+import { DialogContext } from '../components/dialog/dialog';
 import { EmptyState } from '../components/empty-state';
 import { ExclamationCircle } from '../icons/glyphs/exclamation-circle';
 import { useMessages } from '../localization';

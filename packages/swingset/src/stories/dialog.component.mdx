@@ -34,7 +34,7 @@ import { Dialog } from '@clerk/mosaic/components/dialog';
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
   <Dialog.Popup>
-    <Card.Root elevation='overlay'>
+    <Card.Root>
       <Card.Header>
         <Card.Title>Confirm action</Card.Title>
         <Card.Description>Are you sure you want to proceed?</Card.Description>
@@ -286,7 +286,7 @@ what opens over one.
 
 ### Detached triggers
 
-`Dialog.createHandle()` links a `Dialog.Trigger` to a `Dialog.Root` anywhere in the tree. The
+`Dialog.createDialogHandle()` links a `Dialog.Trigger` to a `Dialog.Root` anywhere in the tree. The
 handle also has `open()` / `close()` / `isOpen` for opens with no trigger element.
 
 <Story
@@ -297,7 +297,7 @@ handle also has `open()` / `close()` / `isOpen` for opens with no trigger elemen
 ### Multiple triggers
 
 Several triggers can share one dialog through a handle. Give each an `id` and a `payload`, and make
-the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`, and
+the root's children a function of `{ payload }`. Type it with `Dialog.createDialogHandle<Payload>()`, and
 every trigger on that handle must pass a payload.
 
 <Story

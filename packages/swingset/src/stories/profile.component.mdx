@@ -24,6 +24,7 @@ dismiss into the navigation; standalone it paints the same frame and takes its o
 ```tsx
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Panel } from '@clerk/mosaic/components/panel';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
 import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
@@ -36,20 +37,25 @@ import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
   <Profile.Nav>
     <Profile.NavItem
       value='account'
-      icon={<Icon glyph={UserCircle} size='md' />}
+      icon={<Icon glyph={UserCircle} />}
     >
       Account
     </Profile.NavItem>
     <Profile.NavItem
       value='security'
-      icon={<Icon glyph={ShieldCheck} size='md' />}
+      icon={<Icon glyph={ShieldCheck} />}
       badge={<Badge>2</Badge>}
     >
       Security
     </Profile.NavItem>
   </Profile.Nav>
-  <Profile.Content pageTitle={page === 'security' ? 'Security' : 'Account'}>
-    <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
+  <Profile.Content>
+    <Profile.ContentPanel value='account'>
+      <Panel.Root>
+        <Panel.Title>Account</Panel.Title>
+        …
+      </Panel.Root>
+    </Profile.ContentPanel>
     <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
 </Profile.Root>;
@@ -63,9 +69,8 @@ scrolls, the columns a gap apart, held to a reading width and centered. A
 leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
-`Content` renders its `pageTitle` above the pages, the selected page's name, as a heading that
-scrolls with the page and names it. A page's `Panel.Title` renders nothing there, and a ref on it
-reaches the page title instead.
+Each page's `Panel.Title` is its page title. It scrolls with the page, names it, and on compact
+layouts opens the navigation.
 
 ## Parts
 
@@ -119,6 +124,19 @@ caret and opens it. On a viewport of `40rem` or more the title is a `Select` tri
 tall as its content, holding the tablist. A choice closes either. The root
 reads the layout off a sentinel it renders: `1px` wide, `2px` once the query matches, `3px` on a
 phone's viewport as well.
+
+## Sub-pages
+
+Give a page's `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap each of
+its views in a `Profile.SubPage`, with `value={null}` for the page itself. A sub-page's
+`Panel.Title` gets a small back button above it, named "Back to" the page's `label`. On compact
+layouts a sub-page's title doesn't open the navigation; the page's title does again once you go
+back.
+
+<Story
+  name='SubPages'
+  storyModule={ProfileStories}
+/>
 
 ## Customising the marks
 

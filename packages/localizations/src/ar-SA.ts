@@ -1103,6 +1103,10 @@ export const arSA: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1573,12 +1577,14 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'قائمة بجميع الحسابات',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'طلب أنضمام',
+    membershipListLabel: 'قائمة بجميع عضويات المنظمات',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
     suggestionsAcceptedLabel: 'موافقة معلقة',

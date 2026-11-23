@@ -132,6 +132,22 @@ describe('OAuthApplication', () => {
       });
     });
 
+    it('maps the client registration fields', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
+        response: {
+          ...consentPayload,
+          client_registration: 'metadata_document',
+          client_metadata_host: 'claude.ai',
+        },
+      } as any);
+
+      BaseResource.clerk = {} as any;
+
+      const info = await oauthApp.getConsentInfo({ oauthClientId: 'client_abc' });
+      expect(info.clientRegistration).toBe('metadata_document');
+      expect(info.clientMetadataHost).toBe('claude.ai');
+    });
+
     it('defaults scopes to [] when absent', async () => {
       vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
         response: { ...consentPayload, scopes: undefined },

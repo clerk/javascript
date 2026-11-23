@@ -3,12 +3,12 @@ import React, { createRef } from 'react';
 import { createPortal } from 'react-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Flow, useFlowAutoFocus } from './index';
+import { Flow } from './index';
 
 function AutoFocusInput(props: React.ComponentProps<'input'>) {
   return (
     <input
-      ref={useFlowAutoFocus()}
+      ref={Flow.useFlowAutoFocus()}
       {...props}
     />
   );
@@ -333,7 +333,7 @@ describe('Flow', () => {
     });
   });
 
-  describe('useFlowAutoFocus', () => {
+  describe('Flow.useFlowAutoFocus', () => {
     it('does not focus the initially active step', () => {
       render(<TestFlow value='password' />);
 

@@ -15,6 +15,7 @@ import { OrganizationProfileView } from '../organization-profile/organization-pr
 import { OrganizationProfileApiKeysPanel } from '../organization-profile/organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from '../organization-profile/organization-profile-general-panel';
 import { OrganizationProfileMembersPanel } from '../organization-profile/organization-profile-members-panel/organization-profile-members-panel';
+import { OrganizationProfileSecurityPanel } from '../organization-profile/organization-profile-security-panel/organization-profile-security-panel';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
 import { useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { useUserProfilePages } from '../switcher/switcher.pages';
@@ -307,6 +308,7 @@ function organizationProfilePanels(
   return {
     general: <OrganizationProfileGeneralPanel />,
     members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
+    security: available.includes('security') ? <OrganizationProfileSecurityPanel /> : undefined,
     apiKeys:
       available.includes('apiKeys') && !hideAPIKeys ? <OrganizationProfileApiKeysPanel {...apiKeysProps} /> : undefined,
   };

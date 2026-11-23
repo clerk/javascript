@@ -27,6 +27,11 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('type', 'button');
   });
 
+  it('gives the text label a class consumers can target', () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByText('Save')).toHaveClass('cl-button-label');
+  });
+
   it('omits the boolean modifiers when they are off', () => {
     render(<Button>Hi</Button>);
     const button = screen.getByRole('button');

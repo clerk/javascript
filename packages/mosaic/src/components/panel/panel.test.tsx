@@ -65,7 +65,39 @@ describe('Panel', () => {
     expect(screen.getByRole('heading', { level: 5, name: 'Email addresses' })).toBeInTheDocument();
   });
 
-  it('leaves the title to the profile inside a profile page', () => {
+  it('labels the profile page from the open panel when hidden panels stay mounted', () => {
+    render(
+      <MosaicProvider>
+        <Profile.Root value='security'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Nav>
+            <Profile.NavItem value='account'>Account</Profile.NavItem>
+            <Profile.NavItem value='security'>Security</Profile.NavItem>
+          </Profile.Nav>
+          <Profile.Content>
+            <Profile.ContentPanel
+              value='account'
+              keepMounted
+            >
+              <Account />
+            </Profile.ContentPanel>
+            <Profile.ContentPanel
+              value='security'
+              keepMounted
+            >
+              <Panel.Root>
+                <Panel.Title>Security</Panel.Title>
+              </Panel.Root>
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('tabpanel', { name: 'Security' })).toBeInTheDocument();
+  });
+
+  it('renders the profile page title in its place inside a profile page', () => {
     render(
       <MosaicProvider>
         <Profile.Root value='account'>
@@ -73,7 +105,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content pageTitle='Account'>
+          <Profile.Content>
             <Profile.ContentPanel value='account'>
               <Account />
             </Profile.ContentPanel>
@@ -85,6 +117,7 @@ describe('Panel', () => {
     expect(document.querySelector('.cl-panel-title')).not.toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Account' })).toHaveLength(1);
     expect(screen.getByRole('heading', { name: 'Account' })).toHaveClass('cl-profile-page-title');
+    expect(screen.getByTestId('root')).toContainElement(screen.getByRole('heading', { name: 'Account' }));
   });
 
   it('hands its ref to the page title inside a profile page', () => {
@@ -96,7 +129,7 @@ describe('Panel', () => {
           <Profile.Nav>
             <Profile.NavItem value='account'>Account</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content pageTitle='Account'>
+          <Profile.Content>
             <Profile.ContentPanel value='account'>
               <Panel.Root>
                 <Panel.Title ref={titleRef}>Account</Panel.Title>

@@ -6,4 +6,5 @@ export {
   ProfileNavItem as NavItem,
   ProfileContent as Content,
   ProfileContentPanel as ContentPanel,
+  ProfileSubPage as SubPage,
 } from './profile';

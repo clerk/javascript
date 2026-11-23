@@ -12,10 +12,10 @@ import type {
 import { useSwitcherModel } from './switcher.model';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
-import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
+import type { SwitcherTriggerOptions, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
 
-type SwitcherBaseProps = SwitcherTriggerProps &
+type SwitcherBaseProps = SwitcherTriggerOptions &
   SwitcherMenuProps & {
     /**
      * Fallback while loading.

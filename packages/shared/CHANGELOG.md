@@ -1,5 +1,45 @@
 # Change Log
 
+## 4.48.3
+
+### Patch Changes
+
+- Move the code behind `useSignIn()`, `useSignUp()` and `useWaitlist()` that listens for sign-in, sign-up and waitlist updates into `@clerk/shared`, so `@clerk/mosaic` can use it too. No behavior change. ([#10867](https://github.com/clerk/javascript/pull/10867)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Move the rules that decide which fields the `<SignUp />` form shows and requires, and the parser for blocked-request errors, into `@clerk/shared` so `@clerk/mosaic` can use them too. No behavior change. ([#10868](https://github.com/clerk/javascript/pull/10868)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Fix the internal sign-up step helper used by `@clerk/mosaic` so it verifies the email and phone before asking for missing fields, the same order `<SignUp />` follows. `<SignUp />` is unaffected. ([#10883](https://github.com/clerk/javascript/pull/10883)) by [@austincalvelage](https://github.com/austincalvelage)
+
+## 4.48.2
+
+### Patch Changes
+
+- Request Frontend API version `2026-11-18`, where `GET` responses only include the client when clerk-js asks for it. ([#10931](https://github.com/clerk/javascript/pull/10931)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.48.1
+
+### Patch Changes
+
+- Move the OAuth client identity notice on `<OAuthConsent />` into the existing consent warning instead of a separate line under the header. A client that registered itself through Dynamic Client Registration now reads "{{applicationName}} registered itself, so its name and logo are not verified.", and a client identified by a Client ID Metadata Document reads "Details published by {{metadataHost}}.". ([#10905](https://github.com/clerk/javascript/pull/10905)) by [@Zertsov](https://github.com/Zertsov)
+
+## 4.48.0
+
+### Minor Changes
+
+- Show how an OAuth client's identity was established on `<OAuthConsent />`. Clients that registered themselves through Dynamic Client Registration get an "Unverified app" notice, and clients identified by a Client ID Metadata Document show the host that publishes their details. `OAuthConsentInfo` gains optional `clientRegistration` and `clientMetadataHost` fields, and the notice can be styled with the new `oauthConsentClientIdentity` appearance element. ([#10895](https://github.com/clerk/javascript/pull/10895)) by [@Zertsov](https://github.com/Zertsov)
+
+## 4.47.0
+
+### Minor Changes
+
+- Add `clientTrustState` to `SignInFuture`, so custom sign-in flows can read whether Clerk trusts the user's device (`'new'`, `'known'`, or `'pending'`). With the Device Trust Status update, Clerk returns it once the first factor, such as the password, is verified, and it's `undefined` before then. Without that update, Clerk returns it on every response. It's `undefined` when Device Trust is off. ([#10775](https://github.com/clerk/javascript/pull/10775)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Add ChatGPT as a supported OAuth provider strategy for instances where Sign in with ChatGPT is enabled. ([#10107](https://github.com/clerk/javascript/pull/10107)) by [@brkalow](https://github.com/brkalow)
+
 ## 4.46.0
 
 ### Minor Changes

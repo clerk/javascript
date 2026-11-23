@@ -1,5 +1,17 @@
 # @clerk/expo-native-components
 
+## 0.4.7
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.4.1` to `1.5.0`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.5.0. ([#10938](https://github.com/clerk/javascript/pull/10938)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+## 0.4.6
+
+### Patch Changes
+
+- Fix a custom page in the Android `UserProfileView` closing right after it opens when the profile was shown before the native SDK finished picking up the signed-in session. ([#10899](https://github.com/clerk/javascript/pull/10899)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.4.5
 
 ### Patch Changes

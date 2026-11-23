@@ -168,11 +168,11 @@ describe('getSignUpNextStep', () => {
     });
   });
 
-  it('collects missing fields before verifying the email', () => {
-    expect(getSignUpNextStep(signUp({ missingFields: ['username'], unverifiedFields: ['email_address'] }))).toEqual({
-      type: 'fields',
-      fields: ['username'],
-    });
+  it('verifies the email before collecting missing fields', () => {
+    const step = getSignUpNextStep(
+      signUp({ missingFields: ['username'], unverifiedFields: ['email_address'], emailAddress: 'ada@example.com' }),
+    );
+    expect(step).toEqual({ type: 'verify_email', target: 'ada@example.com', sent: false });
   });
 
   it('verifies the email before the phone', () => {

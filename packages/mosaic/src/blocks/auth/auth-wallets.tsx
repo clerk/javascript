@@ -4,12 +4,12 @@ import type { Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
 import { Link } from '../../components/link';
 import { ProviderButton, ProviderButtonGroup } from '../../components/provider-button';
 import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { fill, rich } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 import type { AuthProvider } from './auth.types';
 

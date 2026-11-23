@@ -24,4 +24,10 @@ export default {
     },
   },
   related: ['MosaicProvider'],
+  exports: {
+    useDirection: {
+      description: 'Returns the reading direction from the nearest `DirectionProvider`, or `ltr` without one.',
+    },
+    readingDirectionKeys: { description: 'Maps a reading direction to its previous and next arrow keys.' },
+  },
 } satisfies ComponentDoc<{ DirectionProvider: DirectionProviderProps }>;

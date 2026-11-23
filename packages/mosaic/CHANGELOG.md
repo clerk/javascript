@@ -1,5 +1,171 @@
 # @clerk/mosaic
 
+## 0.10.0
+
+### Minor Changes
+
+- `<OrganizationProfile />` and `<Profile />` now show a Security page with the organization's SSO bypass allow list. Members with the `org:sys_entconns_sso_bypass:manage` permission can see who is on the list, page through it, remove members after a confirmation, and add members by email or by role. The page shows to members with `org:sys_entconns_sso_bypass:manage` once the organization has an enterprise connection, and to members with `org:sys_entconns:manage` when self-serve SSO or self-serve Directory Sync is enabled for the instance and the organization. ([#10882](https://github.com/clerk/javascript/pull/10882)) by [@kylemac](https://github.com/kylemac)
+
+- **Breaking:** A page's `Panel.Title` is now its profile page title, so `Profile.Content` no longer takes `pageTitle`. On compact layouts it still opens the navigation. ([#10932](https://github.com/clerk/javascript/pull/10932)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  A page can now open sub-pages. Give its `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap each view in a `Profile.SubPage`, with `value={null}` for the page itself. A sub-page's `Panel.Title` gets a back button to the page above it.
+
+  | Before                                | After                                                                                         |
+  | ------------------------------------- | --------------------------------------------------------------------------------------------- |
+  | `<Profile.Content pageTitle={label}>` | `<Profile.Content>`, with `<Panel.Title>{label}</Panel.Title>` in each `Profile.ContentPanel` |
+
+  Find affected usage with `git grep -n "pageTitle="`.
+
+### Patch Changes
+
+- A `Card.Root` inside a `Dialog.Popup` now defaults to `elevation='overlay'`, so dialog cards no longer need to set it. Cards outside a dialog still default to `'card'`, and an explicit `elevation` still wins. ([#10935](https://github.com/clerk/javascript/pull/10935)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `Flow.Root` clips its content only vertically, and only while it moves between steps, so a focus ring at the edge of a step is no longer cut off. ([#10932](https://github.com/clerk/javascript/pull/10932)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- `SegmentedControl.Root` now keeps its natural width inside flex and grid containers instead of stretching to fill them. Pass the new `fullWidth` prop to fill the container, with the items sharing the width evenly. ([#10920](https://github.com/clerk/javascript/pull/10920)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+
+## 0.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+
+## 0.9.0
+
+### Minor Changes
+
+- **Breaking:** Remove the `placement` prop from `Icon`, along with the `data-icon` attribute it rendered. `Button` now tightens its padding on the side of an `Icon` placed directly before or after the label, read from its position. An icon inside a wrapper element no longer counts as leading or trailing, so the button keeps its text padding. Delete `placement` from your `Icon`s; TypeScript flags the ones left. ([#10910](https://github.com/clerk/javascript/pull/10910)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                           | After                   |
+  | ------------------------------------------------ | ----------------------- |
+  | `<Icon glyph={Plus} placement='inline-start' />` | `<Icon glyph={Plus} />` |
+
+  Find usages with `git grep -nE "placement=\{?['\"]inline-|data-icon"`.
+
+  The text label inside `Button` and `SubmitButton` now carries a `cl-button-label` class you can target in your styles.
+
+- **Breaking:** Two helpers move onto their component's namespace. Behavior is unchanged; TypeScript flags the old imports. ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                         | After                          |
+  | -------------------------------------------------------------- | ------------------------------ |
+  | `usePanelTitle` from `@clerk/mosaic/components/panel`          | `Panel.usePanelTitle`          |
+  | `sectionCompactStyles` from `@clerk/mosaic/components/section` | `Section.sectionCompactStyles` |
+
+  Find usages with `git grep -nE "usePanelTitle|sectionCompactStyles"`.
+
+  Every component and primitive on the Mosaic docs site now imports from its docs path:
+  - Components from `@clerk/mosaic/components/<name>`: `ActionBar`, `Checkbox`, `Combobox`, `CopyButton`, `Dialog`, `Drawer`, `Flow`, `InputGroup`, `Link`, `Menu`, `Otp`, `Pagination`, `PasswordInput`, `PhoneInput`, `Reveal`, `Select`, `Separator`, `Spinner`, `Stepper`, `Switch`, `Tabs`, `TagInput`, `Tooltip` and `VisuallyHidden`
+  - Headless primitives from `@clerk/mosaic/primitives/<name>`
+
+  Components and compound primitives export one namespace plus their types, and helpers live on the namespace.
+
+### Patch Changes
+
+- Compound components imported from `@clerk/mosaic/components/*` (`Avatar`, `Banner`, `Card`, `DataList`, `EmptyState`, `Entity`, `Field`, `Item`, `Panel`, `Popover`, `Profile`, `Radio`, `Section`, `SegmentedControl`, `Switcher` and `Table`) can now be rendered from React Server Components, e.g. `<Avatar.Root>` in a Next.js App Router page. ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Glyphs imported from `@clerk/mosaic/icons/glyphs/*` can now be passed to `Icon` from React Server Components, e.g. `<Icon glyph={External} />` in a Next.js App Router page. Before, the page failed to render with "Functions cannot be passed directly to Client Components". ([#10806](https://github.com/clerk/javascript/pull/10806)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+
+## 0.8.0
+
+### Minor Changes
+
+- **Breaking:** The Settings submenu in `UserButton` and `OrganizationSwitcher` now reads "Manage account" instead of "Manage profile", and its message key is renamed to match. TypeScript flags overrides that still use the old key. ([#10908](https://github.com/clerk/javascript/pull/10908)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                | After                                 |
+  | ------------------------------------- | ------------------------------------- |
+  | `userButton.manage.profile`           | `userButton.manage.account`           |
+  | `organizationSwitcher.manage.profile` | `organizationSwitcher.manage.account` |
+
+  Find usages with `git grep -nE "manage\.profile|manage: *\{"`.
+
+- The combined organization and user switcher now shows the user's role in the active organization next to their identifier in the popup header, for example `cameron@clerk.com · Admin`. ([#10869](https://github.com/clerk/javascript/pull/10869)) by [@prestonwebdev](https://github.com/prestonwebdev)
+
+### Patch Changes
+
+- Fix a React "unique key" warning that `OAuthConsent` logged on every render in development. It came from copy that puts a link or button inside a styled part of the text, such as the redirect domain in the consent subtitle. ([#10888](https://github.com/clerk/javascript/pull/10888)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Switcher rows and menu items now use the primary foreground color for their text and icons at rest, instead of the secondary color that only darkened on hover. Trailing icons, such as the active checkmark and submenu chevrons, stay secondary. ([#10889](https://github.com/clerk/javascript/pull/10889)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+
+## 0.7.0
+
+### Minor Changes
+
+- **Breaking:** Add a `Profile` component that shows the account's pages, the active organization's pages, or both. `<UserProfile />` now shows only the account's pages, and `<OrganizationProfile />` only the organization's. To keep both in one profile, render `<Profile />`. ([#10758](https://github.com/clerk/javascript/pull/10758)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  ```tsx
+  <Profile />
+  <Profile mode='user' />
+  <Profile mode='organization' afterLeaveOrganizationUrl='/organizations' />
+  ```
+
+  `mode` defaults to `'combined'`. Without a `mode`, `Profile` follows `MosaicProvider`'s `profile.combined`, so `false` shows only the account's pages.
+
+  With `experimental.newProfiles`, the profile a menu opens now matches the menu. `<UserButton />` and `<Switcher mode='user' />` open the account's pages, a lone `<OrganizationSwitcher />` opens the organization's pages, and only a combined `<Switcher />` opens one profile with both. `profile.combined: false` still splits a combined menu's profile in two.
+
+  | Before                                           | After                                          |
+  | ------------------------------------------------ | ---------------------------------------------- |
+  | `<UserProfile />`                                | `<Profile />`                                  |
+  | `<UserProfile combined />`                       | `<Profile />`                                  |
+  | `<UserProfile combined={false} />`               | `<UserProfile />` or `<Profile mode='user' />` |
+  | `<UserProfile organizationProfileProps={...} />` | `<Profile organizationProfileProps={...} />`   |
+
+  To find the code to update, run:
+
+  ```sh
+  git grep -n '<UserProfile'
+  ```
+
+  New exported type: `ProfileProps`.
+
+- **Breaking:** Add `Switcher`, the account and organization menu, and make `UserButton` list accounts only. `Switcher` takes `mode`: `'combined'` (the default) lists accounts and organizations, `'user'` lists accounts only, and `'organization'` lists organizations. `<UserButton />` is now `<Switcher mode='user' />` and `<OrganizationSwitcher />` is `<Switcher mode='organization' />`. Each mode takes only its own props, so TypeScript flags organization options on `UserButton` and `triggerVariant` outside `combined`. A `mode` chosen at runtime takes only the props every mode shares. ([#10752](https://github.com/clerk/javascript/pull/10752)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                                                                          | After                                                    |
+  | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+  | `<UserButton />` (accounts and organizations)                                                                   | `<Switcher />`                                           |
+  | `<UserButton combined={false} />`                                                                               | `<UserButton />` or `<Switcher mode='user' />`           |
+  | `<UserButton triggerVariant='condensed' />`                                                                     | `<Switcher triggerVariant='condensed' />`                |
+  | Organization props on `UserButton` (`hidePersonal`, `afterSelectOrganizationUrl`, `createOrganizationUrl`, ...) | The same props on `Switcher`                             |
+  | `UserButtonProps` (combined menu)                                                                               | `SwitcherProps`                                          |
+  | `UserButtonProps` (user-only menu)                                                                              | `UserButtonProps`, which now takes account options only  |
+  | `.cl-user-button-*` classes on the combined menu                                                                | `.cl-switcher-*`; `UserButton` keeps `.cl-user-button-*` |
+
+  Find usages with `git grep -n -e "UserButton" -e "cl-user-button-"`.
+
+- **Breaking:** Rename `Consent` to `OAuthConsent`. Behavior is unchanged; TypeScript flags the old names. ([#10870](https://github.com/clerk/javascript/pull/10870)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                            | After                                                         |
+  | ------------------------------------------------- | ------------------------------------------------------------- |
+  | `Consent`                                         | `OAuthConsent`                                                |
+  | `ConsentProps`                                    | `OAuthConsentProps`                                           |
+  | `consent.*` localization keys                     | `oauthConsent.*`                                              |
+  | `consent_missing_client_id` error code            | `oauth_consent_missing_client_id`                             |
+  | `consent_missing_redirect_uri` error code         | `oauth_consent_missing_redirect_uri`                          |
+  | `.cl-consent-scopes` / `.cl-consent-redirect-url` | `.cl-oauth-consent-scopes` / `.cl-oauth-consent-redirect-url` |
+
+  Find usages with `git grep -nE "(^|[^[:alnum:]_])(Consent(Props)?([^[:alnum:]_]|$)|consent[\"']?[[:space:]]*(\.[[:alpha:]]|:)|consent_missing_)|cl-consent-"`.
+
+### Patch Changes
+
+- Add component entry points: ([#10854](https://github.com/clerk/javascript/pull/10854)) by [@maxyinger](https://github.com/maxyinger)
+  - `Card` from `@clerk/mosaic/components/card` and `Field` from `@clerk/mosaic/components/field`
+  - `Popover` from `@clerk/mosaic/components/popover`
+  - `ProviderButton` and `ProviderButtonGroup` from `@clerk/mosaic/components/provider-button`
+  - `Switcher` from `@clerk/mosaic/components/switcher`: `Switcher.Root`, `Switcher.Trigger` and `Switcher.Popup`, and the content parts `Switcher.Header`, `Switcher.Separator`, `Switcher.Group`, `Switcher.Item` (with `ItemMedia`, `ItemContent`, `ItemLabel`, `ItemDescription` and `ItemTrailing`), `Switcher.Avatar` and `Switcher.BadgedAvatar`. `UserButton` and `OrganizationSwitcher` are built from them
+  - The `Building`, `Checkmark`, `ChevronDown`, `ChevronRight`, `Cog6Teeth`, `EllipsisHorizontal`, `Key`, `SecurityLockSquare`, `SecurityPhone`, `SignOut`, `SwitchAccount` and `UsersAddRight` glyphs from `@clerk/mosaic/icons/glyphs/<name>`
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+
 ## 0.6.0
 
 ### Minor Changes

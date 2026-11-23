@@ -16,7 +16,7 @@ export type TriggerPayloadRequirement<Payload> = [Payload] extends [void]
 export type DialogTriggerProps<Payload = unknown> = ComponentProps<'button'> & {
   /**
    * Connects this trigger to a root rendered elsewhere in the tree. Create with
-   * `Dialog.createHandle()` and pass the same handle to the `Dialog.Root`. A trigger nested
+   * `Dialog.createDialogHandle()` and pass the same handle to the `Dialog.Root`. A trigger nested
    * inside a root needs no handle.
    */
   handle?: DialogHandle<Payload>;

@@ -14,7 +14,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Mark the element a step should focus when it enters with `useFlowAutoFocus`, exported from this unit.',
+      text: 'Mark the element a step should focus when it enters with `Flow.useFlowAutoFocus`.',
     },
     {
       do: true,
@@ -71,5 +71,8 @@ export default {
 `,
     },
   ],
-  related: ['Card', 'Dialog', 'useFlowAutoFocus'],
+  related: ['Card', 'Dialog', 'Flow.useFlowAutoFocus'],
+  exports: {
+    'Flow.useFlowAutoFocus': { description: 'Returns a ref for the element a step focuses when it enters.' },
+  },
 } satisfies ComponentDoc<{ 'Flow.Root': FlowRootProps<unknown>; 'Flow.Step': FlowStepProps }>;

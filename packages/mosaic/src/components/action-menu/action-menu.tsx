@@ -1,3 +1,5 @@
+'use client';
+
 import { type Ref, useState } from 'react';
 
 import { useSpinDelay } from '../../hooks/use-spin-delay';

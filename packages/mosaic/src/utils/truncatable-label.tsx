@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { mergeStyleProps, themeProps } from '../props';
 import { reset } from '../styles/reset.styles';
 import { truncationStyles } from '../styles/typography.styles';
 
@@ -9,7 +10,7 @@ import { truncationStyles } from '../styles/typography.styles';
 // adjacent text shares one box, or `Delete {name}` would split into two flex items with the
 // container's `gap` opening up mid-sentence. Element children (icons) pass through untouched,
 // so they stay direct flex items and `gap` still applies.
-export function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
+export function withTruncatableLabel(children: React.ReactNode, { slot }: { slot?: string } = {}): React.ReactNode {
   const result: React.ReactNode[] = [];
   let run: React.ReactNode[] = [];
 
@@ -20,7 +21,9 @@ export function withTruncatableLabel(children: React.ReactNode): React.ReactNode
     result.push(
       <span
         key={`label-${result.length}`}
-        {...stylex.props(reset.base, truncationStyles.singleLine)}
+        {...(slot
+          ? mergeStyleProps(themeProps(slot), stylex.props(reset.base, truncationStyles.singleLine))
+          : stylex.props(reset.base, truncationStyles.singleLine))}
       >
         {run}
       </span>,

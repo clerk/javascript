@@ -1,12 +1,15 @@
 'use client';
 
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import { ArrowLeft } from '../../icons/glyphs/arrow-left';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
-import { useMessages } from '../../localization';
+import { fill, useMessages } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
@@ -20,15 +23,18 @@ import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
+import { Button } from '../button';
 import type { DialogContextValue } from '../dialog';
-import { Dialog, DialogContext, isInDialog } from '../dialog';
+import { Dialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog/dialog';
 import { Drawer } from '../drawer';
+import { Flow } from '../flow';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
-import { SelectPopup } from '../select';
+import { SelectPopup } from '../select/select';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
-import { ContentPanelContext, ProfileContext } from './profile.context';
+import { ContentPanelContext, ProfileContext, SubPagesContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
@@ -109,13 +115,24 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     // eslint-disable-next-line react/set-state-in-effect -- Reset navigation when the active profile panel changes.
     setNavOpenIn(null);
   }, [navLayout]);
+  const pickedPage = React.useRef<string | null>(null);
   const selectPage = React.useCallback(
     (next: string) => {
+      pickedPage.current = next;
       onValueChange?.(next);
       closeNav();
     },
     [onValueChange, closeNav],
   );
+  React.useEffect(() => {
+    const trigger = navTriggerRef.current;
+    const picked = pickedPage.current === value;
+    pickedPage.current = null;
+    const focusLost = trigger?.ownerDocument.activeElement === trigger?.ownerDocument.body;
+    if (picked && focusLost) {
+      trigger?.focus();
+    }
+  }, [value]);
   const context = React.useMemo(
     () => ({
       titleId,
@@ -220,8 +237,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   const Tag = `h${useHeadingLevel()}` as const;
   return (
     <VisuallyHidden
-      // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper preserves the component signature at this polymorphic boundary.
-      ref={ref as React.Ref<HTMLSpanElement>}
+      ref={ref}
       render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
       id={titleId}
@@ -253,7 +269,6 @@ function BackButton() {
       >
         <Icon
           glyph={ArrowLeft}
-          size='md'
           xstyle={rtl.mirror}
         />
       </span>
@@ -508,7 +523,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   );
 });
 
-function PageTitle({ title }: { title: React.ReactNode }) {
+function PageTitle({ title, claim }: { title: React.ReactNode; claim: boolean }) {
   const {
     navLayout,
     navOpen,
@@ -522,7 +537,9 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     navTriggerRef,
   } = useProfileContext('Profile.Content');
   const level = useHeadingLevel();
-  const label = <span id={`${pageTitleId}-label`}>{title}</span>;
+  const focusRef = useFlowAutoFocus<HTMLHeadingElement>();
+  const headingRef = useMergeRefs([claim ? pageTitleRef : undefined, focusRef]);
+  const label = <span id={claim ? `${pageTitleId}-label` : undefined}>{title}</span>;
   const triggerProps = mergeStyleProps(
     themeProps('profile-nav-trigger'),
     stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
@@ -532,19 +549,17 @@ function PageTitle({ title }: { title: React.ReactNode }) {
       {label}
       <Icon
         glyph={ChevronDown}
-        size='md'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
     </>
   );
   const heading = (children: React.ReactNode) => (
     <Heading
-      ref={pageTitleRef}
-      id={pageTitleId}
+      ref={headingRef}
+      id={claim ? pageTitleId : undefined}
       level={level}
       size='2xl'
       tabIndex={-1}
-      xstyle={styles.pageTitle}
       {...themeProps('profile-page-title')}
     >
       {children}
@@ -557,7 +572,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
   if (navLayout === 'sheet') {
     return heading(
       <button
-        ref={navTriggerRef}
+        ref={claim ? navTriggerRef : undefined}
         type='button'
         aria-haspopup='dialog'
         aria-expanded={navOpen}
@@ -577,6 +592,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     >
       {heading(
         <SelectPrimitive.Trigger
+          ref={claim ? navTriggerRef : undefined}
           // A combobox takes no name from its content.
           aria-labelledby={`${pageTitleId}-label`}
           {...triggerProps}
@@ -591,14 +607,11 @@ function PageTitle({ title }: { title: React.ReactNode }) {
   );
 }
 
-export interface ProfileContentProps extends MosaicComponentProps<'div'> {
-  /** The selected page's name, shown as the page title. */
-  pageTitle: React.ReactNode;
-}
+export type ProfileContentProps = MosaicComponentProps<'div'>;
 
 // A plain `div`, not `main`: the profile often renders inside the host's `main` or a dialog.
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
-  { pageTitle, children, render, xstyle, ...rest },
+  { children, render, xstyle, ...rest },
   ref,
 ) {
   const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
@@ -624,9 +637,6 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
           )}
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
-            <HeadingLevelProvider>
-              <PageTitle title={pageTitle} />
-            </HeadingLevelProvider>
             {children}
             {inline && renderBranding && !compact ? (
               <div
@@ -645,30 +655,184 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   });
 });
 
-export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
-  value: string;
+interface ProfileContentPanelSubPagesProps {
+  /** The page's name, shown on the back button of each of its sub-pages. */
+  label: string;
+  /** The open sub-page, or `null` for the page itself. Matches a `Profile.SubPage` value. */
+  subPage: string | null;
+  /** Called with the sub-page to open, or `null` to go back to the page. */
+  onSubPageChange: (subPage: string | null) => void;
 }
 
+interface ProfileContentPanelNoSubPagesProps {
+  label?: never;
+  subPage?: never;
+  onSubPageChange?: never;
+}
+
+export type ProfileContentPanelProps = MosaicComponentProps<'div'> & {
+  value: string;
+} & (ProfileContentPanelSubPagesProps | ProfileContentPanelNoSubPagesProps);
+
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, xstyle, ...rest },
+  { value, label, subPage, onSubPageChange, children, xstyle, ...rest },
   ref,
 ) {
-  const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
+  const { compact, pageTitleId, value: selected } = useProfileContext('Profile.ContentPanel');
+  const active = value === selected;
+  const page = React.useMemo(
+    () => ({
+      active,
+      renderTitle: (title: React.ReactNode, claim: boolean) => (
+        <PageTitle
+          title={title}
+          claim={claim}
+        />
+      ),
+    }),
+    [active],
+  );
+  const subPages = React.useMemo(
+    () =>
+      label !== undefined && subPage !== undefined && onSubPageChange !== undefined
+        ? { label, subPage, onSubPageChange }
+        : null,
+    [label, subPage, onSubPageChange],
+  );
+  const [panel, setPanel] = React.useState<HTMLDivElement | null>(null);
+  const panelRef = useMergeRefs([ref, setPanel]);
+  useAccessibleNameWarning(active ? panel : null, {
+    part:
+      typeof subPage === 'string'
+        ? `Profile.ContentPanel value="${value}" subPage="${subPage}"`
+        : `Profile.ContentPanel value="${value}"`,
+    roles: ['tabpanel', 'group'],
+    title: 'Panel.Title',
+  });
   return (
-    <ContentPanelContext.Provider value>
+    <ContentPanelContext.Provider value={page}>
       <HeadingLevelProvider>
         <Tabs.Panel
-          ref={ref}
+          ref={panelRef}
           value={value}
           aria-labelledby={`${pageTitleId}-label`}
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
           {...(compact ? { role: 'group', tabIndex: undefined } : null)}
           {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
-        />
+        >
+          {subPages ? (
+            <SubPagesContext.Provider value={subPages}>
+              <Flow.Root
+                value={stepId(subPages.subPage)}
+                direction={subPages.subPage === null ? -1 : 1}
+                state={null}
+              >
+                {() => children}
+              </Flow.Root>
+            </SubPagesContext.Provider>
+          ) : (
+            children
+          )}
+        </Tabs.Panel>
       </HeadingLevelProvider>
     </ContentPanelContext.Provider>
   );
 });
+
+function stepId(subPage: string | null): string {
+  return subPage === null ? 'page' : `sub-page:${subPage}`;
+}
+
+export interface ProfileSubPageProps {
+  /** The sub-page it shows for, or `null` for the page itself. Matches the `Profile.ContentPanel` `subPage`. */
+  value: string | null;
+  children?: React.ReactNode;
+}
+
+/**
+ * One view of a `Profile.ContentPanel` with sub-pages, shown while its `value` is the open `subPage`.
+ * A sub-page's `Panel.Title` gets a back button to the page above it, and never opens the
+ * navigation on compact layouts.
+ */
+function SubPage({ value, children }: ProfileSubPageProps) {
+  const subPages = React.useContext(SubPagesContext);
+  const page = React.useContext(ContentPanelContext);
+  if (!subPages || !page) {
+    throw new Error('Profile.SubPage must be rendered inside a Profile.ContentPanel with subPage');
+  }
+  const { label, onSubPageChange } = subPages;
+  const { active } = page;
+  const subPage = React.useMemo(
+    () => ({
+      active,
+      renderTitle: (title: React.ReactNode, claim: boolean) => (
+        <SubPageTitle
+          title={title}
+          claim={claim}
+          parent={label}
+          onBack={() => onSubPageChange(null)}
+        />
+      ),
+    }),
+    [active, label, onSubPageChange],
+  );
+  return (
+    <Flow.Step ids={[stepId(value)]}>
+      {value === null ? (
+        children
+      ) : (
+        <ContentPanelContext.Provider value={subPage}>{children}</ContentPanelContext.Provider>
+      )}
+    </Flow.Step>
+  );
+}
+
+function SubPageTitle({
+  title,
+  claim,
+  parent,
+  onBack,
+}: {
+  title: React.ReactNode;
+  claim: boolean;
+  parent: string;
+  onBack: () => void;
+}) {
+  const { pageTitleId, pageTitleRef } = useProfileContext('Profile.SubPage');
+  const m = useMessages('profile');
+  const level = useHeadingLevel();
+  const focusRef = useFlowAutoFocus<HTMLHeadingElement>();
+  const headingRef = useMergeRefs([claim ? pageTitleRef : undefined, focusRef]);
+  return (
+    <div {...mergeStyleProps(themeProps('profile-sub-page-title'), stylex.props(reset.base, styles.subPageTitle))}>
+      <Button
+        color='neutral'
+        variant='ghost'
+        size='sm'
+        onClick={onBack}
+        aria-label={fill(m.backTo, { page: parent })}
+        xstyle={styles.subPageBack}
+        {...themeProps('profile-sub-page-back')}
+      >
+        <Icon
+          glyph={ArrowLeft}
+          xstyle={rtl.mirror}
+        />
+        {parent}
+      </Button>
+      <Heading
+        ref={headingRef}
+        id={claim ? pageTitleId : undefined}
+        level={level}
+        size='2xl'
+        tabIndex={-1}
+        {...themeProps('profile-page-title')}
+      >
+        <span id={claim ? `${pageTitleId}-label` : undefined}>{title}</span>
+      </Heading>
+    </div>
+  );
+}
 
 export {
   Root as ProfileRoot,
@@ -678,4 +842,5 @@ export {
   NavItem as ProfileNavItem,
   Content as ProfileContent,
   ContentPanel as ProfileContentPanel,
+  SubPage as ProfileSubPage,
 };

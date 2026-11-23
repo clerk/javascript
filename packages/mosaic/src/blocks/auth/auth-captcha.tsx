@@ -1,5 +1,5 @@
 import { Captcha } from '../../components/captcha';
-import { useFlowStepActive } from '../../primitives/flow';
+import { useFlowStepActive } from '../../primitives/flow/flow-step-context';
 import { styles } from './auth.styles';
 
 interface AuthCaptchaProps {

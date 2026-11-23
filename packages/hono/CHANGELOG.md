@@ -1,5 +1,45 @@
 # @clerk/hono
 
+## 0.1.106
+
+### Patch Changes
+
+- Updated dependencies [[`fe4840d`](https://github.com/clerk/javascript/commit/fe4840dc6e9899b3a954faa3dc50326de82d0b04), [`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716), [`6b8c3a7`](https://github.com/clerk/javascript/commit/6b8c3a7c24f8831b6ef04fbed070e3b26f121135), [`88bddcc`](https://github.com/clerk/javascript/commit/88bddccc09ebe04a90aa9b73c3be60bf10852035)]:
+  - @clerk/backend@3.31.4
+  - @clerk/shared@4.48.3
+
+## 0.1.105
+
+### Patch Changes
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+  - @clerk/backend@3.31.3
+
+## 0.1.104
+
+### Patch Changes
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+  - @clerk/backend@3.31.2
+
+## 0.1.103
+
+### Patch Changes
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+  - @clerk/backend@3.31.1
+
+## 0.1.102
+
+### Patch Changes
+
+- Updated dependencies [[`189c71a`](https://github.com/clerk/javascript/commit/189c71af29979ac1ad8f6dd66cde17763d713b9b), [`dc25c3b`](https://github.com/clerk/javascript/commit/dc25c3b43b534544ae4ec3bcdd062f65277595ab), [`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443), [`2855616`](https://github.com/clerk/javascript/commit/28556161d941e6dab17fd9bd7ac921e491860c5a)]:
+  - @clerk/backend@3.31.0
+  - @clerk/shared@4.47.0
+
 ## 0.1.101
 
 ### Patch Changes

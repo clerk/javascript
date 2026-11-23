@@ -48,6 +48,7 @@ describe('subpath /internal exports', () => {
         "createAuthenticateRequest",
         "createBootstrapSignedOutState",
         "createClerkRequest",
+        "createDebug",
         "createRedirect",
         "debugRequestState",
         "decorateObjectWithResources",

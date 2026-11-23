@@ -1112,6 +1112,10 @@ export const ptPT: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1586,12 +1590,14 @@ export const ptPT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lista de todas as contas',
     action__closeOrganizationSwitcher: 'Fechar seletor de organizações',
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Configurar organização',
     action__openOrganizationSwitcher: 'Abrir seletor de organizações',
     action__suggestionsAccept: 'Solicitar participação',
+    membershipListLabel: 'Lista de todas as associações a organizações',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
     suggestionsAcceptedLabel: 'Aprovação pendente',

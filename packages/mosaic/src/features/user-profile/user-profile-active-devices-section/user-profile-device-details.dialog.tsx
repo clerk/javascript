@@ -52,10 +52,7 @@ export function UserProfileDeviceDetailsDialog({
             compactPlacement='center'
             finalFocus={finalFocus}
           >
-            <Card.Root
-              elevation='overlay'
-              renderBranding={false}
-            >
+            <Card.Root renderBranding={false}>
               {reverification ? (
                 <Flow.Root
                   value={step}

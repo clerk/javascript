@@ -39,7 +39,6 @@ export function OrganizationProfileInviteMembersDialog({
         finalFocus={finalFocus}
       >
         <Card.Root
-          elevation='overlay'
           size='lg'
           renderBranding={false}
         >

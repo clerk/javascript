@@ -8,12 +8,13 @@ import { CopyButton } from '../../components/copy-button';
 import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
-import { Flow, useFlowAutoFocus } from '../../components/flow';
+import { Flow } from '../../components/flow';
 import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { fill } from '../../localization';
+import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
@@ -54,10 +55,7 @@ export function CreateAPIKeyDialog(props: CreateAPIKeyDialogProps) {
         initialFocus={props.secret ? undefined : nameInput}
         finalFocus={props.finalFocus}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Flow.Root
             value={props.secret ? 'copy' : 'create'}
             state={props}

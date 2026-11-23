@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 import { render } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { isReact18, lazyNode } from '../../../__tests__/lazy';
 import { Api } from '../../../icons/glyphs/api';
 import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import type { MosaicIconOverrides } from '../../../icons/overrides';
@@ -248,44 +249,6 @@ describe('Mosaic Icon', () => {
     expect(svg).not.toHaveClass(stylex.props(containerStyles.mdHeight).className ?? '');
   });
 
-  it('emits no placement attribute when the icon is not placed', () => {
-    const { container } = wrap(<Icon glyph={ChevronRight} />);
-    expect(container.querySelector('svg')).not.toHaveAttribute('data-icon');
-  });
-
-  it('reflects placement as data-icon so a container can select on it', () => {
-    const { container } = wrap(
-      <Icon
-        glyph={ChevronRight}
-        placement='inline-end'
-      />,
-    );
-    expect(container.querySelector('svg')).toHaveAttribute('data-icon', 'inline-end');
-  });
-
-  it('does not leak the placement prop itself to the DOM', () => {
-    const { container } = wrap(
-      <Icon
-        glyph={ChevronRight}
-        placement='inline-start'
-      />,
-    );
-    const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('data-icon', 'inline-start');
-    expect(svg).not.toHaveAttribute('placement');
-  });
-
-  it('reflects placement on an override element too', () => {
-    const { getByTestId } = wrap(
-      <Icon
-        glyph={ChevronRight}
-        placement='inline-end'
-      />,
-      override,
-    );
-    expect(getByTestId('override')).toHaveAttribute('data-icon', 'inline-end');
-  });
-
   it('renders the override element instead of the default glyph', () => {
     const { getByTestId, container } = wrap(<Icon glyph={ChevronRight} />, override);
     expect(getByTestId('override')).not.toBeNull();
@@ -336,6 +299,37 @@ describe('Mosaic Icon', () => {
       override,
     );
     expect(getByTestId('override')).toHaveAttribute('aria-label', 'Next');
+  });
+
+  it.skipIf(isReact18)('renders an override element delivered as a lazy node from a Server Component', () => {
+    const { getByTestId, container } = wrap(
+      <Icon
+        glyph={ChevronRight}
+        size='lg'
+      />,
+      {
+        'chevron-right': lazyNode(
+          <span
+            data-testid='override'
+            className='consumer-glyph'
+          />,
+        ),
+      },
+    );
+    const el = getByTestId('override');
+    expect(el).toHaveClass('cl-icon', 'consumer-glyph');
+    expect(el).toHaveAttribute('data-size', 'lg');
+    expect(container.querySelector('svg')).toBeNull();
+  });
+
+  it.runIf(isReact18)('renders the default glyph for a lazy override on React 18, without resolving it', () => {
+    const init = vi.fn((p: unknown) => p);
+    const { container, queryByTestId } = wrap(<Icon glyph={ChevronRight} />, {
+      'chevron-right': lazyNode(<span data-testid='override' />, init),
+    });
+    expect(queryByTestId('override')).toBeNull();
+    expect(container.querySelector('svg.cl-icon')).not.toBeNull();
+    expect(init).not.toHaveBeenCalled();
   });
 
   it('falls through to the default when a different name is overridden', () => {

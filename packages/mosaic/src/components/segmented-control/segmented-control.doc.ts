@@ -24,6 +24,11 @@ export default {
         defaultValue: { type: 'Value', doc: 'The selected value on mount, when uncontrolled.' },
         onValueChange: { type: '(value: Value) => void', doc: 'Called with the newly selected value.' },
         disabled: { type: 'boolean', doc: 'Disables every item.', default: 'false' },
+        fullWidth: {
+          type: 'boolean',
+          doc: 'Stretches to the width of the container and splits it evenly between the items. Carries `data-full-width`.',
+          default: 'false',
+        },
       },
     },
     'SegmentedControl.Item': {
@@ -42,6 +47,15 @@ export default {
 <SegmentedControl.Root aria-label='Billing period' value={period} onValueChange={setPeriod}>
   <SegmentedControl.Item value='month'>Monthly</SegmentedControl.Item>
   <SegmentedControl.Item value='annual'>Yearly</SegmentedControl.Item>
+</SegmentedControl.Root>
+`,
+    },
+    {
+      title: 'Full width',
+      code: `
+<SegmentedControl.Root aria-label='Add by' fullWidth value={mode} onValueChange={setMode}>
+  <SegmentedControl.Item value='email'>Email</SegmentedControl.Item>
+  <SegmentedControl.Item value='role'>Role</SegmentedControl.Item>
 </SegmentedControl.Root>
 `,
     },

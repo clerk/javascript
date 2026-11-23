@@ -64,9 +64,9 @@ A trigger rendered **outside** `Drawer.Root` can drive it through a shared handl
 `handle.isOpen` / `handle.subscribe(cb)` make it `useSyncExternalStore`-compatible.
 
 ```tsx
-import { createDrawerHandle } from '@clerk/mosaic/primitives/drawer';
+import { Drawer } from '@clerk/mosaic/primitives/drawer';
 
-const handle = createDrawerHandle();
+const handle = Drawer.createDrawerHandle();
 
 <>
   <Drawer.Trigger handle={handle}>Open from anywhere</Drawer.Trigger>

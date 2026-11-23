@@ -24,7 +24,7 @@ vi.mock('react-native', async () => {
     Modal: ({ visible, children }: { visible: boolean; children?: ReactNode }) =>
       visible ? React.createElement('div', { 'data-testid': 'modal' }, children) : null,
     StyleSheet: { create: <T,>(styles: T) => styles, hairlineWidth: 0.5 },
-    Linking: { openURL: mocks.openURL },
+    Linking: { openURL: (url: string) => mocks.openURL(url) ?? Promise.reject(new Error('No app can open ' + url)) },
     useColorScheme: () => 'light',
     Platform: {
       get OS() {
@@ -112,14 +112,11 @@ describe('UpdateRequiredView', () => {
     const { store, UpdateRequiredView } = await loadModules();
     render(<UpdateRequiredView />);
     block(store, { updateUrl: APP_STORE_URL, supportEmail: 'support@example.com' });
-    const rejection = Promise.reject(new Error('No app can open mailto:'));
-    const caught = vi.spyOn(rejection, 'catch');
-    mocks.openURL.mockReturnValueOnce(rejection);
+    mocks.openURL.mockReturnValueOnce(undefined);
 
     fireEvent.click(screen.getByText('Get Help'));
-    await act(() => Promise.resolve());
+    await act(() => new Promise(resolve => setTimeout(resolve, 0)));
 
-    expect(caught).toHaveBeenCalledOnce();
     expect(screen.getByText('Get Help')).toBeDefined();
   });
 

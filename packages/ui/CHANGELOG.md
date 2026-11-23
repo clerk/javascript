@@ -1,5 +1,67 @@
 # @clerk/ui
 
+## 1.44.3
+
+### Patch Changes
+
+- Move the rules that decide which fields the `<SignUp />` form shows and requires, and the parser for blocked-request errors, into `@clerk/shared` so `@clerk/mosaic` can use them too. No behavior change. ([#10868](https://github.com/clerk/javascript/pull/10868)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+  - @clerk/localizations@4.26.3
+
+## 1.44.2
+
+### Patch Changes
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+  - @clerk/localizations@4.26.2
+
+## 1.44.1
+
+### Patch Changes
+
+- Move the OAuth client identity notice on `<OAuthConsent />` into the existing consent warning instead of a separate line under the header. A client that registered itself through Dynamic Client Registration now reads "{{applicationName}} registered itself, so its name and logo are not verified.", and a client identified by a Client ID Metadata Document reads "Details published by {{metadataHost}}.". ([#10905](https://github.com/clerk/javascript/pull/10905)) by [@Zertsov](https://github.com/Zertsov)
+
+- Updated dependencies [[`0a49e7e`](https://github.com/clerk/javascript/commit/0a49e7e71d8799f5dd0eecf1bece3e19c3b2d71b)]:
+  - @clerk/shared@4.48.1
+  - @clerk/localizations@4.26.1
+
+## 1.44.0
+
+### Minor Changes
+
+- Show how an OAuth client's identity was established on `<OAuthConsent />`. Clients that registered themselves through Dynamic Client Registration get an "Unverified app" notice, and clients identified by a Client ID Metadata Document show the host that publishes their details. `OAuthConsentInfo` gains optional `clientRegistration` and `clientMetadataHost` fields, and the notice can be styled with the new `oauthConsentClientIdentity` appearance element. ([#10895](https://github.com/clerk/javascript/pull/10895)) by [@Zertsov](https://github.com/Zertsov)
+
+- Allow users to select or clear optional scopes in `<OAuthConsent />`. Only selected scopes are submitted. When shown, `offline_access` remains checked and cannot be cleared. ([#10134](https://github.com/clerk/javascript/pull/10134)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  Customize the scope checkboxes with the new `listGroupItemCheckbox` appearance element. Checkboxes align with the first line of descriptions that wrap onto multiple lines.
+
+### Patch Changes
+
+- Fix a stray scrollbar on the `<OAuthConsent />` and `<OAuthDeviceVerification />` scope list when only one scope is shown. ([#10134](https://github.com/clerk/javascript/pull/10134)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- Updated dependencies [[`9f40d5c`](https://github.com/clerk/javascript/commit/9f40d5cb48807e6e4223f233e8b6e8bba96be2db)]:
+  - @clerk/shared@4.48.0
+  - @clerk/localizations@4.26.0
+
+## 1.43.1
+
+### Patch Changes
+
+- Add ChatGPT as a supported OAuth provider strategy for instances where Sign in with ChatGPT is enabled. ([#10107](https://github.com/clerk/javascript/pull/10107)) by [@brkalow](https://github.com/brkalow)
+
+- Show an error and re-enable the buttons in `<UserProfile />` Connected Accounts when the OAuth transport fails, for example when an Electron app cannot open the system browser. The connect buttons previously stayed disabled until the component remounted. ([#10878](https://github.com/clerk/javascript/pull/10878)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `<OrganizationProfile />` now prompts for reverification before deleting an organization, when the instance requires it. ([#10871](https://github.com/clerk/javascript/pull/10871)) by [@gabrielmeloc22](https://github.com/gabrielmeloc22)
+
+- Updated dependencies [[`c71b7d3`](https://github.com/clerk/javascript/commit/c71b7d389f28393511b92e8d416bb6641d6b0ab0), [`2ab3bb8`](https://github.com/clerk/javascript/commit/2ab3bb881435dee9cf520e2e230f932e2c13b443)]:
+  - @clerk/shared@4.47.0
+  - @clerk/localizations@4.25.1
+
 ## 1.43.0
 
 ### Minor Changes

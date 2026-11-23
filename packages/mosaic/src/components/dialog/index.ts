@@ -6,7 +6,7 @@
  * <Dialog.Root>
  *   <Dialog.Trigger render={<Button />}>Open</Dialog.Trigger>
  *   <Dialog.Popup>
- *     <Card.Root elevation='overlay'>
+ *     <Card.Root>
  *       <Card.Header>
  *         <Card.Title>…</Card.Title>
  *         <Card.Description>…</Card.Description>
@@ -31,7 +31,6 @@
  * management, scroll lock, and ARIA wiring.
  */
 export * as Dialog from './dialog.parts';
-export { DialogContext, isInDialog } from './dialog';
 export type { DialogFocusTarget, DialogHandle, DialogOpenChangeDetails, DialogRole } from '../../primitives/dialog';
 export type {
   DialogCloseButtonProps,

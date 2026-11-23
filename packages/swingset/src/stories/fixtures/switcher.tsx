@@ -35,6 +35,7 @@ const nestLabs: SwitcherMembership = {
   name: 'NestLabs Creative',
   membersCount: 24,
   planLabel: 'Pro plan',
+  roleName: 'Admin',
   imageUrl: defaultOrgLogo,
 };
 

@@ -1110,6 +1110,10 @@ export const caES: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1584,12 +1588,14 @@ export const caES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Llista de tots els comptes',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea organització',
     action__invitationAccept: 'Uneix-te',
     action__manageOrganization: 'Gestiona',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Sol·licita unir-te',
+    membershipListLabel: 'Llista de totes les pertinences a organitzacions',
     notSelected: "No s'ha seleccionat cap organització",
     personalWorkspace: 'Compte personal',
     suggestionsAcceptedLabel: 'Aprovació pendent',

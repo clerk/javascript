@@ -63,7 +63,7 @@ export interface DialogProps<Payload = unknown> {
   /** The popup's ARIA role. Default: `dialog` */
   role?: DialogRole;
   /**
-   * Connects this root to triggers rendered outside it. Create with `Dialog.createHandle()`
+   * Connects this root to triggers rendered outside it. Create with `Dialog.createDialogHandle()`
    * and pass the same handle to each `Dialog.Trigger`.
    */
   handle?: DialogHandle<Payload>;

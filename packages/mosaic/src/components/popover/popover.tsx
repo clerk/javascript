@@ -66,7 +66,7 @@ const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionPro
 
 function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof Primitive.Positioner>) {
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Popover');
+  useAccessibleNameWarning(node, { part: 'Popover.Popup', roles: ['dialog', 'alertdialog'], title: 'Popover.Title' });
 
   return (
     <Primitive.Positioner

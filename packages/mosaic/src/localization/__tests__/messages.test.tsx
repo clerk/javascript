@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { fill, plural, rich } from '../messages';
 
@@ -89,6 +89,21 @@ describe('rich', () => {
       </p>,
     );
     expect(container.innerHTML).toBe('<p>Read the <a href="/terms"><b>terms</b> now</a></p>');
+  });
+
+  it('renders an element value inside markup without a key warning', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(
+      <p>
+        {rich('Trust {#nowrap}({domain}){/nowrap}', {
+          values: { domain: <button>acme.com</button> },
+          components: { nowrap: c => <span>{c}</span> },
+        })}
+      </p>,
+    );
+    expect(container.innerHTML).toBe('<p>Trust <span>(<button>acme.com</button>)</span></p>');
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
   });
 
   it('renders standalone markup', () => {

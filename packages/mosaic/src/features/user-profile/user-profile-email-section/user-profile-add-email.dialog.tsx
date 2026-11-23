@@ -8,7 +8,7 @@ import { Card } from '../../../components/card';
 import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import { Flow } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { Input } from '../../../components/input';
 import { Item } from '../../../components/item';
@@ -16,6 +16,7 @@ import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
+import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
 import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
@@ -60,10 +61,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
         initialFocus={props.step === 'email' ? emailRef : props.step === 'verify' ? codeRef : undefined}
         finalFocus={props.finalFocus}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Flow.Root
             value={props.step}
             state={props}
@@ -381,11 +379,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
               onClick={props.onConnect}
             >
               {m.sso.connect}
-              <Icon
-                glyph={ArrowUpRight}
-                placement='inline-end'
-                size='md'
-              />
+              <Icon glyph={ArrowUpRight} />
             </Button>
           </Item.Actions>
         </Item.Root>

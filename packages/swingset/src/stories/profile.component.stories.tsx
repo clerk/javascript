@@ -170,19 +170,14 @@ function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolea
           <Profile.NavItem
             key={item.id}
             value={item.id}
-            icon={
-              <Icon
-                glyph={item.icon}
-                size='md'
-              />
-            }
+            icon={<Icon glyph={item.icon} />}
             badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
+      <Profile.Content>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
@@ -349,5 +344,83 @@ export function Transitions() {
       `}</style>
       <Surface stub />
     </>
+  );
+}
+
+/**
+ * A page with a sub-page: Security opens Passkeys, whose `Panel.Title` gets a back button to
+ * Security. Going back focuses the Security title.
+ */
+export function SubPages() {
+  const [page, setPage] = useState('security');
+  const [subPage, setSubPage] = useState<string | null>(null);
+  return (
+    <Profile.Root
+      value={page}
+      onValueChange={setPage}
+    >
+      <Profile.Title>Settings</Profile.Title>
+      <Profile.Nav>
+        {pages.map(item => (
+          <Profile.NavItem
+            key={item.id}
+            value={item.id}
+            icon={<Icon glyph={item.icon} />}
+          >
+            {item.label}
+          </Profile.NavItem>
+        ))}
+      </Profile.Nav>
+      <Profile.Content>
+        <Profile.ContentPanel value='general'>
+          <Placeholder title='General' />
+        </Profile.ContentPanel>
+        <Profile.ContentPanel
+          value='security'
+          label='Security'
+          subPage={subPage}
+          onSubPageChange={setSubPage}
+        >
+          <Profile.SubPage value={null}>
+            <Panel.Root>
+              <Panel.Title>Security</Panel.Title>
+              <Section.Root>
+                <Section.Group>
+                  <Section.Body>
+                    <Section.Row>
+                      <Section.Item>
+                        <Section.Content>
+                          <Section.Label>Passkeys</Section.Label>
+                          <Section.Description>MacBook Pro · iPhone</Section.Description>
+                        </Section.Content>
+                        <Section.Actions>
+                          <Button
+                            color='neutral'
+                            size='sm'
+                            variant='outline'
+                            onClick={() => setSubPage('passkeys')}
+                          >
+                            Manage
+                          </Button>
+                        </Section.Actions>
+                      </Section.Item>
+                    </Section.Row>
+                  </Section.Body>
+                </Section.Group>
+              </Section.Root>
+            </Panel.Root>
+          </Profile.SubPage>
+          <Profile.SubPage value='passkeys'>
+            <Panel.Root>
+              <Panel.Title>Passkeys</Panel.Title>
+              <Text>Your passkeys.</Text>
+            </Panel.Root>
+          </Profile.SubPage>
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='billing'>
+          <Placeholder title='Billing' />
+        </Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
   );
 }

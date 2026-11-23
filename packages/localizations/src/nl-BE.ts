@@ -1103,6 +1103,10 @@ export const nlBE: LocalizationResource = {
   oauthConsent: {
     action__allow: undefined,
     action__deny: undefined,
+    clientIdentity: {
+      dynamic: undefined,
+      metadataDocument: undefined,
+    },
     offlineAccessNotice: undefined,
     redirectNotice: undefined,
     redirectUriModal: {
@@ -1578,12 +1582,14 @@ export const nlBE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    accountListLabel: 'Lijst van alle accounts',
     action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
     action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
+    membershipListLabel: 'Lijst van alle organisatielidmaatschappen',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
     suggestionsAcceptedLabel: 'In behandeling',

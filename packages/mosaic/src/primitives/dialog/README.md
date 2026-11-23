@@ -47,13 +47,13 @@ const [open, setOpen] = useState(false);
 
 ### Detached triggers
 
-A trigger does not have to be nested inside its root. `Dialog.createHandle()` returns a handle;
+A trigger does not have to be nested inside its root. `Dialog.createDialogHandle()` returns a handle;
 pass the same handle to both, and the trigger drives the root from anywhere in the tree. The
 handle also has imperative `open()` / `close()` / `isOpen` members; calls made while no root is
 mounted are ignored.
 
 ```tsx
-const feedbackDialog = Dialog.createHandle();
+const feedbackDialog = Dialog.createDialogHandle();
 
 <Dialog.Trigger handle={feedbackDialog}>Give feedback</Dialog.Trigger>;
 
@@ -64,12 +64,12 @@ const feedbackDialog = Dialog.createHandle();
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
 the active payload, so one dialog renders per-trigger content. Type the payload through
-the handle: `Dialog.createHandle<Payload>()`, and every trigger on that handle must pass one. The
+the handle: `Dialog.createDialogHandle<Payload>()`, and every trigger on that handle must pass one. The
 payload is captured when the trigger opens the dialog; for data that can change while it is open,
 carry an id and read live state inside.
 
 ```tsx
-const detail = Dialog.createHandle<{ name: string }>();
+const detail = Dialog.createDialogHandle<{ name: string }>();
 
 <Dialog.Trigger handle={detail} id='a' payload={{ name: 'Alice' }}>Alice</Dialog.Trigger>
 <Dialog.Trigger handle={detail} id='b' payload={{ name: 'Bob' }}>Bob</Dialog.Trigger>
@@ -85,7 +85,7 @@ programmatic counterpart, for a dialog raised by something that happened rather 
 trigger names its own payload.
 
 ```tsx
-const confirmation = Dialog.createHandle<{ question: string }>();
+const confirmation = Dialog.createDialogHandle<{ question: string }>();
 
 confirmation.open({ question: 'Discard changes?' });
 ```
@@ -157,7 +157,7 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 | `modal`        | `boolean`                                                   | `true`     | Traps focus and blocks page interaction                               |
 | `role`         | `'dialog' \| 'alertdialog'`                                 | `'dialog'` | The popup's ARIA role                                                 |
 | `closedBy`     | `'any' \| 'closerequest' \| 'none'`                         | `'any'`    | Which gestures dismiss the dialog                                     |
-| `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createHandle()`)              |
+| `handle`       | `DialogHandle`                                              | —          | Connects detached triggers (see `Dialog.createDialogHandle()`)        |
 | `triggerId`    | `string \| null`                                            | —          | Controls which trigger the open is attributed to                      |
 | `children`     | `ReactNode \| ({ payload }) => ReactNode`                   | —          | Content, or a render function of the active `payload`                 |
 

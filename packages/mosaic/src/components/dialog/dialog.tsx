@@ -12,7 +12,8 @@ import type {
   DialogProps as HeadlessDialogProps,
   DialogRole,
 } from '../../primitives/dialog';
-import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import { Dialog as Primitive } from '../../primitives/dialog';
+import { useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog/dialog-context';
 import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -111,7 +112,7 @@ export function isInDialog(dialog: DialogContextValue | null): dialog is DialogC
 export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button'> & {
   /**
    * Connects this trigger to a root rendered elsewhere in the tree. Create with
-   * `Dialog.createHandle()` and pass the same handle to the `Dialog.Root`.
+   * `Dialog.createDialogHandle()` and pass the same handle to the `Dialog.Root`.
    */
   handle?: DialogHandle<Payload>;
   /**
@@ -417,7 +418,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog', holdsProfile(variant) ? 'Profile.Title' : 'Card.Title');
+  useAccessibleNameWarning(node, {
+    part: 'Dialog.Popup',
+    roles: ['dialog', 'alertdialog'],
+    title: holdsProfile(variant) ? 'Profile.Title' : 'Card.Title',
+  });
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
   useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');
@@ -488,7 +493,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 });
 
 /** Creates a handle linking detached `Dialog.Trigger`s to a `Dialog.Root` anywhere in the tree. */
-const createDialogHandle = Primitive.createHandle;
+const createDialogHandle = Primitive.createDialogHandle;
 export {
   Root as DialogRoot,
   Trigger as DialogTrigger,

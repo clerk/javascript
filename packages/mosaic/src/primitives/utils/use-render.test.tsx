@@ -2,6 +2,7 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { isReact18, lazyNode } from '../../__tests__/lazy';
 import { isRef, mergeProps, useRender } from './use-render';
 
 afterEach(() => {
@@ -133,6 +134,20 @@ describe('useRender', () => {
     expect(el).toHaveTextContent('content');
   });
 
+  it('renders the default tag when render is null', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        // @ts-expect-error -- `render` is not typed to accept null, but an untyped caller can pass it
+        render: null,
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+  });
+
   it('returns null when enabled is false', () => {
     const { result } = renderHook(() =>
       useRender({ defaultTagName: 'div', enabled: false, props: { children: 'hidden' } }),
@@ -179,6 +194,22 @@ describe('useRender', () => {
     const el = screen.getByTestId('test');
     expect(refA.current).toBe(el);
     expect(refB).toHaveBeenCalledWith(el);
+  });
+
+  it('attaches and detaches a ref that comes and goes between renders', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const ref = React.createRef<HTMLDivElement>();
+    function C({ attach }: { attach: boolean }) {
+      return useRender({ defaultTagName: 'div', ref: attach ? ref : undefined, props: { 'data-testid': 'test' } });
+    }
+    const { rerender } = render(<C attach />);
+    rerender(<C attach={false} />);
+
+    expect(ref.current).toBeNull();
+    rerender(<C attach />);
+
+    expect(ref.current).toBe(screen.getByTestId('test'));
+    expect(error).not.toHaveBeenCalled();
   });
 
   it("merges a render element's own ref with the params ref", () => {
@@ -269,5 +300,119 @@ describe('useRender', () => {
         ref: expect.any(Function),
       }),
     );
+  });
+});
+
+describe.skipIf(isReact18)('useRender with a lazy render element', () => {
+  it('clones the element the lazy node resolves to, with computed props and state attributes', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'div',
+        render: lazyNode(<article data-variant='x' />),
+        state: { open: true },
+        stateAttributesMapping: { open: (v: boolean) => (v ? { 'data-open': '' } : null) },
+        props: { 'data-testid': 'test', children: 'content' },
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    expect(el.tagName).toBe('ARTICLE');
+    expect(el).toHaveAttribute('data-variant', 'x');
+    expect(el).toHaveAttribute('data-open', '');
+    expect(el).toHaveTextContent('content');
+  });
+
+  it("keeps the resolved element's className and event handlers", () => {
+    const partHandler = vi.fn();
+    const elementHandler = vi.fn();
+    function C() {
+      return useRender({
+        defaultTagName: 'button',
+        render: lazyNode(
+          <button
+            type='button'
+            className='from-element'
+            onClick={elementHandler}
+            data-testid='test'
+          />,
+        ),
+        props: { className: 'from-part', onClick: partHandler },
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    el.click();
+
+    expect(el).toHaveClass('from-part', 'from-element');
+    expect(partHandler).toHaveBeenCalledTimes(1);
+    expect(elementHandler).toHaveBeenCalledTimes(1);
+  });
+
+  it("merges the resolved element's own ref with the params ref", () => {
+    const paramRef = React.createRef<HTMLElement>();
+    const elementRef = React.createRef<HTMLElement>();
+    function C() {
+      return useRender({
+        defaultTagName: 'div',
+        ref: paramRef,
+        render: lazyNode(
+          <article
+            ref={elementRef}
+            data-testid='test'
+          />,
+        ),
+      });
+    }
+    render(<C />);
+
+    const el = screen.getByTestId('test');
+    expect(paramRef.current).toBe(el);
+    expect(elementRef.current).toBe(el);
+  });
+
+  it('does not resolve the lazy node when enabled is false', () => {
+    const init = vi.fn((p: unknown) => p);
+    const { result } = renderHook(() =>
+      useRender({
+        defaultTagName: 'div',
+        enabled: false,
+        render: lazyNode(<article />, init),
+      }),
+    );
+
+    expect(result.current).toBeNull();
+    expect(init).not.toHaveBeenCalled();
+  });
+
+  it('renders the default tag when the lazy node resolves to something other than an element', () => {
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        render: lazyNode('text'),
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+  });
+});
+
+describe.runIf(isReact18)('useRender with a lazy render element on React 18', () => {
+  it('renders the default tag without resolving the lazy node', () => {
+    const init = vi.fn((p: unknown) => p);
+    function C() {
+      return useRender({
+        defaultTagName: 'span',
+        render: lazyNode(<article />, init),
+        props: { 'data-testid': 'test' },
+      });
+    }
+    render(<C />);
+
+    expect(screen.getByTestId('test').tagName).toBe('SPAN');
+    expect(init).not.toHaveBeenCalled();
   });
 });

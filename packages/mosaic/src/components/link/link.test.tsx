@@ -35,7 +35,7 @@ describe('Link', () => {
       </>,
     );
     const external = screen.getByRole('link', { name: 'External' });
-    const arrow = external.querySelector('[data-icon="inline-end"]');
+    const arrow = external.querySelector('.cl-icon');
     expect(arrow).toHaveAttribute('aria-hidden', 'true');
     expect(external.lastElementChild?.contains(arrow)).toBe(true);
     expect(screen.getByRole('link', { name: 'Internal' }).querySelector('svg')).toBeNull();

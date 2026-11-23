@@ -11,7 +11,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Set `placement` when the icon leads or trails a `Button` label, so the button tightens that side.',
+      text: 'Put the icon directly before or after a `Button` label, not inside a wrapper, so the button tightens that side.',
     },
     { do: true, text: "Use `size='inherit'` for an icon in running text or a heading." },
     {
@@ -35,10 +35,6 @@ export default {
           doc: '`sm`, `md`, `lg`, or `inherit` to follow the font size.',
           default: "'md'",
         },
-        placement: {
-          type: "'inline-start' | 'inline-end'",
-          doc: 'Marks the icon as leading or trailing content, as `data-icon`. Applies no style of its own.',
-        },
       },
     },
     IconFrame: {
@@ -57,7 +53,7 @@ export default {
       code: `
 <Button>
   Next
-  <Icon glyph={ChevronRight} placement='inline-end' />
+  <Icon glyph={ChevronRight} />
 </Button>
 `,
     },
