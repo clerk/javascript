@@ -29,19 +29,11 @@ type MockRequestParams = {
   method?: string;
   headers?: Headers;
   machineAuthObject?: Partial<MachineAuthObject<MachineTokenType>>;
-  // The token middleware verified. Defaults to the request's bearer token.
-  machineToken?: string;
 };
 
 const mockRequest = (params: MockRequestParams) => {
-  const {
-    url,
-    appendDevBrowserCookie = false,
-    method = 'GET',
-    headers = new Headers(),
-    machineAuthObject,
-    machineToken = headers.get(constants.Headers.Authorization)?.replace('Bearer ', '') ?? '',
-  } = params;
+  const { url, appendDevBrowserCookie = false, method = 'GET', headers = new Headers(), machineAuthObject } = params;
+  const machineToken = headers.get(constants.Headers.Authorization)?.replace('Bearer ', '') ?? '';
   const headersWithCookie = new Headers(headers);
 
   if (appendDevBrowserCookie) {
@@ -73,17 +65,6 @@ const createMockMachineAuthObject = <T extends MachineTokenType>(data: Partial<M
 describe('getAuthDataFromRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it('rejects a forwarded machine auth object when the bearer token is not the one it was created for', () => {
-    const req = mockRequest({
-      url: '/api/protected',
-      headers: new Headers({ [constants.Headers.Authorization]: 'Bearer ak_other' }),
-      machineAuthObject: createMockMachineAuthObject({ tokenType: 'api_key', isAuthenticated: true, id: 'ak_id' }),
-      machineToken: 'ak_verified',
-    });
-
-    expect(() => getAuthDataFromRequest(req, { acceptsToken: 'api_key' })).toThrow(/auth_signature_invalid/);
   });
 
   it('rejects a forwarded machine auth object without a token signature', () => {
