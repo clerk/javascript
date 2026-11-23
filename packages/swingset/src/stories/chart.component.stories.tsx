@@ -86,9 +86,10 @@ const growth = [
     retained: 158,
     reactivated: 14,
     new: 27,
-    retainedChurned: -12,
-    reactivatedChurned: -6,
-    newChurned: -9,
+    // Churn is known only once the week ends, so the week in progress has none.
+    retainedChurned: null,
+    reactivatedChurned: null,
+    newChurned: null,
   },
 ];
 
