@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import { ChartContext } from '../chart-context';
 import type { ChartInstance } from '../types';
 import type { BarStyleElement } from './bar-canvas';
-import type { PaintedProjection, PreparedStackedBars, StackedBarLayout } from './bar-layout';
+import type { PreparedStackedBars, StackedBarLayout } from './bar-layout';
 import type { ActiveBar, BarCategory, BarIdentity, BarSelection } from './types';
 
 /** Only `useBarChart` sets it, so a chart that carries it came from `useBarChart`. */
@@ -39,7 +39,8 @@ export function useBarChartContext(part: string) {
 export interface StackedBarsContextValue {
   /** Registers the `Chart.Bar` element whose computed `color` paints bars. */
   setBar: (element: BarStyleElement | null) => void;
-  projection: PaintedProjection | null;
+  /** Registers the `Chart.ProjectionOutline` element whose computed stroke outlines the projection. */
+  setProjectionOutline: (element: BarStyleElement | null) => void;
 }
 
 export const StackedBarsContext = createContext<StackedBarsContextValue | null>(null);

@@ -28,7 +28,6 @@ beforeAll(async () => {
     .projected { max-width: 32px; border-radius: 4px 4px 2px 2px; color: rgb(0, 0, 255); }
     .projected[data-projection] { color: rgb(255, 0, 0); }
     .outline { fill: none; stroke: rgb(0, 0, 0); }
-    .outline.hairline { stroke-width: 0.25px; }
   `;
   document.head.append(style);
 });
@@ -277,12 +276,26 @@ describe('the projection outline', () => {
     };
   }
 
-  function outline() {
-    const element = document.querySelector('.outline');
-    if (!(element instanceof SVGGeometryElement)) {
-      throw new Error('The projection outline is not an SVG shape');
+  /** One row of the screenshot at device-pixel resolution, as `[r, g, b]` per device pixel. */
+  /** The Canvas row at CSS `y`, one entry per device pixel. */
+  function canvasRow(y: number) {
+    const canvas = screen.getByRole('img', { name: 'Growth' });
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('The chart image is not a canvas');
     }
-    return element;
+    const ratio = canvas.width / canvas.getBoundingClientRect().width;
+    const data = canvas.getContext('2d')?.getImageData(0, Math.floor(y * ratio), canvas.width, 1).data ?? [];
+    return Array.from({ length: canvas.width }, (_, x) => Array.from(data.slice(x * 4, x * 4 + 4)).join(','));
+  }
+
+  /** The Canvas alpha at the device pixel that contains a CSS point. */
+  function inkAt(x: number, y: number) {
+    const canvas = screen.getByRole('img', { name: 'Growth' });
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('The chart image is not a canvas');
+    }
+    const ratio = canvas.width / canvas.getBoundingClientRect().width;
+    return canvas.getContext('2d')?.getImageData(Math.floor(x * ratio), Math.floor(y * ratio), 1, 1).data[3] ?? 0;
   }
 
   const fill = 'rgb(255, 0, 0)';
@@ -307,8 +320,54 @@ describe('the projection outline', () => {
     expect([top - 2.5, top - 1.5, top - 0.5, top + 0.5].map(y => at(center, y))).toEqual([gap, stroke, gap, fill]);
   });
 
+  it('leaves the same crisp gap on both sides at fractional pixel ratios', async () => {
+    const uneven: string[] = [];
+    try {
+      for (const deviceScaleFactor of [1.1, 1.25, 1.5, 1.8, 2]) {
+        await cdp().send('Emulation.setDeviceMetricsOverride', {
+          width: 1280,
+          height: 900,
+          deviceScaleFactor,
+          mobile: false,
+        });
+        await render(<ProjectedChart />);
+        await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
+        // Rounding in the Canvas transform can leave a 1/255 sliver, so a pixel is classed by coverage.
+        const kinds = canvasRow(projectionFill().top + 10.5).map(pixel => {
+          const [r, g, , a] = pixel.split(',').map(Number);
+          if ((a ?? 0) < 16) {
+            return 'gap';
+          }
+          if ((a ?? 0) > 240) {
+            return r === 255 && g === 0 ? 'fill' : 'stroke';
+          }
+          return 'blur';
+        });
+        const first = kinds.indexOf('fill');
+        const last = kinds.lastIndexOf('fill');
+        const side = (pixels: string[]) =>
+          pixels
+            .join(' ')
+            .replace(/(\w+)( \1)*/g, (run, kind: string) => `${kind}×${run.split(' ').length}`)
+            .split(' ')
+            .slice(0, 2)
+            .join(' ');
+        const left = side(kinds.slice(0, first).reverse());
+        const right = side(kinds.slice(last + 1));
+        if (left !== right || !left.startsWith('gap×') || !left.includes('stroke×')) {
+          uneven.push(`${deviceScaleFactor}x: left ${left}, right ${right}`);
+        }
+        cleanup();
+      }
+    } finally {
+      await cdp().send('Emulation.clearDeviceMetricsOverride');
+    }
+
+    expect(uneven).toEqual([]);
+  });
+
   it('keeps the top corners concentric with the fill', async () => {
-    await render(<ProjectedChart outlineClassName='outline hairline' />);
+    await render(<ProjectedChart />);
     await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
     const { left, right, top } = projectionFill();
     const distance = RADIUS + 1.5;
@@ -321,7 +380,7 @@ describe('the projection outline', () => {
         [left + RADIUS - dx, top + RADIUS - dy],
         [right - RADIUS + dx, top + RADIUS - dy],
       ]) {
-        if (!outline().isPointInStroke(new DOMPoint(x, y))) {
+        if (inkAt(x, y) === 0) {
           missed.push(`${degrees}deg (${x.toFixed(2)}, ${y.toFixed(2)})`);
         }
       }
@@ -331,14 +390,13 @@ describe('the projection outline', () => {
   });
 
   it('meets the zero line with square bottom corners', async () => {
-    await render(<ProjectedChart outlineClassName='outline hairline' />);
+    await render(<ProjectedChart />);
     await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
     const { left, right } = projectionFill();
     const zero = Number(document.querySelector('line')?.getAttribute('y1'));
-    const inStroke = (x: number, y: number) => outline().isPointInStroke(new DOMPoint(x, y));
 
-    expect([inStroke(left - 1.5, zero - 0.1), inStroke(right + 1.5, zero - 0.1)]).toEqual([true, true]);
-    expect([inStroke(left - 1.5, zero + 0.5), inStroke(right + 1.5, zero + 0.5)]).toEqual([false, false]);
+    expect([inkAt(left - 1.5, zero - 1), inkAt(right + 1.5, zero - 1)]).toEqual([255, 255]);
+    expect([inkAt(left - 1.5, zero + 1), inkAt(right + 1.5, zero + 1)]).toEqual([0, 0]);
   });
 });
 

@@ -9,6 +9,7 @@ import {
   type BarStyleElement,
   getBarGeometrySnapshot,
   getBarPaletteSnapshot,
+  getProjectionOutlineSnapshot,
   paintStackedBarCanvas,
   parseBarGeometry,
 } from './bar-canvas';
@@ -53,6 +54,20 @@ function subscribeToTheme(bar: Element | null, onChange: () => void) {
   };
 }
 
+/** The outline repaints on a class change and on a theme change, like the bars. */
+function subscribeToPartStyle(element: Element | null, onChange: () => void) {
+  if (!element) {
+    return () => {};
+  }
+  const observer = new MutationObserver(onChange);
+  observer.observe(element, { attributes: true, attributeFilter: ['class'] });
+  const unsubscribeFromTheme = subscribeToTheme(element, onChange);
+  return () => {
+    observer.disconnect();
+    unsubscribeFromTheme();
+  };
+}
+
 const getServerSnapshot = () => '';
 const getServerPixelRatio = () => 1;
 
@@ -66,6 +81,7 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
     const [canvas, setCanvas] = React.useState<HTMLCanvasElement | null>(null);
     const [canvasError, setCanvasError] = React.useState<CanvasRenderError | null>(null);
     const [bar, setBar] = React.useState<BarStyleElement | null>(null);
+    const [projectionOutline, setProjectionOutline] = React.useState<BarStyleElement | null>(null);
     const subscribeToBarClass = React.useCallback(
       (onChange: () => void) => {
         if (!bar) {
@@ -89,10 +105,13 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
     );
     const geometry = React.useMemo(() => parseBarGeometry(barGeometry), [barGeometry]);
     const marks = React.useMemo(
-      () => projectStackedBarMarks({ prepared, categories, scaleY }, geometry),
-      [categories, geometry, prepared, scaleY],
+      () => projectStackedBarMarks({ prepared, categories, scaleY }, geometry, pixelRatio),
+      [categories, geometry, pixelRatio, prepared, scaleY],
     );
-    const projection = React.useMemo(() => fitProjectionToBar(projectedBar, geometry), [geometry, projectedBar]);
+    const projection = React.useMemo(
+      () => fitProjectionToBar(projectedBar, geometry, pixelRatio),
+      [geometry, pixelRatio, projectedBar],
+    );
     const paletteStates = React.useMemo(() => {
       const states: BarState[] = projection ? [{ projection: true }] : [];
       for (const seriesKey of new Set(marks.map(mark => mark.seriesKey))) {
@@ -108,20 +127,40 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
       () => getBarPaletteSnapshot(bar, paletteStates),
       getServerSnapshot,
     );
-    const stackedBarsContext = React.useMemo(() => ({ setBar, projection }), [projection]);
+    const outlineStyle = React.useSyncExternalStore(
+      React.useCallback(
+        (onChange: () => void) => subscribeToPartStyle(projectionOutline, onChange),
+        [projectionOutline],
+      ),
+      () => getProjectionOutlineSnapshot(projectionOutline),
+      getServerSnapshot,
+    );
+    const stackedBarsContext = React.useMemo(() => ({ setBar, setProjectionOutline }), []);
 
     React.useLayoutEffect(() => {
       if (!canvas || !hasArea(size)) {
         return;
       }
-      paintStackedBarCanvas({ canvas, marks, projection, size, pixelRatio, isBarActive, bar });
+      paintStackedBarCanvas({ canvas, marks, projection, size, pixelRatio, isBarActive, bar, projectionOutline });
       const onContextLost = () => {
         setCanvasError(new CanvasRenderError('Canvas 2D context was lost', null));
       };
       canvas.addEventListener('contextlost', onContextLost);
       return () => canvas.removeEventListener('contextlost', onContextLost);
-      // `barClass` and `palette` are not read here: they change the computed colors the paint reads from the DOM.
-    }, [bar, barClass, canvas, isBarActive, marks, palette, pixelRatio, projection, size]);
+      // `barClass`, `palette` and `outlineStyle` are not read here: they change the computed styles the paint reads from the DOM.
+    }, [
+      bar,
+      barClass,
+      canvas,
+      isBarActive,
+      marks,
+      outlineStyle,
+      palette,
+      pixelRatio,
+      projection,
+      projectionOutline,
+      size,
+    ]);
 
     const ownProps = {
       style: { position: 'absolute', inset: 0 },

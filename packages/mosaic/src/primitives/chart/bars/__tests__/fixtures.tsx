@@ -89,6 +89,13 @@ const context = {
   rect: vi.fn(),
   roundRect: vi.fn(),
   setTransform: vi.fn(),
+  moveTo: vi.fn(),
+  arcTo: vi.fn(),
+  lineTo: vi.fn(),
+  stroke: vi.fn(),
+  setLineDash: vi.fn(),
+  strokeStyle: '',
+  lineWidth: 1,
 };
 
 /** Fakes what happy-dom lacks for the chart to mount: a measured size and a 2D context. */

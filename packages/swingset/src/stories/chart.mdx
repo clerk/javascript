@@ -95,7 +95,9 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
 ### Projection
 
 `projection` draws a projected total above one category's positive stack. The fill is painted
-with `Chart.Bar`'s `data-projection` color, and `Chart.ProjectionOutline` draws its outline.
+with `Chart.Bar`'s `data-projection` color, and the outline with `Chart.ProjectionOutline`'s
+`stroke`, `stroke-width` and `stroke-dasharray`. The Canvas paints both, so they stay aligned at any
+pixel ratio.
 It is drawn only when `value` is above that category's stack.
 
 ```tsx
@@ -116,7 +118,7 @@ const chart = Chart.useBarChart({
 | `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
 | `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
-| `Chart.ProjectionOutline` | `<path>`        | Outlines the projected bar                                           |
+| `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
 | `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
 | `Chart.XAxis`             | `<svg>`         | Holds the category labels                                            |

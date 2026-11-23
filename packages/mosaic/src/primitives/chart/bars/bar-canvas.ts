@@ -227,6 +227,68 @@ export function getBarPaletteSnapshot(element: BarStyleElement | null, states: r
   }
 }
 
+/** How `Chart.ProjectionOutline` strokes, read from its computed style. Without a stroke color, nothing is drawn. */
+type ProjectionOutlineStyle = Readonly<{ color: string; width: number; dash: number[] }>;
+
+function readProjectionOutlineStyle(element: BarStyleElement | null): ProjectionOutlineStyle | null {
+  if (!element) {
+    return null;
+  }
+  const style = getComputedStyle(element);
+  const width = readPixels(style.strokeWidth, 1);
+  if (!style.stroke || style.stroke === 'none' || style.stroke.startsWith('url(') || width <= 0) {
+    return null;
+  }
+  const dash =
+    style.strokeDasharray === 'none'
+      ? []
+      : style.strokeDasharray
+          .split(/[\s,]+/)
+          .map(value => Number.parseFloat(value))
+          .filter(Number.isFinite);
+  return { color: style.stroke, width, dash };
+}
+
+/** The outline stroke serialized, so a change to it can be a `useSyncExternalStore` snapshot. */
+export function getProjectionOutlineSnapshot(element: BarStyleElement | null) {
+  return JSON.stringify(readProjectionOutlineStyle(element));
+}
+
+/** The gap between the fill and the inside of the outline stroke. */
+const PROJECTION_OUTLINE_GAP = 1;
+
+/**
+ * Traces the fill at a constant offset, with concentric top corners and open, square ends on zero.
+ * The gap and a stroke at least one device pixel wide round to whole device pixels, so both sides
+ * match and the stroke stays crisp at any pixel ratio.
+ */
+function strokeProjectionOutline(
+  context: CanvasRenderingContext2D,
+  projection: PaintedProjection,
+  outline: ProjectionOutlineStyle,
+  pixelRatio: number,
+) {
+  const gap = Math.max(1, Math.round(PROJECTION_OUTLINE_GAP * pixelRatio)) / pixelRatio;
+  const deviceWidth = outline.width * pixelRatio;
+  const width = (deviceWidth < 1 ? deviceWidth : Math.round(deviceWidth)) / pixelRatio;
+  const offset = gap + width / 2;
+  const left = projection.x - offset;
+  const right = projection.x + projection.width + offset;
+  const top = projection.y - offset;
+  const bottom = projection.y + projection.height;
+  const radius = projection.radius > 0 ? projection.radius + offset : 0;
+  context.strokeStyle = outline.color;
+  context.lineWidth = width;
+  context.setLineDash(outline.dash);
+  context.beginPath();
+  context.moveTo(left, bottom);
+  context.arcTo(left, top, right, top, radius);
+  context.arcTo(right, top, right, bottom, radius);
+  context.lineTo(right, bottom);
+  context.stroke();
+  context.setLineDash([]);
+}
+
 type PaintOptions<TDatum> = Readonly<{
   canvas: HTMLCanvasElement;
   marks: readonly BarMark<TDatum>[];
@@ -236,6 +298,8 @@ type PaintOptions<TDatum> = Readonly<{
   isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
   /** The `Chart.Bar` element. Without it, nothing is painted. */
   bar: BarStyleElement | null;
+  /** The `Chart.ProjectionOutline` element, whose stroke outlines the projection. */
+  projectionOutline: BarStyleElement | null;
 }>;
 
 export function paintStackedBarCanvas<TDatum>({
@@ -246,6 +310,7 @@ export function paintStackedBarCanvas<TDatum>({
   pixelRatio,
   isBarActive,
   bar,
+  projectionOutline,
 }: PaintOptions<TDatum>) {
   try {
     const context = canvas.getContext('2d');
@@ -282,6 +347,10 @@ export function paintStackedBarCanvas<TDatum>({
           0,
         ]);
         context.fill();
+        const outline = readProjectionOutlineStyle(projectionOutline);
+        if (outline) {
+          strokeProjectionOutline(context, projection, outline, pixelRatio);
+        }
       }
       drawCanvasBars({
         context,

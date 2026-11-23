@@ -4,49 +4,29 @@ import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { useStackedBarsContext } from './bar-context';
-import type { PaintedProjection } from './bar-layout';
 
-export type ChartProjectionOutlineProps = ComponentProps<'path'>;
+export type ChartProjectionOutlineProps = ComponentProps<'g'>;
 
-/** From the fill's edge to the path, so a 1px stroke leaves a 1px gap and covers whole pixels. */
-const OUTLINE_OFFSET = 1.5;
-
-/** Traces the fill at a constant offset, with concentric top corners and a square bottom on zero. */
-function getOutlinePath({ x, y, width, height, radius }: PaintedProjection) {
-  const left = x - OUTLINE_OFFSET;
-  const right = x + width + OUTLINE_OFFSET;
-  const top = y - OUTLINE_OFFSET;
-  const bottom = y + height;
-  const r = radius > 0 ? radius + OUTLINE_OFFSET : 0;
-  return [
-    `M${left} ${bottom}`,
-    `V${top + r}`,
-    `A${r} ${r} 0 0 1 ${left + r} ${top}`,
-    `H${right - r}`,
-    `A${r} ${r} 0 0 1 ${right} ${top + r}`,
-    `V${bottom}`,
-    'Z',
-  ].join('');
-}
-
-export const ChartProjectionOutline = React.forwardRef<SVGPathElement, ChartProjectionOutlineProps>(
+/**
+ * Styles the outline that `Chart.StackedBars` paints around the projection on Canvas, in the same
+ * pass as the fill, so the two stay aligned at any pixel ratio. The Canvas reads this hidden
+ * element's computed `stroke`, `stroke-width` and `stroke-dasharray`.
+ */
+export const ChartProjectionOutline = React.forwardRef<SVGGElement, ChartProjectionOutlineProps>(
   function ChartProjectionOutline(props, ref) {
     const { render, ...otherProps } = props;
-    const { projection } = useStackedBarsContext('ProjectionOutline');
+    const { setProjectionOutline } = useStackedBarsContext('ProjectionOutline');
 
-    const ownProps = projection
-      ? ({
-          d: getOutlinePath(projection),
-          pointerEvents: 'none',
-        } satisfies DefaultProps<'path'>)
-      : {};
+    const ownProps = {
+      'aria-hidden': true,
+      style: { display: 'none' },
+    } satisfies DefaultProps<'g'>;
 
     return useRender({
-      defaultTagName: 'path',
+      defaultTagName: 'g',
       render,
-      ref,
-      enabled: !!projection,
-      props: mergeProps<'path'>(ownProps, otherProps),
+      ref: [setProjectionOutline, ref],
+      props: mergeProps<'g'>(ownProps, otherProps),
     });
   },
 );
