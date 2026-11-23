@@ -70,6 +70,12 @@ export interface SignUpVerifyScreen {
   onCancel?: () => void;
 }
 
+export interface SignUpStartOverScreen {
+  isPending: boolean;
+  globalErrorMessage?: string;
+  onStartOver: () => void;
+}
+
 export interface SignUpRestrictedScreen {
   globalErrorMessage?: string;
   onEmailSupport?: () => void;
@@ -137,7 +143,7 @@ export interface SignUpViewProps {
   verifyPhone: ReactNode;
   restricted: SignUpRestrictedScreen;
   actionBlocked?: AuthActionBlockedDetails;
-  onStartOver: () => void;
+  startOver: SignUpStartOverScreen;
   alternativePhone?: SignUpAlternativePhoneScreen;
   verifyEmailLink?: SignUpEmailLinkScreen;
   emailLinkStatus?: SignUpEmailLinkStatusScreen;

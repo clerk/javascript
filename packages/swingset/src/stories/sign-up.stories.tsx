@@ -140,7 +140,7 @@ function ScreenPanel({
         />
       }
       restricted={{ onSignIn: noop }}
-      onStartOver={noop}
+      startOver={{ isPending: false, onStartOver: noop }}
       alternativePhone={
         alternativePhone
           ? {

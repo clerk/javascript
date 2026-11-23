@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -610,12 +610,33 @@ describe('SignUp', () => {
     await submitStart(user);
 
     expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'We couldn’t continue signing you up. Start over to try again.',
+    );
     expect(fapi.signUp.preparations).toEqual([]);
 
     await user.click(screen.getByRole('button', { name: 'Start over' }));
 
     expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(emailField()).toHaveValue('');
+  });
+
+  it('shows an alert and keeps Start over available when starting over fails', async () => {
+    const { clerk, user } = await renderSignUp({
+      environment: environment({ attributes: { email_address: { required: true, verifications: ['email_link'] } } }),
+    });
+
+    await submitStart(user);
+    const startOver = await screen.findByRole('button', { name: 'Start over' });
+    vi.spyOn(clerk.client!, 'resetSignUp').mockImplementationOnce(() => {
+      throw new Error('reset failed');
+    });
+
+    await user.click(startOver);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(screen.getByRole('button', { name: 'Start over' })).toBeEnabled();
+    expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
   });
 
   it('replaces the form with the blocked notice when the request is blocked', async () => {

@@ -177,11 +177,15 @@ export function useSignUpController(
       onSignIn: navigation.goToSignIn,
     },
     actionBlocked: flow.actionBlocked,
-    onStartOver: () =>
-      void actions.run('startOver', async () => {
-        await flow.reset();
-        details.reset();
-        go('start');
-      }),
+    startOver: {
+      isPending: actions.isPending,
+      globalErrorMessage: actions.error,
+      onStartOver: () =>
+        void actions.run('startOver', async () => {
+          await flow.reset();
+          details.reset();
+          go('start');
+        }),
+    },
   };
 }

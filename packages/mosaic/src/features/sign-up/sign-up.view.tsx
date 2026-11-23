@@ -36,7 +36,7 @@ export function SignUpView(props: SignUpViewProps) {
           verifyPhone,
           restricted,
           actionBlocked,
-          onStartOver,
+          startOver,
           alternativePhone,
           verifyEmailLink,
           emailLinkStatus,
@@ -98,7 +98,7 @@ export function SignUpView(props: SignUpViewProps) {
             <Flow.Step ids={['startOver']}>
               <AuthStartOver
                 messages={m.startOver}
-                onStartOver={onStartOver}
+                {...startOver}
               />
             </Flow.Step>
 
