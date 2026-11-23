@@ -154,11 +154,23 @@ export function useSignUpController(
       sendFinish({ type: 'FINISH', frozenModel: model, frozenScreen });
       return;
     }
+    if (result.type === 'transfer') {
+      completeReturn();
+      return;
+    }
     const nextRoute = routeFor(result, route);
     if (nextRoute) {
       go(nextRoute);
     }
   };
+
+  const completeReturn = () =>
+    void actions.run('return', async () => {
+      const step = await flow.completeReturn();
+      if (step) {
+        next(step);
+      }
+    });
 
   const finishError = finishSnapshot.context.error ? errorText(finishSnapshot.context.error) : undefined;
   const flowError = finishError ?? actions.error;
@@ -173,12 +185,7 @@ export function useSignUpController(
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return once when sign-up opens with its marker in the URL, on any route, or redeems an invitation once when it opens on start with its ticket; arriving from a redirect or a link is not an event a handler could run from. */
   useEffect(() => {
     if (flow.isReturning && actions.lastKey === undefined) {
-      void actions.run('return', async () => {
-        const step = await flow.completeReturn();
-        if (step) {
-          next(step);
-        }
-      });
+      completeReturn();
       return;
     }
     if (
