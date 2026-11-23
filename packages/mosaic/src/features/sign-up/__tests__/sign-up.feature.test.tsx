@@ -1058,6 +1058,15 @@ describe('SignUp social sign-up', () => {
     expect(fapi.signUp.creations[0].get('action_complete_redirect_url')).toBeTruthy();
   });
 
+  it('sends the redirect_url from the query as the URL to land on after Google', async () => {
+    window.history.replaceState(null, '', `${window.location.pathname}?redirect_url=%2Fdashboard`);
+
+    const { fapi } = await startWithGoogle({});
+
+    const afterGoogle = new URL(fapi.signUp.creations[0].get('action_complete_redirect_url') ?? '');
+    expect(afterGoogle.pathname).toBe('/dashboard');
+  });
+
   it('asks for what Google did not provide after the return, then completes', async () => {
     const seed: FakeFapiSeed = {
       environment: socialEnvironment({ attributes: { username: { enabled: true, required: true } } }),
