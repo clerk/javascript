@@ -559,8 +559,8 @@ describe('OAuthConsent', () => {
       fapi.oauthConsent = consent({ scopes: [scope('email', 'Your email address')] });
       rerender(<OAuthConsent scope='email' />);
 
-      await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Your profile' })).toBeNull());
-      expect(scopeCheckbox('Your email address')).toBeChecked();
+      await waitFor(() => expect(scopeCheckbox('Your email address')).toBeChecked());
+      expect(screen.queryByRole('checkbox', { name: 'Your profile' })).toBeNull();
     });
 
     it("shows a skeleton, not the previous request's scopes, while the next request loads", async () => {
