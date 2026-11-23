@@ -31,7 +31,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
 - Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
 - Build a flow with several steps on one surface → [Controllers → Multi-step flows](docs/controllers.md#multi-step-flows), then [Views → Moving between screens](docs/views.md#moving-between-screens-on-one-surface)
-- Route a component's pages or steps, or open a modal at a page → [Routing](docs/routing.md)
+- Route a component's pages or steps, put them in the URL or behind the host router, or open a modal at a page → [Routing](docs/routing.md)
 - Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
 - Add a styled component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
 - Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
