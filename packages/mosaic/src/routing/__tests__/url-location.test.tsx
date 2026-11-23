@@ -313,17 +313,6 @@ describe('the base', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('"/user/../x" cannot be routed under'));
   });
 
-  it('clears to the pathname it was given instead of the base', () => {
-    at('/page/modal/user/security?q=1');
-    const { result } = renderLocation({ routing: 'path', path: '/page/modal/user', clearedPath: '/page' });
-    expect(result.current.parts).toEqual(['security']);
-
-    act(() => result.current.location.clear());
-
-    expect(url()).toBe('/page?q=1');
-    expect(result.current.parts).toBeUndefined();
-  });
-
   it('warns when the hash key would be empty', () => {
     const warn = warnings();
     at('/#security');

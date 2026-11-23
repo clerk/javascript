@@ -5,6 +5,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { MosaicRoutingMode } from './use-mosaic-location';
+
+export type ModalRoutingMode = Exclude<MosaicRoutingMode, 'path'>;
 import { markSettled } from './window-location';
 
 // What a host hands Mosaic so the URL modes read and write the host router's location instead of
@@ -53,14 +55,12 @@ export interface MosaicRouting {
    */
   keyPrefix?: { query?: string; hash?: string };
   /**
-   * Where Mosaic's own modals keep their entry: in memory, in the hash or the query string, or in
-   * the pathname, so a modal survives a reload and Back closes it. In the pathname a modal lives
-   * under `path`, the page it opens from and closes back to, as `<path>/modal/user/security`; that
-   * page's route has to accept the extra parts. Changing it needs the provider remounted.
+   * Where Mosaic's own modals keep their entry: in memory, or in the hash or the query string, so a
+   * modal survives a reload and Back closes it. Changing it needs the provider remounted.
    *
    * @default 'virtual'
    */
-  modals?: MosaicRoutingMode | { routing: MosaicRoutingMode; path?: string };
+  modals?: ModalRoutingMode;
 }
 
 type AdapterReads = Pick<RouterAdapter, 'usePathname' | 'useSearchParams' | 'useHash'>;
@@ -71,7 +71,7 @@ export interface RoutingConfig {
   replace: RouterAdapter['replace'];
   queryPrefix: string;
   hashPrefix: string;
-  modals: { routing: MosaicRoutingMode; path: string } | undefined;
+  modals: ModalRoutingMode | undefined;
 }
 
 const defaultConfig: RoutingConfig = {
@@ -114,8 +114,6 @@ export function RouterAdapterProvider({
   const replace = adapter?.replace;
   const queryPrefix = keyPrefix?.query ?? defaultConfig.queryPrefix;
   const hashPrefix = keyPrefix?.hash ?? defaultConfig.hashPrefix;
-  const modalsRouting = typeof modals === 'string' ? modals : modals?.routing;
-  const modalsPath = typeof modals === 'string' ? undefined : modals?.path;
   const value = useMemo(
     () => ({
       reads,
@@ -123,9 +121,9 @@ export function RouterAdapterProvider({
       replace,
       queryPrefix,
       hashPrefix,
-      modals: modalsRouting === undefined ? undefined : { routing: modalsRouting, path: modalsPath ?? '' },
+      modals,
     }),
-    [reads, push, replace, queryPrefix, hashPrefix, modalsRouting, modalsPath],
+    [reads, push, replace, queryPrefix, hashPrefix, modals],
   );
   return <RoutingConfigContext.Provider value={value}>{children}</RoutingConfigContext.Provider>;
 }

@@ -8,7 +8,6 @@ import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
-import { normalizeBase } from '../routing/base-path';
 import { useRoutingConfig } from '../routing/router-adapter';
 import { useMosaicLocation } from '../routing/use-mosaic-location';
 import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from './modal.types';
@@ -69,13 +68,9 @@ export function ModalSurfaceHost<Options>({
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
-  const modals = useRoutingConfig().modals;
-  const routing = modals?.routing ?? surface.routing ?? 'virtual';
-  const own = surface.path ?? `/modal/${surface.id}`;
-  // In the pathname the modal lives under the page it opens from and closes back to it.
-  const page = routing === 'path' ? (modals?.path ?? '') : undefined;
-  const base = page === undefined ? own : `${normalizeBase(page)}${normalizeBase(own)}`;
-  const location = useMosaicLocation({ routing, path: base, clearedPath: page });
+  const routing = useRoutingConfig().modals ?? surface.routing ?? 'virtual';
+  const base = surface.path ?? `/modal/${surface.id}`;
+  const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
   const stack = React.useContext(ModalStackContext);
   const register = stack?.register;

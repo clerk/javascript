@@ -15,9 +15,6 @@ export type MosaicRoutingMode = 'virtual' | UrlRoutingMode;
 export type MosaicLocationOptions = {
   routing: MosaicRoutingMode;
   path?: string;
-  // In path mode, the pathname `clear` writes instead of the base; a modal names the page it
-  // closes to. Nothing in the other modes.
-  clearedPath?: string;
 };
 
 export interface RoutingProps {
@@ -95,10 +92,10 @@ function navigateTo(url: string, replace: boolean, via: ((url: string) => void) 
 }
 
 function urlModeLocationHook(mode: UrlRoutingMode) {
-  return (path: string, clearedPath: string | undefined) => useUrlModeLocation(mode, path, clearedPath);
+  return (path: string) => useUrlModeLocation(mode, path);
 }
 
-function useVirtualModeLocation(path: string, _clearedPath: string | undefined): MosaicLocation {
+function useVirtualModeLocation(path: string): MosaicLocation {
   const actions = useVirtualActions();
   return useMemo(() => createVirtualLocation(path, actions), [path, actions]);
 }
@@ -107,7 +104,7 @@ function useVirtualModeLocation(path: string, _clearedPath: string | undefined):
 // moment of a write directly. The location is rebuilt only when its entry changes: a write reads the
 // host as it was last committed, so a host that re-renders with a new adapter object or a new URL
 // does not hand the components above a new location each time.
-function useUrlModeLocation(routing: UrlRoutingMode, path: string, clearedPath: string | undefined): MosaicLocation {
+function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocation {
   const { reads, push, replace, queryPrefix, hashPrefix } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
   const pathname = useAdapterRead(reads.usePathname, '');
@@ -115,8 +112,8 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string, clearedPath: 
   const hash = useAdapterRead(reads.useHash, '#');
 
   const carrier = useMemo(
-    () => urlCarrier(routing, path, { query: queryPrefix, hash: hashPrefix }, clearedPath),
-    [routing, path, queryPrefix, hashPrefix, clearedPath],
+    () => urlCarrier(routing, path, { query: queryPrefix, hash: hashPrefix }),
+    [routing, path, queryPrefix, hashPrefix],
   );
   const rendered: Partial<HostUrl> = {
     pathname: pathname ?? fromWindow?.pathname,
@@ -172,8 +169,8 @@ export function useFixedRoutingMode(routing: MosaicRoutingMode): MosaicRoutingMo
   return mode;
 }
 
-export function useMosaicLocation({ routing, path = '/', clearedPath }: MosaicLocationOptions): MosaicLocation {
+export function useMosaicLocation({ routing, path = '/' }: MosaicLocationOptions): MosaicLocation {
   const mode = useFixedRoutingMode(routing);
   const [useLocation] = useState(() => (mode === 'virtual' ? useVirtualModeLocation : urlModeLocationHook(mode)));
-  return useLocation(path, clearedPath);
+  return useLocation(path);
 }

@@ -11,10 +11,10 @@ import { AddressBar } from '@/components/address-bar';
 import { buttonVariants } from '@/components/ui/button';
 import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
-import { LivePageHeader } from '../../../../live-page-header';
+import { LivePageHeader } from '../../../live-page-header';
 
 const pagePath = '/live/switcher/switcher';
-const modes = ['virtual', 'path', 'hash', 'query'] as const;
+const modes = ['virtual', 'hash', 'query'] as const;
 type ModalMode = (typeof modes)[number];
 
 function toMode(value: string | null): ModalMode {
@@ -26,7 +26,7 @@ export default function SwitcherLivePage() {
   const mode = toMode(useSearchParams().get('mode'));
   const routing: MosaicRouting = {
     adapter: nextRouterAdapter,
-    modals: mode === 'virtual' ? undefined : { routing: mode, path: pagePath },
+    modals: mode === 'virtual' ? undefined : mode,
   };
 
   return (
@@ -38,8 +38,7 @@ export default function SwitcherLivePage() {
       <div className='mx-auto flex w-full max-w-5xl flex-col gap-6 p-3 sm:p-8'>
         <LivePageHeader title='Switcher'>
           The connected switcher in each mode, with the signed-in account, its organizations, and the profiles it opens.
-          Pick where the profile modals keep their open page: in memory, in the pathname under this page, in the hash,
-          or in the query string.
+          Pick where the profile modals keep their open page: in memory, in the hash, or in the query string.
         </LivePageHeader>
         {isLoaded && !isSignedIn ? (
           <p className='text-muted-foreground text-sm'>

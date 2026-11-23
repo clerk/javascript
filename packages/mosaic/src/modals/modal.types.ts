@@ -3,12 +3,10 @@ import type { ComponentType, Context, ReactNode } from 'react';
 import type { DialogVariant } from '../components/dialog/dialog';
 import type { PortalContainer } from '../primitives/portal';
 import type { SegmentParts } from '../routing/location';
-import type { MosaicRoutingMode } from '../routing/use-mosaic-location';
+import type { ModalRoutingMode } from '../routing/router-adapter';
 import type { ModalContentLoader } from './modal-content-loader';
 
-// In the pathname a modal's entry is the page's pathname under the modal's base, and closing goes
-// back to the page; one modal at a time can be open there.
-export type ModalRoutingMode = MosaicRoutingMode;
+export type { ModalRoutingMode };
 
 export interface ModalContentProps<Options> {
   options: Options | undefined;

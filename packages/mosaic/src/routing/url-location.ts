@@ -35,9 +35,8 @@ const isDotPart = (part: string) => part === '.' || part === '..';
 // outside the base has no entry. The base is compared part by part on the decoded form, because
 // browsers and host routers leave different characters raw in a pathname; the segment itself is
 // handed on raw. One trailing slash is the same pathname, as a host with trailing slashes on has it.
-// A pathname always says something, so clearing goes to the base, or to the pathname the caller
-// named for it: a modal in the pathname closes to the page it was opened from.
-function pathCarrier(basePath: string, clearedPath: string | undefined): UrlCarrier {
+// A pathname always says something, so clearing goes to the base.
+function pathCarrier(basePath: string): UrlCarrier {
   const base = normalizeBase(basePath);
   const prefix = base === '' ? [] : base.slice(1).split('/').map(decodePart);
   if (prefix.some(isDotPart) || /[?#]/.test(base)) {
@@ -59,7 +58,7 @@ function pathCarrier(basePath: string, clearedPath: string | undefined): UrlCarr
       return parts.slice(prefix.length).join('/');
     },
     write,
-    clear: pathname => (clearedPath === undefined ? write(pathname, '') : normalizeBase(clearedPath) || '/'),
+    clear: pathname => write(pathname, ''),
     decode: decodeSegment,
     encode: encodeSegment,
     refuse: parts => {
@@ -100,15 +99,10 @@ export interface KeyPrefixes {
   hash: string;
 }
 
-export function urlCarrier(
-  mode: UrlRoutingMode,
-  basePath: string,
-  prefixes: KeyPrefixes,
-  clearedPath?: string,
-): UrlCarrier {
+export function urlCarrier(mode: UrlRoutingMode, basePath: string, prefixes: KeyPrefixes): UrlCarrier {
   switch (mode) {
     case 'path':
-      return pathCarrier(basePath, clearedPath);
+      return pathCarrier(basePath);
     case 'query':
       return paramCarrier('search', paramKey(prefixes.query, basePath));
     case 'hash':
