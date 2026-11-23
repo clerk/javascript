@@ -14,6 +14,10 @@ describe('enterpriseConnection.created webhook', () => {
   test('narrows to the enterprise connection payload', () => {
     type Created = Extract<VerifiedEvent, { type: 'enterpriseConnection.created' }>;
     expectTypeOf<Created['data']>().toEqualTypeOf<EnterpriseConnectionJSON>();
+    expectTypeOf<NonNullable<Created['data']['oauth_config']>['redirect_uri']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<NonNullable<Created['data']['custom_attributes']>[number]['directory_path']>().toEqualTypeOf<
+      string | undefined
+    >();
   });
 
   test('preserves the common resource ID used by existing webhook handlers', () => {

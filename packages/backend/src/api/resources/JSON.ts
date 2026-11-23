@@ -839,6 +839,7 @@ export interface EnterpriseConnectionCustomAttributeJSON {
   key: string;
   sso_path: string;
   scim_path: string;
+  directory_path?: string;
   multi_valued: boolean;
 }
 
@@ -881,6 +882,7 @@ export interface EnterpriseConnectionOauthConfigJSON {
   auth_url?: string;
   token_url?: string;
   user_info_url?: string;
+  redirect_uri?: string;
   logo_public_url?: string;
   requires_pkce: boolean;
   created_at: number;
