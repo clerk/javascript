@@ -27,7 +27,6 @@ export const barStyles = stylex.create({
     maxWidth: '32px',
   },
   projectionOutline: {
-    fill: 'none',
     stroke: colorVars['--cl-color-foreground-secondary'],
     strokeDasharray: '3 3',
     strokeWidth: 1,

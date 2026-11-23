@@ -140,7 +140,8 @@ export default {
       slot: 'cl-chart-bar',
     },
     'Chart.ProjectionOutline': {
-      description: 'A dashed outline around the projected total.',
+      description:
+        "A dashed outline around the projected total. The Canvas paints it from this hidden element's `stroke`, `stroke-width` and `stroke-dasharray`.",
       slot: 'cl-chart-projection-outline',
     },
     'Chart.YAxis': {
