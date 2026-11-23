@@ -8,7 +8,7 @@ import rootConfig from '../../oxlint.config.mjs';
 const mosaicRoot = import.meta.dirname;
 const [, rootRestrictedImports] = rootConfig.rules['no-restricted-imports'];
 const chartInternalMessage =
-  'The chart selection engine is for chart-type hooks. Import it only from a chart-type folder under src/primitives/chart/, such as chart/bars/.';
+  'The chart internals are for chart types. Import primitives/chart/internal only from a chart-type folder under src/primitives/chart/, such as chart/bars/, and components/chart/internal only from a src/components/<type>-chart/ folder.';
 const SHARED = ['primitives', 'icons', 'machine', 'utils', 'hooks', 'styles', 'components', 'localization', 'root'];
 const FLOW_UI = { file: { categories: { anyOf: ['view', 'controller'] } } };
 const CLERK_DATA_HOOKS = [
@@ -147,7 +147,14 @@ export default defineConfig({
     ...rootConfig.overrides,
     {
       files: ['src/**/*'],
-      excludeFiles: ['src/primitives/chart/**', 'src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.ts'],
+      excludeFiles: [
+        'src/primitives/chart/**',
+        'src/components/*-chart/**',
+        'src/components/chart/internal/**',
+        'src/**/__tests__/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.test-d.ts',
+      ],
       rules: {
         'no-restricted-imports': [
           'error',
@@ -165,7 +172,26 @@ export default defineConfig({
       },
     },
     {
-      files: ['src/primitives/chart/*'],
+      files: ['src/components/*-chart/**', 'src/components/chart/internal/**'],
+      excludeFiles: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.ts'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            ...rootRestrictedImports,
+            patterns: [
+              ...rootRestrictedImports.patterns,
+              {
+                group: ['**/primitives/chart/internal', '**/primitives/chart/internal/*'],
+                message: chartInternalMessage,
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ['src/primitives/chart/*', 'src/components/chart/*'],
       excludeFiles: ['src/**/*.test.{ts,tsx}', 'src/**/*.test-d.ts'],
       rules: {
         'no-restricted-imports': [

@@ -16,6 +16,16 @@ export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../compon
 export { Captcha } from '../components/captcha';
 export type { CaptchaProps } from '../components/captcha';
 export { Card } from '../components/card';
+export { Chart } from '../components/chart';
+export type {
+  ChartColor,
+  ChartLegendItem,
+  ChartLegendProps,
+  ChartSeries,
+  ChartTooltipContentProps,
+  ChartTooltipMetric,
+  ChartTooltipRow,
+} from '../components/chart';
 export { Checkbox } from '../components/checkbox';
 export type { CheckboxProps } from '../components/checkbox';
 export type { CardProps } from '../components/card';
