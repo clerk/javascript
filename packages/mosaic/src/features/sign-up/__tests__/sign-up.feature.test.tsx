@@ -1038,6 +1038,37 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual([]);
   });
 
+  it("leaves the WhatsApp screen's phone error behind when going back to the form", async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+    const hold = holdRequests('post', '/v1/client/sign_ups');
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    hold.fail('form_identifier_exists', 'That phone number is taken. Please try another.', 'phone_number');
+    await screen.findByText('That phone number is taken. Please try another.');
+    await user.click(screen.getByRole('button', { name: 'Use another method' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(screen.queryByText('That phone number is taken. Please try another.')).toBeNull();
+  });
+
+  it("leaves the form's phone error behind when picking WhatsApp", async () => {
+    const { user } = await renderSignUp({ environment: phoneEnvironment() });
+    const hold = holdRequests('post', '/v1/client/sign_ups');
+
+    await user.type(await screen.findByRole('textbox', { name: 'Phone number' }), '5555550123');
+    await user.click(continueButton());
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
+    hold.fail('form_identifier_exists', 'That phone number is taken. Please try another.', 'phone_number');
+    await screen.findByText('That phone number is taken. Please try another.');
+    await user.click(screen.getByRole('button', { name: /WhatsApp/ }));
+
+    expect(await screen.findByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
+    expect(screen.queryByText('That phone number is taken. Please try another.')).toBeNull();
+  });
+
   it("shows FAPI's message when the instance can't send WhatsApp codes", async () => {
     const { user } = await renderSignUp({ environment: phoneEnvironment(), signUp: { whatsAppEnabled: false } });
 
