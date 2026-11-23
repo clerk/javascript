@@ -210,10 +210,14 @@ export function useSignUpModel({
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
   const locale = useLocale();
+  const query = router.getSearchParams();
+  const returnUrl = query.get('redirect_url') ?? undefined;
+  const afterSignUpUrl = clerk.buildAfterSignUpUrl({ params: query });
+  const signInUrl = () => clerk.buildSignInUrl(returnUrl ? { redirectUrl: returnUrl } : undefined);
   const taskInFlow = (task: SessionTask | undefined): SignUpTaskKey | undefined =>
     task?.key === 'choose-organization' && !clerk.__internal_getOption('taskUrls')?.[task.key] ? task.key : undefined;
   const isTaskReady = useTaskChooseOrganizationReady({
-    redirectUrlComplete: clerk.buildAfterSignUpUrl(),
+    redirectUrlComplete: afterSignUpUrl,
     enabled: taskInFlow(session?.currentTask) !== undefined,
   });
   const passwordSettings = environment?.userSettings.passwordSettings;
@@ -327,7 +331,7 @@ export function useSignUpModel({
             traceId: blocked.traceId,
           }
         : undefined,
-      afterSignUpUrl: clerk.buildAfterSignUpUrl(),
+      afterSignUpUrl,
       finalize: async () => {
         await run(() =>
           signUp.finalize({
@@ -338,12 +342,10 @@ export function useSignUpModel({
               }
               if (task) {
                 await router.navigate(
-                  clerk.__internal_getOption('taskUrls')?.[task.key] ??
-                    buildTaskUrl(task, { base: clerk.buildSignInUrl() }),
+                  clerk.__internal_getOption('taskUrls')?.[task.key] ?? buildTaskUrl(task, { base: signInUrl() }),
                 );
                 return;
               }
-              const afterSignUpUrl = clerk.buildAfterSignUpUrl();
               const decorated = decorateUrl(afterSignUpUrl);
               if (decorated !== afterSignUpUrl && ABSOLUTE_URL.test(decorated)) {
                 router.windowNavigate(decorated);
@@ -362,8 +364,14 @@ export function useSignUpModel({
       supportEmail: mode === 'restricted' ? supportEmail : undefined,
     },
     navigation: {
-      goToSignIn: () => void router.navigate(clerk.buildSignInUrl()),
-      joinWaitlist: mode === 'waitlist' ? () => void router.navigate(clerk.buildWaitlistUrl()) : undefined,
+      goToSignIn: () => void router.navigate(signInUrl()),
+      joinWaitlist:
+        mode === 'waitlist'
+          ? () =>
+              void router.navigate(
+                clerk.buildWaitlistUrl(returnUrl ? { initialValues: { redirect_url: returnUrl } } : undefined),
+              )
+          : undefined,
     },
     details: {
       initialIdentifier:

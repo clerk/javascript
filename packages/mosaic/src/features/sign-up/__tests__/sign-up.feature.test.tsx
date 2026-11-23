@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -61,6 +61,12 @@ function RouteProbe() {
       </button>
     </>
   );
+}
+
+function visitWithQuery(query: string) {
+  const original = window.location.href;
+  window.history.replaceState(null, '', query);
+  onTestFinished(() => window.history.replaceState(null, '', original));
 }
 
 const emailField = () => screen.getByRole('textbox', { name: 'Email address' });
@@ -640,6 +646,54 @@ describe('SignUp', () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(fapi.signUp.preparations).toEqual(['email_code']);
+  });
+
+  it('leaves for the redirect_url in the query after sign-up', async () => {
+    visitWithQuery('?redirect_url=%2Fdashboard');
+    const { user, navigate } = await renderSignUp({}, {}, { signUpFallbackRedirectUrl: '/welcome' });
+
+    await submitStart(user);
+    await enterCode(user);
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('/welcome'));
+  });
+
+  it('keeps the redirect_url from the query on the sign-in link', async () => {
+    visitWithQuery('?redirect_url=%2Fdashboard');
+    const { user, navigate } = await renderSignUp();
+
+    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
+
+    const [to] = navigate.mock.lastCall ?? [''];
+    expect(decodeURIComponent(to)).toContain(`redirect_url=${window.location.origin}/dashboard`);
+  });
+
+  it('keeps the redirect_url from the query on the waitlist link', async () => {
+    visitWithQuery('?redirect_url=%2Fdashboard');
+    const { user, navigate } = await renderSignUp(
+      {
+        environment: environment({
+          user_settings: {
+            sign_up: {
+              allowlist_only: false,
+              progressive: true,
+              captcha_enabled: false,
+              mode: 'waitlist',
+              legal_consent_enabled: false,
+            },
+          },
+        }),
+      },
+      {},
+      { waitlistUrl: '/waitlist' },
+    );
+
+    await user.click(await screen.findByRole('button', { name: 'Join waitlist' }));
+
+    const [to] = navigate.mock.lastCall ?? [''];
+    expect(to).toContain('/waitlist');
+    expect(decodeURIComponent(to)).toContain('redirect_url=/dashboard');
   });
 
   it('links to sign-in from the form', async () => {
