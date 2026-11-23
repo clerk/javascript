@@ -399,9 +399,15 @@ export function signUpHandlers(
       if (applied instanceof HttpResponse) {
         return applied;
       }
-      // FAPI creates the sign-up and sends the phone code in one transaction, so a failed send creates nothing.
-      const prepared = body.get('strategy') === 'phone_code' ? prepare(applied, body) : applied;
-      return prepared instanceof HttpResponse ? prepared : store(settle(issueProtectCheck(prepared)));
+      const created = issueProtectCheck(applied);
+      const prepared = body.get('strategy') === 'phone_code' ? prepare(created, body) : created;
+      // FAPI attaches the sign-up to the client before it sends the code (clerk_go
+      // api/fapi/v1/sign_up/service.go:394-407, send at :529), so a failed send keeps the sign-up.
+      if (prepared instanceof HttpResponse) {
+        store(settle(created));
+        return clientError(prepared);
+      }
+      return store(settle(prepared));
     }),
     http.get(fapiUrl('/protect-check/challenge.js'), () =>
       HttpResponse.text(state.signUp.protectCheckScript ?? PROTECT_CHECK_SCRIPT, {
