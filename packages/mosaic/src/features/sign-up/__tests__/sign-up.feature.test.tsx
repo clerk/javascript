@@ -1048,6 +1048,40 @@ describe('SignUp', () => {
     expect(screen.getByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
   });
 
+  it('creates the sign-up and sends the WhatsApp code in one request', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+    await codeSent();
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.creations[0].get('strategy')).toBe('phone_code');
+    expect(fapi.signUp.creations[0].get('channel')).toBe('whatsapp');
+    expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp']);
+  });
+
+  it('creates no sign-up when the WhatsApp code cannot be sent, so a retry creates the only one', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment(), signUp: { whatsAppEnabled: false } });
+
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+
+    expect(await screen.findByText("The 'whatsapp' channel is not available for this instance.")).toBeInTheDocument();
+    expect(fapi.client.sign_up).toBeNull();
+    fapi.signUp.whatsAppEnabled = true;
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
+    await codeSent();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp']);
+    expect(fapi.client.sign_up?.id).toBe('sua_2');
+  });
+
   it('keeps Continue disabled on the WhatsApp phone screen until the phone number is filled', async () => {
     const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
 
