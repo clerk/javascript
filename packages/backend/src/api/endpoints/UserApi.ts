@@ -108,7 +108,9 @@ export type UserSearchMetadataFilter = {
 };
 
 /** @generateWithEmptyComment */
-export type UserSearchParams = Omit<UserListParams, 'offset' | 'startingAfter' | 'last_active_at_since'> & {
+export type UserSearchParams = Omit<UserListParams, 'limit' | 'offset' | 'startingAfter' | 'last_active_at_since'> & {
+  /** Maximum number of users returned per page. Must be an integer greater than zero and less than `501`. Defaults to `10`. */
+  limit?: number;
   /** The `cursor.startingAfter` of the previous page. Omit it for the first page, and keep every other parameter the same across pages. */
   startingAfter?: string;
   /** The `cursor.endingBefore` of a previous page. Returns the page before that one. It cannot be combined with `startingAfter`. A page read backward can hold fewer users than `limit` even when more users exist. */
@@ -601,7 +603,7 @@ export class UserAPI extends AbstractAPI {
    *
    * Pages are linked by the `cursor` in the response. Pass `cursor.startingAfter` as `startingAfter` to get the next page, until it is `null`, or `cursor.endingBefore` as `endingBefore` to get the previous page. Paging by cursor works with every `orderBy` and does not slow down on later pages.
    *
-   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count. Use `getUserList()` when you need to read a change right after making it.
+   * Results are eventually consistent: a user created, updated, or deleted a short time ago may not yet be reflected in which users are returned, in their order, or in any count. To read a user right after you change them, get them by ID with `getUser()`.
    * @returns A `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `cursor` property with the position of the adjacent pages. There is no `totalCount`; pass `remainingCount` to get a count in the `cursor`.
    */
   public async searchUsers(params: UserSearchParams = {}): Promise<UserSearchResponse> {
