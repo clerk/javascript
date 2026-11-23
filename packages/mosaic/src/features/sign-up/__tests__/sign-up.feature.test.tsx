@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { type ReactElement, useState } from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -13,6 +14,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp } from '../sign-up';
 import {
   codeSent,
@@ -1036,13 +1038,14 @@ describe('SignUp social sign-up', () => {
     fapi: ReturnType<typeof serveFapi>,
     first: Awaited<ReturnType<typeof renderWithClerk>>,
     options?: Parameters<typeof renderWithClerk>[1],
+    ui: ReactElement = <SignUp />,
   ) {
     const started = [...fapi.signUp.creations, ...fapi.signUp.updates].filter(body => body.has('redirect_url'));
     const callback = new URL(started.at(-1)?.get('redirect_url') ?? '');
     first.unmount();
     fapi.signUp.returnFromOAuth();
     window.history.replaceState(null, '', `${callback.pathname}${callback.search}`);
-    return renderWithClerk(<SignUp />, options);
+    return renderWithClerk(ui, options);
   }
 
   it('starts Google sign-up with a callback URL that brings the user back to sign-up', async () => {
@@ -1076,6 +1079,36 @@ describe('SignUp social sign-up', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(fapi.signUp.updates.at(-1)?.get('username')).toBe('alice');
     expect(fapi.client.sessions).toHaveLength(1);
+  });
+
+  it('completes the return when sign-up opens on the continue route', async () => {
+    function OpenOnContinue() {
+      const write = useVirtualWrite();
+      const [opened, setOpened] = useState(false);
+      return opened ? (
+        <SignUp />
+      ) : (
+        <button
+          type='button'
+          onClick={() => {
+            write('/sign-up', ['continue']);
+            setOpened(true);
+          }}
+        >
+          Open sign-up on continue
+        </button>
+      );
+    }
+    const { fapi, first } = await startWithGoogle({
+      environment: socialEnvironment({ attributes: { username: { enabled: true, required: true } } }),
+      signUp: { oauth: { oauth_google: { emailAddress: EMAIL } } },
+    });
+
+    await returnFromGoogle(fapi, first, undefined, <OpenOnContinue />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Open sign-up on continue' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
   });
 
   it('signs in instead when the Google account already belongs to a user', async () => {
