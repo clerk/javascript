@@ -35,6 +35,16 @@ import {
   LabelOnly as BannerLabelOnly,
   meta as bannerMeta,
 } from '../stories/banner.stories';
+import {
+  DarkMode as BarChartComponentDarkMode,
+  Empty as BarChartComponentEmpty,
+  Highlight as BarChartComponentHighlight,
+  meta as barChartComponentMeta,
+  Palette as BarChartComponentPalette,
+  Playground as BarChartComponentPlayground,
+  Projection as BarChartComponentProjection,
+  RenderError as BarChartComponentRenderError,
+} from '../stories/bar-chart.component.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
@@ -803,6 +813,17 @@ const badgeModule: StoryModule = {
   WithIcon: BadgeWithIcon,
 };
 
+const barChartComponentModule: StoryModule = {
+  meta: barChartComponentMeta,
+  Playground: BarChartComponentPlayground,
+  Palette: BarChartComponentPalette,
+  Highlight: BarChartComponentHighlight,
+  Projection: BarChartComponentProjection,
+  Empty: BarChartComponentEmpty,
+  RenderError: BarChartComponentRenderError,
+  DarkMode: BarChartComponentDarkMode,
+};
+
 const bannerModule: StoryModule = {
   meta: bannerMeta,
   Default: BannerDefault,
@@ -1534,6 +1555,7 @@ export const registry: StoryModule[] = [
   actionBarModule,
   avatarModule,
   badgeModule,
+  barChartComponentModule,
   skeletonModule,
   bannerModule,
   buttonModule,
