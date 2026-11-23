@@ -72,7 +72,7 @@
 }
 
 @utility nav-link {
-  @apply text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground relative block rounded-[0.65rem] px-2.5 py-1.5 text-sm transition-colors after:absolute after:inset-x-0 after:top-full after:h-px aria-[current=page]:font-medium;
+  @apply text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground relative block rounded-[0.65rem] px-2.5 py-1.5 text-sm after:absolute after:inset-x-0 after:top-full after:h-px aria-[current=page]:font-medium;
 }
 
 @utility nav-heading {
