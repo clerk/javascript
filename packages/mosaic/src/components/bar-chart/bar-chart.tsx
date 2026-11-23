@@ -335,7 +335,7 @@ function BarChartPlot<TDatum>({
       <ChartAxes
         format={format}
         showXAxis={showXAxis}
-        showYAxis={showYAxis}
+        showYAxis={showYAxis && data.length > 0}
         xTicks={xTicks}
       />
       {interactive && data.length > 0 ? (

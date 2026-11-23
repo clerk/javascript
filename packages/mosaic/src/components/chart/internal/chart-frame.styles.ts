@@ -16,6 +16,7 @@ export const frameStyles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
+    width: '100%',
   },
   height: (height: string) => ({ height }),
   plotArea: {
