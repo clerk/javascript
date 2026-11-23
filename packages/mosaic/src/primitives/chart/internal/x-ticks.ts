@@ -1,18 +1,11 @@
+import type { XTick } from '../types';
 import { parseCalendarDates, selectCalendarTicks } from './calendar-ticks';
+
 type XCategory = Readonly<{ key: string; center: number }>;
 
 const EDGE_INSET = 4;
 const TARGET_SPACING = 56;
 const MIN_LABEL_GAP = 8;
-
-export type XTick = Readonly<{
-  key: string;
-  /** The labelled category key, or null for a calendar boundary label. */
-  category: string | null;
-  label: string;
-  x: number;
-  textAnchor: 'start' | 'middle' | 'end';
-}>;
 
 type Plot = Readonly<{ x: number; width: number }>;
 
@@ -120,6 +113,7 @@ export function selectXTicks(options: SelectXTicksOptions): XTick[] {
   const calendarTicks = timestamps
     ? selectCalendarTicks({
         timestamps,
+        centers: options.categories.map(category => category.center),
         plot: options.plot,
         viewportWidth: options.viewportWidth,
         measure,

@@ -3,7 +3,8 @@ import { useCallback, useRef } from 'react';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 
-import { BarChart, type BarIdentity, type BarProjection } from '../index';
+import { Chart } from '../../chart';
+import { type ActiveBar, BarChart, type BarIdentity, type BarProjection } from '../index';
 
 const growth = [
   { week: '2026-01-05', signups: 40, returning: 22, churned: -14 },
@@ -73,52 +74,55 @@ function GrowthChart({
       className='chart'
       data-testid='chart'
     >
-      <BarChart.Root
+      <Chart.Root
         chart={chart}
         height={320}
         aria-label='Weekly growth'
       >
-        <BarChart.Grid>
-          {lines =>
-            lines.map(line => (
-              <BarChart.GridLine
-                key={line.value}
-                line={line}
+        <Chart.Grid>
+          {ticks =>
+            ticks.map(tick => (
+              <Chart.YLine
+                key={tick.value}
+                value={tick.value}
                 className='grid-line'
               />
             ))
           }
-        </BarChart.Grid>
+        </Chart.Grid>
         <BarChart.StackedBars>
           <BarChart.Bar className='bar' />
           <BarChart.ProjectionOutline className='projection-outline' />
-          <BarChart.ZeroLine className='zero-line' />
+          <Chart.YLine
+            value={0}
+            className='zero-line'
+          />
         </BarChart.StackedBars>
-        <BarChart.YAxis>
+        <Chart.YAxis>
           {ticks =>
             ticks.map(tick => (
-              <BarChart.YTick
+              <Chart.YTick
                 key={tick.value}
                 tick={tick}
                 className='tick'
               />
             ))
           }
-        </BarChart.YAxis>
-        <BarChart.XAxis format={formatWeek}>
+        </Chart.YAxis>
+        <Chart.XAxis format={formatWeek}>
           {ticks =>
             ticks.map(tick => (
-              <BarChart.XTick
+              <Chart.XTick
                 key={tick.key}
                 tick={tick}
                 className='tick'
               />
             ))
           }
-        </BarChart.XAxis>
-        <BarChart.BarSelection>
-          <BarChart.Cursor className='cursor' />
-          <BarChart.Tooltip<GrowthRow>
+        </Chart.XAxis>
+        <Chart.Selection>
+          <Chart.Cursor className='cursor' />
+          <Chart.Tooltip<ActiveBar<GrowthRow>>
             className='tooltip'
             boundaryRef={boundary}
           >
@@ -129,9 +133,9 @@ function GrowthChart({
                 <div>Churned: {datum.churned}</div>
               </>
             )}
-          </BarChart.Tooltip>
-        </BarChart.BarSelection>
-      </BarChart.Root>
+          </Chart.Tooltip>
+        </Chart.Selection>
+      </Chart.Root>
     </div>
   );
 }

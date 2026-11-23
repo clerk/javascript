@@ -2,6 +2,8 @@ type CalendarTick = Readonly<{ label: string; coordinate: number }>;
 
 type CalendarAxis = Readonly<{
   timestamps: readonly number[];
+  /** The center of the category at each timestamp. */
+  centers: readonly number[];
   plot: { x: number; width: number };
   viewportWidth: number;
   measure: (label: string) => number;
@@ -28,7 +30,7 @@ export function parseCalendarDates(indexes: readonly string[]): number[] | null 
   return timestamps;
 }
 
-function coordinateAt(timestamp: number, timestamps: readonly number[], plot: CalendarAxis['plot']): number {
+function coordinateAt(timestamp: number, timestamps: readonly number[], centers: readonly number[]): number {
   let low = 0;
   let high = timestamps.length;
   while (low < high) {
@@ -43,8 +45,12 @@ function coordinateAt(timestamp: number, timestamps: readonly number[], plot: Ca
   const left = Math.max(0, right - 1);
   const leftDate = timestamps[left] ?? timestamp;
   const rightDate = timestamps[right] ?? timestamp;
-  const offset = rightDate === leftDate ? right : left + (timestamp - leftDate) / (rightDate - leftDate);
-  return plot.x + ((offset + 0.5) / timestamps.length) * plot.width;
+  const leftCenter = centers[left] ?? 0;
+  const rightCenter = centers[right] ?? leftCenter;
+  if (rightDate === leftDate) {
+    return rightCenter;
+  }
+  return leftCenter + ((timestamp - leftDate) / (rightDate - leftDate)) * (rightCenter - leftCenter);
 }
 
 function monthBoundaries(first: number, last: number, step: number): Date[] {
@@ -63,7 +69,13 @@ function monthBoundaries(first: number, last: number, step: number): Date[] {
   return result;
 }
 
-export function selectCalendarTicks({ timestamps, plot, viewportWidth, measure }: CalendarAxis): CalendarTick[] {
+export function selectCalendarTicks({
+  timestamps,
+  centers,
+  plot,
+  viewportWidth,
+  measure,
+}: CalendarAxis): CalendarTick[] {
   const first = timestamps[0];
   const last = timestamps[timestamps.length - 1];
   if (first === undefined || last === undefined || last - first < 90 * day || plot.width <= 0) {
@@ -74,7 +86,7 @@ export function selectCalendarTicks({ timestamps, plot, viewportWidth, measure }
     const ticks = monthBoundaries(first, last, step)
       .map(date => ({
         label: monthLabel.format(date),
-        coordinate: coordinateAt(date.getTime(), timestamps, plot),
+        coordinate: coordinateAt(date.getTime(), timestamps, centers),
       }))
       .filter(tick => {
         const halfWidth = measure(tick.label) / 2;

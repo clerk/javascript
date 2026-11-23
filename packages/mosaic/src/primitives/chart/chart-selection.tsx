@@ -3,8 +3,8 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { BarSelectionContext, type BarSelectionContextValue, hasArea, useBarChartContext } from './bar-chart-context';
-import type { BarChartInstance } from './use-bar-chart';
+import { hasArea, SelectionContext, type SelectionContextValue, useChartContext } from './chart-context';
+import type { ChartInstance } from './types';
 
 const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
   position: 'absolute',
@@ -18,7 +18,7 @@ const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
   border: 0,
 };
 
-export type BarChartBarSelectionProps = ComponentProps<'div'>;
+export type ChartSelectionProps = ComponentProps<'div'>;
 
 function KeyboardInstructions({
   id,
@@ -43,15 +43,15 @@ function KeyboardInstructions({
   );
 }
 
-export const BarChartBarSelection = React.forwardRef<HTMLDivElement, BarChartBarSelectionProps>(
-  function BarChartBarSelection(props, ref) {
-    const { chart, ariaLabel, registerInteraction } = useBarChartContext('BarSelection');
+export const ChartSelection = React.forwardRef<HTMLDivElement, ChartSelectionProps>(
+  function ChartSelection(props, ref) {
+    const { chart, ariaLabel, registerInteraction } = useChartContext('Selection');
     React.useLayoutEffect(registerInteraction, [registerInteraction]);
     if (!hasArea(chart.size) || chart.categories.length === 0) {
       return null;
     }
     return (
-      <BarSelectionSurface
+      <SelectionSurface
         {...props}
         forwardedRef={ref}
         chart={chart}
@@ -61,13 +61,13 @@ export const BarChartBarSelection = React.forwardRef<HTMLDivElement, BarChartBar
   },
 );
 
-type SurfaceProps = BarChartBarSelectionProps & {
+type SurfaceProps = ChartSelectionProps & {
   forwardedRef: React.ForwardedRef<HTMLDivElement>;
-  chart: BarChartInstance;
+  chart: ChartInstance;
   ariaLabel: string;
 };
 
-function BarSelectionSurface({ forwardedRef, chart, ariaLabel, children, render, ...otherProps }: SurfaceProps) {
+function SelectionSurface({ forwardedRef, chart, ariaLabel, children, render, ...otherProps }: SurfaceProps) {
   const chartBoxRef = React.useRef<HTMLDivElement | null>(null);
   const keyboardInstructionsId = React.useId();
   const [tooltipCount, setTooltipCount] = React.useState(0);
@@ -75,7 +75,7 @@ function BarSelectionSurface({ forwardedRef, chart, ariaLabel, children, render,
     setTooltipCount(count => count + 1);
     return () => setTooltipCount(count => count - 1);
   }, []);
-  const selectionContext = React.useMemo<BarSelectionContextValue>(
+  const selectionContext = React.useMemo<SelectionContextValue>(
     () => ({ chartBoxRef, registerTooltip }),
     [registerTooltip],
   );
@@ -121,5 +121,5 @@ function BarSelectionSurface({ forwardedRef, chart, ariaLabel, children, render,
     props: mergeProps<'div'>(ownProps, otherProps),
   });
 
-  return <BarSelectionContext.Provider value={selectionContext}>{element}</BarSelectionContext.Provider>;
+  return <SelectionContext.Provider value={selectionContext}>{element}</SelectionContext.Provider>;
 }

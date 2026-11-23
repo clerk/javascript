@@ -1,6 +1,7 @@
 'use client';
 
-import { BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { type ActiveBar, BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { Chart } from '@clerk/mosaic/primitives/chart';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -34,49 +35,49 @@ const getWeek = (row: GrowthRow) => row.week;
 export function Default() {
   const chart = BarChart.useBarChart({ data: growth, series, index: getWeek });
   return (
-    <BarChart.Root
+    <Chart.Root
       chart={chart}
       height={320}
       aria-label='Weekly growth'
       className='w-full'
     >
-      <BarChart.Grid>
-        {lines =>
-          lines.map(line => (
-            <BarChart.GridLine
-              key={line.value}
-              line={line}
+      <Chart.Grid>
+        {ticks =>
+          ticks.map(tick => (
+            <Chart.YLine
+              key={tick.value}
+              value={tick.value}
             />
           ))
         }
-      </BarChart.Grid>
+      </Chart.Grid>
       <BarChart.StackedBars>
         <BarChart.Bar />
-        <BarChart.ZeroLine />
+        <Chart.YLine value={0} />
       </BarChart.StackedBars>
-      <BarChart.YAxis>
+      <Chart.YAxis>
         {ticks =>
           ticks.map(tick => (
-            <BarChart.YTick
+            <Chart.YTick
               key={tick.value}
               tick={tick}
             />
           ))
         }
-      </BarChart.YAxis>
-      <BarChart.XAxis>
+      </Chart.YAxis>
+      <Chart.XAxis>
         {ticks =>
           ticks.map(tick => (
-            <BarChart.XTick
+            <Chart.XTick
               key={tick.key}
               tick={tick}
             />
           ))
         }
-      </BarChart.XAxis>
-      <BarChart.BarSelection>
-        <BarChart.Cursor />
-        <BarChart.Tooltip<GrowthRow>>
+      </Chart.XAxis>
+      <Chart.Selection>
+        <Chart.Cursor />
+        <Chart.Tooltip<ActiveBar<GrowthRow>>>
           {({ datum }) => (
             <>
               <p>{datum.week}</p>
@@ -87,8 +88,8 @@ export function Default() {
               ))}
             </>
           )}
-        </BarChart.Tooltip>
-      </BarChart.BarSelection>
-    </BarChart.Root>
+        </Chart.Tooltip>
+      </Chart.Selection>
+    </Chart.Root>
   );
 }

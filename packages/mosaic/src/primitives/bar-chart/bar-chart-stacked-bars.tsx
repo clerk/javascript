@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { hasArea } from '../chart/chart-context';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
   type BarStyleElement,
@@ -10,7 +11,7 @@ import {
   paintStackedBarCanvas,
   parseBarGeometry,
 } from './bar-chart-canvas';
-import { hasArea, StackedBarsContext, useBarChartContext } from './bar-chart-context';
+import { StackedBarsContext, useBarChartContext } from './bar-chart-context';
 import { fitProjectionToBar, projectStackedBarMarks } from './bar-chart-layout';
 
 export type BarChartStackedBarsProps = ComponentProps<'div'>;
@@ -48,8 +49,9 @@ const getServerPixelRatio = () => 1;
 export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStackedBarsProps>(
   function BarChartStackedBars(props, ref) {
     const { children, render, ...otherProps } = props;
-    const { chart, ariaLabel } = useBarChartContext('StackedBars');
-    const { size, prepared, categories, scaleY, isBarActive, projection: projectedBar } = chart;
+    const { chart, layout, ariaLabel } = useBarChartContext('StackedBars');
+    const { size, categories, scaleY } = chart;
+    const { prepared, isBarActive, projection: projectedBar } = layout;
     const rootThemeAttributes = React.useSyncExternalStore(
       subscribeToRootTheme,
       getRootThemeAttributes,

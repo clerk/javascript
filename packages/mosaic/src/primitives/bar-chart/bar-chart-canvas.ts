@@ -1,6 +1,7 @@
+import type { ChartSize } from '../chart/types';
 import { getComputedStyle } from '../utils/dom';
 import { type BarGeometry, type PaintedProjection, UNSTYLED_BAR_GEOMETRY } from './bar-chart-layout';
-import type { BarIdentity, BarMark, ChartSize } from './types';
+import type { BarIdentity, BarMark } from './types';
 
 const TILE_DEVICE_PIXELS = 32;
 

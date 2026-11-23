@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render as renderComponent, screen } from '@testing-
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { Chart } from '../../chart';
 import type { RenderProps } from '../../utils';
 import { BarChart, type BarSelection } from '../index';
 import { chartFixture, type ChartRow, growthChart, quarter, render, renderChart, setupChart } from './fixtures';
@@ -16,18 +17,18 @@ function StackedChart({
   children,
 }: {
   data?: readonly ChartRow[];
-  render?: React.ComponentProps<typeof BarChart.Root>['render'];
+  render?: React.ComponentProps<typeof Chart.Root>['render'];
   children?: React.ReactNode;
 }) {
   const chart = BarChart.useBarChart({ data, series: chartFixture.series, index: chartFixture.index });
   return (
-    <BarChart.Root
+    <Chart.Root
       chart={chart}
       aria-label='Growth'
       render={renderProp}
     >
       {children}
-    </BarChart.Root>
+    </Chart.Root>
   );
 }
 
@@ -41,21 +42,21 @@ function chartRoot(container: HTMLElement) {
 
 describe('composing parts', () => {
   it.each([
-    ['Grid', <BarChart.Grid key='grid' />],
-    ['StackedBars', <BarChart.StackedBars key='bars' />],
-    ['BarSelection', <BarChart.BarSelection key='selection' />],
-  ])('throws when BarChart.%s is used outside BarChart.Root', (part, element) => {
+    ['Chart.Grid', <Chart.Grid key='grid' />],
+    ['Chart.Selection', <Chart.Selection key='selection' />],
+    ['BarChart.StackedBars', <BarChart.StackedBars key='bars' />],
+  ])('throws when %s is used outside Chart.Root', (part, element) => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => renderComponent(element)).toThrow(`<BarChart.${part}> must be used within <BarChart.Root>`);
+    expect(() => renderComponent(element)).toThrow(`<${part}> must be used within <Chart.Root>`);
   });
 
   it.each([
-    ['Cursor', <BarChart.Cursor key='cursor' />],
-    ['Tooltip', <BarChart.Tooltip key='tooltip'>{() => 'Growth'}</BarChart.Tooltip>],
-  ])('throws when BarChart.%s is used outside BarChart.BarSelection', (part, element) => {
+    ['Cursor', <Chart.Cursor key='cursor' />],
+    ['Tooltip', <Chart.Tooltip key='tooltip'>{() => 'Growth'}</Chart.Tooltip>],
+  ])('throws when Chart.%s is used outside Chart.Selection', (part, element) => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => render(<StackedChart>{element}</StackedChart>)).toThrow(
-      `<BarChart.${part}> must be used within <BarChart.BarSelection>`,
+      `<Chart.${part}> must be used within <Chart.Selection>`,
     );
   });
 
@@ -92,11 +93,11 @@ describe('composing parts', () => {
     expect(screen.getAllByRole('img').map(image => image.getAttribute('aria-label'))).toEqual(['Growth']);
   });
 
-  it('is interactive with BarChart.BarSelection and categories', () => {
+  it('is interactive with Chart.Selection and categories', () => {
     const { container, rerender } = render(
       <StackedChart>
         <BarChart.StackedBars />
-        <BarChart.BarSelection />
+        <Chart.Selection />
       </StackedChart>,
     );
 
@@ -106,7 +107,7 @@ describe('composing parts', () => {
     rerender(
       <StackedChart data={[]}>
         <BarChart.StackedBars />
-        <BarChart.BarSelection />
+        <Chart.Selection />
       </StackedChart>,
     );
     expect(chartRoot(container)).toHaveAttribute('data-chart-interaction-mode', 'visual-only');
@@ -134,7 +135,7 @@ describe('choosing a period', () => {
     const mode = () => container.firstElementChild?.getAttribute('data-chart-interaction-mode');
 
     expect(mode()).toBe('interactive');
-    rerenderChart({ barSelection: false });
+    rerenderChart({ selectionPart: false });
     expect(queryByRole('group', { name: 'Growth' })).toBeNull();
     expect(mode()).toBe('visual-only');
   });

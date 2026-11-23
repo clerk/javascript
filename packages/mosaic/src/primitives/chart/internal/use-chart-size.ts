@@ -3,7 +3,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 
-import type { ChartSize } from './types';
+import type { ChartSize } from '../types';
 
 const EMPTY_SIZE: ChartSize = { width: 0, height: 0 };
 

@@ -3,17 +3,17 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useBarChartContext } from './bar-chart-context';
-import type { BarChartYTickItem } from './bar-chart-y-axis';
+import { useChartContext } from './chart-context';
+import type { ChartYTickItem } from './chart-y-axis';
 
-export type BarChartYTickProps = ComponentProps<'text'> & {
-  /** An entry from the `BarChart.YAxis` children function. */
-  tick: BarChartYTickItem;
+export type ChartYTickProps = ComponentProps<'text'> & {
+  /** An entry from the `Chart.YAxis` children function. */
+  tick: ChartYTickItem;
 };
 
-export const BarChartYTick = React.forwardRef<SVGTextElement, BarChartYTickProps>(function BarChartYTick(props, ref) {
+export const ChartYTick = React.forwardRef<SVGTextElement, ChartYTickProps>(function ChartYTick(props, ref) {
   const { tick, render, ...otherProps } = props;
-  const { chart } = useBarChartContext('YTick');
+  const { chart } = useChartContext('YTick');
 
   const ownProps = {
     x: chart.plot.x - 12,

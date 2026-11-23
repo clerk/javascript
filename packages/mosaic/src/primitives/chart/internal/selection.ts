@@ -1,4 +1,4 @@
-import type { ChartCategory, ChartSelection } from './types';
+import type { ChartActive, ChartCategory, ChartSelection } from '../types';
 
 export type VerticalMove = 'up' | 'down';
 
@@ -8,7 +8,7 @@ export type VerticalMove = 'up' | 'down';
  */
 export type SelectionModel<
   TSelection extends ChartSelection,
-  TActive,
+  TActive extends ChartActive,
   TCategory extends ChartCategory = ChartCategory,
 > = Readonly<{
   /** The selection under a pointer at plot-space `y` over `category`. `current` lets a model hold its pick near a boundary. */
@@ -166,7 +166,7 @@ export function getKeyIntent(key: string, index: number, lastIndex: number, canA
 export function getKeyboardAnnouncement<TSelection extends ChartSelection, TCategory extends ChartCategory>(
   selected: Selected<TSelection> | null,
   category: TCategory | undefined,
-  model: Pick<SelectionModel<TSelection, unknown, TCategory>, 'describe' | 'land'>,
+  model: Pick<SelectionModel<TSelection, ChartActive, TCategory>, 'describe' | 'land'>,
   formatCategory: (category: string) => string | null,
 ) {
   if (selected?.source !== 'keyboard') {

@@ -9,13 +9,17 @@ const dates = (count: number, start = Date.UTC(2020, 0, 14)) =>
   Array.from({ length: count }, (_, index) => start + index * day);
 const isoDates = (timestamps: readonly number[]) =>
   timestamps.map(timestamp => new Date(timestamp).toISOString().slice(0, 10));
-const axis = (timestamps: readonly number[], width: number) =>
-  selectCalendarTicks({
+const axis = (timestamps: readonly number[], width: number) => {
+  const plot = { x: 76, width: width - 92 };
+  const step = plot.width / timestamps.length;
+  return selectCalendarTicks({
     timestamps,
-    plot: { x: 76, width: width - 92 },
+    centers: timestamps.map((_, index) => plot.x + step * (index + 0.5)),
+    plot,
     viewportWidth: width,
     measure: () => labelWidth,
   });
+};
 
 describe('calendar boundaries', () => {
   it('labels year boundaries with their year on a multi-year daily chart', () => {
@@ -52,6 +56,24 @@ describe('calendar boundaries', () => {
         expect(tick.coordinate - previous).toBeGreaterThan(labelWidth);
       });
     }
+  });
+});
+
+describe('placing boundaries on the categories', () => {
+  it('puts a boundary at the center of the category dated on it, wherever the chart type centers it', () => {
+    const timestamps = dates(120, Date.UTC(2024, 0, 1));
+    const plot = { x: 40, width: 800 };
+    const pointCenters = timestamps.map((_, index) => plot.x + (index / (timestamps.length - 1)) * plot.width);
+    const ticks = selectCalendarTicks({
+      timestamps,
+      centers: pointCenters,
+      plot,
+      viewportWidth: 880,
+      measure: () => labelWidth,
+    });
+
+    const february = timestamps.indexOf(Date.UTC(2024, 1, 1));
+    expect(ticks.find(tick => tick.label === 'Feb 2024')?.coordinate).toBe(pointCenters[february]);
   });
 });
 

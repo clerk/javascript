@@ -1,7 +1,7 @@
 import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
 
-import { BarChart, type BarChartInstance, type UseBarChartOptions } from '../index';
-import type { ActiveBar } from '../types';
+import { Chart } from '../../chart';
+import { type ActiveBar, BarChart, type BarChartInstance, type UseBarChartOptions } from '../index';
 
 export type TestChartProps<TDatum> = Pick<
   UseBarChartOptions<TDatum>,
@@ -17,8 +17,8 @@ export type TestChartProps<TDatum> = Pick<
 > & {
   ariaLabel: string;
   formatXTick?: (value: string) => string | null;
-  /** Mounts `BarChart.BarSelection`. Default: true */
-  barSelection?: boolean;
+  /** Mounts `Chart.Selection`. Default: true */
+  selectionPart?: boolean;
   renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
   boundary?: RefObject<HTMLElement | null>;
   height?: number | string;
@@ -33,7 +33,7 @@ export type TestChartProps<TDatum> = Pick<
 export function TestChart<TDatum>({
   ariaLabel,
   formatXTick,
-  barSelection = true,
+  selectionPart = true,
   renderTooltip,
   boundary,
   height,
@@ -49,7 +49,7 @@ export function TestChart<TDatum>({
     }
   });
   return (
-    <BarChart.Root
+    <Chart.Root
       chart={chart}
       height={height}
       aria-label={ariaLabel}
@@ -57,31 +57,31 @@ export function TestChart<TDatum>({
       <BarChart.StackedBars>
         {bar ? <BarChart.Bar className={barClassName} /> : null}
         <BarChart.ProjectionOutline />
-        <BarChart.ZeroLine />
+        <Chart.YLine value={0} />
       </BarChart.StackedBars>
-      <BarChart.XAxis format={formatXTick}>
+      <Chart.XAxis format={formatXTick}>
         {ticks =>
           ticks.map(tick => (
-            <BarChart.XTick
+            <Chart.XTick
               key={tick.key}
               tick={tick}
             />
           ))
         }
-      </BarChart.XAxis>
-      {barSelection ? (
-        <BarChart.BarSelection>
-          <BarChart.Cursor data-testid='cursor' />
+      </Chart.XAxis>
+      {selectionPart ? (
+        <Chart.Selection>
+          <Chart.Cursor data-testid='cursor' />
           {renderTooltip ? (
-            <BarChart.Tooltip<TDatum>
+            <Chart.Tooltip<ActiveBar<TDatum>>
               boundaryRef={boundary}
               data-testid='tooltip'
             >
               {renderTooltip}
-            </BarChart.Tooltip>
+            </Chart.Tooltip>
           ) : null}
-        </BarChart.BarSelection>
+        </Chart.Selection>
       ) : null}
-    </BarChart.Root>
+    </Chart.Root>
   );
 }

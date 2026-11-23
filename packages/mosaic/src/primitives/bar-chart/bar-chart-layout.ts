@@ -1,7 +1,8 @@
 import { scaleBand, scaleLinear } from 'd3-scale';
 import { stack, stackOffsetDiverging } from 'd3-shape';
 
-import type { BarCategory, BarMark, BarProjection, BarSeries, ChartFrame, ChartMargin, ChartSize } from './types';
+import type { ChartMargin, ChartSize } from '../chart/types';
+import type { BarCategory, BarMark, BarProjection, BarSeries } from './types';
 
 const Y_TICK_COUNT = 5;
 
@@ -29,11 +30,12 @@ export type PreparedStackedBars<TDatum> = Readonly<{
   domain: readonly [number, number];
 }>;
 
-type ProjectOptions = ChartFrame &
-  Readonly<{
-    categoryGap: number;
-    projection?: BarProjection;
-  }>;
+type ProjectOptions = Readonly<{
+  size: ChartSize;
+  margin: ChartMargin;
+  categoryGap: number;
+  projection?: BarProjection;
+}>;
 
 /** Bar geometry read from `BarChart.Bar`'s computed style. */
 export type BarGeometry = Readonly<{
@@ -173,7 +175,7 @@ function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWid
     const rawTop = Math.min(scaleY(point.start), scaleY(point.end));
     const rawBottom = Math.max(scaleY(point.start), scaleY(point.end));
     const height = Math.max(0, rawBottom - rawTop);
-    const barWidth = Math.min(category.bandWidth, maxWidth);
+    const barWidth = Math.min(category.width, maxWidth);
     const stackKey = `${point.datumIndex}:${point.positive}`;
     const previousMark = previousMarkByStack.get(stackKey);
     const mark: DraftBarMark<TDatum> = {
@@ -181,7 +183,7 @@ function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWid
       datum: point.datum,
       datumIndex: point.datumIndex,
       value: point.value,
-      x: category.bandX + (category.bandWidth - barWidth) / 2,
+      x: category.x + (category.width - barWidth) / 2,
       y: rawTop,
       width: barWidth,
       height,
@@ -287,8 +289,8 @@ function projectCategories(
     return {
       key,
       datumIndex,
-      bandX,
-      bandWidth: x.bandwidth(),
+      x: bandX,
+      width: x.bandwidth(),
       center: bandX + x.bandwidth() / 2,
       sections: {
         positive: positive.has(datumIndex) || projected === datumIndex,
@@ -321,14 +323,13 @@ export function projectStackedBars<TDatum>(
     categoryGap,
     projection: acceptedProjection,
   });
-  const { x, y, innerWidth, innerHeight } = scales;
+  const { y, innerWidth, innerHeight } = scales;
   const projectedBar = projectOptionalProjection(prepared.indexes, acceptedProjection, scales);
 
   return {
     prepared,
     scaleY: (value: number) => y(value),
     categories: projectCategories(prepared, projectedBar, scales),
-    step: x.step(),
     zeroY: y(0),
     yTicks: y.ticks(Y_TICK_COUNT).map(value => ({ value, y: y(value) })),
     plot: {

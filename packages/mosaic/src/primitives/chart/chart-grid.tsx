@@ -3,17 +3,17 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { hasArea, useBarChartContext } from './bar-chart-context';
+import { hasArea, useChartContext } from './chart-context';
 import type { ChartTick } from './types';
 
-export type BarChartGridProps = Omit<ComponentProps<'svg'>, 'children'> & {
-  /** Renders the lines, usually one `BarChart.GridLine` per entry. */
-  children?: (lines: readonly ChartTick[]) => React.ReactNode;
+export type ChartGridProps = Omit<ComponentProps<'svg'>, 'children'> & {
+  /** Renders the lines, usually one `Chart.YLine` per tick value. */
+  children?: (ticks: readonly ChartTick[]) => React.ReactNode;
 };
 
-export const BarChartGrid = React.forwardRef<SVGSVGElement, BarChartGridProps>(function BarChartGrid(props, ref) {
+export const ChartGrid = React.forwardRef<SVGSVGElement, ChartGridProps>(function ChartGrid(props, ref) {
   const { children, render, ...otherProps } = props;
-  const { chart } = useBarChartContext('Grid');
+  const { chart } = useChartContext('Grid');
   const { size, yTicks } = chart;
 
   const ownProps = {

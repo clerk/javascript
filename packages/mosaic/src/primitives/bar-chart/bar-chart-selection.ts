@@ -1,5 +1,5 @@
+import type { SelectionModel } from '../chart/internal/selection';
 import type { StackedBarLayout } from './bar-chart-layout';
-import type { SelectionModel } from './chart-selection';
 import type { ActiveBar, BarCategory, BarSection, BarSelection } from './types';
 
 /** Selects a section of a stacked bar: above the zero line or below it. */

@@ -3,26 +3,26 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { hasArea, useBarChartContext } from './bar-chart-context';
+import { hasArea, useChartContext } from './chart-context';
 
-export interface BarChartYTickItem {
+export interface ChartYTickItem {
   value: number;
   y: number;
   label: React.ReactNode;
 }
 
-export type BarChartYAxisProps = Omit<ComponentProps<'svg'>, 'children' | 'format'> & {
+export type ChartYAxisProps = Omit<ComponentProps<'svg'>, 'children' | 'format'> & {
   /** Formats a tick value. Default: the locale number */
   format?: (value: number) => React.ReactNode;
-  /** Renders the labels, usually one `BarChart.YTick` per entry. */
-  children?: (ticks: readonly BarChartYTickItem[]) => React.ReactNode;
+  /** Renders the labels, usually one `Chart.YTick` per entry. */
+  children?: (ticks: readonly ChartYTickItem[]) => React.ReactNode;
 };
 
 const formatNumber = (value: number) => value.toLocaleString();
 
-export const BarChartYAxis = React.forwardRef<SVGSVGElement, BarChartYAxisProps>(function BarChartYAxis(props, ref) {
+export const ChartYAxis = React.forwardRef<SVGSVGElement, ChartYAxisProps>(function ChartYAxis(props, ref) {
   const { format = formatNumber, children, render, ...otherProps } = props;
-  const { chart } = useBarChartContext('YAxis');
+  const { chart } = useChartContext('YAxis');
   const { size, yTicks } = chart;
   const ticks = React.useMemo(
     () => yTicks.map(tick => ({ value: tick.value, y: tick.y, label: format(tick.value) })),

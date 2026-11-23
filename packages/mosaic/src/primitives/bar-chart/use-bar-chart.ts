@@ -2,12 +2,12 @@
 
 import React from 'react';
 
-import { prepareStackedBars, projectStackedBars, type StackedBarLayout } from './bar-chart-layout';
+import { useChartFrame, useChartInstance } from '../chart/internal/use-chart-instance';
+import type { ChartOptions } from '../chart/types';
+import { BAR_LAYOUT, type BarChartInstance } from './bar-chart-context';
+import { prepareStackedBars, projectStackedBars } from './bar-chart-layout';
 import { barSelectionModel } from './bar-chart-selection';
-import type { ActiveBar, BarCategory, BarIdentity, BarProjection, BarSelection, BarSeries } from './types';
-import { type ChartOptions, useChartFrame, useChartInstance } from './use-chart-instance';
-
-export type { ChartInteractionProps as BarChartInteractionProps, XTickMode, XTicksOptions } from './use-chart-instance';
+import type { ActiveBar, BarIdentity, BarProjection, BarSelection, BarSeries } from './types';
 
 export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, ActiveBar<TDatum>> {
   data: readonly TDatum[];
@@ -23,15 +23,8 @@ export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, A
   isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
 }
 
-/** The measured layout and selection of one chart, returned by `BarChart.useBarChart`. */
-export type BarChartInstance<TDatum = unknown> = Omit<StackedBarLayout<TDatum>, 'categories' | 'yTicks'> &
-  ReturnType<typeof useChartInstance<BarSelection, ActiveBar<TDatum>, BarCategory>> &
-  Readonly<{
-    isBarActive: ((bar: BarIdentity<TDatum>) => boolean) | undefined;
-  }>;
-
 /**
- * Measures, lays out and selects a stacked bar chart. Pass the result to `BarChart.Root`, or render
+ * Measures, lays out and selects a stacked bar chart. Pass the result to `Chart.Root`, or render
  * from it directly.
  */
 export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarChartInstance<TDatum> {
@@ -59,5 +52,5 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
   const model = React.useMemo(() => barSelectionModel(layout, data), [data, layout]);
   const instance = useChartInstance({ frame, layout, model, options });
 
-  return { ...layout, ...instance, isBarActive };
+  return { ...instance, [BAR_LAYOUT]: { prepared, projection: layout.projection, isBarActive } };
 }

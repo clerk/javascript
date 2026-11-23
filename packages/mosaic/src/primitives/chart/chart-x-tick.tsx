@@ -3,17 +3,17 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useBarChartContext } from './bar-chart-context';
-import type { XTick } from './x-ticks';
+import { useChartContext } from './chart-context';
+import type { XTick } from './types';
 
-export type BarChartXTickProps = ComponentProps<'text'> & {
-  /** An entry from the `BarChart.XAxis` children function. */
+export type ChartXTickProps = ComponentProps<'text'> & {
+  /** An entry from the `Chart.XAxis` children function. */
   tick: XTick;
 };
 
-export const BarChartXTick = React.forwardRef<SVGTextElement, BarChartXTickProps>(function BarChartXTick(props, ref) {
+export const ChartXTick = React.forwardRef<SVGTextElement, ChartXTickProps>(function ChartXTick(props, ref) {
   const { tick, render, ...otherProps } = props;
-  const { chart } = useBarChartContext('XTick');
+  const { chart } = useChartContext('XTick');
   const activeCategory = chart.selected?.category ?? null;
 
   const ownProps = {

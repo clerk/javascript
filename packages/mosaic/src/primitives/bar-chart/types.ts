@@ -1,33 +1,4 @@
-export type ChartSize = Readonly<{ width: number; height: number }>;
-
-export type ChartMargin = Readonly<{
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}>;
-
-/** The measured container and the margin around the plot. */
-export type ChartFrame = Readonly<{ size: ChartSize; margin: ChartMargin }>;
-
-export type ChartPlot = Readonly<{
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}>;
-
-export type ChartTick = Readonly<{ value: number; y: number }>;
-
-/** One datum's place on the X axis. */
-export type ChartCategory = Readonly<{
-  key: string;
-  datumIndex: number;
-  center: number;
-}>;
-
-/** What a selection names. Each chart type extends it with what else a user can pick there. */
-export type ChartSelection = Readonly<{ category: string }>;
+import type { ChartActive, ChartCategory, ChartSelection } from '../chart/types';
 
 export type CornerRadii = readonly [number, number, number, number];
 
@@ -65,8 +36,6 @@ export type BarSection = 'positive' | 'negative';
 
 export type BarCategory = ChartCategory &
   Readonly<{
-    bandX: number;
-    bandWidth: number;
     /** Sections a user can select, including a projection-only positive bar. */
     sections: Readonly<Record<BarSection, boolean>>;
     /** Sections with nonzero data values. */
@@ -79,10 +48,9 @@ export type BarCategory = ChartCategory &
 export type BarSelection = ChartSelection & Readonly<{ section: BarSection }>;
 
 /** A selected bar resolved against the current data. */
-export type ActiveBar<TDatum> = BarSelection &
+export type ActiveBar<TDatum> = ChartActive<TDatum> &
+  BarSelection &
   Readonly<{
-    datumIndex: number;
-    datum: TDatum;
     hasValues: BarCategory['hasValues'];
     projected: BarCategory['projected'];
   }>;

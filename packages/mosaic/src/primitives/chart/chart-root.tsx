@@ -3,22 +3,21 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { BarChartContext, type BarChartContextValue } from './bar-chart-context';
-import type { BarChartInstance } from './use-bar-chart';
+import { ChartContext, type ChartContextValue } from './chart-context';
+import type { ChartInstance } from './types';
 
-export type BarChartRootProps<TDatum = unknown> = Omit<ComponentProps<'div'>, 'aria-label'> & {
-  /** The result of `BarChart.useBarChart`. */
-  chart: BarChartInstance<TDatum>;
+export type ChartRootProps = Omit<ComponentProps<'div'>, 'aria-label'> & {
+  /** The result of a chart-type hook, such as `BarChart.useBarChart`. */
+  chart: ChartInstance;
   /** Default: 500 */
   height?: number | string;
-  /** Labels the bars image and the interaction surface. */
+  /** Labels the chart image and the interaction surface. */
   'aria-label': string;
 };
 
 type InteractionMode = 'pending' | 'interactive' | 'visual-only';
 
-// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the row type parameter; the parts read the chart through context.
-export const BarChartRoot = React.forwardRef<HTMLDivElement, BarChartRootProps>(function BarChartRoot(props, ref) {
+export const ChartRoot = React.forwardRef<HTMLDivElement, ChartRootProps>(function ChartRoot(props, ref) {
   const { chart, height = 500, 'aria-label': ariaLabel, render, children, ...otherProps } = props;
 
   const [interactionLayers, setInteractionLayers] = React.useState(0);
@@ -27,7 +26,7 @@ export const BarChartRoot = React.forwardRef<HTMLDivElement, BarChartRootProps>(
     return () => setInteractionLayers(count => count - 1);
   }, []);
 
-  const context: BarChartContextValue = { chart, ariaLabel, registerInteraction };
+  const context: ChartContextValue = { chart, ariaLabel, registerInteraction };
 
   const interactionMode: InteractionMode =
     chart.size.width <= 0
@@ -52,7 +51,5 @@ export const BarChartRoot = React.forwardRef<HTMLDivElement, BarChartRootProps>(
     props: mergeProps<'div'>(ownProps, otherProps),
   });
 
-  return <BarChartContext.Provider value={context}>{element}</BarChartContext.Provider>;
-}) as <TDatum = unknown>(
-  props: BarChartRootProps<TDatum> & { ref?: React.Ref<HTMLDivElement> },
-) => React.ReactElement | null;
+  return <ChartContext.Provider value={context}>{element}</ChartContext.Provider>;
+});

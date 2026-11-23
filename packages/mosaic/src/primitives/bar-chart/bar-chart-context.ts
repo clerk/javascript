@@ -1,35 +1,39 @@
-import { createContext, type RefObject, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
+import { ChartContext } from '../chart/chart-context';
+import type { ChartInstance } from '../chart/types';
 import type { BarStyleElement } from './bar-chart-canvas';
-import type { PaintedProjection } from './bar-chart-layout';
-import type { ChartSize } from './types';
-import type { BarChartInstance } from './use-bar-chart';
+import type { PaintedProjection, PreparedStackedBars, StackedBarLayout } from './bar-chart-layout';
+import type { ActiveBar, BarCategory, BarIdentity, BarSelection } from './types';
 
-export interface BarChartContextValue {
-  chart: BarChartInstance;
-  ariaLabel: string;
-  /** Marks the chart interactive while the returned cleanup has not run. */
-  registerInteraction: () => () => void;
+/** Only `useBarChart` sets it, so a chart that carries it came from `useBarChart`. */
+export const BAR_LAYOUT: unique symbol = Symbol('BarChart layout');
+
+/** What the bar marks paint from. Read by `BarChart` parts only. */
+export type BarLayout<TDatum> = Readonly<{
+  prepared: PreparedStackedBars<TDatum>;
+  projection: StackedBarLayout<TDatum>['projection'];
+  isBarActive: ((bar: BarIdentity<TDatum>) => boolean) | undefined;
+}>;
+
+/** The measured layout and selection of one stacked bar chart, returned by `BarChart.useBarChart`. */
+export type BarChartInstance<TDatum = unknown> = ChartInstance<ActiveBar<TDatum>, BarSelection, BarCategory> &
+  Readonly<{ [BAR_LAYOUT]: BarLayout<TDatum> }>;
+
+function isBarChart(chart: ChartInstance): chart is BarChartInstance {
+  return BAR_LAYOUT in chart;
 }
 
-export const BarChartContext = createContext<BarChartContextValue | null>(null);
-
-export function useBarChartContext<TDatum = unknown>(part: string) {
-  const context = useContext(BarChartContext);
+export function useBarChartContext(part: string) {
+  const context = useContext(ChartContext);
   if (!context) {
-    throw new Error(`<BarChart.${part}> must be used within <BarChart.Root>`);
+    throw new Error(`<BarChart.${part}> must be used within <Chart.Root>`);
   }
-  return {
-    ...context,
-    // SAFETY: `BarChart.Root` holds one `useBarChart<TDatum>` result, and a part's `TDatum` is the
-    // type of the chart it renders in. Context cannot carry the parameter.
-    // eslint-disable-next-line typescript/consistent-type-assertions -- React context is not generic per consumer.
-    chart: context.chart as unknown as BarChartInstance<TDatum>,
-  };
-}
-
-export function hasArea(size: ChartSize) {
-  return size.width > 0 && size.height > 0;
+  const { chart, ariaLabel } = context;
+  if (!isBarChart(chart)) {
+    throw new Error(`<BarChart.${part}> needs a chart from BarChart.useBarChart`);
+  }
+  return { chart, layout: chart[BAR_LAYOUT], ariaLabel };
 }
 
 export interface StackedBarsContextValue {
@@ -44,23 +48,6 @@ export function useStackedBarsContext(part: string) {
   const context = useContext(StackedBarsContext);
   if (!context) {
     throw new Error(`<BarChart.${part}> must be used within <BarChart.StackedBars>`);
-  }
-  return context;
-}
-
-export interface BarSelectionContextValue {
-  /** Spans the whole chart, so its client rect anchors the tooltip. */
-  chartBoxRef: RefObject<HTMLElement | null>;
-  /** Makes the surface focusable while the returned cleanup has not run. */
-  registerTooltip: () => () => void;
-}
-
-export const BarSelectionContext = createContext<BarSelectionContextValue | null>(null);
-
-export function useBarSelectionContext(part: string) {
-  const context = useContext(BarSelectionContext);
-  if (!context) {
-    throw new Error(`<BarChart.${part}> must be used within <BarChart.BarSelection>`);
   }
   return context;
 }

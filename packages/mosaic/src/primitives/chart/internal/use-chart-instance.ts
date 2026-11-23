@@ -2,7 +2,21 @@
 
 import React from 'react';
 
-import { useControllableState } from '../hooks/use-controllable-state';
+import { useControllableState } from '../../hooks/use-controllable-state';
+import type {
+  ChartActive,
+  ChartCategory,
+  ChartInstance,
+  ChartInteractionProps,
+  ChartMargin,
+  ChartOptions,
+  ChartPlot,
+  ChartSelection,
+  ChartSize,
+  ChartTick,
+  XTick,
+  XTicksOptions,
+} from '../types';
 import {
   getKeyboardAnnouncement,
   getKeyboardInstructions,
@@ -18,10 +32,9 @@ import {
   type SelectionState,
   toPublicSelection,
   type VerticalMove,
-} from './chart-selection';
-import type { ChartCategory, ChartMargin, ChartPlot, ChartSelection, ChartSize, ChartTick } from './types';
+} from './selection';
 import { useChartSize } from './use-chart-size';
-import { selectXTicks, type XTick } from './x-ticks';
+import { selectXTicks } from './x-ticks';
 
 export const DEFAULT_CHART_MARGIN: ChartMargin = {
   top: 8,
@@ -30,52 +43,10 @@ export const DEFAULT_CHART_MARGIN: ChartMargin = {
   left: 52,
 };
 
-export type XTickMode = 'category' | 'calendar';
-
-export type XTicksOptions = Readonly<{
-  /**
-   * `category` thins category labels to fit. `calendar` labels calendar boundaries for long ranges;
-   * category keys must be UTC dates. Default: 'category'
-   */
-  mode?: XTickMode;
-  /** Returns the label for a category key, or null to omit it. Default: the key */
-  format?: (key: string) => string | null;
-}>;
-
-/** Props for the element that takes pointer and keyboard selection, usually the plot. */
-export type ChartInteractionProps = Readonly<{
-  role: 'button' | 'group';
-  /** 0 while something reads the selection: `selection`, `onSelectionChange` or `onActivate`. */
-  tabIndex: 0 | undefined;
-  onPointerDown: React.PointerEventHandler<HTMLElement>;
-  onPointerLeave: React.PointerEventHandler<HTMLElement>;
-  onPointerCancel: React.PointerEventHandler<HTMLElement>;
-  onPointerMove: React.PointerEventHandler<HTMLElement>;
-  onFocus: React.FocusEventHandler<HTMLElement>;
-  onBlur: React.FocusEventHandler<HTMLElement>;
-  onClick: React.MouseEventHandler<HTMLElement>;
-  onKeyDown: React.KeyboardEventHandler<HTMLElement>;
-  /** State the chart type exposes on the surface, such as `data-active-section`. */
-  [attribute: `data-${string}`]: string | undefined;
-}>;
-
-/** Options every chart-type hook takes. */
-export interface ChartOptions<TSelection extends ChartSelection, TActive> {
-  /** Space around the plot for the axes. Default: 8, 16, 36, 52 (top, right, bottom, left) */
-  margin?: Partial<ChartMargin>;
-  /** The selection, or null. Leave it undefined to let the chart hold the selection. */
-  selection?: TSelection | null;
-  /** Called when the user or `select`/`clear` changes the selection. */
-  onSelectionChange?: (selection: TSelection | null) => void;
-  /** Called on click, Enter or Space. Makes the interaction surface a button. */
-  onActivate?: (active: TActive) => void;
-  /** Names a category in announcements. Default: the category key */
-  formatCategory?: (category: string) => string | null;
-}
-
 /** What a chart type's layout gives the shared instance. */
 export type ChartLayout<TCategory extends ChartCategory> = Readonly<{
   plot: ChartPlot;
+  scaleY: (value: number) => number;
   yTicks: readonly ChartTick[];
   categories: readonly TCategory[];
 }>;
@@ -149,7 +120,11 @@ const formatCategoryKey = (category: string) => category;
  * frame, touch select and outside dismissal, the remembered keyboard index, keys, activation, the
  * announcement and the X ticks. The chart type's rules come in through `model`.
  */
-export function useChartInstance<TSelection extends ChartSelection, TActive, TCategory extends ChartCategory>({
+export function useChartInstance<
+  TSelection extends ChartSelection,
+  TActive extends ChartActive,
+  TCategory extends ChartCategory,
+>({
   frame,
   layout,
   model,
@@ -159,7 +134,7 @@ export function useChartInstance<TSelection extends ChartSelection, TActive, TCa
   layout: ChartLayout<TCategory>;
   model: SelectionModel<TSelection, TActive, TCategory>;
   options: ChartOptions<TSelection, TActive>;
-}>) {
+}>): ChartInstance<TActive, TSelection, TCategory> {
   const { onActivate, formatCategory = formatCategoryKey } = options;
   const { rootRef, rootElementRef, size } = frame;
   const { categories, plot } = layout;
@@ -360,6 +335,7 @@ export function useChartInstance<TSelection extends ChartSelection, TActive, TCa
     rootRef,
     size,
     plot,
+    scaleY: layout.scaleY,
     yTicks: layout.yTicks,
     categories,
     xTicks,
