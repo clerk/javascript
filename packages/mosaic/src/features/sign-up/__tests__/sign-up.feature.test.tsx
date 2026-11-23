@@ -1132,7 +1132,8 @@ describe('SignUp social sign-up', () => {
     expect(fapi.client.sessions).toHaveLength(1);
   });
 
-  it('hands a transfer that still needs a second factor to the sign-in page', async () => {
+  it('hands a transfer that still needs a second factor to the sign-in factor-two route, keeping redirect_url', async () => {
+    window.history.replaceState(null, '', `${window.location.pathname}?redirect_url=%2Fdashboard`);
     const { fapi, first } = await startWithGoogle({
       signUp: { oauth: { oauth_google: { existingUser: { emailAddress: EMAIL, secondFactor: true } } } },
     });
@@ -1140,6 +1141,11 @@ describe('SignUp social sign-up', () => {
     const { navigate } = await returnFromGoogle(fapi, first, { signInUrl: '/sign-in' });
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/sign-in')));
+    const target = new URL(String(navigate.mock.calls.at(-1)?.[0]), window.location.origin);
+    const route = new URL(target.hash.slice(1), target.origin);
+    expect(target.pathname).toBe('/sign-in');
+    expect(route.pathname).toBe('/factor-two');
+    expect(new URL(route.searchParams.get('redirect_url') ?? '', target.origin).pathname).toBe('/dashboard');
     expect(fapi.client.sessions).toHaveLength(0);
   });
 
