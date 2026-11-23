@@ -29,6 +29,7 @@ import { useTaskChooseOrganizationReady } from '../task-choose-organization/task
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
 import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
+import { signUpFieldOrder } from './sign-up.utils';
 
 export interface SignUpDetailsValues {
   emailAddress?: string;
@@ -106,16 +107,7 @@ export interface SignUpReadyModel {
 
 export type SignUpModel = { status: 'loading' } | SignUpReadyModel;
 
-const FIELD_NAMES: readonly SignUpFieldName[] = [
-  'firstName',
-  'lastName',
-  'username',
-  'emailAddress',
-  'phoneNumber',
-  'password',
-];
-
-const DETAILS_FIELDS = [...FIELD_NAMES, 'legalAccepted'] as const;
+const DETAILS_FIELDS = [...signUpFieldOrder, 'legalAccepted'] as const;
 
 const PREFILL_NAMES = ['emailAddress', 'phoneNumber', 'username', 'firstName', 'lastName'] as const;
 
@@ -126,7 +118,7 @@ function toViewFields(
   isShown: (name: SignUpFieldName, required: boolean) => boolean,
 ) {
   const result: SignUpFields = {};
-  for (const name of FIELD_NAMES) {
+  for (const name of signUpFieldOrder) {
     const field = fields[name];
     if (field && isShown(name, field.required)) {
       result[name] = field;

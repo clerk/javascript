@@ -5,7 +5,7 @@ import type { SignUpCode, SignUpDetails, SignUpFieldName, SignUpFields, SignUpLe
 
 type Messages = MosaicMessages['signUp'];
 
-const signUpFieldOrder: readonly SignUpFieldName[] = [
+export const signUpFieldOrder: readonly SignUpFieldName[] = [
   'firstName',
   'lastName',
   'username',
