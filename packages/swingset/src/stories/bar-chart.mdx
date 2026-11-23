@@ -3,10 +3,11 @@ import * as BarChartStories from './bar-chart.stories';
 # BarChart
 
 A stacked bar chart over a category or time axis, with values above and below zero. It is a
-**headless** primitive: `BarChart.useBarChart` owns the layout and selection, and the parts render
-from the chart object it returns. D3 computes the stacks and scales, Canvas paints the bars, SVG draws the
-grid, axes and marks, and the primitive handles pointer and keyboard selection. It ships **no
-styles**. Every part, including the Canvas bars, takes its appearance from your CSS.
+**headless** primitive: `BarChart.useBarChart` owns the layout and selection, `BarChart` parts paint
+the bars, and the shared `Chart` parts draw the root, grid, axes, lines, selection, cursor and
+tooltip from the chart object the hook returns. D3 computes the stacks and scales, Canvas paints the
+bars, SVG draws the grid, axes and marks, and the primitive handles pointer and keyboard selection.
+It ships **no styles**. Every part, including the Canvas bars, takes its appearance from your CSS.
 
 ## Example
 
@@ -21,55 +22,56 @@ unstyled, so the bars take the inherited text color and the grid and zero lines 
 ## Usage
 
 ```tsx
-import { BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { type ActiveBar, BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { Chart } from '@clerk/mosaic/primitives/chart';
 
 const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod });
 
-<BarChart.Root
+<Chart.Root
   chart={chart}
   height={320}
   aria-label='Weekly sign-ups'
 >
-  <BarChart.Grid>
-    {lines =>
-      lines.map(line => (
-        <BarChart.GridLine
-          key={line.value}
-          line={line}
+  <Chart.Grid>
+    {ticks =>
+      ticks.map(tick => (
+        <Chart.YLine
+          key={tick.value}
+          value={tick.value}
         />
       ))
     }
-  </BarChart.Grid>
+  </Chart.Grid>
   <BarChart.StackedBars>
     <BarChart.Bar className='bar' />
     <BarChart.ProjectionOutline />
-    <BarChart.ZeroLine />
+    <Chart.YLine value={0} />
   </BarChart.StackedBars>
-  <BarChart.YAxis>
+  <Chart.YAxis>
     {ticks =>
       ticks.map(tick => (
-        <BarChart.YTick
+        <Chart.YTick
           key={tick.value}
           tick={tick}
         />
       ))
     }
-  </BarChart.YAxis>
-  <BarChart.XAxis>
+  </Chart.YAxis>
+  <Chart.XAxis>
     {ticks =>
       ticks.map(tick => (
-        <BarChart.XTick
+        <Chart.XTick
           key={tick.key}
           tick={tick}
         />
       ))
     }
-  </BarChart.XAxis>
-  <BarChart.BarSelection>
-    <BarChart.Cursor />
-    <BarChart.Tooltip>{active => <PeriodSummary row={active.datum} />}</BarChart.Tooltip>
-  </BarChart.BarSelection>
-</BarChart.Root>;
+  </Chart.XAxis>
+  <Chart.Selection>
+    <Chart.Cursor />
+    <Chart.Tooltip<ActiveBar<Row>>>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+  </Chart.Selection>
+</Chart.Root>;
 ```
 
 `series` is an ordered list of `{ key, value }`, where `value` reads a number from a row. `index`
@@ -109,25 +111,25 @@ const chart = BarChart.useBarChart({
 
 | Part                         | Default Element | Description                                                          |
 | ---------------------------- | --------------- | -------------------------------------------------------------------- |
-| `BarChart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
-| `BarChart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
-| `BarChart.GridLine`          | `<line>`        | One line across the plot at a Y tick                                 |
+| `Chart.Root`                 | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
+| `Chart.Grid`                 | `<svg>`         | Holds the grid lines                                                 |
+| `Chart.YLine`                | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
 | `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
 | `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
-| `BarChart.ZeroLine`          | `<line>`        | The line at zero                                                     |
-| `BarChart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
-| `BarChart.YTick`             | `<text>`        | One Y tick label                                                     |
-| `BarChart.XAxis`             | `<svg>`         | Holds the category labels                                            |
-| `BarChart.XTick`             | `<text>`        | One category label                                                   |
-| `BarChart.BarSelection`      | `<div>`         | Pointer and keyboard selection                                       |
-| `BarChart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
-| `BarChart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
+| `Chart.YAxis`                | `<svg>`         | Holds the Y tick labels                                              |
+| `Chart.YTick`                | `<text>`        | One Y tick label                                                     |
+| `Chart.XAxis`                | `<svg>`         | Holds the category labels                                            |
+| `Chart.XTick`                | `<text>`        | One category label                                                   |
+| `Chart.Selection`            | `<div>`         | Pointer and keyboard selection                                       |
+| `Chart.Cursor`               | `<div>`         | Covers the selected category's band                                  |
+| `Chart.Tooltip`              | `<div>`         | The tooltip for the selected bar, portaled                           |
 
+`Chart` parts come from `@clerk/mosaic/primitives/chart` and work with any chart type's hook.
 Every part accepts a `render` prop and the standard attributes of its default element. Every part
-throws outside `BarChart.Root`. `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside
-`BarChart.StackedBars`, and `BarChart.Cursor` and `BarChart.Tooltip` throw outside
-`BarChart.BarSelection`.
+throws outside `Chart.Root`, and `BarChart.StackedBars` also throws for a chart that did not come
+from `BarChart.useBarChart`. `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside
+`BarChart.StackedBars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
 
 ## Props
 
@@ -147,36 +149,44 @@ throws outside `BarChart.Root`. `BarChart.Bar` and `BarChart.ProjectionOutline` 
 | <code>onActivate</code>        | <code>(active: ActiveBar&lt;TDatum&gt;) => void</code>       | —                          | Called on click, Enter or Space                        |
 | <code>formatCategory</code>    | <code>(key: string) => string \| null</code>                 | the key                    | Names a period in keyboard announcements               |
 
-The hook returns the chart object: `rootRef`, `size`, `plot`, `scaleY`, `zeroY`, `categories`,
-`yTicks`, `xTicks(options)`, `projection`, `selected`, `announcement`, `select`, `clear` and
-`getInteractionProps()`. Render from it directly to skip the parts.
+The hook returns the chart object: `rootRef`, `size`, `plot`, `scaleY`, `categories`, `yTicks`,
+`xTicks(options)`, `selected`, `tooltipAnchor`, `announcement`, `keyboardInstructions`, `select`,
+`clear` and `getInteractionProps()`. Each category carries `key`, `datumIndex`, `center`, and its
+band as `x` and `width`. Render from it directly to skip the parts.
 
-### `BarChart.Root`
+### `Chart.Root`
 
-| Prop                    | Type                                        | Default          | Description                                       |
-| ----------------------- | ------------------------------------------- | ---------------- | ------------------------------------------------- |
-| <code>chart</code>      | <code>BarChartInstance&lt;TDatum&gt;</code> | — (required)     | The result of `BarChart.useBarChart`              |
-| <code>aria-label</code> | <code>string</code>                         | — (required)     | Labels the bars image and the interaction surface |
-| <code>height</code>     | <code>number \| string</code>               | <code>500</code> | The container height                              |
+| Prop                    | Type                          | Default          | Description                                        |
+| ----------------------- | ----------------------------- | ---------------- | -------------------------------------------------- |
+| <code>chart</code>      | <code>ChartInstance</code>    | — (required)     | The result of a chart-type hook                    |
+| <code>aria-label</code> | <code>string</code>           | — (required)     | Labels the chart image and the interaction surface |
+| <code>height</code>     | <code>number \| string</code> | <code>500</code> | The container height                               |
 
-### `BarChart.XAxis`
+### `Chart.YLine`
+
+| Prop               | Type                | Default      | Description                                     |
+| ------------------ | ------------------- | ------------ | ----------------------------------------------- |
+| <code>value</code> | <code>number</code> | — (required) | The Y value the line marks, such as a tick or 0 |
+
+### `Chart.XAxis`
 
 | Prop                | Type                                         | Default                 | Description                                                    |
 | ------------------- | -------------------------------------------- | ----------------------- | -------------------------------------------------------------- |
 | <code>ticks</code>  | <code>'category' \| 'calendar'</code>        | <code>'category'</code> | `calendar` labels calendar boundaries for long UTC date ranges |
 | <code>format</code> | <code>(key: string) => string \| null</code> | the key                 | Labels a category, or returns null to omit it                  |
 
-`BarChart.YAxis` takes `format` (`(value: number) => ReactNode`, locale number by default).
-`BarChart.Grid`, `BarChart.YAxis` and `BarChart.XAxis` take a `children` function that receives
-their items. `BarChart.GridLine` takes `line`, and `BarChart.YTick` and `BarChart.XTick` take
-`tick`.
+`Chart.YAxis` takes `format` (`(value: number) => ReactNode`, locale number by default).
+`Chart.Grid`, `Chart.YAxis` and `Chart.XAxis` take a `children` function that receives their
+items. `Chart.YTick` and `Chart.XTick` take `tick`.
 
-### `BarChart.Tooltip`
+### `Chart.Tooltip`
 
-| Prop                     | Type                                                        | Default      | Description                                 |
-| ------------------------ | ----------------------------------------------------------- | ------------ | ------------------------------------------- |
-| <code>children</code>    | <code>(active: ActiveBar&lt;TDatum&gt;) => ReactNode</code> | — (required) | Content for the selected bar; null hides it |
-| <code>boundaryRef</code> | <code>RefObject&lt;HTMLElement \| null&gt;</code>           | the chart    | Element the tooltip stays inside            |
+| Prop                     | Type                                              | Default      | Description                                 |
+| ------------------------ | ------------------------------------------------- | ------------ | ------------------------------------------- |
+| <code>children</code>    | <code>(active: TActive) => ReactNode</code>       | — (required) | Content for the selected bar; null hides it |
+| <code>boundaryRef</code> | <code>RefObject&lt;HTMLElement \| null&gt;</code> | the chart    | Element the tooltip stays inside            |
+
+Name the active type the hook selects: `<Chart.Tooltip<ActiveBar<Row>>>`.
 
 ## Styling
 
@@ -193,13 +203,13 @@ Its `max-width` caps the bar width, `row-gap` sets the gap between segments, its
 rounds a stack's outer end and its bottom corner radius rounds every other corner. Without
 `BarChart.Bar`, nothing is painted.
 
-| Attribute                     | Applies To   | Description                                                    |
-| ----------------------------- | ------------ | -------------------------------------------------------------- |
-| `data-chart-interaction-mode` | Root         | `pending`, `interactive` or `visual-only`                      |
-| `data-active`                 | XTick        | Present while the tick's period is selected                    |
-| `data-active-section`         | BarSelection | `positive` or `negative` on the interaction surface            |
-| `data-side`                   | Tooltip      | `left` or `right` of the period, or `bottom` when pinned       |
-| `data-open` / `data-closed`   | Tooltip      | Open state, with `data-starting-style` and `data-ending-style` |
+| Attribute                     | Applies To | Description                                                    |
+| ----------------------------- | ---------- | -------------------------------------------------------------- |
+| `data-chart-interaction-mode` | Root       | `pending`, `interactive` or `visual-only`                      |
+| `data-active`                 | XTick      | Present while the tick's period is selected                    |
+| `data-active-section`         | Selection  | `positive` or `negative` on the interaction surface            |
+| `data-side`                   | Tooltip    | `left` or `right` of the period, or `bottom` when pinned       |
+| `data-open` / `data-closed`   | Tooltip    | Open state, with `data-starting-style` and `data-ending-style` |
 
 ```css
 .bar[data-series='signups'] {

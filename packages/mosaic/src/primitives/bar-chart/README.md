@@ -1,96 +1,87 @@
 # Bar chart
 
-A headless stacked bar chart: a hook that owns the layout and selection, and composable parts that render from it. D3 computes the diverging stacks and scales, Canvas paints the bars and the projection fill, one SVG over the Canvas draws the grid, axes, zero line and projection outline, and React handles interaction. The parts emit no visual styles: style each one with `className` and `data-*` attributes.
+A headless stacked bar chart: `BarChart.useBarChart` owns the layout and selection, and its marks paint the bars. D3 computes the diverging stacks and scales, Canvas paints the bars and the projection fill, and one SVG over the Canvas holds the projection outline and any `Chart.YLine`. The root, grid, axes, selection, cursor and tooltip are the shared [`Chart`](../chart/README.md) parts. The parts emit no visual styles: style each one with `className` and `data-*` attributes.
 
 ## When to use
 
 - A stacked bar chart over a category or time axis, with values above and below zero.
 - A chart with thousands of bars that still needs keyboard and pointer selection.
-- A decorative placeholder chart: leave out `BarChart.BarSelection`.
+- A decorative placeholder chart: leave out `Chart.Selection`.
 
 ## Usage
 
 ```tsx
-import { BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { type ActiveBar, BarChart } from '@clerk/mosaic/primitives/bar-chart';
+import { Chart } from '@clerk/mosaic/primitives/chart';
 
 const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod });
 
-<BarChart.Root
+<Chart.Root
   chart={chart}
   height={320}
   aria-label='Weekly sign-ups'
 >
-  <BarChart.Grid>
-    {lines =>
-      lines.map(line => (
-        <BarChart.GridLine
-          key={line.value}
-          line={line}
+  <Chart.Grid>
+    {ticks =>
+      ticks.map(tick => (
+        <Chart.YLine
+          key={tick.value}
+          value={tick.value}
           className='grid-line'
         />
       ))
     }
-  </BarChart.Grid>
+  </Chart.Grid>
   <BarChart.StackedBars>
     <BarChart.Bar className='bar' />
     <BarChart.ProjectionOutline className='projection-outline' />
-    <BarChart.ZeroLine className='zero-line' />
+    <Chart.YLine
+      value={0}
+      className='zero-line'
+    />
   </BarChart.StackedBars>
-  <BarChart.YAxis>
+  <Chart.YAxis>
     {ticks =>
       ticks.map(tick => (
-        <BarChart.YTick
+        <Chart.YTick
           key={tick.value}
           tick={tick}
           className='tick'
         />
       ))
     }
-  </BarChart.YAxis>
-  <BarChart.XAxis ticks='calendar'>
+  </Chart.YAxis>
+  <Chart.XAxis ticks='calendar'>
     {ticks =>
       ticks.map(tick => (
-        <BarChart.XTick
+        <Chart.XTick
           key={tick.key}
           tick={tick}
           className='tick'
         />
       ))
     }
-  </BarChart.XAxis>
-  <BarChart.BarSelection>
-    <BarChart.Cursor className='cursor' />
-    <BarChart.Tooltip className='tooltip'>{active => <PeriodSummary row={active.datum} />}</BarChart.Tooltip>
-  </BarChart.BarSelection>
-</BarChart.Root>;
+  </Chart.XAxis>
+  <Chart.Selection>
+    <Chart.Cursor className='cursor' />
+    <Chart.Tooltip<ActiveBar<Row>> className='tooltip'>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+  </Chart.Selection>
+</Chart.Root>;
 ```
 
 `series` is an ordered list of `{ key, value }`, where `value` reads a number from a row. Rows can be any type. Missing or non-finite values count as zero. `index` returns each row's category key; keys must be unique, because repeated keys share a band. Memoize `series`, `index` and `isBarActive`, or define them at module level: the component that calls `useBarChart` re-renders on every selection change, and a new `series` or `index` prepares the stacks again.
 
-A container renders only the items its children function returns. A bare `<BarChart.XAxis />` renders an empty SVG.
-
 ## Parts
 
-| Part                         | Default element | Description                                                          |
-| ---------------------------- | --------------- | -------------------------------------------------------------------- |
-| `BarChart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
-| `BarChart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
-| `BarChart.GridLine`          | `<line>`        | One line across the plot at a Y tick                                 |
-| `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
-| `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
-| `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
-| `BarChart.ZeroLine`          | `<line>`        | The line at zero                                                     |
-| `BarChart.YAxis`             | `<svg>`         | Holds the Y tick labels in the left margin                           |
-| `BarChart.YTick`             | `<text>`        | One Y tick label                                                     |
-| `BarChart.XAxis`             | `<svg>`         | Holds the category labels below the plot                             |
-| `BarChart.XTick`             | `<text>`        | One category label                                                   |
-| `BarChart.BarSelection`      | `<div>`         | Pointer and keyboard selection over the whole chart                  |
-| `BarChart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
-| `BarChart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
+| Part                         | Default element | Description                                                         |
+| ---------------------------- | --------------- | ------------------------------------------------------------------- |
+| `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them |
+| `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                          |
+| `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                          |
 
-Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
+Every part takes `className`, `ref`, `render` and the native props of its default element, merged as the [`Chart` parts](../chart/README.md#parts) are.
 
-Every part throws outside `BarChart.Root`. `BarChart.Bar`, `BarChart.ProjectionOutline` and `BarChart.ZeroLine` live inside `BarChart.StackedBars`, and `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside it. `BarChart.Cursor` and `BarChart.Tooltip` throw outside `BarChart.BarSelection`.
+`BarChart.StackedBars` throws outside `Chart.Root`, and throws when the chart did not come from `BarChart.useBarChart`. `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside `BarChart.StackedBars`. A `Chart.YLine` inside `BarChart.StackedBars`, such as the zero line, paints over the bars.
 
 The namespace also holds `BarChart.useBarChart` and `BarChart.CanvasRenderError`.
 
@@ -112,86 +103,19 @@ The namespace also holds `BarChart.useBarChart` and `BarChart.CanvasRenderError`
 | `onActivate`        | `(active: ActiveBar<TDatum>) => void`       | —               | Called on click, Enter or Space. Makes the surface a button           |
 | `formatCategory`    | `(key: string) => string \| null`           | the key         | Names a period in keyboard announcements                              |
 
-`BarSelection` is `{ category, section }`. A new `isBarActive` function repaints the Canvas.
+`BarSelection` is `{ category, section }`. A new `isBarActive` function repaints the Canvas. `margin` and the last four options are the [options every chart type takes](../chart/README.md#options-every-chart-type-takes).
 
-The hook returns a `BarChartInstance<TDatum>`, the chart object:
+The hook returns a `BarChartInstance<TDatum>`: the [chart object](../chart/README.md#the-chart-object) with `ActiveBar<TDatum>` as `selected` and `BarCategory` entries in `categories`. A `BarCategory` adds the sections a user can select (`sections`), which sections have values (`hasValues`) and whether the chart draws the projection there (`projected`). Its `x` and `width` are the category band.
 
-| Field                   | Type                                              | Description                                                                     |
-| ----------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `rootRef`               | `(element: HTMLElement \| null) => void`          | Measures the element. `BarChart.Root` attaches it                               |
-| `size`                  | `ChartSize`                                       | The measured container, zero until the first measurement                        |
-| `plot`                  | `ChartPlot`                                       | The plot rectangle inside the margin                                            |
-| `scaleY`                | `(value: number) => number`                       | Maps a value to a Y coordinate                                                  |
-| `zeroY`                 | `number`                                          | The Y coordinate of zero                                                        |
-| `categories`            | `readonly BarCategory[]`                          | One band per row, with its selectable sections                                  |
-| `yTicks`                | `readonly ChartTick[]`                            | The Y ticks                                                                     |
-| `xTicks`                | `(options?: { mode?, format? }) => XTick[]`       | The X labels for a tick mode, as `BarChart.XAxis` computes them                 |
-| `projection`            | `{ datumIndex, x, y, width, height } \| null`     | The accepted projection's band rectangle                                        |
-| `selected`              | `ActiveBar<TDatum> \| null`                       | The selected bar in the current data                                            |
-| `announcement`          | `string`                                          | The status text for the keyboard selection                                      |
-| `select`, `clear`       | `(selection: BarSelection) => void`, `() => void` | Change the selection and call `onSelectionChange`                               |
-| `getInteractionProps()` | `BarChartInteractionProps`                        | Role, `tabIndex`, `data-active-section` and the pointer, focus and key handlers |
+`ActiveBar` is the selected period: its `category`, `datumIndex`, `datum` and `section`, plus `hasValues` and `projected`. Name it on the tooltip: `<Chart.Tooltip<ActiveBar<Row>>>`.
 
-The object also carries `isBarActive` and the layout internals `prepared` and `step`.
+## Keyboard and selection
 
-### `BarChart.Root`
+Selection follows [`Chart`](../chart/README.md#keyboard). Up and Down select the positive or negative section of the period. Left, Right, Home and End keep the section when the new period has it, and otherwise take positive, then negative. A pointer selects the section above or below the zero line, and keeps the current section within a few pixels of it.
 
-| Prop         | Type                       | Default    | Description                                       |
-| ------------ | -------------------------- | ---------- | ------------------------------------------------- |
-| `chart`      | `BarChartInstance<TDatum>` | (required) | The result of `BarChart.useBarChart`              |
-| `aria-label` | `string`                   | (required) | Labels the bars image and the interaction surface |
-| `height`     | `number \| string`         | `500`      | The container height                              |
+The interaction surface carries `data-active-section`, `positive` or `negative` while a section is selected. The status region announces the period and its section, such as `Feb, positive values`, or `No values for this period`.
 
-### `BarChart.Grid`, `BarChart.YAxis`, `BarChart.XAxis`
-
-| Part             | Prop       | Type                                        | Default       | Description                                                                                    |
-| ---------------- | ---------- | ------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------- |
-| `BarChart.Grid`  | `children` | `(lines: ChartTick[]) => ReactNode`         | —             | Renders the lines                                                                              |
-| `BarChart.YAxis` | `format`   | `(value: number) => ReactNode`              | locale number | Formats a tick value                                                                           |
-| `BarChart.YAxis` | `children` | `(ticks: BarChartYTickItem[]) => ReactNode` | —             | Renders the labels                                                                             |
-| `BarChart.XAxis` | `ticks`    | `'category' \| 'calendar'`                  | `'category'`  | `category` thins labels to fit. `calendar` labels calendar boundaries for long UTC date ranges |
-| `BarChart.XAxis` | `format`   | `(key: string) => string \| null`           | the key       | Labels a category, or returns null to omit it                                                  |
-| `BarChart.XAxis` | `children` | `(ticks: XTick[]) => ReactNode`             | —             | Renders the labels                                                                             |
-
-`BarChart.GridLine`, `BarChart.YTick` and `BarChart.XTick` each take the entry their container passed: `line` (`{ value, y }`) or `tick` (`{ value, y, label }` for Y, `{ key, category, label, x, textAnchor }` for X). `XTick.category` is the labelled category key, or null for a calendar boundary label.
-
-`BarChart.StackedBars` and `BarChart.BarSelection` take only the props of their element. `isBarActive`, `onActivate` and `formatCategory` are `useBarChart` options.
-
-### `BarChart.Tooltip`
-
-| Prop          | Type                                       | Default   | Description                                                   |
-| ------------- | ------------------------------------------ | --------- | ------------------------------------------------------------- |
-| `children`    | `(active: ActiveBar<TDatum>) => ReactNode` | —         | Content for the selected bar. Return null to hide the tooltip |
-| `boundaryRef` | `RefObject<HTMLElement \| null>`           | the chart | Element the tooltip stays inside                              |
-
-`ActiveBar` is the selected period: its `category`, `datumIndex`, `datum` and `section`, which sections have values (`hasValues`), and whether the chart draws the projection there (`projected`).
-
-## Keyboard
-
-The interaction surface is focusable while something reads the selection: `selection`, `onSelectionChange` or `onActivate` on `useBarChart`, or a `BarChart.Tooltip`.
-
-| Key                      | Behavior                                                                 |
-| ------------------------ | ------------------------------------------------------------------------ |
-| `ArrowLeft`/`ArrowRight` | Selects the previous or next period                                      |
-| `Home`/`End`             | Selects the first or last period                                         |
-| `ArrowUp`/`ArrowDown`    | Selects the positive or negative section of the period                   |
-| `Enter`/`Space`          | Calls `onActivate`. After `Escape`, reselects the dismissed period first |
-| `Escape`                 | Clears the selection and remembers the period                            |
-
-Left and Right do not follow `useDirection()`. A time axis reads left to right in every locale, so the earlier period is always on the left.
-
-A pointer selects the period under it. A tap selects on contact and stays selected until the user taps elsewhere or the gesture is cancelled.
-
-## Selection
-
-The chart holds the selection unless you pass `selection`. `onSelectionChange` is called with `{ category, section }` or null whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. It is not called when data changes: `chart.selected` resolves the selection against the current data, so a selection whose category or section disappears reads as null until the user moves.
-
-A controlled `selection` decides which bar is selected. The chart also remembers two things the value cannot hold, and keeps them only while the controlled value agrees:
-
-- After Escape the selection is `dismissed`: the value is null, and the period is remembered so Enter reselects it instead of activating it. If the consumer then passes a non-null `selection`, that wins.
-- Keyboard focus on a period with no values keeps that period for the next arrow key, with a null value.
-
-A selection set through `selection` or `select` is not announced. Announcements follow keyboard moves only.
+Dim every bar outside the selected section by controlling the selection:
 
 ```tsx
 const [selection, setSelection] = useState<BarSelection | null>(null);
@@ -203,50 +127,13 @@ const isBarActive = useCallback(
 const chart = BarChart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
 ```
 
-## Rendering from the chart object
-
-The parts are optional. Attach `rootRef` to the measured element, spread `getInteractionProps()` on the element that takes selection, and render from the layout fields. Read `rootRef` into its own variable first: the React Compiler lint treats an object whose member is passed to `ref` as a ref, and then flags calls on it during render.
-
-```tsx
-const chart = BarChart.useBarChart({ data, series, index, onSelectionChange });
-const { rootRef } = chart;
-
-<div ref={rootRef}>
-  <div
-    {...chart.getInteractionProps()}
-    aria-label='Weekly sign-ups'
-  >
-    {chart.categories.map(category => (
-      <span key={category.key}>{category.key}</span>
-    ))}
-  </div>
-  <output>{chart.selected?.category}</output>
-</div>;
-```
-
-The pointer maps client coordinates through the `rootRef` element's bounds. Painting the bars is the one thing the object does not do, because their color and geometry come from `BarChart.Bar`'s computed style: keep `BarChart.StackedBars` for that.
-
-## Data attributes
-
-| Attribute                     | Part                    | Description                                                                                                                |
-| ----------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `data-chart-interaction-mode` | `BarChart.Root`         | `pending` before the first measurement, `interactive` with `BarChart.BarSelection` and categories, otherwise `visual-only` |
-| `data-active`                 | `BarChart.XTick`        | Present while the tick's period is selected. Calendar boundary labels never carry it                                       |
-| `data-chart-interaction`      | `BarChart.BarSelection` | On the interaction surface inside the part                                                                                 |
-| `data-active-section`         | `BarChart.BarSelection` | On the interaction surface: `positive` or `negative` while a section is selected                                           |
-| `data-side`                   | `BarChart.Tooltip`      | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                             |
-| `data-open` / `data-closed`   | `BarChart.Tooltip`      | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                            |
+Painting the bars is the one thing the chart object does not do, because their color and geometry come from `BarChart.Bar`'s computed style: keep `BarChart.StackedBars` for that.
 
 ## Accessibility
 
-- The bars Canvas carries `role="img"` and the `aria-label` from `BarChart.Root`. The grid, axes, cursor and marks are `aria-hidden`.
-- The interaction surface sits outside the image role, so assistive technology can reach it. It is a `button` with `onActivate`, otherwise a `group`, and takes the same `aria-label`.
-- Visually hidden text describes the keys. A `status` region announces the selected period, named through `formatCategory`, and its section.
-- An assistive-technology click without coordinates activates the selected period.
+The bars Canvas carries `role="img"` and the `aria-label` from `Chart.Root`. The projection outline is `aria-hidden`. The rest is in [`Chart`](../chart/README.md#accessibility).
 
 ## Styling
-
-An unstyled chart is incomplete on purpose: SVG lines without a stroke do not paint, and text without a fill is black. Pass `className` to each item part.
 
 ### `BarChart.Bar`
 
@@ -293,27 +180,9 @@ The geometry is paint only. Selection, the cursor and the scales use the categor
 
 The Canvas repaints in the same frame when `BarChart.Bar` mounts, unmounts or changes `class`, when `<html>` changes `class`, `style` or `data-theme`, when the pixel ratio changes (capped at 2), and when the layout or the props of `BarChart.StackedBars` change. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
 
-The primitive reads and writes no CSS variables.
-
-### Inline styles
-
-The parts set only the inline styles that layout and behavior depend on: absolute positioning, sizes, `pointer-events`, the tooltip's fixed position and maximum width, `vector-effect` on lines, and the visually hidden announcements. No part sets a z-index. `cursor` is inherited, so a pointer cursor on `BarChart.BarSelection` reaches the interaction surface.
-
 ## Paint order
 
-Root does not reorder its children, so paint order is JSX order. Write the parts in this order:
-
-1. `BarChart.Grid`
-2. `BarChart.StackedBars`, with `BarChart.ProjectionOutline` before `BarChart.ZeroLine`. The position of `BarChart.Bar` does not matter
-3. `BarChart.YAxis`
-4. `BarChart.XAxis`
-5. `BarChart.BarSelection`, last, so its surface receives the pointer and its cursor paints over the bars
-
-Each container renders nothing until Root has measured a non-zero size.
-
-## Tooltip
-
-`BarChart.Tooltip` positions with Floating UI against a virtual element at the selected period: the band center, at the top of the plot. It opens to the right, flips left when the right side does not fit inside `boundaryRef`, and keeps the side it chose last until that side stops fitting, so it does not cross the bar twice near an edge. When the plot is narrower than 416px, it pins to the top-left of the boundary instead. It portals through Mosaic's `Portal`, so a `PortalProvider` decides where. It animates through `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`, and holds its last content while it closes.
+Follow [`Chart`'s paint order](../chart/README.md#paint-order). Inside `BarChart.StackedBars`, put `BarChart.ProjectionOutline` before the zero `Chart.YLine`. The position of `BarChart.Bar` does not matter.
 
 ## Layout
 
