@@ -2,9 +2,10 @@
 
 import { logger } from '@clerk/shared/logger';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { MosaicRoutingMode } from './use-mosaic-location';
+import { markSettled } from './window-location';
 
 // What a host hands Mosaic so the URL modes read and write the host router's location instead of
 // `window`. It is a plain object the host writes from their own framework's hooks, so no framework
@@ -106,6 +107,9 @@ export function RouterAdapterProvider({
       '[Clerk] The routing adapter changed which hooks it has after the first render, so the first set stays in use. Build the adapter once, outside render.',
     );
   }
+  useEffect(() => {
+    queueMicrotask(markSettled);
+  }, []);
   const push = adapter?.push;
   const replace = adapter?.replace;
   const queryPrefix = keyPrefix?.query ?? defaultConfig.queryPrefix;

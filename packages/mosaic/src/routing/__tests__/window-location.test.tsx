@@ -1,10 +1,13 @@
 import { act, render, renderHook } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { readWindowUrl, useWindowUrl, writeWindowUrl } from '../window-location';
+import { markSettled, readWindowUrl, useWindowUrl, writeWindowUrl } from '../window-location';
 
-beforeEach(() => window.history.replaceState(null, '', '/'));
+beforeEach(() => {
+  window.history.replaceState(null, '', '/');
+  markSettled();
+});
 
 describe('readWindowUrl', () => {
   it('reads the raw URL without the leading ? and #', () => {
@@ -83,6 +86,28 @@ describe('useWindowUrl', () => {
 });
 
 describe('writeWindowUrl', () => {
+  // This is necessary because Next and possibly other frameworks don't patch
+  // history.pushState/replaceState until an effect, so we need to guarantee we
+  // don't write until after that has happened
+  it('parks writes until the page has settled, then lands them in order', async () => {
+    vi.resetModules();
+    const fresh = await import('../window-location');
+    window.history.replaceState(null, '', '/');
+    const length = window.history.length;
+
+    fresh.writeWindowUrl('/user', false);
+    fresh.writeWindowUrl('/user/security', true);
+    expect(window.location.pathname).toBe('/');
+    expect(window.history.length).toBe(length);
+
+    fresh.markSettled();
+    expect(window.location.pathname).toBe('/user/security');
+    expect(window.history.length).toBe(length + 1);
+
+    fresh.writeWindowUrl('/user/account', true);
+    expect(window.location.pathname).toBe('/user/account');
+  });
+
   it('writes no history state, so a host router keeps its bookkeeping off entries it did not make', () => {
     window.history.replaceState({ host: 'data', idx: 3 }, '', '/');
     const length = window.history.length;

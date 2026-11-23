@@ -17,6 +17,8 @@ type Listener = () => void;
 
 const listeners = new Set<Listener>();
 let cached: { href: string; url: HostUrl } | undefined;
+let settled = false;
+const parked: Array<() => void> = [];
 
 // A host router's own `pushState` fires neither `popstate` nor `hashchange`, so where the browser
 // has the Navigation API its `currententrychange` is listened to as well; it fires for every
@@ -70,11 +72,28 @@ export function notifyWindowUrl(): void {
   }
 }
 
-export function writeWindowUrl(url: string, replace: boolean): void {
-  if (replace) {
-    window.history.replaceState(null, '', url);
-  } else {
-    window.history.pushState(null, '', url);
+export function markSettled(): void {
+  settled = true;
+  for (const write of parked.splice(0)) {
+    write();
   }
-  notifyWindowUrl();
+}
+
+export function writeWindowUrl(url: string, replace: boolean): void {
+  const write = () => {
+    if (replace) {
+      window.history.replaceState(null, '', url);
+    } else {
+      window.history.pushState(null, '', url);
+    }
+    notifyWindowUrl();
+  };
+  // This is necessary because Next and possibly other frameworks don't patch
+  // history.pushState/replaceState until an effect, so we need to guarantee we
+  // don't write until after that has happened, after that writes are sync
+  if (settled) {
+    write();
+  } else {
+    parked.push(write);
+  }
 }
