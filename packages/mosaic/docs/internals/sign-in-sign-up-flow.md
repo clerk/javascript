@@ -38,7 +38,7 @@ Sign-up renders one component per screen, so the route decides what is mounted (
 - A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way. A screen that runs a controller reaches the view as a slot the wrapper builds, as the profile section's `nameAction` does, so `SignUpView` renders plain props only.
 - `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
 - A screen another feature owns arrives as a slot. The wrapper runs the task's model once, passes it to `TaskChooseOrganizationContent` (the task without its card), and tells the controller whether the task has loaded. The view mounts the slot on the task route.
-- A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`) shows `startOver`.
+- A screen that is not a route sits on top of one. `restricted` and `waitlist` replace `start`, `actionBlocked` replaces `start` and the Protect routes, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`) shows `startOver`.
 
 ## Move on after a submit
 
@@ -57,7 +57,7 @@ submitPassword: async (password: string) => {
 - `complete`: the model's `finalize()`, then leave the flow for the after sign-up URL, which honors `redirect_url` and the redirect query params (`clerk.buildAfterSignUpUrl({ params })`). Creating the session clears the sign-up. Sign-up renders the model it left from while `finalize()` runs, and after it until a task that continues in the flow has its data loaded, so the task replaces the screen with no skeleton between them. It keeps the action pending throughout, the way the switcher holds its `frozenModel` ([Controllers → Wrapping actions](../controllers.md#wrapping-actions)). Once the hold ends with the session signed in, the flow is over: if the host keeps the component mounted, it renders nothing. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
 - `transfer`: planned, not built. From sign-in, the model's `transfer()` will call `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step; a sign-in with sign-up built in holds the sign-up routes under `create/`, otherwise it leaves for the sign-up page. From sign-up, when the identifier already has an account, it will call `signIn.create({ transfer: true })`, then `next` with the sign-in's step. Until then sign-up keeps the current screen on a `transfer` step.
 - `unknown`: nothing. The screen already shows "Start over".
-- `blocked`: sign-up's `create` resolves with it, not a step, when FAPI answers `action_blocked`. The controller keeps the details for this mount and shows the notice in place of `start`. The notice is not read from Clerk's sign-up error, which outlives the component, so a remount shows the form again, as `ui`'s card error does.
+- `blocked`: sign-up's `create` and the Protect proof's `resolve` resolve with it, not a step, when FAPI answers `action_blocked`. The controller keeps the details for this mount and shows the notice in place of `start` or the Protect route. The notice is not read from Clerk's sign-up error, which outlives the component, so a remount shows the form again, as `ui`'s card error does.
 - Anything else: `go(routeFor(step))`.
 - An error from `finalize()` or the transfer stays on the current screen until the user leaves it, so Edit clears it. Verifying a sign-up that is already complete skips the request and returns `complete`, so entering the code again runs `finalize()` again.
 
@@ -77,7 +77,7 @@ Sign-in:
 Sign-up:
 
 - `start` → `start`
-- `protect` → `protectCheck`, where `SignUpProtect` runs the challenge when it mounts and submits the proof. It takes the challenge token as its `key`, so a chained challenge remounts it and runs again
+- `protect` → `protectCheck`, or `continueProtectCheck` when reached from `continue`, where `SignUpProtect` runs the challenge through shared `runProtectCheck` when it mounts. It takes the challenge token as its `key`, so a chained or reissued challenge remounts it and runs again. The controller keeps the expired-reload count above it, so the cap holds across those remounts. A blocked proof shows `actionBlocked`
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
 - `verify_email` (`target`, `sent`) → `verifyEmail`, or `continueVerifyEmail` when reached from `continue`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`

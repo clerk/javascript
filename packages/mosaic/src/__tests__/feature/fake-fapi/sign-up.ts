@@ -22,6 +22,18 @@ export interface FakeSignUpSeed {
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
   protectChecks?: number;
+  /** The request that raises the Protect check: `create` (default) or the continue screen's `update`. */
+  protectCheckOn?: 'create' | 'update';
+  /** Issue each Protect check already expired. */
+  protectCheckExpired?: boolean;
+  /** Replace an expired Protect check with a fresh one on reload. */
+  reissueProtectCheckOnReload?: boolean;
+  /** Clear the Protect check server-side when the proof arrives and answer `protect_check_already_resolved`, as when another tab solved it. */
+  protectCheckResolvedElsewhere?: boolean;
+  /** Answer the proof with `action_blocked` and these meta values. */
+  protectCheckBlocked?: Record<string, string>;
+  /** The challenge script's source, served at a URL unique to this fake. */
+  protectCheckScript?: string;
 }
 
 export interface FakeSignUpState {
@@ -31,7 +43,14 @@ export interface FakeSignUpState {
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
   protectChecks: number;
+  protectCheckOn?: 'create' | 'update';
+  protectCheckExpired?: boolean;
+  reissueProtectCheckOnReload?: boolean;
+  protectCheckResolvedElsewhere?: boolean;
+  protectCheckBlocked?: Record<string, string>;
+  protectCheckScript?: string;
   issuedProtectChecks: number;
+  reloads: number;
   proofTokens: string[];
   creations: URLSearchParams[];
   updates: URLSearchParams[];
@@ -46,6 +65,7 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     weakPasswords: {},
     protectChecks: 0,
     issuedProtectChecks: 0,
+    reloads: 0,
     proofTokens: [],
     creations: [],
     updates: [],
@@ -76,6 +96,8 @@ export default (container, { token, setWidgetVisible }) =>
   });
 `;
 
+let scriptIds = 0;
+
 const STRATEGIES: Record<string, Identifier> = { email_code: 'email_address', phone_code: 'phone_number' };
 const TEXT_FIELDS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'] as const;
 const createdAt = Date.UTC(2026, 0, 1);
@@ -94,19 +116,24 @@ export function signUpHandlers(
 ) {
   const settings = () => state.environment.user_settings;
   const current = (id: unknown) => (state.client.sign_up?.id === id ? state.client.sign_up : undefined);
-  const issueProtectCheck = (signUp: SignUpJSON): SignUpJSON => {
-    if (state.signUp.issuedProtectChecks >= state.signUp.protectChecks) {
-      return { ...signUp, protect_check: null };
-    }
+  const scriptId = (scriptIds += 1);
+  const protectCheck = (expired: boolean): NonNullable<SignUpJSON['protect_check']> => {
     state.signUp.issuedProtectChecks += 1;
     return {
-      ...signUp,
-      protect_check: {
-        status: 'pending',
-        token: `ptk_${state.signUp.issuedProtectChecks}`,
-        sdk_url: fapiUrl(`/protect-check/challenge.js?round=${state.signUp.issuedProtectChecks}`),
-      },
+      status: 'pending',
+      token: `ptk_${state.signUp.issuedProtectChecks}`,
+      sdk_url: fapiUrl(`/protect-check/challenge.js?round=${state.signUp.issuedProtectChecks}&script=${scriptId}`),
+      ...(expired ? { expires_at: 1 } : {}),
     };
+  };
+  const issueProtectCheck = (signUp: SignUpJSON, on: 'create' | 'update' = 'create'): SignUpJSON => {
+    if (
+      (state.signUp.protectCheckOn ?? 'create') !== on ||
+      state.signUp.issuedProtectChecks >= state.signUp.protectChecks
+    ) {
+      return { ...signUp, protect_check: null };
+    }
+    return { ...signUp, protect_check: protectCheck(Boolean(state.signUp.protectCheckExpired)) };
   };
 
   const store = (signUp: SignUpJSON) => {
@@ -319,7 +346,7 @@ export function signUpHandlers(
       return applied instanceof HttpResponse ? applied : store(settle(issueProtectCheck(applied)));
     }),
     http.get(fapiUrl('/protect-check/challenge.js'), () =>
-      HttpResponse.text(PROTECT_CHECK_SCRIPT, {
+      HttpResponse.text(state.signUp.protectCheckScript ?? PROTECT_CHECK_SCRIPT, {
         headers: { 'Content-Type': 'text/javascript', 'Access-Control-Allow-Origin': '*' },
       }),
     ),
@@ -335,6 +362,19 @@ export function signUpHandlers(
       if (!proofToken) {
         return rejected('form_param_missing', 'proof_token must be included.', 'proof_token');
       }
+      if (state.signUp.protectCheckBlocked) {
+        return rejected(
+          'action_blocked',
+          'This request was blocked.',
+          undefined,
+          403,
+          state.signUp.protectCheckBlocked,
+        );
+      }
+      if (state.signUp.protectCheckResolvedElsewhere) {
+        store(settle({ ...signUp, protect_check: null }));
+        return rejected('protect_check_already_resolved', 'This check has already been resolved.', undefined, 400);
+      }
       if (!signUp.protect_check) {
         return rejected('protect_check_already_resolved', 'This check has already been resolved.', undefined, 400);
       }
@@ -342,7 +382,20 @@ export function signUpHandlers(
         return rejected('protect_check_invalid', 'The verification could not be confirmed.', 'proof_token');
       }
       state.signUp.proofTokens.push(proofToken);
-      return store(settle(issueProtectCheck({ ...signUp, protect_check: null })));
+      return store(settle(issueProtectCheck({ ...signUp, protect_check: null }, state.signUp.protectCheckOn)));
+    }),
+    http.get(fapiUrl('/v1/client/sign_ups/:id'), ({ params }) => {
+      const signUp = current(params.id);
+      if (!signUp) {
+        return missing();
+      }
+      state.signUp.reloads += 1;
+      const expired = signUp.protect_check?.expires_at !== undefined;
+      return store(
+        expired && state.signUp.reissueProtectCheckOnReload
+          ? { ...signUp, protect_check: protectCheck(false) }
+          : signUp,
+      );
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -355,7 +408,10 @@ export function signUpHandlers(
       const body = new URLSearchParams(await request.text());
       state.signUp.updates.push(body);
       const applied = apply(signUp, body);
-      return applied instanceof HttpResponse ? applied : store(settle(applied));
+      if (applied instanceof HttpResponse) {
+        return applied;
+      }
+      return store(settle(state.signUp.protectCheckOn === 'update' ? issueProtectCheck(applied, 'update') : applied));
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id/prepare_verification'), async ({ params, request }) => {
       const signUp = current(params.id);

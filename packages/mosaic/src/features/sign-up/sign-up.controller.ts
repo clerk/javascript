@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
@@ -75,11 +75,11 @@ function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode']
   if (route === undefined || route === 'enterpriseConnections') {
     return 'startOver';
   }
+  if (isBlocked && (route === 'start' || route === 'protectCheck' || route === 'continueProtectCheck')) {
+    return 'actionBlocked';
+  }
   if (route !== 'start') {
     return route;
-  }
-  if (isBlocked) {
-    return 'actionBlocked';
   }
   return mode === 'public' ? 'start' : mode;
 }
@@ -108,6 +108,7 @@ export function useSignUpController(
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const actions = usePendingAction<'startOver'>();
+  const expiredProtectReloads = useRef(0);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
@@ -181,7 +182,7 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
-    protectCheck: { protect: model.protect, onNext: next },
+    protectCheck: { protect: model.protect, onNext: next, expiredReloads: expiredProtectReloads },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

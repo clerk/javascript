@@ -14,13 +14,17 @@ export const signUpRoutes = {
   continueVerifyPhone: 'continue/verify-phone-number',
   enterpriseConnections: 'enterprise-connections',
   protectCheck: 'protect-check',
+  continueProtectCheck: 'continue/protect-check',
   taskChooseOrganization: 'tasks/choose-organization',
 } as const;
 
 export type SignUpRoute = RouteName<typeof signUpRoutes>;
 
 export function detailsRouteFor(route: SignUpRoute): 'start' | 'continue' {
-  return route === 'continue' || route === 'continueVerifyEmail' || route === 'continueVerifyPhone'
+  return route === 'continue' ||
+    route === 'continueVerifyEmail' ||
+    route === 'continueVerifyPhone' ||
+    route === 'continueProtectCheck'
     ? 'continue'
     : 'start';
 }
@@ -39,7 +43,7 @@ export function routeFor(step: SignUpNextStep, from: SignUpRoute): SignUpRoute |
     case 'enterprise_sso':
       return 'enterpriseConnections';
     case 'protect':
-      return 'protectCheck';
+      return underContinue ? 'continueProtectCheck' : 'protectCheck';
     case 'transfer':
     case 'complete':
     case 'unknown':

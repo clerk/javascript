@@ -1,13 +1,12 @@
 import type { ClerkError } from '@clerk/shared/error';
-import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { actionBlockedDetailsFrom } from '@clerk/shared/internal/clerk-js/actionBlocked';
-import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { getSignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
-import { executeProtectCheck } from '@clerk/shared/internal/clerk-js/protectCheck';
+import { runProtectCheck } from '@clerk/shared/internal/clerk-js/protectCheckRunner';
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import type { ActiveIdentifier } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import {
@@ -109,7 +108,8 @@ export interface SignUpProtectModel {
   resolve: (options: {
     container: HTMLDivElement;
     setWidgetVisible: (visible: boolean) => Promise<void>;
-  }) => Promise<SignUpNextStep>;
+    expiredReloads: { current: number };
+  }) => Promise<SignUpCreateResult>;
 }
 
 export interface SignUpReadyModel {
@@ -415,20 +415,37 @@ export function useSignUpModel({
     },
     protect: {
       challengeId: signUp.protectCheck?.token,
-      resolve: async ({ container, setWidgetVisible }) => {
+      resolve: async ({ container, setWidgetVisible, expiredReloads }) => {
         const challenge = signUp.protectCheck;
-        if (!challenge) {
-          return next(signUp);
+        if (challenge) {
+          const outcome = await runProtectCheck<SignUpCreateResult>(
+            {
+              getProtectCheck: () => signUp.protectCheck,
+              getResource: () => next(signUp),
+              reload: () => run(() => signUp.reload()),
+              submitProtectCheck: async params => {
+                const result = await signUp.submitProtectCheck(params);
+                const blocked = blockedBy(result.error);
+                if (blocked) {
+                  return { type: 'blocked', details: blocked };
+                }
+                await run(() => Promise.resolve(result));
+                return next(signUp);
+              },
+            },
+            challenge,
+            {
+              container,
+              expiredReloads,
+              setWidgetVisible,
+              loadTimeoutMs:
+                clerk.__internal_protectChallengeLoadTimeoutMs ?? environment.protectConfig?.challenge_load_timeout_ms,
+            },
+          );
+          if (outcome.status === 'resolved') {
+            return outcome.resource;
+          }
         }
-        if (challenge.expiresAt !== undefined && challenge.expiresAt < Date.now()) {
-          throw new ClerkRuntimeError('Protect verification expired', { code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT });
-        }
-        const proofToken = await executeProtectCheck(challenge, container, {
-          setWidgetVisible,
-          loadTimeoutMs:
-            clerk.__internal_protectChallengeLoadTimeoutMs ?? environment.protectConfig?.challenge_load_timeout_ms,
-        });
-        await run(() => signUp.submitProtectCheck({ proofToken }));
         return next(signUp);
       },
     },

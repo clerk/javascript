@@ -203,7 +203,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['protectCheck']}>{protectCheck}</Flow.Step>
+            <Flow.Step ids={['protectCheck', 'continueProtectCheck']}>{protectCheck}</Flow.Step>
           </>
         )}
       </Flow.Root>

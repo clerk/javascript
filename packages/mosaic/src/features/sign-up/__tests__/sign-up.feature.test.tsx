@@ -1,8 +1,8 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
-import { holdRequests, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiMembership,
@@ -11,6 +11,7 @@ import {
   fapiSignUp,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../__tests__/feature/render';
 import { SignUp } from '../sign-up';
 import {
   codeSent,
@@ -25,6 +26,7 @@ import {
   passwordField,
   renderSignUp,
   renderSignUpWithRouteProbe,
+  RouteProbe,
   SHORT_PASSWORD,
   signedInSession,
   submitStart,
@@ -1009,5 +1011,157 @@ describe('SignUp', () => {
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
     await codeSent();
+  });
+
+  it('continues when the Protect check was already resolved', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckResolvedElsewhere: true } });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.reloads).toBe(1);
+    await codeSent();
+  });
+
+  it('reloads an expired Protect check and shows the timeout when the reload returns it expired', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
+
+    await submitStart(user);
+
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete in time. Please try again."),
+    );
+    expect(fapi.signUp.reloads).toBe(1);
+    expect(fapi.signUp.proofTokens).toEqual([]);
+  });
+
+  it('runs the fresh Protect check Clerk issues when an expired one is reloaded', async () => {
+    const { fapi, user } = await renderSignUp({
+      signUp: { protectChecks: 1, protectCheckExpired: true, reissueProtectCheckOnReload: true },
+    });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.reloads).toBe(1);
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_2']);
+    await codeSent();
+  });
+
+  it('keeps the continue screen as the place to edit after a Protect check raised on it', async () => {
+    const fapi = serveFapi({
+      environment: environment({
+        attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
+      }),
+      signUp: { protectChecks: 1, protectCheckOn: 'update' },
+    });
+    const { clerk } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
+    await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+    await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+    await user.click(continueButton());
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('continue/protect-check');
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('continue/verify-email-address');
+    await codeSent();
+    await user.click(screen.getByRole('button', { name: 'Edit email address' }));
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(1);
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+  });
+
+  it('replaces the Protect check with the blocked notice when the proof is blocked', async () => {
+    const { user } = await renderSignUp({
+      signUp: {
+        protectChecks: 1,
+        protectCheckBlocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' },
+      },
+    });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
+    expect(screen.getByText('Contact support.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  it('clears the failed widget before Try again runs the Protect check again', async () => {
+    const { fapi, user } = await renderSignUp({
+      signUp: {
+        protectChecks: 1,
+        protectCheckScript: `
+export default (container, { token, setWidgetVisible }) =>
+  new Promise((resolve, reject) => {
+    const pass = document.createElement('button');
+    pass.type = 'button';
+    pass.textContent = 'I am human';
+    pass.onclick = () => resolve('proof_' + token);
+    const fail = document.createElement('button');
+    fail.type = 'button';
+    fail.textContent = 'Fail the challenge';
+    fail.onclick = () => reject(new Error('challenge failed'));
+    container.append(pass, fail);
+    void setWidgetVisible?.(true);
+  });
+`,
+      },
+    });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+    await user.click(await screen.findByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'I am human' })).toHaveLength(1));
+    expect(screen.getAllByRole('button', { name: 'Fail the challenge' })).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'I am human' }));
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    await codeSent();
+  });
+
+  it('shows the loading spinner on Try again when the failed widget left itself shown', async () => {
+    const { user } = await renderSignUp({
+      signUp: {
+        protectChecks: 1,
+        protectCheckScript: `
+let runs = 0;
+export default (container, { setWidgetVisible }) => {
+  runs += 1;
+  if (runs > 1) {
+    return new Promise(() => {});
+  }
+  return new Promise((_, reject) => {
+    const fail = document.createElement('button');
+    fail.type = 'button';
+    fail.textContent = 'Fail the challenge';
+    fail.onclick = () => reject(new Error('challenge failed'));
+    container.append(fail);
+    void setWidgetVisible?.(true);
+  });
+};
+`,
+      },
+    });
+
+    await submitStart(user);
+    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+    await user.click(await screen.findByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByRole('progressbar', { name: 'Loading…' })).toBeInTheDocument();
   });
 });

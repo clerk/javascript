@@ -457,6 +457,7 @@ export function ProtectCheck() {
         <SignUpProtect
           protect={{ challengeId: 'ptk_story', resolve: () => new Promise(noop) }}
           onNext={noop}
+          expiredReloads={{ current: 0 }}
         />
       }
     />
