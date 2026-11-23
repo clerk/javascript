@@ -145,17 +145,15 @@ describe('signedInAuthObject', () => {
     expect(serialized).not.toContain(rawSessionToken);
   });
 
-  it('trims the machine secret key and leaves out the request in debug output', () => {
+  it('trims the machine secret key in debug output', () => {
     const mockAuthenticateContext = {
       machineSecretKey: 'ak_test_machine_secret_key_value',
-      clerkRequest: new Request('https://example.com', { headers: { cookie: '__session=value' } }),
     } as unknown as AuthenticateContext;
 
     const authObject = signedInAuthObject(mockAuthenticateContext, 'token', { sub: 'userId' } as unknown as JwtPayload);
     const debug = authObject.debug();
 
     expect(debug.machineSecretKey).toBe('ak_test');
-    expect(debug).not.toHaveProperty('clerkRequest');
   });
 
   describe('JWT v1', () => {

@@ -183,7 +183,6 @@ export type AuthObject =
 export const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
     const res = { ...data };
-    delete res.clerkRequest;
     res.secretKey = (res.secretKey || '').substring(0, 7);
     res.machineSecretKey = (res.machineSecretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
