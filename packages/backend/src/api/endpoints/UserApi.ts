@@ -576,11 +576,7 @@ export class UserAPI extends AbstractAPI {
     const countRequest = this.getCount(userCountParams);
     // The count is not awaited when the page shows the total, so a failure must not go unhandled.
     countRequest.catch(() => {});
-    const data = await this.request<User[]>({
-      method: 'GET',
-      path: basePath,
-      queryParams: params,
-    });
+    const { data } = await this.getUserListWithoutCount(params);
     const totalCount = totalCountFromLastPage(data.length, { limit, offset, startingAfter }) ?? (await countRequest);
     return { data, totalCount } as PaginatedResourceResponse<User[]>;
   }
