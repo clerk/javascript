@@ -1037,7 +1037,8 @@ describe('SignUp social sign-up', () => {
     first: Awaited<ReturnType<typeof renderWithClerk>>,
     options?: Parameters<typeof renderWithClerk>[1],
   ) {
-    const callback = new URL(fapi.signUp.creations.at(-1)?.get('redirect_url') ?? '');
+    const started = [...fapi.signUp.creations, ...fapi.signUp.updates].filter(body => body.has('redirect_url'));
+    const callback = new URL(started.at(-1)?.get('redirect_url') ?? '');
     first.unmount();
     fapi.signUp.returnFromOAuth();
     window.history.replaceState(null, '', `${callback.pathname}${callback.search}`);
@@ -1112,6 +1113,24 @@ describe('SignUp social sign-up', () => {
     expect(await screen.findByText('You did not grant access to your account.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
+  });
+
+  it('keeps the denial on screen when an invitee comes back from Google, and does not redeem the ticket again', async () => {
+    window.history.replaceState(null, '', `${window.location.pathname}?__clerk_ticket=tkt_invite`);
+    const { fapi, first } = await startWithGoogle({
+      signUp: {
+        tickets: { tkt_invite: { emailAddress: EMAIL } },
+        oauth: { oauth_google: { error: { code: 'oauth_access_denied', message: 'Access was denied.' } } },
+      },
+    });
+    expect(fapi.signUp.updates.at(-1)?.get('strategy')).toBe('oauth_google');
+
+    await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByText('You did not grant access to your account.')).toBeInTheDocument();
+    await waitFor(() => expect(window.location.search).not.toContain('__clerk_ticket'));
+    expect(screen.getByText('You did not grant access to your account.')).toBeInTheDocument();
+    expect(fapi.signUp.creations.filter(body => body.get('strategy') === 'ticket')).toHaveLength(1);
   });
 
   it('starts a new sign-up from start even when an earlier one is still on the client', async () => {
