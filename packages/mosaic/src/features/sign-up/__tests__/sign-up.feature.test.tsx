@@ -1023,6 +1023,31 @@ describe('SignUp', () => {
     }
   });
 
+  it('resends the phone code by SMS after switching to SMS from the WhatsApp code screen', async () => {
+    const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+    await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+    await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+    await user.click(continueButton());
+    await codeSent();
+    await user.click(screen.getByRole('button', { name: 'Send code via SMS instead' }));
+    expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+    await codeSent();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
+    try {
+      await act(() => vi.advanceTimersByTimeAsync(30_000));
+      await user.click(await screen.findByRole('button', { name: 'Resend' }));
+
+      await waitFor(() =>
+        expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:sms', 'phone_code:sms']),
+      );
+      expect(screen.getByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+      await codeSent();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('shows a rejected phone number on the WhatsApp phone screen', async () => {
     const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
     const hold = holdRequests('post', '/v1/client/sign_ups');

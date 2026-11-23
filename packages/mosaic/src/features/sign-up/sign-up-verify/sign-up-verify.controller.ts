@@ -24,6 +24,7 @@ type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'SEND_SMS' } | 
 
 const code = setup<CodeContext, CodeEvent>();
 
+// Without a channel, a send goes out over the channel the last code used, which the model reads from the sign-up.
 const clearError = code.assign(() => ({ error: undefined, channel: undefined }));
 
 const sendBySms = {
