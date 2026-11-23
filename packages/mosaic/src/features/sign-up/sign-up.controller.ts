@@ -129,7 +129,7 @@ export function useSignUpController(
 
   useRouteGuard({ route, go }, shown);
 
-  // TODO: With a URL routing mode (#10780) a reload can mount on a sign-up that is already complete. Finalize it
+  // TODO: With a URL routing mode (#10860) a reload can mount on a sign-up that is already complete. Finalize it
   // here, once per mount.
   const next = (nextStep: SignUpNextStep) => {
     if (nextStep.type === 'complete') {
