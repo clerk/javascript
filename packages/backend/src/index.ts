@@ -190,6 +190,7 @@ export type {
   SMSWebhookEvent,
   DirectoryGroupWebhookEvent,
   DirectoryGroupMembershipWebhookEvent,
+  EnterpriseConnectionWebhookEvent,
   UserWebhookEvent,
   WaitlistEntryWebhookEvent,
   WebhookEvent,
