@@ -174,7 +174,7 @@ A pointer selects the category whose center is nearest. A tap selects on contact
 
 ## Selection
 
-The chart holds the selection unless you pass `selection`. `onSelectionChange` is called whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. It is not called when data changes: `chart.selected` resolves the selection against the current data, so a selection whose category disappears reads as null until the user moves.
+The chart holds the selection unless you pass `selection`. `onSelectionChange` is called whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. A data change alone does not call it: `chart.selected` resolves the selection against the current data, so a selection whose category disappears reads as null until the user moves. The exception is data that empties, covered below.
 
 Removing the interaction surface, such as unmounting `Chart.Selection`, ends a pointer or keyboard selection and calls `onSelectionChange` with null, as leaving or blurring the surface does. A selection set through `selection` or `select` stays. `Chart.Selection` also removes its surface when the data has no categories.
 
