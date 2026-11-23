@@ -119,7 +119,7 @@ export default {
     },
     'Chart.StackedBars': {
       description:
-        'A `div` that paints the bars on a Canvas with `role="img"`, and holds one SVG over it for `Chart.ProjectionOutline` and any `Chart.YLine`. Throws outside `Chart.Root`, and when the chart did not come from `Chart.useBarChart`.',
+        'A `div` that paints the bars and the projection outline on a Canvas with `role="img"`, and holds one SVG over it for `Chart.Bar`, `Chart.ProjectionOutline` and any `Chart.YLine`. Throws outside `Chart.Root`, and when the chart did not come from `Chart.useBarChart`.',
     },
     'Chart.Bar': {
       description:
@@ -127,7 +127,7 @@ export default {
     },
     'Chart.ProjectionOutline': {
       description:
-        'An `aria-hidden` `path` that outlines the projected bar 1.5px outside its fill, with concentric top corners and a square bottom on the zero line, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
+        'A hidden `g` whose computed `stroke`, `stroke-width` and `stroke-dasharray` outline the projected bar on the Canvas, 1px outside its fill, with concentric top corners and square ends on the zero line, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
     },
     'Chart.YAxis': {
       description: 'An `aria-hidden` `svg` that holds the Y tick labels in the left margin.',

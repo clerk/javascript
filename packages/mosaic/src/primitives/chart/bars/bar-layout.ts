@@ -160,24 +160,33 @@ function splitNeighbourGap<TDatum>(previous: DraftBarMark<TDatum>, mark: DraftBa
   }
 }
 
-/** Bars at least this wide snap their sides to whole pixels; narrower bars would lose too much width. */
+/** Bars at least this wide snap their sides to whole device pixels; narrower bars would lose too much width. */
 const MIN_SNAPPED_WIDTH = 2;
+
+/** Rounds a CSS length to whole device pixels, which are fractional CSS pixels at a ratio such as 1.25. */
+export function snapToDevicePixels(value: number, pixelRatio: number) {
+  return Math.round(value * pixelRatio) / pixelRatio;
+}
 
 /**
  * Centers a bar of at most `maxWidth` in its category band. Snapping keeps the sides of the bars, the
- * projection and its outline on the same whole pixels, so they paint crisp and line up.
+ * projection and its outline on the same whole device pixels, so they paint crisp and line up.
  */
-function fitBarToBand(band: Readonly<{ x: number; width: number }>, maxWidth: number) {
+function fitBarToBand(band: Readonly<{ x: number; width: number }>, maxWidth: number, pixelRatio: number) {
   const width = Math.min(band.width, maxWidth);
   const x = band.x + (band.width - width) / 2;
   if (width < MIN_SNAPPED_WIDTH) {
     return { x, width };
   }
-  const left = Math.round(x);
-  return { x: left, width: Math.round(x + width) - left };
+  const left = snapToDevicePixels(x, pixelRatio);
+  return { x: left, width: snapToDevicePixels(x + width, pixelRatio) - left };
 }
 
-function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWidth, gap }: BarGeometry) {
+function projectMarksAndPaintInsets<TDatum>(
+  layout: MarkSource<TDatum>,
+  { maxWidth, gap }: BarGeometry,
+  pixelRatio: number,
+) {
   const { categories, scaleY } = layout;
   const marks: DraftBarMark<TDatum>[] = [];
   const previousMarkByStack = new Map<string, DraftBarMark<TDatum>>();
@@ -192,7 +201,7 @@ function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWid
     const rawTop = Math.min(scaleY(point.start), scaleY(point.end));
     const rawBottom = Math.max(scaleY(point.start), scaleY(point.end));
     const height = Math.max(0, rawBottom - rawTop);
-    const fitted = fitBarToBand(category, maxWidth);
+    const fitted = fitBarToBand(category, maxWidth, pixelRatio);
     const stackKey = `${point.datumIndex}:${point.positive}`;
     const previousMark = previousMarkByStack.get(stackKey);
     const mark: DraftBarMark<TDatum> = {
@@ -364,8 +373,12 @@ export type StackedBarLayout<TDatum> = ReturnType<typeof projectStackedBars<TDat
 type MarkSource<TDatum> = Pick<StackedBarLayout<TDatum>, 'prepared' | 'scaleY'> &
   Readonly<{ categories: readonly BarCategory[] }>;
 
-export function projectStackedBarMarks<TDatum>(layout: MarkSource<TDatum>, geometry: BarGeometry): BarMark<TDatum>[] {
-  return applyCornerRadii(projectMarksAndPaintInsets(layout, geometry), geometry);
+export function projectStackedBarMarks<TDatum>(
+  layout: MarkSource<TDatum>,
+  geometry: BarGeometry,
+  pixelRatio: number,
+): BarMark<TDatum>[] {
+  return applyCornerRadii(projectMarksAndPaintInsets(layout, geometry, pixelRatio), geometry);
 }
 
 /** The projection fill as the Canvas paints it: `radius` rounds the top corners, and the bottom is square on zero. */
@@ -374,13 +387,14 @@ export type PaintedProjection = NonNullable<StackedBarLayout<unknown>['projectio
 export function fitProjectionToBar(
   projection: StackedBarLayout<unknown>['projection'],
   { maxWidth, outerRadius }: BarGeometry,
+  pixelRatio: number,
 ): PaintedProjection | null {
   if (!projection) {
     return null;
   }
-  const { x, width } = fitBarToBand(projection, maxWidth);
+  const { x, width } = fitBarToBand(projection, maxWidth, pixelRatio);
   const bottom = projection.y + projection.height;
-  const y = Math.min(Math.round(projection.y), bottom);
+  const y = Math.min(snapToDevicePixels(projection.y, pixelRatio), bottom);
   const height = bottom - y;
   return {
     ...projection,

@@ -82,7 +82,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, inside any chart SVG          |
 | `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
-| `Chart.ProjectionOutline` | `<path>`        | Outlines the projected bar                                           |
+| `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels in the left margin                           |
 | `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
 | `Chart.XAxis`             | `<svg>`         | Holds the category labels below the plot                             |
@@ -326,11 +326,13 @@ Tailwind reads `_` inside `data-[…]` as a space, so a key such as `first_activ
 | Top corner radius    | The corners at a stack's outer end, mirrored below zero | Square         |
 | Bottom corner radius | Every other corner                                      | Square         |
 
-The geometry is paint only. Selection, the cursor and the scales use the category band. Bars 2px or wider snap their sides to whole pixels, and the projection also snaps its top. `Chart.ProjectionOutline` traces the projection fill the Canvas paints, 1.5px outside it, so a 1px stroke covers whole pixels and leaves a 1px gap. Its top corner radius is the fill's plus 1.5px, so the corners stay concentric, and its bottom corners are square on the zero line.
+The geometry is paint only. Selection, the cursor and the scales use the category band. Bars 2px or wider snap their sides to whole device pixels, and the projection also snaps its top, so edges stay crisp at a pixel ratio such as 1.25.
+
+`Chart.ProjectionOutline` styles the outline the Canvas strokes around the projection fill, in the same pass, so the two stay aligned at any pixel ratio. The Canvas reads its computed `stroke`, `stroke-width` and `stroke-dasharray`; unstyled, its `stroke` is `none` and nothing is drawn. The outline leaves a 1px gap outside the fill. The gap, and a stroke one device pixel or wider, round to whole device pixels, so both sides match. Its top corner radius is the fill's plus that offset, so the corners stay concentric, and its sides end square on the zero line.
 
 The Canvas repaints in the same frame when:
 
-- `Chart.Bar` mounts, unmounts or changes `class`
+- `Chart.Bar` or `Chart.ProjectionOutline` mounts, unmounts or changes `class`
 - any attribute on an ancestor of `Chart.Bar`, up to `<html>`, changes and a color the bars paint computes to a new value, so a theme switched through a class, `style`, `data-theme` or any other attribute repaints the bars, and an unrelated attribute change does not
 - `prefers-color-scheme` changes and a color the bars paint computes to a new value, so `light-dark()` colors under `color-scheme: light dark` follow the OS
 - the pixel ratio changes (capped at 2)
@@ -350,7 +352,7 @@ Root does not reorder its children, so paint order is JSX order. Write the parts
 
 Each container renders nothing until Root has measured a non-zero size.
 
-Inside `Chart.StackedBars`, put `Chart.ProjectionOutline` before the zero `Chart.YLine`. The position of `Chart.Bar` does not matter.
+Inside `Chart.StackedBars`, the position of `Chart.Bar` and `Chart.ProjectionOutline` does not matter: both are hidden, and the Canvas paints under every `Chart.YLine`.
 
 ## Layout
 
