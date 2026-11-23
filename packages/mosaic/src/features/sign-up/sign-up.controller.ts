@@ -106,10 +106,12 @@ export function useSignUpController(
   const liveStep = liveModel.flow.step;
   const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
-  const [arrivedSignedIn] = useState(liveStep.type === 'signed_in');
-  const [leaveOnArrival] = useState(() => (liveStep.type === 'signed_in' ? liveModel.flow.leave : undefined));
+  const [signedInOnArrival] = useState(() =>
+    liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined,
+  );
+  const arrivedSignedIn = signedInOnArrival !== undefined;
 
-  useEffect(() => leaveOnArrival?.(), [leaveOnArrival]);
+  useEffect(() => signedInOnArrival?.leave?.(), [signedInOnArrival]);
 
   // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
   // `useMachine`, in its own PR, so both controllers drop this effect.
@@ -121,8 +123,7 @@ export function useSignUpController(
   const { flow, app, navigation, verification } = model;
   const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
   const isHidden =
-    liveStep.type === 'signed_in' &&
-    (finishSnapshot.value === 'finished' || (arrivedSignedIn && liveModel.flow.leave !== undefined));
+    liveStep.type === 'signed_in' && (finishSnapshot.value === 'finished' || signedInOnArrival?.leave !== undefined);
   const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
   const screen = screenFor(shown, flow);
 
