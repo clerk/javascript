@@ -16,40 +16,142 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/chart/index.ts',
 };
 
+/** Weekly active users, as Dashboard's overview reports them. The last week is still in progress. */
 const growth = [
-  { week: '2026-01-05', signups: 40, returning: 22, churned: -14 },
-  { week: '2026-01-12', signups: 52, returning: 30, churned: -18 },
-  { week: '2026-01-19', signups: 36, returning: 26, churned: -22 },
-  { week: '2026-01-26', signups: 61, returning: 34, churned: -12 },
-  { week: '2026-02-02', signups: 48, returning: 29, churned: -25 },
-  { week: '2026-02-09', signups: 55, returning: 41, churned: -17 },
+  {
+    week: '2026-01-05',
+    retained: 120,
+    reactivated: 18,
+    new: 34,
+    retainedChurned: -22,
+    reactivatedChurned: -9,
+    newChurned: -15,
+  },
+  {
+    week: '2026-01-12',
+    retained: 128,
+    reactivated: 22,
+    new: 41,
+    retainedChurned: -25,
+    reactivatedChurned: -11,
+    newChurned: -18,
+  },
+  {
+    week: '2026-01-19',
+    retained: 131,
+    reactivated: 19,
+    new: 38,
+    retainedChurned: -24,
+    reactivatedChurned: -12,
+    newChurned: -16,
+  },
+  {
+    week: '2026-01-26',
+    retained: 137,
+    reactivated: 25,
+    new: 46,
+    retainedChurned: -27,
+    reactivatedChurned: -10,
+    newChurned: -20,
+  },
+  {
+    week: '2026-02-02',
+    retained: 142,
+    reactivated: 21,
+    new: 43,
+    retainedChurned: -29,
+    reactivatedChurned: -13,
+    newChurned: -19,
+  },
+  {
+    week: '2026-02-09',
+    retained: 150,
+    reactivated: 27,
+    new: 52,
+    retainedChurned: -28,
+    reactivatedChurned: -12,
+    newChurned: -22,
+  },
+  {
+    week: '2026-02-16',
+    retained: 155,
+    reactivated: 24,
+    new: 49,
+    retainedChurned: -31,
+    reactivatedChurned: -14,
+    newChurned: -21,
+  },
+  {
+    week: '2026-02-23',
+    retained: 158,
+    reactivated: 14,
+    new: 27,
+    retainedChurned: -12,
+    reactivatedChurned: -6,
+    newChurned: -9,
+  },
 ];
 
 type GrowthRow = (typeof growth)[number];
 
+// Related series share a hue: gains are tints of the first palette color, churn steps of the text
+// colors, so every step stays visible in light and dark. Each reads a CSS variable first, so a
+// theme can set the exact colors.
+const gain = (percent: number) => `color-mix(in oklab, var(--cl-color-chart-1) ${percent}%, white)`;
+const faintText = 'color-mix(in oklab, var(--cl-color-foreground-secondary) 50%, var(--cl-color-surface))';
+
 const series: ChartSeries<GrowthRow>[] = [
-  { key: 'signups', label: 'Sign-ups', color: 1, value: row => row.signups },
-  { key: 'returning', label: 'Returning', color: 2, value: row => row.returning },
-  { key: 'churned', label: 'Churned', color: 3, value: row => row.churned },
+  { key: 'retained', label: 'Retained', color: `var(--users-retained, ${gain(100)})`, value: row => row.retained },
+  {
+    key: 'reactivated',
+    label: 'Reactivated',
+    color: `var(--users-reactivated, ${gain(60)})`,
+    value: row => row.reactivated,
+  },
+  { key: 'new', label: 'New', color: `var(--users-new, ${gain(30)})`, value: row => row.new },
+  {
+    key: 'retainedChurned',
+    label: 'Retained churned',
+    color: `var(--churned-retained, var(--cl-color-foreground))`,
+    value: row => row.retainedChurned,
+  },
+  {
+    key: 'reactivatedChurned',
+    label: 'Reactivated churned',
+    color: `var(--churned-reactivated, var(--cl-color-foreground-secondary))`,
+    value: row => row.reactivatedChurned,
+  },
+  { key: 'newChurned', label: 'New churned', color: `var(--churned-new, ${faintText})`, value: row => row.newChurned },
 ];
 
 const getWeek = (row: GrowthRow) => row.week;
 
+const lastWeek = growth.length - 1;
+
+/** The week in progress, projected from its pace so far. */
+const projection = {
+  datumIndex: lastWeek,
+  value: 245,
+  label: 'Projected',
+  description: 'Projected active users for the week in progress',
+};
+
 export function Default() {
-  const chart = Chart.useBarChart({ data: growth, series, index: getWeek });
+  const chart = Chart.useBarChart({ data: growth, series, index: getWeek, projection });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly growth'
+      aria-label='Weekly active users'
     >
       <Chart.Legend />
       <Chart.Grid />
       <Chart.StackedBars>
         <Chart.Bar />
+        <Chart.ProjectionOutline />
         <Chart.YLine value={0} />
       </Chart.StackedBars>
       <Chart.YAxis />
-      <Chart.XAxis />
+      <Chart.XAxis ticks='calendar' />
       <Chart.Selection>
         <Chart.Cursor />
         <Chart.Tooltip />
@@ -108,7 +210,7 @@ export function Palette() {
 }
 
 export function Highlight() {
-  const [selection, setSelection] = useState<BarSelection | null>({ category: '2026-02-02', section: 'positive' });
+  const [selection, setSelection] = useState<BarSelection | null>({ category: '2026-02-16', section: 'positive' });
   const chart = Chart.useBarChart({
     data: growth,
     series,
@@ -120,7 +222,7 @@ export function Highlight() {
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly growth'
+      aria-label='Weekly active users'
     >
       <DefaultParts />
     </Chart.Root>
@@ -132,17 +234,12 @@ export function Projection() {
     data: growth,
     series,
     index: getWeek,
-    projection: {
-      datumIndex: growth.length - 1,
-      value: 115,
-      label: 'Projected',
-      description: 'Projected sign-ups and returning users for the week in progress',
-    },
+    projection,
   });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly growth'
+      aria-label='Weekly active users'
     >
       <DefaultParts />
     </Chart.Root>
@@ -154,7 +251,7 @@ export function Empty() {
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly growth'
+      aria-label='Weekly active users'
     >
       <DefaultParts />
     </Chart.Root>
@@ -176,7 +273,7 @@ export function RenderError() {
       <Chart.Root
         ref={root}
         chart={chart}
-        aria-label='Weekly growth'
+        aria-label='Weekly active users'
       >
         <DefaultParts />
       </Chart.Root>
@@ -189,7 +286,7 @@ export function DarkMode() {
     data: growth,
     series,
     index: getWeek,
-    projection: { datumIndex: growth.length - 1, value: 115, label: 'Projected' },
+    projection,
   });
   return (
     <div
@@ -204,7 +301,7 @@ export function DarkMode() {
     >
       <Chart.Root
         chart={chart}
-        aria-label='Weekly growth'
+        aria-label='Weekly active users'
       >
         <DefaultParts />
       </Chart.Root>

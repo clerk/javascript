@@ -74,16 +74,22 @@ html[data-swingset-theme='clerk'] {
     0 0 2px 0 light-dark(rgb(0 0 0 / 0.08), transparent), 0 0 3px 0 light-dark(transparent, rgb(0 0 0 / 0.2));
 }
 
-/* The Dashboard's overview growth chart. It colors series by meaning; the slots follow the stories'
-   order: 1 sign-ups (first active), 2 returning (reactivated), 3 churned (retained churned), then the
-   rest of the ramp. */
+/* The Dashboard's overview "Active users" chart colors related series as ramps: purple for retained,
+   reactivated and new users, gray for their churn. The chart stories read these variables, and the
+   palette slots take them in stack order. */
 html[data-swingset-theme='clerk'] {
-  --cl-color-chart-1: light-dark(#ccc8ff, #bab0ff);
-  --cl-color-chart-2: light-dark(#9280ff, #846bff);
-  --cl-color-chart-3: light-dark(#232328, #adadb7);
-  --cl-color-chart-4: light-dark(#6c47ff, #4d06d1);
-  --cl-color-chart-5: light-dark(#c7c7cf, #4c4c5c);
-  --cl-color-chart-6: light-dark(#90909d, #767684);
+  --users-retained: light-dark(#6c47ff, #4d06d1);
+  --users-reactivated: light-dark(#9280ff, #846bff);
+  --users-new: light-dark(#ccc8ff, #bab0ff);
+  --churned-retained: #232328;
+  --churned-reactivated: light-dark(#90909d, #3d3d4a);
+  --churned-new: light-dark(#c7c7cf, #767684);
+  --cl-color-chart-1: var(--users-retained);
+  --cl-color-chart-2: var(--users-reactivated);
+  --cl-color-chart-3: var(--users-new);
+  --cl-color-chart-4: var(--churned-retained);
+  --cl-color-chart-5: var(--churned-reactivated);
+  --cl-color-chart-6: var(--churned-new);
   --cl-color-chart-grid: light-dark(#dbdbe0, #3d3d4a);
   --cl-color-chart-tooltip: light-dark(#ffffff, #111113);
   --cl-chart-inactive-mix: 50%;

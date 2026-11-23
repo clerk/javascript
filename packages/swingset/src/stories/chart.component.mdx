@@ -7,6 +7,10 @@ styles applied, plus a legend and tooltip content. The anatomy is the same in bo
 example below is the primitive page's example, styled. It inherits the primitive's pointer and
 keyboard selection and its announcements.
 
+The example is Dashboard's weekly "Active users" chart: retained, reactivated and new users above
+zero, their churn below, and the week in progress projected. Switch Swingset to the Clerk theme to
+see it in Dashboard's colors.
+
 ## Example
 
 <Story
@@ -23,19 +27,30 @@ one line per part. Define `series` and `index` at module level or memoize them.
 ```tsx
 import { Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
 
+const gain = (percent: number) => `color-mix(in oklab, var(--cl-color-chart-1) ${percent}%, white)`;
+const faintText = 'color-mix(in oklab, var(--cl-color-foreground-secondary) 50%, var(--cl-color-surface))';
+
 const series: ChartSeries<Week>[] = [
-  { key: 'signups', label: 'Sign-ups', color: 1, value: week => week.signups },
-  { key: 'returning', label: 'Returning', color: 2, value: week => week.returning },
-  { key: 'churned', label: 'Churned', color: 3, value: week => week.churned },
+  { key: 'retained', label: 'Retained', color: gain(100), value: week => week.retained },
+  { key: 'reactivated', label: 'Reactivated', color: gain(60), value: week => week.reactivated },
+  { key: 'new', label: 'New', color: gain(30), value: week => week.new },
+  { key: 'retainedChurned', label: 'Retained churned', color: 'var(--cl-color-foreground)', value: week => week.retainedChurned },
+  { key: 'reactivatedChurned', label: 'Reactivated churned', color: 'var(--cl-color-foreground-secondary)', value: week => week.reactivatedChurned },
+  { key: 'newChurned', label: 'New churned', color: faintText, value: week => week.newChurned },
 ];
 const getWeek = (week: Week) => week.week;
 
-function WeeklyGrowth({ weeks }: { weeks: Week[] }) {
-  const chart = Chart.useBarChart({ data: weeks, index: getWeek, series });
+function ActiveUsers({ weeks, projected }: { weeks: Week[]; projected: number }) {
+  const chart = Chart.useBarChart({
+    data: weeks,
+    index: getWeek,
+    series,
+    projection: { datumIndex: weeks.length - 1, value: projected, label: 'Projected' },
+  });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly growth'
+      aria-label='Weekly active users'
     >
       <Chart.Legend />
       <Chart.Grid />
@@ -56,7 +71,9 @@ function WeeklyGrowth({ weeks }: { weeks: Week[] }) {
 
 Each series names its color: a palette slot from `1` to `6`, which reads `--cl-color-chart-<n>`, or
 any CSS color. The legend, the bars and the tooltip read that one field, so filtering the list never
-recolors the series that remain.
+recolors the series that remain. Give unrelated series separate slots. Give related series, such as
+a measure and its churn, steps of one hue, as above, so the chart reads as gains and losses rather
+than six categories.
 
 Besides `data`, `index` and `series`, the hook takes `highlight`, `projection`, `formatValue`,
 `formatCategory`, `categoryGap`, `margin`, `selection`, `onSelectionChange` and `onActivate`. Keys in
