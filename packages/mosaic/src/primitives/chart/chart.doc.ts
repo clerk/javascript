@@ -127,7 +127,7 @@ export default {
     },
     'Chart.ProjectionOutline': {
       description:
-        'An `aria-hidden` `rect` that outlines the projected bar, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
+        'An `aria-hidden` `path` that outlines the projected bar 1.5px outside its fill, with concentric top corners and a square bottom on the zero line, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
     },
     'Chart.YAxis': {
       description: 'An `aria-hidden` `svg` that holds the Y tick labels in the left margin.',

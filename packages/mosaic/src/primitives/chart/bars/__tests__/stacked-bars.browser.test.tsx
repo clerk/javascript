@@ -24,6 +24,10 @@ beforeAll(async () => {
     html.dark .themed { color: rgb(0, 0, 255); }
     .scheme { color-scheme: light dark; color: light-dark(rgb(255, 0, 0), rgb(0, 0, 255)); }
     .dark-scope .scoped { color: rgb(0, 0, 255); }
+    .projected { max-width: 32px; border-radius: 4px 4px 2px 2px; color: rgb(0, 0, 255); }
+    .projected[data-projection] { color: rgb(255, 0, 0); }
+    .outline { fill: none; stroke: rgb(0, 0, 0); }
+    .outline.hairline { stroke-width: 0.25px; }
   `;
   document.head.append(style);
 });
@@ -199,6 +203,128 @@ describe('painting', () => {
 
     await expect.poll(() => surface()).toBeTruthy();
     expect(pixelAt(x, y)).toBe('rgba(0, 0, 0, 0)');
+  });
+});
+
+describe('the projection outline', () => {
+  const RADIUS = 4;
+  const projection = { datumIndex: months.length - 1, value: 120 };
+
+  function ProjectedChart({ outlineClassName = 'outline' }: { outlineClassName?: string }) {
+    return (
+      <div
+        data-testid='projected'
+        style={{ background: 'white' }}
+      >
+        <Chart
+          width={640}
+          barClassName='projected'
+          outlineClassName={outlineClassName}
+          projection={projection}
+        />
+      </div>
+    );
+  }
+
+  /** The projection fill's edges in CSS pixels: the run of opaque projection color on the Canvas. */
+  function projectionFill() {
+    const canvas = screen.getByRole('img', { name: 'Growth' });
+    const { width, height } = canvas.getBoundingClientRect();
+    const red = 'rgba(255, 0, 0, 255)';
+    const row = Array.from({ length: width }, (_, x) => x).filter(x => pixelAt(x, 20) === red);
+    const left = Math.min(...row);
+    const right = Math.max(...row) + 1;
+    const column = Array.from({ length: height }, (_, y) => y).filter(
+      y => pixelAt(Math.floor((left + right) / 2), y) === red,
+    );
+    return { left, right, top: Math.min(...column) };
+  }
+
+  /** What the screen shows at CSS pixels, by decoding a screenshot of the chart. */
+  async function screenPixels() {
+    const chart = screen.getByTestId('projected');
+    const base64 = await page.elementLocator(chart).screenshot({ save: false });
+    const image = new Image();
+    image.src = `data:image/png;base64,${base64}`;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    context?.drawImage(image, 0, 0);
+    const origin = chart.getBoundingClientRect();
+    const ratio = image.width / origin.width;
+    const canvasBox = screen.getByRole('img', { name: 'Growth' }).getBoundingClientRect();
+    return (x: number, y: number) => {
+      const px = Math.floor((x + canvasBox.left - origin.left) * ratio);
+      const py = Math.floor((y + canvasBox.top - origin.top) * ratio);
+      const [r, g, b] = context?.getImageData(px, py, 1, 1).data ?? [];
+      return `rgb(${r}, ${g}, ${b})`;
+    };
+  }
+
+  function outline() {
+    const element = document.querySelector('.outline');
+    if (!(element instanceof SVGGeometryElement)) {
+      throw new Error('The projection outline is not an SVG shape');
+    }
+    return element;
+  }
+
+  const fill = 'rgb(255, 0, 0)';
+  const gap = 'rgb(255, 255, 255)';
+  const stroke = 'rgb(0, 0, 0)';
+
+  it('draws a crisp 1px stroke 1px outside the fill on both sides and the top', async () => {
+    await render(<ProjectedChart />);
+    await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
+    const { left, right, top } = projectionFill();
+    const at = await screenPixels();
+    const middle = top + 10.5;
+    const center = (left + right) / 2;
+
+    expect([left - 2.5, left - 1.5, left - 0.5, left + 0.5].map(x => at(x, middle))).toEqual([gap, stroke, gap, fill]);
+    expect([right - 0.5, right + 0.5, right + 1.5, right + 2.5].map(x => at(x, middle))).toEqual([
+      fill,
+      gap,
+      stroke,
+      gap,
+    ]);
+    expect([top - 2.5, top - 1.5, top - 0.5, top + 0.5].map(y => at(center, y))).toEqual([gap, stroke, gap, fill]);
+  });
+
+  it('keeps the top corners concentric with the fill', async () => {
+    await render(<ProjectedChart outlineClassName='outline hairline' />);
+    await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
+    const { left, right, top } = projectionFill();
+    const distance = RADIUS + 1.5;
+    const missed: string[] = [];
+    for (let degrees = 0; degrees <= 90; degrees += 15) {
+      const angle = (degrees * Math.PI) / 180;
+      const dx = distance * Math.cos(angle);
+      const dy = distance * Math.sin(angle);
+      for (const [x, y] of [
+        [left + RADIUS - dx, top + RADIUS - dy],
+        [right - RADIUS + dx, top + RADIUS - dy],
+      ]) {
+        if (!outline().isPointInStroke(new DOMPoint(x, y))) {
+          missed.push(`${degrees}deg (${x.toFixed(2)}, ${y.toFixed(2)})`);
+        }
+      }
+    }
+
+    expect(missed).toEqual([]);
+  });
+
+  it('meets the zero line with square bottom corners', async () => {
+    await render(<ProjectedChart outlineClassName='outline hairline' />);
+    await expect.poll(() => pixelAt(insideLastBar().x, 20.5)).toBe('rgba(255, 0, 0, 255)');
+    const { left, right } = projectionFill();
+    const zero = Number(document.querySelector('line')?.getAttribute('y1'));
+    const inStroke = (x: number, y: number) => outline().isPointInStroke(new DOMPoint(x, y));
+
+    expect([inStroke(left - 1.5, zero - 0.1), inStroke(right + 1.5, zero - 0.1)]).toEqual([true, true]);
+    expect([inStroke(left - 1.5, zero + 0.5), inStroke(right + 1.5, zero + 0.5)]).toEqual([false, false]);
   });
 });
 

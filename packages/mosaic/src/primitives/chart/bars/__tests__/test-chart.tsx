@@ -24,6 +24,7 @@ export type TestChartProps<TDatum> = Pick<
   /** Mounts `Chart.Bar`. Default: true */
   bar?: boolean;
   barClassName?: string;
+  outlineClassName?: string;
   /** Receives the chart object after each render. */
   chartRef?: { current: BarChartInstance<TDatum> | null };
 };
@@ -38,6 +39,7 @@ export function TestChart<TDatum>({
   height,
   bar = true,
   barClassName,
+  outlineClassName,
   chartRef,
   ...options
 }: TestChartProps<TDatum>) {
@@ -55,7 +57,7 @@ export function TestChart<TDatum>({
     >
       <Chart.StackedBars>
         {bar ? <Chart.Bar className={barClassName} /> : null}
-        <Chart.ProjectionOutline />
+        <Chart.ProjectionOutline className={outlineClassName} />
         <Chart.YLine value={0} />
       </Chart.StackedBars>
       <Chart.XAxis format={formatXTick}>
