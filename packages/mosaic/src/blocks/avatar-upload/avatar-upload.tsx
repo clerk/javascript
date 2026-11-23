@@ -25,6 +25,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { AVATAR_UPLOAD, cropAvatar, croppedFile, skipsCrop } from '../../utils/avatar-upload';
+import { initials } from '../../utils/initials';
 import { avatarUploadDropzoneScope } from './avatar-upload.markers.stylex';
 import { styles } from './avatar-upload.styles';
 
@@ -379,13 +380,4 @@ function useAvatarUploadContext() {
     throw new Error('AvatarUpload parts must be rendered inside <AvatarUpload.Root>');
   }
   return context;
-}
-
-function initials(name: string) {
-  return name
-    .split(/\s+/)
-    .map(part => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 }

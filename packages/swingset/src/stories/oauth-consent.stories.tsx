@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { manyScopes, organizationScopes, useOAuthConsentFixture } from './fixtures/oauth-consent';
+import { dashboardLogomark, manyScopes, organizationScopes, useOAuthConsentFixture } from './fixtures/oauth-consent';
 
 export { default as __source } from './oauth-consent.stories?raw';
 
@@ -185,6 +185,15 @@ export function MetadataDocument() {
   const props = useOAuthConsentFixture({
     clientIdentity: { registration: 'metadata_document', metadataHost: 'claude.ai' },
   });
+  return (
+    <Card.Root align='center'>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
+}
+
+export function DashboardLogomark() {
+  const props = useOAuthConsentFixture(dashboardLogomark);
   return (
     <Card.Root align='center'>
       <OAuthConsentView {...props} />

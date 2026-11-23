@@ -229,6 +229,106 @@ describe('OAuthConsent', () => {
     });
   });
 
+  describe('logos', () => {
+    const OAUTH_LOGO = `${PIXEL}#oauth`;
+    const APP_LOGO = `${PIXEL}#app`;
+    const APP_LOGOMARK = `${PIXEL}#logomark`;
+    const withLogos = (oauthLogo: string, appLogo: string) =>
+      signedIn({
+        oauthConsent: consent({ oauth_application_logo_url: oauthLogo }),
+        environment: fapiEnvironment({ display_config: { logo_image_url: appLogo } }),
+      });
+    const arrow = (container: HTMLElement) => container.querySelector('.cl-card-media .cl-icon');
+    it('shows the OAuth application logo and the application logo with an arrow between them', async () => {
+      visitOAuthConsent();
+      const { container } = await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO));
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Linear' })).toHaveAttribute('src', OAUTH_LOGO);
+      expect(await screen.findByRole('img', { name: 'Acme' })).toHaveAttribute('src', APP_LOGO);
+      expect(arrow(container)).not.toBeNull();
+    });
+
+    it('fits the application logo inside the avatar without cropping it', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO));
+
+      await ready();
+      expect(getComputedStyle(await screen.findByRole('img', { name: 'Acme' })).objectFit).toBe('contain');
+    });
+
+    it('covers the avatar with the logomark set in the Clerk Dashboard in place of the application logo', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(
+        signedIn({
+          oauthConsent: consent({ oauth_application_logo_url: OAUTH_LOGO }),
+          environment: fapiEnvironment({
+            display_config: { logo_image_url: APP_LOGO, logomark_image_url: APP_LOGOMARK },
+          }),
+        }),
+      );
+
+      await ready();
+      const logomark = await screen.findByRole('img', { name: 'Acme' });
+      expect(logomark).toHaveAttribute('src', APP_LOGOMARK);
+      expect(getComputedStyle(logomark).objectFit).toBe('cover');
+    });
+
+    it('shows the OAuth application initials and the application logo when the OAuth application has no logo', async () => {
+      visitOAuthConsent();
+      const { container } = await renderOAuthConsent(withLogos('', APP_LOGO));
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Acme' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Linear' })).toBeNull();
+      expect(screen.getByText('L')).toBeVisible();
+      expect(arrow(container)).not.toBeNull();
+    });
+
+    it.each([
+      ['claude.ai', 'Claude'],
+      ['claude.com', 'Claude'],
+      ['anthropic.com', 'Claude'],
+      ['chatgpt.com', 'ChatGPT'],
+      ['openai.com', 'ChatGPT'],
+      [' Claude.AI ', 'Claude'],
+    ])('shows the %s client logo when the OAuth application has no logo', async (domain, client) => {
+      visitOAuthConsent();
+      const { container } = await renderOAuthConsent(
+        signedIn({
+          oauthConsent: consent({ oauth_application_logo_url: '', redirect_domain: domain }),
+          environment: fapiEnvironment({ display_config: { logo_image_url: APP_LOGO } }),
+        }),
+      );
+
+      await ready();
+      expect(await screen.findByRole('img', { name: client })).toBeVisible();
+      expect(arrow(container)).not.toBeNull();
+    });
+
+    it('prefers the OAuth application logo over a known client logo', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(
+        signedIn({
+          oauthConsent: consent({ oauth_application_logo_url: OAUTH_LOGO, redirect_domain: 'claude.ai' }),
+        }),
+      );
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Linear' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Claude' })).toBeNull();
+    });
+
+    it('shows the OAuth application initials alone when there are no logos', async () => {
+      visitOAuthConsent();
+      const { container } = await renderOAuthConsent(withLogos('', ''));
+
+      await ready();
+      expect(screen.getByText('L')).toBeVisible();
+      expect(arrow(container)).toBeNull();
+    });
+  });
+
   describe('redirect domain', () => {
     it('warns about the domain the Frontend API reports, and where the user will land', async () => {
       visitOAuthConsent();

@@ -48,6 +48,14 @@ export const manyScopes: OAuthConsentScopeRecord[] = [
   { scope: 'webhooks', description: 'Create and delete webhooks in your workspace' },
 ];
 
+export const dashboardLogomark: Partial<OAuthConsentReadyModel> = {
+  oauthApplicationName: 'Claude',
+  knownClient: 'claude',
+  redirectUrl: 'https://claude.ai/api/mcp/auth_callback',
+  redirectDomain: 'claude.ai',
+  applicationLogomarkUrl: 'https://clerk.com/v2/downloads/avatar-square-primary-light.png',
+};
+
 const SUBMIT_ROUND_TRIP_MS = 1500;
 
 function useMockSubmit() {

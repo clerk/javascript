@@ -23,6 +23,7 @@ export const DUMMY_TEST_LARGE_JSON = {
     },
     preferred_sign_in_strategy: 'password',
     logo_image_url: '',
+    logomark_image_url: '',
     favicon_image_url: '',
     home_url: '',
     sign_in_url: '',

@@ -30,7 +30,7 @@ export const styles = stylex.create({
   },
 
   overlay: {
-    outlineColor: colorVars['--cl-color-neutral-alpha-100'],
+    outlineColor: colorVars['--cl-color-neutral-subtle'],
     outlineOffset: '-1px',
     outlineStyle: 'solid',
     outlineWidth: '1px',

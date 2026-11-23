@@ -87,6 +87,7 @@ describe('Environment', () => {
         },
         preferred_sign_in_strategy: 'password',
         logo_image_url: '',
+        logomark_image_url: 'https://img.clerk.com/logomark.png',
         favicon_image_url: '',
         home_url: '',
         sign_in_url: '',
@@ -303,6 +304,7 @@ describe('Environment', () => {
         branded: true,
         showDevModeWarning: true,
         preferredSignInStrategy: 'password',
+        logomarkImageUrl: 'https://img.clerk.com/logomark.png',
         theme: expect.objectContaining({
           general: expect.objectContaining({
             color: '#6c47ff',
@@ -373,6 +375,7 @@ describe('Environment', () => {
         },
         preferred_sign_in_strategy: 'password',
         logo_image_url: '',
+        logomark_image_url: 'https://img.clerk.com/logomark.png',
         favicon_image_url: '',
         home_url: '',
         sign_in_url: '',
@@ -593,6 +596,7 @@ describe('Environment', () => {
         branded: true,
         show_devmode_warning: true,
         preferred_sign_in_strategy: 'password',
+        logomark_image_url: 'https://img.clerk.com/logomark.png',
       }),
       user_settings: expect.objectContaining({
         attributes: expect.objectContaining({

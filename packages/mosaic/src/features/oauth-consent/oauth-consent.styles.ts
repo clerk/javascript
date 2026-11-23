@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  logos: { gap: space['3'], alignItems: 'center', display: 'flex', justifyContent: 'center' },
   skeletonCentered: { marginInline: 'auto' },
   skeletonFill: { width: '100%' },
   organizationAccess: { gap: space['3'], display: 'flex', flexDirection: 'column' },
