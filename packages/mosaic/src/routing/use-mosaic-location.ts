@@ -121,7 +121,7 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string, clearedPath: 
   const rendered: Partial<HostUrl> = {
     pathname: pathname ?? fromWindow?.pathname,
     search: search ?? fromWindow?.search,
-    hash: hash ?? fromWindow?.hash,
+    hash: fromWindow === undefined ? undefined : (hash ?? fromWindow.hash),
   };
   const value = rendered[carrier.field];
   const raw = value === undefined ? undefined : carrier.read(value);

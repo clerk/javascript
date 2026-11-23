@@ -413,6 +413,18 @@ describe('with an adapter', () => {
     };
   }
 
+  it("ignores the adapter's hash on the server, which has none, so a hash-mode page hydrates from its root", () => {
+    const adapter: RouterAdapter = { usePathname: () => '/page', useHash: () => '.user=security' };
+    function Probe() {
+      const location = useMosaicLocation({ routing: 'hash', path: '/user' });
+      return <output>{JSON.stringify(location.useSegmentParts() ?? null)}</output>;
+    }
+    expect(renderToString(wrapperWith({ adapter })({ children: <Probe /> }))).toBe('<output>null</output>');
+
+    const { result } = renderLocation({ routing: 'hash', path: '/user' }, { adapter });
+    expect(result.current.parts).toEqual(['security']);
+  });
+
   it('takes the query string as URLSearchParams, as Next hands it over', () => {
     const adapter: RouterAdapter = { useSearchParams: () => new URLSearchParams('.user=organization/general') };
     const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter });
