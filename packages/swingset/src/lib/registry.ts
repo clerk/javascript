@@ -174,9 +174,10 @@ import {
   Default as OAuthConsentDefault,
   ManyScopes as OAuthConsentManyScopes,
   meta as oauthConsentMeta,
+  MetadataDocument as OAuthConsentMetadataDocument,
   MultipleOrganizations as OAuthConsentMultipleOrganizations,
   OfflineAccess as OAuthConsentOfflineAccess,
-  ScopeList as OAuthConsentScopeList,
+  UnverifiedApp as OAuthConsentUnverifiedApp,
 } from '../stories/oauth-consent.stories';
 import {
   Default as OrganizationListDefault,
@@ -1327,10 +1328,11 @@ const apiKeysTableModule: StoryModule = {
 const oauthConsentModule: StoryModule = {
   meta: oauthConsentMeta,
   Default: OAuthConsentDefault,
-  ScopeList: OAuthConsentScopeList,
   ManyScopes: OAuthConsentManyScopes,
   MultipleOrganizations: OAuthConsentMultipleOrganizations,
   OfflineAccess: OAuthConsentOfflineAccess,
+  UnverifiedApp: OAuthConsentUnverifiedApp,
+  MetadataDocument: OAuthConsentMetadataDocument,
 };
 
 const reverificationModule: StoryModule = {

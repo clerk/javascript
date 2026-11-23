@@ -1,7 +1,7 @@
 import { useOAuthConsentController } from '@clerk/mosaic/features/oauth-consent/oauth-consent.controller';
 import type {
   OAuthConsentReadyModel,
-  OAuthConsentScopeItem,
+  OAuthConsentScopeRecord,
   OAuthConsentViewProps,
 } from '@clerk/mosaic/features/oauth-consent/oauth-consent.types';
 import { useMessages } from '@clerk/mosaic/localization';
@@ -13,6 +13,7 @@ const baseModel: OAuthConsentReadyModel = {
   status: 'ready',
   applicationName: 'Acme',
   oauthApplicationName: 'Linear',
+  clientIdentity: null,
   identifier: 'alice@example.com',
   scopes: [
     { scope: 'profile', description: 'Read your name and profile image' },
@@ -32,18 +33,19 @@ const baseModel: OAuthConsentReadyModel = {
   renderBranding: true,
 };
 
-const selectableScopes: OAuthConsentScopeItem[] = [
-  { scope: 'email', label: 'View your email address', description: 'alice@example.com', required: true },
-  { scope: 'projects', label: 'Read your projects', description: 'Read the projects in your account.' },
-  { scope: 'phone', label: 'View your phone number', description: 'Allow Linear to view your phone number' },
+export const organizationScopes: OAuthConsentScopeRecord[] = [
+  { scope: 'profile', description: 'Read your name and profile image' },
+  { scope: 'user:org:read', description: 'Read your organizations' },
 ];
 
-export const manyScopes: OAuthConsentScopeItem[] = [
-  ...selectableScopes,
-  { scope: 'issues', label: 'Read your issues', description: 'Read the issues assigned to you.' },
-  { scope: 'comments', label: 'Write comments', description: 'Comment on issues on your behalf.' },
-  { scope: 'teams', label: 'Read your teams', description: 'See the teams you belong to.' },
-  { scope: 'webhooks', label: 'Manage webhooks', description: 'Create and delete webhooks in your workspace.' },
+export const manyScopes: OAuthConsentScopeRecord[] = [
+  { scope: 'email', description: 'View your email address' },
+  { scope: 'projects', description: 'Read the projects in your account' },
+  { scope: 'phone', description: 'View your phone number' },
+  { scope: 'issues', description: 'Read the issues assigned to you' },
+  { scope: 'comments', description: 'Comment on issues on your behalf' },
+  { scope: 'teams', description: 'See the teams you belong to' },
+  { scope: 'webhooks', description: 'Create and delete webhooks in your workspace' },
 ];
 
 const SUBMIT_ROUND_TRIP_MS = 1500;
@@ -76,21 +78,4 @@ export function useOAuthConsentFixture(overrides: Partial<OAuthConsentReadyModel
   const messages = useMessages('oauthConsent');
   const props = useOAuthConsentController({ ...baseModel, ...overrides }, messages);
   return { ...props, ...useMockSubmit() };
-}
-
-export function useOAuthConsentScopeSelectionFixture(
-  overrides: Partial<OAuthConsentReadyModel> = {},
-  scopes: OAuthConsentScopeItem[] = selectableScopes,
-): OAuthConsentViewProps {
-  const props = useOAuthConsentFixture(overrides);
-  const [checked, setChecked] = useState<readonly string[]>(() => scopes.map(item => item.scope));
-  return {
-    ...props,
-    scopes,
-    scopeSelection: {
-      checked,
-      onCheckedChange: (scope, isChecked) =>
-        setChecked(current => (isChecked ? [...current, scope] : current.filter(item => item !== scope))),
-    },
-  };
 }

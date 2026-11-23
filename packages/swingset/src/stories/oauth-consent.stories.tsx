@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { manyScopes, useOAuthConsentFixture, useOAuthConsentScopeSelectionFixture } from './fixtures/oauth-consent';
+import { manyScopes, organizationScopes, useOAuthConsentFixture } from './fixtures/oauth-consent';
 
 export { default as __source } from './oauth-consent.stories?raw';
 
@@ -28,7 +28,8 @@ function isStatus(value: unknown): value is Status {
 }
 
 export function Default() {
-  const props = useOAuthConsentScopeSelectionFixture({
+  const props = useOAuthConsentFixture({
+    scopes: organizationScopes,
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
@@ -78,17 +79,8 @@ export function Default() {
   );
 }
 
-export function ScopeList() {
-  const props = useOAuthConsentFixture();
-  return (
-    <Card.Root align='center'>
-      <OAuthConsentView {...props} />
-    </Card.Root>
-  );
-}
-
 export function ManyScopes() {
-  const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
+  const props = useOAuthConsentFixture({ scopes: manyScopes });
   return (
     <Card.Root align='center'>
       <OAuthConsentView {...props} />
@@ -97,7 +89,8 @@ export function ManyScopes() {
 }
 
 export function MultipleOrganizations() {
-  const props = useOAuthConsentScopeSelectionFixture({
+  const props = useOAuthConsentFixture({
+    scopes: organizationScopes,
     organizations: [
       { value: 'org_1', label: 'My workspace' },
       { value: 'org_2', label: 'Globex' },
@@ -117,7 +110,33 @@ export function MultipleOrganizations() {
 }
 
 export function OfflineAccess() {
-  const props = useOAuthConsentScopeSelectionFixture({ hasOfflineAccess: true });
+  const props = useOAuthConsentFixture({
+    scopes: [
+      { scope: 'profile', description: 'Read your name and profile image' },
+      { scope: 'offline_access', description: 'Stay signed in' },
+    ],
+    hasOfflineAccess: true,
+  });
+  return (
+    <Card.Root align='center'>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
+}
+
+export function UnverifiedApp() {
+  const props = useOAuthConsentFixture({ clientIdentity: { registration: 'dynamic' } });
+  return (
+    <Card.Root align='center'>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
+}
+
+export function MetadataDocument() {
+  const props = useOAuthConsentFixture({
+    clientIdentity: { registration: 'metadata_document', metadataHost: 'claude.ai' },
+  });
   return (
     <Card.Root align='center'>
       <OAuthConsentView {...props} />
