@@ -173,7 +173,7 @@ export function parseBarGeometry(snapshot: string): BarGeometry {
   };
 }
 
-type BarState = Readonly<{
+export type BarState = Readonly<{
   seriesKey?: string;
   inactive?: boolean;
   projection?: boolean;
@@ -212,6 +212,19 @@ function createBarColorResolver(element: BarStyleElement) {
   };
 
   return { resolve, restore };
+}
+
+/** The colors these states compute to, serialized so a theme change can be told from an unrelated one. */
+export function getBarPaletteSnapshot(element: BarStyleElement | null, states: readonly BarState[]) {
+  if (!element) {
+    return '';
+  }
+  const barColor = createBarColorResolver(element);
+  try {
+    return JSON.stringify(states.map(barColor.resolve));
+  } finally {
+    barColor.restore();
+  }
 }
 
 type PaintOptions<TDatum> = Readonly<{

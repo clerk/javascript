@@ -24,6 +24,7 @@ beforeAll(async () => {
     html.dark .themed { color: rgb(0, 0, 255); }
     .scheme { color-scheme: light dark; color: light-dark(rgb(255, 0, 0), rgb(0, 0, 255)); }
     .dark-scope .scoped { color: rgb(0, 0, 255); }
+    html[data-brand-theme='night'] .branded { color: rgb(0, 0, 255); }
     .projected { max-width: 32px; border-radius: 4px 4px 2px 2px; color: rgb(0, 0, 255); }
     .projected[data-projection] { color: rgb(255, 0, 0); }
     .outline { fill: none; stroke: rgb(0, 0, 0); }
@@ -141,6 +142,19 @@ describe('painting', () => {
     screen.getByTestId('scope').classList.add('dark-scope');
 
     await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+  });
+
+  it('repaints when a theme switches through any attribute on <html>', async () => {
+    await render(<Chart barClassName='red branded' />);
+    const { x, y } = insideLastBar();
+    await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+
+    document.documentElement.setAttribute('data-brand-theme', 'night');
+    try {
+      await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 0, 255, 255)');
+    } finally {
+      document.documentElement.removeAttribute('data-brand-theme');
+    }
   });
 
   it('repaints when the preferred color scheme changes', async () => {

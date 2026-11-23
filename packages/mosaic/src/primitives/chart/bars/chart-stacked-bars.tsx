@@ -4,7 +4,14 @@ import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
 import { hasArea } from '../chart-context';
-import { type BarStyleElement, getBarGeometrySnapshot, paintStackedBarCanvas, parseBarGeometry } from './bar-canvas';
+import {
+  type BarState,
+  type BarStyleElement,
+  getBarGeometrySnapshot,
+  getBarPaletteSnapshot,
+  paintStackedBarCanvas,
+  parseBarGeometry,
+} from './bar-canvas';
 import { CanvasRenderError } from './bar-canvas-error';
 import { StackedBarsContext, useBarChartContext } from './bar-context';
 import { fitProjectionToBar, projectStackedBarMarks } from './bar-layout';
@@ -27,34 +34,16 @@ function getPixelRatio() {
   return Math.min(window.devicePixelRatio || 1, 2);
 }
 
-const THEME_ATTRIBUTES = ['class', 'style', 'data-theme'];
 const PREFERS_DARK = '(prefers-color-scheme: dark)';
 
-function getAncestors(element: Element) {
-  const ancestors: Element[] = [];
-  for (let node = element.parentElement; node; node = node.parentElement) {
-    ancestors.push(node);
-  }
-  return ancestors;
-}
-
-function getThemeSnapshot(bar: Element | null) {
-  if (!bar) {
-    return '';
-  }
-  return JSON.stringify([
-    window.matchMedia(PREFERS_DARK).matches,
-    ...getAncestors(bar).flatMap(element => THEME_ATTRIBUTES.map(name => element.getAttribute(name))),
-  ]);
-}
-
+/** A theme can switch through any attribute on an ancestor; the palette snapshot ignores the rest. */
 function subscribeToTheme(bar: Element | null, onChange: () => void) {
   if (!bar) {
     return () => {};
   }
   const observer = new MutationObserver(onChange);
-  for (const element of getAncestors(bar)) {
-    observer.observe(element, { attributes: true, attributeFilter: THEME_ATTRIBUTES });
+  for (let element = bar.parentElement; element; element = element.parentElement) {
+    observer.observe(element, { attributes: true });
   }
   const query = window.matchMedia(PREFERS_DARK);
   query.addEventListener('change', onChange);
@@ -88,11 +77,6 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
       },
       [bar],
     );
-    const theme = React.useSyncExternalStore(
-      React.useCallback((onChange: () => void) => subscribeToTheme(bar, onChange), [bar]),
-      () => getThemeSnapshot(bar),
-      getServerSnapshot,
-    );
     const barClass = React.useSyncExternalStore(
       subscribeToBarClass,
       () => bar?.getAttribute('class') ?? '',
@@ -109,6 +93,21 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
       [categories, geometry, prepared, scaleY],
     );
     const projection = React.useMemo(() => fitProjectionToBar(projectedBar, geometry), [geometry, projectedBar]);
+    const paletteStates = React.useMemo(() => {
+      const states: BarState[] = projection ? [{ projection: true }] : [];
+      for (const seriesKey of new Set(marks.map(mark => mark.seriesKey))) {
+        states.push({ seriesKey });
+        if (isBarActive) {
+          states.push({ seriesKey, inactive: true });
+        }
+      }
+      return states;
+    }, [isBarActive, marks, projection]);
+    const palette = React.useSyncExternalStore(
+      React.useCallback((onChange: () => void) => subscribeToTheme(bar, onChange), [bar]),
+      () => getBarPaletteSnapshot(bar, paletteStates),
+      getServerSnapshot,
+    );
     const stackedBarsContext = React.useMemo(() => ({ setBar, projection }), [projection]);
 
     React.useLayoutEffect(() => {
@@ -121,8 +120,8 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
       };
       canvas.addEventListener('contextlost', onContextLost);
       return () => canvas.removeEventListener('contextlost', onContextLost);
-      // `barClass` and `theme` are not read here: they change the computed colors the paint reads from the DOM.
-    }, [bar, barClass, canvas, isBarActive, marks, pixelRatio, projection, size, theme]);
+      // `barClass` and `palette` are not read here: they change the computed colors the paint reads from the DOM.
+    }, [bar, barClass, canvas, isBarActive, marks, palette, pixelRatio, projection, size]);
 
     const ownProps = {
       style: { position: 'absolute', inset: 0 },
