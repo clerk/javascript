@@ -83,27 +83,17 @@ describe('useWindowUrl', () => {
 });
 
 describe('writeWindowUrl', () => {
-  it('pushes or replaces, keeping the history state', () => {
-    window.history.replaceState({ host: 'data' }, '', '/');
+  it('writes no history state, so a host router keeps its bookkeeping off entries it did not make', () => {
+    window.history.replaceState({ host: 'data', idx: 3 }, '', '/');
     const length = window.history.length;
 
     writeWindowUrl('/user', false);
     expect(window.history.length).toBe(length + 1);
-    expect(window.history.state).toEqual({ host: 'data' });
+    expect(window.history.state).toBeNull();
 
     writeWindowUrl('/user/security', true);
     expect(window.history.length).toBe(length + 1);
     expect(window.location.pathname).toBe('/user/security');
-    expect(window.history.state).toEqual({ host: 'data' });
-  });
-
-  it('drops the Next.js App Router marker so Next applies the write', () => {
-    window.history.replaceState({ __NA: true, __PRIVATE_NEXTJS_INTERNALS_TREE: ['tree'] }, '', '/');
-
-    writeWindowUrl('/user', false);
-    expect(window.history.state).toEqual({ __PRIVATE_NEXTJS_INTERNALS_TREE: ['tree'] });
-
-    writeWindowUrl('/user/security', true);
-    expect(window.history.state).toEqual({ __PRIVATE_NEXTJS_INTERNALS_TREE: ['tree'] });
+    expect(window.history.state).toBeNull();
   });
 });

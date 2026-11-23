@@ -70,27 +70,11 @@ export function notifyWindowUrl(): void {
   }
 }
 
-// The Next.js App Router patches `pushState` and `replaceState`, and takes a state that carries its
-// marker for one of its own writes: it keeps the entry but does not move `usePathname` and
-// `useSearchParams` to the new URL. A write of ours goes without the marker, so Next applies it and
-// copies its own state back in. Everything else in the state goes along, so a host router that keeps
-// its own data there still finds it.
-export function withoutNextAppRouterMarker(state: unknown): unknown {
-  if (typeof state !== 'object' || state === null || !('__NA' in state || '_N' in state)) {
-    return state;
-  }
-  const copy: object = Object.assign(Array.isArray(state) ? [] : {}, state);
-  Reflect.deleteProperty(copy, '__NA');
-  Reflect.deleteProperty(copy, '_N');
-  return copy;
-}
-
 export function writeWindowUrl(url: string, replace: boolean): void {
-  const state = withoutNextAppRouterMarker(window.history.state);
   if (replace) {
-    window.history.replaceState(state, '', url);
+    window.history.replaceState(null, '', url);
   } else {
-    window.history.pushState(state, '', url);
+    window.history.pushState(null, '', url);
   }
   notifyWindowUrl();
 }

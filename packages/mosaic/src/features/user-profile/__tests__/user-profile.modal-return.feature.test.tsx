@@ -81,30 +81,6 @@ describe('UserProfile modal return', () => {
     expect(window.location.hash).toBe('#accounts');
   });
 
-  it('keeps the history state of the page when it clears the param', async () => {
-    serve();
-    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
-    window.history.replaceState({ router: 'state' }, '');
-
-    await renderWithClerk(<p>Page</p>);
-
-    await screen.findByRole('dialog');
-    expect(window.location.search).toBe('');
-    expect(window.history.state).toEqual({ router: 'state' });
-  });
-
-  it('drops the Next.js marker when it clears the param, so the App Router syncs the new URL', async () => {
-    serve();
-    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
-    window.history.replaceState({ __NA: true, router: 'state' }, '');
-
-    await renderWithClerk(<p>Page</p>);
-
-    await screen.findByRole('dialog');
-    expect(window.location.search).toBe('');
-    expect(window.history.state).toEqual({ router: 'state' });
-  });
-
   it('clears the param through a history patch that a parent installs while mounting', async () => {
     serve();
     visit('?__clerk_mosaic_modal=user-profile%2Faccount');
@@ -130,32 +106,6 @@ describe('UserProfile modal return', () => {
     await screen.findByRole('dialog');
     expect(window.location.search).toBe('');
     expect(onReplaceState).toHaveBeenCalledTimes(1);
-  });
-
-  it('keeps history state that is not a plain object when it clears the param', async () => {
-    serve();
-    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
-    window.history.replaceState(['router', 'state'], '');
-
-    await renderWithClerk(<p>Page</p>);
-
-    await screen.findByRole('dialog');
-    expect(window.location.search).toBe('');
-    expect(window.history.state).toEqual(['router', 'state']);
-  });
-
-  it('keeps an array as an array when it drops the Next.js marker', async () => {
-    serve();
-    visit('?__clerk_mosaic_modal=user-profile%2Faccount');
-    window.history.replaceState(Object.assign(['router', 'state'], { __NA: true }), '');
-
-    await renderWithClerk(<p>Page</p>);
-
-    await screen.findByRole('dialog');
-    expect(window.location.search).toBe('');
-    expect(Array.isArray(window.history.state)).toBe(true);
-    expect(window.history.state).toEqual(['router', 'state']);
-    expect(window.history.state).not.toHaveProperty('__NA');
   });
 
   describe("with the provider's profile", () => {

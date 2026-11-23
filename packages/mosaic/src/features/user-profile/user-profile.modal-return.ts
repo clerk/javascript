@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useModal } from '../../modals/use-modal';
-import { withoutNextAppRouterMarker } from '../../routing/window-location';
 import { profileModal } from '../profile/profile.modal';
 import { profileModalOptions, useMosaicProfile, userProfileModalOptions } from '../profile-pages/use-mosaic-profile';
 import { userProfileModal } from './user-profile.modal';
@@ -36,7 +35,7 @@ export function UserProfileModalReturn(): null {
         return;
       }
       url.searchParams.delete(MODAL_PARAM);
-      window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
+      window.history.replaceState(null, '', url);
       if (page === COMBINED_ACCOUNT_PAGE) {
         openProfile({ ...profileModalOptions(profile), page: 'account' });
       } else {
