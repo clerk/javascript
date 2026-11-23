@@ -2,6 +2,6 @@
   "files": [
     { "path": "./dist/.bundlewatch/eager/index.js", "maxSize": "28KB" },
     { "path": "./dist/.bundlewatch/total/index.js", "maxSize": "310KB" },
-    { "path": "./dist/styles.css", "maxSize": "18KB" }
+    { "path": "./dist/styles.css", "maxSize": "20KB" }
   ]
 }

@@ -56,6 +56,11 @@
       "import": "./dist/components/banner.js",
       "default": "./dist/components/banner.js"
     },
+    "./components/bar-chart": {
+      "types": "./dist/components/bar-chart.d.ts",
+      "import": "./dist/components/bar-chart.js",
+      "default": "./dist/components/bar-chart.js"
+    },
     "./components/button": {
       "types": "./dist/components/button.d.ts",
       "import": "./dist/components/button.js",
@@ -65,6 +70,11 @@
       "types": "./dist/components/card.d.ts",
       "import": "./dist/components/card.js",
       "default": "./dist/components/card.js"
+    },
+    "./components/chart": {
+      "types": "./dist/components/chart.d.ts",
+      "import": "./dist/components/chart.js",
+      "default": "./dist/components/chart.js"
     },
     "./components/checkbox": {
       "types": "./dist/components/checkbox.d.ts",
