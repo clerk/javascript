@@ -7,6 +7,7 @@ import { runtime } from '../runtime';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { joinPaths } from '../util/path';
 import { deserialize } from './resources/Deserializer';
+import type { PaginationCursorJSON } from './resources/JSON';
 
 type ClerkBackendApiRequestOptionsUrlOrPath =
   | {
@@ -49,11 +50,13 @@ export type ClerkBackendApiResponse<T> =
       data: T;
       errors: null;
       totalCount?: number;
+      cursor?: PaginationCursorJSON;
     }
   | {
       data: null;
       errors: ClerkAPIError[];
       totalCount?: never;
+      cursor?: never;
       clerkTraceId?: string;
       status?: number;
       statusText?: string;
@@ -277,7 +280,7 @@ type LegacyRequestFunction = <T>(requestOptions: ClerkBackendApiRequestOptions) 
 // TODO(dimkl): Will be probably be dropped in next major version
 function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
   return async (...args) => {
-    const { data, errors, totalCount, status, statusText, clerkTraceId, retryAfter } = await cb(...args);
+    const { data, errors, totalCount, cursor, status, statusText, clerkTraceId, retryAfter } = await cb(...args);
     if (errors) {
       // instead of passing `data: errors`, we have set the `error.errors` because
       // the errors returned from callback is already parsed and passing them as `data`
@@ -290,6 +293,10 @@ function withLegacyRequestReturn(cb: any): LegacyRequestFunction {
       });
       error.errors = errors;
       throw error;
+    }
+
+    if (typeof cursor !== 'undefined') {
+      return { data, cursor };
     }
 
     if (typeof totalCount !== 'undefined') {
