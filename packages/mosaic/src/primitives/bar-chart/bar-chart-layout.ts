@@ -5,13 +5,6 @@ import type { BarCategory, BarMark, BarProjection, BarSeries, ChartFrame, ChartM
 
 const Y_TICK_COUNT = 5;
 
-export const DEFAULT_CHART_MARGIN: ChartMargin = {
-  top: 8,
-  right: 16,
-  bottom: 36,
-  left: 52,
-};
-
 type PrepareOptions<TDatum> = Readonly<{
   data: readonly TDatum[];
   series: readonly BarSeries<TDatum>[];
@@ -350,7 +343,8 @@ export function projectStackedBars<TDatum>(
 
 export type StackedBarLayout<TDatum> = ReturnType<typeof projectStackedBars<TDatum>>;
 
-type MarkSource<TDatum> = Pick<StackedBarLayout<TDatum>, 'prepared' | 'categories' | 'scaleY'>;
+type MarkSource<TDatum> = Pick<StackedBarLayout<TDatum>, 'prepared' | 'scaleY'> &
+  Readonly<{ categories: readonly BarCategory[] }>;
 
 export function projectStackedBarMarks<TDatum>(layout: MarkSource<TDatum>, geometry: BarGeometry): BarMark<TDatum>[] {
   return applyCornerRadii(projectMarksAndPaintInsets(layout, geometry), geometry);

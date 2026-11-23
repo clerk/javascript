@@ -1,0 +1,374 @@
+'use client';
+
+import React from 'react';
+
+import { useControllableState } from '../hooks/use-controllable-state';
+import {
+  getKeyboardAnnouncement,
+  getKeyboardInstructions,
+  getKeyIntent,
+  nearestCategory,
+  NO_SELECTION,
+  reconcileSelection,
+  sameSelection,
+  selectedState,
+  type SelectionAction,
+  type SelectionModel,
+  selectionReducer,
+  type SelectionState,
+  toPublicSelection,
+  type VerticalMove,
+} from './chart-selection';
+import type { ChartCategory, ChartMargin, ChartPlot, ChartSelection, ChartSize, ChartTick } from './types';
+import { useChartSize } from './use-chart-size';
+import { selectXTicks, type XTick } from './x-ticks';
+
+export const DEFAULT_CHART_MARGIN: ChartMargin = {
+  top: 8,
+  right: 16,
+  bottom: 36,
+  left: 52,
+};
+
+export type XTickMode = 'category' | 'calendar';
+
+export type XTicksOptions = Readonly<{
+  /**
+   * `category` thins category labels to fit. `calendar` labels calendar boundaries for long ranges;
+   * category keys must be UTC dates. Default: 'category'
+   */
+  mode?: XTickMode;
+  /** Returns the label for a category key, or null to omit it. Default: the key */
+  format?: (key: string) => string | null;
+}>;
+
+/** Props for the element that takes pointer and keyboard selection, usually the plot. */
+export type ChartInteractionProps = Readonly<{
+  role: 'button' | 'group';
+  /** 0 while something reads the selection: `selection`, `onSelectionChange` or `onActivate`. */
+  tabIndex: 0 | undefined;
+  onPointerDown: React.PointerEventHandler<HTMLElement>;
+  onPointerLeave: React.PointerEventHandler<HTMLElement>;
+  onPointerCancel: React.PointerEventHandler<HTMLElement>;
+  onPointerMove: React.PointerEventHandler<HTMLElement>;
+  onFocus: React.FocusEventHandler<HTMLElement>;
+  onBlur: React.FocusEventHandler<HTMLElement>;
+  onClick: React.MouseEventHandler<HTMLElement>;
+  onKeyDown: React.KeyboardEventHandler<HTMLElement>;
+  /** State the chart type exposes on the surface, such as `data-active-section`. */
+  [attribute: `data-${string}`]: string | undefined;
+}>;
+
+/** Options every chart-type hook takes. */
+export interface ChartOptions<TSelection extends ChartSelection, TActive> {
+  /** Space around the plot for the axes. Default: 8, 16, 36, 52 (top, right, bottom, left) */
+  margin?: Partial<ChartMargin>;
+  /** The selection, or null. Leave it undefined to let the chart hold the selection. */
+  selection?: TSelection | null;
+  /** Called when the user or `select`/`clear` changes the selection. */
+  onSelectionChange?: (selection: TSelection | null) => void;
+  /** Called on click, Enter or Space. Makes the interaction surface a button. */
+  onActivate?: (active: TActive) => void;
+  /** Names a category in announcements. Default: the category key */
+  formatCategory?: (category: string) => string | null;
+}
+
+/** What a chart type's layout gives the shared instance. */
+export type ChartLayout<TCategory extends ChartCategory> = Readonly<{
+  plot: ChartPlot;
+  yTicks: readonly ChartTick[];
+  categories: readonly TCategory[];
+}>;
+
+export type ChartFrame = Readonly<{
+  rootRef: (element: HTMLElement | null) => void;
+  rootElementRef: React.RefObject<HTMLElement | null>;
+  /** The measured container, zero until the first measurement. */
+  size: ChartSize;
+  /** Stable while its four numbers are, so an inline `margin` does not relayout. */
+  margin: ChartMargin;
+}>;
+
+/** Measures the chart root and resolves the margin around the plot. */
+export function useChartFrame(margin: Partial<ChartMargin> | undefined): ChartFrame {
+  const { ref: sizeRef, size } = useChartSize<HTMLElement>();
+  const rootElementRef = React.useRef<HTMLElement | null>(null);
+  const rootRef = React.useCallback(
+    (element: HTMLElement | null) => {
+      rootElementRef.current = element;
+      sizeRef(element);
+    },
+    [sizeRef],
+  );
+  const top = margin?.top ?? DEFAULT_CHART_MARGIN.top;
+  const right = margin?.right ?? DEFAULT_CHART_MARGIN.right;
+  const bottom = margin?.bottom ?? DEFAULT_CHART_MARGIN.bottom;
+  const left = margin?.left ?? DEFAULT_CHART_MARGIN.left;
+  const resolved = React.useMemo(() => ({ top, right, bottom, left }), [bottom, left, right, top]);
+  return { rootRef, rootElementRef, size, margin: resolved };
+}
+
+/** Coalesces pointer moves into at most one selection update per frame. */
+function useFramePointerUpdates<TSelection>(layout: unknown) {
+  const applyRef = React.useRef<(selection: TSelection | null) => void>(() => {});
+  const pendingRef = React.useRef<TSelection | null | undefined>(undefined);
+  const frameRef = React.useRef<number | null>(null);
+  const cancel = React.useCallback(() => {
+    pendingRef.current = undefined;
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+  }, []);
+  // A new layout invalidates a pending hit test.
+  React.useLayoutEffect(() => cancel, [cancel, layout]);
+
+  const schedule = (selection: TSelection | null, apply: (selection: TSelection | null) => void) => {
+    pendingRef.current = selection;
+    applyRef.current = apply;
+    if (frameRef.current !== null) {
+      return;
+    }
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      const pending = pendingRef.current;
+      pendingRef.current = undefined;
+      if (pending !== undefined) {
+        applyRef.current(pending);
+      }
+    });
+  };
+  const pending = () => pendingRef.current ?? null;
+  return { schedule, cancel, pending };
+}
+
+const formatCategoryKey = (category: string) => category;
+
+/**
+ * Owns selection for every chart type: the controlled value, the reducer, one pointer update per
+ * frame, touch select and outside dismissal, the remembered keyboard index, keys, activation, the
+ * announcement and the X ticks. The chart type's rules come in through `model`.
+ */
+export function useChartInstance<TSelection extends ChartSelection, TActive, TCategory extends ChartCategory>({
+  frame,
+  layout,
+  model,
+  options,
+}: Readonly<{
+  frame: ChartFrame;
+  layout: ChartLayout<TCategory>;
+  model: SelectionModel<TSelection, TActive, TCategory>;
+  options: ChartOptions<TSelection, TActive>;
+}>) {
+  const { onActivate, formatCategory = formatCategoryKey } = options;
+  const { rootRef, rootElementRef, size } = frame;
+  const { categories, plot } = layout;
+
+  const xTicks = React.useCallback(
+    ({ mode = 'category', format = formatCategoryKey }: XTicksOptions = {}): XTick[] =>
+      selectXTicks({
+        categories,
+        plot,
+        viewportWidth: size.width,
+        xAxis: mode === 'calendar' ? 'calendar' : undefined,
+        formatXTick: format,
+      }),
+    [categories, plot, size.width],
+  );
+
+  const [value, setValue] = useControllableState<TSelection | null>(options.selection, null, options.onSelectionChange);
+  const [stored, setStored] = React.useState<SelectionState<TSelection>>(NO_SELECTION);
+  const state = reconcileSelection(stored, value);
+  const stateRef = React.useRef(state);
+  React.useLayoutEffect(() => {
+    stateRef.current = state;
+  });
+
+  const categoryByKey = React.useMemo(
+    () => new Map(categories.map(category => [category.key, category])),
+    [categories],
+  );
+  const current = selectedState(state);
+  const currentCategory = current ? categoryByKey.get(current.category) : undefined;
+  const resolve = (selection: TSelection | null) => {
+    const category = selection ? categoryByKey.get(selection.category) : undefined;
+    return selection && category ? model.resolve(selection, category) : null;
+  };
+  const selected = resolve(current?.selection ?? null);
+  // A selection whose category or value left the data reads as none until the user moves.
+  const valid = current && currentCategory && (current.selection === null || selected) ? current : null;
+  const announcement = getKeyboardAnnouncement(valid, currentCategory, model, formatCategory);
+  const keyboardInstructions = getKeyboardInstructions(model.verticalInstructions, !!onActivate);
+  const tooltipAnchor =
+    valid?.selection && currentCategory && selected
+      ? { x: currentCategory.center, y: model.anchorY(valid.selection, currentCategory) }
+      : null;
+
+  const lastIndexRef = React.useRef(0);
+  const selectedIndex = valid ? currentCategory?.datumIndex : undefined;
+  React.useLayoutEffect(() => {
+    if (selectedIndex !== undefined) {
+      lastIndexRef.current = selectedIndex;
+    }
+  }, [selectedIndex]);
+  const keyboardIndex = () => selectedIndex ?? lastIndexRef.current;
+
+  const pointerUpdates = useFramePointerUpdates<TSelection>(layout);
+
+  const dispatch = (action: SelectionAction<TSelection>) => {
+    if (action.type !== 'pointer') {
+      pointerUpdates.cancel();
+    }
+    const previous = stateRef.current;
+    const next = selectionReducer(previous, action);
+    stateRef.current = next;
+    setStored(next);
+    const nextValue = toPublicSelection(next);
+    if (!sameSelection(toPublicSelection(previous), nextValue)) {
+      setValue(nextValue);
+    }
+    return next;
+  };
+  const dispatchRef = React.useRef(dispatch);
+  React.useLayoutEffect(() => {
+    dispatchRef.current = dispatch;
+  });
+  const select = React.useCallback((selection: TSelection) => {
+    dispatchRef.current({ type: 'select', selection });
+  }, []);
+  const clear = React.useCallback(() => {
+    dispatchRef.current({ type: 'clear' });
+  }, []);
+
+  // Only a pointer event on the surface makes a pointer selection, so its target is the surface.
+  const surfaceRef = React.useRef<EventTarget | null>(null);
+
+  // A tap fires no pointerleave or blur, so a tap anywhere else dismisses.
+  const hasPointerSelection = valid?.source === 'pointer';
+  React.useEffect(() => {
+    if (!hasPointerSelection) {
+      return;
+    }
+    const dismissOutside = (event: PointerEvent) => {
+      const surface = surfaceRef.current;
+      if (!(event.target instanceof Node) || !(surface instanceof Node) || !surface.contains(event.target)) {
+        clear();
+      }
+    };
+    document.addEventListener('pointerdown', dismissOutside, true);
+    return () => document.removeEventListener('pointerdown', dismissOutside, true);
+  }, [clear, hasPointerSelection]);
+
+  const currentSelection = valid?.selection ?? null;
+
+  const pointerSelection = (clientX: number, clientY: number) => {
+    const bounds = rootElementRef.current?.getBoundingClientRect();
+    if (!bounds || bounds.width <= 0 || bounds.height <= 0) {
+      return null;
+    }
+    const x = ((clientX - bounds.left) / bounds.width) * size.width;
+    const y = ((clientY - bounds.top) / bounds.height) * size.height;
+    const category = categories[nearestCategory(categories, x)];
+    return category ? model.hitTest(category, y, pointerUpdates.pending() ?? currentSelection) : null;
+  };
+
+  const selectKeyboardIndex = (target: number, move: VerticalMove | undefined, from: TSelection | null) => {
+    const category = categories[Math.max(0, Math.min(categories.length - 1, target))];
+    return dispatch({
+      type: 'keyboard',
+      category: category?.key,
+      selection: category ? model.land(category, move, from) : null,
+    });
+  };
+
+  const activate = (selection: TSelection | null) => {
+    const active = resolve(selection);
+    if (active) {
+      onActivate?.(active);
+    }
+  };
+
+  const activateKeyboardSelection = () => {
+    const dismissed = stateRef.current.status === 'dismissed';
+    const next = selectKeyboardIndex(keyboardIndex(), undefined, currentSelection);
+    if (!dismissed) {
+      activate(toPublicSelection(next));
+    }
+  };
+
+  const reads = options.selection !== undefined || !!options.onSelectionChange || !!onActivate;
+  const getInteractionProps = (): ChartInteractionProps => ({
+    ...model.surfaceAttributes(currentSelection),
+    role: onActivate ? 'button' : 'group',
+    tabIndex: reads ? 0 : undefined,
+    onPointerDown: event => {
+      event.preventDefault();
+      surfaceRef.current = event.currentTarget;
+      // A tap fires no pointermove, so touch selects on contact and survives the pointerleave that
+      // follows the finger lifting.
+      if (event.pointerType !== 'touch') {
+        return;
+      }
+      pointerUpdates.cancel();
+      dispatch({ type: 'pointer', selection: pointerSelection(event.clientX, event.clientY) });
+    },
+    onPointerLeave: event => {
+      if (event.pointerType !== 'touch') {
+        dispatch({ type: 'clear' });
+      }
+    },
+    onPointerCancel: () => {
+      dispatch({ type: 'clear' });
+    },
+    onPointerMove: event => {
+      surfaceRef.current = event.currentTarget;
+      pointerUpdates.schedule(pointerSelection(event.clientX, event.clientY), next =>
+        dispatch({ type: 'pointer', selection: next }),
+      );
+    },
+    onFocus: () => {
+      selectKeyboardIndex(keyboardIndex(), undefined, null);
+    },
+    onBlur: () => {
+      dispatch({ type: 'clear' });
+    },
+    onClick: event => {
+      // Assistive technology activates the chart with a synthetic click that has no coordinates.
+      if (event.detail === 0 && event.clientX === 0 && event.clientY === 0) {
+        activateKeyboardSelection();
+        return;
+      }
+      activate(pointerSelection(event.clientX, event.clientY));
+    },
+    onKeyDown: event => {
+      const intent = getKeyIntent(event.key, keyboardIndex(), categories.length - 1, !!onActivate);
+      if (!intent) {
+        return;
+      }
+      event.preventDefault();
+      if (intent.type === 'dismiss') {
+        dispatch({ type: 'dismiss' });
+      } else if (intent.activate) {
+        activateKeyboardSelection();
+      } else {
+        selectKeyboardIndex(intent.index, intent.move, currentSelection);
+      }
+    },
+  });
+
+  return {
+    rootRef,
+    size,
+    plot,
+    yTicks: layout.yTicks,
+    categories,
+    xTicks,
+    selected,
+    tooltipAnchor,
+    announcement,
+    keyboardInstructions,
+    select,
+    clear,
+    getInteractionProps,
+  };
+}

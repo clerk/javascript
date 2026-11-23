@@ -22,18 +22,16 @@ export type BarChartBarSelectionProps = ComponentProps<'div'>;
 
 function KeyboardInstructions({
   id,
-  canActivate,
+  instructions,
   announcement,
-}: Readonly<{ id: string; canActivate: boolean; announcement: string }>) {
+}: Readonly<{ id: string; instructions: string; announcement: string }>) {
   return (
     <>
       <span
         id={id}
         style={VISUALLY_HIDDEN_STYLE}
       >
-        Use Left and Right to choose a period, or Home and End to jump to the first or last. Use Up and Down to choose
-        positive or negative values. {canActivate ? 'Press Enter or Space to open the selected period. ' : ''}
-        Press Escape to dismiss.
+        {instructions}
       </span>
       <span
         role='status'
@@ -109,7 +107,7 @@ function BarSelectionSurface({ forwardedRef, chart, ariaLabel, children, render,
         </div>
         <KeyboardInstructions
           id={keyboardInstructionsId}
-          canActivate={interaction.role === 'button'}
+          instructions={chart.keyboardInstructions}
           announcement={chart.announcement}
         />
       </>

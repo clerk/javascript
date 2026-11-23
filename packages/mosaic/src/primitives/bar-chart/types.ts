@@ -19,6 +19,16 @@ export type ChartPlot = Readonly<{
 
 export type ChartTick = Readonly<{ value: number; y: number }>;
 
+/** One datum's place on the X axis. */
+export type ChartCategory = Readonly<{
+  key: string;
+  datumIndex: number;
+  center: number;
+}>;
+
+/** What a selection names. Each chart type extends it with what else a user can pick there. */
+export type ChartSelection = Readonly<{ category: string }>;
+
 export type CornerRadii = readonly [number, number, number, number];
 
 /** A projected total for one category, drawn only above its positive stack. */
@@ -53,25 +63,20 @@ export type BarMark<TDatum> = BarIdentity<TDatum> &
 
 export type BarSection = 'positive' | 'negative';
 
-export type BarCategory = Readonly<{
-  key: string;
-  datumIndex: number;
-  bandX: number;
-  bandWidth: number;
-  center: number;
-  /** Sections a user can select, including a projection-only positive bar. */
-  sections: Readonly<Record<BarSection, boolean>>;
-  /** Sections with nonzero data values. */
-  hasValues: Readonly<Record<BarSection, boolean>>;
-  /** True when the chart draws the projection at this category. */
-  projected: boolean;
-}>;
+export type BarCategory = ChartCategory &
+  Readonly<{
+    bandX: number;
+    bandWidth: number;
+    /** Sections a user can select, including a projection-only positive bar. */
+    sections: Readonly<Record<BarSection, boolean>>;
+    /** Sections with nonzero data values. */
+    hasValues: Readonly<Record<BarSection, boolean>>;
+    /** True when the chart draws the projection at this category. */
+    projected: boolean;
+  }>;
 
 /** A selected category and section. */
-export type BarSelection = Readonly<{
-  category: string;
-  section: BarSection;
-}>;
+export type BarSelection = ChartSelection & Readonly<{ section: BarSection }>;
 
 /** A selected bar resolved against the current data. */
 export type ActiveBar<TDatum> = BarSelection &

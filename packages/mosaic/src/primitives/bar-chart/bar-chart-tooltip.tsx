@@ -51,12 +51,13 @@ export const BarChartTooltip = React.forwardRef<HTMLDivElement, BarChartTooltipP
     const { chart } = useBarChartContext('Tooltip');
     const { plot, selected: activeBar } = chart;
     const chartWidth = chart.size.width;
-    const selectedCategory = activeBar ? chart.categories[activeBar.datumIndex] : undefined;
     React.useLayoutEffect(registerTooltip, [registerTooltip]);
 
-    const content = activeBar && selectedCategory ? children(activeBar) : null;
+    const anchor = chart.tooltipAnchor;
+    const content = activeBar && anchor ? children(activeBar) : null;
     const open = content !== null && content !== undefined;
-    const anchorX = selectedCategory?.center;
+    const anchorX = anchor?.x;
+    const anchorY = anchor?.y;
 
     const pinned = plot.width < PINNED_BELOW_PLOT_WIDTH;
     const popupRef = React.useRef<HTMLDivElement | null>(null);
@@ -89,7 +90,7 @@ export const BarChartTooltip = React.forwardRef<HTMLDivElement, BarChartTooltipP
 
     React.useLayoutEffect(() => {
       const chart = chartBoxRef.current;
-      if (anchorX === undefined || !chart || chartWidth <= 0) {
+      if (anchorX === undefined || anchorY === undefined || !chart || chartWidth <= 0) {
         return;
       }
       const getBoundingClientRect = () => {
@@ -99,10 +100,10 @@ export const BarChartTooltip = React.forwardRef<HTMLDivElement, BarChartTooltipP
           return new DOMRect(boundary.left + EDGE, boundary.top + EDGE, 0, 0);
         }
         const x = Math.round((chartRect.left + (anchorX / chartWidth) * chartRect.width) * 2) / 2;
-        return new DOMRect(x, chartRect.top + plot.y, 0, 0);
+        return new DOMRect(x, chartRect.top + anchorY, 0, 0);
       };
       refs.setReference({ getBoundingClientRect, contextElement: chart });
-    }, [anchorX, chartBoxRef, chartWidth, getBoundary, pinned, plot, refs]);
+    }, [anchorX, anchorY, chartBoxRef, chartWidth, getBoundary, pinned, refs]);
 
     const { mounted, transitionProps } = useTransition({ open, ref: popupRef });
 
