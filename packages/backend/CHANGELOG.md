@@ -1,5 +1,39 @@
 # Change Log
 
+## 3.32.0
+
+### Minor Changes
+
+- Add `clerkClient.users.getUserListWithoutCount()`, which takes the same parameters as `getUserList()` and returns `{ data }` with the same page of users, without the request to count them. Use it when you don't need `totalCount`: counting can be slow for a search over many users, and `getUserList()` fails when the count does and the page is full. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+- Add `clerkClient.users.searchUsers()`, a faster way to list and filter users on large instances. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+  ```ts
+  const { data, cursor } = await clerkClient.users.searchUsers({
+    metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+  });
+
+  // Next page: the same filters, plus the cursor
+  if (cursor.startingAfter) {
+    await clerkClient.users.searchUsers({
+      metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+      startingAfter: cursor.startingAfter,
+    });
+  }
+  ```
+
+  Compared with `getUserList()`:
+  - It pages with a cursor instead of an offset, so later pages are as fast as the first.
+  - It can also filter on public, private and unsafe metadata, on an external account's provider and provider user ID, and on banned or deprovisioned users.
+  - It returns no `totalCount`. Pass `remainingCount` to get a count of the users from the current page onward.
+  - Results can lag a recent change by a short time. To read a user right after you change them, get them by ID with `getUser()`.
+
+  `getUserList()` is unchanged.
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Sign-in security** page under **Protect** (`/~/protect/sign-in-security`) in the Clerk Dashboard, where the lockout settings now live. ([#10745](https://github.com/clerk/javascript/pull/10745)) by [@brunol95](https://github.com/brunol95)
+
 ## 3.31.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.17.5
+
+### Patch Changes
+
+- Updated dependencies [[`f9d5b3a`](https://github.com/clerk/javascript/commit/f9d5b3a3272f17b9a428bc56acfa9d5a9f6726c7)]:
+  - @clerk/react@6.19.5
+
 ## 4.17.4
 
 ### Patch Changes

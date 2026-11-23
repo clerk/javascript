@@ -47,7 +47,7 @@ import { BillingPlan } from './CommercePlan';
 import { BillingSubscription } from './CommerceSubscription';
 import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
 import { Feature } from './Feature';
-import type { PaginatedResponseJSON } from './JSON';
+import type { PaginatedResponseJSON, PaginationCursorJSON } from './JSON';
 import { ObjectType } from './JSON';
 import { WaitlistEntry } from './WaitlistEntry';
 
@@ -76,7 +76,13 @@ export type PaginatedResourceResponse<T> = ResourceResponse<T> & {
   totalCount: number;
 };
 
-export function deserialize<U = any>(payload: unknown): PaginatedResourceResponse<U> | ResourceResponse<U> {
+type CursorResourceResponse<T> = ResourceResponse<T> & {
+  cursor: PaginationCursorJSON;
+};
+
+export function deserialize<U = any>(
+  payload: unknown,
+): PaginatedResourceResponse<U> | CursorResourceResponse<U> | ResourceResponse<U> {
   let data, totalCount: number | undefined;
 
   if (Array.isArray(payload)) {
@@ -91,6 +97,10 @@ export function deserialize<U = any>(payload: unknown): PaginatedResourceRespons
   } else if (isPaginated(payload)) {
     data = payload.data.map(item => jsonToObject(item)) as U;
     totalCount = payload.total_count;
+
+    if (payload.cursor) {
+      return { data, cursor: payload.cursor };
+    }
 
     return { data, totalCount };
   } else {
