@@ -1,5 +1,5 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
@@ -27,6 +27,13 @@ type FinishEvent = { type: 'FINISH'; frozenModel: SignUpReadyModel };
 
 const finish = setup<FinishContext, FinishEvent>();
 
+const startFinishing = {
+  FINISH: {
+    target: 'finishing' as const,
+    actions: finish.assign<FinishEvent>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
+  },
+};
+
 const finishMachine = finish.createMachine({
   id: 'signUpFinish',
   initial: 'idle',
@@ -37,12 +44,7 @@ const finishMachine = finish.createMachine({
   },
   states: {
     idle: {
-      on: {
-        FINISH: {
-          target: 'finishing',
-          actions: finish.assign<FinishEvent>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
-        },
-      },
+      on: startFinishing,
     },
     finishing: {
       invoke: finish.fromPromise(context => context.frozenModel?.flow.finalize() ?? Promise.resolve(), {
@@ -59,9 +61,12 @@ const finishMachine = finish.createMachine({
     handingOff: {
       always: {
         guard: context => !context.isLeaving,
-        target: 'idle',
+        target: 'finished',
         actions: finish.assign(() => ({ frozenModel: null })),
       },
+    },
+    finished: {
+      on: startFinishing,
     },
   },
 });
@@ -79,14 +84,17 @@ function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignU
   return flow.mode === 'public' ? 'start' : flow.mode;
 }
 
-type SignUpControllerResult = Omit<
-  SignUpViewProps,
-  'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone'
-> & {
-  attempt?: string;
-  verifyEmail: SignUpVerifyScreen;
-  verifyPhone: SignUpVerifyScreen;
-};
+type SignUpControllerResult =
+  | { status: 'hidden' }
+  | (Omit<
+      SignUpViewProps,
+      'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone'
+    > & {
+      status: 'ready';
+      attempt?: string;
+      verifyEmail: SignUpVerifyScreen;
+      verifyPhone: SignUpVerifyScreen;
+    });
 
 export function useSignUpController(
   liveModel: SignUpReadyModel,
@@ -98,6 +106,10 @@ export function useSignUpController(
   const liveStep = liveModel.flow.step;
   const isLeaving = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isLeaving } });
+  const [arrivedSignedIn] = useState(liveStep.type === 'signed_in');
+  const [leaveOnArrival] = useState(() => (liveStep.type === 'signed_in' ? liveModel.flow.leave : undefined));
+
+  useEffect(() => leaveOnArrival?.(), [leaveOnArrival]);
 
   // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
   // `useMachine`, in its own PR, so both controllers drop this effect.
@@ -107,8 +119,11 @@ export function useSignUpController(
 
   const model = finishSnapshot.context.frozenModel ?? liveModel;
   const { flow, app, navigation, verification } = model;
-  const isFinishing = finishSnapshot.value !== 'idle';
-  const shown = shownRoute(route, flow.step);
+  const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
+  const isHidden =
+    liveStep.type === 'signed_in' &&
+    (finishSnapshot.value === 'finished' || (arrivedSignedIn && liveModel.flow.leave !== undefined));
+  const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
   const screen = screenFor(shown, flow);
 
   useRouteGuard({ route, go }, shown);
@@ -142,7 +157,12 @@ export function useSignUpController(
     onEditIdentifier: () => go(detailsRouteFor(route)),
   };
 
+  if (isHidden) {
+    return { status: 'hidden' };
+  }
+
   return {
+    status: 'ready',
     screen,
     attempt: flow.signUpId,
     start: details.start,

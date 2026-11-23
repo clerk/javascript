@@ -58,6 +58,7 @@ export interface SignUpFlowModel {
   mode: 'public' | 'restricted' | 'waitlist';
   actionBlocked?: AuthActionBlockedDetails;
   afterSignUpUrl: string;
+  leave?: () => void;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
 }
@@ -215,6 +216,8 @@ export function useSignUpModel({
   const signInUrl = () => clerk.buildSignInUrl(returnUrl ? { redirectUrl: returnUrl } : undefined);
   const taskInFlow = (task: SessionTask | undefined): SignUpTaskKey | undefined =>
     task?.key === 'choose-organization' && !clerk.__internal_getOption('taskUrls')?.[task.key] ? task.key : undefined;
+  const taskUrl = (task: SessionTask) =>
+    clerk.__internal_getOption('taskUrls')?.[task.key] ?? buildTaskUrl(task, { base: signInUrl() });
   const passwordSettings = environment?.userSettings.passwordSettings;
   const moduleManager = clerk.__internal_moduleManager;
   const validatePassword = useMemo(
@@ -258,11 +261,14 @@ export function useSignUpModel({
     if (signUp.id) {
       return next(signUp);
     }
-    const task = taskInFlow(session?.currentTask);
-    if (task) {
-      return { type: 'task', key: task };
+    if (session === null) {
+      return next(signUp);
     }
-    return session === null ? next(signUp) : { type: 'leaving' };
+    if (session === undefined) {
+      return { type: 'leaving' };
+    }
+    const task = taskInFlow(session.currentTask);
+    return task ? { type: 'task', key: task } : { type: 'signed_in' };
   };
 
   const [lastError] = errors.raw ?? [];
@@ -327,6 +333,12 @@ export function useSignUpModel({
           }
         : undefined,
       afterSignUpUrl,
+      leave: environment.authConfig.singleSessionMode
+        ? () => {
+            const task = session?.currentTask;
+            void router.navigate(task ? taskUrl(task) : afterSignUpUrl);
+          }
+        : undefined,
       finalize: async () => {
         await run(() =>
           signUp.finalize({
@@ -336,9 +348,7 @@ export function useSignUpModel({
                 return;
               }
               if (task) {
-                await router.navigate(
-                  clerk.__internal_getOption('taskUrls')?.[task.key] ?? buildTaskUrl(task, { base: signInUrl() }),
-                );
+                await router.navigate(taskUrl(task));
                 return;
               }
               const decorated = decorateUrl(afterSignUpUrl);

@@ -56,16 +56,22 @@ function SignUpFlow({
   model,
   routing,
   path,
-}: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement {
+}: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement | null {
   const task = useTaskChooseOrganizationModel({
     redirectUrlComplete: model.flow.afterSignUpUrl,
     enabled: model.flow.step.type === 'task',
   });
-  const { attempt, verifyEmail, verifyPhone, ...view } = useSignUpController(model, {
+  const controller = useSignUpController(model, {
     routing,
     path,
     isTaskReady: isTaskChooseOrganizationReady(task),
   });
+
+  if (controller.status === 'hidden') {
+    return null;
+  }
+
+  const { status: _status, attempt, verifyEmail, verifyPhone, ...view } = controller;
 
   return (
     <SignUpView

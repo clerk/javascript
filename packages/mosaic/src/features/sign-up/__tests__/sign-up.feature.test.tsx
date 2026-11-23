@@ -5,16 +5,20 @@ import { describe, expect, it, onTestFinished } from 'vitest';
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
+  fapiClient,
   fapiEnvironment,
   type FapiEnvironmentOverrides,
   fapiMembership,
   fapiOrganization,
+  fapiSession,
+  fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { useVirtualSegment, useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp, type SignUpProps } from '../sign-up';
 
 const EMAIL = 'alice@example.com';
+const signedInSession = fapiSession({ id: 'sess_existing', user: fapiUser({ id: 'user_existing' }) });
 const PASSWORD = 'correct-horse-battery';
 
 function environment({ attributes, ...overrides }: FapiEnvironmentOverrides = {}) {
@@ -119,18 +123,61 @@ describe('SignUp', () => {
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
-  it('stays on the code screen after the session is created', async () => {
+  it('shows nothing and is no longer busy when it stays mounted after the session is created', async () => {
     const { user, navigate } = await renderSignUp();
 
     await submitStart(user);
     await enterCode(user);
 
-    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verify your email' })).toBeNull());
     await tick();
     await tick();
-    expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(navigate).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
-    expect(continueButton()).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByRole('button', { busy: true })).toBeNull();
+  });
+
+  it('leaves once and shows nothing when it stays mounted after the session is created in single-session mode', async () => {
+    const { user, navigate } = await renderSignUp(
+      { environment: environment({ auth_config: { single_session_mode: true } }) },
+      {},
+      { signUpFallbackRedirectUrl: '/welcome' },
+    );
+
+    await submitStart(user);
+    await enterCode(user);
+
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verify your email' })).toBeNull());
+    await tick();
+    await tick();
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledWith('/welcome');
+    expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
+  });
+
+  it('leaves for the after sign-up URL without showing the form when a user is signed in, in single-session mode', async () => {
+    const sawForm = watchForHeading('Create your account');
+    const { navigate } = await renderSignUp(
+      {
+        environment: environment({ auth_config: { single_session_mode: true } }),
+        client: fapiClient([signedInSession]),
+      },
+      {},
+      { signUpFallbackRedirectUrl: '/welcome' },
+    );
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/welcome'));
+    await tick();
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(sawForm()).toBe(false);
+  });
+
+  it('shows the form to add another account when a user is signed in, in multi-session mode', async () => {
+    const { navigate } = await renderSignUp({ client: fapiClient([signedInSession]) });
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(continueButton()).not.toHaveAttribute('aria-busy', 'true');
+    expect(navigate).not.toHaveBeenCalled();
   });
 
   it('shows the organization task in the same card when the new session has one', async () => {

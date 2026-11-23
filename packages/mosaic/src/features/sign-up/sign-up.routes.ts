@@ -4,7 +4,11 @@ import type { RouteName } from '../../routing/routes';
 
 export type SignUpTaskKey = 'choose-organization';
 
-export type SignUpFlowStep = SignUpNextStep | { type: 'task'; key: SignUpTaskKey } | { type: 'leaving' };
+export type SignUpFlowStep =
+  | SignUpNextStep
+  | { type: 'task'; key: SignUpTaskKey }
+  | { type: 'signed_in' }
+  | { type: 'leaving' };
 
 export const signUpRoutes = {
   start: '',
@@ -30,6 +34,7 @@ export function routeFor(step: SignUpFlowStep, from: SignUpRoute): SignUpRoute |
   const underContinue = detailsRouteFor(from) === 'continue';
   switch (step.type) {
     case 'start':
+    case 'signed_in':
       return 'start';
     case 'fields':
       return 'continue';

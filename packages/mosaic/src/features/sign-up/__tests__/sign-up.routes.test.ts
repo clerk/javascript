@@ -51,6 +51,7 @@ describe('sign-up shown route', () => {
       'taskChooseOrganization',
     ],
     ['moves a task route back to start once signed out', 'taskChooseOrganization', { type: 'start' }, 'start'],
+    ['shows start to a signed-in user adding an account', 'verifyEmail', { type: 'signed_in' }, 'start'],
   ])('%s', (_, route, step, expected) => {
     expect(shownRoute(route, step)).toBe(expected);
   });
