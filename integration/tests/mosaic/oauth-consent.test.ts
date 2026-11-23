@@ -159,4 +159,46 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic OAut
     expect(params.get('code')).toBeTruthy();
     expect(params.get('state')).toBe(state);
   });
+
+  test('grants only the scopes the user keeps checked', async ({ page, context }) => {
+    const u = await signIn({ page, context });
+    await u.page.goToRelative(path, { searchParams: authorizeParams('profile email') });
+    await expect(heading(page)).toBeVisible();
+
+    await page.getByRole('checkbox', { name: 'Your email address' }).uncheck();
+
+    const consentRequest = page.waitForRequest(
+      request => request.method() === 'POST' && request.url().includes(`/me/oauth/consent/`),
+    );
+    await page.getByRole('button', { name: 'Allow' }).click();
+
+    const posted = new URLSearchParams((await consentRequest).postData() ?? '');
+    expect(posted.getAll('scope')).toEqual(['profile']);
+    const params = await waitForCallback(page);
+    expect(params.get('code')).toBeTruthy();
+    expect(params.get('state')).toBe(state);
+  });
+
+  test('grants no organization when the user unchecks organization access', async ({ page, context }) => {
+    const u = await signIn({ page, context });
+    await u.page.goToRelative(path, { searchParams: authorizeParams('profile email user:org:read') });
+    await expect(heading(page)).toBeVisible();
+    const picker = page.getByRole('combobox', { name: /^Grant access for:/ });
+    await expect(picker).toBeVisible();
+
+    await page.getByRole('checkbox', { name: 'Your organization membership information' }).uncheck();
+    await expect(picker).toHaveCount(0);
+
+    const consentRequest = page.waitForRequest(
+      request => request.method() === 'POST' && request.url().includes(`/me/oauth/consent/`),
+    );
+    await page.getByRole('button', { name: 'Allow' }).click();
+
+    const posted = new URLSearchParams((await consentRequest).postData() ?? '');
+    expect(posted.getAll('scope')).toEqual(['profile email']);
+    expect(posted.has('organization_id')).toBe(false);
+    const params = await waitForCallback(page);
+    expect(params.get('code')).toBeTruthy();
+    expect(params.get('state')).toBe(state);
+  });
 });

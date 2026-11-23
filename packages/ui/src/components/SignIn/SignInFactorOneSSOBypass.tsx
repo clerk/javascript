@@ -85,6 +85,7 @@ export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) =
         <SignInFactorOneCodeForm
           factor={bypassFactor}
           factorAlreadyPrepared={false}
+          isInitialFactor
           onFactorPrepare={() => {}}
           cardTitle={localizationKeys('signIn.ssoBypass.code.title')}
           cardSubtitle={localizationKeys('signIn.ssoBypass.code.subtitle')}

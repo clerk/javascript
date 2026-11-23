@@ -824,9 +824,18 @@ export interface DeletedDirectoryGroupMembershipWebhookEventJSON extends Directo
   cause: 'group_deleted' | 'member_removed';
 }
 
+export interface PaginationCursorJSON {
+  starting_after: string | null;
+  ending_before: string | null;
+  has_next_page: boolean;
+  remaining_count_exact?: number;
+  remaining_count_at_least?: number;
+}
+
 export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
+  cursor?: PaginationCursorJSON;
 }
 
 export interface EnterpriseConnectionSamlConnectionLoginHintJSON {
