@@ -6,11 +6,11 @@ import { hasArea } from '../chart/chart-context';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import {
   type BarStyleElement,
-  CanvasRenderError,
   getBarGeometrySnapshot,
   paintStackedBarCanvas,
   parseBarGeometry,
 } from './bar-chart-canvas';
+import { CanvasRenderError } from './bar-chart-canvas-error';
 import { StackedBarsContext, useBarChartContext } from './bar-chart-context';
 import { fitProjectionToBar, projectStackedBarMarks } from './bar-chart-layout';
 

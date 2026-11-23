@@ -1,16 +1,10 @@
 import type { ChartSize } from '../chart/types';
 import { getComputedStyle } from '../utils/dom';
+import { CanvasRenderError } from './bar-chart-canvas-error';
 import { type BarGeometry, type PaintedProjection, UNSTYLED_BAR_GEOMETRY } from './bar-chart-layout';
 import type { BarIdentity, BarMark } from './types';
 
 const TILE_DEVICE_PIXELS = 32;
-
-export class CanvasRenderError extends Error {
-  constructor(message: string, cause: unknown) {
-    super(message, { cause });
-    this.name = 'CanvasRenderError';
-  }
-}
 
 type BarCanvasContext = Pick<
   CanvasRenderingContext2D,

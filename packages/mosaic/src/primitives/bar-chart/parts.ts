@@ -5,4 +5,4 @@ export {
   type BarChartProjectionOutlineProps,
   BarChartProjectionOutline as ProjectionOutline,
 } from './bar-chart-projection-outline';
-export { CanvasRenderError } from './bar-chart-canvas';
+export { CanvasRenderError } from './bar-chart-canvas-error';
