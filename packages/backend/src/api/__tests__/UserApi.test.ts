@@ -129,12 +129,12 @@ describe('UserAPI', () => {
       expect(putHandler).toHaveBeenCalledTimes(1);
     });
 
-    it('sends reset_client_trust alongside the password and sign out fields', async () => {
+    it('sends reset_device_trust alongside the password and sign out fields', async () => {
       const patchHandler = vi.fn(async ({ request }: { request: Request }) => {
         expect(await request.json()).toEqual({
           password: 'x',
           sign_out_of_other_sessions: true,
-          reset_client_trust: true,
+          reset_device_trust: true,
         });
         return HttpResponse.json(mockUserResponse);
       });
@@ -144,7 +144,7 @@ describe('UserAPI', () => {
       await apiClient.users.updateUser('user_123', {
         password: 'x',
         signOutOfOtherSessions: true,
-        resetClientTrust: true,
+        resetDeviceTrust: true,
       });
 
       expect(patchHandler).toHaveBeenCalledTimes(1);

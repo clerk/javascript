@@ -42,18 +42,18 @@ describe('SessionAPI', () => {
   });
 
   describe('revokeSession', () => {
-    it('sends reset_client_trust when resetClientTrust is set', async () => {
+    it('sends reset_device_trust when resetDeviceTrust is set', async () => {
       server.use(
         http.post(
           `https://api.clerk.test/v1/sessions/${sessionId}/revoke`,
           validateHeaders(async ({ request }) => {
-            expect(await request.json()).toEqual({ reset_client_trust: true });
+            expect(await request.json()).toEqual({ reset_device_trust: true });
             return HttpResponse.json({ object: 'session', id: sessionId, status: 'revoked' });
           }),
         ),
       );
 
-      const response = await apiClient.sessions.revokeSession(sessionId, { resetClientTrust: true });
+      const response = await apiClient.sessions.revokeSession(sessionId, { resetDeviceTrust: true });
       expect(response.id).toBe(sessionId);
     });
 

@@ -308,7 +308,7 @@ export type UpdateUserParams = {
   /** When set to `true`, the user is signed out from all their active sessions once their password is updated. */
   signOutOfOtherSessions?: boolean;
   /** When set to `true`, Clerk also forgets all of the user's devices. The user's next sign-in on any device counts as a new device. That sign-in can require a Device Trust challenge, and Clerk can email the user about the new device. Requires a new `password` or `passwordDigest`, and `signOutOfOtherSessions` set to `true`. Otherwise the request fails and the user is not updated. */
-  resetClientTrust?: boolean;
+  resetDeviceTrust?: boolean;
   /** The ID of the email address to set as primary. Must be verified and present on the given user. */
   primaryEmailAddressID?: string;
   /** When set to `true`, the user is notified that their primary email address has changed. */
