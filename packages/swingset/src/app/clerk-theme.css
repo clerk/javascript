@@ -73,3 +73,73 @@ html[data-swingset-theme='clerk'] {
     0 1px 2px 0 light-dark(rgb(25 28 33 / 0.06), transparent), 0 1px 3px 0 light-dark(transparent, rgb(0 0 0 / 0.4)),
     0 0 2px 0 light-dark(rgb(0 0 0 / 0.08), transparent), 0 0 3px 0 light-dark(transparent, rgb(0 0 0 / 0.2));
 }
+
+/* The Dashboard's overview growth chart. It colors series by meaning; the slots follow the stories'
+   order: 1 sign-ups (first active), 2 returning (reactivated), 3 churned (retained churned), then the
+   rest of the ramp. */
+html[data-swingset-theme='clerk'] {
+  --cl-color-chart-1: light-dark(#ccc8ff, #bab0ff);
+  --cl-color-chart-2: light-dark(#9280ff, #846bff);
+  --cl-color-chart-3: light-dark(#232328, #adadb7);
+  --cl-color-chart-4: light-dark(#6c47ff, #4d06d1);
+  --cl-color-chart-5: light-dark(#c7c7cf, #4c4c5c);
+  --cl-color-chart-6: light-dark(#90909d, #767684);
+}
+
+html[data-swingset-theme='clerk']:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+  & .cl-chart-legend,
+  & .cl-chart-tooltip-row {
+    font-size: var(--cl-text-xs-size);
+    line-height: var(--cl-text-xs-leading);
+  }
+
+  & .cl-chart-swatch:is([data-swatch='square'], [data-swatch='line']) {
+    border-radius: 9999px;
+    height: 0.375rem;
+    width: 0.375rem;
+  }
+
+  & .cl-chart-grid-line {
+    stroke: light-dark(#dbdbe0, #3d3d4a);
+  }
+
+  & .cl-chart-y-line {
+    stroke: light-dark(#2b2b34, #adadb7);
+  }
+
+  & :is(.cl-chart-y-tick, .cl-chart-x-tick) {
+    fill: var(--cl-color-foreground-secondary);
+    font-size: 0.6875rem;
+  }
+
+  & .cl-chart-bar[data-projection] {
+    color: light-dark(#f6f6f7, #33333e);
+  }
+
+  & .cl-chart-projection-outline {
+    stroke: light-dark(#90909d, #adadb7);
+    stroke-width: 0.5;
+  }
+
+  & .cl-chart-cursor {
+    border-radius: 0;
+    background-color: rgb(209 213 219 / 0.15);
+  }
+
+  & .cl-chart-tooltip {
+    background-color: light-dark(#ffffff, #111113);
+    box-shadow:
+      0 0 0 1px rgb(25 28 33 / 0.06),
+      0 32px 72px -12px rgb(0 0 0 / 0.2),
+      0 16px 32px -6px rgb(0 0 0 / 0.2);
+  }
+
+  & .cl-chart-tooltip-heading:not(:last-child) {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--cl-color-border-subtle);
+  }
+
+  & .cl-chart-tooltip-row {
+    --cl-color-foreground-secondary: var(--cl-color-foreground);
+  }
+}
