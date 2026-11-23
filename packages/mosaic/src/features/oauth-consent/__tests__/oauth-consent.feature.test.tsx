@@ -562,6 +562,21 @@ describe('OAuthConsent', () => {
       await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Your profile' })).toBeNull());
       expect(scopeCheckbox('Your email address')).toBeChecked();
     });
+
+    it("shows a skeleton, not the previous request's scopes, while the next request loads", async () => {
+      visitOAuthConsent();
+      const { fapi, rerender } = await renderOAuthConsent();
+
+      await ready();
+      fapi.oauthConsent = consent({ scopes: [scope('email', 'Your email address')] });
+      const held = holdRequests('get', CONSENT_PATH);
+      rerender(<OAuthConsent scope='email' />);
+
+      await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Your profile' })).toBeNull());
+      expect(screen.getByRole('status')).toHaveTextContent('Loading consent information');
+      held.release();
+      await waitFor(() => expect(scopeCheckbox('Your email address')).toBeChecked());
+    });
   });
 
   describe('client identity', () => {

@@ -44,6 +44,7 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
     scope,
     redirectUri: redirectUrl || undefined,
     enabled: redirectUrl !== '',
+    keepPreviousData: false,
   });
 
   if (!isLoaded || !environment) {
