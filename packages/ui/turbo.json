@@ -6,28 +6,6 @@
       "dependsOn": ["build"],
       "persistent": true
     },
-    "build": {
-      "inputs": [
-        "*.d.ts",
-        "src/**",
-        "tsconfig.json",
-        "tsconfig.base.json",
-        "tsconfig.src.json",
-        "rspack.config.js",
-        "tsdown.config.mts",
-
-        "!**/*.test.*",
-        "!**/test/**",
-        "!**/tests/**",
-        "!**/__tests__/**",
-        "!**/__mocks__/**",
-        "!**/__snapshots__/**",
-        "!coverage/**",
-        "!examples/**",
-        "!node_modules/**"
-      ],
-      "outputs": ["*/package.json", "dist/**"]
-    },
     "test": {
       "inputs": [
         "*.d.ts",
@@ -37,7 +15,6 @@
         "tsconfig.*.json",
         "rspack.config.js",
         "vitest.*.mts",
-
         "!**/__snapshots__/**",
         "!coverage/**",
         "!examples/**",
