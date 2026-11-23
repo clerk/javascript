@@ -17,6 +17,8 @@ export type TestChartProps<TDatum> = StackedBarLayoutOptions<TDatum> &
     renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
     boundary?: React.RefObject<HTMLElement | null>;
     height?: number | string;
+    /** Mounts `BarChart.Bar`. Default: true */
+    bar?: boolean;
     barClassName?: string;
     isBarActive?: BarChartStackedBarsProps<TDatum>['isBarActive'];
   };
@@ -36,6 +38,7 @@ export function TestChart<TDatum>({
   renderTooltip,
   boundary,
   height,
+  bar = true,
   barClassName,
   isBarActive,
 }: TestChartProps<TDatum>) {
@@ -47,7 +50,7 @@ export function TestChart<TDatum>({
       aria-label={ariaLabel}
     >
       <BarChart.StackedBars<TDatum> isBarActive={isBarActive}>
-        <BarChart.Bar className={barClassName} />
+        {bar ? <BarChart.Bar className={barClassName} /> : null}
         <BarChart.ProjectionOutline />
         <BarChart.ZeroLine />
       </BarChart.StackedBars>
