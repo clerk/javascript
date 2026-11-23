@@ -261,11 +261,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const submitSignUp = () =>
     run(() => {
+      const emailAddress = values.emailAddress.trim();
       if (!values.firstName.trim() || !values.lastName.trim()) {
         setGlobalErrorMessage('Enter your first and last name.');
         return;
       }
-      if (!identifier.includes('@')) {
+      if (!emailAddress.includes('@')) {
         setGlobalErrorMessage('Enter a valid email address.');
         return;
       }
@@ -277,7 +278,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setGlobalErrorMessage('Accept the Terms of Service and Privacy Policy to continue.');
         return;
       }
-      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
+      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: emailAddress }, 1);
     });
 
   const onSubmit = (event?: SignInSubmitEvent) => {
