@@ -43,6 +43,12 @@ function RouteProbe() {
       <output aria-label='Stored route'>{parts?.join('/') || 'start'}</output>
       <button
         type='button'
+        onClick={() => write('/sign-up', [])}
+      >
+        Open the start route
+      </button>
+      <button
+        type='button'
         onClick={() => write('/sign-up', ['verify-email-address'])}
       >
         Open the verify route
@@ -205,18 +211,18 @@ describe('SignUp', () => {
     expect(fapi.signUp.creations[0].get('first_name')).toBe('Alice');
   });
 
-  it('sends a code for the new sign-up when the address is edited while the first code is sending', async () => {
+  it('keeps Edit disabled until the first code is sent', async () => {
     const { fapi, user } = await renderSignUp();
     const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
 
     await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'Edit email address' }));
-    await user.click(await screen.findByRole('button', { name: 'Continue' }));
-    await waitFor(() => expect(hold.requests).toHaveLength(2));
-    hold.release();
+    await waitFor(() => expect(hold.requests).toHaveLength(1));
 
+    expect(await screen.findByRole('button', { name: 'Edit email address' })).toBeDisabled();
+
+    hold.release();
     await codeSent();
-    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Edit email address' })).toBeEnabled();
     expect(fapi.signUp.preparations).toEqual(['email_code']);
   });
 
@@ -601,7 +607,7 @@ describe('SignUp', () => {
 
     await submitStart(user);
     await waitFor(() => expect(hold.requests).toHaveLength(1));
-    await user.click(await screen.findByRole('button', { name: 'Edit email address' }));
+    await user.click(screen.getByRole('button', { name: 'Open the start route' }));
     await screen.findByRole('heading', { name: 'Create your account' });
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));

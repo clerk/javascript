@@ -17,6 +17,7 @@ export function SignUpVerify({ channel, provider, onEditIdentifier, onCancel, ..
     errorMessage,
     globalErrorMessage,
     isPending,
+    canEditIdentifier,
     onSubmit,
     onComplete,
     onResend,
@@ -49,7 +50,7 @@ export function SignUpVerify({ channel, provider, onEditIdentifier, onCancel, ..
           <AuthIdentityPreview
             identifier={identity.identifier}
             editLabel={identity.editLabel}
-            disabled={isPending}
+            disabled={!canEditIdentifier}
             onEdit={onEditIdentifier}
           />
         ) : undefined

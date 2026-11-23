@@ -88,6 +88,7 @@ export function useSignUpVerifyController({
     onSubmit: () => submit(value),
     onComplete: submit,
     isPending,
+    canEditIdentifier: !isPending && snapshot.value !== 'sending',
     errorMessage: actions.error,
     globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
     onResend: () => send({ type: 'RESEND' }),
