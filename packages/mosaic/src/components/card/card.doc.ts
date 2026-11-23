@@ -39,8 +39,8 @@ export default {
       props: {
         elevation: {
           type: "'card' | 'flush' | 'overlay'",
-          doc: '`card`, `flush` or `overlay`.',
-          default: "'overlay' inside a dialog, otherwise 'card'",
+          doc: '`card`, `flush` or `overlay`. Inside a `Dialog` it defaults to `overlay`.',
+          default: "'card'",
         },
         size: {
           type: "'md' | 'lg'",
