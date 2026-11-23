@@ -54,6 +54,43 @@ describe('check-docs-exports', () => {
     expect(result.stderr).toContain('components/thing exports Thing.Secret, which its doc does not list');
   });
 
+  it('passes when a second doc in the unit folder lists another export', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/other-thing.doc.ts': `export default { name: 'OtherThing', parts: { OtherThing: {} } };\n`,
+        'dist/components/thing.js': `export * as Thing from './thing/thing.parts.js';\nexport const OtherThing = () => null;\n`,
+      },
+    });
+    expect(result.stderr).toBe('');
+    expect(result.status).toBe(0);
+  });
+
+  it('fails when a second doc in the unit folder lists a missing export', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/other-thing.doc.ts': `export default { name: 'OtherThing', parts: { OtherThing: {} } };\n`,
+      },
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('components/thing does not export OtherThing');
+  });
+
+  it('fails when a doc is nested below the unit folder', () => {
+    const result = checkDocsExports({
+      ...validPackage,
+      files: {
+        ...validPackage.files,
+        'src/components/thing/parts/other-thing.doc.ts': `export default { name: 'OtherThing', parts: { OtherThing: {} } };\n`,
+      },
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain('src/components/thing/parts/other-thing.doc.ts is not at a documented location');
+  });
+
   it('fails when a name the doc only mentions in prose is exported', () => {
     const result = checkDocsExports({
       ...validPackage,
