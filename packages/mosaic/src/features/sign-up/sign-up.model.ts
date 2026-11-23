@@ -286,6 +286,7 @@ export function useSignUpModel({
     emailAddress: values.emailAddress,
     phoneNumber: values.phoneNumber,
     username: values.username,
+    password: values.password,
     firstName: values.firstName,
     lastName: values.lastName,
     legalAccepted: values.legalAccepted,
@@ -390,11 +391,7 @@ export function useSignUpModel({
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       create: async values => {
-        await save(
-          () => run(() => signUp.create({ ...details(values), password: values.password })),
-          DETAILS_FIELDS,
-          usernameBounds,
-        );
+        await save(() => run(() => signUp.create(details(values))), DETAILS_FIELDS, usernameBounds);
         return next(signUp);
       },
       update: async values => {

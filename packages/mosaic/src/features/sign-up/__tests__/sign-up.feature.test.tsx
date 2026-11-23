@@ -381,6 +381,31 @@ describe('SignUp', () => {
     expect(fapi.client.sessions).toHaveLength(1);
   });
 
+  it('sends the password from the continue screen when the sign-up has none', async () => {
+    const fapi = serveFapi({ environment: environment() });
+    const { clerk, navigate } = await renderWithClerk(
+      <>
+        <SignUp />
+        <RouteProbe />
+      </>,
+    );
+    const user = userEvent.setup();
+    await screen.findByRole('heading', { name: 'Create your account' });
+    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL }));
+
+    await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+    await enterCode(user);
+
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    await user.type(passwordField(), PASSWORD);
+    await user.click(continueButton());
+
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(fapi.signUp.updates).toHaveLength(1);
+    expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
+    expect(fapi.client.sessions).toHaveLength(1);
+  });
+
   it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {
     const fapi = serveFapi({
       environment: environment({
