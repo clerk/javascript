@@ -78,6 +78,8 @@ export type ChartInteractionProps = Readonly<{
   role: 'button' | 'group';
   /** 0 while something reads the selection: `selection`, `onSelectionChange` or `onActivate`. */
   tabIndex: 0 | undefined;
+  /** Removing the surface ends a pointer or keyboard selection, as leaving or blurring it does. */
+  ref: React.RefCallback<HTMLElement>;
   onPointerDown: React.PointerEventHandler<HTMLElement>;
   onPointerLeave: React.PointerEventHandler<HTMLElement>;
   onPointerCancel: React.PointerEventHandler<HTMLElement>;

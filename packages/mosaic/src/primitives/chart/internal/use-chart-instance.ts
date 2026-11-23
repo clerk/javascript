@@ -215,8 +215,15 @@ export function useChartInstance<
     dispatchRef.current({ type: 'clear' });
   }, []);
 
-  // Only a pointer event on the surface makes a pointer selection, so its target is the surface.
-  const surfaceRef = React.useRef<EventTarget | null>(null);
+  const surfaceRef = React.useRef<HTMLElement | null>(null);
+  // A removed surface fires no pointerleave or blur, so its removal ends what the user selected on it.
+  const attachSurface = React.useCallback((element: HTMLElement | null) => {
+    surfaceRef.current = element;
+    const state = stateRef.current;
+    if (!element && state.status === 'selected' && state.source !== 'external') {
+      dispatchRef.current({ type: 'clear' });
+    }
+  }, []);
 
   // A tap fires no pointerleave or blur, so a tap anywhere else dismisses.
   const hasPointerSelection = valid?.source === 'pointer';
@@ -226,7 +233,7 @@ export function useChartInstance<
     }
     const dismissOutside = (event: PointerEvent) => {
       const surface = surfaceRef.current;
-      if (!(event.target instanceof Node) || !(surface instanceof Node) || !surface.contains(event.target)) {
+      if (!(event.target instanceof Node) || !surface?.contains(event.target)) {
         clear();
       }
     };
@@ -276,9 +283,9 @@ export function useChartInstance<
     ...model.surfaceAttributes(currentSelection),
     role: onActivate ? 'button' : 'group',
     tabIndex: reads ? 0 : undefined,
+    ref: attachSurface,
     onPointerDown: event => {
       event.preventDefault();
-      surfaceRef.current = event.currentTarget;
       // A tap fires no pointermove, so touch selects on contact and survives the pointerleave that
       // follows the finger lifting.
       if (event.pointerType !== 'touch') {
@@ -296,7 +303,6 @@ export function useChartInstance<
       dispatch({ type: 'clear' });
     },
     onPointerMove: event => {
-      surfaceRef.current = event.currentTarget;
       pointerUpdates.schedule(pointerSelection(event.clientX, event.clientY), next =>
         dispatch({ type: 'pointer', selection: next }),
       );

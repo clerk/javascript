@@ -128,21 +128,21 @@ Name the active type the chart's hook selects, such as `<Chart.Tooltip<ActiveBar
 
 A chart-type hook returns a `ChartInstance` plus what its own marks need:
 
-| Field                   | Type                                     | Description                                                              |
-| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------ |
-| `rootRef`               | `(element: HTMLElement \| null) => void` | Measures the element. `Chart.Root` attaches it                           |
-| `size`                  | `ChartSize`                              | The measured container, zero until the first measurement                 |
-| `plot`                  | `ChartPlot`                              | The plot rectangle inside the margin                                     |
-| `scaleY`                | `(value: number) => number`              | Maps a value to a Y coordinate                                           |
-| `yTicks`                | `readonly ChartTick[]`                   | The Y ticks                                                              |
-| `categories`            | `readonly ChartCategory[]`               | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`        |
-| `xTicks`                | `(options?: XTicksOptions) => XTick[]`   | The X labels for a tick mode, as `Chart.XAxis` computes them             |
-| `selected`              | `TActive \| null`                        | The selection in the current data                                        |
-| `tooltipAnchor`         | `{ x, y } \| null`                       | Where a tooltip for `selected` points                                    |
-| `announcement`          | `string`                                 | The status text for the keyboard selection                               |
-| `keyboardInstructions`  | `string`                                 | The keys the chart answers to                                            |
-| `select`, `clear`       | `(selection) => void`, `() => void`      | Change the selection and call `onSelectionChange`                        |
-| `getInteractionProps()` | `ChartInteractionProps`                  | Role, `tabIndex`, the chart type's `data-*` state and the event handlers |
+| Field                   | Type                                     | Description                                                                     |
+| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
+| `rootRef`               | `(element: HTMLElement \| null) => void` | Measures the element. `Chart.Root` attaches it                                  |
+| `size`                  | `ChartSize`                              | The measured container, zero until the first measurement                        |
+| `plot`                  | `ChartPlot`                              | The plot rectangle inside the margin                                            |
+| `scaleY`                | `(value: number) => number`              | Maps a value to a Y coordinate                                                  |
+| `yTicks`                | `readonly ChartTick[]`                   | The Y ticks                                                                     |
+| `categories`            | `readonly ChartCategory[]`               | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`               |
+| `xTicks`                | `(options?: XTicksOptions) => XTick[]`   | The X labels for a tick mode, as `Chart.XAxis` computes them                    |
+| `selected`              | `TActive \| null`                        | The selection in the current data                                               |
+| `tooltipAnchor`         | `{ x, y } \| null`                       | Where a tooltip for `selected` points                                           |
+| `announcement`          | `string`                                 | The status text for the keyboard selection                                      |
+| `keyboardInstructions`  | `string`                                 | The keys the chart answers to                                                   |
+| `select`, `clear`       | `(selection) => void`, `() => void`      | Change the selection and call `onSelectionChange`                               |
+| `getInteractionProps()` | `ChartInteractionProps`                  | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers |
 
 A category's `x` and `width` are the extent its marks occupy: a band for bars. Its `center` is where the pointer snaps, the X tick sits and the tooltip anchors. `Chart.Root` and the shared parts hold the chart as a `ChartInstance`, whose `select` takes no value, so only the code that called the hook can select.
 
@@ -175,6 +175,8 @@ A pointer selects the category whose center is nearest. A tap selects on contact
 ## Selection
 
 The chart holds the selection unless you pass `selection`. `onSelectionChange` is called whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. It is not called when data changes: `chart.selected` resolves the selection against the current data, so a selection whose category disappears reads as null until the user moves.
+
+Removing the interaction surface, such as unmounting `Chart.Selection`, ends a pointer or keyboard selection and calls `onSelectionChange` with null, as leaving or blurring the surface does. A selection set through `selection` or `select` stays. `Chart.Selection` also removes its surface when the data has no categories.
 
 A controlled `selection` decides what is selected. The chart also remembers two things the value cannot hold, and keeps them only while the controlled value agrees:
 

@@ -264,3 +264,68 @@ describe('the tooltip', () => {
     await expect.poll(() => screen.queryByTestId('tooltip')).toBeNull();
   });
 });
+
+function activeTicks() {
+  return [...document.querySelectorAll('text[data-active]')].map(tick => tick.textContent);
+}
+
+describe('removing Chart.Selection', () => {
+  it('ends a keyboard selection', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    const { rerender } = await render(<Chart onSelectionChange={onSelectionChange} />);
+    surface().focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(activeTicks).toEqual(['Feb']);
+
+    rerender(
+      <Chart
+        onSelectionChange={onSelectionChange}
+        selectionPart={false}
+      />,
+    );
+
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+    expect(activeTicks()).toEqual([]);
+  });
+
+  it('ends a pointer selection', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    const { rerender } = await render(<Chart onSelectionChange={onSelectionChange} />);
+    const { x, y } = centerOfCategory(3);
+    pointer('pointermove', surface(), x, y);
+    await expect.poll(activeTicks).toEqual(['Apr']);
+
+    rerender(
+      <Chart
+        onSelectionChange={onSelectionChange}
+        selectionPart={false}
+      />,
+    );
+
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+    expect(activeTicks()).toEqual([]);
+  });
+
+  it('keeps a selection the consumer set', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    const selection: BarSelection = { category: 'Mar', section: 'positive' };
+    const { rerender } = await render(
+      <Chart
+        selection={selection}
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    await expect.poll(activeTicks).toEqual(['Mar']);
+
+    rerender(
+      <Chart
+        selection={selection}
+        onSelectionChange={onSelectionChange}
+        selectionPart={false}
+      />,
+    );
+
+    expect(activeTicks()).toEqual(['Mar']);
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+});
