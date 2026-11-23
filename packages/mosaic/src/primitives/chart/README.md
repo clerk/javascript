@@ -82,7 +82,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, inside any chart SVG          |
 | `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
-| `Chart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
+| `Chart.ProjectionOutline` | `<path>`        | Outlines the projected bar                                           |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels in the left margin                           |
 | `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
 | `Chart.XAxis`             | `<svg>`         | Holds the category labels below the plot                             |
@@ -326,17 +326,17 @@ Tailwind reads `_` inside `data-[…]` as a space, so a key such as `first_activ
 | Top corner radius    | The corners at a stack's outer end, mirrored below zero | Square         |
 | Bottom corner radius | Every other corner                                      | Square         |
 
-The geometry is paint only. Selection, the cursor and the scales use the category band. `Chart.ProjectionOutline` takes its width and corner radius from the same geometry.
+The geometry is paint only. Selection, the cursor and the scales use the category band. Bars 2px or wider snap their sides to whole pixels, and the projection also snaps its top. `Chart.ProjectionOutline` traces the projection fill the Canvas paints, 1.5px outside it, so a 1px stroke covers whole pixels and leaves a 1px gap. Its top corner radius is the fill's plus 1.5px, so the corners stay concentric, and its bottom corners are square on the zero line.
 
 The Canvas repaints in the same frame when:
 
 - `Chart.Bar` mounts, unmounts or changes `class`
-- any ancestor of `Chart.Bar`, up to `<html>`, changes `class`, `style` or `data-theme`, so a theme class or `color-scheme` set on a wrapper repaints the bars
-- `prefers-color-scheme` changes, so `light-dark()` colors under `color-scheme: light dark` follow the OS
+- any attribute on an ancestor of `Chart.Bar`, up to `<html>`, changes and a color the bars paint computes to a new value, so a theme switched through a class, `style`, `data-theme` or any other attribute repaints the bars, and an unrelated attribute change does not
+- `prefers-color-scheme` changes and a color the bars paint computes to a new value, so `light-dark()` colors under `color-scheme: light dark` follow the OS
 - the pixel ratio changes (capped at 2)
 - the layout or the props of `Chart.StackedBars` change
 
-Other changes to the computed color do not repaint: a stylesheet added or removed, another media query such as `prefers-contrast`, or an attribute other than those three on an ancestor. Change the class of `Chart.Bar` to repaint after one. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
+Other changes to the computed color do not repaint: a stylesheet added or removed, or another media query such as `prefers-contrast`. Change the class of `Chart.Bar` to repaint after one. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
 
 ## Paint order
 

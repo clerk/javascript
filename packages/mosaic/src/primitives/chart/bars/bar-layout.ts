@@ -160,6 +160,23 @@ function splitNeighbourGap<TDatum>(previous: DraftBarMark<TDatum>, mark: DraftBa
   }
 }
 
+/** Bars at least this wide snap their sides to whole pixels; narrower bars would lose too much width. */
+const MIN_SNAPPED_WIDTH = 2;
+
+/**
+ * Centers a bar of at most `maxWidth` in its category band. Snapping keeps the sides of the bars, the
+ * projection and its outline on the same whole pixels, so they paint crisp and line up.
+ */
+function fitBarToBand(band: Readonly<{ x: number; width: number }>, maxWidth: number) {
+  const width = Math.min(band.width, maxWidth);
+  const x = band.x + (band.width - width) / 2;
+  if (width < MIN_SNAPPED_WIDTH) {
+    return { x, width };
+  }
+  const left = Math.round(x);
+  return { x: left, width: Math.round(x + width) - left };
+}
+
 function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWidth, gap }: BarGeometry) {
   const { categories, scaleY } = layout;
   const marks: DraftBarMark<TDatum>[] = [];
@@ -175,7 +192,7 @@ function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWid
     const rawTop = Math.min(scaleY(point.start), scaleY(point.end));
     const rawBottom = Math.max(scaleY(point.start), scaleY(point.end));
     const height = Math.max(0, rawBottom - rawTop);
-    const barWidth = Math.min(category.width, maxWidth);
+    const fitted = fitBarToBand(category, maxWidth);
     const stackKey = `${point.datumIndex}:${point.positive}`;
     const previousMark = previousMarkByStack.get(stackKey);
     const mark: DraftBarMark<TDatum> = {
@@ -183,9 +200,9 @@ function projectMarksAndPaintInsets<TDatum>(layout: MarkSource<TDatum>, { maxWid
       datum: point.datum,
       datumIndex: point.datumIndex,
       value: point.value,
-      x: category.x + (category.width - barWidth) / 2,
+      x: fitted.x,
       y: rawTop,
-      width: barWidth,
+      width: fitted.width,
       height,
       radii: [0, 0, 0, 0],
       positive: point.positive,
@@ -351,6 +368,7 @@ export function projectStackedBarMarks<TDatum>(layout: MarkSource<TDatum>, geome
   return applyCornerRadii(projectMarksAndPaintInsets(layout, geometry), geometry);
 }
 
+/** The projection fill as the Canvas paints it: `radius` rounds the top corners, and the bottom is square on zero. */
 export type PaintedProjection = NonNullable<StackedBarLayout<unknown>['projection']> & Readonly<{ radius: number }>;
 
 export function fitProjectionToBar(
@@ -360,11 +378,16 @@ export function fitProjectionToBar(
   if (!projection) {
     return null;
   }
-  const width = Math.min(projection.width, maxWidth);
+  const { x, width } = fitBarToBand(projection, maxWidth);
+  const bottom = projection.y + projection.height;
+  const y = Math.min(Math.round(projection.y), bottom);
+  const height = bottom - y;
   return {
     ...projection,
-    x: projection.x + (projection.width - width) / 2,
+    x,
+    y,
     width,
-    radius: Math.min(outerRadius, width / 2),
+    height,
+    radius: Math.min(outerRadius, width / 2, height),
   };
 }

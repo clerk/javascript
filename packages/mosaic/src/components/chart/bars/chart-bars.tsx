@@ -60,7 +60,7 @@ export type ChartProjectionOutlineProps = Omit<PrimitiveChartProjectionOutlinePr
   MosaicStyleProps;
 
 /** A dashed outline around the projected total. */
-export const ChartProjectionOutline = React.forwardRef<SVGRectElement, ChartProjectionOutlineProps>(
+export const ChartProjectionOutline = React.forwardRef<SVGPathElement, ChartProjectionOutlineProps>(
   function ChartProjectionOutline({ xstyle, ...rest }, ref) {
     return (
       <Primitive.ProjectionOutline
