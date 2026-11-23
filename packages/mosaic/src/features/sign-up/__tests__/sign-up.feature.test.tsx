@@ -1288,6 +1288,23 @@ describe('SignUp social sign-up', () => {
     expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
   });
 
+  it('signs in instead after the Protect check when the Google account already belongs to a user', async () => {
+    const { fapi, first } = await startWithGoogle({
+      signUp: { protectChecks: 1, oauth: { oauth_google: { existingUser: { emailAddress: EMAIL } } } },
+    });
+
+    const { navigate } = await returnFromGoogle(fapi, first, { signInFallbackRedirectUrl: '/home' });
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    expect(fapi.signUp.transfers).toHaveLength(0);
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'I am human' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/home')));
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    expect(fapi.signUp.transfers).toHaveLength(1);
+    expect(fapi.client.sessions).toHaveLength(1);
+  });
+
   it('sends the accepted legal terms and the unsafe metadata with the Google sign-up', async () => {
     const fapi = serveFapi({
       environment: socialEnvironment({
