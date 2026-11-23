@@ -978,6 +978,7 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
     await codeSent();
+    expect(fapi.signUp.creations[0].get('strategy')).toBeNull();
     expect(fapi.signUp.preparations).toEqual(['phone_code:sms']);
   });
 
@@ -1240,5 +1241,6 @@ describe('SignUp', () => {
 
     expect(await screen.findByRole('heading', { name: 'Verify your WhatsApp' })).toBeInTheDocument();
     await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp']));
+    expect(fapi.signUp.creations[0].get('channel')).toBe('whatsapp');
   });
 });
