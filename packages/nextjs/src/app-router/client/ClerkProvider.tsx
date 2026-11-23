@@ -106,7 +106,10 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
         else if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
         } else {
-          void invalidateCacheAction().then(() => resolve());
+          // A failed invalidation (e.g. a stale Server Action after a redeploy) must not leave `setActive` pending forever.
+          void invalidateCacheAction()
+            .catch(() => {})
+            .then(() => resolve());
         }
       });
     };
