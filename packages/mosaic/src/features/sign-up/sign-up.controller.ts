@@ -106,12 +106,13 @@ export function useSignUpController(
   const liveStep = liveModel.flow.step;
   const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
-  const [signedInOnArrival] = useState(() =>
-    liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined,
-  );
-  const arrivedSignedIn = signedInOnArrival !== undefined;
+  // Finishing this sign-up also reaches `signed_in`, so only the step at mount marks a visit by a signed-in user.
+  // `leave` is kept from mount so the visit leaves once. Only single-session mode has it.
+  const [signedInVisit] = useState(() => (liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined));
+  const arrivedSignedIn = signedInVisit !== undefined;
+  const leavesOnArrival = signedInVisit?.leave !== undefined;
 
-  useEffect(() => signedInOnArrival?.leave?.(), [signedInOnArrival]);
+  useEffect(() => signedInVisit?.leave?.(), [signedInVisit]);
 
   // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
   // `useMachine`, in its own PR, so both controllers drop this effect.
@@ -122,8 +123,7 @@ export function useSignUpController(
   const model = finishSnapshot.context.frozenModel ?? liveModel;
   const { flow, app, navigation, verification } = model;
   const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
-  const isHidden =
-    liveStep.type === 'signed_in' && (finishSnapshot.value === 'finished' || signedInOnArrival?.leave !== undefined);
+  const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || finishSnapshot.value === 'finished');
   const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
   const screen = screenFor(shown, flow);
 
