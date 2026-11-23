@@ -1048,6 +1048,25 @@ describe('SignUp invitations', () => {
     await codeSent();
   });
 
+  it('shows an expired invitation on the start form, then signs up normally', async () => {
+    openInvitation('__clerk_ticket', 'tkt_expired');
+    const { fapi, user } = await renderSignUp({ signUp: { tickets: { tkt_expired: 'expired' } } });
+
+    expect(
+      await screen.findByText('This link has expired. Please start again or request a new link.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(window.location.search).not.toContain('__clerk_ticket');
+    expect(emailField()).not.toHaveAttribute('aria-disabled');
+
+    await submitStart(user);
+
+    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+    expect(fapi.signUp.creations).toHaveLength(2);
+    expect(fapi.signUp.creations[1].get('strategy')).toBeNull();
+    await codeSent();
+  });
+
   it('clears a rejected invitation error once the user submits the start form', async () => {
     openInvitation('__clerk_ticket', 'tkt_unknown');
     const { user } = await renderSignUp();
