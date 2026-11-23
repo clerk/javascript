@@ -19,6 +19,7 @@ import {
   getInitialActiveIdentifier,
   showFormFields,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { getPreferredPhoneCodeChannelByCountry } from '@clerk/shared/phone';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
@@ -28,6 +29,8 @@ import type {
   PhoneCodeChannel,
   SessionTask,
   SetActiveNavigate,
+  SignInFutureResource,
+  SignInStatus,
   SignUpFutureResource,
   SignUpInitialValues,
   UserSettingsResource,
@@ -177,6 +180,18 @@ const SHOWN_RETURN_ERRORS: readonly string[] = [
   ERROR_CODES.USER_BANNED,
   ERROR_CODES.USER_DEACTIVATED,
 ];
+
+// The sign-in routes `clerk.ts` `_handleRedirectCallback` sends a transfer to when it does not complete.
+const TRANSFER_ROUTES: Partial<Record<SignInStatus, string>> = {
+  needs_first_factor: '/factor-one',
+  needs_second_factor: '/factor-two',
+  needs_new_password: '/reset-password',
+  needs_protect_check: '/protect-check',
+};
+
+function transferRoute(signIn: Pick<SignInFutureResource, 'status' | 'protectCheck'>): string {
+  return signIn.protectCheck ? '/protect-check' : (TRANSFER_ROUTES[signIn.status] ?? '');
+}
 
 function ssoCallbackUrl(): string {
   const url = new URL(window.location.href);
@@ -485,7 +500,9 @@ export function useSignUpModel({
         if (signUp.isTransferable) {
           await run(() => signIn.create({ transfer: true }));
           if (signIn.status !== 'complete') {
-            await router.navigate(clerk.buildSignInUrl());
+            await router.navigate(
+              buildURL({ base: signInUrl(), hashPath: transferRoute(signIn) }, { stringify: true }),
+            );
             return undefined;
           }
           await run(() =>
