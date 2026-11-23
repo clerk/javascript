@@ -8,3 +8,11 @@ export { type ChartXTickProps, ChartXTick as XTick } from './chart-x-tick';
 export { type ChartSelectionProps, ChartSelection as Selection } from './chart-selection';
 export { type ChartCursorProps, ChartCursor as Cursor } from './chart-cursor';
 export { type ChartTooltipProps, ChartTooltip as Tooltip } from './chart-tooltip';
+export { useBarChart, type UseBarChartOptions } from './bars/use-bar-chart';
+export { type ChartStackedBarsProps, ChartStackedBars as StackedBars } from './bars/chart-stacked-bars';
+export { type ChartBarProps, ChartBar as Bar } from './bars/chart-bar';
+export {
+  type ChartProjectionOutlineProps,
+  ChartProjectionOutline as ProjectionOutline,
+} from './bars/chart-projection-outline';
+export { CanvasRenderError } from './bars/bar-canvas-error';

@@ -1,10 +1,13 @@
 export * as Chart from './parts';
 
 export type {
+  ChartBarProps,
   ChartCursorProps,
   ChartGridProps,
+  ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
+  ChartStackedBarsProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
@@ -12,6 +15,7 @@ export type {
   ChartYLineProps,
   ChartYTickItem,
   ChartYTickProps,
+  UseBarChartOptions,
 } from './parts';
 export type {
   ChartActive,
@@ -28,3 +32,13 @@ export type {
   XTickMode,
   XTicksOptions,
 } from './types';
+export type { BarChartInstance } from './bars/bar-context';
+export type {
+  ActiveBar,
+  BarCategory,
+  BarIdentity,
+  BarProjection,
+  BarSection,
+  BarSelection,
+  BarSeries,
+} from './bars/types';

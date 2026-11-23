@@ -94,7 +94,7 @@ export type ChartInteractionProps = Readonly<{
 
 /**
  * The measured layout and selection of one chart, returned by a chart-type hook such as
- * `BarChart.useBarChart`. `TSelection` defaults to `never`, so `Chart.Root` takes any chart and the
+ * `Chart.useBarChart`. `TSelection` defaults to `never`, so `Chart.Root` takes any chart and the
  * shared parts cannot call `select`.
  */
 export type ChartInstance<

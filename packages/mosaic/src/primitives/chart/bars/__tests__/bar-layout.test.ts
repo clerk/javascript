@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_CHART_MARGIN } from '../../chart/internal/use-chart-instance';
-import { prepareStackedBars, projectStackedBars } from '../bar-chart-layout';
+import { DEFAULT_CHART_MARGIN } from '../../internal/use-chart-instance';
+import { prepareStackedBars, projectStackedBars } from '../bar-layout';
 import type { BarProjection } from '../types';
 
 interface TypedRow {

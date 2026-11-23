@@ -2,11 +2,11 @@
 
 import React from 'react';
 
-import { useChartFrame, useChartInstance } from '../chart/internal/use-chart-instance';
-import type { ChartOptions } from '../chart/types';
-import { BAR_LAYOUT, type BarChartInstance } from './bar-chart-context';
-import { prepareStackedBars, projectStackedBars } from './bar-chart-layout';
-import { barSelectionModel } from './bar-chart-selection';
+import { useChartFrame, useChartInstance } from '../internal/use-chart-instance';
+import type { ChartOptions } from '../types';
+import { BAR_LAYOUT, type BarChartInstance } from './bar-context';
+import { prepareStackedBars, projectStackedBars } from './bar-layout';
+import { barSelectionModel } from './bar-selection';
 import type { ActiveBar, BarIdentity, BarProjection, BarSelection, BarSeries } from './types';
 
 export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, ActiveBar<TDatum>> {
@@ -19,7 +19,7 @@ export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, A
   categoryGap?: number;
   /** Paints a projected total behind the bar at `datumIndex`, when it rises above the bar. */
   projection?: BarProjection;
-  /** Returns false for a bar that `BarChart.Bar` styles through `data-inactive`. Default: every bar is active */
+  /** Returns false for a bar that `Chart.Bar` styles through `data-inactive`. Default: every bar is active */
   isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
 }
 

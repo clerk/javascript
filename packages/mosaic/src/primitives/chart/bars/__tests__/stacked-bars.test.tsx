@@ -2,9 +2,8 @@ import { cleanup, fireEvent, render as renderComponent, screen } from '@testing-
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Chart } from '../../chart';
-import type { RenderProps } from '../../utils';
-import { BarChart, type BarSelection } from '../index';
+import type { RenderProps } from '../../../utils';
+import { type BarSelection, Chart } from '../..';
 import { chartFixture, type ChartRow, growthChart, quarter, render, renderChart, setupChart } from './fixtures';
 import { TestChart } from './test-chart';
 
@@ -20,7 +19,7 @@ function StackedChart({
   render?: React.ComponentProps<typeof Chart.Root>['render'];
   children?: React.ReactNode;
 }) {
-  const chart = BarChart.useBarChart({ data, series: chartFixture.series, index: chartFixture.index });
+  const chart = Chart.useBarChart({ data, series: chartFixture.series, index: chartFixture.index });
   return (
     <Chart.Root
       chart={chart}
@@ -44,7 +43,7 @@ describe('composing parts', () => {
   it.each([
     ['Chart.Grid', <Chart.Grid key='grid' />],
     ['Chart.Selection', <Chart.Selection key='selection' />],
-    ['BarChart.StackedBars', <BarChart.StackedBars key='bars' />],
+    ['Chart.StackedBars', <Chart.StackedBars key='bars' />],
   ])('throws when %s is used outside Chart.Root', (part, element) => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => renderComponent(element)).toThrow(`<${part}> must be used within <Chart.Root>`);
@@ -60,15 +59,15 @@ describe('composing parts', () => {
     );
   });
 
-  it('throws when BarChart.Bar is used outside BarChart.StackedBars', () => {
+  it('throws when Chart.Bar is used outside Chart.StackedBars', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>
       render(
         <StackedChart>
-          <BarChart.Bar />
+          <Chart.Bar />
         </StackedChart>,
       ),
-    ).toThrow('<BarChart.Bar> must be used within <BarChart.StackedBars>');
+    ).toThrow('<Chart.Bar> must be used within <Chart.StackedBars>');
   });
 
   it.each([
@@ -77,7 +76,7 @@ describe('composing parts', () => {
   ])('renders a part as %s passed to render', (_, renderElement) => {
     const { container } = render(
       <StackedChart render={renderElement}>
-        <BarChart.StackedBars />
+        <Chart.StackedBars />
       </StackedChart>,
     );
 
@@ -96,7 +95,7 @@ describe('composing parts', () => {
   it('is interactive with Chart.Selection and categories', () => {
     const { container, rerender } = render(
       <StackedChart>
-        <BarChart.StackedBars />
+        <Chart.StackedBars />
         <Chart.Selection />
       </StackedChart>,
     );
@@ -106,7 +105,7 @@ describe('composing parts', () => {
 
     rerender(
       <StackedChart data={[]}>
-        <BarChart.StackedBars />
+        <Chart.StackedBars />
         <Chart.Selection />
       </StackedChart>,
     );
@@ -460,7 +459,7 @@ describe('controlling the selection', () => {
 describe('rendering from the chart object', () => {
   it('selects with the keyboard on a surface that spreads the interaction props', () => {
     function CustomChart() {
-      const chart = BarChart.useBarChart({ ...chartFixture, data: quarter, onSelectionChange: () => {} });
+      const chart = Chart.useBarChart({ ...chartFixture, data: quarter, onSelectionChange: () => {} });
       const { rootRef } = chart;
       return (
         <div ref={rootRef}>

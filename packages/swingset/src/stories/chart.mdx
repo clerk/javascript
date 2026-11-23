@@ -1,12 +1,13 @@
-import * as BarChartStories from './bar-chart.stories';
+import * as ChartStories from './chart.stories';
 
-# BarChart
+# Chart
 
 A stacked bar chart over a category or time axis, with values above and below zero. It is a
-**headless** primitive: `BarChart.useBarChart` owns the layout and selection, `BarChart` parts paint
-the bars, and the shared `Chart` parts draw the root, grid, axes, lines, selection, cursor and
-tooltip from the chart object the hook returns. D3 computes the stacks and scales, Canvas paints the
-bars, SVG draws the grid, axes and marks, and the primitive handles pointer and keyboard selection.
+**headless** primitive: `Chart.useBarChart` owns the layout and selection, `Chart.StackedBars` and
+`Chart.Bar` paint the bars, and the shared parts draw the root, grid, axes, lines, selection,
+cursor and tooltip from the chart object the hook returns. D3 computes the stacks and scales,
+Canvas paints the bars, SVG draws the grid, axes and marks, and the primitive handles pointer and
+keyboard selection.
 It ships **no styles**. Every part, including the Canvas bars, takes its appearance from your CSS.
 
 ## Example
@@ -16,16 +17,15 @@ unstyled, so the bars take the inherited text color and the grid and zero lines 
 
 <Story
   name='Default'
-  storyModule={BarChartStories}
+  storyModule={ChartStories}
 />
 
 ## Usage
 
 ```tsx
-import { type ActiveBar, BarChart } from '@clerk/mosaic/primitives/bar-chart';
-import { Chart } from '@clerk/mosaic/primitives/chart';
+import { type ActiveBar, Chart } from '@clerk/mosaic/primitives/chart';
 
-const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod });
+const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod });
 
 <Chart.Root
   chart={chart}
@@ -42,11 +42,11 @@ const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod
       ))
     }
   </Chart.Grid>
-  <BarChart.StackedBars>
-    <BarChart.Bar className='bar' />
-    <BarChart.ProjectionOutline />
+  <Chart.StackedBars>
+    <Chart.Bar className='bar' />
+    <Chart.ProjectionOutline />
     <Chart.YLine value={0} />
-  </BarChart.StackedBars>
+  </Chart.StackedBars>
   <Chart.YAxis>
     {ticks =>
       ticks.map(tick => (
@@ -89,17 +89,17 @@ const isBarActive = useCallback(
     !selection || (bar.datum.week === selection.category && bar.positive === (selection.section === 'positive')),
   [selection],
 );
-const chart = BarChart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
+const chart = Chart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
 ```
 
 ### Projection
 
 `projection` draws a projected total above one category's positive stack. The fill is painted
-with `BarChart.Bar`'s `data-projection` color, and `BarChart.ProjectionOutline` draws its outline.
+with `Chart.Bar`'s `data-projection` color, and `Chart.ProjectionOutline` draws its outline.
 It is drawn only when `value` is above that category's stack.
 
 ```tsx
-const chart = BarChart.useBarChart({
+const chart = Chart.useBarChart({
   data,
   series,
   index,
@@ -109,31 +109,31 @@ const chart = BarChart.useBarChart({
 
 ## Parts
 
-| Part                         | Default Element | Description                                                          |
-| ---------------------------- | --------------- | -------------------------------------------------------------------- |
-| `Chart.Root`                 | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
-| `Chart.Grid`                 | `<svg>`         | Holds the grid lines                                                 |
-| `Chart.YLine`                | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
-| `BarChart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
-| `BarChart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
-| `BarChart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
-| `Chart.YAxis`                | `<svg>`         | Holds the Y tick labels                                              |
-| `Chart.YTick`                | `<text>`        | One Y tick label                                                     |
-| `Chart.XAxis`                | `<svg>`         | Holds the category labels                                            |
-| `Chart.XTick`                | `<text>`        | One category label                                                   |
-| `Chart.Selection`            | `<div>`         | Pointer and keyboard selection                                       |
-| `Chart.Cursor`               | `<div>`         | Covers the selected category's band                                  |
-| `Chart.Tooltip`              | `<div>`         | The tooltip for the selected bar, portaled                           |
+| Part                      | Default Element | Description                                                          |
+| ------------------------- | --------------- | -------------------------------------------------------------------- |
+| `Chart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
+| `Chart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
+| `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
+| `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
+| `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
+| `Chart.ProjectionOutline` | `<rect>`        | Outlines the projected bar                                           |
+| `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
+| `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
+| `Chart.XAxis`             | `<svg>`         | Holds the category labels                                            |
+| `Chart.XTick`             | `<text>`        | One category label                                                   |
+| `Chart.Selection`         | `<div>`         | Pointer and keyboard selection                                       |
+| `Chart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
+| `Chart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
 
-`Chart` parts come from `@clerk/mosaic/primitives/chart` and work with any chart type's hook.
+Every part comes from `@clerk/mosaic/primitives/chart`.
 Every part accepts a `render` prop and the standard attributes of its default element. Every part
-throws outside `Chart.Root`, and `BarChart.StackedBars` also throws for a chart that did not come
-from `BarChart.useBarChart`. `BarChart.Bar` and `BarChart.ProjectionOutline` throw outside
-`BarChart.StackedBars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
+throws outside `Chart.Root`, and `Chart.StackedBars` also throws for a chart that did not come
+from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside
+`Chart.StackedBars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
 
 ## Props
 
-### `BarChart.useBarChart`
+### `Chart.useBarChart`
 
 | Prop                           | Type                                                         | Default                    | Description                                            |
 | ------------------------------ | ------------------------------------------------------------ | -------------------------- | ------------------------------------------------------ |
@@ -190,7 +190,7 @@ Name the active type the hook selects: `<Chart.Tooltip<ActiveBar<Row>>>`.
 
 ## Styling
 
-`BarChart.Bar` styles the Canvas. Before each paint the chart sets these attributes on it, reads
+`Chart.Bar` styles the Canvas. Before each paint the chart sets these attributes on it, reads
 its computed `color`, and paints with it:
 
 | Attribute         | Description                      |
@@ -201,7 +201,7 @@ its computed `color`, and paints with it:
 
 Its `max-width` caps the bar width, `row-gap` sets the gap between segments, its top corner radius
 rounds a stack's outer end and its bottom corner radius rounds every other corner. Without
-`BarChart.Bar`, nothing is painted.
+`Chart.Bar`, nothing is painted.
 
 | Attribute                     | Applies To | Description                                                    |
 | ----------------------------- | ---------- | -------------------------------------------------------------- |

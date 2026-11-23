@@ -84,7 +84,6 @@ export default defineConfig({
     'icons/glyphs/users-add-right': './src/icons/glyphs/users-add-right.tsx',
     'primitives/accordion': './src/primitives/accordion/index.ts',
     'primitives/autocomplete': './src/primitives/autocomplete/index.ts',
-    'primitives/bar-chart': './src/primitives/bar-chart/index.ts',
     'primitives/button': './src/primitives/button/index.ts',
     'primitives/chart': './src/primitives/chart/index.ts',
     'primitives/collapsible': './src/primitives/collapsible/index.ts',

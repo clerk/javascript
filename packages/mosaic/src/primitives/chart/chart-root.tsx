@@ -7,7 +7,7 @@ import { ChartContext, type ChartContextValue } from './chart-context';
 import type { ChartInstance } from './types';
 
 export type ChartRootProps = Omit<ComponentProps<'div'>, 'aria-label'> & {
-  /** The result of a chart-type hook, such as `BarChart.useBarChart`. */
+  /** The result of a chart-type hook, such as `Chart.useBarChart`. */
   chart: ChartInstance;
   /** Default: 500 */
   height?: number | string;

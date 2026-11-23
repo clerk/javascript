@@ -376,11 +376,6 @@
       "import": "./dist/primitives/autocomplete.js",
       "default": "./dist/primitives/autocomplete.js"
     },
-    "./primitives/bar-chart": {
-      "types": "./dist/primitives/bar-chart.d.ts",
-      "import": "./dist/primitives/bar-chart.js",
-      "default": "./dist/primitives/bar-chart.js"
-    },
     "./primitives/button": {
       "types": "./dist/primitives/button.d.ts",
       "import": "./dist/primitives/button.js",

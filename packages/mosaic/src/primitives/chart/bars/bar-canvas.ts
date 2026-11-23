@@ -1,7 +1,7 @@
-import type { ChartSize } from '../chart/types';
-import { getComputedStyle } from '../utils/dom';
-import { CanvasRenderError } from './bar-chart-canvas-error';
-import { type BarGeometry, type PaintedProjection, UNSTYLED_BAR_GEOMETRY } from './bar-chart-layout';
+import { getComputedStyle } from '../../utils/dom';
+import type { ChartSize } from '../types';
+import { CanvasRenderError } from './bar-canvas-error';
+import { type BarGeometry, type PaintedProjection, UNSTYLED_BAR_GEOMETRY } from './bar-layout';
 import type { BarIdentity, BarMark } from './types';
 
 const TILE_DEVICE_PIXELS = 32;
@@ -139,7 +139,7 @@ function readPixels(value: string, fallback: number) {
 }
 
 /**
- * Serializes the bar geometry from `BarChart.Bar`'s computed style, so it can be a
+ * Serializes the bar geometry from `Chart.Bar`'s computed style, so it can be a
  * `useSyncExternalStore` snapshot.
  */
 export function getBarGeometrySnapshot(element: BarStyleElement | null) {
@@ -221,7 +221,7 @@ type PaintOptions<TDatum> = Readonly<{
   size: ChartSize;
   pixelRatio: number;
   isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
-  /** The `BarChart.Bar` element. Without it, nothing is painted. */
+  /** The `Chart.Bar` element. Without it, nothing is painted. */
   bar: BarStyleElement | null;
 }>;
 

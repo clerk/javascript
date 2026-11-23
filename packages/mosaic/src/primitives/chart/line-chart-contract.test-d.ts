@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
-import type { BarChartInstance } from '../bar-chart';
+import type { BarChartInstance } from '.';
 import type { SelectionModel } from './internal/selection';
 import type { useChartInstance } from './internal/use-chart-instance';
 import type { ChartRootProps, ChartTooltipProps } from './parts';

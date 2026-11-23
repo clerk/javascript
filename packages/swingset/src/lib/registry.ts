@@ -35,10 +35,10 @@ import {
   LabelOnly as BannerLabelOnly,
   meta as bannerMeta,
 } from '../stories/banner.stories';
-import { meta as barChartMeta } from '../stories/bar-chart.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import { meta as chartMeta } from '../stories/chart.stories';
 import {
   Default as CheckboxDefault,
   meta as checkboxMeta,
@@ -1096,7 +1096,7 @@ const iconFrameModule: StoryModule = {
 // `<Preview>` embeds in the MDX, which import the stories module directly.
 const accordionModule: StoryModule = { meta: accordionMeta };
 const autocompleteModule: StoryModule = { meta: autocompleteMeta };
-const barChartModule: StoryModule = { meta: barChartMeta };
+const chartModule: StoryModule = { meta: chartMeta };
 const comboboxPrimitiveModule: StoryModule = { meta: comboboxPrimitiveMeta };
 const collapsibleModule: StoryModule = { meta: collapsibleMeta };
 const dialogModule: StoryModule = { meta: dialogMeta };
@@ -1583,7 +1583,7 @@ export const registry: StoryModule[] = [
   // Primitives
   accordionModule,
   autocompleteModule,
-  barChartModule,
+  chartModule,
   comboboxPrimitiveModule,
   collapsibleModule,
   dialogModule,

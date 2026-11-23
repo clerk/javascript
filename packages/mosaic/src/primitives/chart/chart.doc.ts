@@ -1,9 +1,12 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type {
+  ChartBarProps,
   ChartCursorProps,
   ChartGridProps,
+  ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
+  ChartStackedBarsProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
@@ -15,13 +18,32 @@ import type {
 export default {
   name: 'Chart',
   description:
-    'Headless, unstyled parts every chart type shares: the root, grid, axes, Y lines, and pointer and keyboard selection with its cursor and tooltip. A chart-type hook, such as `BarChart.useBarChart`, owns the layout and selection and returns a chart object; `Chart.Root` takes it and the parts render from it. `Chart` draws no data. Each container renders nothing until the root has a measured, non-zero size.',
+    'Headless, unstyled charts. A chart-type hook owns the layout and selection and returns a chart object; `Chart.Root` takes it, and the parts render from it. The shared parts draw the root, grid, axes, Y lines, and pointer and keyboard selection with its cursor and tooltip. Stacked bars with values above and below zero come from `Chart.useBarChart`: D3 computes the stacks and scales, and `Chart.StackedBars` paints the bars on Canvas, styled through the hidden `Chart.Bar`. Up and Down select the positive or negative section of a period. Each container renders nothing until the root has a measured, non-zero size.',
   useFor: [
-    'axes, a grid and reference lines for a bar chart',
+    'a stacked bar chart over a category or time axis',
+    'bars with values above and below zero',
+    'a chart with thousands of bars that still needs keyboard and pointer selection',
+    'axes, a grid and reference lines for a chart',
     'pointer and keyboard selection over a chart, with a cursor and a tooltip',
     'a decorative placeholder chart with no selection',
   ],
-  keywords: ['chart', 'graph', 'axis', 'grid', 'tick', 'tooltip', 'cursor', 'selection', 'data visualization'],
+  keywords: [
+    'chart',
+    'graph',
+    'bar chart',
+    'stacked bars',
+    'diverging',
+    'projection',
+    'canvas',
+    'useBarChart',
+    'axis',
+    'grid',
+    'tick',
+    'tooltip',
+    'cursor',
+    'selection',
+    'data visualization',
+  ],
   practices: [
     {
       do: true,
@@ -40,6 +62,19 @@ export default {
       text: 'Leave out `Chart.Selection` for a decorative chart. It then has no interaction surface and takes no focus.',
     },
     {
+      do: true,
+      text: 'Memoize `series`, `index` and `isBarActive`, or define them at module level. A new `series` or `index` prepares the stacks again on every selection change.',
+    },
+    { do: true, text: 'Return a unique category key from `index`. Repeated keys share a band.' },
+    {
+      do: true,
+      text: 'Style `Chart.Bar` with a `color` per `data-series`, and `data-projection` whenever there is a projection. Without it nothing is painted.',
+    },
+    {
+      do: true,
+      text: 'Catch `Chart.CanvasRenderError` in an error boundary and offer a retry that mounts a fresh chart.',
+    },
+    {
       do: false,
       text: 'Expect Left and Right to follow `useDirection()`. A time axis reads left to right in every locale.',
     },
@@ -47,13 +82,21 @@ export default {
       do: false,
       text: 'Render a bare `<Chart.XAxis />` or `<Chart.YAxis />`. A container renders only the items its children function returns.',
     },
+    {
+      do: false,
+      text: 'Animate the bar color with a CSS transition. `Chart.Bar` is `display: none`, so the bars repaint at the end value.',
+    },
+    {
+      do: false,
+      text: 'Expect a stylesheet change alone to repaint. Change the class of `Chart.Bar`, or of an ancestor, to repaint.',
+    },
   ],
   parts: {
     'Chart.Root': {
       description:
         'A `div` that attaches the measurement of the chart and provides the chart to the parts. Carries `data-chart-interaction-mode`: `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only`.',
       props: {
-        chart: { type: 'ChartInstance', doc: 'The result of a chart-type hook, such as `BarChart.useBarChart`.' },
+        chart: { type: 'ChartInstance', doc: 'The result of a chart-type hook, such as `Chart.useBarChart`.' },
         'aria-label': { type: 'string', doc: 'Labels the chart image and the interaction surface.' },
         height: { type: 'number | string', doc: 'The container height.', default: '500' },
       },
@@ -73,6 +116,18 @@ export default {
       props: {
         value: { type: 'number', doc: 'The value on the Y axis the line marks, such as a tick value or `0`.' },
       },
+    },
+    'Chart.StackedBars': {
+      description:
+        'A `div` that paints the bars on a Canvas with `role="img"`, and holds one SVG over it for `Chart.ProjectionOutline` and any `Chart.YLine`. Throws outside `Chart.Root`, and when the chart did not come from `Chart.useBarChart`.',
+    },
+    'Chart.Bar': {
+      description:
+        'A hidden `g` whose computed style paints the bars. Before each paint it takes `data-series`, `data-inactive` and `data-projection` in turn and the bars use its `color`. Its `max-width`, `row-gap` and corner radii in pixels set the bar geometry. Throws outside `Chart.StackedBars`.',
+    },
+    'Chart.ProjectionOutline': {
+      description:
+        'An `aria-hidden` `rect` that outlines the projected bar, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
     },
     'Chart.YAxis': {
       description: 'An `aria-hidden` `svg` that holds the Y tick labels in the left margin.',
@@ -146,17 +201,18 @@ export default {
   },
   examples: [
     {
-      title: 'Axes, grid, cursor and tooltip around a bar chart',
+      title: 'Stacked bars with axes, a grid, a cursor and a tooltip',
       code: `
-const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod });
+const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod });
 
 <Chart.Root chart={chart} height={320} aria-label='Weekly sign-ups'>
   <Chart.Grid>
     {ticks => ticks.map(tick => <Chart.YLine key={tick.value} value={tick.value} className='grid-line' />)}
   </Chart.Grid>
-  <BarChart.StackedBars>
-    <BarChart.Bar className='bar' />
-  </BarChart.StackedBars>
+  <Chart.StackedBars>
+    <Chart.Bar className='bar' />
+    <Chart.YLine value={0} className='zero-line' />
+  </Chart.StackedBars>
   <Chart.YAxis>
     {ticks => ticks.map(tick => <Chart.YTick key={tick.value} tick={tick} className='tick' />)}
   </Chart.YAxis>
@@ -170,12 +226,51 @@ const chart = BarChart.useBarChart({ data, series, index, onActivate: openPeriod
 </Chart.Root>
 `,
     },
+    {
+      title: 'A projected total',
+      code: `
+const chart = Chart.useBarChart({ data, series, index, projection: { datumIndex: data.length - 1, value: 130 } });
+
+<Chart.Root chart={chart} height={320} aria-label='Weekly sign-ups'>
+  <Chart.StackedBars>
+    <Chart.Bar className='bar' />
+    <Chart.ProjectionOutline className='projection-outline' />
+    <Chart.YLine value={0} className='zero-line' />
+  </Chart.StackedBars>
+</Chart.Root>
+`,
+    },
+    {
+      title: 'Dim the bars outside the selected section',
+      code: `
+const [selection, setSelection] = useState<BarSelection | null>(null);
+const isBarActive = useCallback(
+  (bar: BarIdentity<Row>) =>
+    !selection || (bar.datum.week === selection.category && bar.positive === (selection.section === 'positive')),
+  [selection],
+);
+const chart = Chart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
+`,
+    },
   ],
-  related: ['BarChart', 'Portal'],
+  related: ['Portal'],
+  exports: {
+    'Chart.useBarChart': {
+      description:
+        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate` and `formatCategory`. Returns the chart object for `Chart.Root`.',
+    },
+    'Chart.CanvasRenderError': {
+      description:
+        'Thrown when the Canvas 2D context is missing or lost, or painting fails, with the original failure as its `cause`.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Chart.Root': ChartRootProps;
   'Chart.Grid': ChartGridProps;
   'Chart.YLine': ChartYLineProps;
+  'Chart.StackedBars': ChartStackedBarsProps;
+  'Chart.Bar': ChartBarProps;
+  'Chart.ProjectionOutline': ChartProjectionOutlineProps;
   'Chart.YAxis': ChartYAxisProps;
   'Chart.YTick': ChartYTickProps;
   'Chart.XAxis': ChartXAxisProps;

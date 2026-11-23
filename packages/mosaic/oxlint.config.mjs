@@ -8,7 +8,7 @@ import rootConfig from '../../oxlint.config.mjs';
 const mosaicRoot = import.meta.dirname;
 const [, rootRestrictedImports] = rootConfig.rules['no-restricted-imports'];
 const chartInternalMessage =
-  'The chart selection engine is for chart-type hooks. Import it only from a src/primitives/<type>-chart/ folder.';
+  'The chart selection engine is for chart-type hooks. Import it only from a chart-type folder under src/primitives/chart/, such as chart/bars/.';
 const SHARED = ['primitives', 'icons', 'machine', 'utils', 'hooks', 'styles', 'components', 'localization', 'root'];
 const FLOW_UI = { file: { categories: { anyOf: ['view', 'controller'] } } };
 const CLERK_DATA_HOOKS = [
@@ -147,13 +147,7 @@ export default defineConfig({
     ...rootConfig.overrides,
     {
       files: ['src/**/*'],
-      excludeFiles: [
-        'src/primitives/*-chart/**',
-        'src/primitives/chart/internal/**',
-        'src/**/__tests__/**',
-        'src/**/*.test.{ts,tsx}',
-        'src/**/*.test-d.ts',
-      ],
+      excludeFiles: ['src/primitives/chart/**', 'src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.ts'],
       rules: {
         'no-restricted-imports': [
           'error',

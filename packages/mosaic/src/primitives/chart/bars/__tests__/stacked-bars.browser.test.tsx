@@ -88,7 +88,7 @@ function centerOfCategory(categoryIndex: number) {
 }
 
 describe('painting', () => {
-  it('paints the bars in the computed color of BarChart.Bar', async () => {
+  it('paints the bars in the computed color of Chart.Bar', async () => {
     await render(<Chart />);
     const { x, y } = insideLastBar();
 
@@ -102,7 +102,7 @@ describe('painting', () => {
     await expect.poll(() => pixelAt(x, y)).toBe('rgba(0, 128, 0, 255)');
   });
 
-  it('repaints when the class of BarChart.Bar changes', async () => {
+  it('repaints when the class of Chart.Bar changes', async () => {
     const { rerender } = await render(<Chart />);
     const { x, y } = insideLastBar();
     await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
@@ -193,7 +193,7 @@ describe('painting', () => {
     }
   });
 
-  it('paints nothing without BarChart.Bar', async () => {
+  it('paints nothing without Chart.Bar', async () => {
     await render(<Chart bar={false} />);
     const { x, y } = insideLastBar();
 

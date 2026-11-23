@@ -1,7 +1,7 @@
 import { scaleBand, scaleLinear } from 'd3-scale';
 import { stack, stackOffsetDiverging } from 'd3-shape';
 
-import type { ChartMargin, ChartSize } from '../chart/types';
+import type { ChartMargin, ChartSize } from '../types';
 import type { BarCategory, BarMark, BarProjection, BarSeries } from './types';
 
 const Y_TICK_COUNT = 5;
@@ -37,7 +37,7 @@ type ProjectOptions = Readonly<{
   projection?: BarProjection;
 }>;
 
-/** Bar geometry read from `BarChart.Bar`'s computed style. */
+/** Bar geometry read from `Chart.Bar`'s computed style. */
 export type BarGeometry = Readonly<{
   maxWidth: number;
   gap: number;

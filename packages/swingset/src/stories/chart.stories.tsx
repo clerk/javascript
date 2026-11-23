@@ -1,16 +1,15 @@
 'use client';
 
-import { type ActiveBar, BarChart } from '@clerk/mosaic/primitives/bar-chart';
-import { Chart } from '@clerk/mosaic/primitives/chart';
+import { type ActiveBar, Chart } from '@clerk/mosaic/primitives/chart';
 
 import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
   status: 'wip',
-  title: 'BarChart',
-  label: 'Bar Chart',
-  source: 'packages/mosaic/src/primitives/bar-chart/index.ts',
+  title: 'Chart',
+  label: 'Chart',
+  source: 'packages/mosaic/src/primitives/chart/index.ts',
 };
 
 const growth = [
@@ -33,7 +32,7 @@ const series = [
 const getWeek = (row: GrowthRow) => row.week;
 
 export function Default() {
-  const chart = BarChart.useBarChart({ data: growth, series, index: getWeek });
+  const chart = Chart.useBarChart({ data: growth, series, index: getWeek });
   return (
     <Chart.Root
       chart={chart}
@@ -51,10 +50,10 @@ export function Default() {
           ))
         }
       </Chart.Grid>
-      <BarChart.StackedBars>
-        <BarChart.Bar />
+      <Chart.StackedBars>
+        <Chart.Bar />
         <Chart.YLine value={0} />
-      </BarChart.StackedBars>
+      </Chart.StackedBars>
       <Chart.YAxis>
         {ticks =>
           ticks.map(tick => (

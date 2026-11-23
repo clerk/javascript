@@ -2,7 +2,7 @@ import { act, render as renderComponent } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
-import type { BarChartInstance } from '../index';
+import type { BarChartInstance } from '../..';
 import type { BarSelection } from '../types';
 import { TestChart, type TestChartProps } from './test-chart';
 

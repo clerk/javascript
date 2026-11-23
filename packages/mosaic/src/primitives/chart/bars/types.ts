@@ -1,4 +1,4 @@
-import type { ChartActive, ChartCategory, ChartSelection } from '../chart/types';
+import type { ChartActive, ChartCategory, ChartSelection } from '../types';
 
 export type CornerRadii = readonly [number, number, number, number];
 

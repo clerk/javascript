@@ -3,8 +3,7 @@ import { useCallback, useRef } from 'react';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 
-import { Chart } from '../../chart';
-import { type ActiveBar, BarChart, type BarIdentity, type BarProjection } from '../index';
+import { type ActiveBar, type BarIdentity, type BarProjection, Chart } from '../..';
 
 const growth = [
   { week: '2026-01-05', signups: 40, returning: 22, churned: -14 },
@@ -60,7 +59,7 @@ function GrowthChart({
       !selected || (bar.datum.week === selected.week && bar.positive === selected.positive),
     [selected],
   );
-  const chart = BarChart.useBarChart({
+  const chart = Chart.useBarChart({
     data: growth,
     series,
     index: getWeek,
@@ -90,14 +89,14 @@ function GrowthChart({
             ))
           }
         </Chart.Grid>
-        <BarChart.StackedBars>
-          <BarChart.Bar className='bar' />
-          <BarChart.ProjectionOutline className='projection-outline' />
+        <Chart.StackedBars>
+          <Chart.Bar className='bar' />
+          <Chart.ProjectionOutline className='projection-outline' />
           <Chart.YLine
             value={0}
             className='zero-line'
           />
-        </BarChart.StackedBars>
+        </Chart.StackedBars>
         <Chart.YAxis>
           {ticks =>
             ticks.map(tick => (
@@ -147,20 +146,20 @@ async function renderChart(ui: React.ReactElement) {
   return page.elementLocator(screen.getByTestId('chart'));
 }
 
-describe('BarChart visual state', () => {
+describe('Chart stacked bars visual state', () => {
   it('stacks values above and below zero', async () => {
     const chart = await renderChart(<GrowthChart />);
-    await expect(chart).toMatchScreenshot('bar-chart-diverging');
+    await expect(chart).toMatchScreenshot('stacked-bars-diverging');
   });
 
   it('dims every bar outside the selected section', async () => {
     const chart = await renderChart(<GrowthChart selected={{ week: '2026-01-26', positive: true }} />);
-    await expect(chart).toMatchScreenshot('bar-chart-dimmed-selection');
+    await expect(chart).toMatchScreenshot('stacked-bars-dimmed-selection');
   });
 
   it('draws a projection above the latest bar', async () => {
     const chart = await renderChart(<GrowthChart projected />);
-    await expect(chart).toMatchScreenshot('bar-chart-projection');
+    await expect(chart).toMatchScreenshot('stacked-bars-projection');
   });
 
   it('opens the tooltip beside the selected period', async () => {
@@ -170,6 +169,6 @@ describe('BarChart visual state', () => {
     await expect
       .poll(() => screen.queryByText('Sign-ups: 52')?.closest<HTMLElement>('.tooltip')?.style.visibility)
       .toBe('');
-    await expect(chart).toMatchScreenshot('bar-chart-tooltip-open');
+    await expect(chart).toMatchScreenshot('stacked-bars-tooltip-open');
   });
 });

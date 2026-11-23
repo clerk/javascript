@@ -2,19 +2,14 @@
 
 import React from 'react';
 
-import { hasArea } from '../chart/chart-context';
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import {
-  type BarStyleElement,
-  getBarGeometrySnapshot,
-  paintStackedBarCanvas,
-  parseBarGeometry,
-} from './bar-chart-canvas';
-import { CanvasRenderError } from './bar-chart-canvas-error';
-import { StackedBarsContext, useBarChartContext } from './bar-chart-context';
-import { fitProjectionToBar, projectStackedBarMarks } from './bar-chart-layout';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
+import { hasArea } from '../chart-context';
+import { type BarStyleElement, getBarGeometrySnapshot, paintStackedBarCanvas, parseBarGeometry } from './bar-canvas';
+import { CanvasRenderError } from './bar-canvas-error';
+import { StackedBarsContext, useBarChartContext } from './bar-context';
+import { fitProjectionToBar, projectStackedBarMarks } from './bar-layout';
 
-export type BarChartStackedBarsProps = ComponentProps<'div'>;
+export type ChartStackedBarsProps = ComponentProps<'div'>;
 
 function subscribeToPixelRatio(callback: () => void) {
   let query = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
@@ -72,8 +67,8 @@ function subscribeToTheme(bar: Element | null, onChange: () => void) {
 const getServerSnapshot = () => '';
 const getServerPixelRatio = () => 1;
 
-export const BarChartStackedBars = React.forwardRef<HTMLDivElement, BarChartStackedBarsProps>(
-  function BarChartStackedBars(props, ref) {
+export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBarsProps>(
+  function ChartStackedBars(props, ref) {
     const { children, render, ...otherProps } = props;
     const { chart, layout, ariaLabel } = useBarChartContext('StackedBars');
     const { size, categories, scaleY } = chart;

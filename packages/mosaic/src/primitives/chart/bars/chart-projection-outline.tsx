@@ -2,13 +2,13 @@
 
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useStackedBarsContext } from './bar-chart-context';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../../utils';
+import { useStackedBarsContext } from './bar-context';
 
-export type BarChartProjectionOutlineProps = ComponentProps<'rect'>;
+export type ChartProjectionOutlineProps = ComponentProps<'rect'>;
 
-export const BarChartProjectionOutline = React.forwardRef<SVGRectElement, BarChartProjectionOutlineProps>(
-  function BarChartProjectionOutline(props, ref) {
+export const ChartProjectionOutline = React.forwardRef<SVGRectElement, ChartProjectionOutlineProps>(
+  function ChartProjectionOutline(props, ref) {
     const { render, ...otherProps } = props;
     const { projection } = useStackedBarsContext('ProjectionOutline');
 

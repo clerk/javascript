@@ -1,7 +1,6 @@
 import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
 
-import { Chart } from '../../chart';
-import { type ActiveBar, BarChart, type BarChartInstance, type UseBarChartOptions } from '../index';
+import { type ActiveBar, type BarChartInstance, Chart, type UseBarChartOptions } from '../..';
 
 export type TestChartProps<TDatum> = Pick<
   UseBarChartOptions<TDatum>,
@@ -22,7 +21,7 @@ export type TestChartProps<TDatum> = Pick<
   renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
   boundary?: RefObject<HTMLElement | null>;
   height?: number | string;
-  /** Mounts `BarChart.Bar`. Default: true */
+  /** Mounts `Chart.Bar`. Default: true */
   bar?: boolean;
   barClassName?: string;
   /** Receives the chart object after each render. */
@@ -42,7 +41,7 @@ export function TestChart<TDatum>({
   chartRef,
   ...options
 }: TestChartProps<TDatum>) {
-  const chart = BarChart.useBarChart({ ...options, formatCategory: formatXTick });
+  const chart = Chart.useBarChart({ ...options, formatCategory: formatXTick });
   useLayoutEffect(() => {
     if (chartRef) {
       chartRef.current = chart;
@@ -54,11 +53,11 @@ export function TestChart<TDatum>({
       height={height}
       aria-label={ariaLabel}
     >
-      <BarChart.StackedBars>
-        {bar ? <BarChart.Bar className={barClassName} /> : null}
-        <BarChart.ProjectionOutline />
+      <Chart.StackedBars>
+        {bar ? <Chart.Bar className={barClassName} /> : null}
+        <Chart.ProjectionOutline />
         <Chart.YLine value={0} />
-      </BarChart.StackedBars>
+      </Chart.StackedBars>
       <Chart.XAxis format={formatXTick}>
         {ticks =>
           ticks.map(tick => (
