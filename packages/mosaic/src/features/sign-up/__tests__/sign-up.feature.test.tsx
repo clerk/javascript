@@ -1260,6 +1260,61 @@ describe('SignUp social sign-up', () => {
     expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
   });
 
+  it('switches to the session already signed in to the Google account', async () => {
+    const otherSession = fapiSession({ id: 'sess_other', user: fapiUser({ id: 'user_other' }) });
+    const { fapi, first } = await startWithGoogle({
+      client: fapiClient([otherSession, signedInSession]),
+      signUp: { oauth: { oauth_google: { signedInSession: signedInSession.id } } },
+    });
+
+    const { clerk, navigate } = await returnFromGoogle(fapi, first, { signInFallbackRedirectUrl: '/home' });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/home')));
+    expect(clerk.session?.id).toBe(signedInSession.id);
+    expect(fapi.signUp.transfers).toHaveLength(0);
+  });
+
+  it('runs the Protect check the sign-up still has after the return, then continues', async () => {
+    const { fapi, first } = await startWithGoogle({
+      environment: socialEnvironment({ attributes: { username: { enabled: true, required: true } } }),
+      signUp: { protectChecks: 1, oauth: { oauth_google: { emailAddress: EMAIL } } },
+    });
+
+    await returnFromGoogle(fapi, first);
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'I am human' }));
+    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+  });
+
+  it('sends the accepted legal terms and the unsafe metadata with the Google sign-up', async () => {
+    const fapi = serveFapi({
+      environment: socialEnvironment({
+        user_settings: {
+          social: { oauth_google: GOOGLE },
+          sign_up: {
+            allowlist_only: false,
+            progressive: true,
+            captcha_enabled: false,
+            mode: 'public',
+            legal_consent_enabled: true,
+          },
+        },
+      }),
+    });
+    const { clerk } = await renderWithClerk(<SignUp unsafeMetadata={{ plan: 'pro' }} />);
+    vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('checkbox'));
+    await user.click(screen.getByRole('button', { name: /Google/ }));
+
+    await waitFor(() => expect(fapi.signUp.creations).toHaveLength(1));
+    expect(fapi.signUp.creations[0].get('legal_accepted')).toBe('true');
+    expect(JSON.parse(fapi.signUp.creations[0].get('unsafe_metadata') ?? '{}')).toEqual({ plan: 'pro' });
+  });
+
   it('takes a user who signs in instead to their pending task', async () => {
     const { fapi, first } = await startWithGoogle({
       signUp: {

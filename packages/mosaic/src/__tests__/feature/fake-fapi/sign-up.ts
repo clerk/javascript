@@ -46,6 +46,8 @@ export interface FakeSignUpSeed {
 export type FakeOAuthAccount =
   | { emailAddress: string; firstName?: string; lastName?: string }
   | { existingUser: { emailAddress: string; secondFactor?: boolean } }
+  /** The account is already signed in on this client, in the session with this id. */
+  | { signedInSession: string }
   | { error: { code: string; message: string } };
 
 export type FakeTicket = { emailAddress: string } | 'expired';
@@ -339,6 +341,18 @@ export function signUpHandlers(
     });
     if ('error' in account) {
       store(withExternal({ status: 'unverified', error: apiError(account.error.code, account.error.message) }));
+      return;
+    }
+    if ('signedInSession' in account) {
+      store(
+        withExternal({
+          status: 'unverified',
+          error: {
+            ...apiError('identifier_already_signed_in', "You're already signed in."),
+            meta: { session_id: account.signedInSession },
+          },
+        }),
+      );
       return;
     }
     if ('existingUser' in account) {
