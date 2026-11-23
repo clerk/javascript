@@ -5,10 +5,11 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { Protect, useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { EnterpriseAccountSection } from './AccessOnboarding/EnterpriseAccountSection';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';
 import { AddDomainForm } from './AddDomainForm';
 import { DomainList } from './DomainList';
@@ -55,6 +56,7 @@ const DeleteOrganizationScreen = () => {
 };
 
 export const OrganizationGeneralPage = () => {
+  const { shouldShowAccessOnboarding } = useOrganizationProfileContext();
   return (
     <ProfileCard.Page>
       <ProfileCard.PagePanel
@@ -62,6 +64,7 @@ export const OrganizationGeneralPage = () => {
         titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
       >
         <OrganizationProfileSection />
+        {shouldShowAccessOnboarding ? <EnterpriseAccountSection /> : null}
         <Protect permission='org:sys_domains:read'>
           <OrganizationDomainsSection />
         </Protect>

@@ -1,5 +1,6 @@
+import { useState } from 'react';
+
 import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 
@@ -21,10 +22,14 @@ import {
 import { Header } from '../../../elements/Header';
 import type { PropsOfComponent } from '../../../styledSystem';
 import { ManageConnectionPage, SetupWizard } from './ConnectionPages';
+import { EnterpriseSetupForm } from './EnterpriseSetupForm';
+import { ExternalSignInBanner, JoinRequestBanner } from './ExternalSignIn';
+import { LinkNote } from './Membership';
 import { useAccessNavigation } from './navigation';
-import { borderSx, ContentRefContext, InfoTooltip, smallSx } from './parts';
+import { OutsidePeopleBadge } from './OutsidePeopleBanner';
+import { borderSx, ContentRefContext, InfoTooltip, smallSx, xsSx } from './parts';
 import { PolicyPage } from './PolicyPage';
-import type { ProtoConnection, ProtoPolicy, ScenarioKey } from './prototypeState';
+import type { ProtoConnection, ProtoPolicy } from './prototypeState';
 import {
   activationBlocker,
   connectionById,
@@ -32,7 +37,6 @@ import {
   ENROLLMENT_LABELS,
   policyTarget,
   protoKey,
-  SCENARIO_LABELS,
   useAccessPrototype,
 } from './prototypeState';
 import { ProviderMark } from './ProviderMark';
@@ -86,61 +90,12 @@ const AccessListPage = () => {
         elementDescriptor={descriptors.page}
         sx={t => ({ gap: t.space.$4 })}
       >
-        <Flex
-          justify='between'
-          align='start'
-          gap={4}
-        >
-          <Flex
-            align='center'
-            gap={2}
-          >
-            <Header.Root>
-              <Header.Title
-                localizationKey={protoKey('Access')}
-                textVariant='h2'
-              />
-            </Header.Root>
-            {store.hierarchy ? (
-              <Badge colorScheme='primary'>
-                {isParent ? 'Parent organization' : `Part of ${store.hierarchy.parentName}`}
-              </Badge>
-            ) : null}
-            {store.hierarchy?.role === 'child' && store.hierarchy.isParentMember ? (
-              <Button
-                variant='outline'
-                size='xs'
-                textVariant='buttonSmall'
-                block={false}
-                onClick={() => store.setScenario('parent')}
-                localizationKey={protoKey(`Go to ${store.hierarchy.parentName}`)}
-              />
-            ) : null}
-          </Flex>
-          {/* Prototype-only: jump between the states on the design board. */}
-          <Select
-            elementId='role'
-            options={(Object.keys(SCENARIO_LABELS) as ScenarioKey[]).map(value => ({
-              value,
-              label: SCENARIO_LABELS[value],
-            }))}
-            value={store.scenario}
-            onChange={option => store.setScenario(option.value)}
-          >
-            <SelectButton
-              sx={t => ({ color: t.colors.$colorMutedForeground, fontSize: t.fontSizes.$sm, textWrap: 'nowrap' })}
-            >
-              <Text
-                as='span'
-                colorScheme='secondary'
-                sx={smallSx}
-              >
-                {`Prototype: ${SCENARIO_LABELS[store.scenario]}`}
-              </Text>
-            </SelectButton>
-            <SelectOptionList />
-          </Select>
-        </Flex>
+        <Header.Root>
+          <Header.Title
+            localizationKey={protoKey('Access')}
+            textVariant='h2'
+          />
+        </Header.Root>
 
         {store.notice ? (
           <Flex
@@ -161,16 +116,26 @@ const AccessListPage = () => {
           </Flex>
         ) : null}
 
+        <ExternalSignInBanner />
+        <JoinRequestBanner />
+
         <Tabs
           value={tabIndex}
-          onChange={index =>
-            index === 1 ? nav.toConnections() : index === 2 ? nav.toSubOrganizations() : nav.toPolicies()
-          }
+          onChange={index => {
+            const tab = tabs[index];
+            if (tab === 'connections') {
+              nav.toConnections();
+            } else if (tab === 'sub-organizations') {
+              nav.toSubOrganizations();
+            } else {
+              nav.toPolicies();
+            }
+          }}
         >
           <TabsList sx={t => ({ gap: t.space.$2 })}>
             <Tab localizationKey={protoKey('Policies')} />
             <Tab localizationKey={protoKey('Connections')} />
-            {isParent ? <Tab localizationKey={protoKey('Sub-organizations')} /> : null}
+            {isParent ? <Tab localizationKey={protoKey('Organizations')} /> : null}
           </TabsList>
           <TabPanels>
             <TabPanel sx={{ width: '100%' }}>
@@ -192,6 +157,28 @@ const AccessListPage = () => {
 };
 
 /* ------------------------------------------------------------- policies */
+
+/** Before the first policy: a quiet way to start with a parent account instead. */
+const ParentAccountHint = ({ onCreated }: { onCreated: () => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  if (isOpen) {
+    return (
+      <Col sx={t => ({ ...borderSx(t), padding: t.space.$4 })}>
+        <EnterpriseSetupForm
+          onClose={() => setIsOpen(false)}
+          onCreated={onCreated}
+        />
+      </Col>
+    );
+  }
+  return (
+    <LinkNote
+      text='Setting up access for several organizations? '
+      link='Start with a parent account'
+      onClick={() => setIsOpen(true)}
+    />
+  );
+};
 
 const PoliciesPanel = () => {
   const { policies, access, hierarchy } = useAccessPrototype();
@@ -216,7 +203,7 @@ const PoliciesPanel = () => {
               sx={smallSx}
             >
               {hierarchy?.role === 'parent'
-                ? 'Sign-in applies to everyone at these domains. Other rules apply to members of your sub-organizations.'
+                ? `Sign-in applies to everyone at these domains. Other rules apply to members of organizations in ${hierarchy.parentName}.`
                 : hierarchy?.role === 'child'
                   ? `Add rules on top of ${hierarchy.parentName}’s. They can be stricter, not looser.`
                   : 'Control access for your organization, including SSO and Directory Sync.'}
@@ -233,6 +220,9 @@ const PoliciesPanel = () => {
           ) : null}
         </Flex>
         <PolicyTable policies={[...active, ...catchAll]} />
+        {!hierarchy && access.canManage && active.length === 0 && inactive.length === 0 ? (
+          <ParentAccountHint onCreated={nav.toUnmanagedUsers} />
+        ) : null}
       </Col>
 
       {inactive.length > 0 ? (
@@ -259,7 +249,7 @@ const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
             />
             {isParent ? (
               <Th
-                localizationKey={protoKey('Sub-organizations')}
+                localizationKey={protoKey('Organizations')}
                 sx={{ width: '26%' }}
               />
             ) : (
@@ -291,7 +281,9 @@ const PolicyTable = ({ policies }: { policies: ProtoPolicy[] }) => {
 };
 
 const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
-  const { policies, connections, access, hierarchy, updatePolicy, removePolicy } = useAccessPrototype();
+  const store = useAccessPrototype();
+  const { policies, connections, access, hierarchy, organizationName, updatePolicy, removePolicy } = store;
+  const exclusive = Boolean(policy.exclusive);
   const nav = useAccessNavigation();
   const open = () => nav.toPolicy(policy.id);
   const directory = connectionById(policy.directoryId, connections);
@@ -339,35 +331,57 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
             />
           ) : policy.status !== 'active' ? (
             <Badge colorScheme='primary'>{policy.status === 'draft' ? 'Draft' : 'Inactive'}</Badge>
-          ) : null}
+          ) : (
+            <OutsidePeopleBadge policy={policy} />
+          )}
         </Flex>
       </Td>
       {hierarchy?.role === 'parent' ? (
         <Td>
-          <Text
-            sx={smallSx}
-            truncate
-          >
-            {policy.isCatchAll
-              ? 'Parent members only'
-              : !policy.subOrganizationIds
-                ? 'All'
-                : hierarchy.subOrganizations
-                    .filter(organization => policy.subOrganizationIds?.includes(organization.id))
-                    .map(organization => organization.name)
-                    .join(', ') || 'None'}
-          </Text>
+          <Col sx={t => ({ gap: t.space.$0x5 })}>
+            <Text
+              sx={smallSx}
+              truncate
+            >
+              {policy.isCatchAll
+                ? 'Parent members only'
+                : !policy.subOrganizationIds
+                  ? 'All'
+                  : hierarchy.subOrganizations
+                      .filter(organization => policy.subOrganizationIds?.includes(organization.id))
+                      .map(organization => organization.name)
+                      .join(', ') || 'None'}
+            </Text>
+            {exclusive ? (
+              <Text
+                colorScheme='secondary'
+                sx={xsSx}
+              >
+                {`Only in ${hierarchy.parentName}’s organizations`}
+              </Text>
+            ) : null}
+          </Col>
         </Td>
       ) : (
         <Td>
-          {policy.enrollment === 'directory_sync' && directory ? (
-            <ProviderMark
-              provider={directory.provider}
-              name={directory.name}
-            />
-          ) : (
-            <Text sx={smallSx}>{ENROLLMENT_LABELS[policy.enrollment].label}</Text>
-          )}
+          <Col sx={t => ({ gap: t.space.$0x5 })}>
+            {policy.enrollment === 'directory_sync' && directory ? (
+              <ProviderMark
+                provider={directory.provider}
+                name={directory.name}
+              />
+            ) : (
+              <Text sx={smallSx}>{ENROLLMENT_LABELS[policy.enrollment].label}</Text>
+            )}
+            {exclusive ? (
+              <Text
+                colorScheme='secondary'
+                sx={xsSx}
+              >
+                {`Only in ${organizationName}`}
+              </Text>
+            ) : null}
+          </Col>
         </Td>
       )}
       <Td>

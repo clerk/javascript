@@ -5,13 +5,14 @@ import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Switch } from '@/ui/elements/Switch';
 
 import { Button, Col, descriptors, Flex, Icon, Text } from '../../../customizables';
-import { Cog, Plus, Trash } from '../../../icons';
-import { DomainConflict, SharedDomainPrompt } from './CreateParent';
-import { ClaimLine } from './DomainClaim';
+import { CheckmarkCircle, Cog, Plus, Trash } from '../../../icons';
+import { DomainConflict } from './DomainConflict';
 import { DomainEntry } from './DomainProof';
+import { LinkNote, MembershipControl, MoveToEnterprise, Note, OrganizationsBox, RemovalConfirm } from './Membership';
 import { useAccessNavigation } from './navigation';
 import {
   BackTitle,
+  borderSx,
   PageFooter,
   RadioOption,
   SettingRow,
@@ -31,20 +32,27 @@ import type {
 } from './prototypeState';
 import {
   activationBlocker,
+  addDays,
   APP_REVERIFICATION_HOURS,
+  CHANGE_NOTICE_DAYS,
   DOMAIN_PATTERN,
   draftFromPolicy,
   ENROLLMENT_LABELS,
+  formatDate,
   formatReverification,
   isProven,
+  joinList,
+  knownProof,
+  landingSummary,
   needsOwnership,
   newDraft,
   NON_DIRECTORY_FALLBACK_LABELS,
+  ownDomainOwner,
   PARENT_DOMAINS,
-  proofFor,
+  peopleElsewhereAt,
+  plural,
   protoKey,
   REVERIFICATION_OPTIONS,
-  ROUTING_LABELS,
   simulateRequest,
   useAccessPrototype,
 } from './prototypeState';
@@ -85,7 +93,9 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
   const saved = policies.find(entry => entry.id === draft.policyId);
   const [domainInput, setDomainInput] = useState('');
   const [domainError, setDomainError] = useState<string | null>(null);
-  const [conflict, setConflict] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<string | null>(() =>
+    draft.policyId === 'new' && draft.domains.length === 0 ? (ownDomainOwner(store)?.id ?? null) : null,
+  );
   const [saving, setSaving] = useState<ProtoPolicyStatus | null>(null);
   const canManage = access.canManage;
 
@@ -97,11 +107,34 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
 
   const isNew = draft.policyId === 'new';
   const isDraft = isNew || saved?.status === 'draft';
-  const blocker = activationBlocker(draft, false);
   const isDirty = !saved || JSON.stringify(draftFromPolicy(saved)) !== JSON.stringify(draft);
   const ownershipNeeded = needsOwnership(draft);
-  const claimsShown = access.claimsAllowed && store.hierarchy?.role !== 'child';
   const hierarchy = store.hierarchy;
+  const unowned = draft.domains.filter(domain => draft.proofs[domain]?.ownership !== 'verified');
+  // Choosing "Only in" removes people from their other organizations; a parent decides that in Members › Unmanaged users.
+  const removing =
+    draft.exclusive && hierarchy?.role !== 'parent' && unowned.length === 0
+      ? peopleElsewhereAt(draft.domains, store.outsidePeople).people.length
+      : 0;
+  // Said on the Only in option either way, so the choice carries its consequence.
+  const leaving =
+    draft.domains.length > 0 && unowned.length === 0 && hierarchy?.role !== 'parent'
+      ? peopleElsewhereAt(draft.domains, store.outsidePeople).people.length
+      : 0;
+  const confirmsRemoval = removing > 0 && !(saved?.exclusive && saved.removeElsewhereOn);
+  const [confirming, setConfirming] = useState<ProtoPolicyStatus | null>(null);
+  // Proven domains with people in other organizations unlock a third Membership option: a parent account.
+  const organizationsElsewhere =
+    draft.domains.length > 0 && unowned.length === 0 && !hierarchy && canManage
+      ? peopleElsewhereAt(draft.domains, store.outsidePeople).organizations.length
+      : 0;
+  const [parentSelected, setParentSelected] = useState(false);
+  const choosingParent = parentSelected && organizationsElsewhere > 0;
+  const [isMovingToParent, setIsMovingToParent] = useState(false);
+  // Like SSO without a connection: the third Membership option holds the policy until its parent account exists.
+  const blocker = activationBlocker(draft, false) ?? (choosingParent ? 'Create the parent account' : null);
+  const commit = (status: ProtoPolicyStatus) =>
+    confirmsRemoval && status === 'active' ? setConfirming(status) : save(status);
 
   const addDomain = () => {
     const domain = domainInput.trim().toLowerCase();
@@ -125,16 +158,26 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
     }
     set({
       domains: [...draft.domains, domain],
-      proofs: { ...draft.proofs, [domain]: draft.proofs[domain] ?? proofFor(domain, store.userEmail) },
+      proofs: { ...draft.proofs, [domain]: draft.proofs[domain] ?? knownProof(store, domain) },
     });
     setDomainInput('');
     setDomainError(null);
   };
 
+  // Who a rule reaches shows on the page itself, before and after saving; saving only asks before it removes people.
   const save = (status: ProtoPolicyStatus) => {
     setSaving(status);
     void simulateRequest().then(() => {
-      store.saveDraft(draft, status);
+      store.saveDraft(
+        {
+          ...draft,
+          removeElsewhereOn:
+            removing > 0 && status === 'active'
+              ? (draft.removeElsewhereOn ?? addDays(new Date(), CHANGE_NOTICE_DAYS))
+              : undefined,
+        },
+        status,
+      );
       setSaving(null);
       nav.toPolicies();
     });
@@ -153,6 +196,20 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
           title={isNew ? 'Add policy' : 'Manage policy'}
           onBack={leave}
         />
+
+        {store.policyNotice ? (
+          <Flex
+            align='center'
+            gap={2}
+            sx={t => ({ ...borderSx(t), padding: t.space.$3 })}
+          >
+            <Icon
+              icon={CheckmarkCircle}
+              sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, flexShrink: 0, color: t.colors.$success500 })}
+            />
+            <Text sx={smallSx}>{store.policyNotice}</Text>
+          </Flex>
+        ) : null}
 
         {!isDraft ? (
           <SettingRow label='Status'>
@@ -210,33 +267,21 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
             </Col>
           ) : null}
           {draft.domains.map(domain => {
-            const proof = draft.proofs[domain] ?? proofFor(domain, store.userEmail);
+            const proof = draft.proofs[domain] ?? knownProof(store, domain);
             return (
               <DomainEntry
                 key={domain}
                 domain={domain}
                 proof={proof}
-                ownershipNeeded={ownershipNeeded || claimsShown}
-                claim={
-                  <>
-                    <ClaimLine
-                      domain={domain}
-                      owned={proof.ownership === 'verified'}
-                      canManage={canManage}
-                      context={draft}
-                    />
-                    {proof.ownership === 'verified' ? <SharedDomainPrompt domain={domain} /> : null}
-                  </>
-                }
+                ownershipNeeded={ownershipNeeded}
                 compact={saved?.status === 'active' && isProven(draft, domain)}
                 canManage={canManage}
-                onVerified={() => {
+                onVerified={() =>
                   store.setDraft(previous => ({
                     ...previous,
                     proofs: { ...previous.proofs, [domain]: { association: true, ownership: 'verified' } },
-                  }));
-                  store.restoreClaim(domain);
-                }}
+                  }))
+                }
                 onRemove={() =>
                   set({
                     domains: draft.domains.filter(entry => entry !== domain),
@@ -250,7 +295,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
 
         {hierarchy?.role === 'parent' ? (
           <SettingRow
-            label='Sub-organizations'
+            label='Organizations'
             info='Who follows this policy’s multi-factor and re-verification rules. Everyone at these domains still signs in the same way.'
           >
             <RadioOption
@@ -258,7 +303,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
               checked={!draft.subOrganizationIds}
               onSelect={() => set({ subOrganizationIds: undefined })}
               isDisabled={!canManage}
-              label='All sub-organizations'
+              label={`All organizations in ${hierarchy.parentName}`}
               description='Includes any added later'
             />
             <RadioOption
@@ -292,6 +337,78 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
           </SettingRow>
         ) : null}
 
+        <SettingRow label='Membership'>
+          <MembershipControl
+            value={draft.exclusive}
+            onChange={exclusive => {
+              setParentSelected(false);
+              set({ exclusive });
+            }}
+            isDisabled={!canManage}
+            who='Users at these domains'
+            onlyDescription={
+              leaving > 0
+                ? `Users at these domains can’t be in other organizations. ${
+                    draft.removeElsewhereOn
+                      ? `Anyone already in one is removed on ${formatDate(draft.removeElsewhereOn)}.`
+                      : `Anyone already in one is removed ${CHANGE_NOTICE_DAYS} days after you ${draft.status === 'active' ? 'save' : 'activate'}.`
+                  }`
+                : undefined
+            }
+            reach={
+              !store.hierarchy && draft.domains.some(domain => draft.proofs[domain]?.ownership === 'verified')
+                ? draft.signIn === 'sso'
+                  ? 'They sign in with your SSO there.'
+                  : 'Your sign-in rules apply to them there.'
+                : undefined
+            }
+            context={
+              <ElsewhereOrganizations
+                draft={draft}
+                isLive={!isDirty && saved?.status === 'active'}
+              />
+            }
+            parentOption={
+              organizationsElsewhere > 0
+                ? {
+                    description: `Manage which organizations users at these domains are in. Invite the ${plural(organizationsElsewhere, 'other organization')}, migrate these users, or remove them.`,
+                    isSelected: choosingParent,
+                    onSelect: () => setParentSelected(true),
+                    action: (
+                      <Button
+                        variant='outline'
+                        textVariant='buttonSmall'
+                        block={false}
+                        sx={{ alignSelf: 'flex-start' }}
+                        onClick={() => setIsMovingToParent(true)}
+                      >
+                        <Icon
+                          icon={Plus}
+                          sx={t => ({ width: t.sizes.$3x5, height: t.sizes.$3x5, marginInlineEnd: t.space.$1 })}
+                        />
+                        Create parent account
+                      </Button>
+                    ),
+                  }
+                : undefined
+            }
+          >
+            {unowned.length > 0 ? <OwnershipWarning domains={unowned} /> : null}
+          </MembershipControl>
+          {isMovingToParent ? (
+            <MoveToEnterprise
+              domains={draft.domains}
+              carries='this policy'
+              onCreate={name => {
+                store.moveDomainToEnterprise(name, draft);
+                set({ exclusive: true });
+                setParentSelected(false);
+              }}
+              onClose={() => setIsMovingToParent(false)}
+            />
+          ) : null}
+        </SettingRow>
+
         <SettingRow label='Authentication'>
           <RadioOption
             name='authentication'
@@ -313,6 +430,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 : access.ssoUnavailableMessage || 'Not available for your organization'
             }
           >
+            {unowned.length > 0 ? <OwnershipWarning domains={unowned} /> : null}
             <ConnectionList
               label='Connections'
               chosen={draft.connectionIds}
@@ -339,14 +457,14 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 isChecked={draft.skipMfaForSso}
                 isDisabled={!canManage}
                 onChange={skipMfaForSso => set({ skipMfaForSso })}
-                label={protoKey('Skip for people who sign in with SSO')}
+                label={protoKey('Skip for users who sign in with SSO')}
               />
               <Text
                 colorScheme='secondary'
                 sx={xsSx}
               >
                 {hierarchy?.role === 'parent'
-                  ? 'Your identity provider handles the second factor. Applies inside your sub-organizations only.'
+                  ? `Your identity provider handles the second factor. Applies inside organizations in ${hierarchy.parentName} only.`
                   : 'Your identity provider handles the second factor. Applies inside this organization only.'}
               </Text>
             </Col>
@@ -367,13 +485,13 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
               colorScheme='secondary'
               sx={smallSx}
             >
-              People join the parent by invitation. Whoever created it is its first member.
+              Users join the parent by invitation. Whoever created it is its first member.
             </Text>
             <Text
               colorScheme='secondary'
               sx={smallSx}
             >
-              {`People reach sub-organizations this way: ${ROUTING_LABELS[hierarchy.routing].label.toLowerCase()}. Change it on the Sub-organizations tab.`}
+              {`Where users land: ${landingSummary(hierarchy)}. Change it on the Organizations tab.`}
             </Text>
           </SettingRow>
         ) : (
@@ -392,6 +510,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 >
                   {mode === 'directory_sync' ? (
                     <Col sx={t => ({ gap: t.space.$4 })}>
+                      {unowned.length > 0 ? <OwnershipWarning domains={unowned} /> : null}
                       <ConnectionList
                         label='Directory'
                         chosen={draft.directoryId ? [draft.directoryId] : []}
@@ -431,7 +550,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                             colorScheme='secondary'
                             sx={xsSx}
                           >
-                            Only reaches people your identity provider lets sign in.
+                            Only reaches users your identity provider lets sign in.
                           </Text>
                         ) : null}
                       </Col>
@@ -463,7 +582,7 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
                 block={false}
                 isDisabled={Boolean(blocker) || saving !== null}
                 isLoading={saving === 'active'}
-                onClick={() => save('active')}
+                onClick={() => commit('active')}
                 localizationKey={protoKey('Activate policy')}
               />
             </>
@@ -473,17 +592,79 @@ const PolicyForm = ({ draft }: { draft: PolicyDraft }) => {
               block={false}
               isDisabled={!isDirty || (draft.status === 'active' && Boolean(blocker)) || saving !== null}
               isLoading={saving !== null}
-              onClick={() => save(draft.status)}
+              onClick={() => commit(draft.status)}
               localizationKey={protoKey('Save')}
             />
           )}
         </PageFooter>
+      ) : null}
+      {confirming ? (
+        <RemovalConfirm
+          domains={draft.domains}
+          count={removing}
+          verb={isDraft ? 'activate' : 'save'}
+          onClose={() => setConfirming(null)}
+          onConfirm={() => {
+            setConfirming(null);
+            save(confirming);
+          }}
+        />
       ) : null}
     </ProfileCard.Page>
   );
 };
 
 /* ------------------------------------------------------------ controls */
+
+/* Under the Membership choice: which other organizations people at these domains are in. */
+const ElsewhereOrganizations = ({ draft, isLive }: { draft: PolicyDraft; isLive: boolean }) => {
+  const store = useAccessPrototype();
+  const nav = useAccessNavigation();
+  const owned = draft.domains.filter(domain => draft.proofs[domain]?.ownership === 'verified');
+  if (owned.length === 0) {
+    return null;
+  }
+  const elsewhere = peopleElsewhereAt(owned, store.outsidePeople);
+  if (elsewhere.organizations.length === 0) {
+    return <Note>{`Nobody at ${joinList(owned)} is in another organization.`}</Note>;
+  }
+  const at = owned.filter(domain => peopleElsewhereAt([domain], store.outsidePeople).organizations.length > 0);
+  const from = at.length === 1 ? `from ${at[0]}` : 'from these domains';
+  const rows = elsewhere.organizations.map(entry => ({
+    name: entry.name,
+    detail: `${plural(entry.people.length, 'user', 'users')} ${from}`,
+  }));
+
+  const parent = store.hierarchy?.role === 'parent' ? store.hierarchy.parentName : null;
+
+  return (
+    <OrganizationsBox
+      title={`Users at ${joinList(at)} are in ${plural(rows.length, 'other organization', 'other organizations')}`}
+      rows={rows}
+      footer={
+        parent ? (
+          // Unmanaged users reads live policies, so it follows this one once it's saved.
+          isLive ? (
+            <LinkNote
+              text={`${parent} manages them and their users. Decide what happens to these users in Members › `}
+              link='Unmanaged users'
+              onClick={nav.toUnmanagedUsers}
+            />
+          ) : (
+            <LinkNote
+              text={`${parent} manages them and their users. ${draft.status === 'active' ? 'Save' : 'Activate'} this policy, then decide what happens to these users in Members › Unmanaged users.`}
+            />
+          )
+        ) : undefined
+      }
+    />
+  );
+};
+
+/** Under an option that needs domain ownership: what's missing. Verify sits on the domain in Target. */
+const OwnershipWarning = ({ domains }: { domains: string[] }) => (
+  <WarningLine>{`Verify ownership of ${joinList(domains)} in Target to use this.`}</WarningLine>
+);
 
 const MfaControl = ({
   value,
@@ -728,17 +909,21 @@ const DefaultPolicyPage = ({ policyId }: { policyId: string }) => {
   const [mfa, setMfa] = useState<ProtoMfa>(policy?.mfa ?? 'off');
   const [reverificationHours, setReverificationHours] = useState(policy?.reverificationHours ?? null);
   const [enrollment, setEnrollment] = useState<ProtoEnrollment>(policy?.enrollment ?? 'invitation_only');
+  const [exclusive, setExclusive] = useState(policy?.exclusive ?? false);
   const [isSaving, setIsSaving] = useState(false);
   if (!policy) {
     return null;
   }
   const isDirty =
-    mfa !== policy.mfa || reverificationHours !== policy.reverificationHours || enrollment !== policy.enrollment;
+    mfa !== policy.mfa ||
+    reverificationHours !== policy.reverificationHours ||
+    enrollment !== policy.enrollment ||
+    exclusive !== (policy.exclusive ?? false);
 
   const save = () => {
     setIsSaving(true);
     void simulateRequest().then(() => {
-      store.updatePolicy(policy.id, { mfa, reverificationHours, enrollment });
+      store.updatePolicy(policy.id, { mfa, reverificationHours, enrollment, exclusive });
       setIsSaving(false);
       nav.toPolicies();
     });
@@ -776,6 +961,16 @@ const DefaultPolicyPage = ({ policyId }: { policyId: string }) => {
             }))}
             value={enrollment}
             onChange={value => setEnrollment(value as ProtoEnrollment)}
+          />
+        </SettingRow>
+        <SettingRow label='Membership'>
+          <MembershipControl
+            value={exclusive}
+            onChange={setExclusive}
+            isDisabled={!store.access.canManage}
+            who='Members'
+            onlyDescription={`Members can’t be in other organizations. Anyone already in one is removed ${CHANGE_NOTICE_DAYS} days after you save.`}
+            caution='This includes contractors and guests at other email domains.'
           />
         </SettingRow>
       </Col>

@@ -771,7 +771,7 @@ const BypassSso = ({ connection, canManage }: { connection: ProtoConnection; can
           colorScheme='secondary'
           sx={smallSx}
         >
-          People who can sign in with an email code if this connection stops working. Every admin is alerted each time.
+          Users who can sign in with an email code if this connection stops working. Every admin is alerted each time.
         </Text>
       </Col>
       {emails.length > 0 ? (

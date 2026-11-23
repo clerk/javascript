@@ -1,4 +1,3 @@
-import type { FieldId } from '@clerk/shared/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import type { LocalizationKey } from '../../../customizables';
@@ -20,7 +19,7 @@ export type ProtoSignIn = 'default' | 'sso';
 export type ProtoMfa = 'off' | 'optional' | 'required';
 export type ProtoPolicyStatus = 'active' | 'draft' | 'inactive';
 export type ProtoProvider = 'saml_okta' | 'saml_microsoft' | 'saml_google' | 'saml_custom' | 'oidc';
-/** People at the domain who aren't provisioned by the directory. */
+/** Users at the domain who aren't provisioned by the directory. */
 export type ProtoNonDirectoryFallback = 'join' | 'create_own' | 'error';
 export type ProtoOwnership = 'unverified' | 'verified';
 export type ProtoConnectionStatus = 'pending' | 'active' | 'broken';
@@ -57,6 +56,10 @@ export type ProtoPolicy = {
   skipMfaForSso: boolean;
   /** Parent organizations only: the sub-organizations the policy's rules reach. Undefined = all. */
   subOrganizationIds?: string[];
+  /** Membership only here: people at these domains can only be in this organization. */
+  exclusive?: boolean;
+  /** Under exclusive: when people at these domains are removed from their other organizations. */
+  removeElsewhereOn?: string;
   createdAt: string;
 };
 
@@ -80,57 +83,43 @@ export type ProtoConnection = {
   bypassEmails?: string[];
 };
 
-export type ScenarioKey =
-  | 'work'
-  | 'personal'
-  | 'configured'
-  | 'view_only'
-  | 'sso_unavailable'
-  | 'claims_off'
-  | 'parent'
-  | 'child';
+const SCENARIO_KEYS = [
+  'domain_elsewhere',
+  'domain_clear',
+  'domain_taken',
+  'configured',
+  // Not in the picker: the parent account states the tests start from.
+  'personal',
+  'parent',
+  'child',
+  'join_request',
+] as const;
 
-export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
-  work: 'New org, work email',
-  personal: 'New org, personal email',
-  configured: 'Configured org',
-  view_only: 'Configured org, view only',
-  sso_unavailable: 'New org, SSO not allowed',
-  claims_off: 'Configured org, claiming not allowed',
-  parent: 'Parent organization',
-  child: 'Sub-organization',
-};
+export type ScenarioKey = (typeof SCENARIO_KEYS)[number];
 
-/* --------------------------------------------------------------- claiming */
+/** What the sandbox picker offers, and the Access view each one opens on. */
+export const PICKER_SCENARIOS: { key: ScenarioKey; label: string; open: Record<string, string> }[] = [
+  { key: 'domain_elsewhere', label: 'Domain, users in other orgs', open: { policy: 'new' } },
+  { key: 'domain_clear', label: 'Domain, nobody in other orgs', open: { policy: 'new' } },
+  { key: 'domain_taken', label: 'Domain, SSO in another org', open: { policy: 'new' } },
+  { key: 'configured', label: 'SSO already live', open: {} },
+];
+
+/* --------------------------------------------------------- outside people */
 
 /** Someone with an email at a domain who isn't a member of this organization. */
 export type ProtoOutsidePerson = {
   email: string;
-  lastSignIn: string;
   /** How many other organizations they belong to. Names stay hidden from the organization. */
   otherOrganizations: number;
-  /** Their only organization is one where they are the sole member. */
-  inSingleMemberOrganization: boolean;
   inactive: boolean;
 };
 
-export type ProtoClaimStatus = 'notice' | 'claimed' | 'proof_lost';
+/** How long people get between a change to their organizations and its effect. */
+export const CHANGE_NOTICE_DAYS = 14;
 
-/** Claiming a domain: people there join this organization. No entry = not claimed. */
-export type ProtoClaim = {
-  status: ProtoClaimStatus;
-  /** When the notice period ends, or ended. */
-  startsAt: string;
-  /** When a claim with lost proof is released. */
-  endsAt?: string;
-  /** Also bring in single-member organizations and ask owners of shared ones. */
-  includeOrganizations: boolean;
-};
-
-export const CLAIM_NOTICE_DAYS = 14;
-export const CLAIM_RELEASE_DAYS = 30;
-
-const addDays = (from: Date, days: number) => new Date(from.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
+export const addDays = (from: Date, days: number) =>
+  new Date(from.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
 
 export const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -139,29 +128,48 @@ export const formatDate = (iso: string) =>
 
 export type ProtoSubOrganization = { id: string; name: string; membersCount: number };
 
-/** How someone who signs in at a parent's domain ends up in a sub-organization. */
-export type ProtoRouting = 'application' | 'org_rules' | 'directory_groups' | 'group_per_organization';
+/** Where someone who signs in at a parent's domain lands. */
+export type ProtoRouting = 'invited' | 'one_organization' | 'rules';
 
-export const ROUTING_LABELS: Record<ProtoRouting, { label: string; description: string }> = {
-  application: {
-    label: 'Your application adds them',
-    description: 'They can sign in straight away, and belong to no sub-organization until the application adds them.',
+export const ROUTING_OPTIONS: Record<ProtoRouting, { label: string; description: string }> = {
+  invited: {
+    label: 'No organization until invited',
+    description: 'They sign in, then wait for an invitation.',
   },
-  org_rules: {
-    label: 'Each sub-organization decides',
-    description: 'Sub-organizations use their own enrollment rules. Best when each has its own domain.',
+  one_organization: {
+    label: 'One organization',
+    description: 'Everyone joins an organization you pick.',
   },
-  directory_groups: {
-    label: 'Directory groups',
-    description: 'Map groups from your identity provider to existing sub-organizations.',
-  },
-  group_per_organization: {
-    label: 'One sub-organization per directory group',
-    description: 'Each group becomes a sub-organization, and its members stay in sync with the group.',
+  rules: {
+    label: 'By directory group or domain',
+    description: 'Recommended with SSO and directory sync.',
   },
 };
 
-export type ProtoGroupMapping = { group: string; subOrganizationId: string | null };
+/** Users in a directory group, or at a domain, join these organizations. Rules add up: users join every match. */
+export type ProtoPlacementRule = { id: string; kind: 'group' | 'domain'; value: string; organizationIds: string[] };
+
+/** The groups the parent's directory sends. */
+export const DIRECTORY_GROUPS = [
+  'Austin Clinic Staff',
+  'Dallas Clinic Staff',
+  'Houston Clinic Staff',
+  'El Paso Clinic Staff',
+  'Regional Managers',
+];
+
+/** Where users land, to finish "Where users land: …" elsewhere on the page. */
+export const landingSummary = (
+  hierarchy: Pick<ProtoHierarchy, 'routing' | 'landingOrganizationId' | 'subOrganizations'>,
+) => {
+  if (hierarchy.routing === 'one_organization') {
+    return (
+      hierarchy.subOrganizations.find(entry => entry.id === hierarchy.landingOrganizationId)?.name ?? 'one organization'
+    );
+  }
+  const { label } = ROUTING_OPTIONS[hierarchy.routing];
+  return label.charAt(0).toLowerCase() + label.slice(1);
+};
 
 /**
  * A parent is an organization with a type flag and sub-organizations. Nobody
@@ -174,12 +182,29 @@ export type ProtoHierarchy = {
   parentName: string;
   subOrganizations: ProtoSubOrganization[];
   routing: ProtoRouting;
-  groupMappings: ProtoGroupMapping[];
+  /** One organization: where everyone lands. */
+  landingOrganizationId?: string | null;
+  /** By directory group or domain. */
+  placementRules?: ProtoPlacementRule[];
+  /** By directory group or domain: where users no rule matches land. Null is no organization. */
+  fallbackOrganizationId?: string | null;
   /** The member on screen is also a member of the parent, so the switcher offers a way in. */
   isParentMember: boolean;
   /** Optional: parent members can open every sub-organization. Off by default. */
   parentMembersSeeAll: boolean;
+  /** Organizations outside the parent it has invited, by organization id. */
+  organizationPlans?: Record<string, ProtoOrganizationPlan>;
+  /** Decisions on unmanaged users, by email. */
+  userPlans?: Record<string, ProtoUserPlan>;
+  /** For users who migrate: the parent's organization they join, by email. */
+  userDestinations?: Record<string, string>;
 };
+
+/** For an organization outside the parent: invited to join it, with all its members. */
+export type ProtoOrganizationPlan = 'bring';
+
+/** For an unmanaged user: migrate them into one of the parent's organizations, or remove them from the others. */
+export type ProtoUserPlan = 'migrate' | 'remove';
 
 /** Another organization in the application that shares a domain with this one. */
 export type ProtoRelatedOrganization = {
@@ -189,8 +214,8 @@ export type ProtoRelatedOrganization = {
   domain: string;
   /** It proved the domain itself. */
   ownsDomain: boolean;
-  /** The member on screen is an admin there. */
-  isAdmin: boolean;
+  /** It has single sign-on set up for the domain. */
+  sso?: boolean;
 };
 
 /** What the application owner allows this organization's members to do. */
@@ -201,10 +226,6 @@ export type ProtoAccess = {
   ssoAllowed: boolean;
   /** Shown on the SSO option when ssoAllowed is off. */
   ssoUnavailableMessage: string;
-  /** The application owner lets members claim domains they own. */
-  claimsAllowed: boolean;
-  /** ...and bring in other organizations on those domains. */
-  organizationClaimsAllowed: boolean;
 };
 
 /** The Add/Manage policy form, kept outside the page so the setup wizards can hand a new connection back to it. */
@@ -224,6 +245,8 @@ export type PolicyDraft = {
   contactEmail: string;
   skipMfaForSso: boolean;
   subOrganizationIds?: string[];
+  exclusive: boolean;
+  removeElsewhereOn?: string;
 };
 
 export type ProtoState = {
@@ -237,19 +260,44 @@ export type ProtoState = {
   organizationName: string;
   /** Keyed by domain. */
   outsidePeople: Record<string, ProtoOutsidePerson[]>;
-  /** Keyed by domain. */
-  claims: Record<string, ProtoClaim>;
   hierarchy: ProtoHierarchy | null;
   relatedOrganizations: ProtoRelatedOrganization[];
   /** A one-off message on the Access page, e.g. after creating a parent. */
   notice: string | null;
+  /** Shown at the top of the policy form, e.g. after its domain moved to a parent account. */
+  policyNotice?: string | null;
+  /** Members here sign in with another organization's SSO, because it owns their domain. */
+  externalSignIn?: ProtoExternalSignIn | null;
+  /** Organizations that asked this one to manage them. */
+  joinRequests?: ProtoJoinRequest[];
+};
+
+export type ProtoExternalSignIn = {
+  ownerName: string;
+  /** The owner's parent account, the only thing another organization can ask to join. */
+  enterpriseName?: string;
+  domain: string;
+  members: string[];
+  status: 'new' | 'requested' | 'dismissed';
+};
+
+export type ProtoJoinRequest = {
+  id: string;
+  name: string;
+  membersCount: number;
+  /** Its members at this organization's domains. */
+  people: string[];
+  requestedBy: string;
 };
 
 /* ----------------------------------------------------------------- labels */
 
 export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; description: string }> = {
   invitation_only: { label: 'Invitation only', description: 'Members can only join through invitation' },
-  join_automatically: { label: 'Join automatically', description: 'Members can join without approval' },
+  join_automatically: {
+    label: 'Join automatically',
+    description: 'Users at these domains join when they sign in. They’ll see this organization in their switcher.',
+  },
   request_access: { label: 'Request access', description: 'Members can request to join with approval' },
   directory_sync: {
     label: 'Sync from directory',
@@ -296,11 +344,14 @@ export const policyTarget = (policy: ProtoPolicy, policies: ProtoPolicy[]) => {
   return policy.domains.join(', ');
 };
 
-/* SSO or directory sync need ownership of the domain; anything else needs association. */
-export const needsOwnership = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment'>) =>
-  policy.signIn === 'sso' || policy.enrollment === 'directory_sync';
+/* SSO, directory sync or keeping users out of other organizations need ownership of the domain; anything else needs association. */
+export const needsOwnership = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment' | 'exclusive'>) =>
+  policy.signIn === 'sso' || policy.enrollment === 'directory_sync' || Boolean(policy.exclusive);
 
-export const isProven = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment' | 'proofs'>, domain: string): boolean => {
+export const isProven = (
+  policy: Pick<ProtoPolicy, 'signIn' | 'enrollment' | 'exclusive' | 'proofs'>,
+  domain: string,
+): boolean => {
   const proof = policy.proofs[domain];
   if (!proof) {
     return false;
@@ -311,11 +362,36 @@ export const isProven = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment' | 'pr
   return !needsOwnership(policy) && proof.association;
 };
 
+/** Every domain the organization has proven it owns, on any of its policies. */
+export const provenDomains = (policies: Pick<ProtoPolicy, 'domains' | 'proofs'>[]) => [
+  ...new Set(policies.flatMap(entry => entry.domains.filter(domain => entry.proofs[domain]?.ownership === 'verified'))),
+];
+
+/** Every domain the policies target, with the strongest proof any of them holds for it. */
+const orgDomains = (state: Pick<ProtoState, 'policies'>) => {
+  const proofs = new Map<string, ProtoProof>();
+  state.policies.forEach(entry =>
+    entry.domains.forEach(domain => {
+      const proof = entry.proofs[domain];
+      if (!proofs.has(domain) || proof?.ownership === 'verified') {
+        proofs.set(domain, proof ?? emptyProof());
+      }
+    }),
+  );
+  return [...proofs].map(([domain, proof]) => ({ domain, proof }));
+};
+
+/** A domain's proof when it's added to a policy: whatever the organization already proved. */
+export const knownProof = (state: Pick<ProtoState, 'policies' | 'userEmail'>, domain: string) =>
+  orgDomains(state).find(entry => entry.domain === domain)?.proof ?? proofFor(domain, state.userEmail);
+
+export const plural = (count: number, one: string, many = `${one}s`) => `${count} ${count === 1 ? one : many}`;
+
+export const joinList = (items: string[]) =>
+  items.length < 2 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+
 export const connectionById = (id: string | undefined, connections: ProtoConnection[]) =>
   id ? (connections.find(connection => connection.id === id) ?? null) : null;
-
-export const policiesUsing = (connectionId: string, policies: ProtoPolicy[]) =>
-  policies.filter(policy => policy.connectionIds.includes(connectionId) || policy.directoryId === connectionId);
 
 /** What stops a draft from going active, or null when nothing does. */
 export const activationBlocker = (draft: PolicyDraft, isCatchAll: boolean): string | null => {
@@ -398,17 +474,25 @@ export const draftFromPolicy = (source: ProtoPolicy): PolicyDraft => ({
   contactEmail: source.contactEmail,
   skipMfaForSso: source.skipMfaForSso,
   subOrganizationIds: source.subOrganizationIds,
+  exclusive: source.exclusive ?? false,
+  removeElsewhereOn: source.removeElsewhereOn,
 });
 
-/** Add policy starts from the member's own email domain when no policy has it yet. */
-export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies'>): PolicyDraft => {
+/** Another organization that owns the member's own email domain, so it can't start a new policy. */
+export const ownDomainOwner = (state: Pick<ProtoState, 'userEmail' | 'relatedOrganizations'>) => {
   const own = state.userEmail.split('@')[1]?.toLowerCase() ?? '';
-  const taken = state.policies.some(entry => entry.domains.includes(own));
+  return state.relatedOrganizations.find(entry => entry.domain === own && entry.ownsDomain) ?? null;
+};
+
+/** Add policy starts from the member's own email domain when no policy has it yet. */
+export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies' | 'relatedOrganizations'>): PolicyDraft => {
+  const own = state.userEmail.split('@')[1]?.toLowerCase() ?? '';
+  const taken = state.policies.some(entry => entry.domains.includes(own)) || Boolean(ownDomainOwner(state));
   const domains = own && !taken ? [own] : [];
   return {
     policyId: 'new',
     domains,
-    proofs: Object.fromEntries(domains.map(domain => [domain, proofFor(domain, state.userEmail)])),
+    proofs: Object.fromEntries(domains.map(domain => [domain, knownProof(state, domain)])),
     status: 'draft',
     mfa: 'optional',
     signIn: 'default',
@@ -418,6 +502,7 @@ export const newDraft = (state: Pick<ProtoState, 'userEmail' | 'policies'>): Pol
     nonDirectoryFallback: 'create_own',
     contactEmail: '',
     skipMfaForSso: false,
+    exclusive: false,
   };
 };
 
@@ -425,45 +510,131 @@ const DEFAULT_ACCESS: ProtoAccess = {
   canManage: true,
   ssoAllowed: true,
   ssoUnavailableMessage: '',
-  claimsAllowed: true,
-  organizationClaimsAllowed: true,
 };
 
 const person = (
   email: string,
-  lastSignIn: string,
   otherOrganizations: number,
   extra: Partial<ProtoOutsidePerson> = {},
 ): ProtoOutsidePerson => ({
   email,
-  lastSignIn,
   otherOrganizations,
-  inSingleMemberOrganization: false,
   inactive: false,
   ...extra,
 });
 
 const ACME_OUTSIDE: ProtoOutsidePerson[] = [
-  person('sam.ortiz@acmedev.org', '2 days ago', 1, { inSingleMemberOrganization: true }),
-  person('lee.park@acmedev.org', '5 days ago', 1),
-  person('jordan.wu@acmedev.org', '3 weeks ago', 2),
-  person('riley.shah@acmedev.org', 'Yesterday', 0),
-  person('alex.kim@acmedev.org', '4 months ago', 1, { inSingleMemberOrganization: true, inactive: true }),
+  person('sam.ortiz@acmedev.org', 1),
+  person('lee.park@acmedev.org', 1),
+  person('jordan.wu@acmedev.org', 2),
+  person('riley.shah@acmedev.org', 0),
+  person('alex.kim@acmedev.org', 1, { inactive: true }),
 ];
 
 const OUTSIDE_PEOPLE: Record<string, ProtoOutsidePerson[]> = {
+  'acme.com': [person('dana@acme.com', 1), person('eli@acme.com', 2), person('fran@acme.com', 0)],
   'acmedev.org': ACME_OUTSIDE,
+  'exampledev.net': [person('casey@exampledev.net', 1), person('morgan@exampledev.net', 1)],
+  'meridianvet.com': [
+    person('nadia.ross@meridianvet.com', 1),
+    person('owen.cho@meridianvet.com', 2),
+    person('ines.duarte@meridianvet.com', 0),
+    person('ben.fowler@meridianvet.com', 1, { inactive: true }),
+  ],
+  'meridianpets.com': [person('kai.morgan@meridianpets.com', 1)],
+};
+
+/** An organization outside this one that people at a domain belong to. */
+export type ProtoOutsideOrganization = {
+  id: string;
+  name: string;
+  membersCount: number;
+  /** Emails at the domain that are members there. */
+  people: string[];
+  /** The member on screen administers it, so it can move without asking. */
+  isAdmin: boolean;
+};
+
+const outsideOrganization = (
+  id: string,
+  name: string,
+  membersCount: number,
+  people: string[],
+  isAdmin = false,
+): ProtoOutsideOrganization => ({ id, name, membersCount, people, isAdmin });
+
+/** Keyed by domain; matches each person's otherOrganizations count. */
+export const OUTSIDE_ORGANIZATIONS: Record<string, ProtoOutsideOrganization[]> = {
+  'acme.com': [
+    outsideOrganization('org_out_dana', 'Dana’s workspace', 1, ['dana@acme.com']),
+    outsideOrganization('org_out_northwind', 'Northwind Partners', 9, ['eli@acme.com']),
+    outsideOrganization('org_out_globex', 'Globex Consulting', 23, ['eli@acme.com']),
+  ],
+  'acmedev.org': [
+    outsideOrganization(
+      'org_acme_research',
+      'Acme Research',
+      12,
+      ['lee.park@acmedev.org', 'jordan.wu@acmedev.org'],
+      true,
+    ),
+    outsideOrganization('org_acme_design', 'Acme Design', 7, ['jordan.wu@acmedev.org']),
+    outsideOrganization('org_out_sam', 'Sam’s workspace', 1, ['sam.ortiz@acmedev.org']),
+    outsideOrganization('org_out_alex', 'Alex’s side project', 1, ['alex.kim@acmedev.org']),
+  ],
   'exampledev.net': [
-    person('casey@exampledev.net', '1 week ago', 1, { inSingleMemberOrganization: true }),
-    person('morgan@exampledev.net', '2 months ago', 1),
+    outsideOrganization('org_out_casey', 'Casey’s workspace', 1, ['casey@exampledev.net']),
+    outsideOrganization('org_out_initech', 'Initech', 14, ['morgan@exampledev.net']),
   ],
   'meridianvet.com': [
-    person('nadia.ross@meridianvet.com', '3 days ago', 1, { inSingleMemberOrganization: true }),
-    person('owen.cho@meridianvet.com', '1 week ago', 1),
-    person('ines.duarte@meridianvet.com', 'Yesterday', 0),
-    person('ben.fowler@meridianvet.com', '5 months ago', 1, { inSingleMemberOrganization: true, inactive: true }),
+    outsideOrganization('org_out_nadia', 'Nadia’s workspace', 1, ['nadia.ross@meridianvet.com']),
+    outsideOrganization('org_out_paws', 'Paws Partners Network', 30, ['owen.cho@meridianvet.com']),
+    outsideOrganization('org_out_lonestar', 'Lone Star Vet Collective', 18, ['owen.cho@meridianvet.com']),
+    outsideOrganization('org_out_ben', 'Ben’s practice notes', 1, ['ben.fowler@meridianvet.com']),
   ],
-  'meridianpets.com': [person('kai.morgan@meridianpets.com', '2 weeks ago', 1)],
+  'meridianpets.com': [outsideOrganization('org_out_supply', 'Pet Supply Co-op', 11, ['kai.morgan@meridianpets.com'])],
+};
+
+export const outsideOrganizationsAt = (domains: string[]) =>
+  domains.flatMap(domain => OUTSIDE_ORGANIZATIONS[domain] ?? []);
+
+/** Organizations the member on screen can bring in without asking: ones they administer, or a one-user workspace. */
+export const joinsRightAway = (organization: ProtoOutsideOrganization) =>
+  organization.isAdmin || organization.membersCount === 1;
+
+/** A parent's proven domains, and the organizations outside it that have users there. */
+export const outsideOfParent = (state: Pick<ProtoState, 'policies' | 'draft' | 'hierarchy'>) => {
+  // A policy that moved here unsaved still counts: its domain is already proven.
+  const domains = provenDomains(state.draft ? [...state.policies, state.draft] : state.policies);
+  const managed = new Set(state.hierarchy?.subOrganizations.map(entry => entry.id) ?? []);
+  return { domains, organizations: outsideOrganizationsAt(domains).filter(entry => !managed.has(entry.id)) };
+};
+
+/** Members of this organization who are also in other organizations, keyed by domain. */
+const MEMBERS_ELSEWHERE: Record<string, { people: ProtoOutsidePerson[]; organizations: ProtoOutsideOrganization[] }> = {
+  'acme.com': {
+    people: [person('gus@acme.com', 1)],
+    organizations: [outsideOrganization('org_out_gus', 'Gus’s workspace', 1, ['gus@acme.com'])],
+  },
+  'acmedev.org': {
+    people: [person('priya.nair@acmedev.org', 1)],
+    organizations: [outsideOrganization('org_out_labs', 'Side Project Labs', 3, ['priya.nair@acmedev.org'])],
+  },
+};
+
+/** Who at these domains is in other organizations: members, and people who'd have to leave them to join. */
+export const peopleElsewhereAt = (domains: string[], outsidePeople: Record<string, ProtoOutsidePerson[]>) => {
+  const members = domains.flatMap(domain => MEMBERS_ELSEWHERE[domain]?.people ?? []);
+  const others = domains.flatMap(domain => (outsidePeople[domain] ?? []).filter(entry => entry.otherOrganizations > 0));
+  return {
+    members,
+    others,
+    people: [...members, ...others],
+    organizations: domains.flatMap(domain => [
+      ...(MEMBERS_ELSEWHERE[domain]?.organizations ?? []),
+      ...(OUTSIDE_ORGANIZATIONS[domain] ?? []),
+    ]),
+  };
 };
 
 export const PARENT_NAME = 'Meridian Vet Group';
@@ -479,36 +650,28 @@ const MERIDIAN_HIERARCHY: ProtoHierarchy = {
   role: 'parent',
   parentName: PARENT_NAME,
   subOrganizations: MERIDIAN_SUB_ORGANIZATIONS,
-  routing: 'application',
-  groupMappings: [
-    { group: 'Austin staff', subOrganizationId: 'org_sub_austin' },
-    { group: 'Dallas staff', subOrganizationId: 'org_sub_dallas' },
-    { group: 'Houston staff', subOrganizationId: 'org_sub_houston' },
-    { group: 'El Paso staff', subOrganizationId: 'org_sub_el_paso' },
-    { group: 'Regional managers', subOrganizationId: null },
+  routing: 'rules',
+  placementRules: [
+    { id: 'rule_houston', kind: 'group', value: 'Houston Clinic Staff', organizationIds: ['org_sub_houston'] },
+    {
+      id: 'rule_regional',
+      kind: 'group',
+      value: 'Regional Managers',
+      organizationIds: ['org_sub_houston', 'org_sub_el_paso'],
+    },
+    { id: 'rule_pets', kind: 'domain', value: 'meridianpets.com', organizationIds: ['org_sub_el_paso'] },
   ],
+  fallbackOrganizationId: null,
   isParentMember: true,
   parentMembersSeeAll: false,
+  // A mix for the Unmanaged users tab: one invited organization, one decided user, the rest undecided.
+  organizationPlans: { org_out_supply: 'bring' },
+  userPlans: { 'nadia.ross@meridianvet.com': 'migrate' },
+  userDestinations: { 'nadia.ross@meridianvet.com': 'org_sub_houston' },
 };
 
 const ACME_RELATED: ProtoRelatedOrganization[] = [
-  {
-    id: 'org_acme_research',
-    name: 'Acme Research',
-    membersCount: 12,
-    domain: 'acmedev.org',
-    ownsDomain: false,
-    isAdmin: true,
-  },
-  {
-    id: 'org_acme_design',
-    name: 'Acme Design',
-    membersCount: 7,
-    domain: 'acmedev.org',
-    ownsDomain: false,
-    isAdmin: false,
-  },
-  { id: 'org_acme_labs', name: 'Acme Labs', membersCount: 19, domain: 'acmelabs.io', ownsDomain: true, isAdmin: true },
+  { id: 'org_acme_labs', name: 'Acme Labs', membersCount: 19, domain: 'acmelabs.io', ownsDomain: true },
 ];
 
 /** The parent's rules, as a sub-organization sees them. */
@@ -521,7 +684,7 @@ export const PARENT_RULES = [
   },
   {
     rule: 'Domain',
-    value: `meridianvet.com is claimed by ${PARENT_NAME}`,
+    value: `${PARENT_NAME} owns meridianvet.com`,
     audience: 'Everyone with a meridianvet.com email',
   },
 ];
@@ -533,21 +696,40 @@ const okLog = (id: string, at: string, detail: string): ProtoTestLog => ({ id, a
 
 const scenario = (key: ScenarioKey): ProtoState => {
   switch (key) {
-    case 'view_only':
-      return { ...scenario('configured'), scenario: key, access: { ...DEFAULT_ACCESS, canManage: false } };
-    case 'sso_unavailable':
+    case 'domain_clear':
       return {
-        ...scenario('work'),
+        ...scenario('domain_elsewhere'),
         scenario: key,
-        access: {
-          ...DEFAULT_ACCESS,
-          ssoAllowed: false,
-          ssoUnavailableMessage: 'Single sign-on is available on the Business plan. Contact your account owner.',
+        userEmail: 'you@acme.io',
+        relatedOrganizations: [],
+      };
+    case 'domain_taken':
+      return {
+        ...scenario('domain_elsewhere'),
+        scenario: key,
+        userEmail: 'jordan.wu@acmedev.org',
+        organizationName: 'Acme Design',
+        relatedOrganizations: [
+          {
+            id: 'org_acme',
+            name: 'Acme',
+            membersCount: 24,
+            domain: 'acmedev.org',
+            ownsDomain: true,
+            sso: true,
+          },
+        ],
+        externalSignIn: {
+          ownerName: 'Acme',
+          enterpriseName: 'Acme Enterprise',
+          domain: 'acmedev.org',
+          members: ['jordan.wu@acmedev.org'],
+          status: 'new',
         },
       };
     case 'personal':
-      return { ...scenario('work'), scenario: key, userEmail: 'you@gmail.com' };
-    case 'work':
+      return { ...scenario('domain_elsewhere'), scenario: key, userEmail: 'you@gmail.com' };
+    case 'domain_elsewhere':
       return {
         scenario: key,
         userEmail: 'you@acmedev.org',
@@ -557,20 +739,36 @@ const scenario = (key: ScenarioKey): ProtoState => {
         draft: null,
         organizationName: 'Acme',
         outsidePeople: OUTSIDE_PEOPLE,
-        claims: {},
         hierarchy: null,
         relatedOrganizations: ACME_RELATED,
         notice: null,
       };
-    case 'claims_off':
+    case 'join_request':
       return {
         ...scenario('configured'),
         scenario: key,
-        access: { ...DEFAULT_ACCESS, claimsAllowed: false, organizationClaimsAllowed: false },
+        organizationName: 'Acme Enterprise',
+        hierarchy: {
+          role: 'parent',
+          parentName: 'Acme Enterprise',
+          subOrganizations: [{ id: 'org_current', name: 'Acme', membersCount: 24 }],
+          routing: 'invited',
+          isParentMember: true,
+          parentMembersSeeAll: false,
+        },
+        joinRequests: [
+          {
+            id: 'org_acme_design',
+            name: 'Acme Design',
+            membersCount: 7,
+            people: ['jordan.wu@acmedev.org'],
+            requestedBy: 'pat@acmedesign.studio',
+          },
+        ],
       };
     case 'child':
       return {
-        ...scenario('work'),
+        ...scenario('domain_elsewhere'),
         scenario: key,
         userEmail: 'dana@meridianvet.com',
         organizationName: 'Austin Clinic',
@@ -586,6 +784,7 @@ const scenario = (key: ScenarioKey): ProtoState => {
           policy('meridianvet.com', {
             id: 'pol_meridianvet',
             mfa: 'required',
+            exclusive: true,
             skipMfaForSso: true,
             signIn: 'sso',
             connectionIds: ['con_meridian_okta'],
@@ -626,9 +825,6 @@ const scenario = (key: ScenarioKey): ProtoState => {
         access: DEFAULT_ACCESS,
         draft: null,
         outsidePeople: OUTSIDE_PEOPLE,
-        claims: {
-          'meridianpets.com': { status: 'claimed', startsAt: '2026-10-20T09:00:00.000Z', includeOrganizations: false },
-        },
         hierarchy: MERIDIAN_HIERARCHY,
         relatedOrganizations: [],
         notice: null,
@@ -701,9 +897,6 @@ const scenario = (key: ScenarioKey): ProtoState => {
         draft: null,
         organizationName: 'Acme',
         outsidePeople: OUTSIDE_PEOPLE,
-        claims: {
-          'exampledev.net': { status: 'notice', startsAt: '2026-11-18T09:00:00.000Z', includeOrganizations: true },
-        },
         hierarchy: null,
         relatedOrganizations: ACME_RELATED,
         notice: null,
@@ -713,14 +906,14 @@ const scenario = (key: ScenarioKey): ProtoState => {
 
 /* ------------------------------------------------------------------ store */
 
-const STORAGE_KEY = 'clerk-access-prototype-v5';
-const SERVER_STATE = scenario('work');
+const STORAGE_KEY = 'clerk-access-prototype-v9';
+const SERVER_STATE = scenario('domain_elsewhere');
 
 let state: ProtoState | null = null;
 const listeners = new Set<() => void>();
 
 const isScenarioKey = (value: unknown): value is ScenarioKey =>
-  typeof value === 'string' && Object.keys(SCENARIO_LABELS).includes(value);
+  typeof value === 'string' && (SCENARIO_KEYS as readonly string[]).includes(value);
 
 const load = (): ProtoState => {
   if (state) {
@@ -777,6 +970,7 @@ export const useAccessPrototype = () => {
       update(previous => ({
         ...previous,
         draft: typeof next === 'function' ? (previous.draft ? next(previous.draft) : previous.draft) : next,
+        policyNotice: next === null ? null : previous.policyNotice,
       })),
     [update],
   );
@@ -794,6 +988,7 @@ export const useAccessPrototype = () => {
         return {
           ...previous,
           draft: null,
+          policyNotice: null,
           policies: withCatchAllLast(
             existing
               ? previous.policies.map(entry => (entry.id === id ? saved : entry))
@@ -803,6 +998,37 @@ export const useAccessPrototype = () => {
       });
       return id;
     },
+    [update],
+  );
+
+  /*
+   * From a policy: create a parent account and move only this policy's
+   * domains, with the policy and its proof, up to it. The organization's other
+   * policies stay with it, and the draft keeps its unsaved changes.
+   */
+  const moveDomainToEnterprise = useCallback(
+    (name: string, draft: PolicyDraft) =>
+      update(previous => {
+        const moving = previous.policies.find(entry => entry.id === draft.policyId);
+        const owned = draft.domains.filter(domain => draft.proofs[domain]?.ownership === 'verified');
+        return {
+          ...previous,
+          organizationName: name,
+          hierarchy: {
+            role: 'parent',
+            parentName: name,
+            subOrganizations: [{ id: 'org_current', name: previous.organizationName, membersCount: 24 }],
+            routing: 'invited',
+            isParentMember: true,
+            parentMembersSeeAll: false,
+          },
+          policies: withCatchAllLast([...(moving ? [moving] : []), catchAll()]),
+          notice: owned.length
+            ? `${name} is ready. Decide what happens to unmanaged users on the Members page.`
+            : `${name} is ready.`,
+          policyNotice: `${joinList(draft.domains)} now belongs to ${name}. Your changes are still here.`,
+        };
+      }),
     [update],
   );
 
@@ -846,76 +1072,6 @@ export const useAccessPrototype = () => {
     [update],
   );
 
-  const startClaim = useCallback(
-    (domain: string, startNow: boolean, includeOrganizations: boolean) => {
-      const now = new Date();
-      const claim: ProtoClaim = startNow
-        ? { status: 'claimed', startsAt: now.toISOString(), includeOrganizations }
-        : { status: 'notice', startsAt: addDays(now, CLAIM_NOTICE_DAYS), includeOrganizations };
-      update(previous => ({ ...previous, claims: { ...previous.claims, [domain]: claim } }));
-    },
-    [update],
-  );
-
-  const startClaimNow = useCallback(
-    (domain: string) =>
-      update(previous => {
-        const claim = previous.claims[domain];
-        return claim
-          ? {
-              ...previous,
-              claims: {
-                ...previous.claims,
-                [domain]: { ...claim, status: 'claimed', startsAt: new Date().toISOString() },
-              },
-            }
-          : previous;
-      }),
-    [update],
-  );
-
-  const endClaim = useCallback(
-    (domain: string) =>
-      update(previous => {
-        const { [domain]: _removed, ...claims } = previous.claims;
-        return { ...previous, claims };
-      }),
-    [update],
-  );
-
-  /** Prototype-only: the DNS record disappears, so the claim winds down. */
-  const loseOwnership = useCallback(
-    (domain: string) =>
-      update(previous => {
-        const claim = previous.claims[domain];
-        return claim
-          ? {
-              ...previous,
-              claims: {
-                ...previous.claims,
-                [domain]: { ...claim, status: 'proof_lost', endsAt: addDays(new Date(), CLAIM_RELEASE_DAYS) },
-              },
-            }
-          : previous;
-      }),
-    [update],
-  );
-
-  /** Ownership proven again: a winding-down claim is back in force. */
-  const restoreClaim = useCallback(
-    (domain: string) =>
-      update(previous => {
-        const claim = previous.claims[domain];
-        return claim?.status === 'proof_lost'
-          ? {
-              ...previous,
-              claims: { ...previous.claims, [domain]: { ...claim, status: 'claimed', endsAt: undefined } },
-            }
-          : previous;
-      }),
-    [update],
-  );
-
   const updateHierarchy = useCallback(
     (patch: Partial<ProtoHierarchy>) =>
       update(previous =>
@@ -924,46 +1080,107 @@ export const useAccessPrototype = () => {
     [update],
   );
 
-  /**
-   * Puts a parent on top of this organization and the chosen others. They keep
-   * their IDs and data; domain proof moves up so nobody verifies again.
-   * Organizations the member doesn't administer join once their owner agrees.
-   */
-  const createParent = useCallback(
-    (name: string, organizationIds: string[]) =>
+  /** Invites organizations outside the parent. Ones the member can bring in without asking join right away. */
+  const inviteOrganizations = useCallback(
+    (ids: string[]) =>
       update(previous => {
-        const chosen = previous.relatedOrganizations.filter(entry => organizationIds.includes(entry.id));
-        const joined = chosen.filter(entry => entry.isAdmin);
-        const pending = chosen.filter(entry => !entry.isAdmin);
-        const proven = previous.policies.flatMap(policy =>
-          policy.domains.filter(domain => policy.proofs[domain]?.ownership === 'verified'),
-        );
-        const moved = [...new Set([...proven, ...joined.filter(entry => entry.ownsDomain).map(entry => entry.domain)])];
+        const hierarchy = previous.hierarchy;
+        if (!hierarchy) {
+          return previous;
+        }
+        const chosen = outsideOfParent(previous).organizations.filter(entry => ids.includes(entry.id));
+        const joining = chosen.filter(joinsRightAway);
+        const organizationPlans = { ...hierarchy.organizationPlans };
+        chosen.forEach(entry => {
+          if (joinsRightAway(entry)) {
+            delete organizationPlans[entry.id];
+          } else {
+            organizationPlans[entry.id] = 'bring';
+          }
+        });
         return {
           ...previous,
-          organizationName: name,
           hierarchy: {
-            role: 'parent',
-            parentName: name,
+            ...hierarchy,
+            organizationPlans,
             subOrganizations: [
-              { id: 'org_current', name: previous.organizationName, membersCount: 24 },
-              ...joined.map(entry => ({ id: entry.id, name: entry.name, membersCount: entry.membersCount })),
+              ...hierarchy.subOrganizations,
+              ...joining.map(entry => ({ id: entry.id, name: entry.name, membersCount: entry.membersCount })),
             ],
-            routing: 'application',
-            groupMappings: [],
-            isParentMember: true,
-            parentMembersSeeAll: false,
           },
-          relatedOrganizations: previous.relatedOrganizations.filter(entry => !joined.includes(entry)),
-          notice: [
-            `${name} now manages ${joined.length + 1} organization${joined.length ? 's' : ''}. You’re its first member; others join by invitation.`,
-            moved.length ? `Proof for ${moved.join(', ')} moved to ${name}, so nobody needs to verify again.` : null,
-            pending.length
-              ? `${pending.map(entry => entry.name).join(', ')} ${pending.length === 1 ? 'joins' : 'join'} once ${pending.length === 1 ? 'its owner agrees' : 'their owners agree'}.`
-              : null,
-          ]
-            .filter(Boolean)
-            .join(' '),
+          notice: joining.length
+            ? `${joinList(joining.map(entry => entry.name))} joined ${hierarchy.parentName}.`
+            : previous.notice,
+        };
+      }),
+    [update],
+  );
+
+  const cancelInvitation = useCallback(
+    (id: string) =>
+      update(previous => {
+        if (!previous.hierarchy) {
+          return previous;
+        }
+        const organizationPlans = { ...previous.hierarchy.organizationPlans };
+        delete organizationPlans[id];
+        return { ...previous, hierarchy: { ...previous.hierarchy, organizationPlans } };
+      }),
+    [update],
+  );
+
+  /** Puts a parent on top of this organization. It keeps its ID and data; domain proof moves up so nobody verifies again. */
+  const createParent = useCallback(
+    (name: string, notice: string) =>
+      update(previous => ({
+        ...previous,
+        organizationName: name,
+        hierarchy: {
+          role: 'parent',
+          parentName: name,
+          subOrganizations: [{ id: 'org_current', name: previous.organizationName, membersCount: 24 }],
+          routing: 'invited',
+          isParentMember: true,
+          parentMembersSeeAll: false,
+        },
+        notice,
+      })),
+    [update],
+  );
+
+  const setExternalSignInStatus = useCallback(
+    (status: ProtoExternalSignIn['status']) =>
+      update(previous =>
+        previous.externalSignIn ? { ...previous, externalSignIn: { ...previous.externalSignIn, status } } : previous,
+      ),
+    [update],
+  );
+
+  /** Accepting brings the organization under the parent; only a parent receives requests. */
+  const resolveJoinRequest = useCallback(
+    (id: string, accept: boolean) =>
+      update(previous => {
+        const request = previous.joinRequests?.find(entry => entry.id === id);
+        if (!request) {
+          return previous;
+        }
+        const hierarchy =
+          accept && previous.hierarchy
+            ? {
+                ...previous.hierarchy,
+                subOrganizations: [
+                  ...previous.hierarchy.subOrganizations,
+                  { id: request.id, name: request.name, membersCount: request.membersCount },
+                ],
+              }
+            : previous.hierarchy;
+        return {
+          ...previous,
+          hierarchy,
+          joinRequests: previous.joinRequests?.filter(entry => entry.id !== id),
+          relatedOrganizations: accept
+            ? previous.relatedOrganizations.filter(entry => entry.id !== id)
+            : previous.relatedOrganizations,
         };
       }),
     [update],
@@ -974,13 +1191,13 @@ export const useAccessPrototype = () => {
   return {
     ...current,
     createParent,
+    moveDomainToEnterprise,
+    setExternalSignInStatus,
+    resolveJoinRequest,
     dismissNotice,
-    startClaim,
-    startClaimNow,
-    endClaim,
-    loseOwnership,
-    restoreClaim,
     updateHierarchy,
+    inviteOrganizations,
+    cancelInvitation,
     setScenario,
     setDraft,
     saveDraft,
@@ -996,6 +1213,3 @@ export const simulateRequest = (ms = 400) => new Promise<void>(resolve => setTim
 
 // Prototype-only: raw strings render fine at runtime (makeLocalizable's string branch).
 export const protoKey = (value: string) => value as unknown as LocalizationKey;
-
-// Prototype-only: readable runtime field names; FieldId only scopes descriptors.
-export const protoFieldId = (value: string) => value as unknown as FieldId;

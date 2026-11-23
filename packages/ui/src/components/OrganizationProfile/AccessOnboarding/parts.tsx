@@ -1,8 +1,9 @@
-import { createContext, useId } from 'react';
+import { createContext, useContext, useId } from 'react';
 
+import { Modal } from '@/ui/elements/Modal';
 import { Tooltip } from '@/ui/elements/Tooltip';
 
-import { Box, Button, Col, Flex, Icon, Input, RadioInput, Text } from '../../../customizables';
+import { Badge, Box, Button, Col, Flex, Icon, Input, RadioInput, Span, Text } from '../../../customizables';
 import { ArrowLeft, ChevronLeft, ChevronRight, Close, ExclamationTriangle, InformationCircle } from '../../../icons';
 import { protoKey } from './prototypeState';
 
@@ -10,6 +11,43 @@ import { protoKey } from './prototypeState';
 
 /** The profile's content pane, so dialogs blur it rather than the whole screen. */
 export const ContentRefContext = createContext<React.RefObject<HTMLDivElement> | null>(null);
+
+/** A centered card over the profile, for decisions that need their own moment. */
+export const ModalCard = ({ onClose, children }: { onClose: () => void; children: React.ReactNode }) => {
+  const contentRef = useContext(ContentRefContext);
+  return (
+    <Modal
+      handleClose={onClose}
+      portalRoot={contentRef ?? undefined}
+      containerSx={t => ({
+        alignItems: 'center',
+        position: 'absolute',
+        inset: 0,
+        width: 'auto',
+        height: 'auto',
+        backgroundColor: 'inherit',
+        backdropFilter: `blur(${t.sizes.$2})`,
+      })}
+    >
+      <Col
+        sx={t => ({
+          gap: t.space.$4,
+          width: '24rem',
+          maxWidth: '100%',
+          padding: t.space.$5,
+          backgroundColor: t.colors.$colorBackground,
+          borderRadius: t.radii.$lg,
+          boxShadow: t.shadows.$cardContentShadow,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$borderAlpha100,
+        })}
+      >
+        {children}
+      </Col>
+    </Modal>
+  );
+};
 
 export const smallSx = (t: { fontSizes: { $sm: string } }) => ({ fontSize: t.fontSizes.$sm });
 export const xsSx = (t: { fontSizes: { $xs: string } }) => ({ fontSize: t.fontSizes.$xs });
@@ -26,7 +64,7 @@ export const borderSx = (t: {
   borderRadius: t.radii.$lg,
 });
 
-export const InfoTooltip = ({ text }: { text: string }) => (
+export const InfoTooltip = ({ text, tone = 'info' }: { text: string; tone?: 'info' | 'warning' }) => (
   <Tooltip.Root>
     <Tooltip.Trigger>
       <Button
@@ -39,17 +77,41 @@ export const InfoTooltip = ({ text }: { text: string }) => (
           padding: 0,
           height: 'fit-content',
           borderRadius: t.radii.$sm,
-          color: t.colors.$colorMutedForeground,
+          color: tone === 'warning' ? t.colors.$warning500 : t.colors.$colorMutedForeground,
         })}
       >
         <Icon
-          icon={InformationCircle}
+          icon={tone === 'warning' ? ExclamationTriangle : InformationCircle}
           aria-hidden
           sx={t => ({ width: t.sizes.$3x5, height: t.sizes.$3x5 })}
         />
       </Button>
     </Tooltip.Trigger>
     <Tooltip.Content text={protoKey(text)} />
+  </Tooltip.Root>
+);
+
+/** A badge that is its own tooltip trigger, so it carries its explanation without a separate icon. */
+export const TipBadge = ({
+  children,
+  tip,
+  colorScheme = 'primary',
+}: {
+  children: string;
+  tip: string;
+  colorScheme?: React.ComponentProps<typeof Badge>['colorScheme'];
+}) => (
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      <Span
+        tabIndex={0}
+        aria-label={`${children}. ${tip}`}
+        sx={t => ({ display: 'inline-flex', width: 'fit-content', borderRadius: t.radii.$sm })}
+      >
+        <Badge colorScheme={colorScheme}>{children}</Badge>
+      </Span>
+    </Tooltip.Trigger>
+    <Tooltip.Content text={protoKey(tip)} />
   </Tooltip.Root>
 );
 

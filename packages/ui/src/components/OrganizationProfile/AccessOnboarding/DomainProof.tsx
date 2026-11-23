@@ -1,12 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ClipboardInput } from '@/ui/elements/ClipboardInput';
-import { Modal } from '@/ui/elements/Modal';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 
 import { Badge, Button, Col, Flex, Icon, Spinner, Text } from '../../../customizables';
 import { CheckmarkCircle, ExclamationCircle } from '../../../icons';
-import { ContentRefContext, InfoTooltip, smallSx, xsSx } from './parts';
+import { InfoTooltip, ModalCard, smallSx, xsSx } from './parts';
 import type { ProtoProof } from './prototypeState';
 import { protoKey, simulateRequest, txtRecordFor } from './prototypeState';
 
@@ -24,7 +23,6 @@ export const DomainEntry = ({
   canManage,
   onVerified,
   onRemove,
-  claim,
 }: {
   domain: string;
   proof: ProtoProof;
@@ -34,8 +32,6 @@ export const DomainEntry = ({
   canManage: boolean;
   onVerified: () => void;
   onRemove: () => void;
-  /** The domain's claim line, under its proof. */
-  claim?: React.ReactNode;
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const owned = proof.ownership === 'verified';
@@ -75,14 +71,14 @@ export const DomainEntry = ({
           {ownershipNeeded ? (
             <ProofLine
               ok={owned}
+              warning
               label={`Domain ownership ${owned ? 'verified' : 'unverified'}`}
-              info='Single sign-on, directory sync and claiming the domain need a DNS record that proves you own it.'
+              info='Single sign-on, directory sync and keeping users out of other organizations need a DNS record that proves you own it.'
               action={!owned && canManage ? <VerifyButton onClick={() => setIsVerifying(true)} /> : null}
             />
           ) : null}
         </>
       )}
-      {claim}
       {isVerifying ? (
         <DnsDialog
           domain={domain}
@@ -94,24 +90,27 @@ export const DomainEntry = ({
   );
 };
 
-const ProofIcon = ({ ok }: { ok: boolean }) => (
+const ProofIcon = ({ ok, warning = false }: { ok: boolean; warning?: boolean }) => (
   <Icon
     icon={ok ? CheckmarkCircle : ExclamationCircle}
     sx={t => ({
       width: t.sizes.$3x5,
       height: t.sizes.$3x5,
-      color: ok ? t.colors.$success500 : t.colors.$colorMutedForeground,
+      color: ok ? t.colors.$success500 : warning ? t.colors.$warning500 : t.colors.$colorMutedForeground,
     })}
   />
 );
 
 const ProofLine = ({
   ok,
+  warning = false,
   label,
   info,
   action,
 }: {
   ok: boolean;
+  /** Something on the policy needs this proof and it's missing. */
+  warning?: boolean;
   label: string;
   info: string;
   action: React.ReactNode;
@@ -125,9 +124,12 @@ const ProofLine = ({
       align='center'
       gap={1}
     >
-      <ProofIcon ok={ok} />
+      <ProofIcon
+        ok={ok}
+        warning={warning}
+      />
       <Text
-        colorScheme='secondary'
+        colorScheme={!ok && warning ? 'warning' : 'secondary'}
         sx={xsSx}
       >
         {label}
@@ -153,7 +155,7 @@ const VerifyButton = ({ onClick }: { onClick: () => void }) => (
  * The TXT record over a blurred form. The prototype "finds" the record a few
  * seconds after the dialog opens, the way the real check polls.
  */
-const DnsDialog = ({
+export const DnsDialog = ({
   domain,
   onVerified,
   onClose,
@@ -162,7 +164,6 @@ const DnsDialog = ({
   onVerified: () => void;
   onClose: () => void;
 }) => {
-  const contentRef = useContext(ContentRefContext);
   const [isVerified, setIsVerified] = useState(false);
   const record = txtRecordFor(domain);
 
@@ -181,86 +182,59 @@ const DnsDialog = ({
   }, []);
 
   return (
-    <Modal
-      handleClose={onClose}
-      portalRoot={contentRef ?? undefined}
-      containerSx={t => ({
-        alignItems: 'center',
-        position: 'absolute',
-        inset: 0,
-        width: 'auto',
-        height: 'auto',
-        backgroundColor: 'inherit',
-        backdropFilter: `blur(${t.sizes.$2})`,
-      })}
-    >
-      <Col
-        sx={t => ({
-          gap: t.space.$4,
-          width: '24rem',
-          maxWidth: '100%',
-          padding: t.space.$5,
-          backgroundColor: t.colors.$colorBackground,
-          borderRadius: t.radii.$lg,
-          boxShadow: t.shadows.$cardContentShadow,
-          borderWidth: t.borderWidths.$normal,
-          borderStyle: t.borderStyles.$solid,
-          borderColor: t.colors.$borderAlpha100,
-        })}
-      >
-        <Col sx={t => ({ gap: t.space.$1 })}>
+    <ModalCard onClose={onClose}>
+      <Col sx={t => ({ gap: t.space.$1 })}>
+        <Flex
+          justify='between'
+          align='center'
+        >
           <Flex
-            justify='between'
             align='center'
+            gap={2}
           >
-            <Flex
-              align='center'
-              gap={2}
-            >
-              <Text variant='subtitle'>{domain}</Text>
-              <Badge colorScheme={isVerified ? 'success' : 'warning'}>{isVerified ? 'Verified' : 'Unverified'}</Badge>
-            </Flex>
-            {isVerified ? null : (
-              <Spinner
-                size='xs'
-                colorScheme='neutral'
-              />
-            )}
+            <Text variant='subtitle'>{domain}</Text>
+            <Badge colorScheme={isVerified ? 'success' : 'warning'}>{isVerified ? 'Verified' : 'Unverified'}</Badge>
           </Flex>
-          <Text
-            colorScheme='secondary'
-            sx={smallSx}
-          >
-            {isVerified
-              ? 'We found the record. You own this domain.'
-              : 'Add this TXT record to your DNS provider. We’ll verify automatically once the record is live.'}
-          </Text>
-        </Col>
-        <Col sx={t => ({ gap: t.space.$1x5 })}>
-          <RecordRow
-            label='Type'
-            value='TXT'
-          />
-          <RecordRow
-            label='Host / Name'
-            value={record.name}
-          />
-        </Col>
-        <ClipboardInput
-          value={record.value}
-          readOnly
-        />
-        <Flex justify='end'>
-          <Button
-            variant='outline'
-            textVariant='buttonSmall'
-            block={false}
-            onClick={onClose}
-            localizationKey={protoKey('Close')}
-          />
+          {isVerified ? null : (
+            <Spinner
+              size='xs'
+              colorScheme='neutral'
+            />
+          )}
         </Flex>
+        <Text
+          colorScheme='secondary'
+          sx={smallSx}
+        >
+          {isVerified
+            ? 'We found the record. You own this domain.'
+            : 'Add this TXT record to your DNS provider. We’ll verify automatically once the record is live.'}
+        </Text>
       </Col>
-    </Modal>
+      <Col sx={t => ({ gap: t.space.$1x5 })}>
+        <RecordRow
+          label='Type'
+          value='TXT'
+        />
+        <RecordRow
+          label='Host / Name'
+          value={record.name}
+        />
+      </Col>
+      <ClipboardInput
+        value={record.value}
+        readOnly
+      />
+      <Flex justify='end'>
+        <Button
+          variant='outline'
+          textVariant='buttonSmall'
+          block={false}
+          onClick={onClose}
+          localizationKey={protoKey('Close')}
+        />
+      </Flex>
+    </ModalCard>
   );
 };
 
