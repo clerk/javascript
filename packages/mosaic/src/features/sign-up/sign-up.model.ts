@@ -263,6 +263,7 @@ export function useSignUpModel({
 
   const ticket = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token') || undefined;
   const inTicketSignUp = Boolean(ticket) && signUp.verifications.emailAddress.strategy === 'ticket';
+  const phoneCodeChannels = inTicketSignUp ? [] : userSettings.alternativePhoneCodeChannels;
   const forgetTicket = () => {
     removeClerkQueryParam('__clerk_ticket');
     removeClerkQueryParam('__clerk_invitation_token');
@@ -446,12 +447,10 @@ export function useSignUpModel({
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       startUpdatesSignUp: inTicketSignUp,
-      alternativeChannels: inTicketSignUp
-        ? []
-        : userSettings.alternativePhoneCodeChannels.flatMap(channel => {
-            const provider = getAlternativePhoneCodeProviderData(channel);
-            return provider ? [{ id: channel, name: provider.name, iconUrl: iconImageUrl(channel) }] : [];
-          }),
+      alternativeChannels: phoneCodeChannels.flatMap(channel => {
+        const provider = getAlternativePhoneCodeProviderData(channel);
+        return provider ? [{ id: channel, name: provider.name, iconUrl: iconImageUrl(channel) }] : [];
+      }),
       create: async (values, { channel } = {}) => {
         const sendOver = channel ?? preferredPhoneChannel(values.phoneNumber);
         const result = await signUp.create({
