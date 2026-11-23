@@ -418,6 +418,8 @@ export function useSignUpModel({
   const legalConsent = legalConsentRequired
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
+  const startLegalConsent = showForm ? legalConsent : undefined;
+  const continueLegalConsent = signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined;
 
   const navigateAfter =
     (destination: string, { keepsTaskInFlow }: { keepsTaskInFlow: boolean }): SetActiveNavigate =>
@@ -557,8 +559,8 @@ export function useSignUpModel({
         }
         return hidden;
       },
-      legalConsent: showForm ? legalConsent : undefined,
-      continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
+      legalConsent: startLegalConsent,
+      continueLegalConsent,
       validatePassword,
       inTicketSignUp,
       oauthProviders,
