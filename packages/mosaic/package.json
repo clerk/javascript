@@ -522,7 +522,9 @@
   "dependencies": {
     "@clerk/shared": "workspace:^",
     "@floating-ui/react": "catalog:repo",
-    "@wallet-standard/core": "catalog:module-manager"
+    "@wallet-standard/core": "catalog:module-manager",
+    "d3-scale": "4.0.2",
+    "d3-shape": "3.2.0"
   },
   "devDependencies": {
     "@clerk/clerk-js": "workspace:^",
@@ -534,6 +536,8 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.5",
+    "@types/d3-scale": "4.0.9",
+    "@types/d3-shape": "3.1.7",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "axe-core": "^4.11.3",
