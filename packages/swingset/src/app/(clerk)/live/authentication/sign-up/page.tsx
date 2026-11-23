@@ -3,7 +3,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { SignUp } from '@clerk/mosaic/features/sign-up';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import { useAuth, useClerk } from '@clerk/nextjs';
+import { useAuth, useClerk, useSignUp } from '@clerk/nextjs';
 import { useState } from 'react';
 
 import { LivePageHeader } from '../../../live-page-header';
@@ -11,6 +11,7 @@ import { LivePageHeader } from '../../../live-page-header';
 export default function SignUpLivePage() {
   const clerk = useClerk();
   const { isSignedIn } = useAuth();
+  const { signUp } = useSignUp();
   const [demoKey, setDemoKey] = useState(0);
 
   return (
@@ -32,7 +33,14 @@ export default function SignUpLivePage() {
             ) : null}
             <Button
               variant='outline'
-              onClick={() => setDemoKey(key => key + 1)}
+              onClick={() =>
+                // A remount alone resumes the sign-up in progress, so clear it first.
+                void signUp.reset().then(({ error }) => {
+                  if (!error) {
+                    setDemoKey(key => key + 1);
+                  }
+                })
+              }
             >
               Reset
             </Button>
