@@ -94,6 +94,10 @@ function scopeLabels(name?: string) {
     .map(item => item.textContent);
 }
 
+function scopeCheckbox(name: string, list?: string) {
+  return within(scopeList(list)).getByRole('checkbox', { name });
+}
+
 function captureSubmits() {
   const submits: { action: string; method: string; data: FormData }[] = [];
   const onSubmit = (event: SubmitEvent) => {
@@ -194,23 +198,26 @@ describe('OAuthConsent', () => {
       expect(scopeLabels()).toEqual(['Métadonnées privées de Acme']);
     });
 
-    it('keeps offline access out of the list and says the user stays signed in', async () => {
+    it('lists offline access as required and says the user stays signed in', async () => {
       visitOAuthConsent();
       await renderOAuthConsent(
         signedIn({ oauthConsent: consent({ scopes: [scope('profile', 'Your profile'), scope('offline_access')] }) }),
       );
 
       await ready();
-      expect(scopeLabels()).toEqual(['Your profile']);
+      const offline = scopeCheckbox('offline_access');
+      expect(offline).toBeChecked();
+      expect(offline).toBeDisabled();
+      expect(within(scopeList()).getByText('Required')).toBeVisible();
       expect(screen.getByText(/You'll stay signed in until you sign out or revoke access\./)).toBeVisible();
     });
 
-    it('hides the scope list when offline access is the only scope', async () => {
+    it('lists offline access when it is the only scope', async () => {
       visitOAuthConsent();
       await renderOAuthConsent(signedIn({ oauthConsent: consent({ scopes: [scope('offline_access')] }) }));
 
       await ready();
-      expect(screen.queryByRole('list')).toBeNull();
+      expect(scopeCheckbox('offline_access')).toBeDisabled();
     });
 
     it('leaves out the offline access notice when it is not requested', async () => {
@@ -292,7 +299,7 @@ describe('OAuthConsent', () => {
       const data = submits[0]?.data;
       expect(data?.get('consented')).toBe('true');
       expect(data?.get('client_id')).toBe('client_1');
-      expect(data?.get('scope')).toBe('profile email');
+      expect(data?.getAll('scope')).toEqual(['profile email']);
       expect(data?.get('redirect_uri')).toBe(REDIRECT_URI);
       expect(data?.get('state')).toBe('st_1');
     });
@@ -436,6 +443,19 @@ describe('OAuthConsent', () => {
       expect((await submitAllow(user))?.has('organization_id')).toBe(false);
     });
 
+    it('stops asking once the user clears organization access', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(signedIn(orgScopes));
+
+      await ready();
+      await user.click(scopeCheckbox('user:org:read'));
+
+      expect(screen.queryByRole('combobox', { name: /^Grant access for:/ })).toBeNull();
+      const data = await submitAllow(user);
+      expect(data?.has('organization_id')).toBe(false);
+      expect(data?.get('scope')).toBe('profile');
+    });
+
     it('does not ask when the user has no memberships', async () => {
       visitOAuthConsent();
       const loner = fapiUser({ id: 'user_3', organization_memberships: [] });
@@ -446,6 +466,145 @@ describe('OAuthConsent', () => {
       await ready();
       expect(screen.queryByRole('combobox', { name: /^Grant access for:/ })).toBeNull();
       expect((await submitAllow(user))?.has('organization_id')).toBe(false);
+    });
+  });
+
+  describe('choosing scopes', () => {
+    async function submitAllow(user: ReturnType<typeof userEvent.setup>) {
+      const submits = captureSubmits();
+      await user.click(screen.getByRole('button', { name: 'Allow' }));
+      return submits[0]?.data;
+    }
+
+    it('checks every requested scope', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent();
+
+      await ready();
+      expect(scopeCheckbox('Your profile')).toBeChecked();
+      expect(scopeCheckbox('Your email address')).toBeChecked();
+    });
+
+    it('posts only the scopes the user keeps', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
+
+      await ready();
+      await user.click(scopeCheckbox('Your email address'));
+
+      expect(scopeCheckbox('Your email address')).not.toBeChecked();
+      expect((await submitAllow(user))?.getAll('scope')).toEqual(['profile']);
+    });
+
+    it('posts a scope again once the user checks it back', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
+
+      await ready();
+      await user.click(scopeCheckbox('Your email address'));
+      await user.click(scopeCheckbox('Your email address'));
+
+      expect((await submitAllow(user))?.getAll('scope')).toEqual(['profile email']);
+    });
+
+    it('always posts offline access', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: [scope('profile', 'Your profile'), scope('offline_access')] }) }),
+      );
+
+      await ready();
+      await user.click(scopeCheckbox('Your profile'));
+
+      expect((await submitAllow(user))?.getAll('scope')).toEqual(['offline_access']);
+    });
+
+    it('posts offline access when the user clears every scope', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
+
+      await ready();
+      await user.click(scopeCheckbox('Your profile'));
+      await user.click(scopeCheckbox('Your email address'));
+
+      expect((await submitAllow(user))?.getAll('scope')).toEqual(['offline_access']);
+    });
+
+    it('does not forward the organization or answer from the URL', async () => {
+      visitOAuthConsent({ organization_id: 'org_from_url', consented: 'false' });
+      const { user } = await renderOAuthConsent();
+
+      await ready();
+      const data = await submitAllow(user);
+      expect(data?.getAll('consented')).toEqual(['true']);
+      expect(data?.has('organization_id')).toBe(false);
+    });
+
+    it('locks the scopes once the form submits', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent();
+
+      await ready();
+      await submitAllow(user);
+
+      expect(scopeCheckbox('Your profile')).toBeDisabled();
+    });
+
+    it('starts over when the consent request changes', async () => {
+      visitOAuthConsent();
+      const { user, fapi, rerender } = await renderOAuthConsent();
+
+      await ready();
+      await user.click(scopeCheckbox('Your email address'));
+      fapi.oauthConsent = consent({ scopes: [scope('email', 'Your email address')] });
+      rerender(<OAuthConsent scope='email' />);
+
+      await waitFor(() => expect(screen.queryByRole('checkbox', { name: 'Your profile' })).toBeNull());
+      expect(scopeCheckbox('Your email address')).toBeChecked();
+    });
+  });
+
+  describe('client identity', () => {
+    it('warns that a self-registered app named itself', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(signedIn({ oauthConsent: consent({ client_registration: 'dynamic' }) }));
+
+      await ready();
+      expect(screen.getByText('Linear registered itself, so its name and logo are not verified.')).toBeVisible();
+    });
+
+    it('names the application in the warning when a self-registered app has no name', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ client_registration: 'dynamic', oauth_application_name: '' }) }),
+      );
+
+      expect(await screen.findByText('Acme registered itself, so its name and logo are not verified.')).toBeVisible();
+    });
+
+    it('names the host that publishes the app details', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(
+        signedIn({
+          oauthConsent: consent({ client_registration: 'metadata_document', client_metadata_host: 'claude.ai' }),
+        }),
+      );
+
+      await ready();
+      expect(screen.getByText('Details published by claude.ai.')).toBeVisible();
+    });
+
+    it.each<[string, Partial<OAuthConsentInfoJSON>]>([
+      ['a pre-registered app', { client_registration: 'preregistered' }],
+      ['a metadata document without a host', { client_registration: 'metadata_document', client_metadata_host: null }],
+      ['no registration', {}],
+    ])('says nothing for %s', async (_, overrides) => {
+      visitOAuthConsent();
+      await renderOAuthConsent(signedIn({ oauthConsent: consent(overrides) }));
+
+      await ready();
+      expect(screen.queryByText(/registered itself/)).toBeNull();
+      expect(screen.queryByText(/Details published by/)).toBeNull();
     });
   });
 
