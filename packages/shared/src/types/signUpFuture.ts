@@ -66,6 +66,10 @@ export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
     | AppleIdTokenStrategy
     | PhoneCodeStrategy;
   /**
+   * The mechanism to use to send the code to `phoneNumber` when `strategy` is `'phone_code'`. The sign-up is created and the code is sent in the same request. Defaults to `'sms'`.
+   */
+  channel?: PhoneCodeChannel;
+  /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */
   slackTeamIdHint?: string;
