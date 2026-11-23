@@ -26,9 +26,7 @@ export interface FakeSignUpSeed {
   protectCheckOn?: 'create' | 'update';
   /** Issue each Protect check already expired. */
   protectCheckExpired?: boolean;
-  /** Replace an expired Protect check with a fresh one on reload. */
-  reissueProtectCheckOnReload?: boolean;
-  /** Clear the Protect check server-side when the proof arrives and answer `protect_check_already_resolved`, as when another tab solved it. */
+  /** Resolve the Protect check server-side before the proof arrives, as when another tab solved it. */
   protectCheckResolvedElsewhere?: boolean;
   /** Answer the proof with `action_blocked` and these meta values. */
   protectCheckBlocked?: Record<string, string>;
@@ -45,7 +43,6 @@ export interface FakeSignUpState {
   protectChecks: number;
   protectCheckOn?: 'create' | 'update';
   protectCheckExpired?: boolean;
-  reissueProtectCheckOnReload?: boolean;
   protectCheckResolvedElsewhere?: boolean;
   protectCheckBlocked?: Record<string, string>;
   protectCheckScript?: string;
@@ -134,6 +131,14 @@ export function signUpHandlers(
       return { ...signUp, protect_check: null };
     }
     return { ...signUp, protect_check: protectCheck(Boolean(state.signUp.protectCheckExpired)) };
+  };
+  const isExpired = (check: NonNullable<SignUpJSON['protect_check']>) =>
+    check.expires_at !== undefined && check.expires_at < Date.now();
+
+  // FAPI wraps a sign-up error with the client (clerk_go api/fapi/v1/wrapper/wrapper.go WrapError), and clerk-js applies it.
+  const clientError = async (response: Response) => {
+    const body = (await response.json()) as object;
+    return HttpResponse.json({ ...body, meta: { client: state.client } }, { status: response.status });
   };
 
   const store = (signUp: SignUpJSON) => {
@@ -371,17 +376,16 @@ export function signUpHandlers(
           state.signUp.protectCheckBlocked,
         );
       }
-      if (state.signUp.protectCheckResolvedElsewhere) {
+      // clerk_go api/shared/sign_up/service.go ResolveProtectCheck: no pending check is a 404, and a
+      // rejected proof is answered with a replacement challenge rather than an error.
+      if (state.signUp.protectCheckResolvedElsewhere || !signUp.protect_check) {
         store(settle({ ...signUp, protect_check: null }));
-        return rejected('protect_check_already_resolved', 'This check has already been resolved.', undefined, 400);
-      }
-      if (!signUp.protect_check) {
-        return rejected('protect_check_already_resolved', 'This check has already been resolved.', undefined, 400);
-      }
-      if (proofToken !== `proof_${signUp.protect_check.token}`) {
-        return rejected('protect_check_invalid', 'The verification could not be confirmed.', 'proof_token');
+        return clientError(missing());
       }
       state.signUp.proofTokens.push(proofToken);
+      if (proofToken !== `proof_${signUp.protect_check.token}`) {
+        return store(settle({ ...signUp, protect_check: protectCheck(false) }));
+      }
       return store(settle(issueProtectCheck({ ...signUp, protect_check: null }, state.signUp.protectCheckOn)));
     }),
     http.get(fapiUrl('/v1/client/sign_ups/:id'), ({ params }) => {
@@ -390,12 +394,7 @@ export function signUpHandlers(
         return missing();
       }
       state.signUp.reloads += 1;
-      const expired = signUp.protect_check?.expires_at !== undefined;
-      return store(
-        expired && state.signUp.reissueProtectCheckOnReload
-          ? { ...signUp, protect_check: protectCheck(false) }
-          : signUp,
-      );
+      return store(signUp);
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -411,7 +410,9 @@ export function signUpHandlers(
       if (applied instanceof HttpResponse) {
         return applied;
       }
-      return store(settle(state.signUp.protectCheckOn === 'update' ? issueProtectCheck(applied, 'update') : applied));
+      // clerk_go runProtectCheck returns a pending, unexpired check unchanged and asks Protect again otherwise.
+      const pending = applied.protect_check && !isExpired(applied.protect_check);
+      return store(settle(pending ? applied : issueProtectCheck(applied, 'update')));
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id/prepare_verification'), async ({ params, request }) => {
       const signUp = current(params.id);

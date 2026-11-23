@@ -1013,15 +1013,15 @@ describe('SignUp', () => {
     await codeSent();
   });
 
-  it('continues when the Protect check was already resolved', async () => {
-    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckResolvedElsewhere: true } });
+  it('continues with the sign-up the 404 returns when the Protect check was resolved elsewhere', async () => {
+    const { user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckResolvedElsewhere: true } });
 
     await submitStart(user);
     await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.reloads).toBe(1);
     await codeSent();
+    expect(screen.getByRole('alert')).toHaveTextContent(/^$/);
   });
 
   it('reloads an expired Protect check and shows the timeout when the reload returns it expired', async () => {
@@ -1034,19 +1034,34 @@ describe('SignUp', () => {
     );
     expect(fapi.signUp.reloads).toBe(1);
     expect(fapi.signUp.proofTokens).toEqual([]);
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
+    expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
   });
 
-  it('runs the fresh Protect check Clerk issues when an expired one is reloaded', async () => {
+  it('runs the replacement Protect check Clerk issues for a rejected proof', async () => {
     const { fapi, user } = await renderSignUp({
-      signUp: { protectChecks: 1, protectCheckExpired: true, reissueProtectCheckOnReload: true },
+      signUp: {
+        protectChecks: 1,
+        protectCheckScript: `
+export default (container, { token }) =>
+  new Promise(resolve => {
+    const pass = document.createElement('button');
+    pass.type = 'button';
+    pass.textContent = 'I am human';
+    pass.onclick = () => resolve(token === 'ptk_1' ? 'proof_rejected' : 'proof_' + token);
+    container.replaceChildren(pass);
+  });
+`,
+      },
     });
 
     await submitStart(user);
     await user.click(await screen.findByRole('button', { name: 'I am human' }));
+    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_rejected']));
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.reloads).toBe(1);
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_2']);
+    expect(fapi.signUp.proofTokens).toEqual(['proof_rejected', 'proof_ptk_2']);
     await codeSent();
   });
 
