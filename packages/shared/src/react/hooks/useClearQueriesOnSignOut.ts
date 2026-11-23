@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { useClerkInstanceContext } from '../contexts';
+import { registerQueryCleanupOnSignOut } from '../query/clerk-query-client';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { usePreviousValue } from './usePreviousValue';
 
@@ -58,4 +60,15 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
       onCleanup?.();
     }
   }, [authenticated, isSignedOut, previousIsSignedIn, queryClient]);
+}
+
+export function usePersistentQueryCleanupOnSignOut(stableKey: string): void {
+  const clerk = useClerkInstanceContext();
+  const [queryClient, isLoaded] = useClerkQueryClient();
+
+  useEffect(() => {
+    if (isLoaded) {
+      registerQueryCleanupOnSignOut(clerk, stableKey);
+    }
+  }, [clerk, isLoaded, queryClient, stableKey]);
 }
