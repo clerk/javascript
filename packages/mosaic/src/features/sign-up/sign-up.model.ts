@@ -268,6 +268,44 @@ async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<v
   }
 }
 
+interface OAuthOutcomeActions {
+  next: (resource: SignUpFutureResource) => SignUpNextStep;
+  transfer: () => Promise<void>;
+  activate: (sessionId: string) => Promise<void>;
+  forgetTicket: () => void;
+}
+
+/** Settles a sign-up the provider sent back. Resolves no step when the flow leaves sign-up. */
+async function completeOAuth(
+  signUp: SignUpFutureResource,
+  { next, transfer, activate, forgetTicket }: OAuthOutcomeActions,
+): Promise<SignUpNextStep | undefined> {
+  const step = next(signUp);
+  if (step.type === 'protect') {
+    return step;
+  }
+  if (signUp.isTransferable) {
+    await transfer();
+    return undefined;
+  }
+  const existingSession = signUp.existingSession?.sessionId;
+  if (existingSession) {
+    await activate(existingSession);
+    return undefined;
+  }
+  const failure = signUp.verifications.externalAccount.error;
+  if (failure) {
+    forgetTicket();
+    await run(() => signUp.reset());
+    throw new SaveError({
+      global: SHOWN_RETURN_ERRORS.includes(failure.code)
+        ? { code: failure.code, message: failure.longMessage || failure.message }
+        : UNEXPECTED_ERROR,
+    });
+  }
+  return step;
+}
+
 export function useSignUpModel({
   initialValues = {},
   unsafeMetadata,
@@ -455,6 +493,23 @@ export function useSignUpModel({
       await router.navigate(destination);
     };
 
+  const oauthOutcome: OAuthOutcomeActions = {
+    next,
+    forgetTicket,
+    transfer: async () => {
+      await run(() => signIn.create({ transfer: true }));
+      if (signIn.status !== 'complete') {
+        await router.navigate(buildURL({ base: signInUrl(), hashPath: transferRoute(signIn) }, { stringify: true }));
+        return;
+      }
+      await run(() =>
+        signIn.finalize({ navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }) }),
+      );
+    },
+    activate: session =>
+      clerk.setActive({ session, navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }) }),
+  };
+
   const step = next(signUp);
   const phoneChannel = signUp.verifications.phoneNumber.channel;
   const preferredPhoneChannel = (phoneNumber: string | undefined): PhoneCodeChannel | undefined => {
@@ -491,44 +546,9 @@ export function useSignUpModel({
         return { result: next(signUp), emailAddress: signUp.emailAddress ?? '' };
       },
       isReturning: new URL(window.location.href).searchParams.get(RETURN_PARAM) === SSO_RETURN,
-      completeReturn: async () => {
+      completeReturn: () => {
         forgetReturn();
-        const step = next(signUp);
-        if (step.type === 'protect') {
-          return step;
-        }
-        if (signUp.isTransferable) {
-          await run(() => signIn.create({ transfer: true }));
-          if (signIn.status !== 'complete') {
-            await router.navigate(
-              buildURL({ base: signInUrl(), hashPath: transferRoute(signIn) }, { stringify: true }),
-            );
-            return undefined;
-          }
-          await run(() =>
-            signIn.finalize({ navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }) }),
-          );
-          return undefined;
-        }
-        const existingSession = signUp.existingSession?.sessionId;
-        if (existingSession) {
-          await clerk.setActive({
-            session: existingSession,
-            navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }),
-          });
-          return undefined;
-        }
-        const failure = signUp.verifications.externalAccount.error;
-        if (failure) {
-          forgetTicket();
-          await run(() => signUp.reset());
-          throw new SaveError({
-            global: SHOWN_RETURN_ERRORS.includes(failure.code)
-              ? { code: failure.code, message: failure.longMessage || failure.message }
-              : UNEXPECTED_ERROR,
-          });
-        }
-        return step;
+        return completeOAuth(signUp, oauthOutcome);
       },
       finalize: async () => {
         forgetTicket();
