@@ -184,6 +184,7 @@ export const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
     const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
+    res.machineSecretKey = (res.machineSecretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
     // Session and machine tokens are live bearer credentials, so only ever expose a
     // short, non-reconstructable prefix here, the same way secretKey/jwtKey are handled
