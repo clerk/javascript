@@ -60,8 +60,8 @@ export type OrganizationListEntries = Pick<
   onAcceptSuggestion: (suggestionId: string) => Promise<unknown>;
 };
 
-export function useOrganizationListEntries(): OrganizationListEntries {
-  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView();
+export function useOrganizationListEntries({ enabled = true }: { enabled?: boolean } = {}): OrganizationListEntries {
+  const { userMemberships, userInvitations, userSuggestions, ref } = useOrganizationListInView({ enabled });
 
   const membershipData = userMemberships.data ?? [];
   const invitationData = userInvitations.data?.filter(Boolean) ?? [];

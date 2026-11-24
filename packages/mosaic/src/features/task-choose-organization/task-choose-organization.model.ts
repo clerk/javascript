@@ -27,15 +27,16 @@ const ABSOLUTE_URL = /^https?:\/\//;
 
 export function useTaskChooseOrganizationModel({
   redirectUrlComplete,
-}: TaskChooseOrganizationModelOptions): TaskChooseOrganizationModel {
+  enabled = true,
+}: TaskChooseOrganizationModelOptions & { enabled?: boolean }): TaskChooseOrganizationModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
-  const createOrganization = useCreateOrganizationModel({ skipInvitationScreen: true });
-  const { findOrganization: _findOrganization, ...entries } = useOrganizationListEntries();
-  const creationDefaults = useOrganizationCreationDefaults();
+  const createOrganization = useCreateOrganizationModel({ skipInvitationScreen: true, enabled });
+  const { findOrganization: _findOrganization, ...entries } = useOrganizationListEntries({ enabled });
+  const creationDefaults = useOrganizationCreationDefaults({ enabled });
 
   if (!isUserLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
