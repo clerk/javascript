@@ -264,10 +264,11 @@ export interface ComboboxItemIndicatorProps extends MosaicComponentProps<'span'>
 }
 
 export const ComboboxItemIndicator = React.forwardRef<HTMLSpanElement, ComboboxItemIndicatorProps>(
-  function MosaicComboboxItemIndicator({ xstyle, children, ...rest }, ref) {
+  function MosaicComboboxItemIndicator({ xstyle, children, keepMounted = true, ...rest }, ref) {
     return (
       <HeadlessCombobox.ItemIndicator
         ref={ref}
+        keepMounted={keepMounted}
         {...mergeStyleProps(themeProps('combobox-item-indicator'), stylex.props(styles.indicator, xstyle), rest)}
       >
         {children ?? <Icon glyph={Checkmark} />}

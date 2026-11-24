@@ -127,6 +127,45 @@ describe('Mosaic Select', () => {
     expect(otherIndicator).not.toHaveAttribute('data-selected');
   });
 
+  it('keeps a composed row check mounted by default, marking only the selected one', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='admin'
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Item
+            value='admin'
+            label='Admin'
+          >
+            <Select.Content>
+              <Select.Label>Admin</Select.Label>
+            </Select.Content>
+            <Select.ItemIndicator />
+          </Select.Item>
+          <Select.Item
+            value='member'
+            label='Member'
+          >
+            <Select.Content>
+              <Select.Label>Member</Select.Label>
+            </Select.Content>
+            <Select.ItemIndicator />
+          </Select.Item>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const admin = screen.getByRole('option', { name: 'Admin' });
+    expect(admin.querySelector('.cl-select-item-indicator')).toHaveAttribute('data-selected', '');
+    const member = screen.getByRole('option', { name: 'Member' });
+    const memberIndicator = member.querySelector('.cl-select-item-indicator');
+    expect(memberIndicator).toBeInTheDocument();
+    expect(memberIndicator).not.toHaveAttribute('data-selected');
+  });
+
   it('leaves the check to a composed row, which places its own', () => {
     render(
       <Select.Root
@@ -143,7 +182,7 @@ describe('Mosaic Select', () => {
             <Select.Content>
               <Select.Label>Admin</Select.Label>
             </Select.Content>
-            <Select.ItemIndicator keepMounted />
+            <Select.ItemIndicator />
           </Select.Item>
           <Select.Item
             value='member'

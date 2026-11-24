@@ -86,7 +86,7 @@ describe('Mosaic Combobox', () => {
     await user.click(screen.getByRole('option', { name: 'Apple' }));
     await user.clear(screen.getByRole('combobox'));
     expect(onValueChange).toHaveBeenLastCalledWith(null);
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
     expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'false');
     await user.keyboard('{Escape}');
     expect(screen.getByRole('combobox')).toHaveValue('');
@@ -96,18 +96,19 @@ describe('Mosaic Combobox', () => {
     render(<FloatingCombobox />);
     const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
     await user.click(trigger);
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
     await user.click(screen.getByRole('option', { name: 'Apple' }));
     await user.click(trigger);
     await user.hover(screen.getByRole('option', { name: 'Banana' }));
     expect(screen.getByTestId('apple-check')).toBeVisible();
     expect(screen.getByTestId('apple-check')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.queryByTestId('banana-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).toHaveAttribute('data-selected', '');
+    expect(screen.getByTestId('banana-check')).not.toHaveAttribute('data-selected');
     expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true');
     await user.click(screen.getByRole('option', { name: 'Banana' }));
     await user.click(trigger);
-    expect(screen.getByTestId('banana-check')).toBeVisible();
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('banana-check')).toHaveAttribute('data-selected', '');
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
   });
   it('positions the popup against the full input group', async () => {
     const user = userEvent.setup();

@@ -99,7 +99,7 @@ export function Media() {
                 <Select.Label>{organization.label}</Select.Label>
                 {organization.description ? <Select.Description>{organization.description}</Select.Description> : null}
               </Select.Content>
-              <Select.ItemIndicator keepMounted />
+              <Select.ItemIndicator />
             </Select.Item>
           ))}
         </Select.Popup>

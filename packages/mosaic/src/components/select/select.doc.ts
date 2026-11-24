@@ -112,13 +112,13 @@ export default {
     },
     'Select.ItemIndicator': {
       description:
-        'The check. `Select.Item` renders one with `keepMounted`, so every row keeps room for it and only the selected rows show it. A checkmark when given no children.',
+        'The check. Every row keeps room for it and only the selected rows show it. A checkmark when given no children.',
       slot: 'cl-select-item-indicator',
       props: {
         keepMounted: {
           type: 'boolean',
-          doc: 'Keeps it rendered in unselected items too, with `data-selected` only on the selected one.',
-          default: 'false',
+          doc: 'Renders it in every item, hidden but holding its width, with `data-selected` and visible only on the selected one. `false` renders it only in the selected item.',
+          default: 'true',
         },
       },
     },

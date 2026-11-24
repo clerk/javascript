@@ -275,7 +275,7 @@ export const SelectItem = React.forwardRef<HTMLButtonElement, SelectItemProps>(f
               <SelectLabel>{label}</SelectLabel>
               {description !== undefined ? <SelectDescription>{description}</SelectDescription> : null}
             </SelectContent>
-            <SelectItemIndicator keepMounted />
+            <SelectItemIndicator />
           </>
         )}
       </ItemContext.Provider>
@@ -288,10 +288,11 @@ export interface SelectItemIndicatorProps extends MosaicComponentProps<'span'> {
 }
 
 export const SelectItemIndicator = React.forwardRef<HTMLSpanElement, SelectItemIndicatorProps>(
-  function MosaicSelectItemIndicator({ xstyle, children, ...rest }, ref) {
+  function MosaicSelectItemIndicator({ xstyle, children, keepMounted = true, ...rest }, ref) {
     return (
       <Primitive.ItemIndicator
         ref={ref}
+        keepMounted={keepMounted}
         {...mergeStyleProps(themeProps('select-item-indicator'), stylex.props(slots.indicator.base, xstyle), rest)}
       >
         {children ?? <Icon glyph={Checkmark} />}

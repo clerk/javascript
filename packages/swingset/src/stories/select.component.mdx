@@ -119,7 +119,7 @@ same `value`, `label`, `description`, and `disabled`.
 Give `Select.Item` children to lead a row with an icon, image, or avatar. `Select.Media` is a
 20px square column that sits at the top of the row, beside the label; `Select.Content` stacks
 `Select.Label` over an optional `Select.Description`. A row with children places its own check, so
-add `Select.ItemIndicator keepMounted` where it belongs, or leave it out.
+add `Select.ItemIndicator` where it belongs, or leave it out.
 The option's `label` prop still names it for typeahead and for the trigger, which shows the label
 only. Pass `alignItemWithTrigger={false}`, since the row's text no longer lines up with the
 trigger's.
@@ -142,7 +142,7 @@ trigger's.
         <Select.Label>Acme Inc.</Select.Label>
         <Select.Description>Owner</Select.Description>
       </Select.Content>
-      <Select.ItemIndicator keepMounted />
+      <Select.ItemIndicator />
     </Select.Item>
   </Select.Popup>
 </Select.Root>
@@ -246,20 +246,20 @@ with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` com
 
 ## Parts
 
-| Part                   | Slot                                 | Description                                                                                                 |
-| ---------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `Select.Root`          | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.                                    |
-| `Select.Trigger`       | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome.                         |
-| ↳ value                | `select-value`                       | The selected labels, or the placeholder.                                                                    |
-| ↳ icon                 | `select-trigger-icon`                | The trailing chevron.                                                                                       |
-| `Select.Popup`         | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                                        |
-| ↳ viewport             | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.                              |
-| `Select.Item`          | `select-item`                        | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`.                         |
-| `Select.Media`         | `select-item-media`                  | A 20px square leading column, top-aligned, that holds an icon, image, or avatar.                            |
-| `Select.Content`       | `select-item-content`                | Stacks the label over the description.                                                                      |
-| `Select.Label`         | `select-item-label`                  | The item's text. Truncates to one line.                                                                     |
-| `Select.Description`   | `select-item-description`            | The optional second line.                                                                                   |
-| `Select.ItemIndicator` | `select-item-indicator`              | The check. `Select.Item` renders it with `keepMounted`: present on every row, visible on each selected one. |
+| Part                   | Slot                                 | Description                                                                         |
+| ---------------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
+| `Select.Root`          | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
+| `Select.Trigger`       | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
+| ↳ value                | `select-value`                       | The selected labels, or the placeholder.                                            |
+| ↳ icon                 | `select-trigger-icon`                | The trailing chevron.                                                               |
+| `Select.Popup`         | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
+| ↳ viewport             | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
+| `Select.Item`          | `select-item`                        | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`. |
+| `Select.Media`         | `select-item-media`                  | A 20px square leading column, top-aligned, that holds an icon, image, or avatar.    |
+| `Select.Content`       | `select-item-content`                | Stacks the label over the description.                                              |
+| `Select.Label`         | `select-item-label`                  | The item's text. Truncates to one line.                                             |
+| `Select.Description`   | `select-item-description`            | The optional second line.                                                           |
+| `Select.ItemIndicator` | `select-item-indicator`              | The check. Present on every row, visible on each selected one.                      |
 
 ## Styling
 

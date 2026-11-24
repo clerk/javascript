@@ -347,7 +347,7 @@ function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrgan
           <Select.Content>
             <Select.Label>{organization.label}</Select.Label>
           </Select.Content>
-          <Select.ItemIndicator keepMounted />
+          <Select.ItemIndicator />
         </Select.Item>
       ))}
     </Select.Popup>

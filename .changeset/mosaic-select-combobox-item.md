@@ -25,8 +25,8 @@
 | `.cl-combobox-option-indicator`        | `.cl-combobox-item-indicator`        |
 | `.cl-phone-input-country-option` | `.cl-phone-input-country-item` |
 
-Add `Select.ItemIndicator`, which renders only inside the selected item. It is `aria-hidden` and works like `Combobox.ItemIndicator`. Both indicators now take `keepMounted`, which renders them in every item and puts `data-selected` only on the selected one. The styled `Select.Item` renders a `Select.ItemIndicator` with `keepMounted`, so the check's `.cl-select-item-indicator` element is now a `span` wrapping the icon.
+Add `Select.ItemIndicator`, which renders only inside the selected item. It is `aria-hidden` and works like `Combobox.ItemIndicator`. Both indicators take `keepMounted`, which renders them in every item and puts `data-selected` only on the selected one. The styled `Select.ItemIndicator` and `Combobox.ItemIndicator` default `keepMounted` to `true` and hide the check on unselected items while keeping its width, so rows no longer change width as the selection moves; pass `keepMounted={false}` to render the check only in the selected item. The primitives default to `false`. The styled `Select.Item` renders a `Select.ItemIndicator`, so the check's `.cl-select-item-indicator` element is now a `span` wrapping the icon.
 
-A styled `Select.Item` with children no longer adds a check, matching `Combobox.Item`. Add `<Select.ItemIndicator keepMounted />` to composed rows that should show one.
+A styled `Select.Item` with children no longer adds a check, matching `Combobox.Item`. Add `<Select.ItemIndicator />` to composed rows that should show one.
 
 Find usages with `git grep -nE "(Select|Combobox)\.Option|OptionIndicator|(Select|Combobox)Option(Indicator)?Props|cl-(select|combobox|phone-input-country)-option"`.

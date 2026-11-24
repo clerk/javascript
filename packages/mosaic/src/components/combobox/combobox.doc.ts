@@ -158,13 +158,14 @@ export default {
       slot: 'cl-combobox-item-detail',
     },
     'Combobox.ItemIndicator': {
-      description: 'Shows on the selected item. A checkmark when given no children.',
+      description:
+        'The check. Every item keeps room for it and only the selected item shows it. A checkmark when given no children.',
       slot: 'cl-combobox-item-indicator',
       props: {
         keepMounted: {
           type: 'boolean',
-          doc: 'Keeps it rendered in unselected items too, with `data-selected` only on the selected one.',
-          default: 'false',
+          doc: 'Renders it in every item, hidden but holding its width, with `data-selected` and visible only on the selected one. `false` renders it only in the selected item.',
+          default: 'true',
         },
       },
     },
