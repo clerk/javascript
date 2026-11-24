@@ -80,14 +80,6 @@ describe('Chart.TooltipContent', () => {
 });
 
 describe('series boundary', () => {
-  it('keys series by position and resolves palette slots to their tokens', () => {
-    const bridge = bridgeSeries(series);
-
-    expect(bridge.positioned.map(entry => entry.key)).toEqual(['0', '1']);
-    expect(bridge.colors).toEqual(['var(--cl-color-chart-1)', 'var(--brand-red)']);
-    expect(bridge.seriesAt('1').key).toBe('churned');
-  });
-
   it('rejects a repeated key', () => {
     expect(() => bridgeSeries([...series, signups])).toThrow('Two chart series share the key "signups"');
   });

@@ -3,7 +3,7 @@ import type {} from '@vitest/browser-playwright';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
 
-import { type ActiveBar, Chart, type ChartSeries } from '..';
+import { type ActiveBar, type BarChartHighlight, Chart, type ChartSeries } from '..';
 
 type Row = { period: string; a: number; b: number; c: number };
 
@@ -45,7 +45,7 @@ function GrowthChart({
   onRenderError,
 }: Readonly<{
   series?: ChartSeries<Row>[];
-  highlight?: { category: string };
+  highlight?: BarChartHighlight;
   onRenderError?: (error: Error) => void;
 }>) {
   const chart = Chart.useBarChart({ data: rows, index, series: growthSeries, highlight });
@@ -177,6 +177,13 @@ describe('Chart parts', () => {
     await expect.poll(() => near(canvasPixel(onLine), VIOLET_DIMMED)).toBe(true);
     expect(near(await screenPixel(onLine), VIOLET_DIMMED)).toBe(true);
     expect(near(canvasPixel(segmentCenter(1, 0)), VIOLET)).toBe(true);
+  });
+
+  it('keeps the highlighted series at full strength and dims the others', async () => {
+    await renderChart(<GrowthChart highlight={{ series: 'b' }} />);
+
+    await expect.poll(() => near(canvasPixel(segmentCenter(1, 1)), SKY)).toBe(true);
+    expect(near(canvasPixel(segmentCenter(1, 0)), VIOLET_DIMMED)).toBe(true);
   });
 
   it('colors the grid, labels and tooltip from the border, secondary text and surface tokens', async () => {
