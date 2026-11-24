@@ -1,5 +1,12 @@
 # @clerk/mosaic-docs
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/mosaic@0.11.1
+
 ## 0.0.5
 
 ### Patch Changes
