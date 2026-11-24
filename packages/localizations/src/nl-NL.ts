@@ -1742,7 +1742,7 @@ export const nlNL: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'De client komt niet overeen met wat verwacht werd. Probeer het opnieuw.',
-        title: 'Clientfout',
+        title: 'Deze verificatielink is niet geldig op dit apparaat',
       },
       expired: {
         subtitle: 'Ga naar de oorspronkelijke tab om verder te gaan.',

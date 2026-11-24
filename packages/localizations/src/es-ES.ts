@@ -1750,7 +1750,7 @@ export const esES: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'El cliente no coincide con el solicitado. Por favor, intente de nuevo.',
-        title: 'Error de cliente no coincidente',
+        title: 'Este enlace de verificación no es válido en este dispositivo',
       },
       expired: {
         subtitle: 'Regrese a la pestaña original para continuar.',

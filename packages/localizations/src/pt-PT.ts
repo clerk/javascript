@@ -1752,7 +1752,7 @@ export const ptPT: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'O cliente não corresponde ao esperado. Tente novamente.',
-        title: 'Erro de cliente',
+        title: 'Esta ligação de verificação é inválida neste dispositivo',
       },
       expired: {
         subtitle: 'Retorne para a aba original para continuar',

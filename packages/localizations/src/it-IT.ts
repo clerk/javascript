@@ -1749,7 +1749,7 @@ export const itIT: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Il client utilizzato non corrisponde al tipo di account associato.',
-        title: 'Errore di mismatch del client',
+        title: 'Questo link di verifica non è valido su questo dispositivo',
       },
       expired: {
         subtitle: 'Ritorna alla scheda originaria per continuare',

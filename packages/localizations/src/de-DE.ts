@@ -1756,7 +1756,7 @@ export const deDE: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',
-        title: 'Client-Kompatibilitätsfehler',
+        title: 'Dieser Bestätigungslink ist auf diesem Gerät ungültig',
       },
       expired: {
         subtitle: 'Kehren Sie zum ursprünglichen Tab zurück, um fortzufahren.',

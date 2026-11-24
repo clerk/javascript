@@ -1757,7 +1757,7 @@ export const frFR: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',
-        title: 'Erreur de correspondance du client',
+        title: "Ce lien de vérification n'est pas valide sur cet appareil",
       },
       expired: {
         subtitle: "Retournez à l'onglet d'origine pour continuer",

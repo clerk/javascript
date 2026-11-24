@@ -1739,7 +1739,7 @@ export const daDK: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Klient uoverensstemmelse. Prøv igen.',
-        title: 'Klient fejl',
+        title: 'Dette bekræftelseslink er ugyldigt på denne enhed',
       },
       expired: {
         subtitle: 'Vend tilbage til den oprindelige fane for at fortsætte.',
