@@ -125,6 +125,10 @@ export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {
    * The user's username. Only supported if [username](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#username) is enabled in the instance settings.
    */
   username?: string;
+  /**
+   * The user's password. [Password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) must be enabled in the instance settings.
+   */
+  password?: string;
 }
 
 /** @generateWithEmptyComment */
