@@ -930,9 +930,12 @@ describe('OAuthConsent', () => {
       it.each([0, -1, 2.5])(
         'keeps the selection of one organization when the reported limit is %s',
         async maxOrganizations => {
-          const { form, getByRole } = await renderWithOrgs(3, maxOrganizations);
+          const { trigger, form, findByRole, getByRole, userEvent } = await renderWithOrgs(3, maxOrganizations);
 
-          expect(new FormData(form).getAll('organization_id')).toEqual(['org_1']);
+          await userEvent.click(trigger);
+          await userEvent.click(await findByRole('option', { name: /Org 3/ }));
+
+          expect(new FormData(form).getAll('organization_id')).toEqual(['org_3']);
           expect(getByRole('button', { name: 'Allow' })).toBeEnabled();
         },
       );
