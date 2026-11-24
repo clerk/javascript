@@ -118,7 +118,10 @@ export interface SignUpDetailsModel {
   alternativeChannels: Array<AuthProvider & { id: PhoneCodeChannel }>;
   oauthProviders: Array<AuthProvider & { id: OAuthStrategy }>;
   continueOAuthProviders: Array<AuthProvider & { id: OAuthStrategy }>;
-  sso: (strategy: OAuthStrategy, options: { legalAccepted?: boolean; continueSignUp: boolean }) => Promise<void>;
+  sso: (
+    strategy: OAuthStrategy,
+    options: { legalAccepted?: boolean; continueSignUp: boolean },
+  ) => Promise<SignUpCreateResult | undefined>;
   inTicketSignUp: boolean;
   create: (values: SignUpDetailsValues, options?: { channel?: PhoneCodeChannel }) => Promise<SignUpCreateResult>;
   update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
@@ -594,15 +597,19 @@ export function useSignUpModel({
           await run(() => signUp.reset());
           target = clerk.client?.signUp.__internal_future ?? signUp;
         }
-        await run(() =>
-          target.sso({
-            strategy,
-            redirectCallbackUrl: ssoCallbackUrl(),
-            redirectUrl: afterSignUpUrl,
-            unsafeMetadata,
-            legalAccepted: legalAccepted || undefined,
-          }),
-        );
+        const result = await target.sso({
+          strategy,
+          redirectCallbackUrl: ssoCallbackUrl(),
+          redirectUrl: afterSignUpUrl,
+          unsafeMetadata,
+          legalAccepted: legalAccepted || undefined,
+        });
+        const blocked = continueSignUp ? undefined : blockedBy(result.error);
+        if (blocked) {
+          return { type: 'blocked', details: blocked };
+        }
+        await run(() => Promise.resolve(result));
+        return undefined;
       },
       alternativeChannels: phoneCodeChannels.flatMap(channel => {
         const provider = getAlternativePhoneCodeProviderData(channel);

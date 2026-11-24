@@ -188,10 +188,14 @@ export function useSignUpDetailsController(
       return;
     }
     void providerActions.run(id, async () => {
-      await details.sso(provider.id, {
+      const result = await details.sso(provider.id, {
         legalAccepted: form.values.legalAccepted,
         continueSignUp: purpose === 'continue',
       });
+      if (result) {
+        onNext(result);
+        return;
+      }
       await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
     });
   };
