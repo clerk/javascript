@@ -494,7 +494,7 @@ describe('SignInFactorOne', () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
-          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
           f.startSignInWithEmailAddress({
             supportEmailCode: true,
             supportPassword: true,
@@ -524,6 +524,7 @@ describe('SignInFactorOne', () => {
           await screen.findByText('Password reset required');
           screen.getByText('You need to reset your password before you can use it again.');
           screen.getByText('Email code to hello@clerk.com');
+          expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
           expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
           expect(screen.queryByText('Back')).not.toBeInTheDocument();
           expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();

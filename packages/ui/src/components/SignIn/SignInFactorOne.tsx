@@ -79,17 +79,18 @@ function SignInFactorOneInternal(): JSX.Element {
   const card = useCardState();
   const { supportedFirstFactors, firstFactorVerification } = useCoreSignIn();
 
+  // The first step hands over this error when a password it submitted needs a reset.
+  const passwordResetRequiredHandedOver =
+    typeof card.rawError === 'object' && card.rawError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED;
+
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => {
-    const factor = determineStartingSignInFactor(
-      availableFactors,
-      signIn.identifier,
-      preferredSignInStrategy,
-      webAuthnSupported,
-    );
+    const factor =
+      (passwordResetRequiredHandedOver && availableFactors?.find(f => f.strategy === 'password')) ||
+      determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy, webAuthnSupported);
     if (
       factor?.strategy === 'phone_code' &&
       !!firstFactorVerification.channel &&
@@ -122,11 +123,8 @@ function SignInFactorOneInternal(): JSX.Element {
     return defaultShow || (resetPasswordIntent && !resetPasswordFactor);
   });
 
-  // The first step hands over this error when a password it submitted needs a reset.
   const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(() =>
-    typeof card.rawError === 'object' && card.rawError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED
-      ? 'resetRequired'
-      : null,
+    passwordResetRequiredHandedOver ? 'resetRequired' : null,
   );
 
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(
