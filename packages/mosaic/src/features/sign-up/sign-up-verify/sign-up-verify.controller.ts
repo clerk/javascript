@@ -112,6 +112,7 @@ export function useSignUpVerifyController({
     onSendSms: verification.provider
       ? () => {
           setValue('');
+          actions.reset();
           send({ type: 'SEND_SMS' });
         }
       : undefined,
