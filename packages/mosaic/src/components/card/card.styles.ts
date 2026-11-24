@@ -10,7 +10,7 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker, cardHeaderMarker } from './card.markers.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -221,7 +221,11 @@ export const content = stylex.create({
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one keeps the footerless padding.
       [stylex.when.siblingAfter(':where(*)', cardFooterMarker)]: space['4'],
     },
-    paddingBlockStart: space['4'],
+    paddingBlockStart: {
+      default: 'var(--_cl-card-inset-block-start)',
+      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one keeps the headerless inset.
+      [stylex.when.siblingBefore(':where(*)', cardHeaderMarker)]: space['4'],
+    },
   },
 });
 

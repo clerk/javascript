@@ -138,6 +138,15 @@ export function Flush() {
   );
 }
 
+export function FlushLoading() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'loading' }}
+      elevation='flush'
+    />
+  );
+}
+
 export function StartSocialOnly() {
   return <StepPanel step={{ kind: 'details', purpose: 'start', fields: {} }} />;
 }
