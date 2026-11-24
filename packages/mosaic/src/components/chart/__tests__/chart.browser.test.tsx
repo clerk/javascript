@@ -130,6 +130,28 @@ function hover({ x, y }: { x: number; y: number }) {
   );
 }
 
+describe('Chart.Legend', () => {
+  it('grows a described item to a fingertip-sized target under a coarse pointer', async () => {
+    await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 });
+    try {
+      render(
+        <div style={{ padding: 40 }}>
+          <Chart.Legend items={[{ key: 'a', label: 'Series A', color: 1, description: 'About A' }]} />
+        </div>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Series A' });
+      const box = trigger.getBoundingClientRect();
+      const reach = (44 - box.height) / 2 - 1;
+
+      expect(reach).toBeGreaterThan(0);
+      expect(document.elementFromPoint(box.left + box.width / 2, box.top - reach)).toBe(trigger);
+      expect(document.elementFromPoint(box.left + box.width / 2, box.bottom + reach)).toBe(trigger);
+    } finally {
+      await cdp().send('Emulation.setTouchEmulationEnabled', { enabled: false });
+    }
+  });
+});
+
 describe('Chart parts', () => {
   it('paints each series in its palette slot', async () => {
     await renderChart(<GrowthChart />);

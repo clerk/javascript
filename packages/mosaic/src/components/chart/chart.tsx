@@ -8,6 +8,7 @@ import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { styles as buttonStyles } from '../button/button.styles';
 import { Tooltip } from '../tooltip';
 import { legendStyles, swatchStyles, tooltipContentStyles } from './chart.styles';
 import {
@@ -81,7 +82,7 @@ export const ChartLegend = React.forwardRef<HTMLUListElement, ChartLegendProps>(
             ) : (
               <Tooltip.Root>
                 <Tooltip.Trigger
-                  xstyle={[reset.base, legendStyles.trigger, focusOutline.visible]}
+                  xstyle={[reset.base, legendStyles.trigger, focusOutline.visible, buttonStyles.touchTarget]}
                   type='button'
                 >
                   {content}
