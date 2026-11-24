@@ -14,7 +14,7 @@ import {
   getInitialActiveIdentifier,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
-import type { SessionTask, SignUpField, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import type { SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
@@ -28,7 +28,7 @@ import { save } from '../../utils/errors';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
 import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
-import { signUpFieldOrder } from './sign-up.utils';
+import { continueCanSatisfy, continueFields, missesEitherIdentifier, signUpFieldOrder } from './sign-up.utils';
 
 export interface SignUpDetailsValues {
   emailAddress?: string;
@@ -126,67 +126,6 @@ function toViewFields(
     }
   }
   return result;
-}
-
-const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
-  first_name: 'firstName',
-  last_name: 'lastName',
-  username: 'username',
-  password: 'password',
-  email_address: 'emailAddress',
-  phone_number: 'phoneNumber',
-};
-
-type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields'>;
-
-function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
-  return missingFields.filter(
-    field =>
-      field === 'email_address_or_phone_number' ||
-      (optionalFields.includes(field) &&
-        (field === 'email_address' || field === 'phone_number' || field === 'username')),
-  );
-}
-
-const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
-
-function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
-  const asksForIdentifier = missingIdentifiers(signUp).length > 0;
-  return signUp.missingFields.every(
-    field =>
-      field in MISSING_FORM_FIELDS ||
-      CONTINUE_REQUIREMENTS.includes(field) ||
-      (asksForIdentifier && signUp.optionalFields.includes(field)),
-  );
-}
-
-function missesEitherIdentifier(signUp: SignUpFieldLists): boolean {
-  const identifiers = missingIdentifiers(signUp);
-  return (
-    identifiers.includes('email_address_or_phone_number') ||
-    (identifiers.includes('email_address') && identifiers.includes('phone_number'))
-  );
-}
-
-function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier): SignUpFields {
-  const identifiers = missingIdentifiers(signUp);
-  const fields: SignUpFields = {};
-  for (const name of signUp.missingFields) {
-    const field = MISSING_FORM_FIELDS[name];
-    if (field && !identifiers.includes(name)) {
-      fields[field] = { required: true };
-    }
-  }
-  if (missesEitherIdentifier(signUp)) {
-    fields[identifier === 'phoneNumber' ? 'phoneNumber' : 'emailAddress'] = { required: true };
-  } else {
-    const only = identifiers.find(name => name !== 'username') ?? identifiers[0];
-    const field = only ? MISSING_FORM_FIELDS[only] : undefined;
-    if (field) {
-      fields[field] = { required: true };
-    }
-  }
-  return fields;
 }
 
 function emailSupportFor(mode: SignUpFlowModel['mode'], address: string | undefined): (() => void) | undefined {

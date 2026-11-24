@@ -1,6 +1,9 @@
+import type { SignUpField, SignUpFutureResource } from '@clerk/shared/types';
+
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
 import { formatPhoneIdentifier } from '../auth-flow/auth-flow.utils';
+import type { SignUpIdentifier } from './sign-up.model';
 import type { SignUpCode, SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
 
 type Messages = MosaicMessages['signUp'];
@@ -71,4 +74,65 @@ export function signUpCodeSecondaryAction(
     return { label: m.useAnotherMethod, onClick: onCancel };
   }
   return step.provider ? { label: m.verifyPhone.useSms, onClick: onCancel } : { label: m.useAnotherMethod };
+}
+
+const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
+  first_name: 'firstName',
+  last_name: 'lastName',
+  username: 'username',
+  password: 'password',
+  email_address: 'emailAddress',
+  phone_number: 'phoneNumber',
+};
+
+type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields'>;
+
+function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
+  return missingFields.filter(
+    field =>
+      field === 'email_address_or_phone_number' ||
+      (optionalFields.includes(field) &&
+        (field === 'email_address' || field === 'phone_number' || field === 'username')),
+  );
+}
+
+const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
+
+export function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
+  const asksForIdentifier = missingIdentifiers(signUp).length > 0;
+  return signUp.missingFields.every(
+    field =>
+      field in MISSING_FORM_FIELDS ||
+      CONTINUE_REQUIREMENTS.includes(field) ||
+      (asksForIdentifier && signUp.optionalFields.includes(field)),
+  );
+}
+
+export function missesEitherIdentifier(signUp: SignUpFieldLists): boolean {
+  const identifiers = missingIdentifiers(signUp);
+  return (
+    identifiers.includes('email_address_or_phone_number') ||
+    (identifiers.includes('email_address') && identifiers.includes('phone_number'))
+  );
+}
+
+export function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier): SignUpFields {
+  const identifiers = missingIdentifiers(signUp);
+  const fields: SignUpFields = {};
+  for (const name of signUp.missingFields) {
+    const field = MISSING_FORM_FIELDS[name];
+    if (field && !identifiers.includes(name)) {
+      fields[field] = { required: true };
+    }
+  }
+  if (missesEitherIdentifier(signUp)) {
+    fields[identifier === 'phoneNumber' ? 'phoneNumber' : 'emailAddress'] = { required: true };
+  } else {
+    const only = identifiers.find(name => name !== 'username') ?? identifiers[0];
+    const field = only ? MISSING_FORM_FIELDS[only] : undefined;
+    if (field) {
+      fields[field] = { required: true };
+    }
+  }
+  return fields;
 }
