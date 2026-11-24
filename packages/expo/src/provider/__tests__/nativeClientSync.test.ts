@@ -306,3 +306,94 @@ describe('createNativeClientSync', () => {
     expect(native.setDeviceToken).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('device binding', () => {
+  const bound = (rotation: number) =>
+    `header.${Buffer.from(JSON.stringify({ id: 'client_bound', rotating_token: `r${rotation}`, cnf: { jkt: 'thumbprint' } })).toString('base64url')}.signature`;
+
+  function signingNative(initial: string | null): ClerkExpoNativeModule {
+    const native = initial === null ? nativeModule() : nativeWithStoredToken(initial);
+    return {
+      ...native,
+      setHostSignsRequests: vi.fn().mockResolvedValue(undefined),
+      createDpopProof: vi.fn().mockResolvedValue('proof'),
+      recordServerDate: vi.fn(),
+    };
+  }
+
+  function cacheWith(clientToken: string): TokenCache & { clearToken: ReturnType<typeof vi.fn> } {
+    const stored: Record<string, string | undefined> = { [CLERK_CLIENT_JWT_KEY]: clientToken };
+    return {
+      getToken: key => Promise.resolve(stored[key] ?? null),
+      saveToken: (key, token) => {
+        stored[key] = token;
+        return Promise.resolve();
+      },
+      clearToken: vi.fn((key: string) => {
+        stored[key] = undefined;
+      }),
+    };
+  }
+
+  const proofMissing = { status: 401, payload: { errors: [{ code: 'device_binding_proof_missing' }] } };
+
+  beforeEach(() => {
+    vi.resetModules();
+    mocks.appState.currentState = 'active';
+  });
+
+  test('asks a native module that can sign to bind the client', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = signingNative(null);
+    const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    await sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+
+    expect(native.setHostSignsRequests).toHaveBeenCalledWith(true);
+    expect(vi.mocked(native.setHostSignsRequests!).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(native.configureNative).mock.invocationCallOrder[0],
+    );
+    expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', null, null);
+    expect(sync.deviceBinding).not.toBeNull();
+  });
+
+  test('configures a native module that cannot sign as before, and does not sign', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = nativeModule();
+    const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    await sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+
+    expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', null, null);
+    expect(sync.deviceBinding).toBeNull();
+  });
+
+  test('drops a token bound elsewhere from native storage and from the app cache', async () => {
+    const createNativeClientSync = await loadEngine();
+    const token = bound(1);
+    const native = signingNative(token);
+    const cache = cacheWith(token);
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+
+    await sync.deviceBinding!.afterResponse(token, proofMissing);
+
+    expect(native.setDeviceToken).toHaveBeenCalledWith(null, token);
+    await expect(native.getDeviceToken()).resolves.toBeNull();
+    expect(cache.clearToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
+  });
+
+  test('keeps a token that rotated while the rejected request was in flight', async () => {
+    const createNativeClientSync = await loadEngine();
+    const rotated = bound(2);
+    const native = signingNative(rotated);
+    const cache = cacheWith(rotated);
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+
+    await sync.deviceBinding!.afterResponse(bound(1), proofMissing);
+
+    await expect(native.getDeviceToken()).resolves.toBe(rotated);
+    expect(cache.clearToken).not.toHaveBeenCalled();
+  });
+});
