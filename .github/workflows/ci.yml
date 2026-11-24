@@ -2,6 +2,9 @@ name: CI
 
 on:
   merge_group:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
@@ -95,7 +98,7 @@ jobs:
           fi
 
       - name: Require Changeset
-        if: ${{ github.event_name != 'merge_group' && github.event.pull_request.draft == false }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
         run: |
           if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then
             echo 'Skipping';
@@ -246,7 +249,7 @@ jobs:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           CI_BRANCH: ${{ github.ref }}
           CI_BRANCH_BASE: refs/heads/main
-          CI_COMMIT_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          CI_COMMIT_SHA: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.sha }}
           CI_REPO_NAME: ${{ vars.REPO_NAME }}
           CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
         run: pnpm turbo bundlewatch $TURBO_ARGS
@@ -611,10 +614,8 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          # Validate the turbo task exists. Turbo's --affected flag is a no-op for
-          # root-level tasks (//#) — they are always returned as affected. The previous
-          # --affected check only served to silently skip tests when the task was missing
-          # from turbo.json, hiding real configuration errors.
+          # Validate the turbo task exists, so a missing or misnamed task fails here
+          # instead of silently running nothing.
           TASK_NAME="test:integration:${{ matrix.test-name }}"
           TURBO_STDERR=$(mktemp)
           if ! TURBO_RAW=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
@@ -695,6 +696,9 @@ jobs:
             sudo apt-get install -y xvfb
           fi
 
+      - name: Expire cached integration results daily
+        run: echo "E2E_CACHE_DATE=$(date -u +%F)" >> "$GITHUB_ENV"
+
       - name: Configure test user cleanup
         run: echo "INTEGRATION_TEST_RUN_KEY=${RUN_ID}-${RUN_ATTEMPT}-${TEST_NAME}-${TEST_PROJECT}-${NEXT_VERSION:-default}" >> "$GITHUB_ENV"
         env:
@@ -709,9 +713,9 @@ jobs:
         timeout-minutes: 25
         run: |
           if [ "${{ matrix.test-name }}" = "electron" ]; then
-            xvfb-run -a pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+            xvfb-run -a pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS $ONLY_WHEN_FORCED
           else
-            pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
+            pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS $ONLY_WHEN_FORCED
           fi
         env:
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
@@ -723,10 +727,12 @@ jobs:
           E2E_CLERK_UI_VERSION: 'latest'
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
+          E2E_SUITE: ${{ matrix.test-name }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+          ONLY_WHEN_FORCED: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && '--only' || '' }}
+          TURBO_FORCE: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-
       - name: Sanitize artifact name
         if: ${{ cancelled() || failure() }}
         id: sanitize
@@ -766,6 +772,7 @@ jobs:
   pkg-pr-new:
     name: Publish with pkg-pr-new
     needs: [check-permissions, build-packages]
+    if: ${{ github.event_name != 'schedule' && github.event_name != 'workflow_dispatch' }}
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:

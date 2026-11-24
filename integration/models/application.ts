@@ -6,6 +6,7 @@ import { clerkSetup } from '@clerk/testing/playwright';
 import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
+import { assertSuiteBuildsPackages, localPackagesInstalledIn } from './suiteBuilds';
 
 export type Application = ReturnType<typeof application>;
 
@@ -95,11 +96,21 @@ export const application = (
         // Use pkglab add to install packages from the local registry,
         // unless E2E_SDK_SOURCE=latest which installs from npm instead
         const pkglabDeps = config.pkglabDependencies;
+        const manifest = await fs.readJSON(path.resolve(appDirPath, 'package.json'));
+        assertSuiteBuildsPackages(config.name, [
+          ...pkglabDeps,
+          ...Object.entries<string>({ ...manifest.dependencies, ...manifest.devDependencies })
+            .filter(([, version]) => version.startsWith('workspace:'))
+            .map(([name]) => name),
+        ]);
         if (pkglabDeps.length > 0 && process.env.E2E_SDK_SOURCE !== 'latest') {
           await run(`pkglab add ${pkglabDeps.join(' ')}`, { cwd: appDirPath, log });
         } else {
           await run(scripts.setup, { cwd: appDirPath, log });
         }
+        const installed = localPackagesInstalledIn(appDirPath);
+        log(`Locally published @clerk packages installed: ${installed.join(', ') || 'none'}`);
+        assertSuiteBuildsPackages(config.name, installed);
         state.completedSetup = true;
         // Print all Clerk package versions (direct and transitive)
         const clerkPackagesLog = logger.child({ prefix: 'clerk-packages' }).info;
