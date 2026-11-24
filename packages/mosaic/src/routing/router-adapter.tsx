@@ -66,7 +66,13 @@ export interface MosaicRouting {
   modals?: ModalRoutingMode;
 }
 
-type AdapterReads = Pick<RouterAdapter, 'usePathname' | 'useSearchParams' | 'useHash'>;
+export type AdapterRead = NonNullable<RouterAdapter['usePathname' | 'useSearchParams' | 'useHash']>;
+
+export type AdapterReads = Record<'usePathname' | 'useSearchParams' | 'useHash', AdapterRead>;
+
+function useNothing(): undefined {
+  return undefined;
+}
 
 export interface RoutingConfig {
   reads: AdapterReads;
@@ -78,7 +84,7 @@ export interface RoutingConfig {
 }
 
 const defaultConfig: RoutingConfig = {
-  reads: {},
+  reads: { usePathname: useNothing, useSearchParams: useNothing, useHash: useNothing },
   push: undefined,
   replace: undefined,
   queryPrefix: '',
@@ -88,12 +94,18 @@ const defaultConfig: RoutingConfig = {
 
 const RoutingConfigContext = createContext<RoutingConfig>(defaultConfig);
 
+// Every read is a hook, `useNothing` where the adapter has none, so a component calls its read
+// unconditionally and `window` fills in for what comes back empty.
 function readsOf(adapter: RouterAdapter | undefined): AdapterReads {
-  return { usePathname: adapter?.usePathname, useSearchParams: adapter?.useSearchParams, useHash: adapter?.useHash };
+  return {
+    usePathname: adapter?.usePathname ?? useNothing,
+    useSearchParams: adapter?.useSearchParams ?? useNothing,
+    useHash: adapter?.useHash ?? useNothing,
+  };
 }
 
-function shapeOf(reads: AdapterReads): string {
-  return [reads.usePathname, reads.useSearchParams, reads.useHash].map(read => (read ? '1' : '0')).join('');
+function shapeOf(adapter: RouterAdapter | undefined): string {
+  return [adapter?.usePathname, adapter?.useSearchParams, adapter?.useHash].map(read => (read ? '1' : '0')).join('');
 }
 
 // The hooks an adapter has are fixed on the first render, because the components under the provider
@@ -104,8 +116,8 @@ export function RoutingConfigProvider({
   modals,
   children,
 }: MosaicRouting & { children: ReactNode }) {
-  const [reads] = useState(() => readsOf(adapter));
-  if (shapeOf(readsOf(adapter)) !== shapeOf(reads)) {
+  const [{ reads, shape }] = useState(() => ({ reads: readsOf(adapter), shape: shapeOf(adapter) }));
+  if (shapeOf(adapter) !== shape) {
     logger.warnOnce(
       '[Clerk] The routing adapter changed which hooks it has after the first render, so the first set stays in use. Build the adapter once, outside render.',
     );

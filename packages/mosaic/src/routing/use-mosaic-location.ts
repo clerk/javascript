@@ -2,6 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import { useInsertionEffect, useMemo, useRef, useState } from 'react';
 
 import type { MosaicLocation } from './location';
+import type { AdapterRead, AdapterReads } from './router-adapter';
 import { useRoutingConfig } from './router-adapter';
 import type { UrlRoutingMode } from './url-location';
 import { urlCarrier, urlWith, urlWithout } from './url-location';
@@ -17,57 +18,35 @@ export type MosaicLocationOptions = {
   path?: string;
 };
 
-function readNothing(): undefined {
-  return undefined;
-}
+const ADAPTER_READS: Record<keyof HostUrl, keyof AdapterReads> = {
+  pathname: 'usePathname',
+  search: 'useSearchParams',
+  hash: 'useHash',
+};
 
-// An adapter's hook, or nothing when it does not have that one. The provider fixes which hooks the
-// adapter has, so the hooks this calls are fixed too.
-function useAdapterRead(
-  read: (() => string | URLSearchParams | null | undefined) | undefined,
-  leading: string,
-): string | undefined {
-  const value = (read ?? readNothing)() ?? undefined;
+const LEADING: Record<keyof HostUrl, string> = { pathname: '', search: '?', hash: '#' };
+
+// The provider fixes which hooks the adapter has, so the hook this calls is fixed too.
+function useAdapterRead(useRead: AdapterRead, leading: string): string | undefined {
+  const value = useRead() ?? undefined;
   const text = typeof value === 'object' ? value.toString() : value;
   return text?.startsWith(leading) ? text.slice(leading.length) : text;
 }
 
-interface Committed {
-  pathname: string | undefined;
-  search: string | undefined;
-  hash: string | undefined;
-  push: ((url: string) => void) | undefined;
-  replace: ((url: string) => void) | undefined;
-}
+type Via = ((url: string) => void) | undefined;
 
 const release = () => {};
 
-// A write is built in the world of whoever performs it. Through the adapter's `push` or `replace`
-// that is the adapter's reads, with `window` for the ones it lacks; without them it is `window`
-// itself, which already has whatever a host adds around a pathname, such as a base path.
-function startOf(last: Committed, replace: boolean): { via: ((url: string) => void) | undefined; url: HostUrl } {
-  const via = replace ? last.replace : last.push;
-  const live = readWindowUrl();
+// A write is "the URL in the address bar, plus our change", never "the URL the host last rendered,
+// plus our change": the address bar is what the write lands on, and a host updates it before or in
+// the same commit as the tree it renders for it, so it is never behind the host and may be ahead.
+function navigateTo(build: (from: HostUrl) => string | undefined, replace: boolean, via: Via): void {
   if (via === undefined) {
-    return { via, url: live };
-  }
-  return {
-    via,
-    url: { pathname: last.pathname ?? live.pathname, search: last.search ?? live.search, hash: last.hash ?? live.hash },
-  };
-}
-
-function navigateTo(
-  build: (from: HostUrl) => string | undefined,
-  replace: boolean,
-  start: { via: ((url: string) => void) | undefined; url: HostUrl },
-): void {
-  const url = build(start.url);
-  if (url === undefined) {
+    writeWindowUrl(() => build(readWindowUrl()), replace);
     return;
   }
-  if (start.via === undefined) {
-    writeWindowUrl(() => build(readWindowUrl()), replace);
+  const url = build(readWindowUrl());
+  if (url === undefined) {
     return;
   }
   if (!isSameOrigin(url)) {
@@ -76,7 +55,7 @@ function navigateTo(
     );
     return;
   }
-  start.via(url);
+  via(url);
   notifyWindowUrl();
 }
 
@@ -98,51 +77,49 @@ export function useHostPathname(): string | undefined {
   return useAdapterRead(reads.usePathname, '') ?? fromWindow?.pathname;
 }
 
-// A read the adapter does not supply comes from `window`, at render through its store and at the
-// moment of a write directly. The location is rebuilt only when its entry changes: a write reads the
-// host as it was last committed, so a host that re-renders with a new adapter object or a new URL
-// does not hand the components above a new location each time.
+// Each mode renders from the one field of the URL it owns, read through the adapter when it has
+// that hook so the route agrees with what the host has rendered, and from `window` otherwise. The
+// other fields matter only to a write, which preserves them from the address bar.
 function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocation {
   const { reads, push, replace, queryPrefix, hashPrefix } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
-  const pathname = useAdapterRead(reads.usePathname, '');
-  const search = useAdapterRead(reads.useSearchParams, '?');
-  const hash = useAdapterRead(reads.useHash, '#');
-
   const carrier = useMemo(
     () => urlCarrier(routing, path, { query: queryPrefix, hash: hashPrefix }),
     [routing, path, queryPrefix, hashPrefix],
   );
-  const rendered: Partial<HostUrl> = {
-    pathname: pathname ?? fromWindow?.pathname,
-    search: search ?? fromWindow?.search,
-    hash: fromWindow === undefined ? undefined : (hash ?? fromWindow.hash),
-  };
-  const value = rendered[carrier.field];
+  // We already lock this in RoutingConfigProvider to avoid conditional hooks, so this could
+  // technically be removed, but keeping it to be very explicit about preventing conditional hooks
+  const [useAdapterField] = useState(() => {
+    const useRead = reads[ADAPTER_READS[carrier.field]];
+    return () => useAdapterRead(useRead, LEADING[carrier.field]);
+  });
+  const fromAdapter = useAdapterField();
+  const value =
+    carrier.field === 'hash' && fromWindow === undefined ? undefined : (fromAdapter ?? fromWindow?.[carrier.field]);
   const raw = value === undefined ? undefined : carrier.read(value);
   const parts = useMemo(() => (raw === undefined ? undefined : carrier.decode(raw)), [carrier, raw]);
 
-  // Written in an insertion effect so that a write from any layout or passive effect of the same
-  // commit, in this component or below it, already starts from this commit's host URL.
-  const committed = useRef<Committed>({ pathname, search, hash, push, replace });
+  const via = useRef({ push, replace });
   useInsertionEffect(() => {
-    committed.current = { pathname, search, hash, push, replace };
+    via.current = { push, replace };
   });
 
   // A base's entry in the page's URL. It holds nothing of its own: it hands out the parts decoded
-  // from the host's URL for this render, and a write goes straight to the host as a full URL. What
-  // a write starts from is the host as it was last committed, and `window` for whatever the adapter
-  // does not read; reading that only from a write is what lets the location stay the same object
-  // while its entry is unchanged. There are no owners to count, since the URL outlives a component
-  // by itself, and clearing replaces, so closing a modal leaves no entry to go back to.
+  // from the host's URL for this render, and a write goes straight to the host as a full URL built
+  // from the address bar. There are no owners to count, since the URL outlives a component by
+  // itself, and clearing replaces, so closing a modal leaves no entry to go back to.
   return useMemo<MosaicLocation>(
     () => ({
       useSegmentParts: () => parts,
       write: (next, { replace: shouldReplace = false } = {}) => {
-        navigateTo(from => urlWith(carrier, from, next), shouldReplace, startOf(committed.current, shouldReplace));
+        navigateTo(
+          from => urlWith(carrier, from, next),
+          shouldReplace,
+          shouldReplace ? via.current.replace : via.current.push,
+        );
       },
       clear: () => {
-        navigateTo(from => urlWithout(carrier, from), true, startOf(committed.current, true));
+        navigateTo(from => urlWithout(carrier, from), true, via.current.replace);
       },
       own: () => release,
     }),

@@ -18,10 +18,9 @@ export interface UserProfileProps
    */
   path?: string;
   /**
-   * Where the profile keeps the page that is open. `virtual` keeps it in memory, so the URL does not
-   * change. `path` puts it in the URL's pathname under `path`, `query` and `hash` in a param of the
-   * query string or the hash named after `path`, so the page survives a reload and Back returns to
-   * the previous one.
+   * Where the profile keeps the page that is open. `virtual` keeps it in memory, so the URL does
+   * not change. `path` puts it in the URL's pathname, `query` and `hash` in a param of the
+   * query string or the hash.
    *
    * @default 'virtual'
    */

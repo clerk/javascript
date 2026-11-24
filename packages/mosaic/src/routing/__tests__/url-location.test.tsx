@@ -384,11 +384,9 @@ describe('on a page whose pathname starts with //', () => {
 
   it('hands the host router no URL on another origin', () => {
     warnings();
+    window.history.replaceState(null, '', `${window.location.origin}//evil.com/x`);
     const push = vi.fn<(next: string) => void>();
-    const { result } = renderLocation(
-      { routing: 'query', path: '/user' },
-      { adapter: { usePathname: () => '//evil.com/x', push } },
-    );
+    const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter: { push } });
 
     act(() => result.current.location.write(['security']));
 
@@ -453,8 +451,9 @@ describe('with an adapter', () => {
     expect(read('hash')).toEqual(['billing']);
   });
 
-  it('navigates through the host router with a URL built from its reads', () => {
-    const { adapter } = hostRouter({ pathname: '/page', search: 'q=1&.user=x', hash: 'top' });
+  it('navigates through the host router with a URL built from the address bar', () => {
+    at('/page?q=1&.user=x#top');
+    const { adapter } = hostRouter({ pathname: '/stale', search: 'stale=1', hash: 'stale' });
     const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter });
 
     act(() => result.current.location.write(['security']));
@@ -462,7 +461,26 @@ describe('with an adapter', () => {
 
     expect(adapter.push).toHaveBeenCalledWith('/page?q=1&.user=security#top');
     expect(adapter.replace).toHaveBeenCalledWith('/page?q=1#top');
-    expect(url()).toBe('/');
+    expect(url()).toBe('/page?q=1&.user=x#top');
+  });
+
+  it('reads only the field its mode owns through the adapter', () => {
+    const usePathname = vi.fn(() => '/page');
+    const useSearchParams = vi.fn(() => 'q=1');
+    const useHash = vi.fn(() => '.user=security');
+    const adapter: RouterAdapter = { usePathname, useSearchParams, useHash };
+
+    renderLocation({ routing: 'hash', path: '/user' }, { adapter });
+    expect(useHash).toHaveBeenCalled();
+    expect(usePathname).not.toHaveBeenCalled();
+    expect(useSearchParams).not.toHaveBeenCalled();
+
+    usePathname.mockClear();
+    useHash.mockClear();
+    renderLocation({ routing: 'path', path: '/user' }, { adapter });
+    expect(usePathname).toHaveBeenCalled();
+    expect(useSearchParams).not.toHaveBeenCalled();
+    expect(useHash).not.toHaveBeenCalled();
   });
 
   it('starts a write without push or replace from the window, which has what the host adds around the pathname', () => {
@@ -473,8 +491,7 @@ describe('with an adapter', () => {
     expect(url()).toBe('/docs/page?q=1&.user=security');
   });
 
-  it('starts a write from the host as this commit rendered it, even from a layout effect', () => {
-    const host = { pathname: '/a' };
+  it('starts a write from the address bar when the host has moved it but not rendered it yet', () => {
     const push = vi.fn<(next: string) => void>();
     function Probe({ go }: { go: boolean }) {
       const location = useMosaicLocation({ routing: 'query', path: '/user' });
@@ -486,14 +503,15 @@ describe('with an adapter', () => {
       return null;
     }
     const tree = (go: boolean) => (
-      <RoutingConfigProvider adapter={{ usePathname: () => host.pathname, push }}>
+      <RoutingConfigProvider adapter={{ usePathname: () => '/a', push }}>
         <VirtualStoreProvider>
           <Probe go={go} />
         </VirtualStoreProvider>
       </RoutingConfigProvider>
     );
+    at('/a');
     const { rerender } = render(tree(false));
-    host.pathname = '/b';
+    at('/b');
     rerender(tree(true));
     expect(push).toHaveBeenCalledWith('/b?.user=security');
   });

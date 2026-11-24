@@ -11,8 +11,9 @@
  *   state, and Next then moves `usePathname` and `useSearchParams` to the new URL without the server
  *   round trip `router.push` would make. Under a `basePath`, path routing needs it in both places Next
  *   leaves it out: `usePathname: () => basePath + usePathname()` here and in the component's `path`.
- * - In a statically rendered route, `useSearchParams` opts the tree up to the nearest `<Suspense>`
- *   boundary into client rendering, as it does for any component that calls it.
+ * - Only `query` mode calls `useSearchParams`; `path` mode calls `usePathname` and `hash` mode reads
+ *   `window` alone. In a statically rendered route, `useSearchParams` opts the tree up to the nearest
+ *   `<Suspense>` boundary into client rendering, so a query-mode component on such a page needs one.
  */
 import type { RouterAdapter } from '@clerk/mosaic';
 import { usePathname, useSearchParams } from 'next/navigation';
