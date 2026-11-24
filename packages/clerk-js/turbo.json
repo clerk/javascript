@@ -1,6 +1,9 @@
 {
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "env": ["CLERK_ENV"]
+    },
     "build:sandbox": {
       "dependsOn": ["^build", "@clerk/localizations#build"],
       "inputs": ["sandbox/**"],
