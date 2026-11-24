@@ -1183,6 +1183,19 @@ describe('SignUp social sign-up', () => {
     expect(fapi.client.sessions).toHaveLength(1);
   });
 
+  it('lands on the redirect_url when the Google account already belongs to a user', async () => {
+    window.history.replaceState(null, '', `${window.location.pathname}?redirect_url=%2Fdashboard`);
+    const { fapi, first } = await startWithGoogle({
+      signUp: { oauth: { oauth_google: { existingUser: { emailAddress: EMAIL } } } },
+    });
+
+    const { navigate } = await returnFromGoogle(fapi, first, { signInFallbackRedirectUrl: '/home' });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('/home'));
+    expect(fapi.signUp.transfers).toHaveLength(1);
+  });
+
   it('hands a transfer that still needs a second factor to the sign-in factor-two route, keeping redirect_url', async () => {
     window.history.replaceState(null, '', `${window.location.pathname}?redirect_url=%2Fdashboard`);
     const { fapi, first } = await startWithGoogle({
@@ -1323,6 +1336,21 @@ describe('SignUp social sign-up', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/home')));
     expect(clerk.session?.id).toBe(signedInSession.id);
     expect(fapi.signUp.transfers).toHaveLength(0);
+  });
+
+  it('lands on the redirect_url after switching to the session already signed in to the Google account', async () => {
+    window.history.replaceState(null, '', `${window.location.pathname}?redirect_url=%2Fdashboard`);
+    const otherSession = fapiSession({ id: 'sess_other', user: fapiUser({ id: 'user_other' }) });
+    const { fapi, first } = await startWithGoogle({
+      client: fapiClient([otherSession, signedInSession]),
+      signUp: { oauth: { oauth_google: { signedInSession: signedInSession.id } } },
+    });
+
+    const { clerk, navigate } = await returnFromGoogle(fapi, first, { signInFallbackRedirectUrl: '/home' });
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('/home'));
+    expect(clerk.session?.id).toBe(signedInSession.id);
   });
 
   it('runs the Protect check the sign-up still has after the return, then continues', async () => {
