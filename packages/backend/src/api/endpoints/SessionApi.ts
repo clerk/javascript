@@ -49,7 +49,7 @@ export type UpdateSessionParams = {
   expireAt: Date;
 };
 
-/** @generateWithEmptyComment */
+/** @inline */
 export type RevokeSessionParams = {
   /** When set to `true`, Clerk also forgets the device the session was signed in on, even if the session is already revoked. For a session that a native application received through hosted auth, Clerk also forgets the browser the user signed in on. The user's next sign-in on a forgotten device counts as a new device. That sign-in can require a Device Trust challenge, and Clerk can email the user about the new device. Other users on the same device are unaffected. Defaults to `false`. */
   resetDeviceTrust?: boolean;
