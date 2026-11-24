@@ -1861,6 +1861,35 @@ describe('tokens.authenticateRequest(options)', () => {
       );
     });
 
+    test.each([
+      ['sesion_token', 'Invalid acceptsToken: "sesion_token".'],
+      [['m2m_token', 'apikey'], 'Invalid acceptsToken: ["m2m_token","apikey"].'],
+    ])('warns once if acceptsToken is %j', async (acceptsToken, message) => {
+      server.use(
+        http.post(mockMachineAuthResponses.m2m_token.endpoint, () =>
+          HttpResponse.json(mockVerificationResults.m2m_token),
+        ),
+      );
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      for (let i = 0; i < 2; i++) {
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+        await authenticateRequest(request, mockOptions({ acceptsToken }));
+      }
+
+      expect(warn.mock.calls.filter(([msg]) => String(msg).includes(message))).toHaveLength(1);
+      warn.mockRestore();
+    });
+
+    test('rejects every token if acceptsToken is an empty array', async () => {
+      const request = mockRequest({ authorization: `Bearer ${mockTokens.m2m_token}` });
+
+      const requestState = await authenticateRequest(request, mockOptions({ acceptsToken: [] }));
+
+      expect(requestState.status).toBe(AuthStatus.SignedOut);
+      expect(requestState.tokenType).toBeNull();
+    });
+
     describe('Any Token Type Authentication', () => {
       test.each(tokenTypes)('accepts %s when acceptsToken is "any"', async tokenType => {
         const mockToken = mockTokens[tokenType];

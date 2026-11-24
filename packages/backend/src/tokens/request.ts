@@ -71,6 +71,23 @@ function assertMachineSecretOrSecretKey(authenticateContext: AuthenticateContext
   }
 }
 
+const TOKEN_TYPES: readonly unknown[] = Object.values(TokenType);
+
+function warnOnInvalidAcceptsToken(acceptsToken: unknown) {
+  const isValid =
+    acceptsToken === 'any' ||
+    TOKEN_TYPES.includes(acceptsToken) ||
+    (Array.isArray(acceptsToken) && acceptsToken.every(tokenType => TOKEN_TYPES.includes(tokenType)));
+
+  if (!isValid) {
+    logger.warnOnce(
+      `Clerk: Invalid acceptsToken: ${JSON.stringify(acceptsToken)}. ` +
+        `Use 'any', one of ${TOKEN_TYPES.map(tokenType => `'${tokenType}'`).join(', ')}, or an array of them. ` +
+        'In a future version of Clerk, this will throw an error.',
+    );
+  }
+}
+
 function isRequestEligibleForRefresh(
   err: TokenVerificationError,
   authenticateContext: { refreshTokenInCookie?: string },
@@ -154,6 +171,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
+  warnOnInvalidAcceptsToken(acceptsToken);
 
   // machine-to-machine tokens can accept a machine secret or a secret key
   if (acceptsToken !== TokenType.M2MToken) {

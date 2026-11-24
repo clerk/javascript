@@ -291,6 +291,160 @@ describe('isomorphicClerk', () => {
     expect(handleResourceCallback).toHaveBeenCalledWith(signInOrUp, params, customNavigate);
   });
 
+  describe.each(
+    (() => {
+      const signInOrUp = {} as unknown as SignInResource;
+      const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };
+      const customNavigate = vi.fn();
+      const redirectArgs = [params, customNavigate] as const;
+      const oneTapArgs = [signInOrUp, params, customNavigate] as const;
+      return [
+        {
+          method: 'handleRedirectCallback' as const,
+          args: redirectArgs,
+          invoke: (clerk: IsomorphicClerk) => clerk.handleRedirectCallback(...redirectArgs),
+        },
+        {
+          method: 'handleGoogleOneTapCallback' as const,
+          args: oneTapArgs,
+          invoke: (clerk: IsomorphicClerk) => clerk.handleGoogleOneTapCallback(...oneTapArgs),
+        },
+      ];
+    })(),
+  )('$method', ({ method, args, invoke }) => {
+    function createLoadedClerk(delegate: Mock) {
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = { loaded: true, addListener: vi.fn(), [method]: delegate };
+      return isomorphicClerk;
+    }
+
+    function trackSettled(promise: Promise<unknown>) {
+      const state = { settled: false };
+      promise.then(
+        () => (state.settled = true),
+        () => (state.settled = true),
+      );
+      return state;
+    }
+
+    it('forwards every argument to clerk-js and resolves with its result after clerk-js has loaded', async () => {
+      const delegate = vi.fn().mockResolvedValue('done');
+      const isomorphicClerk = createLoadedClerk(delegate);
+
+      await expect(invoke(isomorphicClerk)).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(1);
+      expect(delegate).toHaveBeenCalledWith(...args);
+    });
+
+    it('does not settle while clerk-js is still handling the callback', async () => {
+      let finish!: (value: unknown) => void;
+      const delegate = vi.fn().mockReturnValue(new Promise(resolve => (finish = resolve)));
+      const isomorphicClerk = createLoadedClerk(delegate);
+
+      const result = invoke(isomorphicClerk);
+      const state = trackSettled(result);
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(state.settled).toBe(false);
+
+      finish('done');
+
+      await expect(result).resolves.toBe('done');
+    });
+
+    it('rejects with the error clerk-js rejects with', async () => {
+      const error = new Error('callback failed');
+      const delegate = vi.fn().mockRejectedValue(error);
+      const isomorphicClerk = createLoadedClerk(delegate);
+
+      await expect(invoke(isomorphicClerk)).rejects.toBe(error);
+    });
+
+    it('waits for clerk-js to load, then forwards every argument and settles with its result', async () => {
+      const delegate = vi.fn().mockResolvedValue('done');
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+      const result = invoke(isomorphicClerk);
+      const state = trackSettled(result);
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(delegate).not.toHaveBeenCalled();
+      expect(state.settled).toBe(false);
+
+      (isomorphicClerk as any).replayInterceptedInvocations({ loaded: true, addListener: vi.fn(), [method]: delegate });
+
+      await expect(result).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(1);
+      expect(delegate).toHaveBeenCalledWith(...args);
+    });
+  });
+
+  describe('handleRedirectCallback calls that overlap', () => {
+    const firstParams: HandleOAuthCallbackParams = { signInUrl: '/first' };
+    const secondParams: HandleOAuthCallbackParams = { signInUrl: '/second' };
+
+    function createClerkJS(delegate: Mock) {
+      return { loaded: true, addListener: vi.fn(), handleRedirectCallback: delegate };
+    }
+
+    it('makes one clerk-js call for calls made before clerk-js loads and settles them with its result', async () => {
+      const delegate = vi.fn().mockResolvedValue('done');
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+
+      const first = isomorphicClerk.handleRedirectCallback(firstParams);
+      const second = isomorphicClerk.handleRedirectCallback(secondParams);
+
+      (isomorphicClerk as any).replayInterceptedInvocations(createClerkJS(delegate));
+
+      await expect(first).resolves.toBe('done');
+      await expect(second).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(1);
+      expect(delegate).toHaveBeenCalledWith(firstParams);
+    });
+
+    it('makes one clerk-js call for a call made while clerk-js is still handling an earlier one', async () => {
+      let finish!: (value: unknown) => void;
+      const delegate = vi.fn().mockReturnValue(new Promise(resolve => (finish = resolve)));
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = createClerkJS(delegate);
+
+      const first = isomorphicClerk.handleRedirectCallback(firstParams);
+      await vi.advanceTimersByTimeAsync(0);
+      const second = isomorphicClerk.handleRedirectCallback(secondParams);
+      await vi.advanceTimersByTimeAsync(0);
+
+      finish('done');
+
+      await expect(first).resolves.toBe('done');
+      await expect(second).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(1);
+      expect(delegate).toHaveBeenCalledWith(firstParams);
+    });
+
+    it('makes a new clerk-js call once the earlier one has finished', async () => {
+      const delegate = vi.fn().mockResolvedValue('done');
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = createClerkJS(delegate);
+
+      await expect(isomorphicClerk.handleRedirectCallback(firstParams)).resolves.toBe('done');
+      await expect(isomorphicClerk.handleRedirectCallback(secondParams)).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(2);
+      expect(delegate).toHaveBeenLastCalledWith(secondParams);
+    });
+
+    it('makes a new clerk-js call once the earlier one has failed', async () => {
+      const error = new Error('callback failed');
+      const delegate = vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce('done');
+      const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      (isomorphicClerk as any).clerkjs = createClerkJS(delegate);
+
+      await expect(isomorphicClerk.handleRedirectCallback(firstParams)).rejects.toBe(error);
+      await expect(isomorphicClerk.handleRedirectCallback(secondParams)).resolves.toBe('done');
+      expect(delegate).toHaveBeenCalledTimes(2);
+      expect(delegate).toHaveBeenLastCalledWith(secondParams);
+    });
+  });
+
   describe('a headless Clerk instance whose load failed', () => {
     function createFailingHeadlessClerk({ finishesBeforeLoadRejects = false, throwingListener = false } = {}) {
       const eventBus = createClerkEventBus();

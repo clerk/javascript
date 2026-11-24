@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { docHeadings, docSections } from './doc-sections.ts';
+import { docSections, docTabs, overviewHeadings, overviewSections } from './doc-sections.ts';
 
 const button = {
   name: 'Button',
@@ -19,17 +19,22 @@ const button = {
 void test('lists the sections a component doc has, in page order', () => {
   assert.deepEqual(
     docSections(button).map(section => section.id),
-    ['use-for', 'practices', 'api', 'examples', 'related'],
+    ['usage', 'api', 'best-practices', 'examples', 'related'],
   );
 });
 
-void test('heads a component doc with its sections and one entry per part', () => {
-  assert.deepEqual(docHeadings(button), [
-    { depth: 2, slug: 'use-for', text: 'Use for' },
-    { depth: 2, slug: 'practices', text: 'Practices' },
-    { depth: 2, slug: 'api', text: 'API reference' },
-    { depth: 3, slug: 'part-button', text: 'Button' },
-    { depth: 3, slug: 'part-button-icon', text: 'Button.Icon' },
+void test('shows parts as a summary on the overview, without their props', () => {
+  assert.deepEqual(
+    overviewSections(button).map(section => section.id),
+    ['usage', 'parts', 'best-practices', 'examples', 'related'],
+  );
+});
+
+void test('heads the overview with one entry per section', () => {
+  assert.deepEqual(overviewHeadings(button), [
+    { depth: 2, slug: 'usage', text: 'Usage' },
+    { depth: 2, slug: 'parts', text: 'Parts' },
+    { depth: 2, slug: 'best-practices', text: 'Best practices' },
     { depth: 2, slug: 'examples', text: 'Examples' },
     { depth: 2, slug: 'related', text: 'Related' },
   ]);
@@ -44,7 +49,7 @@ void test('lists the options and returns of a hook doc', () => {
       options: { initial: { type: 'object', doc: 'Initial values.' } },
       returns: { values: { type: 'object', doc: 'The values.' } },
     }).map(section => section.id),
-    ['use-for', 'options', 'returns'],
+    ['usage', 'options', 'returns'],
   );
 });
 
@@ -60,6 +65,22 @@ void test('leaves out empty optional sections', () => {
       examples: [],
       related: [],
     }).map(section => section.id),
-    ['use-for'],
+    ['usage'],
   );
+});
+
+void test('gives a doc with a playground a properties tab for the part it controls', () => {
+  const tabs = docTabs({ ...button, playground: { part: 'Button', defaults: { children: 'Save' } } });
+  assert.deepEqual(tabs && { part: tabs.part.name, defaults: tabs.defaults }, {
+    part: 'Button',
+    defaults: { children: 'Save' },
+  });
+});
+
+void test('gives no properties tab to a playground naming a part the doc lacks', () => {
+  assert.equal(docTabs({ ...button, playground: { part: 'Button.Missing' } }), undefined);
+});
+
+void test('keeps a doc without a playground on one page', () => {
+  assert.equal(docTabs(button), undefined);
 });

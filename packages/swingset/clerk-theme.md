@@ -1,6 +1,6 @@
 # Clerk theme
 
-The Clerk theme (`src/app/clerk-theme.css`, chosen in the header "Theme" dropdown, Clerk by default) restyles Mosaic components to match the Dashboard's design system (Ceramic) without touching `@clerk/mosaic`. It applies under `html[data-swingset-theme='clerk']`; with Default selected, nothing applies.
+The Clerk theme (`src/app/clerk-theme.css`, chosen in the header "Theme" dropdown, off by default) restyles Mosaic components to match the Dashboard's design system (Ceramic) without touching `@clerk/mosaic`. It applies under `html[data-swingset-theme='clerk']`; with Default selected, nothing applies.
 
 ## How the theme is built
 

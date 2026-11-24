@@ -12,6 +12,7 @@ import { membersTableTabMessages } from '../features/organization-profile/organi
 import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.messages';
 import { requestsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.messages';
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
+import { organizationProfileSecurityPanelMessages } from '../features/organization-profile/organization-profile-security-panel/organization-profile-security-panel.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { signInMessages } from '../features/sign-in/sign-in.messages';
@@ -80,6 +81,7 @@ export const mosaicMessages = {
       invite: organizationProfileInviteMembersMessages,
     },
     danger: organizationProfileDangerSectionMessages,
+    security: organizationProfileSecurityPanelMessages,
   },
   inviteMembersButton: inviteMembersButtonMessages,
   apiKeys: apiKeysTableMessages,

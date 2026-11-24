@@ -36,6 +36,6 @@ export interface CustomProfilePage {
   /** Where the page lives, relative to the profile root. Absolute URLs are rejected. */
   path: string;
   icon?: ReactNode;
-  /** Rendered as the page itself. */
+  /** Rendered as the page, below a `Panel.Title` of `label`, so don't start it with one. */
   content: ReactNode;
 }

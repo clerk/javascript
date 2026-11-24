@@ -25,4 +25,17 @@ export interface ProfileContextValue {
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
-export const ContentPanelContext = React.createContext(false);
+export interface ContentPanelContextValue {
+  active: boolean;
+  renderTitle: (title: React.ReactNode, claim: boolean) => React.ReactNode;
+}
+
+export const ContentPanelContext = React.createContext<ContentPanelContextValue | null>(null);
+
+export interface SubPagesContextValue {
+  label: string;
+  subPage: string | null;
+  onSubPageChange: (subPage: string | null) => void;
+}
+
+export const SubPagesContext = React.createContext<SubPagesContextValue | null>(null);

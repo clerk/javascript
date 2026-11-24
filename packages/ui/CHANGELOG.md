@@ -1,5 +1,31 @@
 # @clerk/ui
 
+## 1.44.4
+
+### Patch Changes
+
+- Fix `<SignIn />` not sending a verification code when switching to a second phone number or email address after a code was already sent to another one. ([#10739](https://github.com/clerk/javascript/pull/10739)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 1.44.3
+
+### Patch Changes
+
+- Move the rules that decide which fields the `<SignUp />` form shows and requires, and the parser for blocked-request errors, into `@clerk/shared` so `@clerk/mosaic` can use them too. No behavior change. ([#10868](https://github.com/clerk/javascript/pull/10868)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+  - @clerk/localizations@4.26.3
+
+## 1.44.2
+
+### Patch Changes
+
+- Localize the screen reader label for the list of accounts in `<OrganizationSwitcher />` with the new `organizationSwitcher.membershipListLabel` and `organizationSwitcher.accountListLabel` keys. ([#10923](https://github.com/clerk/javascript/pull/10923)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+  - @clerk/localizations@4.26.2
+
 ## 1.44.1
 
 ### Patch Changes

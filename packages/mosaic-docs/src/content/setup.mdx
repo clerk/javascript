@@ -1,6 +1,6 @@
 # Setup
 
-Install Mosaic, import its stylesheet, and give your app root its own stacking context.
+Install Mosaic, import its stylesheet, set a color scheme, and give your app root its own stacking context.
 
 Mosaic is in active development. Its components and primitives can have breaking changes in minor releases, so pin an exact version.
 
@@ -19,6 +19,20 @@ Mosaic components carry no runtime style injection. The stylesheet holds every c
 ```css
 @import '@clerk/mosaic/styles.css';
 ```
+
+## Set a color scheme
+
+Mosaic’s colors use [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark), which resolves against the `color-scheme` in scope. Mosaic does not set one, so your app must:
+
+```css
+:root {
+  color-scheme: light dark;
+}
+```
+
+Use `light dark` to follow the visitor’s system setting, or `light` or `dark` to pin one. You can also set it on any element to scope a scheme to part of the page.
+
+Without a `color-scheme`, components can render with transparent backgrounds or missing colors. This is most visible when your build runs the stylesheet through Lightning CSS, as Tailwind CSS v4 does. For browser targets without native `light-dark()` support, Lightning CSS rewrites `light-dark()` into a fallback that only works once a `color-scheme` is declared, so each color resolves to two values at once (for example `#171717 #fafafa`), which is invalid and drops the property.
 
 ## Isolate your app root
 

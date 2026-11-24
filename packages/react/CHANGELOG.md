@@ -1,5 +1,29 @@
 # Change Log
 
+## 6.19.5
+
+### Patch Changes
+
+- Fix `<HandleSSOCallback />` hanging when a sign-up started with `signUp.sso()` returns needing another step, such as a required legal acceptance, a missing username or an unverified email address. The component now calls `navigateToSignUp()` so your sign-up page can resume that attempt. ([#10939](https://github.com/clerk/javascript/pull/10939)) by [@mwickett](https://github.com/mwickett)
+
+## 6.19.4
+
+### Patch Changes
+
+- `handleRedirectCallback()` and `handleGoogleOneTapCallback()` from `useClerk()` now match the Clerk JS methods they wrap. The returned promise settles only after Clerk finishes handling the callback, including when you call them before Clerk has loaded. Both methods now pass the optional `customNavigate` argument through to Clerk. They also reject when the callback fails instead of silently swallowing the error, so add error handling (`try`/`catch` around `await`, or `.catch()`) where you call them. A `handleRedirectCallback()` call made while an earlier one is still running returns the result of the earlier call instead of starting a second OAuth transfer, and its own arguments are ignored. `<AuthenticateWithRedirectCallback />` behaves as before. ([#10917](https://github.com/clerk/javascript/pull/10917)) by [@tmilewski](https://github.com/tmilewski)
+
+- Move the code behind `useSignIn()`, `useSignUp()` and `useWaitlist()` that listens for sign-in, sign-up and waitlist updates into `@clerk/shared`, so `@clerk/mosaic` can use it too. No behavior change. ([#10867](https://github.com/clerk/javascript/pull/10867)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+
+## 6.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+
 ## 6.19.2
 
 ### Patch Changes

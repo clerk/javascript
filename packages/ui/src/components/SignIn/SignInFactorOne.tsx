@@ -83,8 +83,7 @@ function SignInFactorOneInternal(): JSX.Element {
   const passwordResetRequiredHandedOver =
     typeof card.rawError === 'object' && card.rawError.code === ERROR_CODES.PASSWORD_RESET_REQUIRED;
 
-  const lastPreparedFactorKeyRef = React.useRef('');
-  const [{ currentFactor }, setFactor] = React.useState<{
+  const [{ currentFactor, prevCurrentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => {
@@ -105,6 +104,10 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: undefined,
     };
   });
+
+  const lastPreparedFactorKeyRef = React.useRef(
+    firstFactorVerification.status === 'unverified' ? factorKey(currentFactor) : '',
+  );
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
@@ -242,6 +245,7 @@ function SignInFactorOneInternal(): JSX.Element {
       return (
         <SignInFactorOneEmailCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          isInitialFactor={!prevCurrentFactor}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -263,6 +267,7 @@ function SignInFactorOneInternal(): JSX.Element {
         return (
           <SignInFactorOnePhoneCodeCard
             factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+            isInitialFactor={!prevCurrentFactor}
             onFactorPrepare={handleFactorPrepare}
             factor={currentFactor}
             onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -283,6 +288,7 @@ function SignInFactorOneInternal(): JSX.Element {
       return (
         <SignInFactorOneForgotPasswordCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          isInitialFactor={!prevCurrentFactor}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -301,6 +307,7 @@ function SignInFactorOneInternal(): JSX.Element {
       return (
         <SignInFactorOneForgotPasswordCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          isInitialFactor={!prevCurrentFactor}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}

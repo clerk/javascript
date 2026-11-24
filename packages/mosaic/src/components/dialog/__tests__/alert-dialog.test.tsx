@@ -23,7 +23,7 @@ function Confirm({ onOpenChange }: Pick<DialogRootProps, 'onOpenChange'> = {}) {
       onOpenChange={onOpenChange}
     >
       <Dialog.Popup>
-        <Card.Root elevation='overlay'>
+        <Card.Root>
           <Card.Header>
             <Card.Title>Discard changes?</Card.Title>
             <Card.Description>This address has not been saved.</Card.Description>
@@ -53,7 +53,7 @@ describe('role="alertdialog"', () => {
         role='alertdialog'
       >
         <Dialog.Popup role='dialog'>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Discard changes?</Card.Title>
               <Card.Description>This address has not been saved.</Card.Description>
@@ -94,7 +94,7 @@ describe('role="alertdialog"', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Add email address</Card.Title>
             </Card.Header>
@@ -112,7 +112,7 @@ describe('role="alertdialog"', () => {
       <Dialog.Root role='alertdialog'>
         <Dialog.Trigger>Delete</Dialog.Trigger>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Delete this key?</Card.Title>
               <Card.Description>Applications using it stop working.</Card.Description>
@@ -172,7 +172,7 @@ describe('focus', () => {
             onOpenChange={setConfirmOpen}
           >
             <Dialog.Popup finalFocus={inputRef}>
-              <Card.Root elevation='overlay'>
+              <Card.Root>
                 <Card.Header>
                   <Card.Title>Discard changes?</Card.Title>
                   <Card.Description>This address has not been saved.</Card.Description>
@@ -231,7 +231,7 @@ describe('dismissal', () => {
           }}
         >
           <Dialog.Popup>
-            <Card.Root elevation='overlay'>
+            <Card.Root>
               <Card.Header>
                 <Card.Title>Discard changes?</Card.Title>
                 <Card.Description>This address has not been saved.</Card.Description>
@@ -262,7 +262,7 @@ describe('dev warnings', () => {
         role='alertdialog'
       >
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Discard changes?</Card.Title>
             </Card.Header>
@@ -282,7 +282,7 @@ describe('dev warnings', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Notifications</Card.Title>
             </Card.Header>
@@ -306,7 +306,7 @@ describe('dev warnings', () => {
         role='alertdialog'
       >
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Description>This address has not been saved.</Card.Description>
             </Card.Header>
@@ -339,7 +339,7 @@ describe('stacked on another dialog', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Add email address</Card.Title>
             </Card.Header>
@@ -347,7 +347,7 @@ describe('stacked on another dialog', () => {
           <Dialog.Root role='alertdialog'>
             <Dialog.Trigger>Discard</Dialog.Trigger>
             <Dialog.Popup>
-              <Card.Root elevation='overlay'>
+              <Card.Root>
                 <Card.Header>
                   <Card.Title>Discard changes?</Card.Title>
                   <Card.Description>This address has not been saved.</Card.Description>
@@ -378,7 +378,7 @@ describe('showCloseButton', () => {
         showCloseButton={showCloseButton}
       >
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Verify it is you</Card.Title>
               <Card.Description>Enter the code sent to your email.</Card.Description>
@@ -416,7 +416,7 @@ describe('showCloseButton', () => {
         showCloseButton={false}
       >
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Add email address</Card.Title>
             </Card.Header>
@@ -438,7 +438,7 @@ describe('showCloseButton', () => {
       >
         <Dialog.Popup>
           <Dialog.CloseButton />
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Title>Verify it is you</Card.Title>
             <Card.Description>Enter the code sent to your email.</Card.Description>
           </Card.Root>

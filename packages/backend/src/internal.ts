@@ -28,6 +28,7 @@ export type {
   UnauthenticatedMachineObject,
 } from './tokens/authObjects';
 export {
+  createDebug,
   makeAuthObjectSerializable,
   signedOutAuthObject,
   signedInAuthObject,

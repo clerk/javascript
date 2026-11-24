@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import jwksJson from '../../fixtures/jwks.json';
 import userJson from '../../fixtures/user.json';
@@ -191,6 +191,36 @@ describe('api.client', () => {
     await expect(apiClient.users.getUserList({ query: 'john', limit: 1 })).rejects.toMatchObject({ status: 500 });
   });
 
+  it('executes 1 backend API request for users.getUserListWithoutCount()', async () => {
+    let countRequests = 0;
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('query')).toBe('john');
+          expect(url.searchParams.get('limit')).toBe('1');
+          expect(url.searchParams.get('offset')).toBe('2');
+          return HttpResponse.json([userJson]);
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, () => {
+        countRequests++;
+        return HttpResponse.json({ object: 'total_count', total_count: 2 });
+      }),
+    );
+
+    // The page is full, so getUserList() would have to wait for the count here.
+    const response = await apiClient.users.getUserListWithoutCount({
+      query: 'john',
+      offset: 2,
+      limit: 1,
+    });
+
+    expect(response).toEqual({ data: [expect.objectContaining({ id: 'user_cafebabe', firstName: 'John' })] });
+    expect(countRequests).toBe(0);
+  });
+
   it('sends startingAfter only to the users list request', async () => {
     server.use(
       http.get(
@@ -220,6 +250,159 @@ describe('api.client', () => {
 
     expect(data[0].id).toBe('user_cafebabe');
     expect(totalCount).toBe(2);
+  });
+
+  it('executes 1 backend API request for users.searchUsers()', async () => {
+    const countHandler = vi.fn(() => HttpResponse.json({ object: 'total_count', total_count: 2 }));
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('starting_after')).toBe('cursor_previous');
+          expect(url.searchParams.get('remaining_count')).toBe('1000');
+          expect(url.searchParams.get('order_by')).toBe('first_name');
+          expect(url.searchParams.getAll('metadata').map(filter => JSON.parse(filter))).toEqual([
+            { scope: 'public', key: 'plan', match: 'equals', value: 'pro' },
+            { scope: 'private', key: 'trial', match: 'exists', negate: true },
+          ]);
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: {
+              starting_after: 'cursor_next',
+              ending_before: 'cursor_before',
+              has_next_page: true,
+              remaining_count_at_least: 1000,
+            },
+          });
+        }),
+      ),
+      http.get(`https://api.clerk.test/v1/users/count`, validateHeaders(countHandler)),
+    );
+
+    const { data, cursor } = await apiClient.users.searchUsers({
+      startingAfter: 'cursor_previous',
+      remainingCount: 1000,
+      orderBy: 'first_name',
+      metadata: [
+        { scope: 'public', key: 'plan', match: 'equals', value: 'pro' },
+        { scope: 'private', key: 'trial', match: 'exists', negate: true },
+      ],
+    });
+
+    expect(data.length).toBe(1);
+    expect(data[0].id).toBe('user_cafebabe');
+    expect(data[0].firstName).toBe('John');
+    expect(cursor).toEqual({
+      startingAfter: 'cursor_next',
+      endingBefore: 'cursor_before',
+      hasNextPage: true,
+      remainingCountAtLeast: 1000,
+    });
+    expect(countHandler).not.toHaveBeenCalled();
+  });
+
+  it('sends endingBefore as ending_before for users.searchUsers()', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('ending_before')).toBe('cursor_before');
+          expect(url.searchParams.has('starting_after')).toBe(false);
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: { starting_after: 'cursor_next', ending_before: null, has_next_page: true },
+          });
+        }),
+      ),
+    );
+
+    const { cursor } = await apiClient.users.searchUsers({ endingBefore: 'cursor_before' });
+
+    expect(cursor.endingBefore).toBeNull();
+    expect(cursor.hasNextPage).toBe(true);
+  });
+
+  it('returns the exact remaining count and a null cursor on the last page of users.searchUsers()', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('remaining_count')).toBe('exact');
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: { starting_after: null, ending_before: null, has_next_page: false, remaining_count_exact: 1 },
+          });
+        }),
+      ),
+    );
+
+    const { data, cursor } = await apiClient.users.searchUsers({ remainingCount: 'exact' });
+
+    expect(data.length).toBe(1);
+    expect(cursor).toEqual({ startingAfter: null, endingBefore: null, hasNextPage: false, remainingCountExact: 1 });
+  });
+
+  it('sends the filters only users.searchUsers() takes as snake_case query params', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          const url = new URL(request.url);
+          expect(url.searchParams.get('pagination')).toBe('cursor');
+          expect(url.searchParams.get('provider')).toBe('oauth_google');
+          expect(url.searchParams.getAll('provider_user_id')).toEqual(['123', '456']);
+          expect(url.searchParams.get('email_address_query')).toBe('ello');
+          expect(url.searchParams.get('phone_number_query')).toBe('555');
+          expect(url.searchParams.get('username_query')).toBe('cool');
+          expect(url.searchParams.get('name_query')).toBe('john');
+          expect(url.searchParams.get('banned')).toBe('false');
+          expect(url.searchParams.get('deprovisioned')).toBe('true');
+          return HttpResponse.json({
+            data: [userJson],
+            cursor: { starting_after: null, ending_before: null, has_next_page: false },
+          });
+        }),
+      ),
+    );
+
+    const { data } = await apiClient.users.searchUsers({
+      provider: 'oauth_google',
+      providerUserId: ['123', '456'],
+      emailAddressQuery: 'ello',
+      phoneNumberQuery: '555',
+      usernameQuery: 'cool',
+      nameQuery: 'john',
+      banned: false,
+      deprovisioned: true,
+    });
+
+    expect(data.length).toBe(1);
+  });
+
+  it('sends pagination=cursor for users.searchUsers() called without params', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users`,
+        validateHeaders(({ request }) => {
+          expect([...new URL(request.url).searchParams.entries()]).toEqual([['pagination', 'cursor']]);
+          return HttpResponse.json({
+            data: [],
+            cursor: { starting_after: null, ending_before: null, has_next_page: false },
+          });
+        }),
+      ),
+    );
+
+    const { data, cursor } = await apiClient.users.searchUsers();
+
+    expect(data).toEqual([]);
+    expect(cursor.hasNextPage).toBe(false);
   });
 
   it('executes users.getUserList() with last_sign_in_at filters', async () => {

@@ -4,6 +4,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useFlowStepActive } from '../../primitives/flow/flow-step-context';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -34,24 +35,27 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
   return <PanelTitleContext.Provider value={titleRef}>{element}</PanelTitleContext.Provider>;
 });
 
-// Inside a profile page, the profile renders the page title, and the ref reaches that instead.
+// Inside a profile page, the title takes the page title's id, ref and compact menu trigger, but only
+// while its page is open and its flow step is not leaving, so one title at a time owns them.
 const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTitle(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const inProfilePage = React.useContext(ContentPanelContext);
+  const page = React.useContext(ContentPanelContext);
   const profile = React.useContext(ProfileContext);
+  const stepActive = useFlowStepActive();
   const panelTitleRef = React.useContext(PanelTitleContext);
-  const titleRef = useMergeRefs([ref, panelTitleRef]);
   const level = useHeadingLevel();
-  const pageTitleRef = inProfilePage ? profile?.pageTitleRef : undefined;
+  const claimed = page?.active === true && stepActive ? profile : null;
+  const titleRef = useMergeRefs([ref, panelTitleRef]);
+  const pageTitleRef = claimed?.pageTitleRef;
   // eslint-disable-next-line typescript/consistent-type-assertions -- The title ref is present when the imperative handle is attached.
   React.useImperativeHandle(pageTitleRef ? titleRef : null, () => pageTitleRef?.current as HTMLDivElement);
-  return useRender({
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref: [ref, panelTitleRef],
-    enabled: !inProfilePage,
+    enabled: !page,
     props: {
       ...mergeStyleProps(themeProps('panel-title'), stylex.props(reset.base, styles.title, xstyle), {
         tabIndex: -1,
@@ -67,6 +71,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
       ),
     },
   });
+  return page ? page.renderTitle(children, claimed !== null) : element;
 });
 
 const Sections = React.forwardRef<HTMLDivElement, PanelSectionsProps>(function PanelSections(

@@ -2,6 +2,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
 import { keysOf } from './object';
+import { unwrapLazyElement } from './unwrap-lazy-element';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -241,9 +242,10 @@ export function useRender<
   Tag extends keyof React.JSX.IntrinsicElements,
   State extends Record<string, unknown> = Record<string, never>,
 >(params: UseRenderParamsBase<Tag, State> & { enabled?: boolean }): React.ReactElement | null {
-  const { defaultTagName, render, ref, enabled = true, state, stateAttributesMapping, props } = params;
+  const { defaultTagName, ref, enabled = true, state, stateAttributesMapping, props } = params;
+  const render = enabled ? unwrapLazyElement(params.render) : params.render;
 
-  const normalizedRefs = ref == null ? [] : Array.isArray(ref) ? ref : [ref];
+  const normalizedRefs = Array.isArray(ref) ? ref : [ref];
   const elementRef = React.isValidElement(render) ? getReactElementRef(render) : undefined;
   const mergedRef = useMergeRefs([...normalizedRefs, elementRef]);
 

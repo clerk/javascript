@@ -1,6 +1,5 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { ButtonProps } from './button';
-import type { SubmitButtonProps } from './submit-button';
 
 export default {
   name: 'Button',
@@ -32,6 +31,7 @@ export default {
       description: 'Renders a `button` and forwards its ref. Defaults can come from `ButtonContext`.',
       slot: 'cl-button',
       props: {
+        children: { type: 'ReactNode', doc: 'The label.' },
         color: {
           type: "'primary' | 'neutral' | 'negative'",
           doc: '`primary`, `neutral` or `negative`.',
@@ -61,28 +61,8 @@ export default {
         },
       },
     },
-    SubmitButton: {
-      description:
-        "A `Button` for async actions. While `isPending` it goes inert and shows a spinner, keeping its width. Takes every `Button` prop; `type` defaults to `submit`, so pass `type='button'` outside a form.",
-      slot: 'cl-button',
-      props: {
-        isPending: {
-          type: 'boolean',
-          doc: 'Makes the button inert and busy. After a short delay it fades the label and centers a spinner over it.',
-          default: 'false',
-        },
-        pendingLabel: {
-          type: 'string',
-          doc: 'Accessible name for the spinner. Pass a localized string.',
-          default: "'pending'",
-        },
-        spinDelay: {
-          type: 'SpinDelayOptions',
-          doc: '`delay` before the spinner shows (default `150`) and `minDuration` it stays (default `400`).',
-        },
-      },
-    },
   },
+  playground: { part: 'Button', defaults: { children: 'Save changes' } },
   examples: [
     {
       title: 'An action',
@@ -90,20 +70,6 @@ export default {
 <Button variant='outline' onClick={onCancel}>Cancel</Button>
 `,
     },
-    {
-      title: 'A submit',
-      code: `
-<SubmitButton isPending={form.isSubmitting}>Save</SubmitButton>
-`,
-    },
-    {
-      title: 'An async action outside a form',
-      code: `
-<SubmitButton type='button' onClick={onRevoke} isPending={isRevoking}>
-  Revoke
-</SubmitButton>
-`,
-    },
   ],
-  related: ['ProviderButton', 'useForm', 'usePendingAction'],
-} satisfies ComponentDoc<{ Button: ButtonProps; SubmitButton: SubmitButtonProps }>;
+  related: ['SubmitButton', 'ProviderButton', 'useForm', 'usePendingAction'],
+} satisfies ComponentDoc<{ Button: ButtonProps }>;

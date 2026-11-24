@@ -1,7 +1,8 @@
-import type { Attribute } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { determineActiveFields, determineRequiredIdentifier, getInitialActiveIdentifier } from '../signUpFormHelpers';
+import type { Attribute } from '@/types';
+
+import { determineActiveFields, determineRequiredIdentifier, getInitialActiveIdentifier } from '../signUpFormFields';
 
 const createAttributeData = (name: Attribute, enabled: boolean, required: boolean, usedForFirstFactor: boolean) => ({
   name,

@@ -11,6 +11,7 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
+import { segmentedControlScope } from './segmented-control.markers.stylex';
 
 // Literals: StyleX cannot import them. Must match `tabs.styles.ts`.
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
@@ -47,6 +48,11 @@ export const styles = stylex.create({
     display: 'inline-flex',
     isolation: 'isolate',
     position: 'relative',
+    width: 'fit-content',
+  },
+  fullWidth: {
+    display: 'flex',
+    width: '100%',
   },
   indicator: {
     ...surface,
@@ -100,6 +106,8 @@ export const styles = stylex.create({
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'inline-flex',
+    flexBasis: { default: null, [stylex.when.ancestor('[data-full-width]', segmentedControlScope)]: 0 },
+    flexGrow: { default: null, [stylex.when.ancestor('[data-full-width]', segmentedControlScope)]: 1 },
     flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],

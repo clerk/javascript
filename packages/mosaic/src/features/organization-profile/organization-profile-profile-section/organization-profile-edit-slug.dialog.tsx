@@ -44,10 +44,7 @@ export function OrganizationProfileEditSlugDialog({
         variant='card'
         initialFocus={inputRef}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Card.Header>
             <Card.Title>{m.slug.dialogTitle}</Card.Title>
             <Card.Description>{m.slug.dialogDescription}</Card.Description>

@@ -4,7 +4,7 @@ How sign-in and sign-up decide which screen to show, from the step FAPI says com
 
 ## The model
 
-A step is a step of the auth flow, not a screen. FAPI owns the step, the order of steps, and whether a code is already sent. Mosaic owns the routes, the layout and copy, and when to send a code.
+FAPI tracks which requirements are outstanding and whether a code has been sent. When several sign-up requirements are outstanding, the shared client picks which one comes next. Mosaic maps the step to a screen and owns the routes, layout, copy, and when to send a code.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
@@ -64,9 +64,9 @@ Sign-up:
 - `start` → `start`
 - `protect` → `protectCheck`
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
-- `fields` (`fields`) → `continue`
 - `verify_email` (`target`, `sent`) → `verifyEmail`
 - `verify_phone` (`target`, `sent`) → `verifyPhone`
+- `fields` (`fields`) → `continue`
 
 `identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
 
@@ -92,6 +92,6 @@ The controller calls these model callbacks on `start`, then `next(step)`.
 
 `getSignInNextStep` and `getSignUpNextStep` (`shared/src/internal/clerk-js/nextStep.ts`) compute the step from today's fields, and return FAPI's `nextStep` once it is sent. They can't compute three things, so FAPI must send them:
 
-- The sign-up order.
+- The sign-up order. Until FAPI sends it, `getSignUpNextStep` follows `ui`'s order (`shared/src/internal/clerk-js/completeSignUpFlow.ts`): verify the email, then the phone, then collect the missing fields.
 - `target` for sign-in. Nothing says which email or phone a code went to.
 - `sent` per target for sign-in. `first_factor_verification` has no identification, so after a code to one email, a second email with the same strategy also reads as sent.

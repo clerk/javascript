@@ -155,6 +155,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         return rejected;
       }
       const query = url.searchParams.get('query')?.toLowerCase();
+      const roles = url.searchParams.getAll('role');
       if (query === '') {
         return HttpResponse.json(
           { errors: [{ code: 'form_param_missing', message: 'Enter query.', meta: { param_name: 'query' } }] },
@@ -163,6 +164,9 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       }
       const matching = state.memberships.filter(member => {
         if (member.organization.id !== params.organizationId) {
+          return false;
+        }
+        if (roles.length > 0 && !roles.includes(member.role)) {
           return false;
         }
         if (!query) {

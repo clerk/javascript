@@ -12,12 +12,15 @@ function propsFor(overrides: Partial<OAuthConsentViewProps> = {}): OAuthConsentV
   return {
     messages: oauthConsentMessages,
     oauthApplicationName: 'Linear',
+    clientIdentity: null,
     identifier: 'alice@example.com',
     applicationName: 'Acme',
     scopes: [
       { scope: 'email', label: 'View your email address', description: 'alice@example.com', required: true },
       { scope: 'projects', label: 'Read your projects', description: 'Read the projects in your account.' },
     ],
+    scopeSelection: { checked: ['email', 'projects'], onCheckedChange: vi.fn() },
+    scope: 'email projects',
     hasOfflineAccess: false,
     organizations: [],
     organizationId: null,
@@ -76,13 +79,6 @@ describe('OAuthConsentView', () => {
       renderView({ pendingAction: 'allow', scopeSelection: { checked: ['projects'], onCheckedChange: vi.fn() } });
 
       expect(screen.getByRole('checkbox', { name: /Read your projects/ })).toBeDisabled();
-    });
-
-    it('lists the scopes without checkboxes when there is no selection', () => {
-      renderView();
-
-      expect(screen.queryByRole('checkbox')).toBeNull();
-      expect(screen.getByText('Read your projects')).toBeVisible();
     });
   });
 

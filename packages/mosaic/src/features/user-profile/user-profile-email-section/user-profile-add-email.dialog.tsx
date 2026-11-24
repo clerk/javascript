@@ -61,10 +61,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
         initialFocus={props.step === 'email' ? emailRef : props.step === 'verify' ? codeRef : undefined}
         finalFocus={props.finalFocus}
       >
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
+        <Card.Root renderBranding={false}>
           <Flow.Root
             value={props.step}
             state={props}

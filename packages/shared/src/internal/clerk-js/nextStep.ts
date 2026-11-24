@@ -1,20 +1,28 @@
 import type { ProtectCheckResource, SignUpField, SignUpIdentificationField, VerificationResource } from '../../types';
 
-export type NextStep =
+type SharedNextStep =
+  | { type: 'protect' }
+  | { type: 'transfer' }
+  | { type: 'complete'; createdSessionId: string | null }
+  | { type: 'unknown' };
+
+export type SignInNextStep =
+  | SharedNextStep
   | { type: 'identifier' }
   | { type: 'first_factor'; strategy: string | null; sent: boolean }
   | { type: 'second_factor'; strategy: string | null; sent: boolean }
   | { type: 'client_trust' }
-  | { type: 'new_password' }
-  | { type: 'protect' }
-  | { type: 'transfer' }
+  | { type: 'new_password' };
+
+export type SignUpNextStep =
+  | SharedNextStep
   | { type: 'start' }
   | { type: 'enterprise_sso' }
   | { type: 'fields'; fields: SignUpField[] }
   | { type: 'verify_email'; target: string | null; sent: boolean }
-  | { type: 'verify_phone'; target: string | null; sent: boolean }
-  | { type: 'complete'; createdSessionId: string | null }
-  | { type: 'unknown' };
+  | { type: 'verify_phone'; target: string | null; sent: boolean };
+
+export type NextStep = SignInNextStep | SignUpNextStep;
 
 type VerificationInput = Pick<VerificationResource, 'status' | 'strategy'>;
 
@@ -48,7 +56,7 @@ export type SignUpNextStepInput = {
  *
  * @internal
  */
-export function getSignInNextStep(signIn: SignInNextStepInput): NextStep {
+export function getSignInNextStep(signIn: SignInNextStepInput): SignInNextStep {
   if (signIn.protectCheck) {
     return { type: 'protect' };
   }
@@ -81,7 +89,7 @@ export function getSignInNextStep(signIn: SignInNextStepInput): NextStep {
  *
  * @internal
  */
-export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
+export function getSignUpNextStep(signUp: SignUpNextStepInput): SignUpNextStep {
   if (!signUp.id) {
     return { type: 'start' };
   }
@@ -100,9 +108,6 @@ export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
   if (signUp.missingFields.includes('enterprise_sso')) {
     return { type: 'enterprise_sso' };
   }
-  if (signUp.missingFields.length > 0) {
-    return { type: 'fields', fields: signUp.missingFields };
-  }
   if (signUp.unverifiedFields.includes('email_address')) {
     return {
       type: 'verify_email',
@@ -117,6 +122,11 @@ export function getSignUpNextStep(signUp: SignUpNextStepInput): NextStep {
       sent: signUp.verifications.phoneNumber.nextAction === 'needs_attempt',
     };
   }
+  if (signUp.missingFields.length > 0) {
+    return { type: 'fields', fields: signUp.missingFields };
+  }
+  // TODO: FAPI computes `MissingRequirements` in `checkStatus` but does not serialize it, so a sign-up blocked only
+  // by an unmet identifier requirement lands here. Return `fields` from `missing_requirements` once FAPI sends it.
   return { type: 'unknown' };
 }
 
