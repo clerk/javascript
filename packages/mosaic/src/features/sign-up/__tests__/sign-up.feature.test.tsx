@@ -1057,6 +1057,20 @@ describe('SignUp invitations', () => {
     await codeSent();
   });
 
+  it('replaces the form with the blocked notice when redeeming the invitation is blocked', async () => {
+    openInvitation('__clerk_ticket', 'tkt_invite');
+    await renderSignUp({
+      signUp: {
+        tickets: { tkt_invite: { emailAddress: EMAIL } },
+        blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' },
+      },
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
+    expect(screen.getByText('Contact support.')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
+  });
+
   it('clears a rejected invitation error once the user submits the start form', async () => {
     openInvitation('__clerk_ticket', 'tkt_unknown');
     const { user } = await renderSignUp();
