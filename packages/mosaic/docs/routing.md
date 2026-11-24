@@ -122,5 +122,5 @@ The swingset has a Routing section at `/routing`, `packages/swingset/src/app/(ex
 ## Tests
 
 - The contract every mode keeps is in `src/routing/__tests__/location-contract.test.tsx`, run for all four modes. Add a behaviour there when it should hold in every mode, and add a mode there before anything else.
-- To test routing in a hook, wrap it in `RouterAdapterProvider` and `VirtualStoreProvider` with an `initial` map of base to parts, and read the store with `useVirtualEntries` or `useVirtualSegment`. Both providers are needed: writes to `window.history` wait for the provider to settle.
+- To test routing in a hook, wrap it in `RoutingConfigProvider` and `VirtualStoreProvider` with an `initial` map of base to parts, and read the store with `useVirtualEntries` or `useVirtualSegment`. Both providers are needed: writes to `window.history` wait for the provider to settle.
 - Feature tests render inside `MosaicProvider` and read entries the same way. `useVirtualSegment` returns `undefined` for a base with no entry, which is how a test tells "cleared" from "empty".
