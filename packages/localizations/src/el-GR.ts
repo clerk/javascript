@@ -1659,6 +1659,11 @@ export const elGR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Ο τρέχων κωδικός πρόσβασής σας πρέπει να επαναφερθεί. Επιβεβαιώστε ότι είστε εσείς για να αποθηκεύσετε τον νέο κωδικό πρόσβασής σας.',
+      title: 'Απαιτείται επαναφορά κωδικού πρόσβασης',
+    },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
       resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
@@ -1837,6 +1842,9 @@ export const elGR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
+    },
+    passwordResetRequired: {
+      title: 'Απαιτείται επαναφορά κωδικού πρόσβασης',
     },
     passwordUntrusted: {
       title: 'Μη αξιόπιστος κωδικός πρόσβασης',
@@ -2202,6 +2210,8 @@ export const elGR: LocalizationResource = {
       requireUppercase: 'ένα κεφαλαίο γράμμα',
       sentencePrefix: 'Ο κωδικός πρόσβασής σας πρέπει να περιέχει',
     },
+    password_reset_required:
+      'Πρέπει να επαναφέρετε τον κωδικό πρόσβασής σας για να μπορέσετε να τον χρησιμοποιήσετε ξανά.',
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

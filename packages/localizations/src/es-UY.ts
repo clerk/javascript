@@ -1656,6 +1656,11 @@ export const esUY: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Tenés que restablecer tu contraseña actual. Confirmá que sos vos para guardar tu nueva contraseña.',
+      title: 'Es necesario restablecer la contraseña',
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -1833,6 +1838,9 @@ export const esUY: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Contraseña comprometida',
+    },
+    passwordResetRequired: {
+      title: 'Es necesario restablecer la contraseña',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2195,6 +2203,7 @@ export const esUY: LocalizationResource = {
       requireUppercase: 'una letra mayúscula',
       sentencePrefix: 'Tu contraseña debe contener',
     },
+    password_reset_required: 'Tenés que restablecer tu contraseña antes de poder usarla de nuevo.',
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1654,6 +1654,11 @@ export const mnMN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Таны одоогийн нууц үгийг шинэчлэх шаардлагатай. Шинэ нууц үгээ хадгалахын тулд өөрийгөө баталгаажуулна уу.',
+      title: 'Нууц үгээ шинэчлэх шаардлагатай',
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1830,6 +1835,9 @@ export const mnMN: LocalizationResource = {
     },
     passwordPwned: {
       title: undefined,
+    },
+    passwordResetRequired: {
+      title: 'Нууц үгээ шинэчлэх шаардлагатай',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2183,6 +2191,7 @@ export const mnMN: LocalizationResource = {
       requireUppercase: 'том үсэг',
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
+    password_reset_required: 'Нууц үгээ дахин ашиглахын өмнө түүнийг шинэчлэх шаардлагатай.',
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

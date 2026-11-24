@@ -1,4 +1,4 @@
-import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
+import { isPasswordCompromisedError, isPasswordPwnedError, isPasswordResetRequiredError } from '@clerk/shared/error';
 import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
@@ -17,8 +17,8 @@ import { useAfterVerification } from './use-after-verification';
 type UserVerificationFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
   /**
-   * Called when the password is rejected as breached or compromised. Without
-   * it, the error only shows on the card.
+   * Called when the password is rejected as breached, compromised, or needing
+   * a reset. Without it, the error only shows on the card.
    */
   onPasswordError?: (errorCode: PasswordErrorCode) => void;
 };
@@ -58,6 +58,12 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
           if (isPasswordCompromisedError(err)) {
             card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
             onPasswordError('compromised');
+            return;
+          }
+
+          if (isPasswordResetRequiredError(err)) {
+            card.setError(err.errors[0]);
+            onPasswordError('resetRequired');
             return;
           }
         }

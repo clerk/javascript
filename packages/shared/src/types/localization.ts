@@ -473,6 +473,9 @@ export type __internal_LocalizationResource = {
     passwordCompromised: {
       title: LocalizationValue;
     };
+    passwordResetRequired: {
+      title: LocalizationValue;
+    };
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -718,6 +721,10 @@ export type __internal_LocalizationResource = {
       subtitle__saveNewPassword: LocalizationValue;
     };
     passwordCompromised: {
+      title: LocalizationValue;
+      subtitle__saveNewPassword: LocalizationValue;
+    };
+    passwordResetRequired: {
       title: LocalizationValue;
       subtitle__saveNewPassword: LocalizationValue;
     };
@@ -2567,6 +2574,7 @@ type UnstableErrors = WithParamName<{
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;
+  password_reset_required: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
   form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;

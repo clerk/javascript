@@ -1664,6 +1664,11 @@ export const ptPT: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'A sua palavra-passe atual tem de ser reposta. Confirme a sua identidade para guardar a nova palavra-passe.',
+      title: 'Reposição da palavra-passe necessária',
+    },
     phoneCode: {
       formTitle: 'Código de verificação',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -1839,6 +1844,9 @@ export const ptPT: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Este password foi comprometido em uma violação de dados. Escolha outro por motivos de segurança.',
+    },
+    passwordResetRequired: {
+      title: 'Reposição da palavra-passe necessária',
     },
     passwordUntrusted: {
       title: 'Palavra-passe não fiável',
@@ -2206,6 +2214,7 @@ export const ptPT: LocalizationResource = {
       requireUppercase: 'uma letra maiúscula',
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
+    password_reset_required: 'Tem de repor a sua palavra-passe antes de a poder utilizar novamente.',
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

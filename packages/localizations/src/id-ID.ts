@@ -1655,6 +1655,11 @@ export const idID: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Kata sandi Anda saat ini perlu direset. Konfirmasi bahwa ini Anda untuk menyimpan kata sandi baru Anda.',
+      title: 'Reset kata sandi diperlukan',
+    },
     phoneCode: {
       formTitle: 'Kode verifikasi',
       resendButton: 'Tidak menerima kode? Kirim ulang',
@@ -1832,6 +1837,9 @@ export const idID: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Kata sandi terkompromi',
+    },
+    passwordResetRequired: {
+      title: 'Reset kata sandi diperlukan',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2191,6 +2199,7 @@ export const idID: LocalizationResource = {
       requireUppercase: 'huruf besar',
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
+    password_reset_required: 'Anda perlu mereset kata sandi sebelum dapat menggunakannya lagi.',
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

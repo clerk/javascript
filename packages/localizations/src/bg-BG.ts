@@ -1653,6 +1653,11 @@ export const bgBG: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Текущата ви парола трябва да бъде нулирана. Потвърдете, че сте вие, за да запазите новата си парола.',
+      title: 'Необходимо е нулиране на паролата',
+    },
     phoneCode: {
       formTitle: 'Enter the verification code sent to your phone number.',
       resendButton: "Didn't receive the code? Resend it.",
@@ -1828,6 +1833,9 @@ export const bgBG: LocalizationResource = {
     },
     passwordPwned: {
       title: undefined,
+    },
+    passwordResetRequired: {
+      title: 'Необходимо е нулиране на паролата',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2181,6 +2189,7 @@ export const bgBG: LocalizationResource = {
       requireUppercase: 'главна буква',
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
+    password_reset_required: 'Трябва да нулирате паролата си, преди да можете да я използвате отново.',
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1661,6 +1661,11 @@ export const hiIN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'आपके वर्तमान पासवर्ड को रीसेट करना होगा। अपना नया पासवर्ड सहेजने के लिए पुष्टि करें कि यह आप ही हैं।',
+      title: 'पासवर्ड रीसेट करना आवश्यक है',
+    },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -1837,6 +1842,9 @@ export const hiIN: LocalizationResource = {
     },
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
+    },
+    passwordResetRequired: {
+      title: 'पासवर्ड रीसेट करना आवश्यक है',
     },
     passwordUntrusted: {
       title: 'पासवर्ड अविश्वसनीय',
@@ -2207,6 +2215,7 @@ export const hiIN: LocalizationResource = {
       requireUppercase: 'एक अपरकेस अक्षर',
       sentencePrefix: 'आपके पासवर्ड में होना चाहिए',
     },
+    password_reset_required: 'इसे फिर से उपयोग करने से पहले आपको अपना पासवर्ड रीसेट करना होगा।',
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

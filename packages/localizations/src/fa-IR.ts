@@ -1661,6 +1661,11 @@ export const faIR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'رمز عبور فعلی شما باید بازنشانی شود. برای ذخیره رمز عبور جدید، تأیید کنید که خودتان هستید.',
+      title: 'بازنشانی رمز عبور الزامی است',
+    },
     phoneCode: {
       formTitle: 'کد تأیید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -1838,6 +1843,9 @@ export const faIR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
+    },
+    passwordResetRequired: {
+      title: 'بازنشانی رمز عبور الزامی است',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2192,6 +2200,7 @@ export const faIR: LocalizationResource = {
       requireUppercase: 'یک حرف بزرگ',
       sentencePrefix: 'رمز عبور شما باید حاوی',
     },
+    password_reset_required: 'قبل از اینکه بتوانید دوباره از رمز عبور خود استفاده کنید، باید آن را بازنشانی کنید.',
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

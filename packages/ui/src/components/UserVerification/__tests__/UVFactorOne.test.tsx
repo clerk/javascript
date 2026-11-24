@@ -560,6 +560,71 @@ describe('UserVerificationFactorOne', () => {
       screen.getByText('Password compromised');
     });
 
+    describe('when the password must be reset', () => {
+      const resetRequiredError = () =>
+        new ClerkAPIResponseError('Error', {
+          data: [
+            {
+              code: 'password_reset_required',
+              message: 'password reset required',
+              long_message:
+                'This account requires a password reset before sign-in can continue. Please reset your password or contact support.',
+            },
+          ],
+          status: 422,
+        });
+
+      const submitPassword = async (
+        supportedFirstFactors: unknown[],
+        resetPassword?: UserVerificationResetPassword,
+      ) => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({ username: 'clerkuser' });
+        });
+        props.setProps({ resetPassword } as any);
+        fixtures.session?.startVerification.mockResolvedValue({
+          status: 'needs_first_factor',
+          supportedFirstFactors,
+        });
+        fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
+        fixtures.session?.attemptFirstFactorVerification.mockRejectedValueOnce(resetRequiredError());
+
+        const utils = render(<UserVerificationFactorOne />, { wrapper });
+        await waitFor(() => utils.getByText('Verification required'));
+        await utils.userEvent.type(utils.getByLabelText(/^password/i), 'current-password');
+        await utils.userEvent.click(utils.getByText('Continue'));
+        return { ...utils, fixtures };
+      };
+
+      it('offers the reset and explains why', async () => {
+        await submitPassword([{ strategy: 'password' }, resetFactor]);
+
+        await screen.findByText('Reset your password');
+        screen.getByText('Password reset required');
+        screen.getByText('You need to reset your password before you can use it again.');
+      });
+
+      it('explains that the chosen password will be saved when the caller already has one', async () => {
+        await submitPassword([{ strategy: 'password' }, resetFactor], {
+          password: 'from-the-form-123',
+          signOutOfOtherSessions: false,
+        });
+
+        await screen.findByText("Your current password needs to be reset. Confirm it's you to save your new password.");
+        screen.getByText('Password reset required');
+        screen.getByText('Email code to xxx@hello.com');
+      });
+
+      it('shows the message on the password card when no reset is offered', async () => {
+        const { fixtures } = await submitPassword([{ strategy: 'password' }]);
+
+        await waitFor(() => expect(fixtures.session?.attemptFirstFactorVerification).toHaveBeenCalledOnce());
+        await screen.findByText('You need to reset your password before you can use it again.');
+        expect(screen.queryByText('Reset your password')).not.toBeInTheDocument();
+        screen.getByText('Verification required');
+      });
+    });
+
     it('shows the error on the password card when no reset is offered', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });

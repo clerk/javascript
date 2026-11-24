@@ -1667,6 +1667,11 @@ export const taIN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'உங்கள் தற்போதைய கடவுச்சொல்லை மீட்டமைக்க வேண்டும். உங்கள் புதிய கடவுச்சொல்லைச் சேமிக்க இது நீங்கள்தான் என்பதை உறுதிப்படுத்தவும்.',
+      title: 'கடவுச்சொல்லை மீட்டமைக்க வேண்டும்',
+    },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -1843,6 +1848,9 @@ export const taIN: LocalizationResource = {
     },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
+    },
+    passwordResetRequired: {
+      title: 'கடவுச்சொல்லை மீட்டமைக்க வேண்டும்',
     },
     passwordUntrusted: {
       title: 'கடவுச்சொல் நம்பத்தகாதது',
@@ -2217,6 +2225,7 @@ export const taIN: LocalizationResource = {
       requireUppercase: 'ஒரு பெரிய எழுத்து',
       sentencePrefix: 'உங்கள் கடவுச்சொல்லில் இருக்க வேண்டும்',
     },
+    password_reset_required: 'உங்கள் கடவுச்சொல்லை மீண்டும் பயன்படுத்துவதற்கு முன் அதை மீட்டமைக்க வேண்டும்.',
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

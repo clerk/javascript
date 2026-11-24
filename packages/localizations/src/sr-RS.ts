@@ -1651,6 +1651,11 @@ export const srRS: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Tvoju trenutnu lozinku je potrebno resetovati. Potvrdi svoj identitet da bi se nova lozinka sačuvala.',
+      title: 'Potrebno je resetovati lozinku',
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1827,6 +1832,9 @@ export const srRS: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Lozinka kompromitovana',
+    },
+    passwordResetRequired: {
+      title: 'Potrebno je resetovati lozinku',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2181,6 +2189,7 @@ export const srRS: LocalizationResource = {
       requireUppercase: 'veliko slovo',
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
+    password_reset_required: 'Moraš da resetuješ lozinku pre ponovnog korišćenja.',
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

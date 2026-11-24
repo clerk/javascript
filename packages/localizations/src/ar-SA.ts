@@ -1649,6 +1649,10 @@ export const arSA: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: 'يجب إعادة تعيين كلمة المرور الحالية. أكّد هويتك لحفظ كلمة المرور الجديدة.',
+      title: 'يلزم إعادة تعيين كلمة المرور',
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1824,6 +1828,9 @@ export const arSA: LocalizationResource = {
     },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordResetRequired: {
+      title: 'يلزم إعادة تعيين كلمة المرور',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2177,6 +2184,7 @@ export const arSA: LocalizationResource = {
       requireUppercase: 'حرف كبير',
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
+    password_reset_required: 'يجب عليك إعادة تعيين كلمة المرور قبل أن تتمكن من استخدامها مرة أخرى.',
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

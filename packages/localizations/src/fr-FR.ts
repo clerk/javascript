@@ -1669,6 +1669,11 @@ export const frFR: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword:
+        'Votre mot de passe actuel doit être réinitialisé. Confirmez votre identité pour enregistrer votre nouveau mot de passe.',
+      title: 'Réinitialisation du mot de passe requise',
+    },
     phoneCode: {
       formTitle: 'Entrez le code de vérification',
       resendButton: 'Renvoyer le code',
@@ -1844,6 +1849,9 @@ export const frFR: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordResetRequired: {
+      title: 'Réinitialisation du mot de passe requise',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2203,6 +2211,7 @@ export const frFR: LocalizationResource = {
       requireUppercase: 'une lettre majuscule',
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
+    password_reset_required: "Vous devez réinitialiser votre mot de passe avant de pouvoir l'utiliser à nouveau.",
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

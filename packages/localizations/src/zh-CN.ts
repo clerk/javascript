@@ -1642,6 +1642,10 @@ export const zhCN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: '您当前的密码需要重置。请确认是您本人，以保存新密码。',
+      title: '需要重置密码',
+    },
     phoneCode: {
       formTitle: undefined,
       resendButton: undefined,
@@ -1815,6 +1819,9 @@ export const zhCN: LocalizationResource = {
     },
     passwordPwned: {
       title: undefined,
+    },
+    passwordResetRequired: {
+      title: '需要重置密码',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2162,6 +2169,7 @@ export const zhCN: LocalizationResource = {
       requireUppercase: '一个大写字母',
       sentencePrefix: '您的密码必须包含',
     },
+    password_reset_required: '您需要先重置密码，然后才能再次使用。',
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

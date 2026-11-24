@@ -1661,6 +1661,10 @@ export const viVN: LocalizationResource = {
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
+    passwordResetRequired: {
+      subtitle__saveNewPassword: 'Mật khẩu hiện tại của bạn cần được đặt lại. Xác nhận đó là bạn để lưu mật khẩu mới.',
+      title: 'Cần đặt lại mật khẩu',
+    },
     phoneCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -1837,6 +1841,9 @@ export const viVN: LocalizationResource = {
     },
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
+    },
+    passwordResetRequired: {
+      title: 'Cần đặt lại mật khẩu',
     },
     passwordUntrusted: {
       title: 'Mật khẩu không đáng tin cậy',
@@ -2202,6 +2209,7 @@ export const viVN: LocalizationResource = {
       requireUppercase: 'một chữ cái viết hoa',
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
+    password_reset_required: 'Bạn cần đặt lại mật khẩu trước khi có thể sử dụng lại.',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

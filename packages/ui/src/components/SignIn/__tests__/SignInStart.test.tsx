@@ -790,7 +790,12 @@ describe('SignInStart', () => {
   });
 
   describe('Submitting form via instant password autofill', () => {
-    const ERROR_CODES = ['strategy_for_user_invalid', 'form_password_incorrect', 'form_password_pwned'];
+    const ERROR_CODES = [
+      'strategy_for_user_invalid',
+      'form_password_incorrect',
+      'form_password_pwned',
+      'password_reset_required',
+    ];
     ERROR_CODES.forEach(code => {
       it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
@@ -837,6 +842,51 @@ describe('SignInStart', () => {
             identifier: 'hello@clerk.com',
           });
         });
+      });
+    });
+
+    describe('after the identifier-only retry', () => {
+      const originalClerk = window.Clerk;
+
+      afterEach(() => {
+        window.Clerk = originalClerk;
+      });
+
+      const submitWithInstantPassword = async (code: string) => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword({ required: true });
+        });
+        fixtures.signIn.create
+          .mockRejectedValueOnce(
+            new ClerkAPIResponseError('Error', {
+              data: [{ code, long_message: '', message: '', meta: { param_name: 'password' } }],
+              status: 422,
+            }),
+          )
+          .mockReturnValueOnce(Promise.resolve({ status: 'needs_first_factor' } as SignInResource));
+        window.Clerk = {} as typeof window.Clerk;
+
+        const { userEvent, container } = render(<SignInStart />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+        fireEvent.change(container.querySelector('#password-field') as Element, {
+          target: { value: 'some-password' },
+        });
+        fireEvent.submit(container.querySelector('form') as Element);
+
+        await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one'));
+      };
+
+      it('passes a required password reset on to the next step', async () => {
+        await submitWithInstantPassword('password_reset_required');
+
+        expect(window.Clerk?.__internal_last_error).toMatchObject({ code: 'password_reset_required' });
+      });
+
+      it('passes no error on to the next step for a breached password', async () => {
+        await submitWithInstantPassword('form_password_pwned');
+
+        expect(window.Clerk?.__internal_last_error).toBeUndefined();
       });
     });
   });
