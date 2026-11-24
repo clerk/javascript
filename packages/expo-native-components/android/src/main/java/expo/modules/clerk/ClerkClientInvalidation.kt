@@ -9,19 +9,22 @@ internal data class ClerkClientFingerprint(
     val sessions: List<SessionState>,
     val activeUserId: String?,
     val activeUserUpdatedAt: Long?,
+    val activeOrganizationId: String?,
     val deviceToken: String?
 ) {
     data class SessionState(val id: String, val status: String)
 
     companion object {
         fun from(client: Client?, deviceToken: String?): ClerkClientFingerprint {
-            val activeUser = client?.sessions?.firstOrNull { it.id == client.lastActiveSessionId }?.user
+            val activeSession = client?.sessions?.firstOrNull { it.id == client.lastActiveSessionId }
+            val activeUser = activeSession?.user
             return ClerkClientFingerprint(
                 clientId = client?.id,
                 lastActiveSessionId = client?.lastActiveSessionId,
                 sessions = client?.sessions?.map { SessionState(it.id, it.status.name) }.orEmpty(),
                 activeUserId = activeUser?.id,
                 activeUserUpdatedAt = activeUser?.updatedAt,
+                activeOrganizationId = activeSession?.lastActiveOrganizationId,
                 deviceToken = deviceToken
             )
         }

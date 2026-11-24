@@ -24,6 +24,7 @@ final class ClerkClientInvalidationTests: XCTestCase {
     clientId: String? = "client_1",
     sessions: [ClerkClientFingerprint.SessionState] = [.init(id: "sess_1", status: "active")],
     userUpdatedAt: Double? = 1,
+    activeOrganizationId: String? = nil,
     deviceToken: String? = "token_1"
   ) -> ClerkClientFingerprint {
     ClerkClientFingerprint(
@@ -32,6 +33,7 @@ final class ClerkClientInvalidationTests: XCTestCase {
       sessions: sessions,
       activeUserId: sessions.isEmpty ? nil : "user_1",
       activeUserUpdatedAt: sessions.isEmpty ? nil : userUpdatedAt,
+      activeOrganizationId: activeOrganizationId,
       deviceToken: deviceToken
     )
   }
@@ -59,6 +61,7 @@ final class ClerkClientInvalidationTests: XCTestCase {
       fingerprint(sessions: [.init(id: "sess_1", status: "ended")]),
       fingerprint(sessions: []),
       fingerprint(userUpdatedAt: 2),
+      fingerprint(activeOrganizationId: "org_2"),
       fingerprint(deviceToken: "token_2"),
     ]
 
@@ -70,6 +73,22 @@ final class ClerkClientInvalidationTests: XCTestCase {
       runLoopTurn()
       XCTAssertEqual(emitCount, 1, "\(change)")
     }
+  }
+
+  func testEmitsWhenTheActiveSessionSwitchesOrganization() {
+    let client = Client.mock
+    XCTAssertEqual(client.sessions[0].id, client.lastActiveSessionId)
+    var switched = client
+    switched.sessions[0].lastActiveOrganizationId = "org_2"
+    let before = ClerkClientFingerprint(client: client, deviceToken: "token_1")
+    let after = ClerkClientFingerprint(client: switched, deviceToken: "token_1")
+    XCTAssertNotEqual(before, after)
+
+    let tracker = makeTracker()
+    tracker.reset(to: before)
+    tracker.observe(after)
+    runLoopTurn()
+    XCTAssertEqual(emitCount, 1)
   }
 
   func testCoalescesChangesWithinOneLoopTurn() {

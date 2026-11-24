@@ -105,6 +105,7 @@ function fingerprint(clerk: SyncableClerk): string {
     client?.signedInSessions.map(session => [session.id, session.status]) ?? [],
     user?.id ?? null,
     +(user?.updatedAt ?? 0),
+    clerk.session?.lastActiveOrganizationId ?? null,
   ]);
 }
 

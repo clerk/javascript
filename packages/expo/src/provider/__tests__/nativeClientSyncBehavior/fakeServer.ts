@@ -6,6 +6,7 @@ export type FakeServerSessionJSON = {
   profileVersion: number;
   /** Bumped by session activity such as minting a session token. */
   activityVersion: number;
+  lastActiveOrganizationId: string | null;
 };
 
 export type FakeServerClientJSON = {
@@ -183,7 +184,13 @@ export class FakeClerkServer {
     const { client, token } = this.#createClient();
     const sessionIds: Record<string, string> = {};
     for (const userId of users) {
-      const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
+      const session = {
+        id: this.#nextId('sess'),
+        userId,
+        profileVersion: 0,
+        activityVersion: 0,
+        lastActiveOrganizationId: null,
+      };
       client.sessions.push(session);
       sessionIds[userId] = session.id;
     }
@@ -233,20 +240,35 @@ export class FakeClerkServer {
       const { client, token: responseToken } = auth.client
         ? { client: auth.client, token: auth.token }
         : this.#createClient();
-      const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
+      const session = {
+        id: this.#nextId('sess'),
+        userId,
+        profileVersion: 0,
+        activityVersion: 0,
+        lastActiveOrganizationId: null,
+      };
       client.sessions.push(session);
       client.lastActiveSessionId = session.id;
       return { ...this.#respond(responseToken, client), sessionId: session.id };
     });
   }
 
-  touchSession(caller: FapiCaller, token: string | null, sessionId: string): Promise<FapiResponse> {
+  touchSession(
+    caller: FapiCaller,
+    token: string | null,
+    sessionId: string,
+    organizationId?: string | null,
+  ): Promise<FapiResponse> {
     return this.#send(caller, 'POST /client/sessions/:id/touch', token, () => {
       const { client, token: clientToken } = this.#authenticate(token);
-      if (!client?.sessions.some(session => session.id === sessionId)) {
+      const session = client?.sessions.find(candidate => candidate.id === sessionId);
+      if (!client || !session) {
         return this.#respond(clientToken, client, 401);
       }
       client.lastActiveSessionId = sessionId;
+      if (organizationId !== undefined) {
+        session.lastActiveOrganizationId = organizationId;
+      }
       return this.#respond(clientToken, client);
     });
   }
