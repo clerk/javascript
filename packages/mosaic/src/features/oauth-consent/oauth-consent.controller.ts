@@ -48,8 +48,10 @@ export function useOAuthConsentController(
     },
     scope: checked.join(' ') || OFFLINE_ACCESS_SCOPE,
     organizations: sharesOrganizations ? organizations : [],
-    organizationId: sharesOrganizations ? (selectedOrganizationId ?? defaultOrganizationId) : null,
-    onOrganizationChange: setSelectedOrganizationId,
+    organizationSelection: {
+      organizationId: sharesOrganizations ? (selectedOrganizationId ?? defaultOrganizationId) : null,
+      onOrganizationIdChange: setSelectedOrganizationId,
+    },
     isRedirectUrlOpen,
     onRedirectUrlOpenChange: setIsRedirectUrlOpen,
     pendingAction,

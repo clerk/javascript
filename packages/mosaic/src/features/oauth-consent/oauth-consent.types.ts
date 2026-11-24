@@ -54,12 +54,26 @@ export interface OAuthConsentScopeSelection {
 
 export type OAuthConsentOrganizationAccess = 'all' | 'selected';
 
-export interface OAuthConsentOrganizationSelection {
-  access: OAuthConsentOrganizationAccess;
-  onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
-  selected: readonly string[];
-  onSelectedChange: (organizationIds: string[]) => void;
+interface OAuthConsentSingleOrganizationSelection {
+  multiple?: false;
+  organizationId: string | null;
+  onOrganizationIdChange: (organizationId: string) => void;
 }
+
+interface OAuthConsentMultipleOrganizationSelection {
+  multiple: true;
+  organizationIds: readonly string[];
+  onOrganizationIdsChange: (organizationIds: string[]) => void;
+}
+
+export type OAuthConsentOrganizationSelection =
+  | OAuthConsentSingleOrganizationSelection
+  | (OAuthConsentMultipleOrganizationSelection & { limit?: number; access?: never; onAccessChange?: never })
+  | (OAuthConsentMultipleOrganizationSelection & {
+      access: OAuthConsentOrganizationAccess;
+      onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
+      limit?: never;
+    });
 
 export interface OAuthConsentViewProps {
   messages: OAuthConsentMessages;
@@ -72,9 +86,7 @@ export interface OAuthConsentViewProps {
   scope: string;
   hasOfflineAccess: boolean;
   organizations: OAuthConsentOrganization[];
-  organizationId: string | null;
-  onOrganizationChange: (organizationId: string) => void;
-  organizationSelection?: OAuthConsentOrganizationSelection;
+  organizationSelection: OAuthConsentOrganizationSelection;
   redirectUrl: string;
   redirectDomain: string;
   isRedirectUrlOpen: boolean;
