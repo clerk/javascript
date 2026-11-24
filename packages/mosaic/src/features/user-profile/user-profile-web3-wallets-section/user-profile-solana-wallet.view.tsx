@@ -19,10 +19,7 @@ export function UserProfileSolanaWalletView({
   const pending = pendingWalletName !== undefined;
 
   return (
-    <Card.Root
-      elevation='overlay'
-      renderBranding={false}
-    >
+    <Card.Root renderBranding={false}>
       <Card.Header>
         <Card.Title>{m.solanaDialog.title}</Card.Title>
         <Card.Description>{m.solanaDialog.description}</Card.Description>

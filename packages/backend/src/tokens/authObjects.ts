@@ -180,10 +180,11 @@ export type AuthObject =
   | UnauthenticatedMachineObject
   | InvalidTokenAuthObject;
 
-const createDebug = (data: AuthObjectDebugData | undefined) => {
+export const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
     const res = { ...data };
     res.secretKey = (res.secretKey || '').substring(0, 7);
+    res.machineSecretKey = (res.machineSecretKey || '').substring(0, 7);
     res.jwtKey = (res.jwtKey || '').substring(0, 7);
     // Session and machine tokens are live bearer credentials, so only ever expose a
     // short, non-reconstructable prefix here, the same way secretKey/jwtKey are handled
@@ -511,9 +512,9 @@ export const getAuthObjectForAcceptedToken = ({
   // 3. single token: must match exactly, else return appropriate unauthenticated object
   if (!isTokenTypeAccepted(authObject.tokenType, acceptsToken)) {
     if (isMachineTokenType(acceptsToken)) {
-      return unauthenticatedMachineObject(acceptsToken, authObject.debug);
+      return unauthenticatedMachineObject(acceptsToken, authObject.debug?.());
     }
-    return signedOutAuthObject(authObject.debug);
+    return signedOutAuthObject(authObject.debug?.());
   }
 
   // 4. default: return as-is

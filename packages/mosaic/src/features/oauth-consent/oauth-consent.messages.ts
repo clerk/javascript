@@ -1,6 +1,10 @@
 export const oauthConsentMessages = {
   title: '{oauthApplicationName} would like to access your {applicationName} account',
   subtitle: 'Only continue if you trust {oauthApplicationName} {#nowrap}({domain}){/nowrap}.',
+  clientIdentity: {
+    dynamic: '{oauthApplicationName} registered itself, so its name and logo are not verified.',
+    metadataDocument: 'Details published by {metadataHost}.',
+  },
   scopeListTitle: 'This will allow {applicationName} access to:',
   privateMetadata: 'Your private metadata set by {applicationName}, which may include sensitive information',
   organizationLabel: 'Grant access for:',

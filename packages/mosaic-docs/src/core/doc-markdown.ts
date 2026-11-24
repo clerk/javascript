@@ -12,10 +12,12 @@ export function docToMarkdown(doc: Doc, hrefFor: (name: string) => string | unde
 
 function sectionBlocks(section: DocSection, hrefFor: (name: string) => string | undefined): string[] {
   switch (section.id) {
-    case 'use-for':
+    case 'usage':
       return [list(section.items)];
-    case 'practices':
+    case 'best-practices':
       return [list(section.practices.map(practice => `${practice.do ? 'Do' : "Don't"}: ${practice.text}`))];
+    case 'parts':
+      return [list(section.parts.map(part => `${codeSpan(part.name)}: ${part.description}`))];
     case 'api':
       return section.parts.flatMap(part => [
         `### ${part.name}`,

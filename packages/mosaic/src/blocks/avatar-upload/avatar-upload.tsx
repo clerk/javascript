@@ -254,10 +254,7 @@ function CropStep({ file, src, labels, shape, save }: CropStepProps) {
     });
 
   return (
-    <Card.Root
-      elevation='overlay'
-      renderBranding={false}
-    >
+    <Card.Root renderBranding={false}>
       <Card.Header>
         <Card.Title>{labels.title}</Card.Title>
       </Card.Header>

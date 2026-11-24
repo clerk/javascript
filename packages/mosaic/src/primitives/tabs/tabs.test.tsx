@@ -1,6 +1,6 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useState } from 'react';
+import { createRef, startTransition, useState } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -150,6 +150,39 @@ describe('Tabs', () => {
       renderTabs();
 
       await user.click(screen.getByText('Settings'));
+
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Settings content')).toBeVisible();
+    });
+
+    it('switches panels when the value changes inside a transition', async () => {
+      function Controlled() {
+        const [value, setValue] = useState('tab1');
+        return (
+          <>
+            <button
+              type='button'
+              onClick={() => startTransition(() => setValue('tab2'))}
+            >
+              Go to settings
+            </button>
+            <Tabs.Root
+              value={value}
+              onValueChange={setValue}
+            >
+              <Tabs.List>
+                <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+                <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+              <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+            </Tabs.Root>
+          </>
+        );
+      }
+      render(<Controlled />);
+
+      await act(() => screen.getByText('Go to settings').click());
 
       expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
       expect(screen.getByText('Settings content')).toBeVisible();

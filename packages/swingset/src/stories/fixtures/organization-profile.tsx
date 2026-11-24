@@ -16,6 +16,7 @@ import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
+import { SecurityPanelExample } from './organization-profile-security-panel';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
 
@@ -96,7 +97,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
         inviteDialog={inviteDialog}
       />
     ),
-    security: <OrganizationProfilePlaceholderPanelView page='security' />,
+    security: <SecurityPanelExample />,
     billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };

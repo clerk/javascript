@@ -145,6 +145,17 @@ describe('signedInAuthObject', () => {
     expect(serialized).not.toContain(rawSessionToken);
   });
 
+  it('trims the machine secret key in debug output', () => {
+    const mockAuthenticateContext = {
+      machineSecretKey: 'ak_test_machine_secret_key_value',
+    } as unknown as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'token', { sub: 'userId' } as unknown as JwtPayload);
+    const debug = authObject.debug();
+
+    expect(debug.machineSecretKey).toBe('ak_test');
+  });
+
   describe('JWT v1', () => {
     it('has() for user scope', () => {
       const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;
@@ -530,6 +541,30 @@ describe('getAuthObjectForAcceptedToken', () => {
     const result = getAuthObjectForAcceptedToken({ authObject: machineAuth, acceptsToken: 'm2m_token' });
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).tokenType).toBe('m2m_token');
     expect((result as UnauthenticatedMachineObject<'m2m_token'>).id).toBeNull();
+  });
+
+  it('keeps redacted debug data when a single machine token type does not match', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'm2m_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
+  });
+
+  it('keeps redacted debug data when a machine token is not accepted as a session token', () => {
+    const authObject = authenticatedMachineObject('api_key', 'ak_xxx', mockVerificationResults.api_key, {
+      foo: 'bar',
+      secretKey: 'sk_test_1234567890',
+    });
+
+    const debug = getAuthObjectForAcceptedToken({ authObject, acceptsToken: 'session_token' }).debug();
+
+    expect(debug.foo).toBe('bar');
+    expect(debug.secretKey).toBe('sk_test');
   });
 });
 

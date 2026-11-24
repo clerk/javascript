@@ -58,6 +58,18 @@ describe('getAuthDataFromRequest', () => {
     vi.clearAllMocks();
   });
 
+  it('redacts debug data of a machine auth object', () => {
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({ [constants.Headers.Authorization]: 'Bearer ak_xxx' }),
+      machineAuthObject: createMockMachineAuthObject({ tokenType: 'api_key', isAuthenticated: true }),
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'api_key' });
+
+    expect(auth.debug().secretKey).toBe('sk_test');
+  });
+
   it('returns invalid token auth object when token type does not match any in acceptsToken array', () => {
     const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',

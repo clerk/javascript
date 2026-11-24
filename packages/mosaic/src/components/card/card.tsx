@@ -48,7 +48,7 @@ function CardBranding() {
 }
 
 export interface CardProps extends MosaicComponentProps<'div'> {
-  /** Surface treatment applied to the card. @default 'card' */
+  /** Surface treatment applied to the card. @default 'overlay' inside a dialog, otherwise 'card' */
   elevation?: CardElevation;
   /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
   size?: CardSize;
@@ -64,19 +64,11 @@ export interface CardProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  {
-    elevation = DEFAULT_ELEVATION,
-    size = 'md',
-    align = 'start',
-    renderBranding = true,
-    render,
-    xstyle,
-    children,
-    ...rest
-  },
+  { elevation: elevationProp, size = 'md', align = 'start', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const elevation = elevationProp ?? (isInDialog(dialog) ? 'overlay' : DEFAULT_ELEVATION);
   const enclosing = React.useContext(CardContext);
   const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
   const context = React.useMemo(() => ({ elevation, align, dialog }), [elevation, align, dialog]);

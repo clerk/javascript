@@ -1,5 +1,59 @@
 # Change Log
 
+## 3.32.0
+
+### Minor Changes
+
+- Add `clerkClient.users.getUserListWithoutCount()`, which takes the same parameters as `getUserList()` and returns `{ data }` with the same page of users, without the request to count them. Use it when you don't need `totalCount`: counting can be slow for a search over many users, and `getUserList()` fails when the count does and the page is full. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+- Add `clerkClient.users.searchUsers()`, a faster way to list and filter users on large instances. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+  ```ts
+  const { data, cursor } = await clerkClient.users.searchUsers({
+    metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+  });
+
+  // Next page: the same filters, plus the cursor
+  if (cursor.startingAfter) {
+    await clerkClient.users.searchUsers({
+      metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+      startingAfter: cursor.startingAfter,
+    });
+  }
+  ```
+
+  Compared with `getUserList()`:
+  - It pages with a cursor instead of an offset, so later pages are as fast as the first.
+  - It can also filter on public, private and unsafe metadata, on an external account's provider and provider user ID, and on banned or deprovisioned users.
+  - It returns no `totalCount`. Pass `remainingCount` to get a count of the users from the current page onward.
+  - Results can lag a recent change by a short time. To read a user right after you change them, get them by ID with `getUser()`.
+
+  `getUserList()` is unchanged.
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Sign-in security** page under **Protect** (`/~/protect/sign-in-security`) in the Clerk Dashboard, where the lockout settings now live. ([#10745](https://github.com/clerk/javascript/pull/10745)) by [@brunol95](https://github.com/brunol95)
+
+## 3.31.4
+
+### Patch Changes
+
+- Fix `debug()` returning empty values on the auth object you get back when a request's token type doesn't match `acceptsToken`. It now returns the same redacted debug data as the original auth object. ([#10855](https://github.com/clerk/javascript/pull/10855)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `authenticateRequest()` now logs a warning when `acceptsToken` is set to an invalid value. A future major version will throw an error instead. ([#10856](https://github.com/clerk/javascript/pull/10856)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `auth().debug()` in route handlers not redacting its data for requests authenticated with an M2M token, OAuth token or API key. Debug data is now redacted the same way as for session tokens. ([#10872](https://github.com/clerk/javascript/pull/10872)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`2619870`](https://github.com/clerk/javascript/commit/26198706450d42a827b77282b8b1efc6bb44458f), [`d3f7ab5`](https://github.com/clerk/javascript/commit/d3f7ab5bd4254ed41fe7ad3241ec1ff12555384e), [`e9ed081`](https://github.com/clerk/javascript/commit/e9ed081fa357fc070b5a8839016e956153ad9716)]:
+  - @clerk/shared@4.48.3
+
+## 3.31.3
+
+### Patch Changes
+
+- Updated dependencies [[`8066057`](https://github.com/clerk/javascript/commit/80660572f80ff05150ce15d1d47f75122ea4561a), [`6977a93`](https://github.com/clerk/javascript/commit/6977a938f11a2618fe01923eae87a10fef64e420)]:
+  - @clerk/shared@4.48.2
+
 ## 3.31.2
 
 ### Patch Changes

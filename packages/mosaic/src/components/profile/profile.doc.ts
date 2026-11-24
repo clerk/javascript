@@ -6,6 +6,7 @@ import type {
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileRootProps,
+  ProfileSubPageProps,
   ProfileTitleProps,
 } from './profile';
 
@@ -17,18 +18,27 @@ export default {
     'a user or organization profile with several pages',
     'a settings surface with side navigation',
     'a tabbed page layout that collapses on small screens',
+    'a page that opens sub-pages with a back button',
   ],
   keywords: ['profile', 'settings', 'navigation', 'sidebar', 'tabs', 'user profile', 'organization profile'],
   practices: [
     { do: true, text: 'Render a `Profile.Title`. It names the nav, and stays visually hidden.' },
     {
       do: true,
-      text: 'Give each `Profile.NavItem` a `value` that matches a `Profile.ContentPanel`, and pass the selected page name as `pageTitle`.',
+      text: 'Give each `Profile.NavItem` a `value` that matches a `Profile.ContentPanel`, and start each page with a `Panel.Title`, its page title.',
     },
     { do: true, text: 'Pass a string as a `Profile.NavItem` child, so it names the option when the nav is a select.' },
     {
+      do: true,
+      text: 'For a page with sub-pages, give its `Profile.ContentPanel` a `label`, `subPage` and `onSubPageChange`, and wrap every view in a `Profile.SubPage`, the page itself as `value={null}`.',
+    },
+    {
+      do: true,
+      text: 'Open a sub-page from a panel through a callback prop, such as `onManagePasskeys`, so the panel also works on its own.',
+    },
+    {
       do: false,
-      text: 'Render a `Panel.Title` inside `Profile.ContentPanel` and expect it to show. `Profile.Content` renders the page title.',
+      text: 'Wrap a sub-page in your own `Flow`. `Profile.ContentPanel` moves between its sub-pages and focuses the new title.',
     },
   ],
   parts: {
@@ -76,14 +86,35 @@ export default {
       },
     },
     'Profile.Content': {
-      description: 'The scrolling page area. Renders the page title, then its children.',
+      description:
+        "The scrolling page area. Each page's `Panel.Title` is its page title, and the navigation's trigger on compact layouts.",
       slot: 'cl-profile-content',
-      props: { pageTitle: { type: 'React.ReactNode', doc: 'The selected page name, shown as the page title.' } },
     },
     'Profile.ContentPanel': {
       description: 'One page, shown while its `value` is selected. Sets the heading level one below the page title.',
       slot: 'cl-profile-content-panel',
-      props: { value: { type: 'string', doc: 'The page it shows for. Matches a `Profile.NavItem` value.' } },
+      props: {
+        value: { type: 'string', doc: 'The page it shows for. Matches a `Profile.NavItem` value.' },
+        label: {
+          type: 'string',
+          doc: "The page's name, shown on the back button of each of its sub-pages. Required with `subPage`.",
+        },
+        subPage: {
+          type: 'string | null',
+          doc: 'The open sub-page, or `null` for the page itself. Matches a `Profile.SubPage` value. Leave it out for a page without sub-pages.',
+        },
+        onSubPageChange: {
+          type: '(subPage: string | null) => void',
+          doc: 'Called with `null` when the user goes back to the page. Required with `subPage`.',
+        },
+      },
+    },
+    'Profile.SubPage': {
+      description:
+        'One view of a `Profile.ContentPanel` with sub-pages, shown while its `value` is the open `subPage`, in a `Flow.Step`. A sub-page\'s `Panel.Title` gets a small back button above it, read as "Back to {label}", and never opens the navigation on compact layouts.',
+      props: {
+        value: { type: 'string | null', doc: 'The sub-page it shows for, or `null` for the page itself.' },
+      },
     },
   },
   examples: [
@@ -96,11 +127,29 @@ export default {
     <Profile.NavItem value='account'>Account</Profile.NavItem>
     <Profile.NavItem value='security'>Security</Profile.NavItem>
   </Profile.Nav>
-  <Profile.Content pageTitle={titles[page]}>
-    <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
+  <Profile.Content>
+    <Profile.ContentPanel value='account'>
+      <Panel.Root>
+        <Panel.Title>Account</Panel.Title>
+        …
+      </Panel.Root>
+    </Profile.ContentPanel>
     <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
 </Profile.Root>
+`,
+    },
+    {
+      title: 'A page with a sub-page',
+      code: `
+<Profile.ContentPanel value='security' label='Security' subPage={subPage} onSubPageChange={setSubPage}>
+  <Profile.SubPage value={null}>
+    <SecurityPanel onManagePasskeys={() => setSubPage('passkeys')} />
+  </Profile.SubPage>
+  <Profile.SubPage value='passkeys'>
+    <PasskeysPanel />
+  </Profile.SubPage>
+</Profile.ContentPanel>
 `,
     },
   ],
@@ -113,4 +162,5 @@ export default {
   'Profile.NavItem': ProfileNavItemProps;
   'Profile.Content': ProfileContentProps;
   'Profile.ContentPanel': ProfileContentPanelProps;
+  'Profile.SubPage': ProfileSubPageProps;
 }>;

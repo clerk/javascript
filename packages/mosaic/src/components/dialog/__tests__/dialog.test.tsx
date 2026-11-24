@@ -19,7 +19,7 @@ afterEach(() => cleanup());
 // id the popup points `aria-labelledby` at. These tests need nothing else from it.
 function Surface({ title, description }: { title: string; description?: string }) {
   return (
-    <Card.Root elevation='overlay'>
+    <Card.Root>
       <Card.Header>
         <Card.Title>{title}</Card.Title>
         {description ? <Card.Description>{description}</Card.Description> : null}

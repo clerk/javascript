@@ -212,6 +212,22 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
+  it('defaults to overlay elevation inside a dialog', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root data-testid='root'>
+            <Card.Title>Title</Card.Title>
+            <Card.Footer data-testid='footer' />
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
+    expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
+  });
+
   it('reflects the size on the root', () => {
     render(
       <>
@@ -562,10 +578,7 @@ describe('Mosaic Card', () => {
         </Card.Root>
         <Dialog.Trigger>Open</Dialog.Trigger>
         <Dialog.Popup>
-          <Card.Root
-            elevation='overlay'
-            renderBranding={false}
-          >
+          <Card.Root renderBranding={false}>
             <Card.Header>
               <Card.Title>Review terms</Card.Title>
             </Card.Header>
@@ -758,7 +771,7 @@ describe('Mosaic Card', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup>
-          <Card.Root elevation='overlay'>
+          <Card.Root>
             <Card.Header>
               <Card.Title>Account</Card.Title>
             </Card.Header>
