@@ -49,7 +49,6 @@ export function SignUpDetailsStep({
   const { fields, legalConsent } = step;
   const heading = signUpDetailsHeading(step, m);
   const [first] = signUpFieldNames(fields);
-  const onlyLegalConsent = Boolean(legalConsent) && !first;
   const hasFields = Boolean(first) || Boolean(legalConsent);
   const hasForm = hasFields || step.purpose === 'continue';
   const [isChallengeShown, setIsChallengeShown] = useState(false);
@@ -80,7 +79,7 @@ export function SignUpDetailsStep({
           {...inertProps(isChallengeShown)}
         >
           <SignUpProviders
-            providers={onlyLegalConsent && step.purpose === 'continue' ? [] : socialProviders}
+            providers={socialProviders}
             showDivider={hasFields}
             pendingProviderId={pendingProviderId}
             isDisabled={isDisabled}
