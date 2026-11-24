@@ -74,7 +74,7 @@ export interface SignUpFlowModel {
   afterSignUpUrl: string;
   leave: () => void;
   ticket: string | undefined;
-  redeemTicket: () => Promise<{ step: SignUpNextStep; emailAddress: string }>;
+  redeemTicket: () => Promise<{ result: SignUpCreateResult; emailAddress: string }>;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
 }
@@ -371,9 +371,13 @@ export function useSignUpModel({
         const { error } = await signUp.ticket({ ticket: ticket ?? '', unsafeMetadata });
         if (error) {
           forgetTicket();
-          throw error;
+          const blocked = blockedBy(error);
+          if (!blocked) {
+            throw error;
+          }
+          return { result: { type: 'blocked', details: blocked }, emailAddress: '' };
         }
-        return { step: next(signUp), emailAddress: signUp.emailAddress ?? '' };
+        return { result: next(signUp), emailAddress: signUp.emailAddress ?? '' };
       },
       finalize: async () => {
         forgetTicket();

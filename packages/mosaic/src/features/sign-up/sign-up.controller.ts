@@ -164,9 +164,9 @@ export function useSignUpController(
     }
     redeemedTicket.current = flow.ticket;
     void actions.run('ticket', async () => {
-      const { step, emailAddress } = await flow.redeemTicket();
+      const { result, emailAddress } = await flow.redeemTicket();
       details.adoptInvitation(emailAddress);
-      next(step);
+      next(result);
     });
   });
   /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
