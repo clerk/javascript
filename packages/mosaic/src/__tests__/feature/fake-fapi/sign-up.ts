@@ -21,7 +21,6 @@ export interface FakeSignUpSeed {
   enterpriseDomains?: string[];
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
-  rateLimited?: boolean;
 }
 
 export interface FakeSignUpState {
@@ -29,7 +28,6 @@ export interface FakeSignUpState {
   enterpriseDomains: string[];
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
-  rateLimited?: boolean;
   creations: URLSearchParams[];
   updates: URLSearchParams[];
   preparations: string[];
@@ -263,9 +261,6 @@ export function signUpHandlers(
       }
       if (state.signUp.blocked) {
         return rejected('action_blocked', 'This request was blocked.', undefined, 403, state.signUp.blocked);
-      }
-      if (state.signUp.rateLimited) {
-        return rejected('signup_rate_limit_exceeded', 'Sign-up rate limit exceeded for this instance.', undefined, 429);
       }
       const blank = fapiSignUp({ id: `sua_${state.signUp.creations.length}` });
       const applied = apply(blank, body);

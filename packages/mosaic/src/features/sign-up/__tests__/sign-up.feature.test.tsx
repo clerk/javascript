@@ -254,13 +254,17 @@ describe('SignUp', () => {
       await codeSent();
     });
 
-    it("shows legacy's rate limit copy when sign-ups are rate limited", async () => {
-      const { user } = await renderSignUp({ signUp: { rateLimited: true } });
+    it('shows a try-again message when sign-ups are rate limited', async () => {
+      const { user } = await renderSignUp();
+      const hold = holdRequests('post', '/v1/client/sign_ups');
 
       await submitStart(user);
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('signup_rate_limit_exceeded', 'Sign-up rate limit exceeded for this instance.');
 
-      expect(await screen.findByText('Too many requests. Please try again in a bit.')).toBeInTheDocument();
-      expect(screen.queryByText('Sign-up rate limit exceeded for this instance.')).not.toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Too many requests. Please try again in a bit.'),
+      );
     });
 
     it('replaces the form with the blocked notice when the request is blocked', async () => {
