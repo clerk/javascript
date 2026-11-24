@@ -648,7 +648,7 @@ describe('SignUp', () => {
   });
 
   describe('opening a route directly', () => {
-    it('replaces a route the sign-up is not ready for with the screen it shows', async () => {
+    it('shows the start form when a verify route is opened before the sign-up exists', async () => {
       serveFapi({ environment: environment() });
       await renderWithClerk(
         <>
