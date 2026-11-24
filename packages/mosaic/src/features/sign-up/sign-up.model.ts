@@ -56,7 +56,6 @@ export interface SignUpFlowModel {
   signUpId: string | undefined;
   step: SignUpFlowStep;
   mode: 'public' | 'restricted' | 'waitlist';
-  actionBlocked?: AuthActionBlockedDetails;
   afterSignUpUrl: string;
   leave?: () => void;
   finalize: () => Promise<void>;
@@ -75,6 +74,8 @@ export interface SignUpNavigationModel {
   emailSupport?: () => void;
 }
 
+export type SignUpCreateResult = SignUpNextStep | { type: 'blocked'; details: AuthActionBlockedDetails };
+
 export interface SignUpDetailsModel {
   initialIdentifier: SignUpIdentifier;
   canSwitchIdentifier: boolean;
@@ -86,7 +87,7 @@ export interface SignUpDetailsModel {
   legalConsent?: SignUpLegalConsent;
   continueLegalConsent?: SignUpLegalConsent;
   validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
-  create: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
+  create: (values: SignUpDetailsValues) => Promise<SignUpCreateResult>;
   update: (values: SignUpDetailsValues) => Promise<SignUpNextStep>;
 }
 
@@ -135,6 +136,15 @@ function emailSupportFor(mode: SignUpFlowModel['mode'], address: string | undefi
   return () => window.location.assign(`mailto:${address}`);
 }
 
+function blockedBy(error: ClerkError | null): AuthActionBlockedDetails | undefined {
+  const blocked = actionBlockedDetailsFrom(error && isClerkAPIResponseError(error) ? error.errors[0] : error);
+  if (!blocked) {
+    return undefined;
+  }
+  const { title, description, linkUrl, linkText, traceId } = blocked;
+  return { title, description, linkUrl, linkText, traceId };
+}
+
 async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<void> {
   const { error } = await call();
   if (error) {
@@ -151,7 +161,7 @@ export function useSignUpModel({
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
   const supportEmail = useMosaicSupportEmail();
-  const { signUp, errors } = __internal_useClerkSignal('signUp');
+  const { signUp } = __internal_useClerkSignal('signUp');
   const { session } = useSession();
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
@@ -219,11 +229,6 @@ export function useSignUpModel({
     return task ? { type: 'task', key: task } : { type: 'signed_in' };
   };
 
-  const [lastError] = errors.raw ?? [];
-  const blocked = actionBlockedDetailsFrom(
-    lastError && isClerkAPIResponseError(lastError) ? lastError.errors[0] : lastError,
-  );
-
   const isShown = (name: SignUpFieldName, required: boolean) =>
     showOptionalFields || required || (canSwitchIdentifier && (name === 'emailAddress' || name === 'phoneNumber'));
 
@@ -271,15 +276,6 @@ export function useSignUpModel({
       signUpId: signUp.id,
       step,
       mode,
-      actionBlocked: blocked
-        ? {
-            title: blocked.title,
-            description: blocked.description,
-            linkUrl: blocked.linkUrl,
-            linkText: blocked.linkText,
-            traceId: blocked.traceId,
-          }
-        : undefined,
       afterSignUpUrl,
       leave: environment.authConfig.singleSessionMode
         ? () => {
@@ -353,7 +349,12 @@ export function useSignUpModel({
       continueLegalConsent: signUp.missingFields.includes('legal_accepted') ? legalConsent : undefined,
       validatePassword,
       create: async values => {
-        await save(() => run(() => signUp.create(details(values))), DETAILS_FIELDS, usernameBounds);
+        const result = await signUp.create(details(values));
+        const blocked = blockedBy(result.error);
+        if (blocked) {
+          return { type: 'blocked', details: blocked };
+        }
+        await save(() => run(() => Promise.resolve(result)), DETAILS_FIELDS, usernameBounds);
         return next(signUp);
       },
       update: async values => {

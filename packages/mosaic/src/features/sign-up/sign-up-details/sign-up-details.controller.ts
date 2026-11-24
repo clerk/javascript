@@ -1,12 +1,11 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
-import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { useState } from 'react';
 
 import type { FieldFeedback } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
-import type { SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
+import type { SignUpCreateResult, SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
 import type { SignUpDetails, SignUpDetailsScreen, SignUpFieldName, SignUpFields, SignUpValues } from '../sign-up.types';
 import { signUpFieldNames } from '../sign-up.utils';
 
@@ -70,7 +69,7 @@ interface SignUpDetailsOptions {
   purpose: 'start' | 'continue';
   isBusy: boolean;
   globalErrorMessage?: string;
-  onNext: (step: SignUpNextStep) => void;
+  onNext: (result: SignUpCreateResult) => void;
   onSignIn: () => void;
 }
 
@@ -87,7 +86,7 @@ export function useSignUpDetailsController(
 
   const consentRequired = Boolean(purpose === 'continue' ? details.continueLegalConsent : details.legalConsent);
 
-  const form = useForm<SignUpValues, SignUpNextStep | undefined>({
+  const form = useForm<SignUpValues, SignUpCreateResult | undefined>({
     initialValues: { ...emptyValues, ...details.prefill },
     canSubmit: values => hasRequired(values, fields, consentRequired),
     onSubmit: values => {
@@ -96,9 +95,9 @@ export function useSignUpDetailsController(
         ? details.update(submitted)
         : details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) });
     },
-    onSuccess: nextStep => {
-      if (nextStep) {
-        onNext(nextStep);
+    onSuccess: result => {
+      if (result) {
+        onNext(result);
       }
     },
   });

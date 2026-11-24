@@ -1,6 +1,6 @@
-import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
+import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
@@ -11,7 +11,7 @@ import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouteGuard } from '../../routing/use-route-guard';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
-import type { SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
+import type { SignUpCreateResult, SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
 import type { SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
@@ -71,17 +71,17 @@ const finishMachine = finish.createMachine({
   },
 });
 
-function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel): SignUpScreen {
+function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode'], isBlocked: boolean): SignUpScreen {
   if (route === undefined || route === 'enterpriseConnections' || route === 'protectCheck') {
     return 'startOver';
   }
   if (route !== 'start') {
     return route;
   }
-  if (flow.actionBlocked) {
+  if (isBlocked) {
     return 'actionBlocked';
   }
-  return flow.mode === 'public' ? 'start' : flow.mode;
+  return mode === 'public' ? 'start' : mode;
 }
 
 type SignUpControllerResult =
@@ -107,6 +107,7 @@ export function useSignUpController(
   const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
   const [signedInVisit] = useState(() => (liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined));
+  const [blocked, setBlocked] = useState<AuthActionBlockedDetails>();
   const arrivedSignedIn = signedInVisit !== undefined;
   const leavesOnArrival = signedInVisit?.leave !== undefined;
 
@@ -121,16 +122,20 @@ export function useSignUpController(
   const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
   const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || finishSnapshot.value === 'finished');
   const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
-  const screen = screenFor(shown, flow);
+  const screen = screenFor(shown, flow.mode, blocked !== undefined);
 
   useRouteGuard({ route, go }, shown);
 
-  const next = (nextStep: SignUpNextStep) => {
-    if (nextStep.type === 'complete') {
+  const next = (result: SignUpCreateResult) => {
+    if (result.type === 'blocked') {
+      setBlocked(result.details);
+      return;
+    }
+    if (result.type === 'complete') {
       sendFinish({ type: 'FINISH', frozenModel: model });
       return;
     }
-    const nextRoute = routeFor(nextStep, route);
+    const nextRoute = routeFor(result, route);
     if (nextRoute) {
       go(nextRoute);
     }
@@ -170,7 +175,7 @@ export function useSignUpController(
       onJoinWaitlist: navigation.joinWaitlist,
       onSignIn: navigation.goToSignIn,
     },
-    actionBlocked: flow.actionBlocked,
+    actionBlocked: blocked,
     startOver: {
       isPending: actions.isPending,
       globalErrorMessage: actions.error,
