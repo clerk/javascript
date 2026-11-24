@@ -3,7 +3,7 @@ import * as ChartStories from './chart.stories';
 # Chart
 
 A stacked bar chart over a category or time axis, with values above and below zero. It is a
-**headless** primitive: `Chart.useBarChart` owns the layout and selection, `Chart.StackedBars` and
+**headless** primitive: `Chart.useBarChart` owns the layout and selection, `Chart.Bars` and
 `Chart.Bar` paint the bars, and the shared parts draw the root, grid, axes, lines, selection,
 cursor and tooltip from the chart object the hook returns. D3 computes the stacks and scales,
 Canvas paints the bars, SVG draws the grid, axes and marks, and the primitive handles pointer and
@@ -42,11 +42,11 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
       ))
     }
   </Chart.Grid>
-  <Chart.StackedBars>
+  <Chart.Bars>
     <Chart.Bar className='bar' />
     <Chart.ProjectionOutline />
     <Chart.YLine value={0} />
-  </Chart.StackedBars>
+  </Chart.Bars>
   <Chart.YAxis>
     {ticks =>
       ticks.map(tick => (
@@ -116,7 +116,7 @@ const chart = Chart.useBarChart({
 | `Chart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
 | `Chart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
 | `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
-| `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
+| `Chart.Bars`              | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
 | `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
@@ -129,9 +129,9 @@ const chart = Chart.useBarChart({
 
 Every part comes from `@clerk/mosaic/primitives/chart`.
 Every part accepts a `render` prop and the standard attributes of its default element. Every part
-throws outside `Chart.Root`, and `Chart.StackedBars` also throws for a chart that did not come
+throws outside `Chart.Root`, and `Chart.Bars` also throws for a chart that did not come
 from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside
-`Chart.StackedBars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
+`Chart.Bars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
 
 ## Props
 

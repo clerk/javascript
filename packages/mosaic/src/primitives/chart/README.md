@@ -34,14 +34,14 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
       ))
     }
   </Chart.Grid>
-  <Chart.StackedBars>
+  <Chart.Bars>
     <Chart.Bar className='bar' />
     <Chart.ProjectionOutline className='projection-outline' />
     <Chart.YLine
       value={0}
       className='zero-line'
     />
-  </Chart.StackedBars>
+  </Chart.Bars>
   <Chart.YAxis>
     {ticks =>
       ticks.map(tick => (
@@ -80,7 +80,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
 | `Chart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
 | `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, inside any chart SVG          |
-| `Chart.StackedBars`       | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
+| `Chart.Bars`              | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
 | `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels in the left margin                           |
@@ -93,7 +93,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 
 Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
 
-Every part throws outside `Chart.Root`. `Chart.StackedBars` also throws when the chart did not come from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside `Chart.StackedBars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`. A `Chart.YLine` inside `Chart.StackedBars`, such as the zero line, paints over the bars.
+Every part throws outside `Chart.Root`. `Chart.Bars` also throws when the chart did not come from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside `Chart.Bars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`. A `Chart.YLine` inside `Chart.Bars`, such as the zero line, paints over the bars.
 
 The namespace also holds `Chart.useBarChart` and `Chart.CanvasRenderError`.
 
@@ -255,7 +255,7 @@ const { rootRef } = chart;
 
 The pointer maps client coordinates through the `rootRef` element's bounds.
 
-Painting the bars is the one thing the chart object does not do, because their color and geometry come from `Chart.Bar`'s computed style: keep `Chart.StackedBars` for that.
+Painting the bars is the one thing the chart object does not do, because their color and geometry come from `Chart.Bar`'s computed style: keep `Chart.Bars` for that.
 
 ## Data attributes
 
@@ -287,7 +287,7 @@ The primitive reads and writes no CSS variables.
 
 ### `Chart.Bar`
 
-Canvas cannot take a class, so the bars are styled through one hidden part. This is the one departure from the part model, where `data-*` attributes stay on the rendered element. `Chart.Bar` renders one `aria-hidden` `<g style="display:none">`. Before each paint, `Chart.StackedBars` puts it in every state it draws, reads its computed `color`, caches it per state, paints, then restores the element:
+Canvas cannot take a class, so the bars are styled through one hidden part. This is the one departure from the part model, where `data-*` attributes stay on the rendered element. `Chart.Bar` renders one `aria-hidden` `<g style="display:none">`. Before each paint, `Chart.Bars` puts it in every state it draws, reads its computed `color`, caches it per state, paints, then restores the element:
 
 | State           | Set on `Chart.Bar`                  |
 | --------------- | ----------------------------------- |
@@ -336,7 +336,7 @@ The Canvas repaints in the same frame when:
 - any attribute on an ancestor of `Chart.Bar`, up to `<html>`, changes and a color the bars paint computes to a new value, so a theme switched through a class, `style`, `data-theme` or any other attribute repaints the bars, and an unrelated attribute change does not
 - `prefers-color-scheme` changes and a color the bars paint computes to a new value, so `light-dark()` colors under `color-scheme: light dark` follow the OS
 - the pixel ratio changes (capped at 2)
-- the layout or the props of `Chart.StackedBars` change
+- the layout or the props of `Chart.Bars` change
 
 Other changes to the computed color do not repaint: a stylesheet added or removed, or another media query such as `prefers-contrast`. Change the class of `Chart.Bar` to repaint after one. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
 
@@ -345,18 +345,18 @@ Other changes to the computed color do not repaint: a stylesheet added or remove
 Root does not reorder its children, so paint order is JSX order. Write the parts in this order:
 
 1. `Chart.Grid`
-2. The chart type's marks, such as `Chart.StackedBars`, with any `Chart.YLine` inside their SVG
+2. The chart type's marks, such as `Chart.Bars`, with any `Chart.YLine` inside their SVG
 3. `Chart.YAxis`
 4. `Chart.XAxis`
 5. `Chart.Selection`, last, so its surface receives the pointer and its cursor paints over the marks
 
 Each container renders nothing until Root has measured a non-zero size.
 
-Inside `Chart.StackedBars`, the position of `Chart.Bar` and `Chart.ProjectionOutline` does not matter: both are hidden, and the Canvas paints under every `Chart.YLine`.
+Inside `Chart.Bars`, the position of `Chart.Bar` and `Chart.ProjectionOutline` does not matter: both are hidden, and the Canvas paints under every `Chart.YLine`.
 
 ## Layout
 
-`useBarChart` prepares the stacks when `data`, `series` or `index` change, measures the `rootRef` element, and projects the layout for each size, margin, gap or projection change. `Chart.StackedBars` projects the bar marks when the layout or the bar geometry changes. The container size is committed before paint, so the chart follows its container while resizing.
+`useBarChart` prepares the stacks when `data`, `series` or `index` change, measures the `rootRef` element, and projects the layout for each size, margin, gap or projection change. `Chart.Bars` projects the bar marks when the layout or the bar geometry changes. The container size is committed before paint, so the chart follows its container while resizing.
 
 The Y scale contains zero and the full positive and negative extents, including an accepted projection, before tick rounding. Gaps and the clearance from the zero line are paint insets: they move no values, ticks or stack endpoints. Insets and radii shrink on small marks so at least one pixel stays visible.
 
@@ -376,4 +376,4 @@ A lost or missing 2D context throws `Chart.CanvasRenderError`, with the original
 
 ## Adding a chart type
 
-A chart type lives in its own folder under `src/primitives/chart/`, as stacked bars live in `bars/`. Its hook measures with `useChartFrame`, lays out its categories, and passes a pure `SelectionModel` to `useChartInstance`, both from `chart/internal/`. Lint lets only files under `chart/` import `chart/internal/`, and keeps the shared parts at the top of `chart/` out of it. The model owns the hit test, where the keyboard lands, how a selection resolves against the data, the announcement and the tooltip's Y. Its marks read their own layout from a module-private symbol on the instance, as `Chart.StackedBars` does. Its hook and parts join the `Chart` namespace in `parts.ts`. `line-chart-contract.test-d.ts` checks that a point chart fits the contract.
+A chart type lives in its own folder under `src/primitives/chart/`, as stacked bars live in `bars/`. Its hook measures with `useChartFrame`, lays out its categories, and passes a pure `SelectionModel` to `useChartInstance`, both from `chart/internal/`. Lint lets only files under `chart/` import `chart/internal/`, and keeps the shared parts at the top of `chart/` out of it. The model owns the hit test, where the keyboard lands, how a selection resolves against the data, the announcement and the tooltip's Y. Its marks read their own layout from a module-private symbol on the instance, as `Chart.Bars` does. Its hook and parts join the `Chart` namespace in `parts.ts`. `line-chart-contract.test-d.ts` checks that a point chart fits the contract.

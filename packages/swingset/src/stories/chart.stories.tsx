@@ -121,10 +121,10 @@ export function Default() {
           ))
         }
       </Chart.Grid>
-      <Chart.StackedBars>
+      <Chart.Bars>
         <Chart.Bar />
         <Chart.YLine value={0} />
-      </Chart.StackedBars>
+      </Chart.Bars>
       <Chart.YAxis>
         {ticks =>
           ticks.map(tick => (

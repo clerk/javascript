@@ -1,12 +1,12 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type {
   ChartBarProps,
+  ChartBarsProps,
   ChartCursorProps,
   ChartGridProps,
   ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
-  ChartStackedBarsProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
@@ -18,7 +18,7 @@ import type {
 export default {
   name: 'Chart',
   description:
-    'Headless, unstyled charts. A chart-type hook owns the layout and selection and returns a chart object; `Chart.Root` takes it, and the parts render from it. The shared parts draw the root, grid, axes, Y lines, and pointer and keyboard selection with its cursor and tooltip. Stacked bars with values above and below zero come from `Chart.useBarChart`: D3 computes the stacks and scales, and `Chart.StackedBars` paints the bars on Canvas, styled through the hidden `Chart.Bar`. Up and Down select the positive or negative section of a period. Each container renders nothing until the root has a measured, non-zero size.',
+    'Headless, unstyled charts. A chart-type hook owns the layout and selection and returns a chart object; `Chart.Root` takes it, and the parts render from it. The shared parts draw the root, grid, axes, Y lines, and pointer and keyboard selection with its cursor and tooltip. Stacked bars with values above and below zero come from `Chart.useBarChart`: D3 computes the stacks and scales, and `Chart.Bars` paints the bars on Canvas, styled through the hidden `Chart.Bar`. Up and Down select the positive or negative section of a period. Each container renders nothing until the root has a measured, non-zero size.',
   useFor: [
     'a stacked bar chart over a category or time axis',
     'bars with values above and below zero',
@@ -117,17 +117,17 @@ export default {
         value: { type: 'number', doc: 'The value on the Y axis the line marks, such as a tick value or `0`.' },
       },
     },
-    'Chart.StackedBars': {
+    'Chart.Bars': {
       description:
         'A `div` that paints the bars and the projection outline on a Canvas with `role="img"`, and holds one SVG over it for `Chart.Bar`, `Chart.ProjectionOutline` and any `Chart.YLine`. Throws outside `Chart.Root`, and when the chart did not come from `Chart.useBarChart`.',
     },
     'Chart.Bar': {
       description:
-        'A hidden `g` whose computed style paints the bars. Before each paint it takes `data-series`, `data-inactive` and `data-projection` in turn and the bars use its `color`. Its `max-width`, `row-gap` and corner radii in pixels set the bar geometry. Throws outside `Chart.StackedBars`.',
+        'A hidden `g` whose computed style paints the bars. Before each paint it takes `data-series`, `data-inactive` and `data-projection` in turn and the bars use its `color`. Its `max-width`, `row-gap` and corner radii in pixels set the bar geometry. Throws outside `Chart.Bars`.',
     },
     'Chart.ProjectionOutline': {
       description:
-        'A hidden `g` whose computed `stroke`, `stroke-width` and `stroke-dasharray` outline the projected bar on the Canvas, 1px outside its fill, with concentric top corners and square ends on the zero line, when `projection` rises above its stack. Throws outside `Chart.StackedBars`.',
+        'A hidden `g` whose computed `stroke`, `stroke-width` and `stroke-dasharray` outline the projected bar on the Canvas, 1px outside its fill, with concentric top corners and square ends on the zero line, when `projection` rises above its stack. Throws outside `Chart.Bars`.',
     },
     'Chart.YAxis': {
       description: 'An `aria-hidden` `svg` that holds the Y tick labels in the left margin.',
@@ -209,10 +209,10 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   <Chart.Grid>
     {ticks => ticks.map(tick => <Chart.YLine key={tick.value} value={tick.value} className='grid-line' />)}
   </Chart.Grid>
-  <Chart.StackedBars>
+  <Chart.Bars>
     <Chart.Bar className='bar' />
     <Chart.YLine value={0} className='zero-line' />
-  </Chart.StackedBars>
+  </Chart.Bars>
   <Chart.YAxis>
     {ticks => ticks.map(tick => <Chart.YTick key={tick.value} tick={tick} className='tick' />)}
   </Chart.YAxis>
@@ -232,11 +232,11 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 const chart = Chart.useBarChart({ data, series, index, projection: { datumIndex: data.length - 1, value: 130 } });
 
 <Chart.Root chart={chart} height={320} aria-label='Weekly sign-ups'>
-  <Chart.StackedBars>
+  <Chart.Bars>
     <Chart.Bar className='bar' />
     <Chart.ProjectionOutline className='projection-outline' />
     <Chart.YLine value={0} className='zero-line' />
-  </Chart.StackedBars>
+  </Chart.Bars>
 </Chart.Root>
 `,
     },
@@ -268,7 +268,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   'Chart.Root': ChartRootProps;
   'Chart.Grid': ChartGridProps;
   'Chart.YLine': ChartYLineProps;
-  'Chart.StackedBars': ChartStackedBarsProps;
+  'Chart.Bars': ChartBarsProps;
   'Chart.Bar': ChartBarProps;
   'Chart.ProjectionOutline': ChartProjectionOutlineProps;
   'Chart.YAxis': ChartYAxisProps;

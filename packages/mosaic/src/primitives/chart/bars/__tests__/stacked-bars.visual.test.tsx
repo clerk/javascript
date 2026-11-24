@@ -89,14 +89,14 @@ function GrowthChart({
             ))
           }
         </Chart.Grid>
-        <Chart.StackedBars>
+        <Chart.Bars>
           <Chart.Bar className='bar' />
           <Chart.ProjectionOutline className='projection-outline' />
           <Chart.YLine
             value={0}
             className='zero-line'
           />
-        </Chart.StackedBars>
+        </Chart.Bars>
         <Chart.YAxis>
           {ticks =>
             ticks.map(tick => (

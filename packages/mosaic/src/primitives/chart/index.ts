@@ -2,12 +2,12 @@ export * as Chart from './parts';
 
 export type {
   ChartBarProps,
+  ChartBarsProps,
   ChartCursorProps,
   ChartGridProps,
   ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
-  ChartStackedBarsProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
