@@ -125,10 +125,10 @@ export function useSignUpDetailsController(
       if (purpose === 'continue') {
         return details.update(submitted);
       }
-      if (alternativeChannel) {
-        return details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) }, { channel });
-      }
-      return details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) });
+      return details.create(
+        { ...submitted, ...details.startHiddenValuesFor(identifier) },
+        { channel: alternativeChannel?.id },
+      );
     },
     onSuccess: result => {
       if (result) {
@@ -159,7 +159,6 @@ export function useSignUpDetailsController(
 
   const switchChannel = (next: PhoneCodeChannel | undefined) => {
     setChosenChannel(next);
-    // Both phone screens share one form, so a channel switch starts it fresh with the same values.
     form.reset(form.values);
   };
 

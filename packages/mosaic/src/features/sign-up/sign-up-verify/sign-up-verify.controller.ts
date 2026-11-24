@@ -56,7 +56,6 @@ const codeMachine = code.createMachine({
         ALREADY_SENT: { target: 'sent', actions: startCooldown },
       },
     },
-    // With no channel, the code goes out over the channel the last code used, which the model reads from the sign-up.
     sending: { invoke: code.fromPromise(context => context.sendCode(), settleSend) },
     sendingSms: { invoke: code.fromPromise(context => context.sendCode({ channel: 'sms' }), settleSend) },
     sent: {

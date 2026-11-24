@@ -1050,15 +1050,15 @@ describe('SignUp', () => {
       }
     });
 
-    it('shows a rejected phone number on the WhatsApp phone screen and leaves it behind on the form', async () => {
+    it('shows field and global errors on the WhatsApp phone screen and leaves them behind on the form', async () => {
       const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
-      const hold = holdRequests('post', '/v1/client/sign_ups');
+      const rejected = holdRequests('post', '/v1/client/sign_ups');
 
       await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
       await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
       await user.click(continueButton());
-      await waitFor(() => expect(hold.requests).toHaveLength(1));
-      hold.fail('form_identifier_exists', 'That phone number is taken. Please try another.', 'phone_number');
+      await waitFor(() => expect(rejected.requests).toHaveLength(1));
+      rejected.fail('form_identifier_exists', 'That phone number is taken. Please try another.', 'phone_number');
 
       expect(await screen.findByText('That phone number is taken. Please try another.')).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: /with WhatsApp/ })).toBeInTheDocument();
@@ -1067,17 +1067,13 @@ describe('SignUp', () => {
 
       expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
       expect(screen.queryByText('That phone number is taken. Please try another.')).toBeNull();
-    });
 
-    it('leaves an error the WhatsApp phone screen got behind when going back to the form', async () => {
-      const { user } = await renderSignUp({ environment: phoneEnvironment() });
-      const hold = holdRequests('post', '/v1/client/sign_ups');
-
-      await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
-      await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+      const limited = holdRequests('post', '/v1/client/sign_ups');
+      await user.click(screen.getByRole('button', { name: /WhatsApp/ }));
+      await screen.findByRole('heading', { name: /with WhatsApp/ });
       await user.click(continueButton());
-      await waitFor(() => expect(hold.requests).toHaveLength(1));
-      hold.fail('too_many_requests', 'Too many requests. Please try again later.');
+      await waitFor(() => expect(limited.requests).toHaveLength(1));
+      limited.fail('too_many_requests', 'Too many requests. Please try again later.');
 
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent('Too many requests. Please try again later.'),

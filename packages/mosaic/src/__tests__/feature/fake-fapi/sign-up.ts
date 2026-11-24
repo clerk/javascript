@@ -401,8 +401,6 @@ export function signUpHandlers(
       }
       const created = issueProtectCheck(applied);
       const prepared = body.get('strategy') === 'phone_code' ? prepare(created, body) : created;
-      // FAPI attaches the sign-up to the client before it sends the code (clerk_go
-      // api/fapi/v1/sign_up/service.go:394-407, send at :529), so a failed send keeps the sign-up.
       if (prepared instanceof HttpResponse) {
         store(settle(created));
         return clientError(prepared);
