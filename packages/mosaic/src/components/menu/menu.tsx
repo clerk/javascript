@@ -3,12 +3,18 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
 import { EllipsisHorizontal } from '../../icons/glyphs/ellipsis-horizontal';
 import type {
+  MenuCheckboxItemIndicatorProps as PrimitiveMenuCheckboxItemIndicatorProps,
+  MenuCheckboxItemProps as PrimitiveMenuCheckboxItemProps,
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps as PrimitiveMenuPopupProps,
   MenuPortalProps,
   MenuProps,
+  MenuRadioGroupProps as PrimitiveMenuRadioGroupProps,
+  MenuRadioItemIndicatorProps as PrimitiveMenuRadioItemIndicatorProps,
+  MenuRadioItemProps as PrimitiveMenuRadioItemProps,
   MenuSeparatorProps as PrimitiveMenuSeparatorProps,
 } from '../../primitives/menu';
 import { Menu as Primitive } from '../../primitives/menu';
@@ -107,27 +113,15 @@ export const MenuPopup = React.forwardRef<HTMLDivElement, MenuPopupProps>(functi
   );
 });
 
-/** The width of the media column, and so the height of the row it sits in. */
-export type MenuMediaSize = 'xs' | 'sm';
-
 /** `span`, not `div`: the item this sits in is a button, so its children are phrasing content. */
-export type MenuMediaProps = MosaicComponentProps<'span'> & {
-  /**
-   * Column width: `sm` fits an icon or an avatar, `xs` a bare glyph. The row takes its height
-   * from this, so every item in one menu wants the same value or their text no longer starts on
-   * one line.
-   *
-   * @default 'sm'
-   */
-  size?: MenuMediaSize;
-};
+export type MenuMediaProps = MosaicComponentProps<'span'>;
 
 /**
- * Square leading column that centers its media (icon, image, or avatar), so every item's
- * text starts on the same line whatever each one leads with.
+ * Square column at either end of the row that centers its content (icon, image, avatar, spinner),
+ * so every item's text lines up whatever each one leads or trails with.
  */
 export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(function MosaicMenuMedia(
-  { size = 'sm', render, xstyle, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -135,11 +129,7 @@ export const MenuMedia = React.forwardRef<HTMLSpanElement, MenuMediaProps>(funct
     render,
     ref,
     props: {
-      ...mergeStyleProps(
-        themeProps('menu-item-media', { size }),
-        stylex.props(reset.base, slots.media.base, slots.media[size], xstyle),
-        rest,
-      ),
+      ...mergeStyleProps(themeProps('menu-item-media'), stylex.props(reset.base, slots.media.base, xstyle), rest),
     },
   });
 });
@@ -170,31 +160,11 @@ export const MenuLabel = React.forwardRef<HTMLSpanElement, MenuLabelProps>(funct
   });
 });
 
-export type MenuIndicatorProps = MosaicComponentProps<'span'>;
-
-export const MenuIndicator = React.forwardRef<HTMLSpanElement, MenuIndicatorProps>(function MosaicMenuIndicator(
-  { render, xstyle, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'span',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('menu-item-indicator'),
-        stylex.props(reset.base, slots.indicator.base, xstyle),
-        rest,
-      ),
-    },
-  });
-});
-
 export interface MenuItemProps extends Omit<PrimitiveMenuItemProps, 'className' | 'style'>, MosaicStyleProps {
   /** Semantic color of the action. */
   color?: 'neutral' | 'negative';
   /**
-   * The row's content, composed from `Menu.Media`, `Menu.Label` and `Menu.Indicator`. Required, and text goes in
+   * The row's content, composed from `Menu.Media` and `Menu.Label`. Required, and text goes in
    * `Menu.Label` rather than straight in here: a bare text node is not a flex item the row can
    * size, so it neither lines up with the other rows nor truncates.
    */
@@ -230,6 +200,119 @@ export const MenuItem = React.forwardRef<HTMLButtonElement, MenuItemProps>(funct
     </Primitive.Item>
   );
 });
+
+export interface MenuCheckboxItemProps
+  extends Omit<PrimitiveMenuCheckboxItemProps, 'className' | 'style'>, MosaicStyleProps {
+  /** The row's content, composed from `Menu.Media`, `Menu.Label` and `Menu.CheckboxItemIndicator`. */
+  children: React.ReactNode;
+}
+
+/**
+ * A menu item that toggles a setting on and off, announced through `aria-checked`. Keeps the menu
+ * open on click unless `closeOnClick` is set.
+ */
+export const MenuCheckboxItem = React.forwardRef<HTMLButtonElement, MenuCheckboxItemProps>(
+  function MosaicMenuCheckboxItem({ xstyle, ...rest }, ref) {
+    return (
+      <Primitive.CheckboxItem
+        ref={ref}
+        {...mergeStyleProps(
+          themeProps('menu-checkbox-item'),
+          stylex.props(reset.base, focusOutline.visible, slots.item.base, xstyle),
+          rest,
+        )}
+      />
+    );
+  },
+);
+
+export type MenuRadioGroupProps = Omit<PrimitiveMenuRadioGroupProps, 'className' | 'style'> & MosaicStyleProps;
+
+/** Holds the value of the `Menu.RadioItem`s inside it. Name it with `aria-label`. */
+export const MenuRadioGroup = React.forwardRef<HTMLDivElement, MenuRadioGroupProps>(function MosaicMenuRadioGroup(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.RadioGroup
+      ref={ref}
+      {...mergeStyleProps(
+        themeProps('menu-radio-group'),
+        stylex.props(reset.base, slots.radioGroup.base, xstyle),
+        rest,
+      )}
+    />
+  );
+});
+
+export interface MenuRadioItemProps extends Omit<PrimitiveMenuRadioItemProps, 'className' | 'style'>, MosaicStyleProps {
+  /** The row's content, composed from `Menu.Media`, `Menu.Label` and `Menu.RadioItemIndicator`. */
+  children: React.ReactNode;
+}
+
+/**
+ * A menu item that picks its `Menu.RadioGroup`'s value, announced through `aria-checked`. Keeps the
+ * menu open on click unless `closeOnClick` is set.
+ */
+export const MenuRadioItem = React.forwardRef<HTMLButtonElement, MenuRadioItemProps>(function MosaicMenuRadioItem(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.RadioItem
+      ref={ref}
+      {...mergeStyleProps(
+        themeProps('menu-radio-item'),
+        stylex.props(reset.base, focusOutline.visible, slots.item.base, xstyle),
+        rest,
+      )}
+    />
+  );
+});
+
+export type MenuCheckboxItemIndicatorProps = Omit<PrimitiveMenuCheckboxItemIndicatorProps, 'className' | 'style'> &
+  MosaicStyleProps;
+
+/** Square column with a check in the secondary icon color, in every row and shown only while its `Menu.CheckboxItem` is checked. */
+export const MenuCheckboxItemIndicator = React.forwardRef<HTMLSpanElement, MenuCheckboxItemIndicatorProps>(
+  function MosaicMenuCheckboxItemIndicator({ xstyle, children, keepMounted = true, ...rest }, ref) {
+    return (
+      <Primitive.CheckboxItemIndicator
+        ref={ref}
+        keepMounted={keepMounted}
+        {...mergeStyleProps(
+          themeProps('menu-checkbox-item-indicator'),
+          stylex.props(reset.base, slots.indicator.base, xstyle),
+          rest,
+        )}
+      >
+        {children ?? <Icon glyph={Checkmark} />}
+      </Primitive.CheckboxItemIndicator>
+    );
+  },
+);
+
+export type MenuRadioItemIndicatorProps = Omit<PrimitiveMenuRadioItemIndicatorProps, 'className' | 'style'> &
+  MosaicStyleProps;
+
+/** Square column with a check in the secondary icon color, in every row and shown only while its `Menu.RadioItem` is checked. */
+export const MenuRadioItemIndicator = React.forwardRef<HTMLSpanElement, MenuRadioItemIndicatorProps>(
+  function MosaicMenuRadioItemIndicator({ xstyle, children, keepMounted = true, ...rest }, ref) {
+    return (
+      <Primitive.RadioItemIndicator
+        ref={ref}
+        keepMounted={keepMounted}
+        {...mergeStyleProps(
+          themeProps('menu-radio-item-indicator'),
+          stylex.props(reset.base, slots.indicator.base, xstyle),
+          rest,
+        )}
+      >
+        {children ?? <Icon glyph={Checkmark} />}
+      </Primitive.RadioItemIndicator>
+    );
+  },
+);
 
 export type MenuSeparatorProps = Omit<PrimitiveMenuSeparatorProps, 'className' | 'style'> & MosaicStyleProps;
 

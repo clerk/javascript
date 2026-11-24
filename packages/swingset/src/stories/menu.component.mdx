@@ -70,7 +70,7 @@ props (ARIA attributes, click and keyboard handlers) to spread.
 ### Items
 
 `label` names the item for typeahead and for assistive technology. Compose the row with
-`Menu.Label` and optional `Menu.Media` and `Menu.Indicator` parts. Text dropped straight into the
+`Menu.Label` and optional `Menu.Media` parts at either end. Text dropped straight into the
 item is not a flex child the row can size, so it neither lines up with the other rows nor
 truncates. A row with nothing to lead it is `Menu.Label` alone. Use
 `color='negative'` for destructive actions; the color is inherited by the children. `disabled` items
@@ -98,21 +98,12 @@ menu; pass `closeOnClick={false}` to keep it open.
 
 ### Media
 
-`Menu.Media` is a square leading column that centers whatever it holds — an icon, an image, an
-avatar. Items that lead with marks of differing widths need it: without it each row sets its own
-text start, and the labels no longer line up. Leave it empty on an item that leads with nothing and
-that row keeps the column. It renders a `span`, since the item it sits in is a button.
-
-`size` is the column's width: `sm` (the default) fits an icon or an avatar, `xs` a bare glyph. The
-row has no height of its own, so it takes whatever the media asks for. That makes the size a
-per-menu decision rather than a per-item one: give every item in one menu the same value, or their
-text no longer starts on one line.
-
-```tsx
-<Menu.Media size='xs'>
-  <Icon glyph={Checkmark} />
-</Menu.Media>
-```
+`Menu.Media` is a square column at either end of the row that centers whatever it holds — an icon,
+an image, an avatar, a spinner. Items that lead or trail with marks of differing widths need it:
+without it each row sets its own text start, and the labels no longer line up. It keeps its width
+while empty, so leave it empty on an item that leads with nothing, or render it on any item whose
+trailing mark can appear later, and the label does not shift. It renders a `span`, since the item it
+sits in is a button.
 
 ### Label
 
@@ -121,33 +112,67 @@ line. Items whose text is a name — an account, an organization — need it mos
 the menu instead of ellipsing. It is also what pushes a trailing mark to the end of the row. Use it
 for every composed item, so rows built from parts all read the same.
 
-### Indicator
+### Radio items
 
-`Menu.Indicator` is a square trailing column for a mark at the end of the row, such as a check or a
-spinner. It keeps its width while empty, so render it on any item whose mark can appear later and
-the label does not shift when it does.
+`Menu.RadioGroup` holds one value, and each `Menu.RadioItem` inside it picks its own `value`. The
+checked item carries `aria-checked`, so a screen reader announces which one is current. A
+`Menu.RadioItemIndicator` draws a check in the secondary icon color, so use it rather than a check in a
+`Menu.Media`. It keeps its column in every row so the labels line up, and shows the check only on the
+checked row. Name the group with `aria-label`.
 
-Together they make a row that leads with an avatar and trails with a check:
+Radio and checkbox items keep the menu open on click, so you can see the change. Pass `closeOnClick`
+where picking one is the whole point, as with switching accounts:
 
 ```tsx
-<Menu.Item label='colin@clerk.dev'>
-  <Menu.Media>
-    <Avatar.Root
-      shape='circle'
-      size='fit'
-    >
-      <Avatar.Fallback>C</Avatar.Fallback>
-    </Avatar.Root>
-  </Menu.Media>
-  <Menu.Label>colin@clerk.dev</Menu.Label>
-  <Menu.Indicator>
-    <Icon glyph={Checkmark} />
-  </Menu.Indicator>
-</Menu.Item>
+<Menu.RadioGroup
+  aria-label='Accounts'
+  value={active}
+  onValueChange={setActive}
+>
+  <Menu.RadioItem
+    label='colin@clerk.dev'
+    value='colin@clerk.dev'
+    closeOnClick
+  >
+    <Menu.Media>
+      <Avatar.Root
+        shape='circle'
+        size='fit'
+      >
+        <Avatar.Fallback>C</Avatar.Fallback>
+      </Avatar.Root>
+    </Menu.Media>
+    <Menu.Label>colin@clerk.dev</Menu.Label>
+    <Menu.RadioItemIndicator />
+  </Menu.RadioItem>
+</Menu.RadioGroup>
 ```
+
+`onValueChange` fires even when the checked item is picked again, so skip work there if you need to.
 
 <Story
   name='Accounts'
+  storyModule={MenuStories}
+/>
+
+### Checkbox items
+
+`Menu.CheckboxItem` turns a setting on and off, with `checked` and `onCheckedChange` (or
+`defaultChecked`). Its `Menu.CheckboxItemIndicator` works the same way.
+
+```tsx
+<Menu.CheckboxItem
+  label='Show archived'
+  checked={showArchived}
+  onCheckedChange={setShowArchived}
+>
+  <Menu.Label>Show archived</Menu.Label>
+  <Menu.CheckboxItemIndicator />
+</Menu.CheckboxItem>
+```
+
+<Story
+  name='CheckboxItems'
   storyModule={MenuStories}
 />
 
@@ -234,17 +259,21 @@ const [open, setOpen] = useState(false);
 
 ## Parts
 
-| Part             | Slot                             | Description                                                                     |
-| ---------------- | -------------------------------- | ------------------------------------------------------------------------------- |
-| `Menu.Root`      | —                                | State provider; owns open/close, placement, and keyboard navigation.            |
-| `Menu.Trigger`   | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis.           |
-| `Menu.Popup`     | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                              |
-| ↳ viewport       | `menu-viewport`                  | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.  |
-| `Menu.Item`      | `menu-item`                      | A single action whose content is composed through children.                     |
-| `Menu.Media`     | `menu-item-media`                | Square leading column that centers an item's icon, image, or avatar.            |
-| `Menu.Label`     | `menu-item-label`                | The item's text. Fills the row between media and trailing marks, and truncates. |
-| `Menu.Indicator` | `menu-item-indicator`            | Square trailing column for a check or spinner. Keeps its width while empty.     |
-| `Menu.Separator` | `menu-separator`                 | Full-bleed divider between groups of items.                                     |
+| Part                         | Slot                             | Description                                                                         |
+| ---------------------------- | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `Menu.Root`                  | —                                | State provider; owns open/close, placement, and keyboard navigation.                |
+| `Menu.Trigger`               | `menu-trigger`                   | Opens the menu. Defaults to a square ghost `Button` with an ellipsis.               |
+| `Menu.Popup`                 | `menu-positioner` / `menu-popup` | Portals, positions, and renders the popup surface.                                  |
+| ↳ viewport                   | `menu-viewport`                  | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
+| `Menu.Item`                  | `menu-item`                      | A single action whose content is composed through children.                         |
+| `Menu.Media`                 | `menu-item-media`                | Square column at either end of the row. Keeps its width while empty.                |
+| `Menu.Label`                 | `menu-item-label`                | The item's text. Fills the row between media and trailing marks, and truncates.     |
+| `Menu.CheckboxItem`          | `menu-checkbox-item`             | An item that toggles on and off, announced with `aria-checked`.                     |
+| `Menu.RadioGroup`            | `menu-radio-group`               | Holds the value of the radio items inside it.                                       |
+| `Menu.RadioItem`             | `menu-radio-item`                | An item that picks its group's value, announced with `aria-checked`.                |
+| `Menu.CheckboxItemIndicator` | `menu-checkbox-item-indicator`   | In every row; check shown while its checkbox item is checked. Secondary icon color. |
+| `Menu.RadioItemIndicator`    | `menu-radio-item-indicator`      | In every row; check shown while its radio item is checked. Secondary icon color.    |
+| `Menu.Separator`             | `menu-separator`                 | Full-bleed divider between groups of items.                                         |
 
 ## Styling
 
