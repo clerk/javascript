@@ -3,7 +3,17 @@ import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, descriptors, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -24,6 +34,7 @@ import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 const USER_ORG_READ_SCOPE = 'user:org:read';
+const MAX_CONSENTED_ORGANIZATIONS = 5;
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
@@ -35,7 +46,7 @@ function _OAuthConsent() {
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const [selectedOrgs, setSelectedOrgs] = useState<string[] | null>(null);
   const [uncheckedScopes, setUncheckedScopes] = useState<string[]>([]);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
@@ -88,7 +99,8 @@ function _OAuthConsent() {
     : [];
   const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
   const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-  const effectiveOrg = selectedOrg ?? defaultOrg;
+  const effectiveOrgs = selectedOrgs ?? (defaultOrg ? [defaultOrg] : []);
+  const isMissingOrgSelection = orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
 
   const { t } = useLocalizations();
   const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
@@ -263,12 +275,29 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
-              <OrgSelect
-                options={orgOptions}
-                value={effectiveOrg}
-                onChange={setSelectedOrg}
-              />
+            {orgSelectionEnabled && orgOptions.length > 0 && (
+              <Col gap={1}>
+                <OrgSelect
+                  multiple
+                  options={orgOptions.map(option => ({
+                    ...option,
+                    disabled:
+                      effectiveOrgs.length >= MAX_CONSENTED_ORGANIZATIONS && !effectiveOrgs.includes(option.value),
+                  }))}
+                  value={effectiveOrgs}
+                  onChange={setSelectedOrgs}
+                />
+                {orgOptions.length > MAX_CONSENTED_ORGANIZATIONS && (
+                  <Text
+                    colorScheme='secondary'
+                    variant='caption'
+                    sx={{ textAlign: 'start' }}
+                    localizationKey={localizationKeys('oauthConsent.organizationSelect.limit', {
+                      limit: MAX_CONSENTED_ORGANIZATIONS,
+                    })}
+                  />
+                )}
+              </Col>
             )}
             {displayedScopes.length > 0 && (
               <ListGroup>
@@ -345,6 +374,7 @@ function _OAuthConsent() {
                 type='submit'
                 name='consented'
                 value='true'
+                isDisabled={isMissingOrgSelection}
                 localizationKey={localizationKeys('oauthConsent.action__allow')}
               />
               <Text
@@ -380,11 +410,11 @@ function _OAuthConsent() {
             value={selectedScope}
           />
         )}
-        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrgs.length > 0 && (
           <input
             type='hidden'
             name='organization_id'
-            value={effectiveOrg}
+            value={effectiveOrgs.join(' ')}
           />
         )}
       </form>

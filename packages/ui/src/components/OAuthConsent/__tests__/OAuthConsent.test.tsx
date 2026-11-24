@@ -821,6 +821,88 @@ describe('OAuthConsent', () => {
         expect(hiddenInput!.value).toBe('org_1');
       });
     });
+
+    describe('multiple organizations', () => {
+      async function renderWithOrgs(count: number) {
+        const memberships = Array.from({ length: count }, (_, i) => ({ id: `org_${i + 1}`, name: `Org ${i + 1}` }));
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({ email_addresses: ['jane@example.com'], organization_memberships: memberships });
+          f.withOrganizations();
+        });
+        fixtures.clerk.session.lastActiveOrganizationId = null;
+        props.setProps({ componentName: 'OAuthConsent' } as any);
+        mockOAuthApplication(fixtures.clerk, {
+          getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfoWithOrgScope),
+        });
+        const result = render(<OAuthConsent />, { wrapper });
+        const trigger = await result.findByRole('button', { name: 'Org 1' });
+        const form = result.baseElement.querySelector('form');
+        if (!form) {
+          throw new Error('Consent form not rendered');
+        }
+        return { ...result, trigger, form };
+      }
+
+      it('posts every selected organization as one space-separated organization_id', async () => {
+        const { trigger, form, findByRole, userEvent } = await renderWithOrgs(3);
+
+        await userEvent.click(trigger);
+        await userEvent.click(await findByRole('option', { name: /Org 3/ }));
+
+        expect(new FormData(form).getAll('organization_id')).toEqual(['org_1 org_3']);
+      });
+
+      it('disables Allow while no organization is selected', async () => {
+        const { trigger, form, findByRole, getByRole, userEvent } = await renderWithOrgs(2);
+
+        await userEvent.click(trigger);
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        await userEvent.keyboard('{Escape}');
+
+        expect(new FormData(form).getAll('organization_id')).toEqual([]);
+        expect(getByRole('button', { name: 'Allow' })).toBeDisabled();
+        expect(getByRole('button', { name: 'Deny' })).toBeEnabled();
+
+        await userEvent.click(trigger);
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        await userEvent.keyboard('{Escape}');
+
+        expect(new FormData(form).getAll('organization_id')).toEqual(['org_2']);
+        expect(getByRole('button', { name: 'Allow' })).toBeEnabled();
+      });
+
+      it('disables the unselected organizations once the limit is selected', async () => {
+        const { trigger, form, findByRole, userEvent } = await renderWithOrgs(6);
+
+        await userEvent.click(trigger);
+        for (const name of ['Org 2', 'Org 3', 'Org 4']) {
+          await userEvent.click(await findByRole('option', { name: new RegExp(name) }));
+        }
+        expect(await findByRole('option', { name: /Org 6/ })).not.toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.click(await findByRole('option', { name: /Org 5/ }));
+        expect(await findByRole('option', { name: /Org 6/ })).toHaveAttribute('aria-disabled', 'true');
+        expect(await findByRole('option', { name: /Org 5/ })).not.toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.click(await findByRole('option', { name: /Org 6/ }));
+        expect(new FormData(form).getAll('organization_id')).toEqual(['org_1 org_2 org_3 org_4 org_5']);
+
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        expect(await findByRole('option', { name: /Org 6/ })).not.toHaveAttribute('aria-disabled', 'true');
+      });
+
+      it('tells the user the organization limit when they have more organizations than it', async () => {
+        const { findByText } = await renderWithOrgs(6);
+
+        expect(await findByText('You can select up to 5 organizations.')).toBeVisible();
+      });
+
+      it('hides the organization limit when the user has no more organizations than it', async () => {
+        const { queryByText } = await renderWithOrgs(5);
+
+        expect(queryByText('You can select up to 5 organizations.')).toBeNull();
+      });
+    });
   });
 
   it('renders the branded logo badge for a recognized client with no uploaded logo', async () => {
