@@ -40,6 +40,10 @@ export class FakeNativeClerk {
     return this.client?.lastActiveSessionId ?? null;
   }
 
+  get activeOrganizationId(): string | null {
+    return this.client?.sessions.find(session => session.id === this.activeSessionId)?.lastActiveOrganizationId ?? null;
+  }
+
   get sessionIds(): string[] {
     return this.client?.sessions.map(session => session.id) ?? [];
   }
@@ -109,6 +113,14 @@ export class FakeNativeClerk {
 
   async setActiveSession(sessionId: string): Promise<void> {
     await this.#observe(() => this.server.touchSession('native', this.token, sessionId));
+  }
+
+  async setActiveOrganization(organizationId: string | null): Promise<void> {
+    const sessionId = this.activeSessionId;
+    if (!sessionId) {
+      throw new Error('Native has no active session to switch the organization of.');
+    }
+    await this.#observe(() => this.server.touchSession('native', this.token, sessionId, organizationId));
   }
 
   async signOutSession(sessionId: string): Promise<void> {

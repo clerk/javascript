@@ -129,6 +129,18 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
+    it('moves JS to the organization native switches to', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      await h.run(() => h.native.setActiveOrganization('org_1'));
+      await h.settle();
+
+      expect(h.native.activeOrganizationId).toBe('org_1');
+      expect(h.js.session?.lastActiveOrganizationId).toBe('org_1');
+      await expectConverged(h);
+    });
+
     it('signs JS in with the session a native sign-in created when the first JS refetch fails', async () => {
       const h = await start();
       vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -420,6 +432,21 @@ describe('native client sync behavior', () => {
       await h.settle();
 
       expect(h.native.activeSessionId).toBe(sessionIds.user_2);
+      await expectConverged(h);
+    });
+
+    it('moves native to the organization JS switches to', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      const refreshesBefore = h.native.clientRefreshCount;
+
+      await h.run(() => h.js.setActive({ organization: 'org_1' }));
+      await h.settle();
+
+      expect(h.js.session?.lastActiveOrganizationId).toBe('org_1');
+      expect(h.native.activeOrganizationId).toBe('org_1');
+      expect(h.native.clientRefreshCount - refreshesBefore).toBe(1);
       await expectConverged(h);
     });
 

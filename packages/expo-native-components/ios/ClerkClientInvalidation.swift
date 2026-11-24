@@ -13,18 +13,21 @@ struct ClerkClientFingerprint: Equatable {
   let sessions: [SessionState]
   let activeUserId: String?
   let activeUserUpdatedAt: Double?
+  let activeOrganizationId: String?
   var deviceToken: String?
 }
 
 extension ClerkClientFingerprint {
   init(client: Client?, deviceToken: String?) {
-    let activeUser = client?.sessions.first { $0.id == client?.lastActiveSessionId }?.user
+    let activeSession = client?.sessions.first { $0.id == client?.lastActiveSessionId }
+    let activeUser = activeSession?.user
     self.init(
       clientId: client?.id,
       lastActiveSessionId: client?.lastActiveSessionId,
       sessions: client?.sessions.map { SessionState(id: $0.id, status: $0.status.rawValue) } ?? [],
       activeUserId: activeUser?.id,
       activeUserUpdatedAt: activeUser?.updatedAt.timeIntervalSince1970,
+      activeOrganizationId: activeSession?.lastActiveOrganizationId,
       deviceToken: deviceToken
     )
   }
