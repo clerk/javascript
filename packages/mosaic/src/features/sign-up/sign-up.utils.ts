@@ -76,7 +76,7 @@ export function signUpCodeSecondaryAction(
   return step.provider ? { label: m.verifyPhone.useSms, onClick: onCancel } : { label: m.useAnotherMethod };
 }
 
-const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
+const FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
   first_name: 'firstName',
   last_name: 'lastName',
   username: 'username',
@@ -85,7 +85,7 @@ const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
   phone_number: 'phoneNumber',
 };
 
-type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields'>;
+type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields' | 'unverifiedFields'>;
 
 function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
   return missingFields.filter(
@@ -102,7 +102,7 @@ export function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
   const asksForIdentifier = missingIdentifiers(signUp).length > 0;
   return signUp.missingFields.every(
     field =>
-      field in MISSING_FORM_FIELDS ||
+      field in FORM_FIELDS ||
       CONTINUE_REQUIREMENTS.includes(field) ||
       (asksForIdentifier && signUp.optionalFields.includes(field)),
   );
@@ -120,7 +120,7 @@ export function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdent
   const identifiers = missingIdentifiers(signUp);
   const fields: SignUpFields = {};
   for (const name of signUp.missingFields) {
-    const field = MISSING_FORM_FIELDS[name];
+    const field = FORM_FIELDS[name];
     if (field && !identifiers.includes(name)) {
       fields[field] = { required: true };
     }
@@ -129,7 +129,13 @@ export function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdent
     fields[identifier === 'phoneNumber' ? 'phoneNumber' : 'emailAddress'] = { required: true };
   } else {
     const only = identifiers.find(name => name !== 'username') ?? identifiers[0];
-    const field = only ? MISSING_FORM_FIELDS[only] : undefined;
+    const field = only ? FORM_FIELDS[only] : undefined;
+    if (field) {
+      fields[field] = { required: true };
+    }
+  }
+  for (const name of signUp.unverifiedFields) {
+    const field = FORM_FIELDS[name];
     if (field) {
       fields[field] = { required: true };
     }
