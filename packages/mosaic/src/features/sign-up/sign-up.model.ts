@@ -14,17 +14,18 @@ import {
   getInitialActiveIdentifier,
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
-import type { SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
+import type { ClerkAPIError, SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
-import type { FieldFeedback } from '../../components/form';
+import type { FieldFeedback, FormFieldErrors } from '../../components/form';
 import { FormSubmitError } from '../../components/form';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
-import { useLocale, useMessages } from '../../localization';
-import { save } from '../../utils/errors';
+import { useErrorText, useLocale, useMessages } from '../../localization';
+import { save, SaveError } from '../../utils/errors';
+import { passwordError } from '../user-profile/user-profile-password-section/user-profile-password-errors';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
 import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
@@ -166,6 +167,7 @@ export function useSignUpModel({
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
   const locale = useLocale();
+  const errorText = useErrorText();
   const query = router.getSearchParams();
   const returnUrl = query.get('redirect_url') ?? undefined;
   const afterSignUpUrl = clerk.buildAfterSignUpUrl({ params: query });
@@ -264,6 +266,37 @@ export function useSignUpModel({
     lastName: signUp.lastName || initialValues.lastName || '',
   };
 
+  const saveDetails = async (result: { error: ClerkError | null }) => {
+    try {
+      await save(() => run(() => Promise.resolve(result)), DETAILS_FIELDS, usernameBounds);
+    } catch (cause) {
+      if (!(cause instanceof SaveError) || !isClerkAPIResponseError(result.error)) {
+        throw cause;
+      }
+      const errors: ClerkAPIError[] = result.error.errors;
+      const passwordErrors = errors.filter(error => error.meta?.paramName === 'password');
+      if (passwordErrors.length === 0) {
+        throw cause;
+      }
+      const { global, fields } = cause.formError;
+      const messages: FormFieldErrors<SignUpDetailsValues> = {};
+      for (const name of DETAILS_FIELDS) {
+        const error = fields?.[name];
+        if (error) {
+          messages[name] = errorText(error);
+        }
+      }
+      messages.password = passwordError(
+        passwordErrors,
+        userSettings.passwordSettings,
+        passwordMessages,
+        locale,
+        errorText,
+      );
+      throw new FormSubmitError({ message: global && errorText(global), fields: messages });
+    }
+  };
+
   const legalConsent = legalConsentRequired
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
@@ -354,11 +387,11 @@ export function useSignUpModel({
         if (blocked) {
           return { type: 'blocked', details: blocked };
         }
-        await save(() => run(() => Promise.resolve(result)), DETAILS_FIELDS, usernameBounds);
+        await saveDetails(result);
         return next(signUp);
       },
       update: async values => {
-        await save(() => run(() => signUp.update(details(values))), DETAILS_FIELDS, usernameBounds);
+        await saveDetails(await signUp.update(details(values)));
         return next(signUp);
       },
     },
