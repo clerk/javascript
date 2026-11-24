@@ -22,12 +22,15 @@ type Identifier = 'email_address' | 'phone_number';
 
 export interface FakeSignUpSeed {
   takenEmailAddresses?: string[];
+  // Email domains an enterprise connection owns. clerk_go then asks a new sign-up for enterprise SSO.
+  enterpriseDomains?: string[];
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
 }
 
 export interface FakeSignUpState {
   takenEmailAddresses: string[];
+  enterpriseDomains: string[];
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   creations: URLSearchParams[];
@@ -39,6 +42,7 @@ export interface FakeSignUpState {
 export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
   return {
     takenEmailAddresses: [],
+    enterpriseDomains: [],
     sessionTasks: null,
     creations: [],
     updates: [],
@@ -153,9 +157,11 @@ export function signUpHandlers(
       settings().sign_up.progressive &&
       identifierNames.every(name => !attributes[name].required) &&
       !identifierNames.some(name => provided(name));
-    const missingFields = [
+    const enterprise = state.signUp.enterpriseDomains.includes(signUp.email_address?.split('@')[1] ?? '');
+    const missingFields: SignUpField[] = [
       ...required_fields.filter(field => !provided(field)),
       ...(anyIdentifierMissing ? identifierNames : []),
+      ...(enterprise ? (['enterprise_sso'] as const) : []),
     ];
     const settled: SignUpJSON = {
       ...signUp,

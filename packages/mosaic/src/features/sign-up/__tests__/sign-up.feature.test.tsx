@@ -621,6 +621,22 @@ describe('SignUp', () => {
     expect(emailField()).toHaveValue('');
   });
 
+  it('offers Start over when the email belongs to an enterprise connection', async () => {
+    const { fapi, user } = await renderSignUp({ signUp: { enterpriseDomains: ['example.com'] } });
+
+    await submitStart(user);
+
+    expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'We couldn’t continue signing you up. Start over to try again.',
+    );
+    expect(fapi.signUp.preparations).toEqual([]);
+
+    await user.click(screen.getByRole('button', { name: 'Start over' }));
+
+    expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+  });
+
   it('replaces the form with the blocked notice when the request is blocked', async () => {
     const { user } = await renderSignUp({
       signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },
