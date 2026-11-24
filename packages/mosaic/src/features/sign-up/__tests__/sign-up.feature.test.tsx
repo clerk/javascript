@@ -291,6 +291,20 @@ describe('SignUp', () => {
       expect(screen.getByText('Contact support.')).toBeInTheDocument();
       expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
     });
+
+    it('shows the form again when it is mounted after a blocked request', async () => {
+      const { user, rerender } = await renderSignUp({
+        signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },
+      });
+
+      await submitStart(user);
+      await screen.findByRole('heading', { name: 'Request blocked' });
+
+      rerender(<SignUp key='mounted again' />);
+
+      expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Request blocked' })).toBeNull();
+    });
   });
 
   describe('verifying the email', () => {
