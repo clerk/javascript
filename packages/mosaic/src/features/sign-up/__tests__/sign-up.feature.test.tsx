@@ -1182,4 +1182,49 @@ describe('SignUp invitations', () => {
     expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
     expect(fapi.signUp.updates[0].get('email_address')).toBeNull();
   });
+
+  describe('when the invitation is all the sign-up needs', () => {
+    function serveCompleteInvitation() {
+      openInvitation('__clerk_ticket', 'tkt_complete');
+      return serveFapi({
+        environment: environment({ attributes: { password: { enabled: false } } }),
+        signUp: { tickets: { tkt_complete: { emailAddress: EMAIL } } },
+      });
+    }
+
+    it('keeps the loading screen up until it leaves, without showing the form or redeeming twice', async () => {
+      const fapi = serveCompleteInvitation();
+      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+      const sawForm = watchForHeading('Create your account');
+      const { navigate } = await renderWithClerk(<SignUp />);
+
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
+      expect(screen.getByRole('progressbar', { name: 'Loading…' })).toBeInTheDocument();
+      hold.release();
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
+      expect(sawForm()).toBe(false);
+      expect(fapi.signUp.creations).toHaveLength(1);
+      expect(fapi.client.sessions).toHaveLength(1);
+      expect(window.location.search).not.toContain('__clerk_ticket');
+    });
+
+    it('shows why on the start form, with the way to sign in, when the new session cannot be activated', async () => {
+      const fapi = serveCompleteInvitation();
+      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+      const { navigate } = await renderWithClerk(<SignUp />);
+
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('form_param_invalid', 'The session could not be activated.');
+
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The session could not be activated.'));
+      expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+      expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
+      expect(continueButton()).not.toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+      expect(navigate).not.toHaveBeenCalled();
+      expect(fapi.signUp.creations).toHaveLength(1);
+    });
+  });
 });
