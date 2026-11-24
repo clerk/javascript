@@ -34,7 +34,6 @@ export default function SignUpLivePage() {
             <Button
               variant='outline'
               onClick={() =>
-                // A remount alone resumes the sign-up in progress, so clear it first.
                 void signUp.reset().then(({ error }) => {
                   if (!error) {
                     setDemoKey(key => key + 1);

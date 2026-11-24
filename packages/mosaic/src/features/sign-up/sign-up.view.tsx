@@ -49,7 +49,6 @@ export function SignUpView(props: SignUpViewProps) {
           taskChooseOrganization,
         }) => (
           <>
-            {/* / */}
             <Flow.Step ids={['start']}>
               <SignUpDetailsStep
                 {...start}
@@ -57,7 +56,6 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* /continue */}
             <Flow.Step ids={['continue']}>
               <SignUpDetailsStep
                 {...continueDetails}
@@ -65,13 +63,10 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* /verify-email-address, /continue/verify-email-address */}
             <Flow.Step ids={['verifyEmail', 'continueVerifyEmail']}>{verifyEmail}</Flow.Step>
 
-            {/* /verify-phone-number, /continue/verify-phone-number */}
             <Flow.Step ids={['verifyPhone', 'continueVerifyPhone']}>{verifyPhone}</Flow.Step>
 
-            {/* / when sign-ups are restricted */}
             <Flow.Step ids={['restricted']}>
               <SignUpRestricted
                 {...restricted}
@@ -80,7 +75,6 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* / when sign-ups go through the waitlist */}
             <Flow.Step ids={['waitlist']}>
               <SignUpRestricted
                 {...restricted}
@@ -89,7 +83,6 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* / after a blocked request */}
             <Flow.Step ids={['actionBlocked']}>
               <AuthActionBlocked
                 messages={m.actionBlocked}
@@ -97,7 +90,6 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* Any route, when the sign-up cannot continue */}
             <Flow.Step ids={['startOver']}>
               <AuthStartOver
                 messages={m.startOver}
@@ -105,15 +97,12 @@ export function SignUpView(props: SignUpViewProps) {
               />
             </Flow.Step>
 
-            {/* /tasks/choose-organization */}
             <Flow.Step ids={['taskChooseOrganization']}>{taskChooseOrganization}</Flow.Step>
 
-            {/* No route yet */}
             <Flow.Step ids={['loading']}>
               <AuthLoading messages={{ loading: m.loading }} />
             </Flow.Step>
 
-            {/* No route yet */}
             <Flow.Step ids={['alternativePhone']}>
               {alternativePhone ? (
                 <AuthAlternativeChannel
@@ -152,7 +141,6 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            {/* No route yet */}
             <Flow.Step ids={['verifyEmailLink']}>
               {verifyEmailLink ? (
                 <AuthEmailLink
@@ -175,7 +163,6 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            {/* No route yet */}
             <Flow.Step ids={['emailLinkStatus']}>
               {emailLinkStatus ? (
                 <AuthEmailLinkStatus
@@ -186,7 +173,6 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            {/* /enterprise-connections */}
             <Flow.Step ids={['enterpriseConnections']}>
               {enterpriseConnections ? (
                 <AuthEnterpriseConnections
@@ -204,7 +190,6 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            {/* No route yet */}
             <Flow.Step ids={['wallets']}>
               {wallets ? (
                 <AuthWallets
@@ -219,7 +204,6 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            {/* /protect-check */}
             <Flow.Step ids={['protectCheck']}>
               {protectCheck ? (
                 <AuthProtectCheck
