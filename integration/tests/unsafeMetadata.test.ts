@@ -97,10 +97,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
   test('user.update({ unsafeMetadata }) preserves replace semantics end-to-end', async ({ page, context }) => {
     const { u, fakeUser, bapiUser } = await signUpAndGetUser({ page, context });
 
-    // Drive the deprecated path from the browser. The SDK should route
-    // metadata through PATCH /v1/me/metadata after computing a merge patch
-    // against the locally-cached value; the server-side outcome must match
-    // a true replace (the original `position` key is gone).
+    // Drive the deprecated path from the browser. The SDK routes metadata
+    // through PUT /v1/me/metadata; the server-side outcome must be a true
+    // replace (the original `position` key is gone).
     await page.evaluate(async () => {
       await window.Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
     });
@@ -130,7 +129,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     const { u, fakeUser, bapiUser } = await signUpAndGetUser({ page, context });
 
     // Mixed call: PATCH /v1/me for the non-metadata field, then
-    // PATCH /v1/me/metadata for the computed patch. Both must land.
+    // PUT /v1/me/metadata for the metadata. Both must land.
     await page.evaluate(async () => {
       await window.Clerk.user.update({
         firstName: 'Updated',
@@ -145,7 +144,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     await fakeUser.deleteIfExists();
   });
 
-  test('user.update reloads before diffing so server-side mutations are not lost', async ({ page, context }) => {
+  test('user.update replaces server-side mutations the browser has not seen', async ({ page, context }) => {
     const { u, fakeUser, bapiUser } = await signUpAndGetUser({ page, context });
 
     // Simulate a server-side mutation made by *another* actor
@@ -157,9 +156,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('unsafeMet
     });
 
     // From the browser, call the deprecated path with replace intent.
-    // Without the pre-diff reload, the SDK would diff against stale `{ position: 'goalie' }`
-    // send `{ position: null, city: 'Toronto' }`, and the server-side `adminAdded` would silently survive violating replace semantics.
-    // The reload makes the SDK observe the fresh state and null-delete the server-added key too.
+    // The server-side `adminAdded` key must be gone too.
     await page.evaluate(async () => {
       await window.Clerk.user.update({ unsafeMetadata: { city: 'Toronto' } });
     });
