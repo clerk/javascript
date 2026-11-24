@@ -135,7 +135,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic OAut
     expect(params.get('state')).toBe(state);
   });
 
-  test('grants access for every organization the user picks', async ({ page, context }) => {
+  test('grants access for the organization the user picks', async ({ page, context }) => {
     const u = await signIn({ page, context });
     await page.evaluate(orgId => window.Clerk?.setActive({ organization: orgId }), organization.id);
     await page.waitForFunction(orgId => window.Clerk?.session?.lastActiveOrganizationId === orgId, organization.id);
@@ -146,8 +146,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic OAut
 
     await picker.click();
     await page.getByRole('option', { name: otherOrganization.name }).click();
-    await page.keyboard.press('Escape');
-    await expect(picker).toHaveText('2 organizations');
+    await expect(picker).toHaveText(otherOrganization.name);
 
     const consentRequest = page.waitForRequest(
       request => request.method() === 'POST' && request.url().includes(`/me/oauth/consent/`),
@@ -155,7 +154,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic OAut
     await page.getByRole('button', { name: 'Allow' }).click();
 
     const posted = new URLSearchParams((await consentRequest).postData() ?? '');
-    expect(posted.getAll('organization_id')).toEqual([organization.id, otherOrganization.id]);
+    expect(posted.getAll('organization_id')).toEqual([otherOrganization.id]);
     const params = await waitForCallback(page);
     expect(params.get('code')).toBeTruthy();
     expect(params.get('state')).toBe(state);
