@@ -807,4 +807,20 @@ describe('SignUp', () => {
       expect(decodeURIComponent(to)).toContain('redirect_url=/dashboard');
     });
   });
+
+  describe('branding', () => {
+    it('signs the card when the instance is branded', async () => {
+      await renderSignUp({ environment: environment({ display_config: { branded: true } }) });
+
+      await screen.findByRole('heading', { name: 'Create your account' });
+      expect(screen.getByText(/Secured by/)).toBeInTheDocument();
+    });
+
+    it('carries no signature when the branding is paid off', async () => {
+      await renderSignUp({ environment: environment({ display_config: { branded: false } }) });
+
+      await screen.findByRole('heading', { name: 'Create your account' });
+      expect(screen.queryByText(/Secured by/)).toBeNull();
+    });
+  });
 });
