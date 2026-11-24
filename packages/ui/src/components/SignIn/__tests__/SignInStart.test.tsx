@@ -667,6 +667,45 @@ describe('SignInStart', () => {
       }
     });
 
+    it('ChatGPTSIWC_ProviderDenied_ShowsErrorWithoutRestartingChatGPT', async () => {
+      window.sessionStorage.removeItem('__clerk_siwc_auto_start_at');
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withSocialProvider({ provider: 'chatgpt' });
+      });
+      fixtures.router.queryParams = {
+        target_flow: 'chatgpt_siwc',
+        redirect_url:
+          'https://clerk.abcef.12345.prod.lclclerk.com/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      } as any;
+      // GIVEN the user denied at OpenAI, so sign-in comes back with the provider's error
+      fixtures.signIn.firstFactorVerification.status = 'unverified';
+      fixtures.signIn.firstFactorVerification.strategy = 'oauth_chatgpt';
+      fixtures.signIn.firstFactorVerification.error = {
+        code: 'oauth_access_denied',
+        message: 'Access denied',
+        longMessage: 'Access denied',
+      };
+      // Resetting the attempt replaces the client's sign-in with one that has no error, which is
+      // what re-ran the ChatGPT preflight before.
+      fixtures.signIn.create.mockImplementationOnce(() => {
+        fixtures.clerk.client.signIn = {
+          ...fixtures.signIn,
+          firstFactorVerification: { ...fixtures.signIn.firstFactorVerification, error: null },
+        } as any;
+        return Promise.resolve(fixtures.clerk.client.signIn);
+      });
+
+      render(<SignInStart />, { wrapper });
+
+      // THEN the denial is shown and only the reset ran; ChatGPT waits for the user to retry
+      await waitFor(() => expect(screen.getByText('You did not grant access to your account.')).toBeInTheDocument());
+      await waitFor(() => expect(fixtures.signIn.create).toHaveBeenCalledWith({}));
+      await new Promise(resolve => setTimeout(resolve, 50));
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(1);
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+
     it('hands the ChatGPT plugin flow to required enterprise SSO before OAuth', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();

@@ -609,12 +609,19 @@ function SignInStartInternal(): JSX.Element {
       // The component-level ref still guards repeat effects when storage is unavailable.
     }
 
+    if (signIn.firstFactorVerification?.error) {
+      // The user came back from a failed or denied provider sign-in. The OAuth error effect
+      // above resets the attempt with signIn.create({}), which re-runs this effect without the
+      // error, so remember the failure for this mount and leave any retry to the ChatGPT button.
+      chatGPTPreflightStarted.current = true;
+      return;
+    }
+
     if (
       chatGPTPreflightStarted.current ||
       hasRecentChatGPTAutoStart ||
       !isChatGPTSIWCFlow(ctx.queryParams) ||
       organizationTicket ||
-      signIn.firstFactorVerification?.error ||
       !authenticatableSocialStrategies.includes('oauth_chatgpt')
     ) {
       return;
