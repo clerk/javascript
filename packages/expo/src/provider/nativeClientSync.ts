@@ -283,15 +283,26 @@ export function createNativeClientSync(
       await activateDefaultSession();
     };
 
+    let attached = true;
     let needsRepair = false;
     const fromNative = singleFlight(async () => {
       if (await ready()) {
         try {
-          await retry(refetchClient, {
-            initialDelay: 300,
-            maxDelayBetweenRetries: 2_000,
-            shouldRetry: (error, iterations) => iterations <= 2 && !is4xxError(error),
-          });
+          await retry(
+            async () => {
+              if (attached) {
+                await refetchClient();
+              }
+            },
+            {
+              initialDelay: 300,
+              maxDelayBetweenRetries: 2_000,
+              shouldRetry: (error, iterations) => attached && iterations <= 2 && !is4xxError(error),
+            },
+          );
+          if (!attached) {
+            return;
+          }
           await activateDefaultSession();
           needsRepair = false;
         } catch (error) {
@@ -398,6 +409,7 @@ export function createNativeClientSync(
     activeEngine = engine;
 
     return () => {
+      attached = false;
       removeClerkListener();
       subscription?.remove();
       appStateSubscription.remove();
