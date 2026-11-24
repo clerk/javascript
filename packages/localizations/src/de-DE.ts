@@ -1119,6 +1119,11 @@ export const deDE: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
