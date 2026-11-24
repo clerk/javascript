@@ -256,6 +256,15 @@ describe('SignUp', () => {
       await codeSent();
     });
 
+    it("shows legacy's rate limit copy when sign-ups are rate limited", async () => {
+      const { user } = await renderSignUp({ signUp: { rateLimited: true } });
+
+      await submitStart(user);
+
+      expect(await screen.findByText('Too many requests. Please try again in a bit.')).toBeInTheDocument();
+      expect(screen.queryByText('Sign-up rate limit exceeded for this instance.')).not.toBeInTheDocument();
+    });
+
     it('replaces the form with the blocked notice when the request is blocked', async () => {
       const { user } = await renderSignUp({
         signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },

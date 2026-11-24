@@ -84,6 +84,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
   role_unavailable: 'This role is no longer available.',
+  signup_rate_limit_exceeded: 'Too many requests. Please try again in a bit.',
   sso_bypass_member_not_found: 'No member of this organization has that email address.',
   sso_bypass_already_added: 'This member is already on the allow list.',
   sso_bypass_all_already_added: 'Everyone with that role is already on the allow list.',
