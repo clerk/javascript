@@ -72,7 +72,7 @@ export const signInMessages = {
   },
   startOver: {
     title: 'Something went wrong',
-    message: 'We couldn’t continue signing you in. Start over to try again.',
+    description: 'We couldn’t continue signing you in. Start over to try again.',
     action: 'Start over',
     pending: 'Starting over',
   },

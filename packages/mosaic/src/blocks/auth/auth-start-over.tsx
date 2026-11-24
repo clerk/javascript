@@ -4,7 +4,7 @@ import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 
 export interface AuthStartOverMessages {
   title: string;
-  message: string;
+  description: string;
   action: string;
   pending: string;
 }
@@ -26,7 +26,7 @@ export function AuthStartOver({ messages, globalErrorMessage, isPending, onStart
         role='alert'
         color='negative'
       >
-        {globalErrorMessage ?? messages.message}
+        {globalErrorMessage ?? messages.description}
       </Card.Banner>
       <Card.Footer>
         <SubmitButton
