@@ -127,6 +127,7 @@ export interface SignUpWalletsScreen {
 
 export interface SignUpProtectScreen {
   protect: SignUpProtectModel;
+  expiredReloads: { current: number };
   onNext: (result: SignUpCreateResult) => void;
 }
 

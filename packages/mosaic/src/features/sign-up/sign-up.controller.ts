@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
@@ -107,6 +107,7 @@ export function useSignUpController(
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
   const [blocked, setBlocked] = useState<AuthActionBlockedDetails>();
+  const expiredProtectReloads = useRef(0);
   const outcome = flowOutcome({
     session: liveModel.flow.session,
     entry: arrival.session,
@@ -176,7 +177,7 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
-    protectCheck: { protect: model.protect, onNext: next },
+    protectCheck: { protect: model.protect, expiredReloads: expiredProtectReloads, onNext: next },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

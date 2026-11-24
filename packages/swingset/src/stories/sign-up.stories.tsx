@@ -455,7 +455,8 @@ export function ProtectCheck() {
       screen='protectCheck'
       protectCheck={
         <SignUpProtect
-          protect={{ challengeId: 'ptk_story', resolve: () => new Promise(noop), resetExpiredReloads: noop }}
+          protect={{ challengeId: 'ptk_story', resolve: () => new Promise(noop) }}
+          expiredReloads={{ current: 0 }}
           logo={LOGO}
           onNext={noop}
         />
