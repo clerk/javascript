@@ -6,7 +6,7 @@ import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicLocation } from '../location';
-import type { MosaicRouting, RouterAdapter } from '../router-adapter';
+import type { RouterAdapter, RoutingOptions } from '../router-adapter';
 import { RoutingConfigProvider } from '../router-adapter';
 import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useMosaicLocation } from '../use-mosaic-location';
@@ -17,7 +17,7 @@ afterEach(() => vi.restoreAllMocks());
 
 const warnings = () => vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
 
-function wrapperWith(routing: MosaicRouting = {}) {
+function wrapperWith(routing: RoutingOptions = {}) {
   return ({ children }: { children: ReactNode }) => (
     <RoutingConfigProvider {...routing}>
       <VirtualStoreProvider>{children}</VirtualStoreProvider>
@@ -30,7 +30,7 @@ function useLocationAt(options: MosaicLocationOptions) {
   return { location, parts: location.useSegmentParts() };
 }
 
-function renderLocation(options: MosaicLocationOptions, routing?: MosaicRouting) {
+function renderLocation(options: MosaicLocationOptions, routing?: RoutingOptions) {
   return renderHook(() => useLocationAt(options), { wrapper: wrapperWith(routing) });
 }
 

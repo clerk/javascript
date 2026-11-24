@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
+import type { RoutingMode } from '../../routing/use-mosaic-location';
 import { profileModalOptions, useMosaicProfile } from '../profile-pages/use-mosaic-profile';
 import { UserProfileSurface } from './profile';
 import type { ProfileModalContentProps, ProfileModalOptions } from './profile.modal.types';
@@ -34,7 +34,7 @@ export function ModalProfile({
   options: ProfileModalOptions;
   close: () => void;
   path: string;
-  routing: MosaicRoutingMode;
+  routing: RoutingMode;
   combined: boolean;
 }): React.ReactElement {
   const { isLoaded, user } = useUser();

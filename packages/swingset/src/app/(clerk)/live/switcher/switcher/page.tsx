@@ -2,7 +2,7 @@
 
 import { Switcher } from '@clerk/mosaic/features/switcher/switcher';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -33,7 +33,7 @@ export default function SwitcherLivePage() {
 function SwitcherLive() {
   const { isLoaded, isSignedIn } = useUser();
   const mode = toMode(useSearchParams().get('mode'));
-  const routing: MosaicRouting = {
+  const routing: RoutingOptions = {
     adapter: nextRouterAdapter,
     modals: mode === 'virtual' ? undefined : mode,
   };

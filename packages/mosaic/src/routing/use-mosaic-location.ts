@@ -11,10 +11,10 @@ import { useVirtualActions } from './virtual-store';
 import type { HostUrl } from './window-location';
 import { isSameOrigin, notifyWindowUrl, readWindowUrl, useWindowUrl, writeWindowUrl } from './window-location';
 
-export type MosaicRoutingMode = 'virtual' | UrlRoutingMode;
+export type RoutingMode = 'virtual' | UrlRoutingMode;
 
 export type MosaicLocationOptions = {
-  routing: MosaicRoutingMode;
+  routing: RoutingMode;
   path?: string;
 };
 
@@ -129,7 +129,7 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
 
 // The mode is fixed on the first render: each mode calls its own hooks, so a component changes mode
 // by remounting, which the profiles do by keying on `routing`.
-export function useFixedRoutingMode<Mode extends MosaicRoutingMode>(routing: Mode): Mode {
+export function useFixedRoutingMode<Mode extends RoutingMode>(routing: Mode): Mode {
   const [mode] = useState(routing);
   if (mode !== routing) {
     logger.warnOnce(

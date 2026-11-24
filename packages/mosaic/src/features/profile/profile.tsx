@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
+import type { RoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import type { OrganizationProfileProps } from '../organization-profile/organization-profile';
 import { organizationProfilePageIds } from '../organization-profile/organization-profile.layout';
@@ -217,7 +217,7 @@ export function UserProfileSurface({
 
 type AccountViewProps = Omit<UserProfileViewProps, 'activePage' | 'onPageChange' | 'organization'> & {
   path: string;
-  routing: MosaicRoutingMode;
+  routing: RoutingMode;
 };
 
 function AccountUserProfileView({ path, routing, ...viewProps }: AccountViewProps) {

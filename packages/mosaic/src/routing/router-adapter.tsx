@@ -4,10 +4,10 @@ import { logger } from '@clerk/shared/logger';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import type { MosaicRoutingMode } from './use-mosaic-location';
+import type { RoutingMode } from './use-mosaic-location';
 import { markSettled } from './window-location';
 
-export type ModalRoutingMode = Exclude<MosaicRoutingMode, 'path'>;
+export type ModalRoutingMode = Exclude<RoutingMode, 'path'>;
 
 // What a host hands Mosaic so the URL modes read and write the host router's location instead of
 // `window`. It is a plain object the host writes from their own framework's hooks, so no framework
@@ -42,7 +42,7 @@ export interface RouterAdapter {
   replace?: (url: string) => void;
 }
 
-export interface MosaicRouting {
+export interface RoutingOptions {
   /**
    * The host router's location and navigation. Without it, the URL modes read and write
    * `window.location`. Its hooks are taken from the first render under the provider, so build the
@@ -115,7 +115,7 @@ export function RoutingConfigProvider({
   keyPrefix,
   modals,
   children,
-}: MosaicRouting & { children: ReactNode }) {
+}: RoutingOptions & { children: ReactNode }) {
   const [{ reads, shape }] = useState(() => ({ reads: readsOf(adapter), shape: shapeOf(adapter) }));
   if (shapeOf(adapter) !== shape) {
     logger.warnOnce(

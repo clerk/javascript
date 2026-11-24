@@ -18,7 +18,7 @@ import type { ModalSurfaces } from './modals/modal.types';
 import { ModalHost } from './modals/modal-host';
 import type { TextDirection } from './primitives/direction-provider';
 import { DirectionProvider } from './primitives/direction-provider';
-import type { MosaicRouting } from './routing/router-adapter';
+import type { RoutingOptions } from './routing/router-adapter';
 import { RoutingConfigProvider } from './routing/router-adapter';
 import { VirtualStoreProvider } from './routing/virtual-store';
 
@@ -40,7 +40,7 @@ export interface MosaicProviderProps {
    * one they use `window.location`. `keyPrefix` sets what the names of their params start with, and
    * `modals` puts Mosaic's own modals in the hash or the query string.
    */
-  routing?: MosaicRouting;
+  routing?: RoutingOptions;
 }
 
 // Exported Mosaic components annotate a React return type on purpose. The package sets

@@ -2,8 +2,8 @@
 
 import { UserProfile } from '@clerk/mosaic/features/user-profile/user-profile';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -15,10 +15,10 @@ import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 import { LivePageHeader } from '../../../../live-page-header';
 
 const pagePath = '/live/user-profile/user-profile';
-const modes: MosaicRoutingMode[] = ['virtual', 'path', 'hash', 'query'];
-const routing: MosaicRouting = { adapter: nextRouterAdapter };
+const modes: RoutingMode[] = ['virtual', 'path', 'hash', 'query'];
+const routing: RoutingOptions = { adapter: nextRouterAdapter };
 
-function toMode(value: string | null): MosaicRoutingMode {
+function toMode(value: string | null): RoutingMode {
   return modes.find(mode => mode === value) ?? 'virtual';
 }
 

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import type { MosaicRoutingMode } from '../../routing/use-mosaic-location';
+import type { RoutingMode } from '../../routing/use-mosaic-location';
 import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { Profile } from '../profile/profile';
 import type { UserProfileOptions } from './user-profile.provider';
@@ -24,7 +24,7 @@ export interface UserProfileProps
    *
    * @default 'virtual'
    */
-  routing?: MosaicRoutingMode;
+  routing?: RoutingMode;
   /**
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
