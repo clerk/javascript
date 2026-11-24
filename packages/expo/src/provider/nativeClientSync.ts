@@ -1,5 +1,7 @@
 import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
+import { retry } from '@clerk/shared/retry';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
+import { AppState } from 'react-native';
 
 import { MemoryTokenCache } from '../cache/MemoryTokenCache';
 import type { TokenCache } from '../cache/types';
@@ -272,12 +274,25 @@ export function createNativeClientSync(
       }
     };
 
+    let needsRepair = false;
     const fromNative = singleFlight(async () => {
       if (await ready()) {
-        await pull();
+        try {
+          await retry(pull, {
+            initialDelay: 300,
+            maxDelayBetweenRetries: 2_000,
+            shouldRetry: (_, iterations) => iterations <= 2,
+          });
+          needsRepair = false;
+        } catch (error) {
+          needsRepair = true;
+          throw error;
+        }
         await reconciling;
       }
     });
+    const pullInBackground = () =>
+      void fromNative.run().catch(error => warn('Failed to refresh the client from native.', error));
 
     const toNative = singleFlight(async () => {
       // Let an in-flight native pull settle first so one refresh covers what it applied.
@@ -354,10 +369,12 @@ export function createNativeClientSync(
     const removeClerkListener = clerk.addListener(
       () => void toNative.run().catch(error => warn('Failed to refresh the native client.', error)),
     );
-    const subscription = native.addListener?.(
-      INVALIDATED_EVENT,
-      () => void fromNative.run().catch(error => warn('Failed to refresh the client from native.', error)),
-    );
+    const subscription = native.addListener?.(INVALIDATED_EVENT, pullInBackground);
+    const appStateSubscription = AppState.addEventListener('change', state => {
+      if (state === 'active' && needsRepair) {
+        pullInBackground();
+      }
+    });
 
     const engine: Engine = {
       settled: async () => {
@@ -373,6 +390,7 @@ export function createNativeClientSync(
     return () => {
       removeClerkListener();
       subscription?.remove();
+      appStateSubscription.remove();
       if (clerk.updateClient === updateClient) {
         clerk.updateClient = originalUpdateClient;
       }
