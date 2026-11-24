@@ -2,8 +2,8 @@ import { act, render as renderComponent } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
-import type { BarChartInstance } from '../..';
-import type { BarSelection } from '../types';
+import type { BarChartInstance } from '..';
+import type { BarSelection } from '../bars/types';
 import { TestChart, type TestChartProps } from './test-chart';
 
 /** Every observed element reports a 600x300 box when `render` flushes it; happy-dom has no layout. */

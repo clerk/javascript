@@ -1,6 +1,6 @@
 import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
 
-import { type ActiveBar, type BarChartInstance, Chart, type UseBarChartOptions } from '../..';
+import { type ActiveBar, type BarChartInstance, Chart, type UseBarChartOptions } from '..';
 
 export type TestChartProps<TDatum> = Pick<
   UseBarChartOptions<TDatum>,
@@ -13,6 +13,7 @@ export type TestChartProps<TDatum> = Pick<
   | 'selection'
   | 'onSelectionChange'
   | 'onActivate'
+  | 'messages'
 > & {
   ariaLabel: string;
   formatXTick?: (value: string) => string | null;

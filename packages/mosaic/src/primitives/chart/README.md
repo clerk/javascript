@@ -146,8 +146,9 @@ Name the active type the chart's hook selects, such as `<Chart.Tooltip<ActiveBar
 | `onSelectionChange` | `(selection: BarSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection    |
 | `onActivate`        | `(active: ActiveBar<TDatum>) => void`       | —               | Called on click, Enter or Space. Makes the surface a button        |
 | `formatCategory`    | `(key: string) => string \| null`           | the key         | Names a period in keyboard announcements                           |
+| `messages`          | `Partial<BarChartMessages>`                 | English         | Screen reader text, including how Up and Down move                 |
 
-`BarSelection` is `{ category, section }`. A new `isBarActive` function repaints the Canvas. `margin` and the last four options are the [options every chart type takes](#options-every-chart-type-takes).
+`BarSelection` is `{ category, section }`. A new `isBarActive` function repaints the Canvas. `margin` and the last five options are the [options every chart type takes](#options-every-chart-type-takes). `BarChartMessages` adds `vertical`, `positiveValues` and `negativeValues` to `ChartMessages`.
 
 The hook returns a `BarChartInstance<TDatum>`: the [chart object](#the-chart-object) with `ActiveBar<TDatum>` as `selected` and `BarCategory` entries in `categories`. A `BarCategory` adds the sections a user can select (`sections`), which sections have values (`hasValues`) and whether the chart draws the projection there (`projected`). Its `x` and `width` are the category band.
 
@@ -177,13 +178,14 @@ A category's `x` and `width` are the extent its marks occupy: a band for bars. I
 
 ## Options every chart type takes
 
-| Option              | Type                                      | Default         | Description                                                     |
-| ------------------- | ----------------------------------------- | --------------- | --------------------------------------------------------------- |
-| `margin`            | `Partial<ChartMargin>`                    | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)   |
-| `selection`         | `TSelection \| null`                      | uncontrolled    | The selection. `null` selects nothing                           |
-| `onSelectionChange` | `(selection: TSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection |
-| `onActivate`        | `(active: TActive) => void`               | —               | Called on click, Enter or Space. Makes the surface a button     |
-| `formatCategory`    | `(key: string) => string \| null`         | the key         | Names a period in keyboard announcements                        |
+| Option              | Type                                      | Default         | Description                                                       |
+| ------------------- | ----------------------------------------- | --------------- | ----------------------------------------------------------------- |
+| `margin`            | `Partial<ChartMargin>`                    | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)     |
+| `selection`         | `TSelection \| null`                      | uncontrolled    | The selection. `null` selects nothing                             |
+| `onSelectionChange` | `(selection: TSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection   |
+| `onActivate`        | `(active: TActive) => void`               | —               | Called on click, Enter or Space. Makes the surface a button       |
+| `formatCategory`    | `(key: string) => string \| null`         | the key         | Names a period in keyboard announcements                          |
+| `messages`          | `Partial<ChartMessages>`                  | English         | Screen reader text: `navigate`, `activate`, `dismiss`, `noValues` |
 
 ## Keyboard
 
@@ -263,7 +265,6 @@ Painting the bars is the one thing the chart object does not do, because their c
 | ----------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `data-chart-interaction-mode` | `Chart.Root`      | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
 | `data-active`                 | `Chart.XTick`     | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
-| `data-chart-interaction`      | `Chart.Selection` | On the interaction surface inside the part                                                                           |
 | `data-active-section`         | `Chart.Selection` | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
 | `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
 | `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
@@ -274,7 +275,7 @@ The interaction surface also carries the chart type's state, such as `data-activ
 
 - The chart type's marks carry `role="img"` and the `aria-label` from `Chart.Root`: for bars, the Canvas. The grid, axes, cursor, lines and projection outline are `aria-hidden`.
 - The interaction surface sits outside the image role, so assistive technology can reach it. It is a `button` with `onActivate`, otherwise a `group`, and takes the same `aria-label`.
-- Visually hidden text describes the keys. A `status` region announces the selected period, named through `formatCategory`, and what the chart type adds.
+- Visually hidden text describes the keys. A `status` region announces the selected period, named through `formatCategory`, and what the chart type adds. Pass `messages` to localize both.
 - An assistive-technology click without coordinates activates the selected period.
 
 ## Styling

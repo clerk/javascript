@@ -23,6 +23,7 @@ export type {
   ChartInstance,
   ChartInteractionProps,
   ChartMargin,
+  ChartMessages,
   ChartOptions,
   ChartPlot,
   ChartSelection,
@@ -36,6 +37,7 @@ export type { BarChartInstance } from './bars/bar-context';
 export type {
   ActiveBar,
   BarCategory,
+  BarChartMessages,
   BarIdentity,
   BarProjection,
   BarSection,

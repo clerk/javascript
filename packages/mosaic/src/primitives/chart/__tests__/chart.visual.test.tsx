@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 
-import { type ActiveBar, type BarIdentity, type BarProjection, Chart } from '../..';
+import { type ActiveBar, type BarIdentity, type BarProjection, Chart } from '..';
 
 const growth = [
   { week: '2026-01-05', signups: 40, returning: 22, churned: -14 },
