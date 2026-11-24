@@ -99,11 +99,11 @@ export type UserSearchMetadataFilter = {
   scope: 'public' | 'private' | 'unsafe';
   /** A dot-separated path into the metadata, for example `settings.theme`. Escape a literal dot in a key as `\.`. */
   key: string;
-  /** `exists` matches users that hold the key, whether it holds a value or nested keys. `equals` matches the whole value, case-insensitively. */
+  /** `exists` matches users that hold the key, whether it holds a value or nested keys. `equals` matches the whole value, case-insensitively. If the key holds an array, `equals` matches any item in it. */
   match: 'exists' | 'equals';
   /** The value to compare against. Required for `equals` and not allowed for `exists`. */
   value?: string;
-  /** If `true`, returns the users the filter does not match instead. */
+  /** If `true`, `exists` matches users that do not hold the key, and `equals` matches users that hold the key with a different value. */
   negate?: boolean;
 };
 
