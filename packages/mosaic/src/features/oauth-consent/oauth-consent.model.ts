@@ -1,12 +1,13 @@
 import { getRedirectDisplay } from '@clerk/shared/internal/clerk-js/oauthConsent';
 import { useClerk, useOAuthConsent, useSession } from '@clerk/shared/react';
+import type { OAuthClientRegistration } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { toLocalizableError } from '../../utils/errors';
-import type { OAuthConsentModel } from './oauth-consent.types';
+import type { OAuthConsentClientIdentity, OAuthConsentModel } from './oauth-consent.types';
+import { OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
 
-const OFFLINE_ACCESS_SCOPE = 'offline_access';
-const USER_ORG_READ_SCOPE = 'user:org:read';
+const POSTED_BY_FORM = ['scope', 'organization_id', 'consented'];
 
 export interface OAuthConsentModelOptions {
   /**
@@ -43,6 +44,7 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
     scope,
     redirectUri: redirectUrl || undefined,
     enabled: redirectUrl !== '',
+    keepPreviousData: false,
   });
 
   if (!isLoaded || !environment) {
@@ -79,17 +81,31 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
     status: 'ready',
     applicationName: environment.displayConfig.applicationName,
     oauthApplicationName: data.oauthApplicationName,
+    clientIdentity: toClientIdentity(data.clientRegistration, data.clientMetadataHost),
     identifier: user.primaryEmailAddress?.emailAddress || user.primaryPhoneNumber?.phoneNumber || '',
     redirectUrl,
     redirectDomain: data.redirectDomain ?? getRedirectDisplay(redirectUrl),
     actionUrl: clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId }),
-    forwardedParams: [...search.entries()],
+    forwardedParams: [...search.entries()].filter(([name]) => !POSTED_BY_FORM.includes(name)),
     renderBranding: environment.displayConfig.branded,
-    scopes: requested.filter(item => item.scope !== OFFLINE_ACCESS_SCOPE),
+    scopes: requested,
     hasOfflineAccess: requested.some(item => item.scope === OFFLINE_ACCESS_SCOPE),
     organizations,
     defaultOrganizationId:
       (organizations.find(organization => organization.value === session.lastActiveOrganizationId) ?? organizations[0])
         ?.value ?? null,
   };
+}
+
+function toClientIdentity(
+  registration: OAuthClientRegistration | undefined,
+  metadataHost: string | null | undefined,
+): OAuthConsentClientIdentity | null {
+  if (registration === 'dynamic') {
+    return { registration };
+  }
+  if (registration === 'metadata_document' && metadataHost) {
+    return { registration, metadataHost };
+  }
+  return null;
 }
