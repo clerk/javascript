@@ -1,4 +1,5 @@
-import { act, screen, waitFor } from '@testing-library/react';
+import type { SignUpJSON } from '@clerk/shared/types';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
@@ -6,11 +7,13 @@ import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  type FapiEnvironment,
   fapiEnvironment,
   type FapiEnvironmentOverrides,
   fapiMembership,
   fapiOrganization,
   fapiSession,
+  fapiSignUp,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
@@ -65,6 +68,19 @@ function RouteProbe() {
       </button>
     </>
   );
+}
+
+async function renderSignUpInProgress(env: FapiEnvironment, signUp: Partial<SignUpJSON>) {
+  const fapi = serveFapi({ environment: env, client: { ...fapiClient(), sign_up: fapiSignUp(signUp) } });
+  const view = await renderWithClerk(
+    <>
+      <SignUp />
+      <RouteProbe />
+    </>,
+  );
+  const user = userEvent.setup();
+  await screen.findByRole('heading', { name: 'Create your account' });
+  return { ...view, fapi, user };
 }
 
 function visitWithQuery(query: string) {
@@ -413,16 +429,10 @@ describe('SignUp', () => {
   });
 
   it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
-    const fapi = serveFapi({ environment: environment({ attributes: { username: { required: true } } }) });
-    const { clerk, navigate } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
+    const { fapi, user, navigate } = await renderSignUpInProgress(
+      environment({ attributes: { username: { required: true } } }),
+      { email_address: EMAIL, has_password: true },
     );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL, password: PASSWORD }));
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
     await enterCode(user);
@@ -441,16 +451,7 @@ describe('SignUp', () => {
   });
 
   it('sends the password from the continue screen when the sign-up has none', async () => {
-    const fapi = serveFapi({ environment: environment() });
-    const { clerk, navigate } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
-    );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL }));
+    const { fapi, user, navigate } = await renderSignUpInProgress(environment(), { email_address: EMAIL });
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
     await enterCode(user);
@@ -466,20 +467,12 @@ describe('SignUp', () => {
   });
 
   it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {
-    const fapi = serveFapi({
-      environment: environment({
+    const { fapi, user } = await renderSignUpInProgress(
+      environment({
         attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
       }),
-    });
-    const { clerk } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
+      { has_password: true },
     );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
 
     await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
 
@@ -498,8 +491,8 @@ describe('SignUp', () => {
   });
 
   it('asks for an email or a phone number on the continue screen of an instance without progressive sign-up', async () => {
-    const fapi = serveFapi({
-      environment: environment({
+    const { fapi, user } = await renderSignUpInProgress(
+      environment({
         attributes: {
           phone_number: {
             enabled: true,
@@ -518,16 +511,8 @@ describe('SignUp', () => {
           },
         },
       }),
-    });
-    const { clerk } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
+      { has_password: true },
     );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
 
     await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
 
@@ -543,8 +528,8 @@ describe('SignUp', () => {
   });
 
   it('asks for legal consent on the continue screen when the sign-up has not accepted it', async () => {
-    const fapi = serveFapi({
-      environment: environment({
+    const { fapi, user, navigate } = await renderSignUpInProgress(
+      environment({
         user_settings: {
           sign_up: {
             allowlist_only: false,
@@ -555,16 +540,8 @@ describe('SignUp', () => {
           },
         },
       }),
-    });
-    const { clerk, navigate } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
+      { email_address: EMAIL, has_password: true },
     );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ emailAddress: EMAIL, password: PASSWORD }));
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
     await enterCode(user);

@@ -13,6 +13,7 @@ import {
   type FapiEnvironment,
   fapiPhoneNumber,
   fapiSession,
+  fapiSignUp,
   fapiUser,
   fapiVerification,
 } from '../fapi';
@@ -95,6 +96,28 @@ export function signUpHandlers(
   const store = (signUp: SignUpJSON) => {
     state.client = { ...state.client, sign_up: signUp.status === 'complete' ? null : signUp };
     return envelope(signUp, state.client);
+  };
+
+  // FAPI derives these from the instance, so a seeded sign-up gets them from the environment, as a created one does.
+  const withSupportedStrategies = (signUp: SignUpJSON): SignUpJSON => {
+    const { attributes } = settings();
+    if (!signUp.verifications) {
+      return signUp;
+    }
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications,
+        email_address: {
+          ...signUp.verifications.email_address,
+          supported_strategies: attributes.email_address.verifications,
+        },
+        phone_number: {
+          ...signUp.verifications.phone_number,
+          supported_strategies: attributes.phone_number.verifications,
+        },
+      },
+    };
   };
 
   const combinesEmailOrPhone = () => {
@@ -202,6 +225,10 @@ export function signUpHandlers(
     return { ...settled, status: 'complete', created_session_id: session.id, created_user_id: user.id };
   };
 
+  if (state.client.sign_up) {
+    state.client = { ...state.client, sign_up: settle(withSupportedStrategies(state.client.sign_up)) };
+  }
+
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
     const { attributes, password_settings } = settings();
     let next = signUp;
@@ -266,38 +293,7 @@ export function signUpHandlers(
       if (state.signUp.blocked) {
         return rejected('action_blocked', 'This request was blocked.', undefined, 403, state.signUp.blocked);
       }
-      const { attributes } = settings();
-      const blank: SignUpJSON = {
-        object: 'sign_up',
-        id: `sua_${state.signUp.creations.length}`,
-        status: 'missing_requirements',
-        required_fields: [],
-        optional_fields: [],
-        missing_fields: [],
-        unverified_fields: [],
-        username: null,
-        first_name: null,
-        last_name: null,
-        email_address: null,
-        phone_number: null,
-        web3_wallet: null,
-        external_account_strategy: null,
-        external_account: null,
-        has_password: false,
-        unsafe_metadata: {},
-        created_session_id: null,
-        created_user_id: null,
-        abandon_at: createdAt + 86_400_000,
-        legal_accepted_at: null,
-        locale: null,
-        timezone: null,
-        verifications: {
-          email_address: verification(attributes.email_address),
-          phone_number: verification(attributes.phone_number),
-          web3_wallet: verification({ verifications: [] }),
-          external_account: verification({ verifications: [] }),
-        },
-      };
+      const blank = withSupportedStrategies(fapiSignUp({ id: `sua_${state.signUp.creations.length}` }));
       const applied = apply(blank, body);
       return applied instanceof HttpResponse ? applied : store(settle(applied));
     }),

@@ -24,6 +24,8 @@ import type {
   PublicOrganizationDataJSON,
   SessionJSON,
   SessionVerificationJSON,
+  SignUpJSON,
+  SignUpVerificationJSON,
   TokenJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
@@ -489,6 +491,51 @@ export function fapiClient(sessions: SessionJSON[] = []): ClientJSON {
     cookie_expires_at: null,
     created_at: createdAt,
     updated_at: createdAt,
+  };
+}
+
+function fapiUnpreparedVerification(): SignUpVerificationJSON {
+  return {
+    ...fapiVerification(''),
+    strategy: null,
+    status: null,
+    next_action: 'needs_prepare',
+    supported_strategies: [],
+  } as SignUpVerificationJSON;
+}
+
+export function fapiSignUp(overrides: Partial<SignUpJSON> = {}): SignUpJSON {
+  return {
+    object: 'sign_up',
+    id: 'sua_seeded',
+    status: 'missing_requirements',
+    required_fields: [],
+    optional_fields: [],
+    missing_fields: [],
+    unverified_fields: [],
+    username: null,
+    first_name: null,
+    last_name: null,
+    email_address: null,
+    phone_number: null,
+    web3_wallet: null,
+    external_account_strategy: null,
+    external_account: null,
+    has_password: false,
+    unsafe_metadata: {},
+    created_session_id: null,
+    created_user_id: null,
+    abandon_at: createdAt + 86_400_000,
+    legal_accepted_at: null,
+    locale: null,
+    timezone: null,
+    verifications: {
+      email_address: fapiUnpreparedVerification(),
+      phone_number: fapiUnpreparedVerification(),
+      web3_wallet: fapiUnpreparedVerification(),
+      external_account: fapiUnpreparedVerification(),
+    },
+    ...overrides,
   };
 }
 
