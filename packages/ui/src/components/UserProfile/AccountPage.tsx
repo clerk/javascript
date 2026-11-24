@@ -10,6 +10,7 @@ import {
   AccountUsername,
   AccountWeb3,
 } from './AccountSections';
+import { AgentConnectionsSection } from './AgentConnectionsSection';
 import { UserProfileSection } from './UserProfileSection';
 
 export const AccountPage = withCardStateProvider(() => {
@@ -28,6 +29,7 @@ export const AccountPage = withCardStateProvider(() => {
         <AccountEmails />
         <AccountPhone />
         <AccountConnectedAccounts />
+        <AgentConnectionsSection />
         <AccountEnterpriseAccounts />
         <AccountWeb3 />
       </ProfileCard.PagePanel>

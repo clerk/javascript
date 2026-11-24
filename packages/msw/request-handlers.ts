@@ -430,6 +430,9 @@ export function setClerkState(state: {
 }
 
 export const clerkHandlers = [
+  http.get('*/v1/me/agent_connections', () => {
+    return createNoStoreResponse({ response: { data: [], total_count: 0 } });
+  }),
   // Environment endpoints
   http.get('*/v1/environment', () => {
     return HttpResponse.json(currentEnvironment.config, {

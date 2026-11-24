@@ -54,6 +54,7 @@ export type ProfileSectionId =
   | 'emailAddresses'
   | 'phoneNumbers'
   | 'connectedAccounts'
+  | 'agentConnections'
   | 'enterpriseAccounts'
   | 'web3Wallets'
   | 'password'
