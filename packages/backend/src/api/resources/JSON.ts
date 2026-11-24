@@ -794,6 +794,19 @@ export interface DirectoryGroupWebhookEventJSON {
 }
 
 /**
+ * Enterprise connection webhook event payload, used for `enterpriseConnection.created` webhook events.
+ * It carries only the connection's own fields; fetch the full `EnterpriseConnectionJSON`
+ * from the Backend API with `id` when you need its name, provider or SAML/OAuth details.
+ */
+export interface EnterpriseConnectionWebhookEventJSON {
+  id: string;
+  organization_id: string | null;
+  domains: string[];
+  active: boolean;
+  created_at: number;
+}
+
+/**
  * Directory group membership webhook event payload: one user's membership in a directory group.
  * `user_id` is null until the member has been provisioned into Clerk.
  * Used for `directoryGroupMembership.created` webhook events.

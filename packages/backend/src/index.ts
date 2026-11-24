@@ -107,6 +107,7 @@ export type {
   DirectoryGroupWebhookEventJSON,
   DirectoryGroupMembershipWebhookEventJSON,
   DeletedDirectoryGroupMembershipWebhookEventJSON,
+  EnterpriseConnectionWebhookEventJSON,
   VerificationJSON,
   WaitlistEntryJSON,
   Web3WalletJSON,

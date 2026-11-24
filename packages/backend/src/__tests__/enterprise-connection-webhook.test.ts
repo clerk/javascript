@@ -1,6 +1,10 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
-import type { EnterpriseConnectionJSON, EnterpriseConnectionWebhookEvent, WebhookEventType } from '../index';
+import type {
+  EnterpriseConnectionWebhookEvent,
+  EnterpriseConnectionWebhookEventJSON,
+  WebhookEventType,
+} from '../index';
 import type { verifyWebhook } from '../webhooks';
 
 type VerifiedEvent = Awaited<ReturnType<typeof verifyWebhook>>;
@@ -13,11 +17,8 @@ describe('enterpriseConnection.created webhook', () => {
 
   test('narrows to the enterprise connection payload', () => {
     type Created = Extract<VerifiedEvent, { type: 'enterpriseConnection.created' }>;
-    expectTypeOf<Created['data']>().toEqualTypeOf<EnterpriseConnectionJSON>();
-    expectTypeOf<NonNullable<Created['data']['oauth_config']>['redirect_uri']>().toEqualTypeOf<string | undefined>();
-    expectTypeOf<NonNullable<Created['data']['custom_attributes']>[number]['directory_path']>().toEqualTypeOf<
-      string | undefined
-    >();
+    expectTypeOf<Created['data']>().toEqualTypeOf<EnterpriseConnectionWebhookEventJSON>();
+    expectTypeOf<Created['data']['organization_id']>().toEqualTypeOf<string | null>();
   });
 
   test('preserves the common resource ID used by existing webhook handlers', () => {

@@ -7,7 +7,7 @@ import type {
   DirectoryGroupMembershipWebhookEventJSON,
   DirectoryGroupWebhookEventJSON,
   EmailJSON,
-  EnterpriseConnectionJSON,
+  EnterpriseConnectionWebhookEventJSON,
   OrganizationDomainJSON,
   OrganizationInvitationAcceptedJSON,
   OrganizationInvitationJSON,
@@ -98,7 +98,10 @@ export type DirectoryGroupMembershipWebhookEvent =
   | Webhook<'directoryGroupMembership.created', DirectoryGroupMembershipWebhookEventJSON>
   | Webhook<'directoryGroupMembership.deleted', DeletedDirectoryGroupMembershipWebhookEventJSON>;
 
-export type EnterpriseConnectionWebhookEvent = Webhook<'enterpriseConnection.created', EnterpriseConnectionJSON>;
+export type EnterpriseConnectionWebhookEvent = Webhook<
+  'enterpriseConnection.created',
+  EnterpriseConnectionWebhookEventJSON
+>;
 
 export type SessionWebhookEvent = Webhook<
   'session.created' | 'session.ended' | 'session.removed' | 'session.revoked',
