@@ -794,19 +794,6 @@ export interface DirectoryGroupWebhookEventJSON {
 }
 
 /**
- * Enterprise connection webhook event payload, used for `enterpriseConnection.created` webhook events.
- * It carries only the connection's own fields; fetch the full `EnterpriseConnectionJSON`
- * from the Backend API with `id` when you need its name, provider or SAML/OAuth details.
- */
-export interface EnterpriseConnectionWebhookEventJSON {
-  id: string;
-  organization_id: string | null;
-  domains: string[];
-  active: boolean;
-  created_at: number;
-}
-
-/**
  * Directory group membership webhook event payload: one user's membership in a directory group.
  * `user_id` is null until the member has been provisioned into Clerk.
  * Used for `directoryGroupMembership.created` webhook events.
@@ -852,7 +839,6 @@ export interface EnterpriseConnectionCustomAttributeJSON {
   key: string;
   sso_path: string;
   scim_path: string;
-  directory_path?: string;
   multi_valued: boolean;
 }
 
@@ -895,7 +881,6 @@ export interface EnterpriseConnectionOauthConfigJSON {
   auth_url?: string;
   token_url?: string;
   user_info_url?: string;
-  redirect_uri?: string;
   logo_public_url?: string;
   requires_pkce: boolean;
   created_at: number;
@@ -922,6 +907,23 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   updated_at: number;
   saml_connection?: EnterpriseConnectionSamlConnectionJSON | null;
   oauth_config?: EnterpriseConnectionOauthConfigJSON | null;
+}
+
+/**
+ * Enterprise connection webhook event payload, used for `enterpriseConnection.created` webhook events.
+ * It carries only the connection's own fields; fetch the full `EnterpriseConnectionJSON`
+ * from the Backend API with `id` when you need its name, provider or SAML/OAuth details.
+ */
+export interface EnterpriseConnectionWebhookEventJSON {
+  object: typeof ObjectType.EnterpriseConnection;
+  id: string;
+  organization_id: string | null;
+  domains: string[];
+  active: boolean;
+  /**
+   * Unix timestamp of creation, in milliseconds.
+   */
+  created_at: number;
 }
 
 export interface SamlConnectionJSON extends ClerkResourceJSON {
