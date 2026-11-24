@@ -85,6 +85,18 @@ function visitWithQuery(query: string) {
   onTestFinished(() => window.history.replaceState(null, '', original));
 }
 
+function captureNavigations() {
+  const navigation = (window as unknown as { navigation: EventTarget }).navigation;
+  const urls: string[] = [];
+  const onNavigate = (event: Event) => {
+    urls.push((event as Event & { destination: { url: string } }).destination.url);
+    event.preventDefault();
+  };
+  navigation.addEventListener('navigate', onNavigate);
+  onTestFinished(() => navigation.removeEventListener('navigate', onNavigate));
+  return urls;
+}
+
 const emailField = () => screen.getByRole('textbox', { name: 'Email address' });
 const passwordField = () => screen.getByLabelText('Password', { selector: 'input' });
 const continueButton = () => screen.getByRole('button', { name: 'Continue' });
@@ -291,9 +303,21 @@ describe('SignUp', () => {
       expect(await screen.findByRole('button', { name: 'Edit email address' })).toBeDisabled();
 
       hold.release();
-      await codeSent();
+      expect(await codeSent()).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Edit email address' })).toBeEnabled();
       expect(fapi.signUp.preparations).toEqual(['email_code']);
+    });
+
+    it('shows why the code could not be sent and keeps the code screen', async () => {
+      const { user } = await renderSignUp();
+      const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
+
+      await submitStart(user);
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('form_param_invalid', 'The email code could not be sent.');
+
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The email code could not be sent.'));
+      expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     });
 
     it('shows a wrong code on the code field and accepts the right one after', async () => {
@@ -311,15 +335,6 @@ describe('SignUp', () => {
 
       await waitFor(() => expect(navigate).toHaveBeenCalled());
       expect(fapi.client.sessions).toHaveLength(1);
-    });
-
-    it('keeps Resend locked right after a code is sent', async () => {
-      const { fapi, user } = await renderSignUp();
-
-      await submitStart(user);
-
-      expect(await codeSent()).toBeDisabled();
-      expect(fapi.signUp.preparations).toEqual(['email_code']);
     });
 
     it('returns to the form with the address and password kept when the user edits it', async () => {
@@ -528,6 +543,20 @@ describe('SignUp', () => {
   });
 
   describe('finishing', () => {
+    it('keeps the code screen and shows why when the new session cannot be activated', async () => {
+      const { user, navigate } = await renderSignUp();
+      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+
+      await submitStart(user);
+      await enterCode(user);
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('form_param_invalid', 'The session could not be activated.');
+
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The session could not be activated.'));
+      expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
     it('shows nothing and is no longer busy when it stays mounted after the session is created', async () => {
       const { user, navigate } = await renderSignUp();
 
@@ -688,7 +717,7 @@ describe('SignUp', () => {
       await screen.findByRole('heading', { name: 'Create your account' });
 
       await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
-      await codeSent();
+      expect(await codeSent()).toBeDisabled();
       await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
       await user.keyboard(VERIFICATION_CODE);
 
@@ -719,37 +748,37 @@ describe('SignUp', () => {
       expect(to).toContain('/sign-in');
       expect(decodeURIComponent(to)).toContain(`redirect_url=${window.location.origin}/dashboard`);
     });
-
-    it('keeps the redirect_url from the query on the waitlist link', async () => {
-      visitWithQuery('?redirect_url=%2Fdashboard');
-      const { user, navigate } = await renderSignUp(
-        {
-          environment: environment({
-            user_settings: {
-              sign_up: {
-                allowlist_only: false,
-                progressive: true,
-                captcha_enabled: false,
-                mode: 'waitlist',
-                legal_consent_enabled: false,
-              },
-            },
-          }),
-        },
-        {},
-        { waitlistUrl: '/waitlist' },
-      );
-
-      await user.click(await screen.findByRole('button', { name: 'Join waitlist' }));
-
-      const [to] = navigate.mock.lastCall ?? [''];
-      expect(to).toContain('/waitlist');
-      expect(decodeURIComponent(to)).toContain('redirect_url=/dashboard');
-    });
   });
 
   describe('when sign-ups are closed', () => {
-    it('shows the waitlist notice in waitlist mode and goes to the waitlist', async () => {
+    it('shows the restricted notice and emails support from it in restricted mode', async () => {
+      await renderSignUp({
+        environment: environment({
+          display_config: { support_email: 'help@acme.test' },
+          user_settings: {
+            sign_up: {
+              allowlist_only: false,
+              progressive: true,
+              captcha_enabled: false,
+              mode: 'restricted',
+              legal_consent_enabled: false,
+            },
+          },
+        }),
+      });
+      const navigations = captureNavigations();
+      const user = userEvent.setup();
+
+      expect(await screen.findByRole('heading', { name: 'Access restricted' })).toBeInTheDocument();
+      expect(screen.queryByRole('textbox', { name: 'Email address' })).toBeNull();
+
+      await user.click(screen.getByRole('button', { name: 'Email support' }));
+
+      await waitFor(() => expect(navigations).toEqual(['mailto:help@acme.test']));
+    });
+
+    it('shows the waitlist notice in waitlist mode and goes to the waitlist with the redirect_url kept', async () => {
+      visitWithQuery('?redirect_url=%2Fdashboard');
       const { user, navigate } = await renderSignUp(
         {
           environment: environment({
@@ -773,7 +802,9 @@ describe('SignUp', () => {
 
       await user.click(screen.getByRole('button', { name: 'Join waitlist' }));
 
-      expect(navigate).toHaveBeenCalledWith(expect.stringContaining('waitlist'));
+      const [to] = navigate.mock.lastCall ?? [''];
+      expect(to).toContain('/waitlist');
+      expect(decodeURIComponent(to)).toContain('redirect_url=/dashboard');
     });
   });
 });
