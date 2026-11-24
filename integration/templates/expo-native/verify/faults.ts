@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 type FetchInput = Parameters<typeof fetch>[0];
 
 const listeners = new Set<() => void>();
+let installed = false;
 let armed = 0;
 let dropped = 0;
 
@@ -13,6 +14,7 @@ function isClientFetch(input: FetchInput, init: RequestInit | undefined): boolea
 }
 
 export function dropClientFetches(): void {
+  installed = true;
   const send = globalThis.fetch;
   globalThis.fetch = async (input, init) => {
     if (armed > 0 && isClientFetch(input, init)) {
@@ -23,6 +25,10 @@ export function dropClientFetches(): void {
     }
     return send(input, init);
   };
+}
+
+export function clientFetchDropsInstalled(): boolean {
+  return installed;
 }
 
 export function armClientFetchDrop(): void {

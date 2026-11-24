@@ -3,7 +3,7 @@ import { AuthView, type AuthViewMode, UserButton } from '@clerk/expo/native-comp
 import { type ReactElement, useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
-import { armClientFetchDrop, useDroppedClientFetches } from '../verify/faults';
+import { armClientFetchDrop, clientFetchDropsInstalled, useDroppedClientFetches } from '../verify/faults';
 import { AuthLogo } from './AuthLogo';
 import { type Destination, homeLinksFor } from './destinations';
 
@@ -78,19 +78,23 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
             title='Sign in'
             onPress={() => setAuthSheet('plain')}
           />
-          <Button
-            testID='verify.fault.dropClientFetch'
-            title='Drop the next client fetch'
-            onPress={armClientFetchDrop}
-          />
+          {clientFetchDropsInstalled() && (
+            <Button
+              testID='verify.fault.dropClientFetch'
+              title='Drop the next client fetch'
+              onPress={armClientFetchDrop}
+            />
+          )}
         </>
       )}
-      <Text
-        testID='verify.fault.dropped'
-        style={styles.detailText}
-      >
-        {String(dropped)}
-      </Text>
+      {clientFetchDropsInstalled() && (
+        <Text
+          testID='verify.fault.dropped'
+          style={styles.detailText}
+        >
+          {String(dropped)}
+        </Text>
+      )}
       <View style={styles.links}>
         {!isSignedIn && (
           <Button
