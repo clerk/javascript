@@ -362,9 +362,17 @@ test('ChatGPT SIWC completes the hosted sign-in, provider, consent, callback, an
   authorize.searchParams.set('target_flow', 'chatgpt_siwc');
   authorize.searchParams.set('login_hint', env('CHATGPT_SIWC_LOGIN_HINT'));
 
+  // Sign-in may start the OpenAI authorization on its own as soon as it
+  // renders, so note the visit when the browser commits to it rather than
+  // polling the current URL afterwards.
+  let reachedSignIn = false;
+  page.on('framenavigated', frame => {
+    if (frame === page.mainFrame() && new URL(frame.url()).pathname.startsWith('/sign-in')) {
+      reachedSignIn = true;
+    }
+  });
   await page.goto(`${bridgeOrigin}${authorize.pathname}${authorize.search}`);
-  await expectPath(/\/sign-in/);
-  const signInContinuationURL = page.url();
+  await expect.poll(() => reachedSignIn).toBe(true);
   if (scenario === 'account-mismatch') {
     await expectQueryParam('__clerk_siwc_account_mismatch', 'true');
     await expect(page.getByText('Add account', { exact: true })).toBeVisible();
@@ -435,27 +443,16 @@ test('ChatGPT SIWC completes the hosted sign-in, provider, consent, callback, an
       .request.get(`${bridgeOrigin}/proxy/v1/client?__clerk_api_version=2026-05-12&_clerk_js_version=6.38.0`);
     const clientAfterDenial = await clientAfterDenialResponse.json();
     expect(clientAfterDenial.response?.sessions ?? []).toHaveLength(0);
-    if (!new URL(page.url()).pathname.startsWith('/sign-in')) {
-      await page.goto(signInContinuationURL);
-      await expectPath(/\/sign-in/);
-    }
+    // The denial brings the user back to sign-in with the provider's error. Sign-in must not send
+    // them back to OpenAI on its own; only the ChatGPT button starts a second attempt.
+    await expectPath(/\/sign-in/);
+    await expect(page.getByText('You did not grant access to your account.')).toBeVisible();
+    await page.waitForTimeout(2000);
+    expect(issuerAuthorizationRequests).toBe(1);
     const retryButton = page.getByRole('button', { name: /chatgpt/i }).first();
-    const retryStep = await Promise.race([
-      expect
-        .poll(() => issuerAuthorizationRequests, { timeout: 1500 })
-        .toBeGreaterThan(1)
-        .then(() => 'provider-started')
-        .catch(() => 'provider-not-started'),
-      retryButton
-        .waitFor({ state: 'visible', timeout: 10000 })
-        .then(() => 'retry-button')
-        .catch(() => 'retry-button-unavailable'),
-    ]);
-    if (retryStep !== 'provider-started' && issuerAuthorizationRequests <= 1) {
-      await expect(retryButton).toBeEnabled();
-      await retryButton.dispatchEvent('click');
-    }
-    await expect.poll(() => issuerAuthorizationRequests).toBeGreaterThan(1);
+    await expect(retryButton).toBeEnabled();
+    await retryButton.click();
+    await expect.poll(() => issuerAuthorizationRequests).toBe(2);
   }
 
   await expectPath(/\/oauth-consent/);

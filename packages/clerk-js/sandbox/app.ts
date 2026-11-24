@@ -477,12 +477,19 @@ void (async () => {
           description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
           requires_consent: true,
         })),
-        {
-          scope: 'sandbox:long_description',
-          description:
-            'Grants access to read and update your profile, connected accounts, and organization memberships across every workspace you belong to',
-          requires_consent: true,
-        },
+        // Preview-only scope for the long-description layout. A real
+        // authorization request (one with a client_id) would submit it and
+        // fail with invalid_scope, so only show it in the bare sandbox page.
+        ...(searchParams.has('client_id')
+          ? []
+          : [
+              {
+                scope: 'sandbox:long_description',
+                description:
+                  'Grants access to read and update your profile, connected accounts, and organization memberships across every workspace you belong to',
+                requires_consent: true,
+              },
+            ]),
       ];
       Clerk.mountOAuthConsent(
         app,
