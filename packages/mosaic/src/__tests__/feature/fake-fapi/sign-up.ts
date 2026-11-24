@@ -22,15 +22,10 @@ export interface FakeSignUpSeed {
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
   protectChecks?: number;
-  /** The request that raises the Protect check: `create` (default) or the continue screen's `update`. */
   protectCheckOn?: 'create' | 'update';
-  /** Issue each Protect check already expired. */
   protectCheckExpired?: boolean;
-  /** Resolve the Protect check server-side before the proof arrives, as when another tab solved it. */
   protectCheckResolvedElsewhere?: boolean;
-  /** Answer the proof with `action_blocked` and these meta values. */
   protectCheckBlocked?: Record<string, string>;
-  /** The challenge script's source, served at a URL unique to this fake. */
   protectCheckScript?: string;
 }
 
@@ -135,7 +130,6 @@ export function signUpHandlers(
   const isExpired = (check: NonNullable<SignUpJSON['protect_check']>) =>
     check.expires_at !== undefined && check.expires_at < Date.now();
 
-  // FAPI wraps a sign-up error with the client (clerk_go api/fapi/v1/wrapper/wrapper.go WrapError), and clerk-js applies it.
   const clientError = async (response: Response) => {
     const body = (await response.json()) as object;
     return HttpResponse.json({ ...body, meta: { client: state.client } }, { status: response.status });
@@ -376,8 +370,6 @@ export function signUpHandlers(
           state.signUp.protectCheckBlocked,
         );
       }
-      // clerk_go api/shared/sign_up/service.go ResolveProtectCheck: no pending check is a 404, and a
-      // rejected proof is answered with a replacement challenge rather than an error.
       if (state.signUp.protectCheckResolvedElsewhere || !signUp.protect_check) {
         store(settle({ ...signUp, protect_check: null }));
         return clientError(missing());
@@ -410,7 +402,6 @@ export function signUpHandlers(
       if (applied instanceof HttpResponse) {
         return applied;
       }
-      // clerk_go runProtectCheck returns a pending, unexpired check unchanged and asks Protect again otherwise.
       const pending = applied.protect_check && !isExpired(applied.protect_check);
       return store(settle(pending ? applied : issueProtectCheck(applied, 'update')));
     }),

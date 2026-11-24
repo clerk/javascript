@@ -1023,21 +1023,7 @@ describe('SignUp', () => {
       expect(screen.getByRole('alert')).toHaveTextContent(/^$/);
     });
 
-    it('reloads an expired Protect check and shows the timeout when the reload returns it expired', async () => {
-      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
-
-      await submitStart(user);
-
-      await waitFor(() =>
-        expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete in time. Please try again."),
-      );
-      expect(fapi.signUp.reloads).toBe(1);
-      expect(fapi.signUp.proofTokens).toEqual([]);
-      expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
-      expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
-    });
-
-    it('reloads an expired Protect check again each time the user clicks Try again', async () => {
+    it('shows the timeout when a reload returns the Protect check expired, and reloads again on each Try again', async () => {
       const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
       const timedOut = () =>
         waitFor(() =>
@@ -1048,6 +1034,10 @@ describe('SignUp', () => {
 
       await submitStart(user);
       await timedOut();
+      expect(fapi.signUp.reloads).toBe(1);
+      expect(fapi.signUp.proofTokens).toEqual([]);
+      expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
+      expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
       for (const reloads of [2, 3]) {
         await user.click(screen.getByRole('button', { name: 'Try again' }));
         await waitFor(() => expect(fapi.signUp.reloads).toBe(reloads));
