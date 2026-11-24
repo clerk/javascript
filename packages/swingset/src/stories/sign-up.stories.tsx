@@ -19,7 +19,6 @@ export { default as __source } from './sign-up.stories?raw';
 export const meta: StoryMeta = {
   group: 'Authentication',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'SignUp',
   label: 'Sign up',
   source: 'packages/mosaic/src/features/sign-up/sign-up.view.tsx',
