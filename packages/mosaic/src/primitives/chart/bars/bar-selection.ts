@@ -1,11 +1,19 @@
 import type { SelectionModel } from '../internal/selection';
+import type { ChartMessages } from '../types';
 import type { StackedBarLayout } from './bar-layout';
-import type { ActiveBar, BarCategory, BarSection, BarSelection } from './types';
+import type { ActiveBar, BarCategory, BarChartMessages, BarSection, BarSelection } from './types';
+
+export const DEFAULT_BAR_MESSAGES = {
+  vertical: 'Use Up and Down to choose positive or negative values.',
+  positiveValues: 'positive values',
+  negativeValues: 'negative values',
+} as const satisfies Omit<BarChartMessages, keyof ChartMessages>;
 
 /** Selects a section of a stacked bar: above the zero line or below it. */
 export function barSelectionModel<TDatum>(
   layout: Pick<StackedBarLayout<TDatum>, 'plot' | 'zeroY'>,
   data: readonly TDatum[],
+  messages: Pick<BarChartMessages, 'vertical' | 'positiveValues' | 'negativeValues'> = DEFAULT_BAR_MESSAGES,
 ): SelectionModel<BarSelection, ActiveBar<TDatum>, BarCategory> {
   return {
     hitTest: (category, y, current) => {
@@ -51,8 +59,8 @@ export function barSelectionModel<TDatum>(
         projected: category.projected,
       };
     },
-    describe: selection => `${selection.section} values`,
-    verticalInstructions: 'Use Up and Down to choose positive or negative values.',
+    describe: selection => (selection.section === 'positive' ? messages.positiveValues : messages.negativeValues),
+    verticalInstructions: messages.vertical,
     anchorY: () => layout.plot.y,
     surfaceAttributes: selection => ({ 'data-active-section': selection?.section }),
   };

@@ -177,7 +177,7 @@ export default {
     },
     'Chart.Selection': {
       description:
-        'A `div` holding the interaction surface: a `button` when the hook has `onActivate`, otherwise a `group`, with `data-chart-interaction` and a `status` region that announces keyboard moves. Removes its surface when the data has no categories, and unmounting it ends a pointer or keyboard selection.',
+        'A `div` holding the interaction surface: a `button` when the hook has `onActivate`, otherwise a `group`, and a `status` region that announces keyboard moves. Removes its surface when the data has no categories, and unmounting it ends a pointer or keyboard selection.',
     },
     'Chart.Cursor': {
       description:
@@ -257,7 +257,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   exports: {
     'Chart.useBarChart': {
       description:
-        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate` and `formatCategory`. Returns the chart object for `Chart.Root`.',
+        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate`, `formatCategory` and `messages`. Returns the chart object for `Chart.Root`.',
     },
     'Chart.CanvasRenderError': {
       description:

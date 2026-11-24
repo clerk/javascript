@@ -1,4 +1,4 @@
-import type { ChartActive, ChartCategory, ChartSelection } from '../types';
+import type { ChartActive, ChartCategory, ChartMessages, ChartSelection } from '../types';
 
 export type CornerRadii = readonly [number, number, number, number];
 
@@ -33,6 +33,17 @@ export type BarMark<TDatum> = BarIdentity<TDatum> &
   }>;
 
 export type BarSection = 'positive' | 'negative';
+
+/** Screen reader text for a bar chart: the shared chart text plus the Up and Down sections. */
+export type BarChartMessages = ChartMessages &
+  Readonly<{
+    /** How Up and Down move between the positive and negative sections. */
+    vertical: string;
+    /** Follows the period name when the positive section is selected. */
+    positiveValues: string;
+    /** Follows the period name when the negative section is selected. */
+    negativeValues: string;
+  }>;
 
 export type BarCategory = ChartCategory &
   Readonly<{

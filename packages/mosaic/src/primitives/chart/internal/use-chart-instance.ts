@@ -18,6 +18,7 @@ import type {
   XTicksOptions,
 } from '../types';
 import {
+  DEFAULT_CHART_MESSAGES,
   getKeyboardAnnouncement,
   getKeyboardInstructions,
   getKeyIntent,
@@ -172,8 +173,9 @@ export function useChartInstance<
   const selected = resolve(current?.selection ?? null);
   // A selection whose category or value left the data reads as none until the user moves.
   const valid = current && currentCategory && (current.selection === null || selected) ? current : null;
-  const announcement = getKeyboardAnnouncement(valid, currentCategory, model, formatCategory);
-  const keyboardInstructions = getKeyboardInstructions(model.verticalInstructions, !!onActivate);
+  const messages = { ...DEFAULT_CHART_MESSAGES, ...options.messages };
+  const announcement = getKeyboardAnnouncement(valid, currentCategory, model, formatCategory, messages);
+  const keyboardInstructions = getKeyboardInstructions(messages, model.verticalInstructions, !!onActivate);
   const tooltipAnchor =
     valid?.selection && currentCategory && selected
       ? { x: currentCategory.center, y: model.anchorY(valid.selection, currentCategory) }

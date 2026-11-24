@@ -1,4 +1,11 @@
-import type { ChartActive, ChartCategory, ChartSelection } from '../types';
+import type { ChartActive, ChartCategory, ChartMessages, ChartSelection } from '../types';
+
+export const DEFAULT_CHART_MESSAGES = {
+  navigate: 'Use Left and Right to choose a period, or Home and End to jump to the first or last.',
+  activate: 'Press Enter or Space to open the selected period.',
+  dismiss: 'Press Escape to dismiss.',
+  noValues: 'No values for this period',
+} as const satisfies ChartMessages;
 
 export type VerticalMove = 'up' | 'down';
 
@@ -168,6 +175,7 @@ export function getKeyboardAnnouncement<TSelection extends ChartSelection, TCate
   category: TCategory | undefined,
   model: Pick<SelectionModel<TSelection, ChartActive, TCategory>, 'describe' | 'land'>,
   formatCategory: (category: string) => string | null,
+  messages: ChartMessages,
 ) {
   if (selected?.source !== 'keyboard') {
     return '';
@@ -177,16 +185,11 @@ export function getKeyboardAnnouncement<TSelection extends ChartSelection, TCate
     return `${label}, ${model.describe(selected.selection)}`;
   }
   const hasValues = !!category && model.land(category, undefined, null) !== null;
-  return hasValues ? '' : 'No values for this period';
+  return hasValues ? '' : messages.noValues;
 }
 
-export function getKeyboardInstructions(verticalInstructions: string, canActivate: boolean) {
-  return [
-    'Use Left and Right to choose a period, or Home and End to jump to the first or last.',
-    verticalInstructions,
-    canActivate ? 'Press Enter or Space to open the selected period.' : '',
-    'Press Escape to dismiss.',
-  ]
+export function getKeyboardInstructions(messages: ChartMessages, verticalInstructions: string, canActivate: boolean) {
+  return [messages.navigate, verticalInstructions, canActivate ? messages.activate : '', messages.dismiss]
     .filter(Boolean)
     .join(' ');
 }

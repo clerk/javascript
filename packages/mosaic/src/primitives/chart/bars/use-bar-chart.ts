@@ -6,8 +6,8 @@ import { useChartFrame, useChartInstance } from '../internal/use-chart-instance'
 import type { ChartOptions } from '../types';
 import { BAR_LAYOUT, type BarChartInstance } from './bar-context';
 import { prepareStackedBars, projectStackedBars } from './bar-layout';
-import { barSelectionModel } from './bar-selection';
-import type { ActiveBar, BarIdentity, BarProjection, BarSelection, BarSeries } from './types';
+import { barSelectionModel, DEFAULT_BAR_MESSAGES } from './bar-selection';
+import type { ActiveBar, BarChartMessages, BarIdentity, BarProjection, BarSelection, BarSeries } from './types';
 
 export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, ActiveBar<TDatum>> {
   data: readonly TDatum[];
@@ -21,6 +21,8 @@ export interface UseBarChartOptions<TDatum> extends ChartOptions<BarSelection, A
   projection?: BarProjection;
   /** Returns false for a bar that `Chart.Bar` styles through `data-inactive`. Default: every bar is active */
   isBarActive?: (bar: BarIdentity<TDatum>) => boolean;
+  /** Screen reader text, including how Up and Down move between sections. Default: English */
+  messages?: Partial<BarChartMessages>;
 }
 
 /**
@@ -49,7 +51,15 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
       }),
     [categoryGap, margin, prepared, projectionIndex, projectionValue, size],
   );
-  const model = React.useMemo(() => barSelectionModel(layout, data), [data, layout]);
+  const {
+    vertical = DEFAULT_BAR_MESSAGES.vertical,
+    positiveValues = DEFAULT_BAR_MESSAGES.positiveValues,
+    negativeValues = DEFAULT_BAR_MESSAGES.negativeValues,
+  } = options.messages ?? {};
+  const model = React.useMemo(
+    () => barSelectionModel(layout, data, { vertical, positiveValues, negativeValues }),
+    [data, layout, vertical, positiveValues, negativeValues],
+  );
   const instance = useChartInstance({ frame, layout, model, options });
 
   return { ...instance, [BAR_LAYOUT]: { prepared, projection: layout.projection, isBarActive } };

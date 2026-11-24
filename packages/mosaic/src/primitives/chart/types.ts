@@ -38,6 +38,18 @@ export type ChartSelection = Readonly<{ category: string }>;
 /** A selection resolved against the current data. */
 export type ChartActive<TDatum = unknown> = ChartSelection & Readonly<{ datumIndex: number; datum: TDatum }>;
 
+/** Screen reader text every chart type reads out. Pass localized strings; each defaults to English. */
+export type ChartMessages = Readonly<{
+  /** How Left, Right, Home and End move. */
+  navigate: string;
+  /** How Enter and Space open the selected period. Read only when the hook has `onActivate`. */
+  activate: string;
+  /** How Escape dismisses the selection. */
+  dismiss: string;
+  /** Announced when the keyboard lands on a period with nothing to select. */
+  noValues: string;
+}>;
+
 /** Options every chart-type hook takes. */
 export interface ChartOptions<TSelection extends ChartSelection, TActive extends ChartActive> {
   /** Space around the plot for the axes. Default: 8, 16, 36, 52 (top, right, bottom, left) */
@@ -50,6 +62,8 @@ export interface ChartOptions<TSelection extends ChartSelection, TActive extends
   onActivate?: (active: TActive) => void;
   /** Names a category in announcements. Default: the category key */
   formatCategory?: (category: string) => string | null;
+  /** Screen reader text. Default: English */
+  messages?: Partial<ChartMessages>;
 }
 
 export type XTick = Readonly<{

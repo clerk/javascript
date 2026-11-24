@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 
-import type { BarSelection } from '../types';
+import type { BarSelection } from '../bars/types';
 import { TestChart, type TestChartProps } from './test-chart';
 
 type Row = { period: string; value: number };

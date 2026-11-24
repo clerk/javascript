@@ -91,7 +91,6 @@ function SelectionSurface({ forwardedRef, chart, ariaLabel, children, render, ..
       <>
         <div
           {...surfaceProps}
-          data-chart-interaction=''
           style={{
             position: 'absolute',
             left: plot.x,

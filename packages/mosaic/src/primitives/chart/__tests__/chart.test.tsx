@@ -2,8 +2,9 @@ import { cleanup, fireEvent, render as renderComponent, screen } from '@testing-
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { RenderProps } from '../../../utils';
-import { type BarSelection, Chart } from '../..';
+import { axe } from '../../test-utils/axe';
+import type { RenderProps } from '../../utils';
+import { type BarSelection, Chart } from '..';
 import { chartFixture, type ChartRow, growthChart, quarter, render, renderChart, setupChart } from './fixtures';
 import { TestChart } from './test-chart';
 
@@ -212,6 +213,52 @@ describe('choosing a period with the keyboard', () => {
     const { interaction, getByRole } = renderChart(props);
     press(interaction, ...keys);
     expect(getByRole('status')).toHaveTextContent(announcement);
+  });
+
+  const french = { negativeValues: 'valeurs négatives', noValues: 'Aucune valeur pour cette période' };
+
+  it('announces a section in the language of `messages`', () => {
+    const { interaction, getByRole } = renderChart({ ...growthChart, data: twoSided, messages: french });
+    press(interaction, 'ArrowDown');
+    expect(getByRole('status')).toHaveTextContent('Jan, valeurs négatives');
+  });
+
+  it('announces a period with no values in the language of `messages`', () => {
+    const { interaction, getByRole } = renderChart({
+      data: [
+        { period: 'Jan', value: 10 },
+        { period: 'Feb', value: 0 },
+      ],
+      messages: french,
+    });
+    press(interaction, 'ArrowRight');
+    expect(getByRole('status')).toHaveTextContent('Aucune valeur pour cette période');
+  });
+
+  it('describes the keys in the language of `messages`', () => {
+    const { interaction } = renderChart({
+      data: quarter,
+      onActivate: () => {},
+      messages: {
+        navigate: 'Gauche et Droite choisissent une période.',
+        vertical: 'Haut et Bas choisissent une section.',
+        activate: 'Entrée ouvre la période.',
+        dismiss: 'Échap ferme.',
+      },
+    });
+    expect(interaction).toHaveAccessibleDescription(
+      'Gauche et Droite choisissent une période. Haut et Bas choisissent une section. Entrée ouvre la période. Échap ferme.',
+    );
+  });
+});
+
+describe('accessibility (axe)', () => {
+  it.each([
+    { name: 'a group', props: {} },
+    { name: 'a button', props: { onActivate: () => {} } },
+  ])('has no violations as $name', async ({ props }) => {
+    const { container } = renderChart({ data: quarter, ...props });
+    expect(await axe(container)).toHaveNoViolations();
   });
 });
 
