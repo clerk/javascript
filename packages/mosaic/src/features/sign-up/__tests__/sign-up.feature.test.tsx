@@ -1250,6 +1250,21 @@ describe('SignUp social sign-up', () => {
     expect(window.location.search).not.toContain('__clerk_mosaic_sign_up');
   });
 
+  it('replaces the form with the blocked notice when starting with Google is blocked', async () => {
+    serveFapi({
+      environment: socialEnvironment(),
+      signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },
+    });
+    await renderWithClerk(<SignUp />);
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: /Google/ }));
+
+    expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
+    expect(screen.getByText('Contact support.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Google/ })).toBeNull();
+  });
+
   it('keeps the denial on screen when an invitee comes back from Google, and does not redeem the ticket again', async () => {
     window.history.replaceState(null, '', `${window.location.pathname}?__clerk_ticket=tkt_invite`);
     const { fapi, first } = await startWithGoogle({
