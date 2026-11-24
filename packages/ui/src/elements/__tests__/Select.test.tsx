@@ -234,4 +234,186 @@ describe('Select', () => {
     expect(listbox).toHaveAttribute('aria-labelledby', 'external-label');
     expect(listbox).not.toHaveAttribute('aria-labelledby', button.id);
   });
+
+  describe('multiple', () => {
+    const fruits = [
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' },
+    ];
+
+    it('adds a clicked option to the selection and keeps the listbox open', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple']}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple' }));
+      await user.click(await screen.findByRole('option', { name: 'Cherry' }));
+
+      expect(onChange).toHaveBeenCalledWith(['apple', 'cherry']);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('removes a clicked option that is already selected', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple', 'banana']}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple, Banana' }));
+      await user.click(await screen.findByRole('option', { name: 'Apple' }));
+
+      expect(onChange).toHaveBeenCalledWith(['banana']);
+    });
+
+    it('toggles the active option with Enter and keeps the listbox open', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={[]}
+          onChange={onChange}
+        />,
+      );
+
+      const button = screen.getByRole('button', { name: 'Select an option' });
+      button.focus();
+      await user.keyboard('{ArrowDown}');
+      await screen.findByRole('listbox');
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      expect(onChange).toHaveBeenCalledWith(['banana']);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('marks the listbox multiselectable and every selected option as selected', async () => {
+      const user = userEvent.setup();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple', 'cherry']}
+          onChange={vi.fn()}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple, Cherry' }));
+
+      expect(await screen.findByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+      expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'false');
+      expect(screen.getByRole('option', { name: 'Cherry' })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('shows the selected labels in selection order, or the placeholder when none are selected', () => {
+      const { rerender } = renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['cherry', 'apple']}
+          onChange={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByRole('button', { name: 'Cherry, Apple' })).toBeInTheDocument();
+
+      rerender(
+        <Select
+          multiple
+          options={fruits}
+          value={[]}
+          onChange={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByRole('button', { name: 'Select an option' })).toBeInTheDocument();
+    });
+
+    it('passes the selected state of each option to renderOption', async () => {
+      const user = userEvent.setup();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['banana', 'cherry']}
+          onChange={vi.fn()}
+          renderOption={(option, _index, isSelected) => (
+            <span>
+              {option.label}
+              {isSelected ? ' (checked)' : ''}
+            </span>
+          )}
+        >
+          <SelectButton>2 fruits</SelectButton>
+          <SelectOptionList />
+        </Select>,
+      );
+
+      await user.click(screen.getByRole('button', { name: '2 fruits' }));
+
+      expect(await screen.findByRole('option', { name: 'Apple' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Banana (checked)' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Cherry (checked)' })).toBeInTheDocument();
+    });
+
+    it('keeps selected options that the search hides', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple']}
+          onChange={onChange}
+          searchPlaceholder='Search'
+          comparator={(term, option) => (option.label ?? '').toLowerCase().includes(term.toLowerCase())}
+        >
+          <SelectButton />
+          <SelectOptionList />
+        </Select>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple' }));
+      await user.type(screen.getByRole('combobox'), 'cher');
+      expect(screen.queryByRole('option', { name: 'Apple' })).not.toBeInTheDocument();
+      await user.click(screen.getByRole('option', { name: 'Cherry' }));
+
+      expect(onChange).toHaveBeenCalledWith(['apple', 'cherry']);
+    });
+
+    it('highlights the first selected option when the listbox opens', async () => {
+      const user = userEvent.setup();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['cherry', 'banana']}
+          onChange={vi.fn()}
+        />,
+      );
+
+      const button = screen.getByRole('button', { name: 'Cherry, Banana' });
+      button.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const listbox = await screen.findByRole('listbox');
+      const activeId = listbox.getAttribute('aria-activedescendant');
+      expect(activeId ? document.getElementById(activeId) : null).toHaveAccessibleName('Banana');
+    });
+  });
 });
