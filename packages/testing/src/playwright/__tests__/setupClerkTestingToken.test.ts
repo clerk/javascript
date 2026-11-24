@@ -7,10 +7,17 @@ import { ERROR_MISSING_FRONTEND_API_URL } from '../../common/errors';
 let setupClerkTestingToken: (typeof import('../setupClerkTestingToken'))['setupClerkTestingToken'];
 
 function createMockRoute(
-  overrides: { url?: string; fetchStatus?: number; fetchJson?: unknown; fetchError?: Error } = {},
+  overrides: {
+    url?: string;
+    fetchStatus?: number;
+    fetchJson?: unknown;
+    fetchError?: Error;
+    isNavigationRequest?: boolean;
+  } = {},
 ) {
   const {
     url = 'https://clerk.example.com/v1/client',
+    isNavigationRequest = false,
     fetchStatus = 200,
     fetchJson = { response: { captcha_bypass: false } },
     fetchError,
@@ -24,6 +31,7 @@ function createMockRoute(
     request: () =>
       ({
         url: () => url,
+        isNavigationRequest: () => isNavigationRequest,
       }) as unknown as Request,
     fetch: vi.fn(() => {
       fetchCallCount++;
@@ -169,6 +177,23 @@ describe('setupClerkTestingToken', () => {
       expect(route.fetch).toHaveBeenCalledWith({
         url: expect.stringContaining(`__clerk_testing_token=${TESTING_TOKEN}`),
       });
+    });
+
+    it('lets the browser handle navigation requests so redirects are followed once', async () => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context });
+
+      const { route } = createMockRoute({
+        url: 'https://clerk.example.com/v1/tickets/accept?ticket=abc',
+        isNavigationRequest: true,
+      });
+      await getRouteHandler()!(route);
+
+      expect(route.fetch).not.toHaveBeenCalled();
+      expect(route.continue).toHaveBeenCalledOnce();
+      const continuedUrl = new URL((route.continue as ReturnType<typeof vi.fn>).mock.calls[0][0].url);
+      expect(continuedUrl.searchParams.get('ticket')).toBe('abc');
+      expect(continuedUrl.searchParams.get('__clerk_testing_token')).toBe(TESTING_TOKEN);
     });
 
     it('overrides captcha_bypass in response', async () => {
