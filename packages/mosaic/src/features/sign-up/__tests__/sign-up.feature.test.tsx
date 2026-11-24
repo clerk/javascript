@@ -1050,6 +1050,22 @@ describe('SignUp', () => {
       }
     });
 
+    it('leaves a wrong WhatsApp code error behind when the code is sent by SMS instead', async () => {
+      const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
+      await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+      await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+      await user.click(continueButton());
+      await enterCode(user, '111111');
+      expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Send code via SMS instead' }));
+
+      expect(await screen.findByRole('heading', { name: 'Verify your phone' })).toBeInTheDocument();
+      await waitFor(() => expect(fapi.signUp.preparations).toEqual(['phone_code:whatsapp', 'phone_code:sms']));
+      await waitFor(() => expect(screen.queryByText('Incorrect code')).toBeNull());
+      expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveValue('');
+    });
+
     it('shows field and global errors on the WhatsApp phone screen and leaves them behind on the form', async () => {
       const { fapi, user } = await renderSignUp({ environment: phoneEnvironment() });
       const rejected = holdRequests('post', '/v1/client/sign_ups');
