@@ -158,13 +158,24 @@ describe('OAuthConsentView', () => {
         expect(postedOrganizationIds()).toEqual(['org_1 org_3']);
       });
 
-      it('keeps the last picked organization from being deselected', async () => {
-        const user = renderView({ organizations, organizationSelection: multiple({ organizationIds: ['org_2'] }) });
+      it('lets the user deselect the last picked organization', async () => {
+        const onChange = vi.fn();
+        const user = renderView({
+          organizations,
+          organizationSelection: multiple({ organizationIds: ['org_2'], onOrganizationIdsChange: onChange }),
+        });
 
         await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+        await user.click(screen.getByRole('option', { name: 'Globex' }));
 
-        expect(screen.getByRole('option', { name: 'Globex' })).toHaveAttribute('aria-disabled', 'true');
-        expect(screen.getByRole('option', { name: 'Initech' })).not.toHaveAttribute('aria-disabled');
+        expect(onChange).toHaveBeenCalledWith([]);
+      });
+
+      it('blocks Allow and posts no organization_id while none is selected', () => {
+        renderView({ organizations, organizationSelection: multiple({ organizationIds: [] }) });
+
+        expect(postedOrganizationIds()).toEqual([]);
+        expect(screen.getByRole('button', { name: 'Allow' })).toBeDisabled();
       });
 
       it('names a single selected organization in the picker', () => {

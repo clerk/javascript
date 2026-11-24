@@ -62,7 +62,7 @@ The default. `organizationSelection` with `organizationId` shows a plain select,
 
 ### Multiple organizations
 
-The view only, for when the backend accepts more than one organization. `multiple: true` with a `limit` lets the user pick up to that many organizations. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. The last picked organization can't be deselected. The form posts the picked organizations as one space-separated `organization_id`.
+The view only, for when the backend accepts more than one organization. `multiple: true` with a `limit` lets the user pick up to that many organizations. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. Allow stays disabled while none is picked. The form posts the picked organizations as one space-separated `organization_id`.
 
 <Story name='MultipleOrganizations' storyModule={Stories} />
 

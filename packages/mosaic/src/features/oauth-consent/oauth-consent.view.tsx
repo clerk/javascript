@@ -413,7 +413,7 @@ function OrganizationMultiSelect({
         </Select.Trigger>
         <OrganizationPopup
           organizations={organizations}
-          isDisabled={value => (organizationIds.includes(value) ? organizationIds.length === 1 : atLimit)}
+          isDisabled={value => atLimit && !organizationIds.includes(value)}
         />
       </Select.Root>
       {limit !== undefined && organizations.length > limit ? (
