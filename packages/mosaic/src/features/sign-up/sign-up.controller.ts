@@ -177,7 +177,13 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
-    protectCheck: { protect: model.protect, expiredReloads: expiredProtectReloads, onNext: next },
+    protectCheck: {
+      protect: model.protect,
+      expiredReloads: expiredProtectReloads,
+      onNext: next,
+      isPending: isFinishing,
+      globalErrorMessage: finishError,
+    },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

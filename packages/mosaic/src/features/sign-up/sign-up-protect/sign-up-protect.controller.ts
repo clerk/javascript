@@ -4,7 +4,13 @@ import { flushSync } from 'react-dom';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { SignUpProtectScreen } from '../sign-up.types';
 
-export function useSignUpProtectController({ protect, expiredReloads, onNext }: SignUpProtectScreen) {
+export function useSignUpProtectController({
+  protect,
+  expiredReloads,
+  onNext,
+  isPending: isFlowPending,
+  globalErrorMessage,
+}: SignUpProtectScreen) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const actions = usePendingAction<'challenge'>();
@@ -37,8 +43,8 @@ export function useSignUpProtectController({ protect, expiredReloads, onNext }: 
   return {
     containerRef,
     isWidgetVisible,
-    isPending: actions.isPending,
-    errorMessage: actions.error,
+    isPending: actions.isPending || isFlowPending,
+    errorMessage: actions.error ?? globalErrorMessage,
     onRetry: () => {
       expiredReloads.current = 0;
       start();

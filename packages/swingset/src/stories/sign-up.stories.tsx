@@ -459,6 +459,7 @@ export function ProtectCheck() {
           expiredReloads={{ current: 0 }}
           logo={LOGO}
           onNext={noop}
+          isPending={false}
         />
       }
     />

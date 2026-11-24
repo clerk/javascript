@@ -129,6 +129,8 @@ export interface SignUpProtectScreen {
   protect: SignUpProtectModel;
   expiredReloads: { current: number };
   onNext: (result: SignUpCreateResult) => void;
+  isPending: boolean;
+  globalErrorMessage?: string;
 }
 
 export interface SignUpViewProps {
