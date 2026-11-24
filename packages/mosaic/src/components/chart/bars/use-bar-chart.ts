@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { useMessages } from '../../../localization/context';
 import {
   type ActiveBar,
   type BarChartInstance as PrimitiveBarChartInstance,
@@ -22,7 +23,7 @@ import {
 
 export interface UseBarChartOptions<TDatum> extends Omit<
   PrimitiveUseBarChartOptions<TDatum>,
-  'series' | 'projection' | 'isBarActive' | 'formatCategory'
+  'series' | 'projection' | 'isBarActive' | 'formatCategory' | 'messages'
 > {
   /** Stack order, bottom first. Define it at module level or memoize it. */
   series: readonly ChartSeries<TDatum>[];
@@ -67,6 +68,7 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
     [bridge, index, category, section, highlightSeries],
   );
   const announceCategory = React.useCallback((key: string) => format.category(key, 'tooltip'), [format]);
+  const text = useMessages('chart');
   const chart = Primitive.useBarChart({
     ...selection,
     data,
@@ -77,6 +79,15 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
     categoryGap: categoryGap ?? categoryGapFor(data.length),
     margin: { ...MARGIN, ...margin },
     formatCategory: announceCategory,
+    messages: {
+      navigate: text.keyboardNavigate,
+      vertical: text.keyboardSections,
+      activate: text.keyboardActivate,
+      dismiss: text.keyboardDismiss,
+      noValues: text.noValues,
+      positiveValues: text.positiveValues,
+      negativeValues: text.negativeValues,
+    },
   });
 
   const projectionLabel = projection?.label;

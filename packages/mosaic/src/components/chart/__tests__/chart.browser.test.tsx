@@ -3,6 +3,7 @@ import type {} from '@vitest/browser-playwright';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
 
+import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { type ActiveBar, type BarChartHighlight, Chart, type ChartSeries } from '..';
 
 type Row = { period: string; a: number; b: number; c: number };
@@ -81,12 +82,13 @@ function canvas() {
   return element;
 }
 
+/** The interaction surface: a group, or a button when the chart has `onActivate`. */
+function surface() {
+  return screen.queryByRole('button', { name: 'Growth' }) ?? screen.getByRole('group', { name: 'Growth' });
+}
+
 function plot() {
-  const element = document.querySelector('[data-chart-interaction]');
-  if (!element) {
-    throw new Error('The chart has no interaction surface');
-  }
-  return element.getBoundingClientRect();
+  return surface().getBoundingClientRect();
 }
 
 /** The middle of a series' segment in a category, in client coordinates. */
@@ -124,8 +126,7 @@ function near(actual: Rgba, expected: Rgba) {
 }
 
 function hover({ x, y }: { x: number; y: number }) {
-  const surface = document.querySelector('[data-chart-interaction]');
-  surface?.dispatchEvent(
+  surface().dispatchEvent(
     new PointerEvent('pointermove', { bubbles: true, clientX: x, clientY: y, pointerType: 'mouse' }),
   );
 }
@@ -227,7 +228,7 @@ describe('Chart parts', () => {
     await expect.poll(async () => near(await screenPixel(besideBar), bandBefore)).toBe(false);
     expect(near(await screenPixel(bar), VIOLET)).toBe(true);
     expect(near(canvasPixel(segmentCenter(0, 0)), VIOLET)).toBe(true);
-    expect(document.elementFromPoint(bar.x, bar.y)?.hasAttribute('data-chart-interaction')).toBe(true);
+    expect(document.elementFromPoint(bar.x, bar.y)).toBe(surface());
   });
 
   it('opens a tooltip with the period and one row per series, top of the stack first', async () => {
@@ -401,6 +402,29 @@ function CustomTooltipChart() {
     </div>
   );
 }
+
+describe('Chart.Selection', () => {
+  it('describes the keys in the language of the localization', async () => {
+    await renderChart(
+      <MosaicLocalizationProvider
+        value={resolveLocalization({
+          overrides: {
+            chart: {
+              keyboardNavigate: 'Gauche et Droite choisissent une période.',
+              keyboardSections: 'Haut et Bas choisissent une section.',
+              keyboardDismiss: 'Échap ferme.',
+            },
+          },
+        })}
+      >
+        <GrowthChart />
+      </MosaicLocalizationProvider>,
+    );
+    expect(surface()).toHaveAccessibleDescription(
+      'Gauche et Droite choisissent une période. Haut et Bas choisissent une section. Échap ferme.',
+    );
+  });
+});
 
 describe('Chart.Tooltip', () => {
   it('renders its children with the selected period instead of the default rows', async () => {
