@@ -47,7 +47,7 @@ When one screen replaces another on the same card or dialog, render both as step
 - **Mark what takes focus with `useFlowAutoFocus`.** Focus moves only for a step that transitions in, so a flow that opens on a step does not take focus.
 - **A multi-step flow gets derived props.** The view renders the `step`, `form` and flags the controller passes and does not work out the step itself. Every step's `Form` uses `id={form.id}` and the controller's `onSubmit`, and its footer action is a `SubmitButton form={form.id}`: `isPending={isTesting}` and `disabled={!canContinue}` on a middle step, `isPending={form.isSubmitting}` and `disabled={!form.canSubmit}` on the last. The controller side is in [Controllers → Multi-step flows](controllers.md#multi-step-flows).
 - A loading or error state of one screen is not a step, and neither is the skeleton shown before a feature has data. Those stay conditionals.
-- **Exception: sign-up.** Its screens follow its routes, so the view takes `screen` and one props object per screen, and each `Flow.Step` mounts that screen's component (`sign-up.view.tsx`). How a screen with its own controller reaches the view is in [Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
+- **Exception: sign-up.** Its screens follow its routes, so each `Flow.Step` mounts that screen's component ([Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen)).
 
 The parts, data attributes and CSS variables are in `src/primitives/flow/README.md`.
 

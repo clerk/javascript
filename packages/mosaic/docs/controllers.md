@@ -193,7 +193,7 @@ One path, so every error a user sees goes through the `errors.*` catalog.
 - **Owners hold an `ErrorDescription`**: a `LocalizableError` (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`). `toLocalizableError` logs the second as `[Clerk] Could not localize error`. Branch with `isLocalizableError` only when a feature handles the two differently.
 - **Owners resolve copy at render; views get a string.** Owners return `errorMessage` from `useErrorText()`, which tries the catalog entry for `code__paramName`, then `code`, then Clerk's message, then the feature's `errorFallback`, then the generic error. Views never call `useErrorText` on an error they did not create.
 - **`errorFallback` is the copy for faults Clerk cannot describe** (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback, never its cause's `.message`. `network_error` has catalog copy, but network failures can also arrive as raw, unlocalizable errors.
-- Known gaps, not precedent: `useForm` resolves copy when the save fails instead of at render (it takes an `errorFallback` and uses `form.error` when none is given), the profile picture row resolves its error in the view, the password section maps its own errors (`user-profile-password-errors.ts`), and sign-up's model maps a password FAPI rejected through the same file so the message names the instance's password rules.
+- Known gaps, not precedent: `useForm` resolves copy when the save fails instead of at render (it takes an `errorFallback` and uses `form.error` when none is given), the profile picture row resolves its error in the view, the password section maps its own errors (`user-profile-password-errors.ts`), and sign-up's model maps a rejected password through the same file.
 
 ## Testing
 

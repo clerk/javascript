@@ -51,9 +51,8 @@ Either way, the controller never imports Clerk, and its effects arrive as inject
 
 ## A flow with several screens
 
-A flow such as sign-up keeps one model and splits its screens into folders, so one screen is one folder to read (`src/features/sign-up/`).
+A flow with a screen per route, such as sign-up, keeps one model and gives each screen a folder (`src/features/sign-up/`). How the screens are wired is in [Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
 
-- **The model stays whole and is grouped by screen.** It reads Clerk in one place and returns a group per screen (`details`, `verification.email`, `verification.phone`) and the groups the whole flow shares (`flow`, `app`, `navigation`) ([Models → Shape](models.md#shape)).
-- **Each screen gets a folder,** named `<feature>-<screen>/` like a profile section, holding that screen's controller and view (`sign-up-verify/`). It takes its group from the model whole.
-- **The flow controller keeps what outlives a screen:** the route and its guard, the next step, finishing, and state two screens share, such as the details form that start and continue both render.
-- **A screen that runs its own controller** follows [Sign-in and sign-up flow → Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
+- **The model returns a group per screen,** plus the groups the flow shares. Each screen takes its group whole.
+- **A screen's folder** is `<feature>-<screen>/` and holds that screen's controller and view (`sign-up-verify/`).
+- **The flow controller keeps what outlives a screen,** such as the route, the next step and finishing.

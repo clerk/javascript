@@ -7,7 +7,7 @@ Worked example: `src/features/reverification/`.
 ## Rules
 
 - The legacy component is the spec. A legacy file fuses rendering, data fetching and flow logic, and splitting it three ways drops behavior that was only implicit (a per-field error map, a step-up reverification, an empty-state gate, a derived callout) without failing a test or a type check.
-- Port what legacy does, not how it decides. Legacy often rebuilds a decision from environment settings that the resource already reports. Read the resource instead ([Models → What the model owns](models.md#what-the-model-owns)), and prove the screen still matches with a test that passes on both.
+- Port what legacy does, not how it decides. Legacy often rebuilds a decision the resource already reports. Read the resource instead ([Models → What the model owns](models.md#what-the-model-owns)).
 - Inventory the legacy behavior first, then make each layer account for a row. Do not write the layers first and ask what you missed.
 - Every inventory row lands in exactly one layer, and later in exactly one parity bucket. A row with no home is a behavior you are about to drop.
 - A deferred behavior gets a tracked ticket, never a buried `// TODO`.
