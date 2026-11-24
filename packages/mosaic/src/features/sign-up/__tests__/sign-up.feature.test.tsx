@@ -607,7 +607,7 @@ describe('SignUp', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
 
-    it('shows the organization list only once it has loaded, and leaves once one is chosen', async () => {
+    it('leaves once an organization is chosen, without showing the create screen or another screen', async () => {
       const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
       const { user, navigate } = await renderSignUp(
         { signUp: { sessionTasks: [{ key: 'choose-organization' }] }, memberships: [fapiMembership(acme)] },
