@@ -6,8 +6,8 @@ import React from 'react';
 import {
   Chart as Primitive,
   type ChartBarProps as PrimitiveChartBarProps,
+  type ChartBarsProps as PrimitiveChartBarsProps,
   type ChartProjectionOutlineProps as PrimitiveChartProjectionOutlineProps,
-  type ChartStackedBarsProps as PrimitiveChartStackedBarsProps,
 } from '../../../primitives/chart';
 import type { MosaicStyleProps } from '../../../props';
 import { mergeStyleProps, themeProps } from '../../../props';
@@ -15,20 +15,20 @@ import { ChartYLine } from '../chart-parts';
 import { seriesMark } from '../internal/series.styles';
 import { barStyles } from './chart-bars.styles';
 
-export type ChartStackedBarsProps = Omit<PrimitiveChartStackedBarsProps, 'className' | 'style'> & MosaicStyleProps;
+export type ChartBarsProps = Omit<PrimitiveChartBarsProps, 'className' | 'style'> & MosaicStyleProps;
 
 /**
  * Paints the bars on Canvas above the cursor, so the hover band shows only in the gaps. Without
  * children it renders `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.
  */
-export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBarsProps>(function ChartStackedBars(
+export const ChartBars = React.forwardRef<HTMLDivElement, ChartBarsProps>(function ChartBars(
   { children, xstyle, ...rest },
   ref,
 ) {
   return (
-    <Primitive.StackedBars
+    <Primitive.Bars
       ref={ref}
-      {...mergeStyleProps(themeProps('chart-stacked-bars'), stylex.props(barStyles.stackedBars, xstyle), rest)}
+      {...mergeStyleProps(themeProps('chart-bars'), stylex.props(barStyles.bars, xstyle), rest)}
     >
       {children ?? (
         <>
@@ -37,7 +37,7 @@ export const ChartStackedBars = React.forwardRef<HTMLDivElement, ChartStackedBar
           <ChartYLine value={0} />
         </>
       )}
-    </Primitive.StackedBars>
+    </Primitive.Bars>
   );
 });
 

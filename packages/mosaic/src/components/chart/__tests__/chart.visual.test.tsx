@@ -42,11 +42,11 @@ function WeeklyGrowth() {
     >
       <Chart.Legend />
       <Chart.Grid />
-      <Chart.StackedBars>
+      <Chart.Bars>
         <Chart.Bar />
         <Chart.ProjectionOutline />
         <Chart.YLine value={0} />
-      </Chart.StackedBars>
+      </Chart.Bars>
       <Chart.YAxis />
       <Chart.XAxis ticks='calendar' />
       <Chart.Selection>

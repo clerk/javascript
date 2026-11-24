@@ -17,7 +17,7 @@ const chart = Chart.useBarChart({ data: rows, index: row => row.week, series });
 <Chart.Root chart={chart} aria-label='Weekly growth'>
   <Chart.Legend />
   <Chart.Grid />
-  <Chart.StackedBars />
+  <Chart.Bars />
   <Chart.YAxis />
   <Chart.XAxis ticks='calendar' />
   <Chart.Selection />

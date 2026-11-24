@@ -12,7 +12,7 @@ export type {
   ChartYLineProps,
   ChartYTickProps,
 } from './chart-parts';
-export type { ChartBarProps, ChartProjectionOutlineProps, ChartStackedBarsProps } from './bars/chart-bars';
+export type { ChartBarProps, ChartBarsProps, ChartProjectionOutlineProps } from './bars/chart-bars';
 export type { BarChartInstance, UseBarChartOptions } from './bars/use-bar-chart';
 export type { BarChartHighlight, BarChartProjection } from './bars/bar-tooltip';
 export type { ChartInstance, ChartTooltipData } from './internal/chart-style';

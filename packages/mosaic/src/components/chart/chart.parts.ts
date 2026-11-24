@@ -12,8 +12,4 @@ export {
   ChartYLine as YLine,
   ChartYTick as YTick,
 } from './chart-parts';
-export {
-  ChartBar as Bar,
-  ChartProjectionOutline as ProjectionOutline,
-  ChartStackedBars as StackedBars,
-} from './bars/chart-bars';
+export { ChartBar as Bar, ChartBars as Bars, ChartProjectionOutline as ProjectionOutline } from './bars/chart-bars';

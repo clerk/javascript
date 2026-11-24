@@ -54,7 +54,7 @@ export const ChartGrid = React.forwardRef<SVGSVGElement, ChartGridProps>(functio
 
 export type ChartYLineProps = Styled<PrimitiveChartYLineProps>;
 
-/** A solid line at a Y value, such as the zero line inside `Chart.StackedBars`. */
+/** A solid line at a Y value, such as the zero line inside `Chart.Bars`. */
 export const ChartYLine = React.forwardRef<SVGLineElement, ChartYLineProps>(function ChartYLine(
   { xstyle, ...rest },
   ref,

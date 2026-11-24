@@ -9,7 +9,7 @@ const mark = 'var(--_cl-chart-mark)';
 export const barStyles = stylex.create({
   // Above the cursor, so the hover band shows only in the gaps and bar colors stay exact. The
   // interaction surface below still takes the pointer, because nothing here does.
-  stackedBars: {
+  bars: {
     pointerEvents: 'none',
     zIndex: 1,
   },

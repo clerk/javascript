@@ -58,7 +58,7 @@ function GrowthChart({
       >
         <Chart.Legend />
         <Chart.Grid />
-        <Chart.StackedBars />
+        <Chart.Bars />
         <Chart.YAxis />
         <Chart.XAxis />
         <Chart.Selection />
@@ -362,7 +362,7 @@ function CustomTooltipChart() {
         chart={chart}
         aria-label='Growth'
       >
-        <Chart.StackedBars />
+        <Chart.Bars />
         <Chart.Selection>
           <Chart.Tooltip<ActiveBar<Row>>>
             {({ heading, active }) => (

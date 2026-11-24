@@ -1,5 +1,5 @@
 import type { ComponentDoc } from '../../docs-schema';
-import type { ChartBarProps, ChartProjectionOutlineProps, ChartStackedBarsProps } from './bars/chart-bars';
+import type { ChartBarProps, ChartBarsProps, ChartProjectionOutlineProps } from './bars/chart-bars';
 import type { ChartLegendProps, ChartTooltipContentProps } from './chart';
 import type {
   ChartCursorProps,
@@ -43,7 +43,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Write the parts in paint order: `Chart.Legend`, `Chart.Grid`, `Chart.StackedBars`, `Chart.YAxis`, `Chart.XAxis`, then `Chart.Selection` last.',
+      text: 'Write the parts in paint order: `Chart.Legend`, `Chart.Grid`, `Chart.Bars`, `Chart.YAxis`, `Chart.XAxis`, then `Chart.Selection` last.',
     },
     {
       do: true,
@@ -123,16 +123,16 @@ export default {
       },
     },
     'Chart.YLine': {
-      description: 'A solid line at a Y value, such as the zero line inside `Chart.StackedBars`.',
+      description: 'A solid line at a Y value, such as the zero line inside `Chart.Bars`.',
       slot: 'cl-chart-y-line',
       props: {
         value: { type: 'number', doc: 'The value on the Y axis the line marks.' },
       },
     },
-    'Chart.StackedBars': {
+    'Chart.Bars': {
       description:
         'Paints the bars on Canvas above the cursor, so the hover band shows only in the gaps. Without children it renders `Chart.Bar`, `Chart.ProjectionOutline` and a zero `Chart.YLine`.',
-      slot: 'cl-chart-stacked-bars',
+      slot: 'cl-chart-bars',
     },
     'Chart.Bar': {
       description:
@@ -249,7 +249,7 @@ const chart = Chart.useBarChart({ data: rows, index: getWeek, series });
 <Chart.Root chart={chart} aria-label='Weekly growth'>
   <Chart.Legend />
   <Chart.Grid />
-  <Chart.StackedBars />
+  <Chart.Bars />
   <Chart.YAxis />
   <Chart.XAxis ticks='calendar' />
   <Chart.Selection />
@@ -294,7 +294,7 @@ const chart = Chart.useBarChart({
 </header>
 <Chart.Root chart={chart} aria-label='Weekly sign-ups'>
   <Chart.Grid />
-  <Chart.StackedBars />
+  <Chart.Bars />
 </Chart.Root>
 `,
     },
@@ -311,7 +311,7 @@ const chart = Chart.useBarChart({
   'Chart.Legend': ChartLegendProps;
   'Chart.Grid': ChartGridProps;
   'Chart.YLine': ChartYLineProps;
-  'Chart.StackedBars': ChartStackedBarsProps;
+  'Chart.Bars': ChartBarsProps;
   'Chart.Bar': ChartBarProps;
   'Chart.ProjectionOutline': ChartProjectionOutlineProps;
   'Chart.YAxis': ChartYAxisProps;

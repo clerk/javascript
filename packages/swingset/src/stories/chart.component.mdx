@@ -54,10 +54,10 @@ function ActiveUsers({ weeks, projected }: { weeks: Week[]; projected: number })
     >
       <Chart.Legend />
       <Chart.Grid />
-      <Chart.StackedBars>
+      <Chart.Bars>
         <Chart.Bar />
         <Chart.ProjectionOutline />
-      </Chart.StackedBars>
+      </Chart.Bars>
       <Chart.YAxis />
       <Chart.XAxis ticks='calendar' />
       <Chart.Selection>
@@ -105,7 +105,7 @@ Children customize a part. `Chart.Tooltip` takes a render function that receives
 | `Chart.Legend`            | `.cl-chart-legend`             | The series, then a labelled projection as a dashed entry. Items are `.cl-chart-legend-item`.                     |
 | `Chart.Grid`              | `.cl-chart-grid`               | Dotted lines (`.cl-chart-grid-line`) at the Y ticks, below the bars.                                             |
 | `Chart.YLine`             | `.cl-chart-y-line`             | A solid line at a value, such as zero.                                                                           |
-| `Chart.StackedBars`       | `.cl-chart-stacked-bars`       | The Canvas, above the hover band. Defaults to `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.            |
+| `Chart.Bars`              | `.cl-chart-bars`               | The Canvas, above the hover band. Defaults to `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.            |
 | `Chart.Bar`               | `.cl-chart-bar`                | The hidden element the Canvas reads for color and geometry.                                                      |
 | `Chart.ProjectionOutline` | `.cl-chart-projection-outline` | A dashed outline around the projected total, painted from this hidden element's `stroke` and `stroke-dasharray`. |
 | `Chart.YAxis`             | `.cl-chart-y-axis`             | Value labels (`Chart.YTick`, `.cl-chart-y-tick`).                                                                |
