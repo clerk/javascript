@@ -1663,8 +1663,9 @@ export const teIN: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'మీ ప్రస్తుత పాస్‌వర్డ్‌ను రీసెట్ చేయాలి. మీ కొత్త పాస్‌వర్డ్‌ను సేవ్ చేయడానికి ఇది మీరేనని నిర్ధారించండి.',
+      title: 'పాస్‌వర్డ్ రీసెట్ అవసరం',
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -1844,7 +1845,7 @@ export const teIN: LocalizationResource = {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'పాస్‌వర్డ్ రీసెట్ అవసరం',
     },
     passwordUntrusted: {
       title: 'పాస్‌వర్డ్ విశ్వసనీయం కాదు',
@@ -2216,7 +2217,7 @@ export const teIN: LocalizationResource = {
       requireUppercase: 'ఒక పెద్ద అక్షరం',
       sentencePrefix: 'మీ పాస్‌వర్డ్‌లో ఉండాలి',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'మీ పాస్‌వర్డ్‌ను మళ్లీ ఉపయోగించే ముందు మీరు దాన్ని రీసెట్ చేయాలి.',
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

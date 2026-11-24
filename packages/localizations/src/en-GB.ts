@@ -1651,8 +1651,8 @@ export const enGB: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword: "Your current password needs to be reset. Confirm it's you to save your new password.",
+      title: 'Password reset required',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -1832,7 +1832,7 @@ export const enGB: LocalizationResource = {
       title: 'Password compromised',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Password reset required',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2190,7 +2190,7 @@ export const enGB: LocalizationResource = {
       requireUppercase: 'an uppercase letter',
       sentencePrefix: 'Your password must contain',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'You need to reset your password before you can use it again.',
     phone_number_exists: 'This phone number is taken. Please try another.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

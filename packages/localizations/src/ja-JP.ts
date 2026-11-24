@@ -1661,8 +1661,9 @@ export const jaJP: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        '現在のパスワードをリセットする必要があります。新しいパスワードを保存するには、本人確認を行ってください。',
+      title: 'パスワードのリセットが必要です',
     },
     phoneCode: {
       formTitle: '検証コード',
@@ -1842,7 +1843,7 @@ export const jaJP: LocalizationResource = {
       title: '漏洩したパスワード',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'パスワードのリセットが必要です',
     },
     passwordUntrusted: {
       title: '信頼できないパスワード',
@@ -2210,7 +2211,7 @@ export const jaJP: LocalizationResource = {
       requireUppercase: '大文字を含む',
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'パスワードを再び使用するには、リセットする必要があります。',
     phone_number_exists: 'この電話番号は既に使用されています。別のものをお試しください。',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

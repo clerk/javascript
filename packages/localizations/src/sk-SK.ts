@@ -1653,8 +1653,9 @@ export const skSK: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Vaše aktuálne heslo je potrebné obnoviť. Potvrďte svoju totožnosť, aby ste mohli uložiť nové heslo.',
+      title: 'Vyžaduje sa obnovenie hesla',
     },
     phoneCode: {
       formTitle: 'Overovací kód',
@@ -1834,7 +1835,7 @@ export const skSK: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Vyžaduje sa obnovenie hesla',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2194,7 +2195,7 @@ export const skSK: LocalizationResource = {
       requireUppercase: 'veľké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Pred opätovným použitím hesla ho musíte obnoviť.',
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

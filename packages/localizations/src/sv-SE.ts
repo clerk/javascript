@@ -1652,8 +1652,9 @@ export const svSE: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Ditt nuvarande lösenord måste återställas. Bekräfta att det är du för att spara ditt nya lösenord.',
+      title: 'Lösenordet måste återställas',
     },
     phoneCode: {
       formTitle: 'Verifieringskod',
@@ -1834,7 +1835,7 @@ export const svSE: LocalizationResource = {
       title: 'Lösenord är för osäkert',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Lösenordet måste återställas',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2189,7 +2190,7 @@ export const svSE: LocalizationResource = {
       requireUppercase: 'Kräver stora bokstäver',
       sentencePrefix: 'Lösenordet måste innehålla',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Du måste återställa ditt lösenord innan du kan använda det igen.',
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1644,8 +1644,8 @@ export const zhTW: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword: '您目前的密碼需要重設。請確認是您本人，以儲存新密碼。',
+      title: '需要重設密碼',
     },
     phoneCode: {
       formTitle: '驗證碼',
@@ -1822,7 +1822,7 @@ export const zhTW: LocalizationResource = {
       title: '密碼可能已遭外洩',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: '需要重設密碼',
     },
     passwordUntrusted: {
       title: '密碼不受信任',
@@ -2172,7 +2172,7 @@ export const zhTW: LocalizationResource = {
       requireUppercase: '一個大寫字母',
       sentencePrefix: '您的密碼必須包含：',
     },
-    password_reset_required: undefined,
+    password_reset_required: '您需要先重設密碼，才能再次使用。',
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

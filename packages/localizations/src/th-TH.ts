@@ -1652,8 +1652,8 @@ export const thTH: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword: 'ต้องรีเซ็ตรหัสผ่านปัจจุบันของคุณ ยืนยันว่าเป็นคุณเพื่อบันทึกรหัสผ่านใหม่',
+      title: 'ต้องรีเซ็ตรหัสผ่าน',
     },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
@@ -1832,7 +1832,7 @@ export const thTH: LocalizationResource = {
       title: 'รหัสผ่านถูกโจรกรรม',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'ต้องรีเซ็ตรหัสผ่าน',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2184,7 +2184,7 @@ export const thTH: LocalizationResource = {
       requireUppercase: 'ตัวอักษรพิมพ์ใหญ่',
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'คุณต้องรีเซ็ตรหัสผ่านก่อนจึงจะใช้งานได้อีกครั้ง',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1651,8 +1651,9 @@ export const trTR: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Mevcut şifrenizin sıfırlanması gerekiyor. Yeni şifrenizi kaydetmek için kimliğinizi doğrulayın.',
+      title: 'Şifre sıfırlama gerekli',
     },
     phoneCode: {
       formTitle: 'Telefon Kodu ile Doğrulama',
@@ -1833,7 +1834,7 @@ export const trTR: LocalizationResource = {
       title: 'Şifre ele geçirildi',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Şifre sıfırlama gerekli',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2190,7 +2191,7 @@ export const trTR: LocalizationResource = {
       requireUppercase: 'bir büyük harf içermeli',
       sentencePrefix: 'Şifreniz;',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Şifrenizi tekrar kullanabilmek için önce sıfırlamanız gerekiyor.',
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

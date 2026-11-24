@@ -1650,8 +1650,9 @@ export const daDK: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Din nuværende adgangskode skal nulstilles. Bekræft, at det er dig, for at gemme din nye adgangskode.',
+      title: 'Nulstilling af adgangskode påkrævet',
     },
     phoneCode: {
       formTitle: undefined,
@@ -1830,7 +1831,7 @@ export const daDK: LocalizationResource = {
       title: 'Sikkerhedsadvarsel',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Nulstilling af adgangskode påkrævet',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2183,7 +2184,7 @@ export const daDK: LocalizationResource = {
       requireUppercase: 'et stort bogstav',
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Du skal nulstille din adgangskode, før du kan bruge den igen.',
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

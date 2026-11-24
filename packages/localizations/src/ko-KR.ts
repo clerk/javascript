@@ -1649,8 +1649,8 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword: '현재 비밀번호를 재설정해야 해요. 새 비밀번호를 저장하려면 본인 확인을 해 주세요.',
+      title: '비밀번호 재설정이 필요해요',
     },
     phoneCode: {
       formTitle: '인증 코드',
@@ -1827,7 +1827,7 @@ export const koKR: LocalizationResource = {
       title: '유출된 비밀번호예요',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: '비밀번호 재설정이 필요해요',
     },
     passwordUntrusted: {
       title: '신뢰할 수 없는 비밀번호예요',
@@ -2183,7 +2183,7 @@ export const koKR: LocalizationResource = {
       requireUppercase: '대문자',
       sentencePrefix: '비밀번호에는 다음이 꼭 포함돼야 해요',
     },
-    password_reset_required: undefined,
+    password_reset_required: '비밀번호를 다시 사용하려면 먼저 재설정해야 해요.',
     phone_number_exists: '이 전화번호는 이미 사용 중이에요. 다른 번호를 시도해 주세요.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

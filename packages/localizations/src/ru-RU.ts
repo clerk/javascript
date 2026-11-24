@@ -1659,8 +1659,9 @@ export const ruRU: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Ваш текущий пароль необходимо сбросить. Подтвердите, что это вы, чтобы сохранить новый пароль.',
+      title: 'Требуется сброс пароля',
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -1841,7 +1842,7 @@ export const ruRU: LocalizationResource = {
       title: 'Пароль скомпрометирован',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Требуется сброс пароля',
     },
     passwordUntrusted: {
       title: undefined,
@@ -2203,7 +2204,7 @@ export const ruRU: LocalizationResource = {
       requireUppercase: 'букву в верхнем регистре',
       sentencePrefix: 'Ваш пароль должен содержать',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Вам необходимо сбросить пароль, прежде чем вы сможете снова его использовать.',
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

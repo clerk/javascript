@@ -1664,8 +1664,9 @@ export const msMY: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Kata laluan semasa anda perlu ditetapkan semula. Sahkan bahawa ini anda untuk menyimpan kata laluan baharu anda.',
+      title: 'Tetapan semula kata laluan diperlukan',
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
@@ -1846,7 +1847,7 @@ export const msMY: LocalizationResource = {
       title: 'Kata laluan dikompromi',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Tetapan semula kata laluan diperlukan',
     },
     passwordUntrusted: {
       title: 'Kata laluan tidak dipercayai',
@@ -2221,7 +2222,7 @@ export const msMY: LocalizationResource = {
       requireUppercase: 'huruf besar',
       sentencePrefix: 'Kata laluan anda mesti mengandungi',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Anda perlu menetapkan semula kata laluan anda sebelum boleh menggunakannya semula.',
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

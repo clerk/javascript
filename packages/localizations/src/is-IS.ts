@@ -1662,8 +1662,9 @@ export const isIS: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'Endurstilla þarf núverandi lykilorðið þitt. Staðfestu að þetta sért þú til að vista nýja lykilorðið þitt.',
+      title: 'Endurstilla þarf lykilorð',
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
@@ -1844,7 +1845,7 @@ export const isIS: LocalizationResource = {
       title: 'Lykilorð brotið',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'Endurstilla þarf lykilorð',
     },
     passwordUntrusted: {
       title: 'Lykilorð óáreiðanlegt',
@@ -2214,7 +2215,7 @@ export const isIS: LocalizationResource = {
       requireUppercase: 'hástaf',
       sentencePrefix: 'Lykilorðið þitt verður að innihalda',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'Þú þarft að endurstilla lykilorðið þitt áður en þú getur notað það aftur.',
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

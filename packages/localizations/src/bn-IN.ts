@@ -1660,8 +1660,9 @@ export const bnIN: LocalizationResource = {
       title: undefined,
     },
     passwordResetRequired: {
-      subtitle__saveNewPassword: undefined,
-      title: undefined,
+      subtitle__saveNewPassword:
+        'আপনার বর্তমান পাসওয়ার্ড রিসেট করতে হবে। আপনার নতুন পাসওয়ার্ড সংরক্ষণ করতে নিশ্চিত করুন যে এটি আপনি।',
+      title: 'পাসওয়ার্ড রিসেট করা প্রয়োজন',
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
@@ -1841,7 +1842,7 @@ export const bnIN: LocalizationResource = {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
     },
     passwordResetRequired: {
-      title: undefined,
+      title: 'পাসওয়ার্ড রিসেট করা প্রয়োজন',
     },
     passwordUntrusted: {
       title: 'পাসওয়ার্ড অবিশ্বস্ত',
@@ -2211,7 +2212,7 @@ export const bnIN: LocalizationResource = {
       requireUppercase: 'একটি বড় হাতের অক্ষর',
       sentencePrefix: 'আপনার পাসওয়ার্ডে অবশ্যই থাকতে হবে',
     },
-    password_reset_required: undefined,
+    password_reset_required: 'আবার ব্যবহার করার আগে আপনাকে আপনার পাসওয়ার্ড রিসেট করতে হবে।',
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
