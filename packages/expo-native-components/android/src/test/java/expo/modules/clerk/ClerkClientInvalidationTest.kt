@@ -1,6 +1,9 @@
 package expo.modules.clerk
 
+import com.clerk.api.network.model.client.Client
+import com.clerk.api.session.Session
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -70,6 +73,29 @@ class ClerkClientInvalidationTest {
             runLoopTurn()
             assertEquals(change.toString(), 1, emitCount)
         }
+    }
+
+    @Test
+    fun `emits when the active session switches organization`() {
+        val session = Session(
+            id = "sess_1",
+            status = Session.SessionStatus.ACTIVE,
+            expireAt = 0,
+            lastActiveAt = 0,
+            createdAt = 0,
+            updatedAt = 0
+        )
+        val client = Client(id = "client_1", sessions = listOf(session), lastActiveSessionId = "sess_1")
+        val switched = client.copy(sessions = listOf(session.copy(lastActiveOrganizationId = "org_2")))
+        val before = ClerkClientFingerprint.from(client, "token_1")
+        val after = ClerkClientFingerprint.from(switched, "token_1")
+        assertNotEquals(before, after)
+
+        val tracker = tracker()
+        tracker.reset(before)
+        tracker.observe(after)
+        runLoopTurn()
+        assertEquals(1, emitCount)
     }
 
     @Test

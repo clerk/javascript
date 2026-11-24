@@ -40,6 +40,10 @@ export class FakeNativeClerk {
     return this.client?.lastActiveSessionId ?? null;
   }
 
+  get activeOrganizationId(): string | null {
+    return this.client?.sessions.find(session => session.id === this.activeSessionId)?.lastActiveOrganizationId ?? null;
+  }
+
   get sessionIds(): string[] {
     return this.client?.sessions.map(session => session.id) ?? [];
   }

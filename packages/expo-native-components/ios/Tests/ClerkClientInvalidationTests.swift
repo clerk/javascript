@@ -72,6 +72,22 @@ final class ClerkClientInvalidationTests: XCTestCase {
     }
   }
 
+  func testEmitsWhenTheActiveSessionSwitchesOrganization() {
+    let client = Client.mock
+    XCTAssertEqual(client.sessions[0].id, client.lastActiveSessionId)
+    var switched = client
+    switched.sessions[0].lastActiveOrganizationId = "org_2"
+    let before = ClerkClientFingerprint(client: client, deviceToken: "token_1")
+    let after = ClerkClientFingerprint(client: switched, deviceToken: "token_1")
+    XCTAssertNotEqual(before, after)
+
+    let tracker = makeTracker()
+    tracker.reset(to: before)
+    tracker.observe(after)
+    runLoopTurn()
+    XCTAssertEqual(emitCount, 1)
+  }
+
   func testCoalescesChangesWithinOneLoopTurn() {
     let tracker = makeTracker()
     tracker.reset(to: fingerprint())

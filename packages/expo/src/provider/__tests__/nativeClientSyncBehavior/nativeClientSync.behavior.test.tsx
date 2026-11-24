@@ -423,6 +423,18 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
+    it('moves native to the organization JS switches to', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      await h.run(() => h.js.setActive({ organization: 'org_1' }));
+      await h.settle();
+
+      expect(h.js.session?.lastActiveOrganizationId).toBe('org_1');
+      expect(h.native.activeOrganizationId).toBe('org_1');
+      await expectConverged(h);
+    });
+
     it('refreshes native for a profile update but not for session activity that only bumps the session', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
