@@ -69,6 +69,12 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
 
       const urlString = originalUrl.toString();
 
+      // Navigations such as invitation tickets redirect to HTML pages, so the browser must follow them itself.
+      if (route.request().isNavigationRequest()) {
+        await route.continue({ url: urlString });
+        return;
+      }
+
       for (let attempt = 0; attempt <= MAX_ROUTE_RETRIES; attempt++) {
         try {
           const response = await route.fetch({ url: urlString });

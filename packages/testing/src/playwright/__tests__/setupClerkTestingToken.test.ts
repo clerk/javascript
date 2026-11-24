@@ -242,7 +242,7 @@ describe('setupClerkTestingToken', () => {
 
       let callCount = 0;
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() => {
           callCount++;
           if (callCount <= 2) {
@@ -271,7 +271,7 @@ describe('setupClerkTestingToken', () => {
 
       let callCount = 0;
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() => {
           callCount++;
           if (callCount === 1) {
@@ -312,7 +312,7 @@ describe('setupClerkTestingToken', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() =>
           Promise.resolve({
             status: () => 429,
@@ -342,7 +342,7 @@ describe('setupClerkTestingToken', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() =>
           Promise.resolve({
             status: () => 429,
@@ -381,7 +381,7 @@ describe('setupClerkTestingToken', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() =>
           Promise.resolve({
             status: () => 429,
@@ -415,7 +415,7 @@ describe('setupClerkTestingToken', () => {
 
       // No headers()/text() on the response: diagnostics are best-effort and must not break fulfillment.
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() =>
           Promise.resolve({
             status: () => 429,
@@ -446,7 +446,7 @@ describe('setupClerkTestingToken', () => {
 
       const networkError = new Error('net::ERR_CONNECTION_REFUSED');
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() => Promise.reject(networkError)),
         fulfill: vi.fn(() => Promise.resolve()),
         continue: vi.fn(() => Promise.resolve()),
@@ -473,7 +473,7 @@ describe('setupClerkTestingToken', () => {
 
       let callCount = 0;
       const route = {
-        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client', isNavigationRequest: () => false }),
         fetch: vi.fn(() => {
           callCount++;
           if (callCount === 1) {
