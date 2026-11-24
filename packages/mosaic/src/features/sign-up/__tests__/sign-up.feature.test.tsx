@@ -17,7 +17,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { useVirtualSegment, useVirtualWrite } from '../../../routing/virtual-store';
+import { useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp, type SignUpProps } from '../sign-up';
 
 const EMAIL = 'alice@example.com';
@@ -43,11 +43,9 @@ async function renderSignUp(
 }
 
 function RouteProbe() {
-  const parts = useVirtualSegment('/sign-up');
   const write = useVirtualWrite();
   return (
     <>
-      <output aria-label='Stored route'>{parts?.join('/') || 'start'}</output>
       <button
         type='button'
         onClick={() => write('/sign-up', [])}
@@ -639,8 +637,9 @@ describe('SignUp', () => {
 
     await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
 
-    await waitFor(() => expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('start'));
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+    expect(emailField()).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Verify your email' })).toBeNull();
   });
 
   it('shows the code screen and sends no second code when a verify route is reopened while the first sends', async () => {
