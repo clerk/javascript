@@ -1,4 +1,3 @@
-import type { SignUpJSON } from '@clerk/shared/types';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
@@ -7,7 +6,6 @@ import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
-  type FapiEnvironment,
   fapiEnvironment,
   type FapiEnvironmentOverrides,
   fapiMembership,
@@ -68,8 +66,8 @@ function RouteProbe() {
   );
 }
 
-async function renderSignUpInProgress(env: FapiEnvironment, signUp: Partial<SignUpJSON>) {
-  const fapi = serveFapi({ environment: env, client: { ...fapiClient(), sign_up: fapiSignUp(signUp) } });
+async function renderSignUpWithRouteProbe(seed: FakeFapiSeed = {}) {
+  const fapi = serveFapi({ environment: environment(), ...seed });
   const view = await renderWithClerk(
     <>
       <SignUp />
@@ -335,10 +333,10 @@ describe('SignUp', () => {
 
   describe('filling in missing fields', () => {
     it('verifies the email before asking for a missing field, then completes from the continue screen', async () => {
-      const { fapi, user, navigate } = await renderSignUpInProgress(
-        environment({ attributes: { username: { required: true } } }),
-        { email_address: EMAIL, has_password: true },
-      );
+      const { fapi, user, navigate } = await renderSignUpWithRouteProbe({
+        environment: environment({ attributes: { username: { required: true } } }),
+        client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL, has_password: true }) },
+      });
 
       await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
       await enterCode(user);
@@ -357,7 +355,9 @@ describe('SignUp', () => {
     });
 
     it('sends the password from the continue screen when the sign-up has none', async () => {
-      const { fapi, user, navigate } = await renderSignUpInProgress(environment(), { email_address: EMAIL });
+      const { fapi, user, navigate } = await renderSignUpWithRouteProbe({
+        client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL }) },
+      });
 
       await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
       await enterCode(user);
@@ -373,12 +373,12 @@ describe('SignUp', () => {
     });
 
     it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {
-      const { fapi, user } = await renderSignUpInProgress(
-        environment({
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: environment({
           attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
         }),
-        { has_password: true },
-      );
+        client: { ...fapiClient(), sign_up: fapiSignUp({ has_password: true }) },
+      });
 
       await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
 
@@ -397,8 +397,8 @@ describe('SignUp', () => {
     });
 
     it('asks for an email or a phone number on the continue screen of an instance without progressive sign-up', async () => {
-      const { fapi, user } = await renderSignUpInProgress(
-        environment({
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: environment({
           attributes: {
             phone_number: {
               enabled: true,
@@ -417,8 +417,8 @@ describe('SignUp', () => {
             },
           },
         }),
-        { has_password: true },
-      );
+        client: { ...fapiClient(), sign_up: fapiSignUp({ has_password: true }) },
+      });
 
       await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
 
@@ -434,8 +434,8 @@ describe('SignUp', () => {
     });
 
     it('asks for legal consent on the continue screen when the sign-up has not accepted it', async () => {
-      const { fapi, user, navigate } = await renderSignUpInProgress(
-        environment({
+      const { fapi, user, navigate } = await renderSignUpWithRouteProbe({
+        environment: environment({
           user_settings: {
             sign_up: {
               allowlist_only: false,
@@ -446,8 +446,8 @@ describe('SignUp', () => {
             },
           },
         }),
-        { email_address: EMAIL, has_password: true },
-      );
+        client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL, has_password: true }) },
+      });
 
       await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
       await enterCode(user);
@@ -649,15 +649,7 @@ describe('SignUp', () => {
 
   describe('opening a route directly', () => {
     it('shows the start form when a verify route is opened before the sign-up exists', async () => {
-      serveFapi({ environment: environment() });
-      await renderWithClerk(
-        <>
-          <SignUp />
-          <RouteProbe />
-        </>,
-      );
-      const user = userEvent.setup();
-      await screen.findByRole('heading', { name: 'Create your account' });
+      const { user } = await renderSignUpWithRouteProbe();
 
       await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
 
@@ -667,14 +659,7 @@ describe('SignUp', () => {
     });
 
     it('shows the code screen and sends no second code when a verify route is reopened while the first sends', async () => {
-      const fapi = serveFapi({ environment: environment() });
-      await renderWithClerk(
-        <>
-          <SignUp />
-          <RouteProbe />
-        </>,
-      );
-      const user = userEvent.setup();
+      const { fapi, user } = await renderSignUpWithRouteProbe();
       const hold = holdRequests('post', '/v1/client/sign_ups/:id/prepare_verification');
 
       await submitStart(user);
@@ -691,14 +676,7 @@ describe('SignUp', () => {
     });
 
     it('sends no second code and keeps Resend locked when a verify route is reopened with a code out', async () => {
-      const fapi = serveFapi({ environment: environment() });
-      const { navigate } = await renderWithClerk(
-        <>
-          <SignUp />
-          <RouteProbe />
-        </>,
-      );
-      const user = userEvent.setup();
+      const { fapi, user, navigate } = await renderSignUpWithRouteProbe();
 
       await submitStart(user);
       await codeSent();
