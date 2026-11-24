@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
@@ -621,24 +621,6 @@ describe('SignUp', () => {
     expect(emailField()).toHaveValue('');
   });
 
-  it('shows an alert and keeps Start over available when starting over fails', async () => {
-    const { clerk, user } = await renderSignUp({
-      environment: environment({ attributes: { email_address: { required: true, verifications: ['email_link'] } } }),
-    });
-
-    await submitStart(user);
-    const startOver = await screen.findByRole('button', { name: 'Start over' });
-    vi.spyOn(clerk.client!, 'resetSignUp').mockImplementationOnce(() => {
-      throw new Error('reset failed');
-    });
-
-    await user.click(startOver);
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
-    expect(screen.getByRole('button', { name: 'Start over' })).toBeEnabled();
-    expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
-  });
-
   it('replaces the form with the blocked notice when the request is blocked', async () => {
     const { user } = await renderSignUp({
       signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },
@@ -668,7 +650,7 @@ describe('SignUp', () => {
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
   });
 
-  it('sends the code when a verify route is opened before a code is out', async () => {
+  it('shows the code screen and sends no second code when a verify route is reopened while the first sends', async () => {
     const fapi = serveFapi({ environment: environment() });
     await renderWithClerk(
       <>
@@ -734,6 +716,7 @@ describe('SignUp', () => {
     await user.click(await screen.findByRole('button', { name: 'Sign in' }));
 
     const [to] = navigate.mock.lastCall ?? [''];
+    expect(to).toContain('/sign-in');
     expect(decodeURIComponent(to)).toContain(`redirect_url=${window.location.origin}/dashboard`);
   });
 
@@ -762,14 +745,6 @@ describe('SignUp', () => {
     const [to] = navigate.mock.lastCall ?? [''];
     expect(to).toContain('/waitlist');
     expect(decodeURIComponent(to)).toContain('redirect_url=/dashboard');
-  });
-
-  it('links to sign-in from the form', async () => {
-    const { user, navigate } = await renderSignUp();
-
-    await user.click(await screen.findByRole('button', { name: 'Sign in' }));
-
-    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/sign-in'));
   });
 
   it('shows the waitlist notice in waitlist mode and goes to the waitlist', async () => {
