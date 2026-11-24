@@ -142,7 +142,8 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   // listbox on ArrowUp/ArrowDown and navigation stays a single source of truth.
   // `virtual` keeps DOM focus on the listbox (or the search input in combobox
   // mode) and exposes the active option via `aria-activedescendant`.
-  const selectedIndex = searchInputCtx.filteredItems.findIndex(o => !o.disabled && selectedValues.includes(o.value));
+  const navigableOptions = props.multiple ? searchInputCtx.filteredItems : options;
+  const selectedIndex = navigableOptions.findIndex(o => !o.disabled && selectedValues.includes(o.value));
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -364,7 +365,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   React.useEffect(() => {
     if (isOpen) {
       const firstEnabledIndex = options.findIndex(o => !o.disabled);
-      setActiveIndex(firstEnabledIndex === -1 ? null : firstEnabledIndex);
+      setActiveIndex(firstEnabledIndex === -1 ? 0 : firstEnabledIndex);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options.length]);
