@@ -24,7 +24,10 @@ export function SignUpView(props: SignUpViewProps) {
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
 
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      align='center'
+      renderBranding={props.renderBranding}
+    >
       <Flow.Root
         value={props.screen}
         state={props}

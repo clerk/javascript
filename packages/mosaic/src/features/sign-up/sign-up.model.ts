@@ -66,6 +66,7 @@ export interface SignUpFlowModel {
 export interface SignUpAppModel {
   applicationName: string;
   applicationLogoUrl?: string;
+  renderBranding: boolean;
 }
 
 export interface SignUpNavigationModel {
@@ -374,6 +375,7 @@ export function useSignUpModel({
     app: {
       applicationName: displayConfig.applicationName,
       applicationLogoUrl: displayConfig.logoImageUrl || undefined,
+      renderBranding: displayConfig.branded,
     },
     navigation: {
       goToSignIn: () => void router.navigate(signInUrl()),

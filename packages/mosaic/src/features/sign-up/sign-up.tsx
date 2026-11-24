@@ -91,6 +91,7 @@ function SignUpFlow({
       }
       applicationName={model.app.applicationName}
       applicationLogoUrl={model.app.applicationLogoUrl}
+      renderBranding={model.app.renderBranding}
       taskChooseOrganization={<TaskChooseOrganizationContent controller={task} />}
     />
   );

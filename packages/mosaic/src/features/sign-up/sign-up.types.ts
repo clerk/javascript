@@ -137,6 +137,7 @@ export interface SignUpViewProps {
   screen: SignUpScreen;
   applicationName: string;
   applicationLogoUrl?: string;
+  renderBranding?: boolean;
   start: SignUpDetailsScreen;
   continue: SignUpDetailsScreen;
   verifyEmail: ReactNode;
