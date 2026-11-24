@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
@@ -103,8 +103,6 @@ export function useSignUpController(
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const actions = usePendingAction<'startOver'>();
-  // Counted here because the Protect screen remounts for each challenge Clerk reissues.
-  const expiredProtectReloads = useRef(0);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
@@ -178,16 +176,7 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
-    protectCheck: {
-      protect: {
-        challengeId: model.protect.challengeId,
-        resolve: options => model.protect.resolve({ ...options, expiredReloads: expiredProtectReloads }),
-      },
-      onNext: next,
-      resetExpiredReloads: () => {
-        expiredProtectReloads.current = 0;
-      },
-    },
+    protectCheck: { protect: model.protect, onNext: next },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

@@ -16,7 +16,7 @@ import {
 } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import { __internal_useClerkSignal, useClerk, useSession } from '@clerk/shared/react';
 import type { ClerkAPIError, SessionTask, SignUpFutureResource, SignUpInitialValues } from '@clerk/shared/types';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import type { FieldFeedback, FormFieldErrors } from '../../components/form';
@@ -103,15 +103,14 @@ export interface SignUpVerificationModel {
   verify: (code: string) => Promise<SignUpNextStep>;
 }
 
-export interface SignUpProtectResolveOptions {
-  container: HTMLDivElement;
-  setWidgetVisible: (visible: boolean) => Promise<void>;
-  expiredReloads: { current: number };
-}
-
 export interface SignUpProtectModel {
   challengeId: string | undefined;
-  resolve: (options: SignUpProtectResolveOptions) => Promise<SignUpCreateResult>;
+  resolve: (options: {
+    container: HTMLDivElement;
+    setWidgetVisible: (visible: boolean) => Promise<void>;
+  }) => Promise<SignUpCreateResult>;
+  /** Starts the count of expired-challenge reloads over, for a retry the user asks for. */
+  resetExpiredReloads: () => void;
 }
 
 export interface SignUpReadyModel {
@@ -180,6 +179,8 @@ export function useSignUpModel({
   const supportEmail = useMosaicSupportEmail();
   const { signUp } = __internal_useClerkSignal('signUp');
   const { session } = useSession();
+  // Counted here because the Protect screen remounts for each challenge Clerk reissues.
+  const expiredProtectReloads = useRef(0);
   const passwordMessages = useMessages('userProfile').password;
   const genericError = useMessages('errors').generic;
   const locale = useLocale();
@@ -417,7 +418,7 @@ export function useSignUpModel({
     },
     protect: {
       challengeId: signUp.protectCheck?.token,
-      resolve: async ({ container, setWidgetVisible, expiredReloads }) => {
+      resolve: async ({ container, setWidgetVisible }) => {
         const challenge = signUp.protectCheck;
         if (challenge) {
           const outcome = await runProtectCheck<SignUpCreateResult>(
@@ -440,7 +441,7 @@ export function useSignUpModel({
             challenge,
             {
               container,
-              expiredReloads,
+              expiredReloads: expiredProtectReloads,
               setWidgetVisible,
               loadTimeoutMs:
                 clerk.__internal_protectChallengeLoadTimeoutMs ?? environment.protectConfig?.challenge_load_timeout_ms,
@@ -451,6 +452,9 @@ export function useSignUpModel({
           }
         }
         return next(signUp);
+      },
+      resetExpiredReloads: () => {
+        expiredProtectReloads.current = 0;
       },
     },
     verification: {

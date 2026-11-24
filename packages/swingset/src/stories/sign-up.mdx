@@ -37,7 +37,7 @@ import { SignUpProtect, SignUpVerify, SignUpView } from '@clerk/mosaic/features/
   continue={{ ...details, step: { purpose: 'continue', fields: {} } }}
   verifyEmail={<SignUpVerify key={signUpId} channel='email' verification={emailVerification} onNext={onNext} isPending={isPending} onEditIdentifier={onEditIdentifier} />}
   verifyPhone={<SignUpVerify key={signUpId} channel='phone' verification={phoneVerification} onNext={onNext} isPending={isPending} onEditIdentifier={onEditIdentifier} />}
-  protectCheck={<SignUpProtect key={protect.challengeId} protect={protect} onNext={onNext} resetExpiredReloads={resetExpiredReloads} />}
+  protectCheck={<SignUpProtect key={protect.challengeId} protect={protect} onNext={onNext} />}
   restricted={{ onSignIn }}
   startOver={{ isPending, onStartOver }}
 />;

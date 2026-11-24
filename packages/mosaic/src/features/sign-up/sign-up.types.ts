@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
-import type { SignUpCreateResult, SignUpProtectResolveOptions, SignUpVerificationModel } from './sign-up.model';
+import type { SignUpCreateResult, SignUpProtectModel, SignUpVerificationModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
@@ -126,13 +126,8 @@ export interface SignUpWalletsScreen {
 }
 
 export interface SignUpProtectScreen {
-  protect: {
-    challengeId: string | undefined;
-    resolve: (options: Omit<SignUpProtectResolveOptions, 'expiredReloads'>) => Promise<SignUpCreateResult>;
-  };
+  protect: SignUpProtectModel;
   onNext: (result: SignUpCreateResult) => void;
-  /** Starts the count of expired-challenge reloads over, for a retry the user asks for. */
-  resetExpiredReloads: () => void;
 }
 
 export interface SignUpViewProps {
