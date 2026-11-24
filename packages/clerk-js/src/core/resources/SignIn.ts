@@ -83,6 +83,7 @@ import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
+  navigatePopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
@@ -530,7 +531,7 @@ export class SignIn extends BaseResource implements SignInResource {
       clerkMissingOptionError('popup');
     }
     return _authenticateWithPopup(SignIn.clerk, 'signIn', this.authenticateWithRedirectOrPopup, params, url => {
-      popup.location.href = url.toString();
+      navigatePopup(popup, url);
     });
   };
 
