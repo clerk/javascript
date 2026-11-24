@@ -155,6 +155,7 @@ export const styles = stylex.create({
     flexShrink: 0,
     justifyContent: 'center',
     marginInlineStart: 'auto',
+    visibility: { default: 'hidden', ':is([data-selected])': 'visible' },
     width: space['4'],
   },
 });
