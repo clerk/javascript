@@ -84,7 +84,12 @@ afterEach(() => {
   harness?.unmount();
   harness = undefined;
   appState.currentState = 'active';
+  vi.useRealTimers();
 });
+
+async function skipRetryBackoff(h: NativeSyncHarness): Promise<void> {
+  await h.run(() => vi.advanceTimersByTimeAsync(10_000));
+}
 
 function returnToForeground(h: NativeSyncHarness): Promise<void> {
   return h.run(() => {
@@ -126,24 +131,26 @@ describe('native client sync behavior', () => {
 
     it('signs JS in with the session a native sign-in created when the first JS refetch fails', async () => {
       const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       h.server.failNextRequests('js', 'GET /client');
 
       const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
 
-      await waitFor(() => expect(h.js.session?.id).toBe(sessionId), { timeout: 3_000 });
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
       await expectConverged(h);
     });
 
     it('signs JS in when the app returns to the foreground after every JS refetch of a native sign-in failed', async () => {
       const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
       const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
       h.server.failNextRequests('js', 'GET /client', 3);
 
       const sessionId = await h.run(() => h.native.signIn('user_1'));
-      await waitFor(() => expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(3), {
-        timeout: 3_000,
-      });
+      await skipRetryBackoff(h);
       await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(3);
       expect(h.js.session).toBeNull();
 
       await returnToForeground(h);
@@ -154,6 +161,42 @@ describe('native client sync behavior', () => {
       await returnToForeground(h);
       await h.settle();
       expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesAfterRepair);
+    });
+
+    it('does not retry a JS refetch of a native sign-in that the server rejected', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.rejectNextRequest('js', 'GET /client', 429);
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+    });
+
+    it('does not refetch the JS client when activating the session of a native sign-in fails', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'POST /client/sessions/:id/touch');
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
     });
 
     it('sends no JS client request when the app returns to the foreground after JS followed a native sign-in', async () => {

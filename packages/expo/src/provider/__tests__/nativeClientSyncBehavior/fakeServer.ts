@@ -1,3 +1,5 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+
 export type FakeServerSessionJSON = {
   id: string;
   userId: string;
@@ -63,7 +65,7 @@ export class FakeClerkServer {
   #retiredTokens = new Set<string>();
   #pendingRotations = new Map<string, number>();
   #responseHolds: ResponseHold[] = [];
-  #requestFailures: Array<{ caller: FapiCaller; operation: string }> = [];
+  #requestFailures: Array<{ caller: FapiCaller; operation: string; status: number | null }> = [];
   #sequence = 0;
   #rotations = 0;
 
@@ -127,7 +129,10 @@ export class FakeClerkServer {
       failure => failure.caller === caller && failure.operation === operation,
     );
     if (failureIndex >= 0) {
-      this.#requestFailures.splice(failureIndex, 1);
+      const [failure] = this.#requestFailures.splice(failureIndex, 1);
+      if (failure.status !== null) {
+        throw new ClerkAPIResponseError('Request rejected', { data: [], status: failure.status });
+      }
       throw new TypeError('Network request failed');
     }
     const response = handle();
@@ -142,8 +147,12 @@ export class FakeClerkServer {
 
   failNextRequests(caller: FapiCaller, operation: string, count = 1): void {
     for (let i = 0; i < count; i++) {
-      this.#requestFailures.push({ caller, operation });
+      this.#requestFailures.push({ caller, operation, status: null });
     }
+  }
+
+  rejectNextRequest(caller: FapiCaller, operation: string, status: number): void {
+    this.#requestFailures.push({ caller, operation, status });
   }
 
   holdNextResponse(caller: FapiCaller, operation: string): HeldResponse {
