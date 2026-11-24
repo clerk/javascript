@@ -56,19 +56,19 @@ A long scope list scrolls inside its box, with the edges fading while there is m
 
 ### Single organization
 
-The default. `organizationSelection` with `organizationId` shows a plain select, and the form posts the one picked `organization_id`.
+`organizationSelection` with `organizationId` shows a plain select, and the form posts the one picked `organization_id`.
 
 <Story name='SingleOrganization' storyModule={Stories} />
 
 ### Multiple organizations
 
-The view only, for when the backend accepts more than one organization. `multiple: true` with a `limit` lets the user pick up to that many organizations. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. Allow stays disabled while none is picked. The form posts the picked organizations as one space-separated `organization_id`.
+The default. `multiple: true` with a `limit` lets the user pick up to that many organizations; `OAuthConsent` sets it to 5. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. Allow stays disabled while none is picked. The form posts the picked organizations as one space-separated `organization_id`.
 
 <Story name='MultipleOrganizations' storyModule={Stories} />
 
 ### Organization access
 
-The view only. `multiple: true` with `access` asks whether to grant all organizations or only selected ones. All posts every organization; only selected shows the multi-select, and Allow stays disabled until one is picked.
+`multiple: true` with `access` asks whether to grant all organizations or only selected ones. All posts every organization; only selected shows the multi-select, and Allow stays disabled until one is picked.
 
 <Story name='OrganizationAccess' storyModule={Stories} />
 

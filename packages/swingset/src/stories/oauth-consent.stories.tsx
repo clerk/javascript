@@ -104,9 +104,13 @@ export function SingleOrganization() {
     organizations: manyOrganizations,
     defaultOrganizationId: 'org_1',
   });
+  const [organizationId, setOrganizationId] = useState<string | null>('org_1');
   return (
     <Card.Root align='center'>
-      <OAuthConsentView {...props} />
+      <OAuthConsentView
+        {...props}
+        organizationSelection={{ organizationId, onOrganizationIdChange: setOrganizationId }}
+      />
     </Card.Root>
   );
 }
@@ -117,18 +121,9 @@ export function MultipleOrganizations() {
     organizations: manyOrganizations,
     defaultOrganizationId: 'org_1',
   });
-  const [organizationIds, setOrganizationIds] = useState<string[]>(['org_1']);
   return (
     <Card.Root align='center'>
-      <OAuthConsentView
-        {...props}
-        organizationSelection={{
-          multiple: true,
-          organizationIds,
-          onOrganizationIdsChange: setOrganizationIds,
-          limit: 5,
-        }}
-      />
+      <OAuthConsentView {...props} />
     </Card.Root>
   );
 }

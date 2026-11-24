@@ -396,7 +396,7 @@ describe('OAuthConsent', () => {
       expect((await submitAllow(user))?.get('organization_id')).toBe('org_1');
     });
 
-    it('submits the organization the user picks', async () => {
+    it('submits every organization the user picks', async () => {
       visitOAuthConsent();
       const { user } = await renderOAuthConsent(signedIn(orgScopes));
 
@@ -404,7 +404,7 @@ describe('OAuthConsent', () => {
       await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
       await user.click(await screen.findByRole('option', { name: 'Globex' }));
 
-      expect((await submitAllow(user))?.get('organization_id')).toBe('org_2');
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1 org_2']);
     });
 
     it('shows each organization logo', async () => {

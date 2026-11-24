@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { fill } from '../../localization';
 import type { OAuthConsentMessages, OAuthConsentReadyModel, OAuthConsentViewProps } from './oauth-consent.types';
-import { OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
+import { MAX_CONSENTED_ORGANIZATIONS, OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
 
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 
@@ -11,7 +11,7 @@ export function useOAuthConsentController(
   messages: OAuthConsentMessages,
 ): OAuthConsentViewProps {
   const [uncheckedScopes, setUncheckedScopes] = useState<readonly string[]>([]);
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
+  const [selectedOrganizationIds, setSelectedOrganizationIds] = useState<string[] | null>(null);
   const [isRedirectUrlOpen, setIsRedirectUrlOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'allow' | 'deny'>();
 
@@ -49,8 +49,12 @@ export function useOAuthConsentController(
     scope: checked.join(' ') || OFFLINE_ACCESS_SCOPE,
     organizations: sharesOrganizations ? organizations : [],
     organizationSelection: {
-      organizationId: sharesOrganizations ? (selectedOrganizationId ?? defaultOrganizationId) : null,
-      onOrganizationIdChange: setSelectedOrganizationId,
+      multiple: true,
+      organizationIds: sharesOrganizations
+        ? (selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]))
+        : [],
+      onOrganizationIdsChange: setSelectedOrganizationIds,
+      limit: MAX_CONSENTED_ORGANIZATIONS,
     },
     isRedirectUrlOpen,
     onRedirectUrlOpenChange: setIsRedirectUrlOpen,
