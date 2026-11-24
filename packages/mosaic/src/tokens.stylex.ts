@@ -96,28 +96,9 @@ const colorDefaults = {
   '--cl-color-chart-4': 'light-dark(oklch(0.6498 0.115 215.37), oklch(0.6646 0.1167 214.95))',
   '--cl-color-chart-5': 'light-dark(oklch(0.6608 0.1347 85.9), oklch(0.665 0.136 85.61))',
   '--cl-color-chart-6': 'light-dark(oklch(0.4802 0.1034 256.97), oklch(0.5389 0.1039 257.52))',
-
-  // Chart roles, each defaulting to the general token it would otherwise use, so a theme can
-  // restyle a chart's grid, axis labels or tooltip without retinting every border, secondary text
-  // or surface on the page.
-  '--cl-color-chart-grid': 'var(--cl-color-border)',
-  '--cl-color-chart-label': 'var(--cl-color-foreground-secondary)',
-  '--cl-color-chart-tooltip': 'var(--cl-color-surface)',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);
-
-// =============================================================================
-// Chart Tokens
-// =============================================================================
-// How much of its own color a dimmed series keeps, mixed toward `--cl-color-surface` so the bar
-// stays opaque over the grid. A percentage, so it is not a color token.
-
-const chartDefaults = {
-  '--cl-chart-inactive-mix': '40%',
-} as const;
-
-export const chartVars = stylex.defineVars(chartDefaults);
 
 // =============================================================================
 // Radius Tokens

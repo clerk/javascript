@@ -26,4 +26,4 @@ const chart = Chart.useBarChart({ data: rows, index: row => row.week, series });
 
 Each series names its color: a palette slot from `1` to `6` or a CSS color. Children customize a part, such as a render function on `Chart.Tooltip`. `Chart.Legend items={series}` renders a legend outside the chart.
 
-The palette ships as six new tokens, `--cl-color-chart-1` to `--cl-color-chart-6`, with separate light and dark values that meet the data-viz contrast and color-blind separation checks. `--cl-color-chart-grid`, `--cl-color-chart-label` and `--cl-color-chart-tooltip` color the grid, tick labels and tooltip, and `--cl-chart-inactive-mix` sets how much color a dimmed bar keeps.
+The palette ships as six new tokens, `--cl-color-chart-1` to `--cl-color-chart-6`, with separate light and dark values that meet the data-viz contrast and color-blind separation checks.
