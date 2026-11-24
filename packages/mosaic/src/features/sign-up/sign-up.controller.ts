@@ -88,12 +88,7 @@ type SignUpControllerResult =
   | { status: 'hidden' }
   | (Omit<
       SignUpViewProps,
-      | 'applicationName'
-      | 'applicationLogoUrl'
-      | 'taskChooseOrganization'
-      | 'verifyEmail'
-      | 'verifyPhone'
-      | 'protectCheck'
+      'applicationName' | 'logo' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone' | 'protectCheck'
     > & {
       status: 'ready';
       attempt?: string;
@@ -108,6 +103,7 @@ export function useSignUpController(
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const actions = usePendingAction<'startOver'>();
+  // Counted here because the Protect screen remounts for each challenge Clerk reissues.
   const expiredProtectReloads = useRef(0);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
@@ -182,7 +178,16 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
-    protectCheck: { protect: model.protect, onNext: next, expiredReloads: expiredProtectReloads },
+    protectCheck: {
+      protect: {
+        challengeId: model.protect.challengeId,
+        resolve: options => model.protect.resolve({ ...options, expiredReloads: expiredProtectReloads }),
+      },
+      onNext: next,
+      resetExpiredReloads: () => {
+        expiredProtectReloads.current = 0;
+      },
+    },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

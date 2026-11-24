@@ -19,8 +19,7 @@ import { SignUpRestricted } from './sign-up-restricted/sign-up-restricted';
 
 export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');
-  const { applicationName, applicationLogoUrl } = props;
-  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+  const { applicationName, logo } = props;
 
   return (
     <Card.Root

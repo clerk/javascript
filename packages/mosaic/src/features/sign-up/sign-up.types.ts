@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
-import type { SignUpCreateResult, SignUpProtectModel, SignUpVerificationModel } from './sign-up.model';
+import type { SignUpCreateResult, SignUpProtectResolveOptions, SignUpVerificationModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
@@ -126,16 +126,19 @@ export interface SignUpWalletsScreen {
 }
 
 export interface SignUpProtectScreen {
-  protect: SignUpProtectModel;
+  protect: {
+    challengeId: string | undefined;
+    resolve: (options: Omit<SignUpProtectResolveOptions, 'expiredReloads'>) => Promise<SignUpCreateResult>;
+  };
   onNext: (result: SignUpCreateResult) => void;
-  /** Expired-challenge reloads so far. Kept above the screen, which remounts for each reissued challenge. */
-  expiredReloads: { current: number };
+  /** Starts the count of expired-challenge reloads over, for a retry the user asks for. */
+  resetExpiredReloads: () => void;
 }
 
 export interface SignUpViewProps {
   screen: SignUpScreen;
   applicationName: string;
-  applicationLogoUrl?: string;
+  logo?: { src: string; alt: string };
   renderBranding?: boolean;
   start: SignUpDetailsScreen;
   continue: SignUpDetailsScreen;
