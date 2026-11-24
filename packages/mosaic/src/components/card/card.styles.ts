@@ -223,7 +223,6 @@ export const content = stylex.create({
     },
     paddingBlockStart: {
       default: 'var(--_cl-card-inset-block-start)',
-      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one keeps the headerless inset.
       [stylex.when.siblingBefore(':where(*)', cardHeaderMarker)]: space['4'],
     },
   },
