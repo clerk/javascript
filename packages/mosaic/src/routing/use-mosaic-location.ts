@@ -100,6 +100,15 @@ function useVirtualModeLocation(path: string): MosaicLocation {
   return useMemo(() => createVirtualLocation(path, actions), [path, actions]);
 }
 
+/**
+ * Low level hook to read the pathname, should not be used directly by components.
+ */
+export function useHostPathname(): string | undefined {
+  const { reads } = useRoutingConfig();
+  const fromWindow = useWindowUrl(true);
+  return useAdapterRead(reads.usePathname, '') ?? fromWindow?.pathname;
+}
+
 // A read the adapter does not supply comes from `window`, at render through its store and at the
 // moment of a write directly. The location is rebuilt only when its entry changes: a write reads the
 // host as it was last committed, so a host that re-renders with a new adapter object or a new URL
@@ -159,7 +168,7 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
 
 // The mode is fixed on the first render: each mode calls its own hooks, so a component changes mode
 // by remounting, which the profiles do by keying on `routing`.
-export function useFixedRoutingMode(routing: MosaicRoutingMode): MosaicRoutingMode {
+export function useFixedRoutingMode<Mode extends MosaicRoutingMode>(routing: Mode): Mode {
   const [mode] = useState(routing);
   if (mode !== routing) {
     logger.warnOnce(

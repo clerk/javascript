@@ -9,7 +9,7 @@ import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
 import { useRoutingConfig } from '../routing/router-adapter';
-import { useMosaicLocation } from '../routing/use-mosaic-location';
+import { useFixedRoutingMode, useHostPathname, useMosaicLocation } from '../routing/use-mosaic-location';
 import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from './modal.types';
 
 // The open modals in the order they opened. Modals are hosted side by side rather than inside
@@ -62,16 +62,25 @@ export function ModalSurfaceHost<Options>({
     openCount: 0,
     openRequested: false,
     wasOpen: false,
+    openedOn: undefined,
   });
 
   // The modal open state is derived from the routing state, so there is no state to sync and
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
-  const routing = useRoutingConfig().modals ?? surface.routing ?? 'virtual';
+  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? surface.routing ?? 'virtual');
   const base = surface.path ?? `/modal/${surface.id}`;
   const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
+  const page = useHostPathname();
+  const leftPage =
+    routing === 'virtual' && isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
+  React.useEffect(() => {
+    if (leftPage) {
+      location.clear();
+    }
+  }, [leftPage, location]);
   const stack = React.useContext(ModalStackContext);
   const register = stack?.register;
   React.useEffect(() => (isOpen ? register?.(surface.id) : undefined), [isOpen, register, surface.id]);
@@ -84,13 +93,14 @@ export function ModalSurfaceHost<Options>({
       // modal is rendering because the routing state says so, and we reset whatever
       // options/container state was lying around since last time the modal was open.
       previous.openRequested
-        ? { ...previous, openRequested: false, wasOpen: true }
+        ? { ...previous, openRequested: false, wasOpen: true, openedOn: page }
         : {
             options: undefined,
             container: undefined,
             openCount: previous.openCount + 1,
             openRequested: false,
             wasOpen: true,
+            openedOn: page,
           },
     );
   } else if (!isOpen && state.wasOpen) {
@@ -213,4 +223,5 @@ interface ModalState<Options> {
   // `isOpen` as of the previous render, kept only to tell the opening and closing edges apart. The
   // entry alone decides whether the modal renders.
   wasOpen: boolean;
+  openedOn: string | undefined;
 }

@@ -111,6 +111,29 @@ describe('useModal', () => {
     expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
   });
 
+  it('closes when the host moves to another pathname, and stays open across a query change', async () => {
+    const original = window.location.href;
+    onTestFinished(() => window.history.replaceState(null, '', original));
+    window.history.replaceState(null, '', '/page');
+    const { ref } = renderCaller(stubSurface());
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?tab=2');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+  });
+
   it('closes through the dialog dismissal and updates isOpen', async () => {
     const { ref } = renderCaller(stubSurface());
     await flush();
@@ -825,6 +848,33 @@ describe('a modal surface in query mode', () => {
   }
 
   beforeEach(() => window.history.replaceState(null, '', '/page?q=1'));
+
+  it('keeps the mode it mounted with when the provider changes it, and warns', async () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const surface = querySurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined } = { handle: undefined };
+    const tree = (modals: 'query' | 'hash') => (
+      <MosaicProvider routing={{ modals }}>
+        <ModalHost surfaces={[surface]}>
+          <Caller
+            surface={surface}
+            onHandle={h => (ref.handle = h)}
+          />
+        </ModalHost>
+      </MosaicProvider>
+    );
+    const view = render(tree('query'));
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+
+    view.rerender(tree('hash'));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"routing" changed'));
+    warn.mockRestore();
+  });
 
   it('opens with a push to its param and closes by replacing it away', async () => {
     const { ref } = renderCaller(querySurface());
