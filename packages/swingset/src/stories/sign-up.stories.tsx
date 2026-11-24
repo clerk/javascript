@@ -1,3 +1,4 @@
+import type { CardElevation } from '@clerk/mosaic/components/card';
 import { useForm } from '@clerk/mosaic/components/form';
 import type { SignInProvider } from '@clerk/mosaic/features/sign-in';
 import type { SignUpStep, SignUpValues } from '@clerk/mosaic/features/sign-up';
@@ -6,6 +7,8 @@ import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
+
+import { BrandingToggle } from './fixtures/branding-toggle';
 
 export { default as __source } from './sign-up.stories?raw';
 
@@ -74,6 +77,8 @@ function StepPanel({
   onJoinWaitlist,
   onRetry,
   resend = false,
+  elevation,
+  renderBranding,
 }: {
   step: SignUpStep;
   providers?: SignInProvider[];
@@ -87,6 +92,8 @@ function StepPanel({
   onJoinWaitlist?: () => void;
   onRetry?: () => void;
   resend?: boolean;
+  elevation?: CardElevation;
+  renderBranding?: boolean;
 }) {
   const form = useForm<SignUpValues>({
     initialValues: { ...emptyValues, identifier },
@@ -96,6 +103,8 @@ function StepPanel({
   return (
     <SignUpView
       step={step}
+      elevation={elevation}
+      renderBranding={renderBranding}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       socialProviders={providers}
@@ -123,6 +132,20 @@ function StepPanel({
 
 export function Default() {
   return <StepPanel step={startStep} />;
+}
+
+export function Flush() {
+  return (
+    <BrandingToggle>
+      {renderBranding => (
+        <StepPanel
+          step={startStep}
+          elevation='flush'
+          renderBranding={renderBranding}
+        />
+      )}
+    </BrandingToggle>
+  );
 }
 
 export function StartSocialOnly() {

@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
+import type { CardElevation } from '../../components/card';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
@@ -37,6 +38,8 @@ export type SignUpValues = AuthFlowValues;
 export type SignUpSubmitEvent = AuthFlowSubmitEvent;
 
 export interface SignUpViewProps {
+  elevation?: CardElevation;
+  renderBranding?: boolean;
   step: SignUpStep;
   direction?: FlowDirection;
   applicationName: string;

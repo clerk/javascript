@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import type { CardElevation } from '@clerk/mosaic/components/card';
 import type { FieldFeedback, FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
@@ -16,6 +17,8 @@ import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
+
+import { BrandingToggle } from './fixtures/branding-toggle';
 
 export { default as __source } from './sign-in.stories?raw';
 
@@ -498,6 +501,8 @@ function StepPanel({
   passwordFeedback,
   onRetry,
   password,
+  elevation,
+  renderBranding,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -517,6 +522,8 @@ function StepPanel({
   passwordFeedback?: FieldFeedback;
   onRetry?: () => void;
   password?: string;
+  elevation?: CardElevation;
+  renderBranding?: boolean;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -533,6 +540,8 @@ function StepPanel({
   return (
     <SignInView
       step={step}
+      elevation={elevation}
+      renderBranding={renderBranding}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       combined={combined}
@@ -574,6 +583,34 @@ function StepPanel({
 }
 
 const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
+
+export function Flush() {
+  return (
+    <BrandingToggle>
+      {renderBranding => (
+        <StepPanel
+          step={{ kind: 'identifier', field: 'email' }}
+          elevation='flush'
+          renderBranding={renderBranding}
+        />
+      )}
+    </BrandingToggle>
+  );
+}
+
+export function FlushCode() {
+  return (
+    <BrandingToggle>
+      {renderBranding => (
+        <StepPanel
+          step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }}
+          elevation='flush'
+          renderBranding={renderBranding}
+        />
+      )}
+    </BrandingToggle>
+  );
+}
 
 export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier', field: 'email' }} />;

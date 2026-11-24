@@ -23,7 +23,7 @@ import { Icon } from '../icon';
 import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
-type CardElevation = 'card' | 'flush' | 'overlay';
+export type CardElevation = 'card' | 'flush' | 'overlay';
 
 export type CardSize = keyof typeof slots.sizes;
 
@@ -83,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
           reset.base,
           slots.root.base,
           slots.root[elevation],
-          slots.sizes[size],
+          elevation === 'flush' ? slots.flushSizes[size] : slots.sizes[size],
           isSurface && slots.surface.root,
           xstyle,
         ),

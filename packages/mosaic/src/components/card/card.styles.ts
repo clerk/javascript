@@ -21,6 +21,7 @@ export const root = stylex.create({
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one draws no footer divider.
       [stylex.when.descendant(':where(*)', cardContentMarker)]: '1px',
     },
+    '--_cl-card-footer-inset-start': space['4'],
     '--_cl-card-header-padding-end': {
       default: space['5'],
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one pads under the header of a card that also has content.
@@ -28,6 +29,9 @@ export const root = stylex.create({
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- as above, for a card whose header is followed by a footer.
       [stylex.when.descendant(':where(*)', cardFooterMarker)]: '0px',
     },
+    '--_cl-card-inset-block-end': space['5'],
+    '--_cl-card-inset-block-start': space['4'],
+    '--_cl-card-inset-inline': space['5'],
     color: colorVars['--cl-color-foreground'],
     containerName: 'card',
     containerType: 'inline-size',
@@ -42,10 +46,17 @@ export const root = stylex.create({
     boxShadow: shadowVars['--cl-shadow-lg'],
   },
   flush: {
-    borderRadius: radiusVars['--cl-radius-xl'],
+    '--_cl-card-branding-gap': space['4'],
+    '--_cl-card-footer-border': '0px',
+    '--_cl-card-footer-inset-start': '0px',
+    '--_cl-card-inset-block-end': '0px',
+    '--_cl-card-inset-block-start': '0px',
+    '--_cl-card-inset-inline': '0px',
+    borderRadius: 0,
     overflow: 'visible',
     backgroundColor: 'transparent',
     boxShadow: 'none',
+    width: '100%',
   },
   overlay: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -71,6 +82,11 @@ export const sizes = stylex.create({
   lg: { width: '36.25rem' },
 });
 
+export const flushSizes = stylex.create({
+  md: { maxWidth: 'var(--cl-card-flush-max-width, 26.25rem)' },
+  lg: { maxWidth: 'var(--cl-card-flush-max-width, 36.25rem)' },
+});
+
 const HEADER_ROW_GAP = space['0.5'];
 const HEADER_COLUMN_GAP = space['1'];
 const CLOSE_BUTTON_WIDTH = space['7'];
@@ -79,12 +95,12 @@ export const header = stylex.create({
   // `row-reverse` so the dismiss button leads in the DOM — and so takes the dialog's opening
   // focus — while sitting at the inline end.
   base: {
-    paddingInline: space['5'],
+    paddingInline: 'var(--_cl-card-inset-inline)',
     columnGap: HEADER_COLUMN_GAP,
     display: 'flex',
     flexDirection: 'row-reverse',
     paddingBlockEnd: 'var(--_cl-card-header-padding-end)',
-    paddingBlockStart: space['4'],
+    paddingBlockStart: 'var(--_cl-card-inset-block-start)',
   },
   content: {
     display: 'flex',
@@ -160,7 +176,7 @@ export const banner = stylex.create({
     minHeight: 0,
   },
   surface: {
-    marginInline: space['5'],
+    marginInline: 'var(--_cl-card-inset-inline)',
     marginBlockStart: INSET,
     opacity: {
       default: 1,
@@ -200,14 +216,14 @@ export const content = stylex.create({
   // keeps its height instead of collapsing to a zero basis on the block axis.
   base: {
     gap: space['4'],
-    paddingInline: space['5'],
+    paddingInline: 'var(--_cl-card-inset-inline)',
     display: 'grid',
     flexBasis: 'auto',
     flexGrow: '1',
     flexShrink: '1',
     gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
     paddingBlockEnd: {
-      default: space['5'],
+      default: 'var(--_cl-card-inset-block-end)',
       // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one keeps the footerless padding.
       [stylex.when.siblingAfter(':where(*)', cardFooterMarker)]: space['4'],
     },
@@ -218,14 +234,17 @@ export const content = stylex.create({
 export const footer = stylex.create({
   base: {
     gap: space['2'],
-    paddingBlock: space['4'],
-    paddingInline: space['5'],
+    paddingInline: 'var(--_cl-card-inset-inline)',
     alignItems: 'center',
     display: { [compactCard]: 'grid', default: 'flex' },
     flexDirection: 'row',
     flexShrink: 0,
     gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
     justifyContent: 'space-between',
+    paddingBlockEnd: {
+      default: `min(${space['4']}, var(--_cl-card-inset-block-end))`,
+    },
+    paddingBlockStart: 'var(--_cl-card-footer-inset-start)',
     borderTopColor: colorVars['--cl-color-border-subtle'],
     borderTopStyle: 'solid',
     borderTopWidth: 'var(--_cl-card-footer-border)',
@@ -243,5 +262,6 @@ export const branding = stylex.create({
     borderBlockStartWidth: '1px',
     display: 'flex',
     justifyContent: 'center',
+    marginBlockStart: 'var(--_cl-card-branding-gap, 0px)',
   },
 });
