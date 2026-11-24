@@ -47,7 +47,7 @@ export type FakeOAuthAccount =
   | { emailAddress: string; firstName?: string; lastName?: string }
   | { existingUser: { emailAddress: string; secondFactor?: boolean } }
   | { signedInSession: string }
-  | { error: { code: string; message: string } };
+  | { error: { code: string; message: string; meta?: ClerkAPIErrorJSON['meta'] } };
 
 type ProtectCheckOn = 'create' | 'update' | 'oauth_callback';
 
@@ -343,7 +343,12 @@ export function signUpHandlers(
       verifications: { ...signUp.verifications!, external_account: { ...external, ...changes } },
     });
     if ('error' in account) {
-      store(withExternal({ status: 'unverified', error: apiError(account.error.code, account.error.message) }));
+      store(
+        withExternal({
+          status: 'unverified',
+          error: { ...apiError(account.error.code, account.error.message), meta: account.error.meta ?? {} },
+        }),
+      );
       return;
     }
     if ('signedInSession' in account) {
