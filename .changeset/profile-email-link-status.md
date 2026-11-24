@@ -9,3 +9,5 @@ The page that opens from a `<UserProfile />` email verification link now shows w
 Adds the localization key `userProfile.emailAddressPage.emailLink.clientMismatch.subtitle`, translated for every locale.
 
 Translates the sign-in email link message for a link opened on another device into Bulgarian, Catalan, Mongolian, Serbian, Ukrainian and Simplified Chinese. The profile page reuses its title.
+
+Corrects that message's title in Belarusian, Danish, Dutch, French, German, Greek, Italian, Portuguese (Portugal) and Spanish (Spain), where it described a client error instead of a link opened on another device.
