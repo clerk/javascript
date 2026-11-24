@@ -18,6 +18,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicOptionsProvider } from '../../../hooks/use-mosaic-options';
 import type { MosaicLocalization } from '../../../localization';
 import type { OAuthConsentProps } from '../oauth-consent';
 import { OAuthConsent } from '../oauth-consent';
@@ -239,6 +240,13 @@ describe('OAuthConsent', () => {
         environment: fapiEnvironment({ display_config: { logo_image_url: appLogo } }),
       });
     const arrow = (container: HTMLElement) => container.querySelector('.cl-card-media .cl-icon');
+    const customLogomark = (
+      <svg
+        role='img'
+        aria-label='Custom logomark'
+      />
+    );
+
     it('shows the OAuth application logo and the application logo with an arrow between them', async () => {
       visitOAuthConsent();
       const { container } = await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO));
@@ -257,6 +265,23 @@ describe('OAuthConsent', () => {
       expect(getComputedStyle(await screen.findByRole('img', { name: 'Acme' })).objectFit).toBe('contain');
     });
 
+    it('covers the avatar with an options.logomark image', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO), {
+        options: {
+          logomark: (
+            <img
+              src={PIXEL}
+              alt='Custom logomark'
+            />
+          ),
+        },
+      });
+
+      await ready();
+      expect(getComputedStyle(await screen.findByRole('img', { name: 'Custom logomark' })).objectFit).toBe('cover');
+    });
+
     it('covers the avatar with the logomark set in the Clerk Dashboard in place of the application logo', async () => {
       visitOAuthConsent();
       await renderOAuthConsent(
@@ -272,6 +297,74 @@ describe('OAuthConsent', () => {
       const logomark = await screen.findByRole('img', { name: 'Acme' });
       expect(logomark).toHaveAttribute('src', APP_LOGOMARK);
       expect(getComputedStyle(logomark).objectFit).toBe('cover');
+    });
+
+    it('prefers options.logomark over the logomark set in the Clerk Dashboard', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(
+        signedIn({
+          oauthConsent: consent({ oauth_application_logo_url: OAUTH_LOGO }),
+          environment: fapiEnvironment({
+            display_config: { logo_image_url: APP_LOGO, logomark_image_url: APP_LOGOMARK },
+          }),
+        }),
+        { options: { logomark: customLogomark } },
+      );
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Custom logomark' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Acme' })).toBeNull();
+    });
+
+    it('replaces the application logo with options.logomark', async () => {
+      visitOAuthConsent();
+      await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO), { options: { logomark: customLogomark } });
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Custom logomark' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Acme' })).toBeNull();
+    });
+
+    it.each([
+      ['no options', undefined],
+      ['options without a logomark', {}],
+    ])('uses the options.logomark from a provider above it when the component passes %s', async (_, options) => {
+      visitOAuthConsent();
+      serveFapi(withLogos(OAUTH_LOGO, APP_LOGO));
+      await renderWithClerk(
+        <MosaicOptionsProvider options={{ logomark: customLogomark }}>
+          <OAuthConsent options={options} />
+        </MosaicOptionsProvider>,
+      );
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Custom logomark' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Acme' })).toBeNull();
+    });
+
+    it('hides the logomark set on a provider above it when the component passes logomark false', async () => {
+      visitOAuthConsent();
+      serveFapi(withLogos(OAUTH_LOGO, APP_LOGO));
+      const { container } = await renderWithClerk(
+        <MosaicOptionsProvider options={{ logomark: customLogomark }}>
+          <OAuthConsent options={{ logomark: false }} />
+        </MosaicOptionsProvider>,
+      );
+
+      await ready();
+      expect(screen.queryByRole('img', { name: 'Custom logomark' })).toBeNull();
+      expect(screen.queryByRole('img', { name: 'Acme' })).toBeNull();
+      expect(arrow(container)).toBeNull();
+    });
+
+    it('hides the application logo and the arrow when options.logomark is false', async () => {
+      visitOAuthConsent();
+      const { container } = await renderOAuthConsent(withLogos(OAUTH_LOGO, APP_LOGO), { options: { logomark: false } });
+
+      await ready();
+      expect(await screen.findByRole('img', { name: 'Linear' })).toBeVisible();
+      expect(screen.queryByRole('img', { name: 'Acme' })).toBeNull();
+      expect(arrow(container)).toBeNull();
     });
 
     it('shows the OAuth application initials and the application logo when the OAuth application has no logo', async () => {
