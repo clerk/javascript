@@ -54,11 +54,23 @@ A long scope list scrolls inside its box, with the edges fading while there is m
 
 <Story name='ManyScopes' storyModule={Stories} />
 
+### Single organization
+
+The default. `organizationSelection` with `organizationId` shows a plain select, and the form posts the one picked `organization_id`.
+
+<Story name='SingleOrganization' storyModule={Stories} />
+
 ### Multiple organizations
 
-With `organizationSelection`, the user grants access to all of their organizations or picks some of them. Picking shows a select of organizations with their avatars, and the select reads as a count once more than one is picked. The form posts one `organization_id` per granted organization.
+The view only, for when the backend accepts more than one organization. `multiple: true` with a `limit` lets the user pick up to that many organizations. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. Allow stays disabled while none is picked. The form posts the picked organizations as one space-separated `organization_id`.
 
 <Story name='MultipleOrganizations' storyModule={Stories} />
+
+### Organization access
+
+The view only. `multiple: true` with `access` asks whether to grant all organizations or only selected ones. All posts every organization; only selected shows the multi-select, and Allow stays disabled until one is picked.
+
+<Story name='OrganizationAccess' storyModule={Stories} />
 
 ### Offline access
 
