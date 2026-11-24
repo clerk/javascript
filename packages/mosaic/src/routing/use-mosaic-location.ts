@@ -8,7 +8,7 @@ import { urlCarrier, urlWith, urlWithout } from './url-location';
 import { createVirtualLocation } from './virtual-location';
 import { useVirtualActions } from './virtual-store';
 import type { HostUrl } from './window-location';
-import { notifyWindowUrl, readWindowUrl, useWindowUrl, writeWindowUrl } from './window-location';
+import { isSameOrigin, notifyWindowUrl, readWindowUrl, useWindowUrl, writeWindowUrl } from './window-location';
 
 export type MosaicRoutingMode = 'virtual' | UrlRoutingMode;
 
@@ -16,17 +16,6 @@ export type MosaicLocationOptions = {
   routing: MosaicRoutingMode;
   path?: string;
 };
-
-export interface RoutingProps {
-  /**
-   * Where the component's pages live: `virtual` keeps them in memory, `path` in the pathname under
-   * `path`, `hash` and `query` in a param of the hash or the query string. Defaults per component.
-   * Changing it needs a remount, so key the component on it.
-   */
-  routing?: MosaicLocationOptions['routing'];
-  /** The base the component's pages are nested under. Defaults per component. */
-  path?: string;
-}
 
 function readNothing(): undefined {
   return undefined;
@@ -68,27 +57,27 @@ function startOf(last: Committed, replace: boolean): { via: ((url: string) => vo
   };
 }
 
-function isSameOrigin(url: string): boolean {
-  try {
-    return new URL(url, window.location.href).origin === window.location.origin;
-  } catch {
-    return false;
+function navigateTo(
+  build: (from: HostUrl) => string | undefined,
+  replace: boolean,
+  start: { via: ((url: string) => void) | undefined; url: HostUrl },
+): void {
+  const url = build(start.url);
+  if (url === undefined) {
+    return;
   }
-}
-
-function navigateTo(url: string, replace: boolean, via: ((url: string) => void) | undefined): void {
+  if (start.via === undefined) {
+    writeWindowUrl(() => build(readWindowUrl()), replace);
+    return;
+  }
   if (!isSameOrigin(url)) {
     logger.warnOnce(
       `[Clerk] "${url}" was not navigated to: it resolves to another origin, as a pathname that starts with "//" does. Serve the page at a pathname with a single leading slash.`,
     );
     return;
   }
-  if (via) {
-    via(url);
-    notifyWindowUrl();
-  } else {
-    writeWindowUrl(url, replace);
-  }
+  start.via(url);
+  notifyWindowUrl();
 }
 
 function urlModeLocationHook(mode: UrlRoutingMode) {
@@ -150,15 +139,10 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
     () => ({
       useSegmentParts: () => parts,
       write: (next, { replace: shouldReplace = false } = {}) => {
-        const start = startOf(committed.current, shouldReplace);
-        const url = urlWith(carrier, start.url, next);
-        if (url !== undefined) {
-          navigateTo(url, shouldReplace, start.via);
-        }
+        navigateTo(from => urlWith(carrier, from, next), shouldReplace, startOf(committed.current, shouldReplace));
       },
       clear: () => {
-        const start = startOf(committed.current, true);
-        navigateTo(urlWithout(carrier, start.url), true, start.via);
+        navigateTo(from => urlWithout(carrier, from), true, startOf(committed.current, true));
       },
       own: () => release,
     }),

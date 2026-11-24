@@ -9,7 +9,8 @@
  * - There is no `useHash`, because Next has no hash hook; Mosaic reads the hash from `window`.
  * - There is no `push` or `replace`. Mosaic writes `window.history` without Next's own history
  *   state, and Next then moves `usePathname` and `useSearchParams` to the new URL without the server
- *   round trip `router.push` would make. Under a `basePath`, path routing needs both, prepending it.
+ *   round trip `router.push` would make. Under a `basePath`, path routing needs it in both places Next
+ *   leaves it out: `usePathname: () => basePath + usePathname()` here and in the component's `path`.
  * - In a statically rendered route, `useSearchParams` opts the tree up to the nearest `<Suspense>`
  *   boundary into client rendering, as it does for any component that calls it.
  */

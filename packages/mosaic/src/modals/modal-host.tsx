@@ -69,7 +69,7 @@ export function ModalSurfaceHost<Options>({
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
-  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? surface.routing ?? 'virtual');
+  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? 'virtual');
   const base = surface.path ?? `/modal/${surface.id}`;
   const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
@@ -81,9 +81,10 @@ export function ModalSurfaceHost<Options>({
       location.clear();
     }
   }, [leftPage, location]);
+  const shown = isOpen && !leftPage;
   const stack = React.useContext(ModalStackContext);
   const register = stack?.register;
-  React.useEffect(() => (isOpen ? register?.(surface.id) : undefined), [isOpen, register, surface.id]);
+  React.useEffect(() => (shown ? register?.(surface.id) : undefined), [shown, register, surface.id]);
   const isTop = stack === null || stack.top === surface.id;
   // wasOpen guarantees this only runs once as we are opening the modal
   if (isOpen && !state.wasOpen) {
@@ -126,6 +127,7 @@ export function ModalSurfaceHost<Options>({
           container,
           openCount: previous.openCount + 1,
           openRequested: !isOpen,
+          openedOn: page,
         }));
         location.write(surface.initialParts?.(options) ?? []);
       },
@@ -136,7 +138,7 @@ export function ModalSurfaceHost<Options>({
       preload,
       isOpen,
     };
-  }, [surface, location, isOpen]);
+  }, [surface, location, isOpen, page]);
 
   return (
     <surface.context.Provider value={modal}>
@@ -144,7 +146,7 @@ export function ModalSurfaceHost<Options>({
       <ModalSlot
         surface={surface}
         state={state}
-        open={isOpen}
+        open={shown}
         base={base}
         routing={routing}
         close={modal.close}

@@ -21,8 +21,6 @@ export interface ModalSurfaceConfig<Options> {
   load: () => Promise<{ default: ComponentType<ModalContentProps<Options>> }>;
   // The base of the entry that keeps the modal open, `/modal/<id>` by default
   path?: string;
-  // Where the entry lives, `virtual` by default. The content routes under the base in the same mode.
-  routing?: ModalRoutingMode;
   // The parts written on open, derived from the open options; an empty entry by default.
   initialParts?: (options: Options | undefined) => SegmentParts;
 }

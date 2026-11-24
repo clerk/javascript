@@ -111,6 +111,31 @@ describe('useModal', () => {
     expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
   });
 
+  it('stays open when the page it moved to opens it again', async () => {
+    const original = window.location.href;
+    onTestFinished(() => window.history.replaceState(null, '', original));
+    window.history.replaceState(null, '', '/page');
+    const { ref } = renderCaller(stubSurface());
+    act(() => ref.handle?.open());
+    await flush();
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(readOptions()).toEqual({ page: 'security' });
+
+    act(() => {
+      window.history.pushState(null, '', '/third');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+  });
+
   it('closes when the host moves to another pathname, and stays open across a query change', async () => {
     const original = window.location.href;
     onTestFinished(() => window.history.replaceState(null, '', original));
@@ -842,7 +867,6 @@ describe('a modal surface in query mode', () => {
       variant: 'card',
       load: () => Promise.resolve({ default: QueryContent }),
       path: '/modal/stub',
-      routing: 'query',
       initialParts: options => (options?.page ? [options.page] : []),
     });
   }
@@ -877,7 +901,7 @@ describe('a modal surface in query mode', () => {
   });
 
   it('opens with a push to its param and closes by replacing it away', async () => {
-    const { ref } = renderCaller(querySurface());
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
     const length = window.history.length;
 
     act(() => ref.handle?.open({ page: 'security' }));
@@ -895,7 +919,7 @@ describe('a modal surface in query mode', () => {
   });
 
   it('routes its content in the query string', async () => {
-    const { ref } = renderCaller(querySurface());
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
 
     act(() => ref.handle?.open());
     await flush();
@@ -909,7 +933,7 @@ describe('a modal surface in query mode', () => {
 
   it('opens from the URL and closes when the browser goes back', async () => {
     window.history.replaceState(null, '', '/page?q=1&.modal.stub=security');
-    const { ref } = renderCaller(querySurface());
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
     await flush();
     expect(ref.handle?.isOpen).toBe(true);
     expect(screen.getByTestId('route').textContent).toBe('security');

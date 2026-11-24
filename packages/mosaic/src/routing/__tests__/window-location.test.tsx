@@ -89,6 +89,33 @@ describe('writeWindowUrl', () => {
   // This is necessary because Next and possibly other frameworks don't patch
   // history.pushState/replaceState until an effect, so we need to guarantee we
   // don't write until after that has happened
+  it('builds a parked write when it lands, from the URL as it is then', async () => {
+    vi.resetModules();
+    const fresh = await import('../window-location');
+    window.history.replaceState(null, '', '/page?a=1');
+
+    fresh.writeWindowUrl(() => `${window.location.pathname}${window.location.search}&.user=security`, true);
+    fresh.writeWindowUrl(() => `${window.location.pathname}${window.location.search}&.org=members`, true);
+    window.history.replaceState(null, '', '/page?a=1&host=2');
+
+    fresh.markSettled();
+    expect(window.location.search).toBe('?a=1&host=2&.user=security&.org=members');
+  });
+
+  it('refuses a parked write that resolves to another origin when it lands', async () => {
+    vi.resetModules();
+    const fresh = await import('../window-location');
+    const { logger: freshLogger } = await import('@clerk/shared/logger');
+    const warn = vi.spyOn(freshLogger, 'warnOnce').mockImplementation(() => {});
+    window.history.replaceState(null, '', '/page');
+
+    fresh.writeWindowUrl(() => '//evil.example/x', false);
+    fresh.markSettled();
+    expect(window.location.pathname).toBe('/page');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('another origin'));
+    warn.mockRestore();
+  });
+
   it('parks writes until the page has settled, then lands them in order', async () => {
     vi.resetModules();
     const fresh = await import('../window-location');

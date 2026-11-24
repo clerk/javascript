@@ -207,6 +207,17 @@ describe.each(['query', 'hash'] as const)('a %s param', routing => {
     expect(renderLocation({ routing, path: '/user' }).result.current.parts).toEqual(['two words']);
   });
 
+  it('refuses an empty part, which would read back as no part', () => {
+    const warn = warnings();
+    seed('security');
+    const { result } = renderLocation({ routing, path: '/user' });
+
+    act(() => result.current.location.write(['billing', '']));
+
+    expect(result.current.parts).toEqual(['security']);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('an empty part'));
+  });
+
   it('keeps a slash inside a part, since the segment is encoded before the param is', () => {
     seed('security');
     const { result } = renderLocation({ routing, path: '/user' });

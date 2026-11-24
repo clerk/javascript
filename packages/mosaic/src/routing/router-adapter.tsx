@@ -27,7 +27,10 @@ export interface RouterAdapter {
    * cannot be read here, as on the server, and that read falls back to `window`.
    */
   useSearchParams?: () => string | URLSearchParams | null | undefined;
-  /** A hook returning the current hash, percent-encoded, as `location.hash` does. A leading `#` is optional. */
+  /**
+   * A hook returning the current hash, percent-encoded, as `location.hash` does. A leading `#` is
+   * optional. It is read only once the page has hydrated, since a server has no hash.
+   */
   useHash?: () => string;
   /**
    * Navigates the host router to a URL made of a pathname, query string and hash, adding a history entry.

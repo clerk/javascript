@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import { useSyncExternalStore } from 'react';
 
 // The page's URL as `window` holds it, for the URL modes when the host's adapter does not supply a
@@ -79,8 +80,26 @@ export function markSettled(): void {
   }
 }
 
-export function writeWindowUrl(url: string, replace: boolean): void {
+export function isSameOrigin(url: string): boolean {
+  try {
+    return new URL(url, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
+export function writeWindowUrl(target: string | (() => string | undefined), replace: boolean): void {
   const write = () => {
+    const url = typeof target === 'string' ? target : target();
+    if (url === undefined) {
+      return;
+    }
+    if (!isSameOrigin(url)) {
+      logger.warnOnce(
+        `[Clerk] "${url}" was not navigated to: it resolves to another origin, as a pathname that starts with "//" does. Serve the page at a pathname with a single leading slash.`,
+      );
+      return;
+    }
     if (replace) {
       window.history.replaceState(null, '', url);
     } else {

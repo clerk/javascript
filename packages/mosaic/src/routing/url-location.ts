@@ -74,7 +74,7 @@ function pathCarrier(basePath: string): UrlCarrier {
   };
 }
 
-// One pair of the query string or the hash, `.user=billing/st_1`.
+// One pair of the query string or the hash, `.user=billing%2Fst_1`.
 function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
   if (key === '') {
     logger.warnOnce(
@@ -88,6 +88,10 @@ function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
     clear: body => writeParam(body, key, undefined),
     decode: decodeSegment,
     encode: encodeSegment,
+    refuse: parts =>
+      parts.includes('')
+        ? `[Clerk] "${parts.join('/')}" was not navigated to: an empty part reads back as no part at all.`
+        : undefined,
   };
 }
 
