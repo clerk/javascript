@@ -152,10 +152,19 @@ describe('OAuthConsentView', () => {
         expect(onChange).toHaveBeenCalledWith(['org_1', 'org_2']);
       });
 
-      it('posts one organization_id per selected organization', () => {
+      it('posts the selected organizations as one space-separated organization_id', () => {
         renderView({ organizations, organizationSelection: multiple({ organizationIds: ['org_1', 'org_3'] }) });
 
-        expect(postedOrganizationIds()).toEqual(['org_1', 'org_3']);
+        expect(postedOrganizationIds()).toEqual(['org_1 org_3']);
+      });
+
+      it('keeps the last picked organization from being deselected', async () => {
+        const user = renderView({ organizations, organizationSelection: multiple({ organizationIds: ['org_2'] }) });
+
+        await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+
+        expect(screen.getByRole('option', { name: 'Globex' })).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('option', { name: 'Initech' })).not.toHaveAttribute('aria-disabled');
       });
 
       it('names a single selected organization in the picker', () => {
@@ -201,7 +210,7 @@ describe('OAuthConsentView', () => {
 
         expect(screen.getByRole('radio', { name: 'All organizations' })).toBeChecked();
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
-        expect(postedOrganizationIds()).toEqual(['org_1', 'org_2', 'org_3']);
+        expect(postedOrganizationIds()).toEqual(['org_1 org_2 org_3']);
       });
 
       it('reports a switch to only selected organizations', async () => {
@@ -232,10 +241,12 @@ describe('OAuthConsentView', () => {
         expect(onChange).toHaveBeenCalledWith([]);
       });
 
-      it('shows a placeholder while no organization is picked', () => {
+      it('shows a placeholder and blocks Allow while no organization is picked', () => {
         renderView({ organizations, organizationSelection: access({ access: 'selected' }) });
 
         expect(screen.getByRole('combobox')).toHaveTextContent('Select organizations');
+        expect(postedOrganizationIds()).toEqual([]);
+        expect(screen.getByRole('button', { name: 'Allow' })).toBeDisabled();
       });
 
       it('posts only the selected organizations', () => {

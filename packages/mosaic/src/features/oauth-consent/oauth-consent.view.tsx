@@ -41,6 +41,10 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
     props.organizations.length === 0 ? [] : organizationIdsToPost(props.organizations, props.organizationSelection);
   const organizationLimit = props.organizationSelection.multiple ? props.organizationSelection.limit : undefined;
   const exceedsOrganizationLimit = organizationLimit !== undefined && postedOrganizationIds.length > organizationLimit;
+  const missingOrganization =
+    props.organizationSelection.multiple === true &&
+    props.organizations.length > 0 &&
+    postedOrganizationIds.length === 0;
   const openRedirectUrl = () => props.onRedirectUrlOpenChange(true);
   const domain = (
     <RedirectDomainButton
@@ -127,14 +131,13 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           name='scope'
           value={props.scope}
         />
-        {postedOrganizationIds.map(id => (
+        {postedOrganizationIds.length > 0 ? (
           <input
-            key={id}
             type='hidden'
             name='organization_id'
-            value={id}
+            value={postedOrganizationIds.join(' ')}
           />
-        ))}
+        ) : null}
         <div {...stylex.props(styles.actions)}>
           <SubmitButton
             name='consented'
@@ -151,7 +154,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           <SubmitButton
             name='consented'
             value='true'
-            disabled={props.pendingAction === 'deny' || exceedsOrganizationLimit}
+            disabled={props.pendingAction === 'deny' || exceedsOrganizationLimit || missingOrganization}
             isPending={props.pendingAction === 'allow'}
             pendingLabel={m.allowing}
             onClick={props.onAllow}
@@ -410,7 +413,7 @@ function OrganizationMultiSelect({
         </Select.Trigger>
         <OrganizationPopup
           organizations={organizations}
-          isDisabled={value => atLimit && !organizationIds.includes(value)}
+          isDisabled={value => (organizationIds.includes(value) ? organizationIds.length === 1 : atLimit)}
         />
       </Select.Root>
       {limit !== undefined && organizations.length > limit ? (
