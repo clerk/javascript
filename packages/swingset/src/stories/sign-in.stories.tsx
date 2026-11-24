@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import type { CardElevation } from '@clerk/mosaic/components/card';
 import type { FieldFeedback, FieldsConfig } from '@clerk/mosaic/components/form';
 import { useForm } from '@clerk/mosaic/components/form';
 import type {
@@ -498,6 +499,7 @@ function StepPanel({
   passwordFeedback,
   onRetry,
   password,
+  elevation,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -517,6 +519,7 @@ function StepPanel({
   passwordFeedback?: FieldFeedback;
   onRetry?: () => void;
   password?: string;
+  elevation?: CardElevation;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -533,6 +536,7 @@ function StepPanel({
   return (
     <SignInView
       step={step}
+      elevation={elevation}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       combined={combined}
@@ -574,6 +578,24 @@ function StepPanel({
 }
 
 const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
+
+export function Flush() {
+  return (
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      elevation='flush'
+    />
+  );
+}
+
+export function FlushCode() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }}
+      elevation='flush'
+    />
+  );
+}
 
 export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier', field: 'email' }} />;

@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { BrandingToggle } from './fixtures/branding-toggle';
 import { manyScopes, organizationScopes, useOAuthConsentFixture } from './fixtures/oauth-consent';
 
 export { default as __source } from './oauth-consent.stories?raw';
@@ -76,6 +77,30 @@ export function Default() {
         </Flow.Root>
       </Card.Root>
     </div>
+  );
+}
+
+export function Flush() {
+  const props = useOAuthConsentFixture({
+    scopes: organizationScopes,
+    organizations: [
+      { value: 'org_1', label: 'My workspace' },
+      { value: 'org_2', label: 'Globex' },
+    ],
+    defaultOrganizationId: 'org_1',
+  });
+  return (
+    <BrandingToggle>
+      {renderBranding => (
+        <Card.Root
+          elevation='flush'
+          align='center'
+          renderBranding={renderBranding}
+        >
+          <OAuthConsentView {...props} />
+        </Card.Root>
+      )}
+    </BrandingToggle>
   );
 }
 

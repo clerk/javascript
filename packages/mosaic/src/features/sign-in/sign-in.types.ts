@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
+import type { CardElevation } from '../../components/card';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
@@ -101,6 +102,7 @@ export interface SignInAccount {
 }
 
 export interface SignInViewProps {
+  elevation?: CardElevation;
   step: SignInStep;
   direction?: FlowDirection;
   applicationName: string;

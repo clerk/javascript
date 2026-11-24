@@ -2,6 +2,7 @@
 
 import type { ReactElement, ReactNode } from 'react';
 
+import type { CardElevation } from '../../components/card';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useErrorText, useMessages } from '../../localization';
@@ -14,6 +15,12 @@ import { OAuthConsentError, OAuthConsentView } from './oauth-consent.view';
 
 /** Everything `<OAuthConsent />` takes: which OAuth request to answer, and what to show while Clerk loads. */
 export type OAuthConsentProps = OAuthConsentModelOptions & {
+  /**
+   * The surface treatment of the consent card. `flush` drops the surface and the padding around it.
+   *
+   * @default 'card'
+   */
+  elevation?: CardElevation;
   /**
    * The element to render while Clerk loads.
    */
@@ -44,7 +51,7 @@ export type OAuthConsentProps = OAuthConsentModelOptions & {
  * />
  * ```
  */
-export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): ReactElement | null {
+export function OAuthConsent({ fallback, elevation, ...options }: OAuthConsentProps): ReactElement | null {
   const messages = useMessages('oauthConsent');
   const errorText = useErrorText();
   const model = useOAuthConsentModel(options);
@@ -57,6 +64,7 @@ export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): React
   }
   return (
     <Card.Root
+      elevation={elevation}
       align='center'
       renderBranding={model.status !== 'error' && model.renderBranding}
     >

@@ -28,6 +28,7 @@ function signUpSignIn(step: Extract<SignInStep, { kind: 'sign-up' }>, onSignIn: 
 }
 
 export function SignInView({
+  elevation,
   step,
   direction,
   applicationName,
@@ -119,7 +120,10 @@ export function SignInView({
   };
 
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      elevation={elevation}
+      align='center'
+    >
       <Flow.Root
         value={stepKey(step)}
         direction={direction}

@@ -39,7 +39,7 @@ export default {
       props: {
         elevation: {
           type: 'CardElevation',
-          doc: '`card`, `flush` or `overlay`.',
+          doc: '`card`, `flush` or `overlay`. `flush` drops the surface, the padding around the card and the footer divider, and keeps the `size` width, shrinking to fit a narrower container.',
           default: "'overlay' inside a dialog, otherwise 'card'",
         },
         size: {

@@ -29,6 +29,7 @@ import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
 import { SignUpRestricted } from './steps/sign-up-restricted';
 
 export function SignUpView({
+  elevation,
   step,
   direction,
   applicationName,
@@ -170,7 +171,10 @@ export function SignUpView({
   };
 
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      elevation={elevation}
+      align='center'
+    >
       <Flow.Root
         value={signUpStepKey(step)}
         direction={direction}

@@ -20,10 +20,10 @@ import type { DialogContextValue } from '../dialog';
 import { Dialog } from '../dialog';
 import { DialogContext, isInDialog } from '../dialog/dialog';
 import { Icon } from '../icon';
-import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker, cardHeaderMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
-type CardElevation = 'card' | 'flush' | 'overlay';
+export type CardElevation = 'card' | 'flush' | 'overlay';
 
 export type CardSize = keyof typeof slots.sizes;
 
@@ -137,7 +137,11 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-header'),
+        stylex.props(reset.base, slots.header.base, cardHeaderMarker, xstyle),
+        rest,
+      ),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening

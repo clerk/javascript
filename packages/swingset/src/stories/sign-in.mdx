@@ -48,6 +48,18 @@ import { SignInView } from '@clerk/mosaic/features/sign-in';
 
 Each section is one component in `features/sign-in/steps/`, or in `blocks/auth/` for the screens sign-in and sign-up share, and each example under it is one `SignInStep` value it draws. A red "not found" box marks a view that legacy sign-in has and Mosaic doesn't yet; it turns into the example once its story exists.
 
+## Flush
+
+`elevation='flush'` drops the card's surface and the padding around it, so the form sits directly on the page. The card keeps its `size` width as a cap and fills a narrower container; position it in your layout (for example by centering its container).
+
+#### Identifier
+
+<Story name='Flush' storyModule={Stories} />
+
+#### Code
+
+<Story name='FlushCode' storyModule={Stories} />
+
 ### Identifier step
 
 `identifier-step.tsx` draws `{ kind: 'identifier' }`: social providers, the identifier field and, outside the combined flow, the sign-up link. `field` picks the email, username, email-or-username or phone input, and `nextField` adds the link that switches to it through `onSwitchField`.

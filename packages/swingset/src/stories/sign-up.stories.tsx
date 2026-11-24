@@ -1,3 +1,4 @@
+import type { CardElevation } from '@clerk/mosaic/components/card';
 import { useForm } from '@clerk/mosaic/components/form';
 import type { SignInProvider } from '@clerk/mosaic/features/sign-in';
 import type { SignUpStep, SignUpValues } from '@clerk/mosaic/features/sign-up';
@@ -74,6 +75,7 @@ function StepPanel({
   onJoinWaitlist,
   onRetry,
   resend = false,
+  elevation,
 }: {
   step: SignUpStep;
   providers?: SignInProvider[];
@@ -87,6 +89,7 @@ function StepPanel({
   onJoinWaitlist?: () => void;
   onRetry?: () => void;
   resend?: boolean;
+  elevation?: CardElevation;
 }) {
   const form = useForm<SignUpValues>({
     initialValues: { ...emptyValues, identifier },
@@ -96,6 +99,7 @@ function StepPanel({
   return (
     <SignUpView
       step={step}
+      elevation={elevation}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       socialProviders={providers}
@@ -123,6 +127,24 @@ function StepPanel({
 
 export function Default() {
   return <StepPanel step={startStep} />;
+}
+
+export function Flush() {
+  return (
+    <StepPanel
+      step={startStep}
+      elevation='flush'
+    />
+  );
+}
+
+export function FlushLoading() {
+  return (
+    <StepPanel
+      step={{ kind: 'notice', purpose: 'loading' }}
+      elevation='flush'
+    />
+  );
 }
 
 export function StartSocialOnly() {

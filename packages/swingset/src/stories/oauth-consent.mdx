@@ -48,6 +48,12 @@ import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent
 
 ## Examples
 
+### Flush
+
+`elevation='flush'` drops the card's surface and the padding around it, so the consent form sits directly on the page. The card keeps its `size` width as a cap and fills a narrower container; position it in your layout (for example by centering its container).
+
+<Story name='Flush' storyModule={Stories} />
+
 ### Many scopes
 
 A long scope list scrolls inside its box, with the edges fading while there is more to see.
