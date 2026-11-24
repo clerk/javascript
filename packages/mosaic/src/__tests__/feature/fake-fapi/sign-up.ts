@@ -214,7 +214,7 @@ export function signUpHandlers(
       }
     }
     for (const field of ['email_address', 'phone_number'] as const) {
-      if (body.get(field) !== null && body.get(field) !== signUp[field] && next.verifications) {
+      if (body.get(field) && next.verifications) {
         next = {
           ...next,
           verifications: { ...next.verifications, [field]: fapiUnpreparedVerification() },

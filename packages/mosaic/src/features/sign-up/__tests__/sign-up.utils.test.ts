@@ -1,4 +1,4 @@
-import type { SignUpField } from '@clerk/shared/types';
+import type { SignUpField, SignUpIdentificationField } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { signUpMessages } from '../sign-up.messages';
@@ -93,10 +93,11 @@ describe('code step copy', () => {
 
 describe('continue screen rules', () => {
   const required = { required: true };
-  const lists = (missingFields: SignUpField[], optionalFields: SignUpField[] = []) => ({
-    missingFields,
-    optionalFields,
-  });
+  const lists = (
+    missingFields: SignUpField[],
+    optionalFields: SignUpField[] = [],
+    unverifiedFields: SignUpIdentificationField[] = [],
+  ) => ({ missingFields, optionalFields, unverifiedFields });
 
   it.each([
     {
@@ -152,6 +153,22 @@ describe('continue screen rules', () => {
       signUp: lists(['legal_accepted']),
       asks: {},
       asksOnPhone: {},
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'keeps an email that is set but not verified, beside what is missing, so it can be changed',
+      signUp: lists(['username'], [], ['email_address']),
+      asks: { username: required, emailAddress: required },
+      asksOnPhone: { username: required, emailAddress: required },
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'keeps a phone that is set but not verified so it can be changed',
+      signUp: lists([], ['email_address', 'phone_number', 'username'], ['phone_number']),
+      asks: { phoneNumber: required },
+      asksOnPhone: { phoneNumber: required },
       canSwitch: false,
       canSatisfy: true,
     },

@@ -19,6 +19,7 @@ import { useVirtualWrite } from '../../../routing/virtual-store';
 import { SignUp, type SignUpProps } from '../sign-up';
 
 const EMAIL = 'alice@example.com';
+const OTHER_EMAIL = 'alice@acme.test';
 const signedInSession = fapiSession({ id: 'sess_existing', user: fapiUser({ id: 'user_existing' }) });
 const PASSWORD = 'correct-horse-battery';
 
@@ -413,6 +414,54 @@ describe('SignUp', () => {
       expect(fapi.signUp.updates[0].get('email_address')).toBe(EMAIL);
       expect(fapi.signUp.updates[0].get('username')).toBeNull();
       await codeSent();
+    });
+
+    it('keeps the unverified email address on the continue screen so the user can change it', async () => {
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: environment({
+          attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
+        }),
+        client: { ...fapiClient(), sign_up: fapiSignUp({ has_password: true }) },
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.click(continueButton());
+      await codeSent();
+      await user.click(screen.getByRole('button', { name: 'Edit email address' }));
+
+      expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+      expect(emailField()).toHaveValue(EMAIL);
+      expect(screen.queryByRole('button', { name: 'Use phone instead' })).toBeNull();
+
+      await user.clear(emailField());
+      await user.type(emailField(), OTHER_EMAIL);
+      await user.click(continueButton());
+
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(screen.getByText(OTHER_EMAIL)).toBeInTheDocument();
+      await waitFor(() => expect(fapi.signUp.preparations).toEqual(['email_code', 'email_code']));
+      expect(fapi.signUp.updates[1].get('email_address')).toBe(OTHER_EMAIL);
+    });
+
+    it('sends a new code when the user continues from Edit without changing the address', async () => {
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: environment({
+          attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
+        }),
+        client: { ...fapiClient(), sign_up: fapiSignUp({ has_password: true }) },
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.click(continueButton());
+      await codeSent();
+      await user.click(screen.getByRole('button', { name: 'Edit email address' }));
+      await screen.findByRole('heading', { name: 'Fill in missing fields' });
+      await user.click(continueButton());
+
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      await waitFor(() => expect(fapi.signUp.preparations).toEqual(['email_code', 'email_code']));
     });
 
     it('asks for an email or a phone number on the continue screen of an instance without progressive sign-up', async () => {
