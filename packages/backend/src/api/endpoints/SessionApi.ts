@@ -50,6 +50,12 @@ export type UpdateSessionParams = {
 };
 
 /** @generateWithEmptyComment */
+export type RevokeSessionParams = {
+  /** When set to `true`, Clerk also forgets the device the session was signed in on, even if the session is already revoked. For a session that a native application received through hosted auth, Clerk also forgets the browser the user signed in on. The user's next sign-in on a forgotten device counts as a new device. That sign-in can require a Device Trust challenge, and Clerk can email the user about the new device. Other users on the same device are unaffected. Defaults to `false`. */
+  resetDeviceTrust?: boolean;
+};
+
+/** @generateWithEmptyComment */
 export class SessionAPI extends AbstractAPI {
   /**
    * Gets a list of sessions for either the specified client or user. Requires either `clientId` or `userId` to be provided. By default, the list is returned in descending order by creation date (newest first).
@@ -107,13 +113,15 @@ export class SessionAPI extends AbstractAPI {
   /**
    * Revokes the given session. The user will be signed out from the client the session is associated with.
    * @param sessionId - The ID of the session to revoke.
+   * @param params - The parameters to revoke the session with.
    * @returns The revoked [`Session`](https://clerk.com/docs/reference/backend/types/backend-session).
    */
-  public async revokeSession(sessionId: string) {
+  public async revokeSession(sessionId: string, params: RevokeSessionParams = {}) {
     this.requireId(sessionId);
     return this.request<Session>({
       method: 'POST',
       path: joinPaths(basePath, sessionId, 'revoke'),
+      bodyParams: params,
     });
   }
 

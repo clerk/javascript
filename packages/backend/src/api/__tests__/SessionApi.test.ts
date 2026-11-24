@@ -41,6 +41,38 @@ describe('SessionAPI', () => {
     });
   });
 
+  describe('revokeSession', () => {
+    it('sends reset_device_trust when resetDeviceTrust is set', async () => {
+      server.use(
+        http.post(
+          `https://api.clerk.test/v1/sessions/${sessionId}/revoke`,
+          validateHeaders(async ({ request }) => {
+            expect(await request.json()).toEqual({ reset_device_trust: true });
+            return HttpResponse.json({ object: 'session', id: sessionId, status: 'revoked' });
+          }),
+        ),
+      );
+
+      const response = await apiClient.sessions.revokeSession(sessionId, { resetDeviceTrust: true });
+      expect(response.id).toBe(sessionId);
+    });
+
+    it('sends no body when called without params', async () => {
+      server.use(
+        http.post(
+          `https://api.clerk.test/v1/sessions/${sessionId}/revoke`,
+          validateHeaders(async ({ request }) => {
+            expect(await request.text()).toBe('');
+            return HttpResponse.json({ object: 'session', id: sessionId, status: 'revoked' });
+          }),
+        ),
+      );
+
+      const response = await apiClient.sessions.revokeSession(sessionId);
+      expect(response.id).toBe(sessionId);
+    });
+  });
+
   describe('getToken', () => {
     it('creates a session token without template', async () => {
       server.use(

@@ -128,6 +128,27 @@ describe('UserAPI', () => {
 
       expect(putHandler).toHaveBeenCalledTimes(1);
     });
+
+    it('sends reset_device_trust alongside the password and sign out fields', async () => {
+      const patchHandler = vi.fn(async ({ request }: { request: Request }) => {
+        expect(await request.json()).toEqual({
+          password: 'x',
+          sign_out_of_other_sessions: true,
+          reset_device_trust: true,
+        });
+        return HttpResponse.json(mockUserResponse);
+      });
+
+      server.use(http.patch('https://api.clerk.test/v1/users/user_123', validateHeaders(patchHandler)));
+
+      await apiClient.users.updateUser('user_123', {
+        password: 'x',
+        signOutOfOtherSessions: true,
+        resetDeviceTrust: true,
+      });
+
+      expect(patchHandler).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('updateUserMetadata', () => {

@@ -385,6 +385,8 @@ export type UpdateUserParams = {
   skipPasswordChecks?: boolean;
   /** When set to `true`, the user is signed out from all their active sessions once their password is updated. */
   signOutOfOtherSessions?: boolean;
+  /** When set to `true`, Clerk also forgets all of the user's devices. The user's next sign-in on any device counts as a new device. That sign-in can require a Device Trust challenge, and Clerk can email the user about the new device. Requires a new `password` or `passwordDigest`, and `signOutOfOtherSessions` set to `true`. Otherwise the request fails and the user is not updated. */
+  resetDeviceTrust?: boolean;
   /** The ID of the email address to set as primary. Must be verified and present on the given user. */
   primaryEmailAddressID?: string;
   /** When set to `true`, the user is notified that their primary email address has changed. */
@@ -1071,7 +1073,7 @@ export class UserAPI extends AbstractAPI {
   }
 
   /**
-   * Sets the given user's password as compromised. The user will be prompted to reset their password on their next sign-in. See the [guide on password protection and rules](/docs/guides/secure/password-protection-and-rules#reject-compromised-passwords) for more information.
+   * Sets the given user's password as compromised. The user will be prompted to reset their password on their next sign-in. Clerk also marks all of the user's devices as untrusted, unless the password was already compromised and `revokeAllSessions` is `false`. On instances with Device Trust enabled, the next password sign-in on any of those devices can require a Device Trust challenge. See the [guide on password protection and rules](/docs/guides/secure/password-protection-and-rules#reject-compromised-passwords) for more information.
    * @param userId - The ID of the user to set the password as compromised for.
    * @param params - Other parameters for the request.
    * @returns The updated [`User`](https://clerk.com/docs/reference/backend/types/backend-user).
