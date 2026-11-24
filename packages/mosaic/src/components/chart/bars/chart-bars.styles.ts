@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { chartVars, colorVars } from '../../../tokens.stylex';
+import { chartVars, colorVars, radiusVars, space } from '../../../tokens.stylex';
 
 const mark = 'var(--_cl-chart-mark)';
 
@@ -19,12 +19,12 @@ export const barStyles = stylex.create({
       ':where([data-inactive])': `color-mix(in oklab, ${mark} ${chartVars['--cl-chart-inactive-mix']}, ${colorVars['--cl-color-surface']})`,
       ':where([data-projection])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, ${colorVars['--cl-color-surface']})`,
     },
-    rowGap: '2px',
+    rowGap: space['0.5'],
     borderBottomLeftRadius: '2px',
     borderBottomRightRadius: '2px',
-    borderTopLeftRadius: '4px',
-    borderTopRightRadius: '4px',
-    maxWidth: '32px',
+    borderTopLeftRadius: radiusVars['--cl-radius-sm'],
+    borderTopRightRadius: radiusVars['--cl-radius-sm'],
+    maxWidth: space['8'],
   },
   projectionOutline: {
     stroke: colorVars['--cl-color-foreground-secondary'],
