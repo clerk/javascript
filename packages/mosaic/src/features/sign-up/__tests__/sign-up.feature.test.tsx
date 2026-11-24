@@ -2,7 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
-import { holdRequests, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
+import { tick } from '../../../__tests__/async';
+import { holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiMembership,
@@ -14,6 +15,7 @@ import {
 import { SignUp } from '../sign-up';
 import {
   codeSent,
+  completedByProtectCheck,
   continueButton,
   EMAIL,
   emailField,
@@ -1110,6 +1112,58 @@ export default (container, { token }) =>
       expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
       expect(screen.getByText('Contact support.')).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+    });
+
+    it('stays busy on the Protect check while the new session is activated', async () => {
+      const { user } = await renderSignUp(completedByProtectCheck());
+      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+
+      expect(await screen.findByRole('progressbar', { name: 'Loading…' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+      hold.release();
+    });
+
+    it('shows why the new session could not be activated and activates it on Try again', async () => {
+      const seed = completedByProtectCheck();
+      const { fapi, user, navigate } = await renderSignUp(seed);
+      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('form_param_invalid', 'The session could not be activated.');
+
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The session could not be activated.'));
+      expect(screen.getByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+      expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
+      expect(navigate).not.toHaveBeenCalled();
+
+      const retry = serveFapi({ ...seed, client: fapi.client });
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verifying your request' })).toBeNull());
+      await tick();
+      await tick();
+      expect(navigate).toHaveBeenCalledTimes(1);
+      expect(retry.signUp.proofTokens).toEqual([]);
+    });
+
+    it('leaves once when the Protect check completes the sign-up', async () => {
+      const { fapi, user, navigate } = await renderSignUp(completedByProtectCheck());
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verifying your request' })).toBeNull());
+      await tick();
+      await tick();
+      expect(navigate).toHaveBeenCalledTimes(1);
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
     });
 
     it('clears the failed widget before Try again runs the Protect check again', async () => {

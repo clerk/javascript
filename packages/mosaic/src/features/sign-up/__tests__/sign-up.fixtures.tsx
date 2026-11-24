@@ -105,6 +105,13 @@ export function watchFor(appeared: () => boolean) {
   };
 }
 
+export function completedByProtectCheck(): FakeFapiSeed {
+  return {
+    environment: environment({ attributes: { email_address: { required: true, verify_at_sign_up: false } } }),
+    signUp: { protectChecks: 1 },
+  };
+}
+
 export const watchForHeading = (name: string | RegExp) =>
   watchFor(() => screen.queryByRole('heading', { name }) !== null);
 
