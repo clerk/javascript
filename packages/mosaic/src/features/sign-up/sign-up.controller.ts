@@ -159,7 +159,7 @@ export function useSignUpController(
   });
   /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Redeems the invitation once when sign-up opens on start with a ticket in the URL; arriving from the invitation link is not an event a handler could run from. */
   useEffect(() => {
-    if (!flow.ticket || flow.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
+    if (!flow.ticket || model.details.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
       return;
     }
     redeemedTicket.current = flow.ticket;

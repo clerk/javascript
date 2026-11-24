@@ -124,7 +124,7 @@ export function useSignUpDetailsController(
     onSubmit: values => {
       onSubmit?.();
       const submitted = detailsValues(values, fields);
-      if (purpose === 'continue' || details.startUpdatesSignUp) {
+      if (purpose === 'continue' || details.inTicketSignUp) {
         return details.update(submitted);
       }
       return details.create(

@@ -1031,31 +1031,21 @@ describe('SignUp invitations', () => {
     expect(fapi.signUp.creations[0].get('ticket')).toBe('tkt_token');
   });
 
-  it('shows a rejected invitation on the start form once, then signs up normally', async () => {
-    openInvitation('__clerk_ticket', 'tkt_unknown');
-    const { fapi, user } = await renderSignUp();
+  it.each([
+    { kind: 'rejected', ticket: 'tkt_unknown', seed: {}, message: INVALID_INVITATION },
+    {
+      kind: 'expired',
+      ticket: 'tkt_expired',
+      seed: { signUp: { tickets: { tkt_expired: 'expired' as const } } },
+      message: 'This link has expired. Please start again or request a new link.',
+    },
+  ])('shows an $kind invitation on the start form, then signs up normally', async ({ ticket, seed, message }) => {
+    openInvitation('__clerk_ticket', ticket);
+    const { fapi, user } = await renderSignUp(seed);
 
-    expect(await screen.findByText(INVALID_INVITATION)).toBeInTheDocument();
+    expect(await screen.findByText(message)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(fapi.signUp.creations).toHaveLength(1);
-    expect(window.location.search).not.toContain('__clerk_ticket');
-
-    await submitStart(user);
-
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.creations).toHaveLength(2);
-    expect(fapi.signUp.creations[1].get('strategy')).toBeNull();
-    await codeSent();
-  });
-
-  it('shows an expired invitation on the start form, then signs up normally', async () => {
-    openInvitation('__clerk_ticket', 'tkt_expired');
-    const { fapi, user } = await renderSignUp({ signUp: { tickets: { tkt_expired: 'expired' } } });
-
-    expect(
-      await screen.findByText('This link has expired. Please start again or request a new link.'),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(window.location.search).not.toContain('__clerk_ticket');
     expect(emailField()).not.toHaveAttribute('aria-disabled');
 
