@@ -59,6 +59,31 @@ public class ClerkExpoModule: Module {
       }
     }
 
+    AsyncFunction("setHostSignsRequests") { (enabled: Bool, promise: Promise) in
+      Task { @MainActor in
+        ClerkNativeBridge.setHostSignsRequests(enabled)
+        promise.resolve()
+      }
+    }
+
+    AsyncFunction("createDpopProof") { (method: String, url: String, authorization: String?, promise: Promise) in
+      Task { @MainActor in
+        do {
+          promise.resolve(
+            try await ClerkNativeBridge.shared.createDpopProof(method: method, url: url, authorization: authorization))
+        } catch {
+          let descriptor = clerkDpopProofErrorDescriptor(error)
+          promise.reject(descriptor.code, descriptor.message)
+        }
+      }
+    }
+
+    Function("recordServerDate") { (date: String) in
+      Task { @MainActor in
+        ClerkNativeBridge.shared.recordServerDate(date)
+      }
+    }
+
     AsyncFunction("getDeviceToken") { (promise: Promise) in
       Task { @MainActor in
         promise.resolve(ClerkNativeBridge.shared.getDeviceToken())

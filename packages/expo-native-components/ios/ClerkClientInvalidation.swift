@@ -103,3 +103,14 @@ func clerkSetDeviceTokenErrorDescriptor(_ error: Error) -> ClerkDeviceTokenError
     return .init(code: "E_SET_DEVICE_TOKEN_FAILED", message: error.localizedDescription)
   }
 }
+
+func clerkDpopProofErrorDescriptor(_ error: Error) -> ClerkDeviceTokenErrorDescriptor {
+  switch error {
+  case ClerkClientSyncError.notConfigured:
+    return .init(code: "E_NOT_CONFIGURED", message: error.localizedDescription)
+  case is CancellationError:
+    return .init(code: "E_CANCELLED", message: "The proof request was cancelled.")
+  default:
+    return .init(code: "E_DPOP_PROOF_FAILED", message: error.localizedDescription)
+  }
+}
