@@ -19,7 +19,7 @@ import { ModalHost } from './modals/modal-host';
 import type { TextDirection } from './primitives/direction-provider';
 import { DirectionProvider } from './primitives/direction-provider';
 import type { MosaicRouting } from './routing/router-adapter';
-import { RouterAdapterProvider } from './routing/router-adapter';
+import { RoutingConfigProvider } from './routing/router-adapter';
 import { VirtualStoreProvider } from './routing/virtual-store';
 
 export interface MosaicProviderProps {
@@ -69,7 +69,7 @@ export function MosaicProvider({
             <MosaicExperimentalProvider value={experimentalValue}>
               <MosaicProfileProvider value={profile}>
                 <ToastProvider>
-                  <RouterAdapterProvider
+                  <RoutingConfigProvider
                     adapter={routing?.adapter}
                     keyPrefix={routing?.keyPrefix}
                     modals={routing?.modals}
@@ -80,7 +80,7 @@ export function MosaicProvider({
                         {children}
                       </ModalHost>
                     </VirtualStoreProvider>
-                  </RouterAdapterProvider>
+                  </RoutingConfigProvider>
                 </ToastProvider>
               </MosaicProfileProvider>
             </MosaicExperimentalProvider>

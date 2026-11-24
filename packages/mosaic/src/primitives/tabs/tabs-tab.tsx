@@ -53,6 +53,12 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         setValue(tabValue);
       }
     };
+    defaultProps.onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (!disabled && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        setValue(tabValue);
+      }
+    };
   } else {
     defaultProps.onClick = () => {
       if (!disabled) {

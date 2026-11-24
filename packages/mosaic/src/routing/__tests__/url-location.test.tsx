@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicLocation } from '../location';
 import type { MosaicRouting, RouterAdapter } from '../router-adapter';
-import { RouterAdapterProvider } from '../router-adapter';
+import { RoutingConfigProvider } from '../router-adapter';
 import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useMosaicLocation } from '../use-mosaic-location';
 import { VirtualStoreProvider } from '../virtual-store';
@@ -19,9 +19,9 @@ const warnings = () => vi.spyOn(logger, 'warnOnce').mockImplementation(() => {})
 
 function wrapperWith(routing: MosaicRouting = {}) {
   return ({ children }: { children: ReactNode }) => (
-    <RouterAdapterProvider {...routing}>
+    <RoutingConfigProvider {...routing}>
       <VirtualStoreProvider>{children}</VirtualStoreProvider>
-    </RouterAdapterProvider>
+    </RoutingConfigProvider>
   );
 }
 
@@ -486,11 +486,11 @@ describe('with an adapter', () => {
       return null;
     }
     const tree = (go: boolean) => (
-      <RouterAdapterProvider adapter={{ usePathname: () => host.pathname, push }}>
+      <RoutingConfigProvider adapter={{ usePathname: () => host.pathname, push }}>
         <VirtualStoreProvider>
           <Probe go={go} />
         </VirtualStoreProvider>
-      </RouterAdapterProvider>
+      </RoutingConfigProvider>
     );
     const { rerender } = render(tree(false));
     host.pathname = '/b';
@@ -509,9 +509,9 @@ describe('with an adapter', () => {
       {
         initialProps: { tick: 0 },
         wrapper: ({ children }) => (
-          <RouterAdapterProvider adapter={{ usePathname: () => host.pathname, push: url => push(url) }}>
+          <RoutingConfigProvider adapter={{ usePathname: () => host.pathname, push: url => push(url) }}>
             <VirtualStoreProvider>{children}</VirtualStoreProvider>
-          </RouterAdapterProvider>
+          </RoutingConfigProvider>
         ),
       },
     );
@@ -532,11 +532,11 @@ describe('with an adapter', () => {
       return <output>{JSON.stringify(location.useSegmentParts())}</output>;
     }
     const tree = (adapter: RouterAdapter) => (
-      <RouterAdapterProvider adapter={adapter}>
+      <RoutingConfigProvider adapter={adapter}>
         <VirtualStoreProvider>
           <Probe />
         </VirtualStoreProvider>
-      </RouterAdapterProvider>
+      </RoutingConfigProvider>
     );
     const { container, rerender } = render(tree({ usePathname: () => '/user/members' }));
     expect(container.textContent).toBe('["members"]');

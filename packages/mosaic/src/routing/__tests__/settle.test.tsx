@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { RouterAdapterProvider } from '../router-adapter';
+import { RoutingConfigProvider } from '../router-adapter';
 import { useRouterScope } from '../use-router';
 import { VirtualStoreProvider } from '../virtual-store';
 
@@ -35,11 +35,11 @@ describe('a correction made in the first commit', () => {
 
     render(
       <PatchesHistoryOnMount onReplace={onReplace}>
-        <RouterAdapterProvider>
+        <RoutingConfigProvider>
           <VirtualStoreProvider>
             <Owner />
           </VirtualStoreProvider>
-        </RouterAdapterProvider>
+        </RoutingConfigProvider>
       </PatchesHistoryOnMount>,
     );
     expect(screen.getByRole('status')).toHaveTextContent('index');

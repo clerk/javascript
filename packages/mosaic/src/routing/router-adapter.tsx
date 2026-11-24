@@ -5,9 +5,9 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { MosaicRoutingMode } from './use-mosaic-location';
+import { markSettled } from './window-location';
 
 export type ModalRoutingMode = Exclude<MosaicRoutingMode, 'path'>;
-import { markSettled } from './window-location';
 
 // What a host hands Mosaic so the URL modes read and write the host router's location instead of
 // `window`. It is a plain object the host writes from their own framework's hooks, so no framework
@@ -98,7 +98,7 @@ function shapeOf(reads: AdapterReads): string {
 
 // The hooks an adapter has are fixed on the first render, because the components under the provider
 // call them in their own hook order. A later adapter may change what `push` and `replace` do.
-export function RouterAdapterProvider({
+export function RoutingConfigProvider({
   adapter,
   keyPrefix,
   modals,

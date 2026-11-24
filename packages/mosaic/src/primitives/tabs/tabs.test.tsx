@@ -231,6 +231,14 @@ describe('Tabs', () => {
       expect(onValueChange).toHaveBeenLastCalledWith('tab2');
       expect(onValueChange).toHaveBeenCalledTimes(2);
       expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+
+      act(() => screen.getByText('Back to account').click());
+      expect(screen.getByText('Account')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Settings')).toHaveFocus();
+
+      await user.keyboard('{Enter}');
+      expect(onValueChange).toHaveBeenCalledTimes(3);
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
     });
 
     it('marks selected tab with data-selected', () => {

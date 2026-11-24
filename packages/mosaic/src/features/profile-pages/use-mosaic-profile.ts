@@ -18,12 +18,14 @@ export interface MosaicProfile {
    */
   combined?: boolean;
   /**
-   * Options for the user profile, whichever component opens or mounts it.
+   * Options for the user profile, whichever component opens or mounts it. `routing` and `path`
+   * apply to a mounted profile; a modal's base and mode come from the modal and `routing.modals`.
    */
   userProfileProps?: ProfileUserProps;
   /**
    * Options for the organization profile, or the organization's pages in a combined profile,
-   * whichever component opens or mounts it.
+   * whichever component opens or mounts it. `routing` and `path` apply to a mounted profile; a
+   * modal's base and mode come from the modal and `routing.modals`.
    */
   organizationProfileProps?: ProfileOrganizationProps;
   /**

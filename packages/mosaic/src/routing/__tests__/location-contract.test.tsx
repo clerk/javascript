@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { normalizeBase } from '../base-path';
 import type { SegmentParts } from '../location';
-import { RouterAdapterProvider } from '../router-adapter';
+import { RoutingConfigProvider } from '../router-adapter';
 import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useRouterScope } from '../use-router';
 import { useVirtualEntries, useVirtualWrite, VirtualStoreProvider } from '../virtual-store';
@@ -97,9 +97,9 @@ function urlMode(
       return null;
     });
     return (
-      <RouterAdapterProvider>
+      <RoutingConfigProvider>
         <VirtualStoreProvider>{children}</VirtualStoreProvider>
-      </RouterAdapterProvider>
+      </RoutingConfigProvider>
     );
   }
   return {
