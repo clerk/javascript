@@ -63,6 +63,7 @@ export class FakeClerkServer {
   #retiredTokens = new Set<string>();
   #pendingRotations = new Map<string, number>();
   #responseHolds: ResponseHold[] = [];
+  #requestFailures: Array<{ caller: FapiCaller; operation: string }> = [];
   #sequence = 0;
   #rotations = 0;
 
@@ -122,6 +123,13 @@ export class FakeClerkServer {
   ): Promise<T> {
     this.requests.push({ caller, operation, token });
     await networkRoundTrip();
+    const failureIndex = this.#requestFailures.findIndex(
+      failure => failure.caller === caller && failure.operation === operation,
+    );
+    if (failureIndex >= 0) {
+      this.#requestFailures.splice(failureIndex, 1);
+      throw new TypeError('Network request failed');
+    }
     const response = handle();
     const holdIndex = this.#responseHolds.findIndex(hold => hold.caller === caller && hold.operation === operation);
     if (holdIndex >= 0) {
@@ -130,6 +138,12 @@ export class FakeClerkServer {
       await hold.released;
     }
     return response;
+  }
+
+  failNextRequests(caller: FapiCaller, operation: string, count = 1): void {
+    for (let i = 0; i < count; i++) {
+      this.#requestFailures.push({ caller, operation });
+    }
   }
 
   holdNextResponse(caller: FapiCaller, operation: string): HeldResponse {

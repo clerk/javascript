@@ -6,7 +6,25 @@ import { FakeClerkServer, type NativeSyncHarness, renderWithNativeSync } from '.
 
 vi.mock('../../../polyfills', () => ({}));
 
+const appState = vi.hoisted(() => {
+  const listeners = new Set<(state: string) => void>();
+  return {
+    currentState: 'active',
+    addEventListener: (_event: string, listener: (state: string) => void) => {
+      listeners.add(listener);
+      return { remove: () => listeners.delete(listener) };
+    },
+    moveTo(state: string) {
+      this.currentState = state;
+      for (const listener of [...listeners]) {
+        listener(state);
+      }
+    },
+  };
+});
+
 vi.mock('react-native', () => ({
+  AppState: appState,
   NativeModules: { BlobModule: {} },
   Platform: { OS: 'ios', constants: { reactNativeVersion: { major: 0, minor: 81, patch: 0 } } },
 }));
@@ -65,7 +83,15 @@ async function start(...args: Parameters<typeof renderWithNativeSync>): Promise<
 afterEach(() => {
   harness?.unmount();
   harness = undefined;
+  appState.currentState = 'active';
 });
+
+function returnToForeground(h: NativeSyncHarness): Promise<void> {
+  return h.run(() => {
+    appState.moveTo('background');
+    appState.moveTo('active');
+  });
+}
 
 function seedDevice(users: string[] = ['user_1'], activeUser?: string) {
   const server = new FakeClerkServer();
@@ -96,6 +122,52 @@ describe('native client sync behavior', () => {
 
       await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
       await expectConverged(h);
+    });
+
+    it('signs JS in with the session a native sign-in created when the first JS refetch fails', async () => {
+      const h = await start();
+      h.server.failNextRequests('js', 'GET /client');
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId), { timeout: 3_000 });
+      await expectConverged(h);
+    });
+
+    it('signs JS in when the app returns to the foreground after every JS refetch of a native sign-in failed', async () => {
+      const h = await start();
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'GET /client', 3);
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await waitFor(() => expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(3), {
+        timeout: 3_000,
+      });
+      await h.settle();
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+      const jsClientFetchesAfterRepair = h.server.requestCount('js', 'GET /client');
+      await returnToForeground(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesAfterRepair);
+    });
+
+    it('sends no JS client request when the app returns to the foreground after JS followed a native sign-in', async () => {
+      const h = await start();
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await h.settle();
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+
+      await returnToForeground(h);
+      await h.settle();
+
+      expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesBefore);
+      expect(h.js.session?.id).toBe(sessionId);
     });
 
     it('switches the JS active session when native switches sessions, without a signed-out emission', async () => {
