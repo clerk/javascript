@@ -39,13 +39,15 @@ export function TaskChooseOrganizationView({ renderBranding = true, ...props }: 
   );
 }
 
+export type TaskChooseOrganizationStepsProps = Omit<TaskChooseOrganizationViewProps, 'renderBranding'>;
+
 export function TaskChooseOrganizationSteps({
   step,
   identifier,
   createSteps,
   onSignOut,
   ...props
-}: Omit<TaskChooseOrganizationViewProps, 'renderBranding'>) {
+}: TaskChooseOrganizationStepsProps) {
   return (
     <>
       <Flow.Root

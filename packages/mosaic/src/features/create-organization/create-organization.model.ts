@@ -16,7 +16,7 @@ import type {
 export type CreateOrganizationModelOptions = Pick<
   CreateOrganizationProps,
   'afterCreateOrganizationUrl' | 'skipInvitationScreen'
-> & { enabled?: boolean };
+>;
 
 export type CreateOrganizationModel =
   | { status: 'loading' }
@@ -30,7 +30,9 @@ export type CreateOrganizationModel =
       onComplete: (organizationId: string) => Promise<void>;
     };
 
-export function useCreateOrganizationModel(options: CreateOrganizationModelOptions = {}): CreateOrganizationModel {
+export function useCreateOrganizationModel(
+  options: CreateOrganizationModelOptions & { enabled?: boolean } = {},
+): CreateOrganizationModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const {
     isLoaded: isListLoaded,
