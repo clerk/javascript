@@ -416,4 +416,128 @@ describe('Select', () => {
       expect(activeId ? document.getElementById(activeId) : null).toHaveAccessibleName('Banana');
     });
   });
+
+  describe('disabled options', () => {
+    const fruits = [
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana', disabled: true },
+      { value: 'cherry', label: 'Cherry' },
+    ];
+
+    it('marks a disabled option as aria-disabled and passes data-disabled to the rendered option', async () => {
+      const user = userEvent.setup();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={[]}
+          onChange={vi.fn()}
+          renderOption={option => <span data-testid={`render-${option.value}`}>{option.label}</span>}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Select an option' }));
+
+      expect(await screen.findByRole('option', { name: 'Banana' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('option', { name: 'Apple' })).not.toHaveAttribute('aria-disabled');
+      expect(screen.getByTestId('render-banana')).toHaveAttribute('data-disabled', 'true');
+      expect(screen.getByTestId('render-apple')).not.toHaveAttribute('data-disabled', 'true');
+    });
+
+    it('ignores a click on a disabled option in multiple mode', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple']}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple' }));
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('ignores a click on a disabled option in single mode and keeps the listbox open', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          options={fruits}
+          value='apple'
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple' }));
+      await user.click(await screen.findByRole('option', { name: 'Banana' }));
+
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('skips disabled options with the arrow keys', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={[]}
+          onChange={onChange}
+        />,
+      );
+
+      screen.getByRole('button', { name: 'Select an option' }).focus();
+      await user.keyboard('{ArrowDown}');
+      await screen.findByRole('listbox');
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      expect(onChange).toHaveBeenCalledWith(['cherry']);
+    });
+
+    it('does not highlight or select a disabled selected option with Enter', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['banana']}
+          onChange={onChange}
+        />,
+      );
+
+      screen.getByRole('button', { name: 'Banana' }).focus();
+      await user.keyboard('{ArrowDown}');
+      const listbox = await screen.findByRole('listbox');
+      const activeId = listbox.getAttribute('aria-activedescendant');
+      expect(activeId ? document.getElementById(activeId) : null).not.toHaveAccessibleName('Banana');
+
+      await user.keyboard('{Enter}');
+      expect(onChange).not.toHaveBeenCalledWith([]);
+    });
+
+    it('still lets a selected option be removed when other options are disabled', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(
+        <Select
+          multiple
+          options={fruits}
+          value={['apple', 'cherry']}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Apple, Cherry' }));
+      await user.click(await screen.findByRole('option', { name: 'Cherry' }));
+
+      expect(onChange).toHaveBeenCalledWith(['apple']);
+    });
+  });
 });

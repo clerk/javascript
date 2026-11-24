@@ -18,7 +18,7 @@ type UsePopoverReturn = ReturnType<typeof usePopover>;
 type UseSearchInputReturn = ReturnType<typeof useSearchInput>;
 type UseInteractionsReturn = ReturnType<typeof useInteractions>;
 
-type Option = { value: string | null; label?: string };
+type Option = { value: string | null; label?: string; disabled?: boolean };
 
 type RenderOption<O extends Option> = (option: O, index?: number, isSelected?: boolean) => ReactNode;
 
@@ -137,7 +137,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   // listbox on ArrowUp/ArrowDown and navigation stays a single source of truth.
   // `virtual` keeps DOM focus on the listbox (or the search input in combobox
   // mode) and exposes the active option via `aria-activedescendant`.
-  const selectedIndex = options.findIndex(o => selectedValues.includes(o.value));
+  const selectedIndex = options.findIndex(o => !o.disabled && selectedValues.includes(o.value));
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -160,6 +160,9 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   const { multiple, value, onChange } = props;
   const select = React.useCallback(
     (option: O) => {
+      if (option.disabled) {
+        return;
+      }
       if (multiple) {
         onChange(value.includes(option.value) ? value.filter(v => v !== option.value) : [...value, option.value]);
         return;
@@ -238,9 +241,10 @@ const SelectRenderOption = React.memo((props: SelectrenderOptionProps<any>) => {
       id={id}
       role='option'
       aria-selected={isSelected}
+      aria-disabled={option.disabled || undefined}
       sx={{
         userSelect: 'none',
-        cursor: 'pointer',
+        cursor: option.disabled ? 'not-allowed' : 'pointer',
       }}
       {...getItemProps({
         onClick: () => handleSelect(option),
@@ -252,6 +256,7 @@ const SelectRenderOption = React.memo((props: SelectrenderOptionProps<any>) => {
         elementId: descriptors.selectOption.setId(elementId),
         'data-selected': isSelected,
         'data-focused': isFocused,
+        'data-disabled': option.disabled,
       })}
     </Flex>
   );
