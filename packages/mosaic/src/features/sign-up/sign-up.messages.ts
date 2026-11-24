@@ -132,7 +132,7 @@ export const signUpMessages = {
   },
   startOver: {
     title: 'Something went wrong',
-    message: 'We couldn’t continue signing you up. Start over to try again.',
+    description: 'We couldn’t continue signing you up. Start over to try again.',
     action: 'Start over',
     pending: 'Starting over',
   },
