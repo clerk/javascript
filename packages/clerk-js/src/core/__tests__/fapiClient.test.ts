@@ -673,4 +673,129 @@ describe('request', () => {
       expect(thirdCall[0].toString()).toMatch(/_clerk_retry_attempt=2/);
     });
   });
+
+  describe('fetch attempt hooks', () => {
+    const okResponse = () =>
+      Promise.resolve<RecursivePartial<Response>>({
+        ok: true,
+        status: 200,
+        headers: { get: vi.fn(() => null) },
+        json: () => Promise.resolve({ foo: 42 }),
+      });
+
+    const failFirstFetches = (failures: number) => {
+      let calls = 0;
+      (global.fetch as Mock).mockImplementation(() =>
+        ++calls <= failures ? Promise.reject(new Error('Network error')) : okResponse(),
+      );
+    };
+
+    const headersOfFetch = (index: number) => (fetch as Mock).mock.calls[index][1].headers as Headers;
+
+    beforeEach(() => {
+      (global.fetch as Mock).mockImplementation(okResponse);
+    });
+
+    it('runs the hook once per attempt, with the URL and wire method of that attempt', async () => {
+      failFirstFetches(2);
+      const client = createFapiClient(baseFapiClientOptions);
+      const seen: Array<{ url: string; method: string; attempt: number }> = [];
+      client.onBeforeFetch(({ url, method, attempt }) => {
+        seen.push({ url: url.toString(), method, attempt });
+      });
+
+      await client.request({ path: '/foo', method: 'GET' });
+
+      expect(fetch).toHaveBeenCalledTimes(3);
+      expect(seen.map(s => s.attempt)).toEqual([0, 1, 2]);
+      expect(seen[0].url).not.toMatch(/_clerk_retry_attempt=/);
+      expect(seen[1].url).toMatch(/_clerk_retry_attempt=1/);
+      expect(seen[2].url).toMatch(/_clerk_retry_attempt=2/);
+      expect(seen.every(s => s.method === 'GET')).toBe(true);
+    });
+
+    it('reports POST as the wire method of a method-overridden request', async () => {
+      const client = createFapiClient(baseFapiClientOptions);
+      const seen: Array<{ url: URL; method: string }> = [];
+      client.onBeforeFetch(({ url, method }) => {
+        seen.push({ url, method });
+      });
+
+      await client.request({ path: '/foo', method: 'PATCH' });
+
+      expect(seen[0].method).toBe('POST');
+      expect(seen[0].url.searchParams.get('_method')).toBe('PATCH');
+      expect((fetch as Mock).mock.calls[0][1].method).toBe('POST');
+    });
+
+    it('sends a header set by the hook on that attempt alone', async () => {
+      failFirstFetches(1);
+      const client = createFapiClient(baseFapiClientOptions);
+      client.onBeforeRequest(request => {
+        request.headers?.set('authorization', 'token');
+      });
+      client.onBeforeFetch(({ headers, attempt }) => {
+        expect(headers.get('dpop')).toBeNull();
+        headers.set('dpop', `proof-${attempt}`);
+      });
+
+      await client.request({ path: '/foo', method: 'GET' });
+
+      expect(headersOfFetch(0).get('dpop')).toBe('proof-0');
+      expect(headersOfFetch(1).get('dpop')).toBe('proof-1');
+      expect(headersOfFetch(1).get('authorization')).toBe('token');
+    });
+
+    it('passes the request that the before request callbacks saw', async () => {
+      const client = createFapiClient(baseFapiClientOptions);
+      let beforeRequest: unknown;
+      let beforeFetch: unknown;
+      client.onBeforeRequest(request => {
+        beforeRequest = request;
+      });
+      client.onBeforeFetch((_, request) => {
+        beforeFetch = request;
+      });
+
+      await client.request({ path: '/foo' });
+
+      expect(beforeFetch).toBe(beforeRequest);
+    });
+
+    it('fails the request as a network error when the hook rejects', async () => {
+      const client = createFapiClient(baseFapiClientOptions);
+      client.onBeforeFetch(() => Promise.reject(new Error('no proof')));
+
+      await expect(client.request({ path: '/foo', method: 'POST' })).rejects.toThrow(/Network error.*no proof/);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it('fetches once more, with a fresh attempt, when a response callback asks for it', async () => {
+      const client = createFapiClient(baseFapiClientOptions);
+      client.onBeforeFetch(({ headers, attempt }) => {
+        headers.set('dpop', `proof-${attempt}`);
+      });
+      const responses: number[] = [];
+      client.onFetchResponse(({ attempt }) => {
+        responses.push(attempt);
+        return true;
+      });
+
+      await client.request({ path: '/foo', method: 'POST' });
+
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(responses).toEqual([0]);
+      expect(headersOfFetch(1).get('dpop')).toBe('proof-1');
+    });
+
+    it('returns the first response when no response callback asks for another fetch', async () => {
+      const client = createFapiClient(baseFapiClientOptions);
+      client.onFetchResponse(() => false);
+
+      const response = await client.request({ path: '/foo', method: 'POST' });
+
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(response.payload).toEqual({ foo: 42 });
+    });
+  });
 });

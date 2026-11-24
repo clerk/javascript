@@ -44,6 +44,32 @@ export type FapiResponse<T> = Response & {
 
 export type FapiRequestCallback<T> = (request: FapiRequestInit, response?: FapiResponse<T>) => unknown;
 
+/**
+ * One fetch of a FAPI request. A request that is retried is fetched more than once.
+ */
+export type FapiFetchAttempt = {
+  /** The URL this attempt fetches, including `_clerk_retry_attempt` on a retry. */
+  url: URL;
+  /** The method sent on the wire, which is `POST` for every method other than `GET`. */
+  method: 'GET' | 'POST';
+  /** The headers of this attempt alone. A change here does not carry over to the next attempt. */
+  headers: Headers;
+  /** 0 for the first fetch of the request, then one more for each fetch after it. */
+  attempt: number;
+};
+
+export type FapiFetchCallback = (attempt: FapiFetchAttempt, request: FapiRequestInit) => unknown;
+
+/**
+ * Sees the response to one fetch attempt. Resolving `true` fetches the request once more, which runs the
+ * `onBeforeFetch` callbacks again; the response to that second fetch is final.
+ */
+export type FapiFetchResponseCallback = (
+  attempt: FapiFetchAttempt,
+  response: Response,
+  request: FapiRequestInit,
+) => boolean | Promise<boolean>;
+
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
   response: T;
@@ -64,6 +90,10 @@ export interface FapiClient {
   onAfterResponse(callback: FapiRequestCallback<unknown>): void;
 
   onBeforeRequest(callback: FapiRequestCallback<unknown>): void;
+
+  onBeforeFetch(callback: FapiFetchCallback): void;
+
+  onFetchResponse(callback: FapiFetchResponseCallback): void;
 
   request<T>(requestInit: FapiRequestInit, options?: FapiRequestOptions): Promise<FapiResponse<T>>;
 }
@@ -113,6 +143,8 @@ function isMergeableBody(body: unknown): body is Record<string, unknown> | undef
 export function createFapiClient(options: FapiClientOptions): FapiClient {
   const onBeforeRequestCallbacks: Array<FapiRequestCallback<unknown>> = [];
   const onAfterResponseCallbacks: Array<FapiRequestCallback<unknown>> = [];
+  const onBeforeFetchCallbacks: Array<FapiFetchCallback> = [];
+  const onFetchResponseCallbacks: Array<FapiFetchResponseCallback> = [];
 
   function onBeforeRequest(callback: FapiRequestCallback<unknown>) {
     onBeforeRequestCallbacks.push(callback);
@@ -120,6 +152,47 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
 
   function onAfterResponse(callback: FapiRequestCallback<unknown>) {
     onAfterResponseCallbacks.push(callback);
+  }
+
+  function onBeforeFetch(callback: FapiFetchCallback) {
+    onBeforeFetchCallbacks.push(callback);
+  }
+
+  function onFetchResponse(callback: FapiFetchResponseCallback) {
+    onFetchResponseCallbacks.push(callback);
+  }
+
+  async function fetchOnce(url: URL, fetchOpts: FapiRequestInit, requestInit: FapiRequestInit, attempt: number) {
+    const headers = new Headers(fetchOpts.headers);
+    const method = fetchOpts.method === 'GET' ? 'GET' : 'POST';
+    const fetchAttempt: FapiFetchAttempt = { url: new URL(url), method, headers, attempt };
+    for (const callback of onBeforeFetchCallbacks) {
+      await callback(fetchAttempt, requestInit);
+    }
+    const response = await fetch(url, { ...fetchOpts, headers });
+    return { fetchAttempt, response };
+  }
+
+  async function wantsRefetch(fetchAttempt: FapiFetchAttempt, response: Response, requestInit: FapiRequestInit) {
+    let refetch = false;
+    for (const callback of onFetchResponseCallbacks) {
+      refetch = (await callback(fetchAttempt, response, requestInit)) || refetch;
+    }
+    return refetch;
+  }
+
+  function createAttemptFetcher(url: URL, fetchOpts: FapiRequestInit, requestInit: FapiRequestInit) {
+    if (onBeforeFetchCallbacks.length === 0 && onFetchResponseCallbacks.length === 0) {
+      return () => fetch(url, fetchOpts);
+    }
+    let attempt = 0;
+    return async () => {
+      const first = await fetchOnce(url, fetchOpts, requestInit, attempt++);
+      if (!(await wantsRefetch(first.fetchAttempt, first.response, requestInit))) {
+        return first.response;
+      }
+      return (await fetchOnce(url, fetchOpts, requestInit, attempt++)).response;
+    };
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
@@ -299,7 +372,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
         // TODO @userland-errors:
-        response = await retry(() => fetch(url, fetchOpts), {
+        response = await retry(createAttemptFetcher(url, fetchOpts, requestInit), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
           // Since fapiClient is responsible for the network layer only,
@@ -360,7 +433,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     buildEmailAddress,
     buildUrl,
     onAfterResponse,
+    onBeforeFetch,
     onBeforeRequest,
+    onFetchResponse,
     request,
   };
 }
