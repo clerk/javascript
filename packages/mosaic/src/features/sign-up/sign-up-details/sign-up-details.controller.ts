@@ -159,8 +159,7 @@ export function useSignUpDetailsController(
 
   const switchChannel = (next: PhoneCodeChannel | undefined) => {
     setChosenChannel(next);
-    // Both screens edit the same phone number, so setting it again clears the error the last screen got.
-    form.setValue('phoneNumber', form.values.phoneNumber);
+    form.reset(form.values);
   };
 
   const alternativePhone: SignUpAlternativePhoneScreen | undefined = alternativeChannel

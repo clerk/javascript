@@ -1069,6 +1069,25 @@ describe('SignUp', () => {
       expect(screen.queryByText('That phone number is taken. Please try another.')).toBeNull();
     });
 
+    it('leaves an error the WhatsApp phone screen got behind when going back to the form', async () => {
+      const { user } = await renderSignUp({ environment: phoneEnvironment() });
+      const hold = holdRequests('post', '/v1/client/sign_ups');
+
+      await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+      await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+      await user.click(continueButton());
+      await waitFor(() => expect(hold.requests).toHaveLength(1));
+      hold.fail('too_many_requests', 'Too many requests. Please try again later.');
+
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Too many requests. Please try again later.'),
+      );
+      await user.click(screen.getByRole('button', { name: 'Use another method' }));
+
+      expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByText('Too many requests. Please try again later.')).toBeNull());
+    });
+
     it("leaves the form's phone error behind when picking WhatsApp", async () => {
       const { user } = await renderSignUp({ environment: phoneEnvironment() });
       const hold = holdRequests('post', '/v1/client/sign_ups');
