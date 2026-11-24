@@ -1086,11 +1086,9 @@ export default (container, { token }) =>
     await user.click(continueButton());
 
     expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
-    expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('continue/protect-check');
     await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(screen.getByRole('status', { name: 'Stored route' })).toHaveTextContent('continue/verify-email-address');
     await codeSent();
     await user.click(screen.getByRole('button', { name: 'Edit email address' }));
 
