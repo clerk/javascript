@@ -20,10 +20,11 @@ import { useSignUpDetailsController } from './sign-up-details/sign-up-details.co
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
+  frozenScreen: 'loading' | undefined;
   error: ErrorDescription | undefined;
 }
 
-type FinishStart = { type: 'FINISH'; frozenModel: SignUpReadyModel };
+type FinishStart = { type: 'FINISH'; frozenModel: SignUpReadyModel; frozenScreen?: 'loading' };
 
 type FinishEvent = FinishStart | { type: 'DISMISS' };
 
@@ -32,7 +33,11 @@ const finish = setup<FinishContext, FinishEvent>();
 const startFinishing = {
   FINISH: {
     target: 'finishing' as const,
-    actions: finish.assign<FinishStart>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
+    actions: finish.assign<FinishStart>((_, event) => ({
+      frozenModel: event.frozenModel,
+      frozenScreen: event.frozenScreen,
+      error: undefined,
+    })),
   },
 };
 
@@ -41,6 +46,7 @@ const finishMachine = finish.createMachine({
   initial: 'idle',
   context: {
     frozenModel: null,
+    frozenScreen: undefined,
     error: undefined,
   },
   states: {
@@ -54,6 +60,7 @@ const finishMachine = finish.createMachine({
           target: 'failed',
           actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
             frozenModel: null,
+            frozenScreen: undefined,
             error: toLocalizableError(event.error),
           })),
         },
@@ -128,17 +135,19 @@ export function useSignUpController(
   const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
   const shown = shownRoute(route, outcome, flow.step);
-  const screen = actions.pendingKey === 'ticket' ? 'loading' : screenFor(shown, flow, blocked !== undefined);
+  const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
+  const screen =
+    actions.pendingKey === 'ticket' ? 'loading' : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
 
   useRouteGuard({ route, go }, shown);
 
-  const next = (result: SignUpCreateResult) => {
+  const next = (result: SignUpCreateResult, frozenScreen?: 'loading') => {
     if (result.type === 'blocked') {
       setBlocked(result.details);
       return;
     }
     if (result.type === 'complete') {
-      sendFinish({ type: 'FINISH', frozenModel: model });
+      sendFinish({ type: 'FINISH', frozenModel: model, frozenScreen });
       return;
     }
     const nextRoute = routeFor(result, route);
@@ -166,7 +175,7 @@ export function useSignUpController(
     void actions.run('ticket', async () => {
       const { result, emailAddress } = await flow.redeemTicket();
       details.adoptInvitation(emailAddress);
-      next(result);
+      next(result, 'loading');
     });
   });
   /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
