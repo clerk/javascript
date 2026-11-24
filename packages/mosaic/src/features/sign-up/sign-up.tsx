@@ -7,8 +7,8 @@ import type { MosaicLocationOptions, RoutingProps } from '../../routing/use-mosa
 import {
   isTaskChooseOrganizationReady,
   TaskChooseOrganizationContent,
-} from '../task-choose-organization/task-choose-organization';
-import { useTaskChooseOrganizationModel } from '../task-choose-organization/task-choose-organization.model';
+  useTaskChooseOrganizationFlow,
+} from '../task-choose-organization';
 import { useSignUpController } from './sign-up.controller';
 import type { SignUpReadyModel } from './sign-up.model';
 import { useSignUpModel } from './sign-up.model';
@@ -57,7 +57,7 @@ function SignUpFlow({
   routing,
   path,
 }: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement | null {
-  const task = useTaskChooseOrganizationModel({
+  const task = useTaskChooseOrganizationFlow({
     redirectUrlComplete: model.flow.afterSignUpUrl,
     enabled: model.flow.step.type === 'task',
   });
@@ -92,7 +92,7 @@ function SignUpFlow({
       }
       applicationName={model.app.applicationName}
       applicationLogoUrl={model.app.applicationLogoUrl}
-      taskChooseOrganization={<TaskChooseOrganizationContent model={task} />}
+      taskChooseOrganization={<TaskChooseOrganizationContent controller={task} />}
     />
   );
 }
