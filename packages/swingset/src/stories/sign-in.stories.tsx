@@ -18,8 +18,6 @@ import { useRef, useState } from 'react';
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
-import { BrandingToggle } from './fixtures/branding-toggle';
-
 export { default as __source } from './sign-in.stories?raw';
 
 export const meta: StoryMeta = {
@@ -502,7 +500,6 @@ function StepPanel({
   onRetry,
   password,
   elevation,
-  renderBranding,
 }: {
   step: SignInStep;
   combined?: boolean;
@@ -523,7 +520,6 @@ function StepPanel({
   onRetry?: () => void;
   password?: string;
   elevation?: CardElevation;
-  renderBranding?: boolean;
 }) {
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
@@ -541,7 +537,6 @@ function StepPanel({
     <SignInView
       step={step}
       elevation={elevation}
-      renderBranding={renderBranding}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       combined={combined}
@@ -586,29 +581,19 @@ const passwordStep: SignInStep = { kind: 'credential', credential: 'password', i
 
 export function Flush() {
   return (
-    <BrandingToggle>
-      {renderBranding => (
-        <StepPanel
-          step={{ kind: 'identifier', field: 'email' }}
-          elevation='flush'
-          renderBranding={renderBranding}
-        />
-      )}
-    </BrandingToggle>
+    <StepPanel
+      step={{ kind: 'identifier', field: 'email' }}
+      elevation='flush'
+    />
   );
 }
 
 export function FlushCode() {
   return (
-    <BrandingToggle>
-      {renderBranding => (
-        <StepPanel
-          step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }}
-          elevation='flush'
-          renderBranding={renderBranding}
-        />
-      )}
-    </BrandingToggle>
+    <StepPanel
+      step={{ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' }}
+      elevation='flush'
+    />
   );
 }
 

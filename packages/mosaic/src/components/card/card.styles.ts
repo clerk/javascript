@@ -56,7 +56,6 @@ export const root = stylex.create({
     overflow: 'visible',
     backgroundColor: 'transparent',
     boxShadow: 'none',
-    width: '100%',
   },
   overlay: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -80,11 +79,6 @@ export const surface = stylex.create({
 export const sizes = stylex.create({
   md: { width: '26.25rem' },
   lg: { width: '36.25rem' },
-});
-
-export const flushSizes = stylex.create({
-  md: { maxWidth: 'var(--cl-card-flush-max-width, 26.25rem)' },
-  lg: { maxWidth: 'var(--cl-card-flush-max-width, 36.25rem)' },
 });
 
 const HEADER_ROW_GAP = space['0.5'];

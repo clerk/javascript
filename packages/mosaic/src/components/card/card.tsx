@@ -83,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
           reset.base,
           slots.root.base,
           slots.root[elevation],
-          elevation === 'flush' ? slots.flushSizes[size] : slots.sizes[size],
+          slots.sizes[size],
           isSurface && slots.surface.root,
           xstyle,
         ),

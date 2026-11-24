@@ -29,7 +29,6 @@ function signUpSignIn(step: Extract<SignInStep, { kind: 'sign-up' }>, onSignIn: 
 
 export function SignInView({
   elevation,
-  renderBranding,
   step,
   direction,
   applicationName,
@@ -123,7 +122,6 @@ export function SignInView({
   return (
     <Card.Root
       elevation={elevation}
-      renderBranding={renderBranding}
       align='center'
     >
       <Flow.Root

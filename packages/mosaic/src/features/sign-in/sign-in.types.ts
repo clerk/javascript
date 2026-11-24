@@ -103,7 +103,6 @@ export interface SignInAccount {
 
 export interface SignInViewProps {
   elevation?: CardElevation;
-  renderBranding?: boolean;
   step: SignInStep;
   direction?: FlowDirection;
   applicationName: string;

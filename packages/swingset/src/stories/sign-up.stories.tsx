@@ -8,8 +8,6 @@ import { useRef, useState } from 'react';
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
-import { BrandingToggle } from './fixtures/branding-toggle';
-
 export { default as __source } from './sign-up.stories?raw';
 
 export const meta: StoryMeta = {
@@ -78,7 +76,6 @@ function StepPanel({
   onRetry,
   resend = false,
   elevation,
-  renderBranding,
 }: {
   step: SignUpStep;
   providers?: SignInProvider[];
@@ -93,7 +90,6 @@ function StepPanel({
   onRetry?: () => void;
   resend?: boolean;
   elevation?: CardElevation;
-  renderBranding?: boolean;
 }) {
   const form = useForm<SignUpValues>({
     initialValues: { ...emptyValues, identifier },
@@ -104,7 +100,6 @@ function StepPanel({
     <SignUpView
       step={step}
       elevation={elevation}
-      renderBranding={renderBranding}
       applicationName={APPLICATION_NAME}
       applicationLogoUrl={APPLICATION_LOGO_URL}
       socialProviders={providers}
@@ -136,15 +131,10 @@ export function Default() {
 
 export function Flush() {
   return (
-    <BrandingToggle>
-      {renderBranding => (
-        <StepPanel
-          step={startStep}
-          elevation='flush'
-          renderBranding={renderBranding}
-        />
-      )}
-    </BrandingToggle>
+    <StepPanel
+      step={startStep}
+      elevation='flush'
+    />
   );
 }
 

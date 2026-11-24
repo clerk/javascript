@@ -39,7 +39,6 @@ export type SignUpSubmitEvent = AuthFlowSubmitEvent;
 
 export interface SignUpViewProps {
   elevation?: CardElevation;
-  renderBranding?: boolean;
   step: SignUpStep;
   direction?: FlowDirection;
   applicationName: string;

@@ -30,7 +30,6 @@ import { SignUpRestricted } from './steps/sign-up-restricted';
 
 export function SignUpView({
   elevation,
-  renderBranding,
   step,
   direction,
   applicationName,
@@ -174,7 +173,6 @@ export function SignUpView({
   return (
     <Card.Root
       elevation={elevation}
-      renderBranding={renderBranding}
       align='center'
     >
       <Flow.Root
