@@ -82,7 +82,7 @@ Sign-up:
 - `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`
 - `fields` (`fields`) → `continue`
 
-Sign-up's model adds two steps of its own to the ones `getSignUpNextStep` returns, for when there is no sign-up in progress:
+Sign-up's model adds three steps of its own to the ones `getSignUpNextStep` returns, for when there is no sign-up in progress:
 
 - `task` (`key`) → `taskChooseOrganization`: the session has a pending task that sign-up shows in its own card. Only the task route is allowed, so a visit to `start` with the task pending moves to it, and the task shows its skeleton until its data loads. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is not a `task` step: the flow leaves for its URL.
 - `signed_in` → `start`: a session is signed in, or pending a task sign-up has no screen for. What it shows depends on whether the session was there when the component mounted. On arrival, single-session mode leaves for the task URL or the after sign-up URL and renders nothing, as `ui`'s `withRedirectToAfterSignUp` does, and multi-session mode shows `start` so the user can add an account. A session that arrived during the flow allows any route, like `leaving`, so the screen whose action created it stays up.
