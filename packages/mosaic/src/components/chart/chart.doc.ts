@@ -25,7 +25,6 @@ export default {
     'a projected total for the current period',
     'a chart legend placed outside the chart, such as in a card header beside an action',
     'a custom chart tooltip with a total, a change badge or a banner',
-    'a decorative placeholder chart behind a loading or empty overlay',
   ],
   keywords: [
     'chart',
@@ -79,7 +78,7 @@ export default {
   parts: {
     'Chart.Root': {
       description:
-        'A column (`cl-chart`) with the legend above the plot (`cl-chart-plot`, the headless root). Carries `data-chart="bar"` and `data-state`. Sets `--_cl-chart-series-<i>` for each series, covers the plot with `cl-chart-empty` without rows, and with `cl-chart-error` and a retry when the Canvas fails. The legend is left out in the error state.',
+        'A column (`cl-chart`) with the legend above the plot (`cl-chart-plot`, the headless root). Carries `data-chart="bar"` and `data-state`. Sets `--_cl-chart-series-<i>` for each series, covers the plot with `cl-chart-empty` without rows, and with `cl-chart-error`, a negative `Banner` with a retry, when the Canvas fails. The legend is left out in the error state.',
       slot: 'cl-chart',
       props: {
         chart: { type: 'ChartInstance', doc: 'The result of `Chart.useBarChart`.' },
