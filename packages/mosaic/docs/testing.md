@@ -85,7 +85,7 @@ it('makes the selected organization active and closes', async () => {
 - **`menu.ts`**: `openMenu(user, trigger)` resolves with the open menu. A mouse press opens a menu one frame later, so querying a `menuitem` straight after `user.click` races it.
 - **`render.tsx`**: `renderWithClerk(ui, loadOptions?)` renders inside `ClerkContextProvider` and `MosaicProvider`, loads Clerk with `standardBrowser: false` (a test's Clerk is never disposed, and its cookies would leak into later tests), and returns `{ clerk, navigate, rerender, ... }`. `navigate` is the router Clerk was loaded with.
 
-The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the window. Before each test it moves FAPI to a new host, so a late request from a previous test's Clerk fails instead of reaching this test. After each test it resets handlers and the shared query cache, and fails the test on any FAPI request without a handler or any hold never released or failed. When a feature needs a new endpoint, add a handler to `serveFapi` that mirrors what FAPI returns.
+The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the window. Before each test it moves FAPI to a new host, so a late request from a previous test's Clerk fails instead of reaching this test, and it resets clerk-js's sign-in and sign-up signals, which every `Clerk` instance shares. After each test it resets handlers and the shared query cache, and fails the test on any FAPI request without a handler or any hold never released or failed. When a feature needs a new endpoint, add a handler to `serveFapi` that mirrors what FAPI returns.
 
 ### Order matters
 
