@@ -8,18 +8,29 @@ import { TaskChooseOrganizationHeader, TaskChooseOrganizationSignOut } from './t
 
 const PLACEHOLDER_ORGANIZATIONS = ['Acme Corporation', 'Globex'];
 
-export function TaskChooseOrganizationSkeleton({
-  canCreate,
-  identifier,
-  renderBranding,
-}: {
+interface TaskChooseOrganizationSkeletonStepsProps {
   canCreate: boolean;
   identifier?: string;
-  renderBranding: boolean;
-}) {
-  const m = useMessages('organizationList');
+}
+
+export function TaskChooseOrganizationSkeleton({
+  renderBranding,
+  ...props
+}: TaskChooseOrganizationSkeletonStepsProps & { renderBranding: boolean }) {
   return (
     <Card.Root renderBranding={renderBranding}>
+      <TaskChooseOrganizationSkeletonSteps {...props} />
+    </Card.Root>
+  );
+}
+
+export function TaskChooseOrganizationSkeletonSteps({
+  canCreate,
+  identifier,
+}: TaskChooseOrganizationSkeletonStepsProps) {
+  const m = useMessages('organizationList');
+  return (
+    <>
       <TaskChooseOrganizationHeader canCreate={canCreate} />
       <Card.Content>
         <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
@@ -45,6 +56,6 @@ export function TaskChooseOrganizationSkeleton({
         </Item.Group>
       </Card.Content>
       <TaskChooseOrganizationSignOut identifier={identifier} />
-    </Card.Root>
+    </>
   );
 }

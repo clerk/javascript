@@ -12,11 +12,14 @@ import {
   useTaskChooseOrganizationController,
   useTaskChooseOrganizationScreenController,
 } from './task-choose-organization.controller';
-import type { TaskChooseOrganizationModelOptions } from './task-choose-organization.model';
+import type { TaskChooseOrganizationModel, TaskChooseOrganizationModelOptions } from './task-choose-organization.model';
 import { useTaskChooseOrganizationModel } from './task-choose-organization.model';
-import { TaskChooseOrganizationSkeleton } from './task-choose-organization.skeleton';
+import {
+  TaskChooseOrganizationSkeleton,
+  TaskChooseOrganizationSkeletonSteps,
+} from './task-choose-organization.skeleton';
 import type { TaskChooseOrganizationData } from './task-choose-organization.types';
-import { TaskChooseOrganizationView } from './task-choose-organization.view';
+import { TaskChooseOrganizationSteps, TaskChooseOrganizationView } from './task-choose-organization.view';
 
 /** Everything `<TaskChooseOrganization />` takes: where to go once the session has no tasks left. */
 export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
@@ -41,19 +44,60 @@ export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
  */
 export function TaskChooseOrganization({ fallback, ...options }: TaskChooseOrganizationProps): ReactElement | null {
   const model = useTaskChooseOrganizationModel(options);
+  return (
+    <TaskChooseOrganizationFlow
+      model={model}
+      fallback={fallback}
+    />
+  );
+}
+
+export function TaskChooseOrganizationContent({ model }: { model: TaskChooseOrganizationModel }): ReactElement | null {
+  return (
+    <TaskChooseOrganizationFlow
+      model={model}
+      embedded
+    />
+  );
+}
+
+export function isTaskChooseOrganizationReady(model: TaskChooseOrganizationModel): boolean {
+  return model.status !== 'loading' && !(model.status === 'ready' && model.organizationsLoading);
+}
+
+function TaskChooseOrganizationFlow({
+  model,
+  fallback,
+  embedded = false,
+}: {
+  model: TaskChooseOrganizationModel;
+  fallback?: ReactNode;
+  embedded?: boolean;
+}): ReactElement | null {
   const controller = useTaskChooseOrganizationController(model);
 
   if (controller.status === 'ready') {
     if (controller.organizationsLoading) {
-      return (
+      const canCreate = Boolean(controller.createOrganization);
+      return embedded ? (
+        <TaskChooseOrganizationSkeletonSteps
+          canCreate={canCreate}
+          identifier={controller.identifier}
+        />
+      ) : (
         <TaskChooseOrganizationSkeleton
-          canCreate={Boolean(controller.createOrganization)}
+          canCreate={canCreate}
           identifier={controller.identifier}
           renderBranding={controller.renderBranding}
         />
       );
     }
-    return <ConnectedTaskChooseOrganization controller={controller} />;
+    return (
+      <ConnectedTaskChooseOrganization
+        controller={controller}
+        embedded={embedded}
+      />
+    );
   }
 
   if (model.status === 'complete') {
@@ -76,12 +120,19 @@ function ContinueAfterTask({ onContinue }: { onContinue: () => Promise<unknown> 
   return null;
 }
 
-function ConnectedTaskChooseOrganization({ controller }: { controller: TaskChooseOrganizationReadyController }) {
+function ConnectedTaskChooseOrganization({
+  controller,
+  embedded,
+}: {
+  controller: TaskChooseOrganizationReadyController;
+  embedded: boolean;
+}) {
   const screen = useTaskChooseOrganizationScreenController(controller);
   const { createOrganization } = controller;
+  const View = embedded ? TaskChooseOrganizationSteps : TaskChooseOrganizationView;
 
   return (
-    <TaskChooseOrganizationView
+    <View
       {...controller}
       step={screen.step}
       createSteps={

@@ -40,7 +40,7 @@ When one screen replaces another on the same card or dialog, render both as step
 ```
 
 - **The surface sits outside the flow, and a step renders only what goes inside it.** A screen used as a step of another feature cannot bring its own `Card.Root`: `ConfirmShell` owns the card and `Reverification` renders only its contents.
-- **One flow per surface.** A step that has steps of its own adds them to the same flow, so the view renders one `Flow.Root`.
+- **One flow per surface.** A step that has steps of its own adds them to the same flow, so the view renders one `Flow.Root`. The exception is a whole feature embedded as one step with its own controller, such as the organization task in sign-up. It keeps its own `Flow.Root`, and the parent treats it as one step.
 - **The controller owns the step.** Going back is direction `-1`. Derive it from the step when each step has one way in, and hold it in the controller when it does not (`reverification.controller.ts`).
 - **Name step kinds for what the user does,** not for what the screen looks like: `credential`, `code`, `choice`. Before adding a member to a kind, check the name still fits it (a passkey is a credential but not a secret).
 - **Hold the primary action while it runs.** A step's async action is a `SubmitButton` with `isPending` and a `pendingLabel`, and it stays pending until the next step renders. Every other action on the step takes `disabled={isPending}` (`reverification.view.tsx`).
