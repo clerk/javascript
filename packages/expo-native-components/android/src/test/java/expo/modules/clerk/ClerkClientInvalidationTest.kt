@@ -27,6 +27,7 @@ class ClerkClientInvalidationTest {
         clientId: String? = "client_1",
         sessions: List<ClerkClientFingerprint.SessionState> = listOf(ClerkClientFingerprint.SessionState("sess_1", "ACTIVE")),
         userUpdatedAt: Long? = 1,
+        activeOrganizationId: String? = null,
         deviceToken: String? = "token_1"
     ) = ClerkClientFingerprint(
         clientId = clientId,
@@ -34,6 +35,7 @@ class ClerkClientInvalidationTest {
         sessions = sessions,
         activeUserId = if (sessions.isEmpty()) null else "user_1",
         activeUserUpdatedAt = if (sessions.isEmpty()) null else userUpdatedAt,
+        activeOrganizationId = activeOrganizationId,
         deviceToken = deviceToken
     )
 
@@ -62,6 +64,7 @@ class ClerkClientInvalidationTest {
             fingerprint(sessions = listOf(ClerkClientFingerprint.SessionState("sess_1", "ENDED"))),
             fingerprint(sessions = emptyList()),
             fingerprint(userUpdatedAt = 2),
+            fingerprint(activeOrganizationId = "org_2"),
             fingerprint(deviceToken = "token_2")
         )
 
