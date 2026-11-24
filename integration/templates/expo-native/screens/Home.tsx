@@ -3,6 +3,7 @@ import { AuthView, type AuthViewMode, UserButton } from '@clerk/expo/native-comp
 import { type ReactElement, useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
+import { armClientFetchDrop, useDroppedClientFetches } from '../verify/faults';
 import { AuthLogo } from './AuthLogo';
 import { type Destination, homeLinksFor } from './destinations';
 
@@ -12,6 +13,7 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
   const { isSignedIn, signOut } = useAuth();
   const { user } = useUser();
   const { session } = useSession();
+  const dropped = useDroppedClientFetches();
   const [authSheet, setAuthSheet] = useState<'closed' | 'plain' | 'withLogo'>('closed');
   const closeAuth = (): void => setAuthSheet('closed');
 
@@ -76,8 +78,19 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
             title='Sign in'
             onPress={() => setAuthSheet('plain')}
           />
+          <Button
+            testID='verify.fault.dropClientFetch'
+            title='Drop the next client fetch'
+            onPress={armClientFetchDrop}
+          />
         </>
       )}
+      <Text
+        testID='verify.fault.dropped'
+        style={styles.detailText}
+      >
+        {String(dropped)}
+      </Text>
       <View style={styles.links}>
         {!isSignedIn && (
           <Button
