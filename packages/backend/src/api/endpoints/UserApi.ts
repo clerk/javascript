@@ -103,7 +103,7 @@ export type UserSearchMetadataFilter = {
   match: 'exists' | 'equals';
   /** The value to compare against. Required for `equals` and not allowed for `exists`. */
   value?: string;
-  /** If `true`, inverts the filter. A negated `exists` matches users that do not hold the key. A negated `equals` matches users that hold the key with a different value. */
+  /** If `true`, `exists` matches users that do not hold the key, and `equals` matches users that hold the key with a different value. */
   negate?: boolean;
 };
 
