@@ -590,6 +590,57 @@ describe('SignUp', () => {
       expect(fapi.signUp.creations).toHaveLength(1);
       expect(fapi.signUp.updates.at(-1)?.get('strategy')).toBe('oauth_google');
     });
+    describe('with legal consent missing', () => {
+      const legalConsentEnvironment = (google: { required: boolean }) =>
+        environment({
+          user_settings: {
+            social: {
+              oauth_google: {
+                enabled: true,
+                authenticatable: true,
+                logo_url: null,
+                strategy: 'oauth_google',
+                name: 'Google',
+                ...google,
+              },
+            },
+            sign_up: {
+              allowlist_only: false,
+              progressive: true,
+              captcha_enabled: false,
+              mode: 'public',
+              legal_consent_enabled: true,
+            },
+          },
+        });
+      const signUpWithPassword = { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL, has_password: true }) };
+
+      it('offers the provider the sign-up still needs alongside legal consent', async () => {
+        const { user } = await renderSignUpWithRouteProbe({
+          environment: legalConsentEnvironment({ required: true }),
+          client: signUpWithPassword,
+        });
+
+        await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+        await enterCode(user);
+
+        expect(await screen.findByRole('checkbox')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Google/ })).toBeInTheDocument();
+      });
+
+      it('offers no provider when legal consent is all the sign-up needs', async () => {
+        const { user } = await renderSignUpWithRouteProbe({
+          environment: legalConsentEnvironment({ required: false }),
+          client: signUpWithPassword,
+        });
+
+        await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+        await enterCode(user);
+
+        expect(await screen.findByRole('heading', { name: 'Legal consent' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Google/ })).toBeNull();
+      });
+    });
   });
 
   describe('starting over', () => {

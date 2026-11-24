@@ -211,6 +211,9 @@ function continueProviders<T extends AuthProvider & { id: OAuthStrategy }>(
   signUp: SignUpFutureResource,
   providers: T[],
 ): T[] {
+  if (signUp.missingFields.length === 1 && signUp.missingFields[0] === 'legal_accepted') {
+    return [];
+  }
   const missing = providers.filter(provider => signUp.missingFields.includes(provider.id));
   if (missing.length > 0) {
     return missing;

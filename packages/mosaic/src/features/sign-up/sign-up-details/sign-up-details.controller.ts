@@ -219,10 +219,7 @@ export function useSignUpDetailsController(
       ...screen,
       step: detailsStep('continue', continueFields, details, identifier),
       onSwitchField: switchField('continue'),
-      socialProviders:
-        details.continueLegalConsent && signUpFieldNames(continueFields).length === 0
-          ? []
-          : details.continueOAuthProviders,
+      socialProviders: details.continueOAuthProviders,
       onSelectProvider: selectOAuth,
     },
     error: form.error,
