@@ -163,6 +163,24 @@ describe('native client sync behavior', () => {
       expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesAfterRepair);
     });
 
+    it('stops retrying the JS refetch of a native sign-in once ClerkProvider unmounts', async () => {
+      const h = await start();
+      vi.useFakeTimers();
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'GET /client');
+
+      const signIn = h.native.signIn('user_1');
+      await h.run(() => vi.advanceTimersByTimeAsync(100));
+      await signIn;
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      h.unmount();
+      harness = undefined;
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.server.requestCount('js', 'POST /client/sessions/:id/touch')).toBe(0);
+    });
+
     it('does not retry a JS refetch of a native sign-in that the server rejected', async () => {
       const h = await start();
       vi.useFakeTimers({ shouldAdvanceTime: true });
