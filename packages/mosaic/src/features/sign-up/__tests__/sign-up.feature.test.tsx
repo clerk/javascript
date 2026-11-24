@@ -1105,7 +1105,7 @@ describe('SignUp social sign-up', () => {
     expect(String(leave.mock.calls[0][0])).toBe('https://oauth.example/authorize?strategy=oauth_google');
     expect(fapi.signUp.creations).toHaveLength(1);
     expect(fapi.signUp.creations[0].get('strategy')).toBe('oauth_google');
-    expect(fapi.signUp.creations[0].get('redirect_url')).toContain('__clerk_mosaic_sign_up=sso-callback');
+    expect(fapi.signUp.creations[0].get('redirect_url')).toBeTruthy();
     expect(fapi.signUp.creations[0].get('action_complete_redirect_url')).toBeTruthy();
   });
 

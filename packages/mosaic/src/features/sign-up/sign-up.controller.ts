@@ -134,7 +134,6 @@ export function useSignUpController(
 
   const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
-  // The marker is in the URL from the first paint, before the effect starts the return. `lastKey` is set once it ran.
   const isReturning = actions.pendingKey === 'return' || (flow.isReturning && actions.lastKey === undefined);
   const shown = shownRoute(route, outcome, flow.step);
   const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
@@ -189,7 +188,6 @@ export function useSignUpController(
       return;
     }
     if (
-      isReturning ||
       actions.isPending ||
       !flow.ticket ||
       model.details.inTicketSignUp ||
