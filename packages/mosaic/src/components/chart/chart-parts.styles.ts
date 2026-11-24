@@ -42,7 +42,10 @@ export const partStyles = stylex.create({
     },
     transitionDuration: durationVars['--cl-duration-fast'],
     transitionProperty: 'opacity',
-    transitionTimingFunction: easingVars['--cl-ease-default'],
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     zIndex: 10,
   },
 });
