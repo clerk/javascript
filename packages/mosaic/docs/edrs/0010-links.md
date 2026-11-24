@@ -41,11 +41,11 @@ Also rejected:
 
 The owner consumes the link for its own base; the provider has no part in it.
 
-- `useConsumeLink(location, entry, { routing, path })` is called by `useRouterScope` and by the modal host for each surface. Nested routers never write, so they do not consume. The key is `paramKey(queryPrefix, path)`, the query carrier's key for that base; the modal host passes the surface's own path, so a path-mode modal answers to `.modal.user` as well.
+- `useConsumeLink(location, entry, { routing, path })` is called by `useRouterScope` and by the modal host for each surface. Nested routers never write, so they do not consume. The key is `paramKey(queryPrefix, path)`, the query carrier's key for that base; the modal host passes the surface's path.
 - In query mode it does nothing. Otherwise it subscribes to the `window` store, and while the owner holds no entry of its own it renders from the link's parts, so a deep link shows its page in the first render. An effect keyed on the query string writes the parts into the owner's carrier or the store and strips the link, so a link that arrives while the owner is mounted is seen too; mount is its first run. The effect reads the live `window.location.search` in a microtask, skipping a run that was cleaned up before the microtask, so StrictMode reads once.
 - At the first run an entry the owner has wins: the link is removed and not applied. "Has" means the store or the carrier holds parts for the base; in path mode the base itself counts as nothing, since a pathname always says something. A link seen on a later run is applied whatever the entry, because it is a navigation.
-- Applying is the location's own write with a replace, to the store, the pathname or the hash. The link is then removed by rewriting the live `window` URL with `writeWindowUrl(url, true)`, never through the adapter's `replace`, so two owners removing their links in one tick compose. Only that one pair is touched; every other pair is kept byte for byte, and Next's history marker is dropped so the App Router applies the change.
-- `useReturnUrl(routes)` reads the inherited scope and returns a builder typed like `go` without the write options. It reads `window.location` when called and returns an absolute URL with the route's parts written by the scope's carrier, and by the query carrier under the query prefix in virtual mode. Outside a scope, or for parts the carrier refuses, it returns the page's URL as it is.
+- Applying is the location's own write with a replace, to the store, the pathname or the hash. The link is then removed by rewriting the live `window` URL with `writeWindowUrl(url, true)`, never through the adapter's `replace`, so two owners removing their links in one tick compose. Only that one pair is removed; the rest of the query string is rewritten in `URLSearchParams` form, and the write carries no history state.
+- `useReturnUrl(routes)` reads the inherited scope and returns a builder typed like `go` without the write options. It reads `window.location` when called and returns an absolute URL with the route's parts written by the scope's carrier, and by the query carrier under the query prefix in virtual mode. Outside a scope it returns the page's URL as it is.
 
 ## Consequences
 
@@ -68,3 +68,4 @@ The owner consumes the link for its own base; the provider has no part in it.
 ## Changelog
 
 - **2026-11-17**: Accepted.
+- **2026-11-24**: Amended: path mode for modals is gone; a removed link leaves the query string in `URLSearchParams` form and no history state.

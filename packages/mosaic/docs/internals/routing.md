@@ -92,7 +92,8 @@ This is mostly based on the above constraints, but also some research.
 - Use framework adapter state over `window` if it exists
   - So our segment and the host page change in the same commit
 - Writes go through the adapter if there is one, otherwise `history.pushState`
-  - Hash steps are written with `pushState` too, never `location.hash =`, since Next strips a hash it did not write (agent finding, not runtime verified)
+  - Hash steps are written with `pushState` too, never `location.hash =`, since Next strips a hash it did not write
+  - `window` writes carry no history state and wait for the page to settle, so a host router keeps its bookkeeping off entries it did not make and sees a correction made in the first commit
 - Automatic navigations replace; only a user action pushes
   - Otherwise every bounce and redirect leaves a history entry, which is the source of legacy's back-button traps
 - Change notifications
@@ -121,8 +122,8 @@ The decisions are recorded in [the routing EDRs](../edrs/README.md) and the usag
   - For now, they are passed into `<MosaicProvider>`, as copy-paste objects rather than entry points. No adapter means the `window` fallback, which stays a supported mode
   - Later when `<ClerkProvider>` starts rendering `<MosaicProvider>` it comes in that way via the framework SDKs instead. Same adapter, different supplier
   - These are also what would provide the server URL
-- SSR status: `virtual` renders the same on server and client. `path` with an adapter reads the request URL through the host's hooks; `hash`, `query` and the `window` fallback render the root on the server and correct once after hydration
-- `query` mode is one param per base, `p.user=security`, not one reserved param: two components keep apart and a modal's param can be dropped on its own. It is sent to the server, so it is the candidate for modal state that survives a refresh or a redirect
+- SSR status: `virtual` renders the same on server and client. `path` and `query` with an adapter read the request URL through the host's hooks; `hash` and the `window` fallback render the root on the server and correct once after hydration
+- `query` mode is one param per base, `.user=security`, not one reserved param: two components keep apart and a modal's param can be dropped on its own. It is sent to the server, so it is the candidate for modal state that survives a refresh or a redirect
 
 ## Security
 
@@ -178,6 +179,6 @@ The URL is attacker-controlled input: anyone can send a user a link. That covers
 - **Step**: a navigation whose destination is inside the component's segment. Made with `go(name, params)`.
 - **Exit**: a navigation whose destination is outside the segment. A full URL handed to `clerk-js`, which decides soft or hard, decoration and the transitive state.
 - **Scope**: the mode and base a surface was mounted with, shared with everything nested inside it through `MosaicRoutingScope`. Configuration, not state. Returned by `useRouterScope` as an opaque value.
-- **Framework adapter**: the host-router integration a URL-mode location reads and writes through, `usePathname` and a raw query string in Next. A plain object of optional members supplied at the top, by `MosaicProvider` now and `ClerkProvider` later ([MEDR-0009](../edrs/0009-router-adapter.md)).
-- **Window fallback**: what a URL-mode location reads and writes for each adapter member that is missing. Reads `window.location`, listens to `popstate`, `hashchange` and the Navigation API's `currententrychange` where the browser has it, writes without Next's history marker, and is the one place `useSyncExternalStore` is still needed.
+- **Framework adapter**: the host-router integration a URL-mode location reads and writes through, `usePathname` and `useSearchParams` in Next. A plain object of optional members supplied at the top, by `MosaicProvider` now and `ClerkProvider` later ([MEDR-0009](../edrs/0009-router-adapter.md)).
+- **Window fallback**: what a URL-mode location reads and writes for each adapter member that is missing. Reads `window.location`, listens to `popstate`, `hashchange` and the Navigation API's `currententrychange` where the browser has it, writes with no history state once the page has settled, and is the one place `useSyncExternalStore` is still needed.
 - **Page** vs **step**: a profile's navigation entries are pages; a flow's states are steps. Both are routes; the words only say which kind of surface owns them.

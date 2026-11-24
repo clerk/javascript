@@ -1,34 +1,45 @@
 # Routing
 
-How a Mosaic component owns a segment of the page's location, and how a host or a modal moves it there. The reasons behind the shape are in the [decision records](edrs/README.md); read them before changing anything under `src/routing`.
+How a Mosaic component keeps its place in the page's location, and how a host or a modal puts it there. The reasoning is in the [decision records](edrs/README.md); this guide is about using what they decided.
 
 ## The model
 
-A component owns one segment of the location under a base. `/user` is the user profile's default base, so its Security page is the segment `security` under `/user`. Which page is open is the location's to say, never the component's: the component reads its segment, derives a route from it, and navigates by writing a new segment. It holds no routing state of its own.
+A component owns one segment of the location under a base. `/user` is the user profile's default base, so its Security page is the segment `security` under `/user`. Which page is open is the location's to say: the component reads its segment, derives a route from it, and navigates by writing a new one. It holds no routing state of its own, so Back, reload and deep links work by construction rather than by handling.
 
-Where the segment lives is the component's `routing`: `virtual` keeps it in memory in `MosaicProvider`, keyed by base, and the browser URL does not change; `path`, `hash` and `query` keep it in the page's URL. The same component code runs in every mode; only the location differs.
+Where the segment lives is the component's `routing`:
 
-In virtual mode a segment lives while a mounted component owns it. Navigate away and it is gone; come back and the component starts on its root. A component that React parks without unmounting, as `Activity` does, keeps its segment and resumes where it was. Virtual mode has no history: Back does not restore a segment the way the URL modes do. In a URL mode the segment lives as long as the URL has it, and nothing is parked.
+- `virtual` keeps it in memory, in `MosaicProvider`, and the browser URL does not change. The default.
+- `path` keeps it in the pathname under `path`, `/user/security`, as the legacy components do.
+- `hash` and `query` keep it in one param per component, `#.user=security` or `?.user=security`.
+
+The same component code runs in every mode. The host, not the component, decides where its segment lives.
 
 ## URL modes
 
-- `path` keeps the segment in the pathname under `path`, `/user/security`, as the legacy components do. `path` is where the component is mounted, so a host with a catch-all route at `/account/[[...page]]` passes `path='/account'`. A component mounted somewhere else shows its first page, and its first navigation writes under `path`, away from where it is. One component per page can use the pathname.
-- `hash` and `query` keep the segment in one param per component, `#.user=security` or `?.user=security`. The param's name is a prefix and the component's base with dots for slashes, so the profile modal at `/modal/user` is `.modal.user`. The leading dot is what keeps them apart from the host's own params, and it survives a host re-serialising the query string, which `~`, `@` and the like do not. A prefix can go in front of it, `routing={{ keyPrefix: { query: 'clerk' } }}` for `clerk.user`; there is none by default. The value is the segment's parts, each percent-encoded, joined with `/`, and is read back the way the host reads any param, decoded, so a part cannot contain a slash in these modes. Other params are left exactly as they are. The query form is also how a page links to a component in any mode, see [Links](#links).
-- A navigation pushes a history entry; a redirect to the root and a modal closing replace. Back moves through a component's pages. Reloading or sharing the URL opens the page it names.
-- `routing` is fixed when the component mounts. To change it, remount the component with a `key`; a changed prop warns and is ignored.
-- Without an adapter the URL modes read and write `window.location`. The server renders the component's first page and the client corrects it after hydration.
+- In `path` mode `path` is where the component is mounted, so a host with a catch-all route at `/account/[[...page]]` passes `path='/account'`. One component per page can use the pathname; a second one takes another mode.
+- In `hash` and `query` mode the param's name is the component's base with dots for slashes and a leading dot, `.user`, `.modal.user`, so it never collides with the host's own params. `routing={{ keyPrefix: { query: 'clerk' } }}` puts a prefix in front, `clerk.user`; there is none by default. The value is the segment, so `?.user=billing%2Fstatement%2Fst_1` is the statement page. The host's other params are kept; a Mosaic write spells the query string the way `URLSearchParams` does, so `x%20y` becomes `x+y` and a bare `flag` becomes `flag=`.
+- In `hash` mode the fragment is Mosaic's. A host anchor such as `#top` stops scrolling once a param sits beside it, and clicking one resets the component.
+- A navigation pushes a history entry; a correction to the first page and a modal closing replace. Back moves through a component's pages. Reloading or sharing the URL opens the page it names.
+- `routing` is fixed when the component mounts; a changed prop warns and is ignored. The profiles remount themselves on their first page when their prop changes.
+- Without an adapter the URL modes read and write `window.location`. The server renders the first page and the client corrects it after hydration. A host router that is not given `push` and `replace` does not see Mosaic's history entries in its blockers or scroll restoration.
 
 ### The host router
 
-Hand `MosaicProvider` an adapter so a Mosaic navigation and the host's page change in the same commit, and so the host's own navigations reach the component without a `popstate`:
+Hand `MosaicProvider` an adapter so a Mosaic navigation and the host's page change in the same commit, and so the host's own navigations reach the component:
 
 ```tsx
 <MosaicProvider routing={{ adapter: nextRouterAdapter }}>
 ```
 
-A `RouterAdapter` is a plain object of optional members: `usePathname` and `useHash` are hooks returning that part of the URL as `window.location` has it, `useSearchParams` returns the query string or a `URLSearchParams`, and `push` and `replace` navigate the host router to a full URL. Each one the adapter does not have falls back to `window`, which follows `popstate`, `hashchange` and, where the browser has the Navigation API, every same-document navigation, so a host router's own `pushState` is seen there too. Build it once, outside render; the hooks it has are taken from the first render.
+A `RouterAdapter` is a plain object of optional members: `usePathname` and `useHash` are hooks returning that part of the URL as `window.location` has it, `useSearchParams` returns the query string or a `URLSearchParams`, and `push` and `replace` navigate the host router to a full URL. Each one the adapter does not have falls back to `window`. Build it once, outside render.
 
-The Next.js App Router adapter is a file to copy, `packages/swingset/src/lib/mosaic-next-router-adapter.ts`. It is `usePathname` and `useSearchParams` from `next/navigation`, as they are. It has no `push` or `replace`: Mosaic writes `window.history` without Next's own history state, and Next then moves its hooks to the new URL without the server round trip `router.push` would make. Two things to know under Next: a component whose adapter has `useSearchParams` is client-rendered up to the nearest `Suspense` boundary in a statically rendered route, as any component calling that hook is; and a host with `trailingSlash` sees one redirect per navigation. Under a `basePath`, hash and query need nothing, since a write without `push` starts from `window`, which has it; path mode needs `push` and `replace` that prepend the base path, because Next's `usePathname` leaves it out and `window.history` does not add it.
+Under Next.js App Router, copy `packages/swingset/src/lib/mosaic-next-router-adapter.ts`: `usePathname` and `useSearchParams` from `next/navigation`, nothing else. Leave out `push` and `replace`; Mosaic writes `window.history` and Next picks the change up without the server round trip `router.push` would make. Three things to know:
+
+- Every component under the provider calls `useSearchParams`, so a statically rendered route needs a `Suspense` boundary above the provider or `next build` fails, as it does for any component that calls that hook.
+- Under a `basePath`, hash and query need nothing. Path mode needs the base path in both places Next leaves it out: `usePathname: () => basePath + usePathname()` in the adapter and `path={basePath + '/account'}` on the component.
+- With `trailingSlash` on, a URL Mosaic wrote gets one redirect when it is loaded. A write itself makes no request.
+
+Routers that keep their own copy of the location, React Router and TanStack among them, need `push` and `replace` as well as the reads, or a step never reaches them.
 
 ## Own a segment
 
@@ -44,30 +55,28 @@ const routes = {
 const { route, params, go, scope } = useRouterScope(routes, { routing: 'virtual', path, root: 'account' });
 ```
 
-- `root` is the route that lives at the base. Its pattern in the table is ignored in favour of the empty segment, and `go(root)` writes the empty segment. A segment nothing matches, the root's own segment included, shows the root at once and is replaced with the base.
-- `notFound(parts)` may name the route a segment nothing matches goes to instead of the root, as the combined profile does for an unknown organization page; a route that needs params cannot be written without them, so naming one shows the root instead, with a warning.
-- `route` is a name from the table and never undefined. If the table depends on data that has not arrived, pass `ready: false` until it has; `route` is then `undefined` and nothing is written, so an entry the table cannot match yet is kept. Passing `ready` at all makes `route` optional in the type, so the loading window is a decision, not a default.
-- `go('statement', { statementId })` writes the segment for a name. Param types come from the pattern; a route without params takes none. There is no way to navigate to a URL from here; anything outside the segment is an exit through `clerk-js`.
-- A pattern literal is written decoded, `api keys` not `api%20keys`; `:name` captures a part, `:name?` may be absent. The pattern `''` is the base itself.
-- Render `<MosaicRoutingScope scope={scope}>` around children that route inside the segment. They call `useRouter(routes)` with their own table, read the same segment, and get `route: undefined` for a segment a sibling owns. They never redirect.
+- `root` is the route that lives at the base. `go(root)` writes the empty segment, and a segment nothing matches shows the root and is corrected to the base.
+- `notFound(parts)` may name the route an unknown segment goes to instead of the root, as the combined profile does for an unknown organization page.
+- `route` is a name from the table and never undefined. If the table depends on data that has not arrived, pass `ready: false` until it has; `route` is then `undefined` and nothing is written, so a segment the table cannot match yet is kept.
+- `go('statement', { statementId })` writes the segment for a name. Param types come from the pattern. There is no way to navigate to a URL from here; anything outside the segment is an exit through `clerk-js`.
+- A pattern literal is written decoded, `api keys` not `api%20keys`; `:name` captures a part, `:name?` may be absent. The pattern `''` is the base itself. A part may contain any character, including a slash.
+- Render `<MosaicRoutingScope scope={scope}>` around children that route inside the segment. They call `useRouter(routes)` with their own table, read the same segment, and never write.
 
-One owner per base on a page. Two scopes on the same base cannot loop while both fall back to the base, but the second keeps snapping the first back to its root on every navigation; the fix is a different `path` for one of them.
+One owner per base on a page. Two owners of one base keep correcting each other; give one of them another `path`.
 
 ## Profiles
 
-`UserProfile` and `OrganizationProfile` route their pages through `useProfilePagesController`, which builds the table from the page ids: the first page in navigation order is the root with no segment, every other page has the segment legacy used, `api-keys` for `apiKeys`, a custom page's `path` for a custom page, and `organization/...` for the organization pages in combined mode. `pageSegment` and `pageParts` in `profile-pages.layout.ts` are the one place that mapping lives.
+`UserProfile`, `OrganizationProfile` and `Profile` route their pages through one table built from the page ids: the first page in navigation order is the root with no segment, every other page has the segment legacy used, `api-keys` for `apiKeys`, a custom page's `path` for a custom page, and `organization/...` for the organization pages in combined mode.
 
-For a host:
-
-- A profile opens on its first page. Reorder with `pageOrder` if another page should come first. There is no prop for the opening page.
-- `routing` picks the mode, `virtual` by default, and `path` sets the base, `/user` and `/organization` by default. Two profiles on one page need different bases. Both can be set once for every profile through the provider's `profile.userProfileProps` and `profile.organizationProfileProps`. In path mode `path` is where the profile is mounted.
-- A profile that unmounts and mounts again starts on its first page, as it would after the host navigated away and back. One that is parked and shown again, by `Activity` or anything else that keeps its state, comes back on the page it was on.
-- A custom page's `path` is its segment, exactly: no leading, trailing or doubled slash, no leading colon, no percent-encoding, and not the segment of one of the profile's built-in pages where that differs from the id, such as `api-keys`. A path that breaks a rule is left out with a warning saying what to write instead. Spaces and non-ASCII are fine.
-- A profile shows its loading fallback until every model its pages depend on is ready. A page written before then, by a modal opening at it, is kept and shown once the pages are known.
+- A profile opens on its first page. Reorder with `pageOrder` if another page should come first; there is no prop for the opening page.
+- `routing` picks the mode and `path` the base, `/user` and `/organization` by default. Both can be set once for every profile through the provider's `profile.userProfileProps` and `profile.organizationProfileProps`. Two profiles on one page need different bases. In path mode `path` is where the profile is mounted.
+- A profile that unmounts and mounts again starts on its first page. One that is parked and shown again, by `Activity` or anything else that keeps its state, comes back on the page it was on.
+- A custom page's `path` is its segment, exactly: no leading, trailing or doubled slash, no leading colon, no percent-encoding, and not the segment of a built-in page. A path that breaks a rule is left out with a warning saying what to write instead.
+- A profile shows its loading fallback until every model its pages depend on is ready. A page written before then, by a modal opening at it, is shown once the pages are known.
 
 ## Modals
 
-A modal surface declares a base with `path`, `/modal/<id>` by default, and a `routing`, virtual by default; the modal is open exactly while that base has an entry. `open(options)` writes `initialParts(options)` and the content mounts reading it; `close()` clears the entry. Content receives the base as `path` and routes under it like any owner.
+A modal surface declares a base with `path`, `/modal/<id>` by default; the modal is open exactly while that base has an entry. `open(options)` writes `initialParts(options)` and the content mounts reading it; `close()` clears the entry. Content receives the base as `path` and routes under it like any owner.
 
 ```ts
 export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
@@ -79,25 +88,22 @@ export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
 });
 ```
 
-`useModal(userProfileModal).open({ page: 'security' })` is how a host opens a profile on a page. Opening on the first page writes its id, which the profile canonicalises to the base. The modal is open whenever its entry exists, so an entry written from outside opens it too, and its content loads whenever it is open, not only when the handle opened it.
+`useModal(userProfileModal).open({ page: 'security' })` opens a profile on a page. An entry written from outside, by a link or a URL, opens the modal too, and its content loads whenever it is open.
 
-In the hash and query modes opening pushes a history entry and closing replaces it, so Back closes the modal, a URL with the param opens it, and after a close the page has two entries for its own URL. A modal opened from another modal stacks on it, in every mode: an outside press or Escape closes the one on top only. Mosaic's own modals are virtual by default; `routing={{ modals: 'query' }}` on the provider puts them in the query string, `'hash'` in the hash, for every modal at once. In the pathname a modal lives under the page it opens from: `routing={{ modals: { routing: 'path', path: '/account' } }}` opens the user profile modal at `/account/modal/user/security` and closes back to `/account`, so that page's route has to accept the extra parts, and one modal at a time can be open. Changing any of it needs the provider remounted.
+Mosaic's own modals are virtual by default; `routing={{ modals: 'query' }}` on the provider puts them in the query string, `'hash'` in the hash, for every modal at once. In those modes opening pushes a history entry and closing replaces it, so Back closes the modal and a URL with the param opens it. Modals never use the pathname. A virtual modal closes when the host moves to another pathname; a change of the query string or the hash leaves it open. A modal opened from another modal stacks on it: an outside press or Escape closes the one on top only.
 
 ## Links
 
-A link to a component's page is the query mode's param, in every mode. `?.user=security` lands the owner of `/user` on Security, and `?.modal.user=account` opens the profile modal on Account, whether they route in memory, the pathname, the hash or the query string. The name is the query prefix and the base with dots for slashes, as in query mode, and the value is the parts, each percent-encoded, joined with `/`. A host links to a page with it, and a redirect returns through it.
+A link to a component's page is the query mode's param, in every mode. `?.user=security` lands the owner of `/user` on Security, and `?.modal.user=account` opens the profile modal on Account, whether they route in memory, the pathname, the hash or the query string. A host links to a page with it, and a redirect returns through it.
 
-- In query mode the param is the component's entry, and it stays.
-- In `virtual`, `path` and `hash` mode the owner of the base reads the param, writes its page to its own place, memory, the pathname or the hash, with a replace, and removes the param, leaving every other param, the hash and the history state as they were. The modal host does it for each modal, so a link opens a modal before its content has mounted. A path-mode modal answers to its own name too, `.modal.user`, not the page's path in front of it.
-- Links are read from the query string only, never from the hash.
-- The owner reads links whenever the URL changes, not only when it mounts, so a host's `<Link href="?.user=security">` on a page that stays mounted works.
-- When the owner mounts with an entry already, the URL wins and the link is removed unused: that is a reload of a page whose URL already names the page. In path mode the base itself counts as no entry. A link that arrives after the owner mounted is followed whatever page it is on, since it is a navigation.
-- Nothing reads a link for a base nothing owns; it stays in the URL until an owner mounts. An inline owner shows its first page until it has read the link, a moment after it mounts.
-- Two owners of one base in different modes, a virtual and a query one of `/user` on the same page, share the one param: the query owner reads it as its entry and the virtual owner takes it as a link and removes it. Give one of them another `path`.
+- In query mode the param is the component's entry and stays in the URL. In the other modes the owner moves the page to its own place and removes the param.
+- Links are read from the query string only, and whenever the URL changes, so a `<Link href="?.user=security">` on a page that stays mounted works.
+- When the owner mounts with a page already in its own place, that page wins and the link is removed unused: a reload of a URL that already names the page. A link that arrives after mount is followed whatever page is open.
+- A link for a base nothing owns stays in the URL until an owner mounts.
 
 ### Returning after a redirect
 
-A flow that leaves the page and comes back, such as an OAuth or enterprise connection or verifying an email through an identity provider, hands Clerk the URL to return to. Build it with `useReturnUrl`, anywhere `useRouter` can be called:
+A flow that leaves the page and comes back, such as an OAuth or enterprise connection, hands Clerk the URL to return to. Build it with `useReturnUrl`, anywhere `useRouter` can be called:
 
 ```ts
 const returnUrl = useReturnUrl(routes);
@@ -105,25 +111,16 @@ const returnUrl = useReturnUrl(routes);
 await user.createExternalAccount({ strategy, redirectUrl: returnUrl('account') });
 ```
 
-- `returnUrl(name, params)` takes a route name and its params, typed from the table as `go` is, and returns the page's URL as it is when called, absolute, with a link to that route for the scope's owner. It never navigates.
-- In `path` and `hash` mode the route is written where the owner keeps it, `/user/security` or `#.user=security`; in `query` and `virtual` mode it is the link, `?.user=security`. Nothing else in the URL changes.
-- Outside a scope, or for params a carrier cannot hold, it returns the page's URL as it is, the latter with a warning.
+`returnUrl(name, params)` is typed like `go` and returns the page's URL as it is when called, with the route for the scope's owner written into it. It never navigates. Outside a scope it returns the page's URL unchanged.
 
-What comes back is the route and nothing else. A modal reopened by a link gets the provider's `profile` options, not the options it was opened with. A flow's machine starts over in its first state, and a section reads its resources again, so it shows what the redirect changed.
-
-The profile sections that redirect, connected accounts, enterprise accounts and email verification through an identity provider, return to the profile's account page: a connection made in the profile modal reopens the modal on Account, and one made in an inline profile shows that profile on Account.
+What comes back is the route and nothing else. A modal reopened by a link gets the provider's `profile` options, a flow's machine starts in its first state, and a section reads its resources again, which is what shows the result of the redirect. The profile sections that redirect return to the account page of the profile they left, modal or inline.
 
 ## Seeing it run
 
-The swingset has a Routing section at `/routing`, `packages/swingset/src/app/(explorer)/routing`, that shows every mode on components with nothing in them but routing: the four modes with Back, reload and a host link into a step; a routed page under a routed modal; a modal opening a modal; two components side by side, which is where path mode stops; tabs in the pathname; and multiple tabs on one page, as the segment, as the trailing part of a step, arriving after mount, and inside a modal. None of it needs a session. The live user profile and user button pages keep a mode switch for the real components.
+The swingset has a Routing section at `/routing`, `packages/swingset/src/app/(explorer)/routing`, that shows every mode on components with nothing in them but routing: a page with host links into its steps, two components side by side, a modal and a modal on a modal, tabs in the pathname, multiple tabs on one page, and a page with modals opened from inside it. None of it needs a session. The live user profile and switcher pages keep a mode switch for the real components.
 
 ## Tests
 
-- The contract every mode keeps is in `src/routing/__tests__/location-contract.test.tsx`, run for all four modes. Add a behaviour there when it should hold in every mode, and add a mode there before anything else. A URL mode is tested against `window.history` directly, with a `popstate` for what the host does; the adapter path is covered in `url-location.test.tsx`.
-- To test routing in a hook, wrap it in `VirtualStoreProvider` with an `initial` map of base to parts, and read the store with `useVirtualEntries` or `useVirtualSegment`.
+- The contract every mode keeps is in `src/routing/__tests__/location-contract.test.tsx`, run for all four modes. Add a behaviour there when it should hold in every mode, and add a mode there before anything else.
+- To test routing in a hook, wrap it in `RouterAdapterProvider` and `VirtualStoreProvider` with an `initial` map of base to parts, and read the store with `useVirtualEntries` or `useVirtualSegment`. Both providers are needed: writes to `window.history` wait for the provider to settle.
 - Feature tests render inside `MosaicProvider` and read entries the same way. `useVirtualSegment` returns `undefined` for a base with no entry, which is how a test tells "cleared" from "empty".
-
-## Appendix: candidates for this guide
-
-- Where the route lives for a flow with steps, once the first flow routes: a `Flow.Step` switching on `route`.
-- A host writing an entry before showing an inline component, once a public handle for that exists.

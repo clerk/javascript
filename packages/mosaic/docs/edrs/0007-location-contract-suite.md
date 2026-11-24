@@ -28,7 +28,7 @@ The component-visible contract is a parameterised test suite, and it is the defi
 ## Consequences
 
 - A divergence between modes is a failing test, not a review finding.
-- The suite's "leave" step is what the host navigating away means in each mode: virtual unmounts the owner, a URL mode navigates to another URL and unmounts it. The URL modes declare `parks` and `dropsOnMove`, since the URL keeps a segment until the host navigates; `path` declares `severalBases`; `hash` and `query` declare `slashInPart`, since a param's value is read decoded. What the suite does not cover is a write through an adapter, which the location tests cover on their own.
+- The suite's "leave" step is what the host navigating away means in each mode: virtual unmounts the owner, a URL mode navigates to another URL and unmounts it. The URL modes declare `parks` and `dropsOnMove`, since the URL keeps a segment until the host navigates; `path` declares `severalBases`; `query` declares `linkIsEntry`, since a link in the query string is its own entry. What the suite does not cover is a write through an adapter, which the location tests cover on their own.
 - The suite found two of the bugs it exists for: a park that also ran on navigation restored an entry cleared from outside, and a park not tied to its location carried a page to a new base. Both cases are in it now.
 - The parked-and-resumed case needs React 19.2's `Activity` and is a todo until a React 19 test project exists.
 - The profile feature tests stay where they are: they test the profiles, not the location.
@@ -43,3 +43,4 @@ The component-visible contract is a parameterised test suite, and it is the defi
 - **2026-11-06**: Accepted.
 - **2026-11-06**: Amended after review: outside-clear, base-change and two-owner cases added.
 - **2026-11-11**: Amended when the URL modes joined the suite: leave per mode, declared differences.
+- **2026-11-24**: Amended: `slashInPart` is gone, a part may contain a slash in every mode; `query` declares `linkIsEntry`.
