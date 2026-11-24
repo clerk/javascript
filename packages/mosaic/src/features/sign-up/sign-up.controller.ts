@@ -165,9 +165,9 @@ export function useSignUpController(
 
   const completeReturn = () =>
     void actions.run('return', async () => {
-      const step = await flow.completeReturn();
-      if (step) {
-        next(step);
+      const result = await flow.completeReturn();
+      if (result) {
+        next(result);
       }
     });
 
