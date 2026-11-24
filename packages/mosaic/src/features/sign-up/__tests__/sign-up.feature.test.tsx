@@ -1,8 +1,8 @@
-import { act, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
-import { holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiMembership,
@@ -11,7 +11,6 @@ import {
   fapiSignUp,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
 import { SignUp } from '../sign-up';
 import {
   codeSent,
@@ -26,7 +25,6 @@ import {
   passwordField,
   renderSignUp,
   renderSignUpWithRouteProbe,
-  RouteProbe,
   SHORT_PASSWORD,
   signedInSession,
   submitStart,
@@ -968,81 +966,82 @@ describe('SignUp', () => {
     });
   });
 
-  it('runs the protect check before verifying the email', async () => {
-    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
+  describe('running the Protect check', () => {
+    it('runs the protect check before verifying the email', async () => {
+      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
 
-    await submitStart(user);
+      await submitStart(user);
 
-    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
-    await codeSent();
-  });
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+      await codeSent();
+    });
 
-  it('shows a failed protect check and runs it again on Try again', async () => {
-    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
+    it('shows a failed protect check and runs it again on Try again', async () => {
+      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1 } });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
 
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete. Please try again."),
-    );
-    expect(fapi.signUp.proofTokens).toEqual([]);
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete. Please try again."),
+      );
+      expect(fapi.signUp.proofTokens).toEqual([]);
 
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
-    await codeSent();
-  });
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+      await codeSent();
+    });
 
-  it('runs a second protect check when Clerk issues another', async () => {
-    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 2 } });
+    it('runs a second protect check when Clerk issues another', async () => {
+      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 2 } });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
-    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']));
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']));
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
-    await codeSent();
-  });
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1', 'proof_ptk_2']);
+      await codeSent();
+    });
 
-  it('continues with the sign-up the 404 returns when the Protect check was resolved elsewhere', async () => {
-    const { user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckResolvedElsewhere: true } });
+    it('continues with the sign-up the 404 returns when the Protect check was resolved elsewhere', async () => {
+      const { user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckResolvedElsewhere: true } });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    await codeSent();
-    expect(screen.getByRole('alert')).toHaveTextContent(/^$/);
-  });
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      await codeSent();
+      expect(screen.getByRole('alert')).toHaveTextContent(/^$/);
+    });
 
-  it('reloads an expired Protect check and shows the timeout when the reload returns it expired', async () => {
-    const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
+    it('reloads an expired Protect check and shows the timeout when the reload returns it expired', async () => {
+      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
 
-    await submitStart(user);
+      await submitStart(user);
 
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete in time. Please try again."),
-    );
-    expect(fapi.signUp.reloads).toBe(1);
-    expect(fapi.signUp.proofTokens).toEqual([]);
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
-  });
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent("Verification didn't complete in time. Please try again."),
+      );
+      expect(fapi.signUp.reloads).toBe(1);
+      expect(fapi.signUp.proofTokens).toEqual([]);
+      expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled();
+      expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
+    });
 
-  it('runs the replacement Protect check Clerk issues for a rejected proof', async () => {
-    const { fapi, user } = await renderSignUp({
-      signUp: {
-        protectChecks: 1,
-        protectCheckScript: `
+    it('runs the replacement Protect check Clerk issues for a rejected proof', async () => {
+      const { fapi, user } = await renderSignUp({
+        signUp: {
+          protectChecks: 1,
+          protectCheckScript: `
 export default (container, { token }) =>
   new Promise(resolve => {
     const pass = document.createElement('button');
@@ -1052,72 +1051,64 @@ export default (container, { token }) =>
     container.replaceChildren(pass);
   });
 `,
-      },
+        },
+      });
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+      await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_rejected']));
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(fapi.signUp.proofTokens).toEqual(['proof_rejected', 'proof_ptk_2']);
+      await codeSent();
     });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
-    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_rejected']));
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+    it('keeps the continue screen as the place to edit after a Protect check raised on it', async () => {
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: environment({
+          attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
+        }),
+        client: { ...fapiClient(), sign_up: fapiSignUp({ has_password: true }) },
+        signUp: { protectChecks: 1, protectCheckOn: 'update' },
+      });
+      await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.click(continueButton());
 
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.proofTokens).toEqual(['proof_rejected', 'proof_ptk_2']);
-    await codeSent();
-  });
+      expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-  it('keeps the continue screen as the place to edit after a Protect check raised on it', async () => {
-    const fapi = serveFapi({
-      environment: environment({
-        attributes: { email_address: { required: false }, phone_number: { enabled: true, required: false } },
-      }),
-      signUp: { protectChecks: 1, protectCheckOn: 'update' },
-    });
-    const { clerk } = await renderWithClerk(
-      <>
-        <SignUp />
-        <RouteProbe />
-      </>,
-    );
-    const user = userEvent.setup();
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await act(() => clerk.client!.signUp.__internal_future.create({ password: PASSWORD }));
-    await user.click(screen.getByRole('button', { name: 'Open the continue route' }));
-    await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
-    await user.click(continueButton());
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      await codeSent();
+      await user.click(screen.getByRole('button', { name: 'Edit email address' }));
 
-    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
-
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    await codeSent();
-    await user.click(screen.getByRole('button', { name: 'Edit email address' }));
-
-    expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
-    expect(fapi.signUp.creations).toHaveLength(1);
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
-  });
-
-  it('replaces the Protect check with the blocked notice when the proof is blocked', async () => {
-    const { user } = await renderSignUp({
-      signUp: {
-        protectChecks: 1,
-        protectCheckBlocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' },
-      },
+      expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+      expect(fapi.signUp.creations).toHaveLength(0);
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
     });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+    it('replaces the Protect check with the blocked notice when the proof is blocked', async () => {
+      const { user } = await renderSignUp({
+        signUp: {
+          protectChecks: 1,
+          protectCheckBlocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' },
+        },
+      });
 
-    expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
-    expect(screen.getByText('Contact support.')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
-  });
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
-  it('clears the failed widget before Try again runs the Protect check again', async () => {
-    const { fapi, user } = await renderSignUp({
-      signUp: {
-        protectChecks: 1,
-        protectCheckScript: `
+      expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
+      expect(screen.getByText('Contact support.')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+    });
+
+    it('clears the failed widget before Try again runs the Protect check again', async () => {
+      const { fapi, user } = await renderSignUp({
+        signUp: {
+          protectChecks: 1,
+          protectCheckScript: `
 export default (container, { token, setWidgetVisible }) =>
   new Promise((resolve, reject) => {
     const pass = document.createElement('button');
@@ -1132,26 +1123,26 @@ export default (container, { token, setWidgetVisible }) =>
     void setWidgetVisible?.(true);
   });
 `,
-      },
+        },
+      });
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+      await user.click(await screen.findByRole('button', { name: 'Try again' }));
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'I am human' })).toHaveLength(1));
+      expect(screen.getAllByRole('button', { name: 'Fail the challenge' })).toHaveLength(1);
+      await user.click(screen.getByRole('button', { name: 'I am human' }));
+      expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
+      expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+      await codeSent();
     });
 
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
-    await user.click(await screen.findByRole('button', { name: 'Try again' }));
-
-    await waitFor(() => expect(screen.getAllByRole('button', { name: 'I am human' })).toHaveLength(1));
-    expect(screen.getAllByRole('button', { name: 'Fail the challenge' })).toHaveLength(1);
-    await user.click(screen.getByRole('button', { name: 'I am human' }));
-    expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
-    await codeSent();
-  });
-
-  it('shows the loading spinner on Try again when the failed widget left itself shown', async () => {
-    const { user } = await renderSignUp({
-      signUp: {
-        protectChecks: 1,
-        protectCheckScript: `
+    it('shows the loading spinner on Try again when the failed widget left itself shown', async () => {
+      const { user } = await renderSignUp({
+        signUp: {
+          protectChecks: 1,
+          protectCheckScript: `
 let runs = 0;
 export default (container, { setWidgetVisible }) => {
   runs += 1;
@@ -1168,13 +1159,14 @@ export default (container, { setWidgetVisible }) => {
   });
 };
 `,
-      },
+        },
+      });
+
+      await submitStart(user);
+      await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
+      await user.click(await screen.findByRole('button', { name: 'Try again' }));
+
+      expect(await screen.findByRole('progressbar', { name: 'Loading…' })).toBeInTheDocument();
     });
-
-    await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'Fail the challenge' }));
-    await user.click(await screen.findByRole('button', { name: 'Try again' }));
-
-    expect(await screen.findByRole('progressbar', { name: 'Loading…' })).toBeInTheDocument();
   });
 });
