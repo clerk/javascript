@@ -1100,6 +1100,21 @@ describe('SignUp', () => {
       await waitFor(() => expect(screen.queryByText('Too many requests. Please try again later.')).toBeNull());
     });
 
+    it('replaces the WhatsApp phone screen with the blocked notice when the request is blocked', async () => {
+      const { user } = await renderSignUp({
+        environment: phoneEnvironment(),
+        signUp: { blocked: { trace_id: 'trace_123', title: 'Request blocked', description: 'Contact support.' } },
+      });
+
+      await user.click(await screen.findByRole('button', { name: /WhatsApp/ }));
+      await user.type(await screen.findByRole('textbox', { name: 'WhatsApp phone number' }), '5555550123');
+      await user.click(continueButton());
+
+      expect(await screen.findByRole('heading', { name: 'Request blocked' })).toBeInTheDocument();
+      expect(screen.getByText('Contact support.')).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /with WhatsApp/ })).toBeNull();
+    });
+
     it("leaves the form's phone error behind when picking WhatsApp", async () => {
       const { user } = await renderSignUp({ environment: phoneEnvironment() });
       const hold = holdRequests('post', '/v1/client/sign_ups');
