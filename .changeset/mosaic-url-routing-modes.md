@@ -6,6 +6,6 @@
 
 `MosaicProvider` takes a `routing` prop. `adapter` connects the URL modes to your router so the page and the component change together; it is a plain object of optional hooks and navigation functions, and `docs/routing.md` in the package shows the Next.js App Router one. `keyPrefix` sets what goes in front of the hash and query param names, which are the component's base with dots for slashes, `.user` for `/user`; nothing by default. `modals` set to `hash` or `query` puts the profile modals in the URL too, so a modal survives a reload and Back closes it. Without an adapter the URL modes read and write `window.location`.
 
-A custom page path with a `.` or `..` part is left out with a warning, since a URL resolves those away. In `hash` and `query` mode a segment's part cannot contain a slash, because the host decodes the value before Mosaic reads it.
+A custom page path with a `.` or `..` part is left out with a warning, since a URL resolves those away.
 
 A profile page switch, a closing dialog or a closing popup now also commits when the change arrives inside a React transition, as it does when a host router such as Next.js moves its hooks, and the leaving content holds the same frame it would from a click. Before, the leaving content's frozen frame held the transition back indefinitely.

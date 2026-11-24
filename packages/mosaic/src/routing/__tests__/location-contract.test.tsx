@@ -37,9 +37,6 @@ interface LocationMode {
     dropsOnMove?: boolean;
     // Parking keeps a hidden owner's segment in the owner. A URL mode keeps it in the URL instead.
     parks?: boolean;
-    // A param's value is the host's to re-serialise, so it is read decoded and a part there cannot
-    // contain a slash. The pathname and the virtual store keep one inside a part.
-    slashInPart?: boolean;
   };
 }
 
@@ -59,11 +56,15 @@ const encode = (parts: SegmentParts) => parts.map(encodeURIComponent).join('/');
 const decode = (raw: string): SegmentParts => (raw === '' ? [] : raw.split('/').map(decodeURIComponent));
 const paramName = (prefix: string, base: string) => prefix + normalizeBase(base).replaceAll('/', '.');
 const pairValue = (body: string, key: string) => new URLSearchParams(body).get(key) ?? undefined;
-const withPair = (body: string, key: string, value: string | undefined) =>
-  [
-    ...body.split('&').filter(pair => pair !== '' && pair.split('=')[0] !== key),
-    ...(value === undefined ? [] : [`${key}=${value}`]),
-  ].join('&');
+const withPair = (body: string, key: string, value: string | undefined) => {
+  const params = new URLSearchParams(body);
+  if (value === undefined) {
+    params.delete(key);
+  } else {
+    params.set(key, value);
+  }
+  return params.toString();
+};
 const urlOf = ({ pathname, search, hash }: HostUrl) =>
   `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
 const currentUrl = (): HostUrl => ({
@@ -153,7 +154,7 @@ function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: 
     {
       entryOf: (url, base) => {
         const value = pairValue(url[field], paramName(prefix, base));
-        return value === undefined ? null : value === '' ? [] : value.split('/');
+        return value === undefined ? null : decode(value);
       },
       urlWith: (url, base, parts) =>
         urlOf({
@@ -161,7 +162,7 @@ function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: 
           [field]: withPair(url[field], paramName(prefix, base), parts === undefined ? undefined : encode(parts)),
         }),
     },
-    { slashInPart: true },
+    {},
   );
 }
 
@@ -266,7 +267,7 @@ describe.each(modes)('$name location', mode => {
       expect(entry()).toEqual(['security']);
     });
 
-    it.skipIf(mode.excludes.slashInPart)('round-trips a slash inside a param value', () => {
+    it('round-trips a slash inside a param value', () => {
       const value = 'st/1';
       expect(openStatement(value)).toEqual({ shown: value, entry: ['billing', 'statement', value] });
     });

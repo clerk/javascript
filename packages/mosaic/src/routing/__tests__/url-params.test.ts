@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { decodeSegment, encodeSegment, paramKey, readParam, splitParamValue, writeParam } from '../url-params';
+import { decodeSegment, encodeSegment, paramKey, readParam, writeParam } from '../url-params';
 
 const awkward = ['a/b', '100%', 'two words', 'a+b', 'a&b', 'a=b', 'a#b', 'a?b', 'åäö', '日本', '%2F'];
 
@@ -42,14 +42,6 @@ describe('paramKey', () => {
   });
 });
 
-describe('splitParamValue', () => {
-  it('splits a decoded value on the slash', () => {
-    expect(splitParamValue('organization/general')).toEqual(['organization', 'general']);
-    expect(splitParamValue('two words')).toEqual(['two words']);
-    expect(splitParamValue('')).toEqual([]);
-  });
-});
-
 describe('readParam', () => {
   it('reads the value of its pair decoded, as any param is read', () => {
     expect(readParam('a=1&.user=billing/st%201&b=2', '.user')).toBe('billing/st 1');
@@ -64,6 +56,11 @@ describe('readParam', () => {
 
   it('reads a pair without a value as empty', () => {
     expect(readParam('.user=&a=1', '.user')).toBe('');
+  });
+
+  it('reads a body with a leading ? the way writeParam writes it', () => {
+    expect(readParam('?.user=x', '.user')).toBe('x');
+    expect(readParam(writeParam('?.user=x', '.user', 'security'), '.user')).toBe('security');
     expect(readParam('a=1&.user', '.user')).toBe('');
   });
 
@@ -78,10 +75,12 @@ describe('readParam', () => {
 });
 
 describe('writeParam', () => {
-  const others = 'q=a+b&path=%2Fx%2Fy&flag&&e=%C3%A9';
+  const others = 'q=a+b&path=%2Fx%2Fy&flag=&e=%C3%A9';
 
-  it('replaces its pair in place and keeps every other pair byte for byte', () => {
-    expect(writeParam(`${others}&.user=x&z=1`, '.user', 'security')).toBe(`${others}&.user=security&z=1`);
+  it('replaces its pair in place and writes every pair in its canonical spelling', () => {
+    expect(writeParam(`q=a+b&path=%2Fx%2Fy&flag&&e=%C3%A9&.user=x&z=1`, '.user', 'security')).toBe(
+      `${others}&.user=security&z=1`,
+    );
   });
 
   it('adds its pair last when there is none', () => {
@@ -94,12 +93,13 @@ describe('writeParam', () => {
     expect(writeParam('.user=a', '.user', undefined)).toBe('');
   });
 
-  it('leaves a body without its pair alone when removing', () => {
-    expect(writeParam(others, '.user', undefined)).toBe(others);
+  it('encodes the value as a param, so an encoded segment is encoded twice', () => {
+    expect(writeParam('', '.user', encodeSegment(['billing', 'st/1']))).toBe('.user=billing%2Fst%252F1');
+    expect(decodeSegment(readParam('.user=billing%2Fst%252F1', '.user') ?? '')).toEqual(['billing', 'st/1']);
   });
 
   it('writes the key encoded', () => {
-    expect(writeParam('', 'my .user', 'x')).toBe('my%20.user=x');
+    expect(writeParam('', 'my .user', 'x')).toBe('my+.user=x');
   });
 
   it.each(['%2Euser', '.%75ser', '%2euser'])('replaces the pair whose key %s reads as its key', raw => {
@@ -114,12 +114,11 @@ describe('writeParam', () => {
   });
 
   it('reads a plus sign and %20 in a key alike as a space', () => {
-    expect(writeParam('my+.user=a&b=1&my%20.user=c', 'my .user', 'x')).toBe('my%20.user=x&b=1');
+    expect(writeParam('my+.user=a&b=1&my%20.user=c', 'my .user', 'x')).toBe('my+.user=x&b=1');
     expect(writeParam('my+.user=a&b=1&my%20.user=c', 'my .user', undefined)).toBe('b=1');
   });
 
-  it('leaves a pair whose key has a malformed escape untouched', () => {
-    expect(writeParam('%E0%A4%A=1&%=2&.user=x', '.user', 'security')).toBe('%E0%A4%A=1&%=2&.user=security');
-    expect(writeParam('%E0%A4%A=1&%=2', '.user', undefined)).toBe('%E0%A4%A=1&%=2');
+  it('does not throw on a pair whose key has a malformed escape', () => {
+    expect(readParam(writeParam('%E0%A4%A=1&%=2&.user=x', '.user', 'security'), '.user')).toBe('security');
   });
 });

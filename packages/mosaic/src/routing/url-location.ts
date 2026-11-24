@@ -2,15 +2,16 @@ import { logger } from '@clerk/shared/logger';
 
 import { normalizeBase } from './base-path';
 import type { SegmentParts } from './location';
-import { decodeSegment, encodeSegment, paramKey, readParam, splitParamValue, writeParam } from './url-params';
+import { decodeSegment, encodeSegment, paramKey, readParam, writeParam } from './url-params';
 import type { HostUrl } from './window-location';
 
 export type UrlRoutingMode = 'path' | 'hash' | 'query';
 
 // Where a URL mode keeps a base's segment: the part of the URL it lives in, how to find the
 // segment there, how to put one back, and how the segment and the parts map onto each other in that
-// field. The pathname is Mosaic's byte for byte, so it is split before it is decoded; a param's
-// value is the host's, so it is decoded first. `refuse` names why parts cannot go into this field.
+// field. The pathname is split before it is decoded; a param's value is read as a param first and
+// then as a segment, so its parts are encoded twice. `refuse` names why parts cannot go into this
+// field.
 export interface UrlCarrier {
   field: keyof HostUrl;
   read: (value: string) => string | undefined;
@@ -85,12 +86,8 @@ function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
     read: body => readParam(body, key),
     write: (body, segment) => writeParam(body, key, segment),
     clear: body => writeParam(body, key, undefined),
-    decode: splitParamValue,
+    decode: decodeSegment,
     encode: encodeSegment,
-    refuse: parts =>
-      parts.some(part => part.includes('/'))
-        ? `[Clerk] "${parts.join('/')}" was not navigated to: a part cannot contain "/" in ${field === 'hash' ? 'hash' : 'query'} routing, since the host decodes the value before it is split.`
-        : undefined,
   };
 }
 

@@ -64,24 +64,23 @@ const carriers: CarrierCase[] = [
   },
   {
     routing: 'query',
-    seeded: '/page?q=a+b&.user=billing/st%2F1&z#top',
-    written: '/page?q=a+b&.user=security&z#top',
-    cleared: '/page?q=a+b&z#top',
+    seeded: '/page?q=a+b&.user=billing%2Fst%252F1&z#top',
+    written: '/page?q=a+b&.user=security&z=#top',
+    cleared: '/page?q=a+b&z=#top',
     elsewhere: '/page?.users=security&user=security',
   },
   {
     routing: 'hash',
-    seeded: '/page?q=a+b#top&.user=billing/st%2F1&z',
-    written: '/page?q=a+b#top&.user=security&z',
-    cleared: '/page?q=a+b#top&z',
+    seeded: '/page?q=a+b#top&.user=billing%2Fst%252F1&z',
+    written: '/page?q=a+b#top=&.user=security&z=',
+    cleared: '/page?q=a+b#top=&z=',
     elsewhere: '/page#user=security',
   },
 ];
 
 // What the seeded entry reads as: the pathname keeps an encoded slash inside its part, a param's
 // value comes back decoded and split, the way the host hands it over.
-const seededParts = (routing: CarrierCase['routing']) =>
-  routing === 'path' ? ['billing', 'st/1'] : ['billing', 'st', '1'];
+const seededParts = (_routing: CarrierCase['routing']) => ['billing', 'st/1'];
 
 describe.each(carriers)('$routing location', ({ routing, seeded, written, cleared, malformed, elsewhere }) => {
   const options: MosaicLocationOptions = { routing, path: '/user' };
@@ -208,15 +207,14 @@ describe.each(['query', 'hash'] as const)('a %s param', routing => {
     expect(renderLocation({ routing, path: '/user' }).result.current.parts).toEqual(['two words']);
   });
 
-  it('refuses a part with a slash, which the host would not keep apart', () => {
-    const warn = warnings();
+  it('keeps a slash inside a part, since the segment is encoded before the param is', () => {
     seed('security');
     const { result } = renderLocation({ routing, path: '/user' });
 
     act(() => result.current.location.write(['billing', 'st/1']));
 
-    expect(result.current.parts).toEqual(['security']);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('a part cannot contain "/"'));
+    expect(result.current.parts).toEqual(['billing', 'st/1']);
+    expect(url()).toContain('.user=billing%2Fst%252F1');
   });
 });
 

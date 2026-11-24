@@ -19,59 +19,24 @@ export function decodeSegment(raw: string): SegmentParts {
   }
 }
 
-// A param's value is the host's: a host router may re-serialise its query string, so the value is
-// read decoded and split as it is. A part in a param therefore cannot contain a slash.
-export function splitParamValue(value: string): SegmentParts {
-  return value === '' ? [] : value.split('/');
-}
-
 // ('', '/modal/user') -> '.modal.user'    ('clerk', '/user') -> 'clerk.user'
 export function paramKey(prefix: string, base: string): string {
   return prefix + normalizeBase(base).replaceAll('/', '.');
 }
 
-// The query string and the hash keep one pair per base, `.user=security&.modal.user=`. A pair is
-// read the way any param is, decoded; it is written on the raw form, so a pair that is not ours is
-// kept byte for byte and only our own value is ever re-encoded.
-function pairsOf(body: string): string[] {
-  return body === '' ? [] : body.split('&');
-}
-
-function decodeEscapes(escapes: string): string {
-  try {
-    return decodeURIComponent(escapes);
-  } catch {
-    return escapes;
-  }
-}
-
-function decodeKeyOf(pair: string): string {
-  const at = pair.indexOf('=');
-  const raw = at === -1 ? pair : pair.slice(0, at);
-  return raw.replaceAll('+', ' ').replace(/(?:%[0-9a-f]{2})+/gi, decodeEscapes);
-}
-
-// ('a=1&.user=billing/st%201', '.user') -> 'billing/st 1'    no pair -> undefined
+// The query string and the hash keep one pair per base, `.user=security&.modal.user=`, read and
+// written as URLSearchParams, so every pair comes out in its canonical spelling and a segment's
+// parts are encoded twice: once by the segment, once by the param.
 export function readParam(body: string, key: string): string | undefined {
   return new URLSearchParams(body).get(key) ?? undefined;
 }
 
-// ('a=1&.user=x', '.user', 'security') -> 'a=1&.user=security'    value undefined -> 'a=1'
-// The pair keeps its place; a new one goes last.
 export function writeParam(body: string, key: string, value: string | undefined): string {
-  const encodedKey = encodeURIComponent(key);
-  let pending = value === undefined ? undefined : `${encodedKey}=${value}`;
-  const next: string[] = [];
-  for (const pair of pairsOf(body)) {
-    if (pair === '' || decodeKeyOf(pair) !== key) {
-      next.push(pair);
-    } else if (pending !== undefined) {
-      next.push(pending);
-      pending = undefined;
-    }
+  const params = new URLSearchParams(body);
+  if (value === undefined) {
+    params.delete(key);
+  } else {
+    params.set(key, value);
   }
-  if (pending !== undefined) {
-    next.push(pending);
-  }
-  return next.join('&');
+  return params.toString();
 }
