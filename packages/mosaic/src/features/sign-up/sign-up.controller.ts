@@ -120,8 +120,9 @@ export function useSignUpController(
   const model = finishSnapshot.context.frozenModel ?? liveModel;
   const { flow, navigation, verification } = model;
   const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
-  const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || finishSnapshot.value === 'finished');
   const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
+  const isFlowOver = finishSnapshot.value === 'finished' || shown === 'taskChooseOrganization';
+  const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || isFlowOver);
   const screen = screenFor(shown, flow.mode, blocked !== undefined);
 
   useRouteGuard({ route, go }, shown);
