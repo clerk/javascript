@@ -22,11 +22,18 @@ const EMAIL = 'alice@example.com';
 const OTHER_EMAIL = 'alice@acme.test';
 const signedInSession = fapiSession({ id: 'sess_existing', user: fapiUser({ id: 'user_existing' }) });
 const PASSWORD = 'correct-horse-battery';
+const SHORT_PASSWORD = 'abc123';
 
 function environment({ attributes, ...overrides }: FapiEnvironmentOverrides = {}) {
   return fapiEnvironment({
     attributes: { email_address: { required: true }, password: { required: true }, ...attributes },
     ...overrides,
+  });
+}
+
+function minimumPasswordLength(min_length: number) {
+  return environment({
+    user_settings: { password_settings: { ...fapiEnvironment().user_settings.password_settings, min_length } },
   });
 }
 
@@ -223,6 +230,44 @@ describe('SignUp', () => {
       expect(await screen.findByText('Your password must contain 8 or more characters.')).toBeInTheDocument();
     });
 
+    it('names the instance minimum when FAPI rejects a password as too short', async () => {
+      const { fapi, user } = await renderSignUp({ environment: minimumPasswordLength(12) });
+
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.type(passwordField(), SHORT_PASSWORD);
+      await user.click(continueButton());
+
+      await waitFor(() => expect(passwordField()).toBeInvalid());
+      expect(passwordField()).toHaveAccessibleDescription('Your password must contain 12 or more characters.');
+      expect(fapi.signUp.creations).toHaveLength(1);
+    });
+
+    it('shows a taken email address beside the password FAPI rejected with it', async () => {
+      const { user } = await renderSignUp({
+        environment: minimumPasswordLength(12),
+        signUp: { takenEmailAddresses: [EMAIL] },
+      });
+
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.type(passwordField(), SHORT_PASSWORD);
+      await user.click(continueButton());
+
+      await waitFor(() => expect(passwordField()).toBeInvalid());
+      expect(passwordField()).toHaveAccessibleDescription('Your password must contain 12 or more characters.');
+      expect(emailField()).toHaveAccessibleDescription('That email address is taken. Please try another.');
+    });
+
+    it('shows what FAPI suggests when it rejects a password as too weak', async () => {
+      const { user } = await renderSignUp({ signUp: { weakPasswords: { [PASSWORD]: ['anotherWord'] } } });
+
+      await submitStart(user);
+
+      await waitFor(() => expect(passwordField()).toBeInvalid());
+      expect(passwordField()).toHaveAccessibleDescription(
+        'Your password is not strong enough. Add more words that are less common.',
+      );
+    });
+
     it('asks for legal consent and sends it', async () => {
       const { fapi, user } = await renderSignUp({
         environment: environment({
@@ -404,6 +449,24 @@ describe('SignUp', () => {
       expect(fapi.signUp.updates).toHaveLength(1);
       expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
       expect(fapi.client.sessions).toHaveLength(1);
+    });
+
+    it('names the instance minimum when FAPI rejects a too-short password from the continue screen', async () => {
+      const { fapi, user } = await renderSignUpWithRouteProbe({
+        environment: minimumPasswordLength(12),
+        client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL }) },
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+      await enterCode(user);
+
+      expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+      await user.type(passwordField(), SHORT_PASSWORD);
+      await user.click(continueButton());
+
+      await waitFor(() => expect(passwordField()).toBeInvalid());
+      expect(passwordField()).toHaveAccessibleDescription('Your password must contain 12 or more characters.');
+      expect(fapi.signUp.updates).toHaveLength(1);
     });
 
     it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {

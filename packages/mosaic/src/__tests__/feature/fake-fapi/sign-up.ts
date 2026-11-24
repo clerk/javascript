@@ -20,6 +20,7 @@ export interface FakeSignUpSeed {
   enterpriseDomains?: string[];
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
+  weakPasswords?: Record<string, string[]>;
 }
 
 export interface FakeSignUpState {
@@ -27,6 +28,7 @@ export interface FakeSignUpState {
   enterpriseDomains: string[];
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
+  weakPasswords: Record<string, string[]>;
   creations: URLSearchParams[];
   updates: URLSearchParams[];
   preparations: string[];
@@ -37,6 +39,7 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     takenEmailAddresses: [],
     enterpriseDomains: [],
     sessionTasks: null,
+    weakPasswords: {},
     creations: [],
     updates: [],
     preparations: [],
@@ -48,20 +51,12 @@ const STRATEGIES: Record<string, Identifier> = { email_code: 'email_address', ph
 const TEXT_FIELDS = ['email_address', 'phone_number', 'username', 'first_name', 'last_name'] as const;
 const createdAt = Date.UTC(2026, 0, 1);
 
-function rejected(code: string, message: string, paramName?: string, status = 422, meta: Record<string, string> = {}) {
-  return HttpResponse.json(
-    {
-      errors: [
-        {
-          code,
-          message,
-          long_message: message,
-          meta: { ...(paramName ? { param_name: paramName } : {}), ...meta },
-        },
-      ],
-    },
-    { status },
-  );
+function formError(code: string, message: string, paramName?: string, meta: Record<string, unknown> = {}) {
+  return { code, message, long_message: message, meta: { ...(paramName ? { param_name: paramName } : {}), ...meta } };
+}
+
+function rejected(code: string, message: string, paramName?: string, status = 422, meta: Record<string, unknown> = {}) {
+  return HttpResponse.json({ errors: [formError(code, message, paramName, meta)] }, { status });
 }
 
 export function signUpHandlers(
@@ -193,6 +188,7 @@ export function signUpHandlers(
 
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
     const { attributes, password_settings } = settings();
+    const errors: ReturnType<typeof formError>[] = [];
     let next = signUp;
     for (const field of TEXT_FIELDS) {
       const value = body.get(field);
@@ -210,7 +206,9 @@ export function signUpHandlers(
         return rejected('form_param_format_invalid', 'email_address must be a valid email address.', 'email_address');
       }
       if (state.signUp.takenEmailAddresses.includes(email)) {
-        return rejected('form_identifier_exists', 'That email address is taken. Please try another.', 'email_address');
+        errors.push(
+          formError('form_identifier_exists', 'That email address is taken. Please try another.', 'email_address'),
+        );
       }
     }
     for (const field of ['email_address', 'phone_number'] as const) {
@@ -226,11 +224,20 @@ export function signUpHandlers(
       if (!attributes.password.enabled) {
         return rejected('form_param_unknown', 'password is not a valid parameter for this request.', 'password');
       }
+      const suggestions = state.signUp.weakPasswords[password];
       if (password.length < password_settings.min_length) {
-        return rejected(
-          'form_password_length_too_short',
-          `Passwords must be ${password_settings.min_length} characters or more.`,
-          'password',
+        errors.push(
+          formError(
+            'form_password_length_too_short',
+            `Passwords must be ${password_settings.min_length} characters or more.`,
+            'password',
+          ),
+        );
+      } else if (suggestions) {
+        errors.push(
+          formError('form_password_not_strong_enough', 'Given password is not strong enough.', 'password', {
+            zxcvbn: { suggestions: suggestions.map(code => ({ code, message: code })) },
+          }),
         );
       }
       next = { ...next, has_password: true };
@@ -241,6 +248,9 @@ export function signUpHandlers(
     const metadata = body.get('unsafe_metadata');
     if (metadata !== null) {
       next = { ...next, unsafe_metadata: JSON.parse(metadata) as SignUpJSON['unsafe_metadata'] };
+    }
+    if (errors.length > 0) {
+      return HttpResponse.json({ errors }, { status: 422 });
     }
     return next;
   };
