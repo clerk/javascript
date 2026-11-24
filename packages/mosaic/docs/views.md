@@ -40,7 +40,7 @@ When one screen replaces another on the same card or dialog, render both as step
 ```
 
 - **The surface sits outside the flow, and a step renders only what goes inside it.** A screen used as a step of another feature cannot bring its own `Card.Root`: `ConfirmShell` owns the card and `Reverification` renders only its contents.
-- **One flow per feature.** A step that has steps of its own adds them to the same flow, so a feature's view renders one `Flow.Root`. A feature mounted as a step of another, such as `Reverification` in the add-email dialog, keeps its own `Flow.Root` nested in that step ([Who renders `Card.Root`](#who-renders-cardroot)).
+- **One flow per feature.** A feature's view renders one `Flow.Root`, so a step with steps of its own adds them to that flow. A feature mounted as a step of another keeps its own, as `Reverification` does in the add-email dialog.
 - **The controller owns the step.** Going back is direction `-1`. Derive it from the step when each step has one way in, and hold it in the controller when it does not (`reverification.controller.ts`).
 - **Name step kinds for what the user does,** not for what the screen looks like: `credential`, `code`, `choice`. Before adding a member to a kind, check the name still fits it (a passkey is a credential but not a secret).
 - **Hold the primary action while it runs.** A step's async action is a `SubmitButton` with `isPending` and a `pendingLabel`, and it stays pending until the next step renders. Every other action on the step takes `disabled={isPending}` (`reverification.view.tsx`).
@@ -60,7 +60,7 @@ Only the part that creates the surface renders `Card.Root`, and cards do not nes
 | Steps   | `Flow.Root` and its steps, no card                             | `CreateOrganizationSteps` |
 | Screen  | `Card.Header`, `Card.Banner`, `Card.Content` and `Card.Footer` | A step of the flow        |
 
-A feature's own skeleton is a surface too. The skeleton it exports for a parent to mount is not. A feature another feature can embed exports a `use<Feature>Flow` hook and the part without the card, and renders `Card.Root` around that part only where it is the surface itself. The hook returns either the steps' props (`useCreateOrganizationFlow` with `CreateOrganizationSteps`) or a controller for a component that handles its own states (`useTaskChooseOrganizationFlow` with `TaskChooseOrganizationContent`).
+A feature's own skeleton is a surface too. A feature another feature mounts exports its content without the card and a `use<Feature>Flow` hook that runs it, and renders `Card.Root` only when it is shown alone (`useCreateOrganizationFlow` with `CreateOrganizationSteps`).
 
 Chrome that stays across steps goes under the surface, outside the flow. A step's `Card.Footer` must be a sibling of its `Card.Content`, so a step on a surface with a shared footer puts its submit button in `Card.Content` (`waitlist.view.tsx`).
 
