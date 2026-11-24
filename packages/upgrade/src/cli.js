@@ -244,6 +244,7 @@ async function main() {
   } else if (config.alreadyUpgraded && !options.canary) {
     renderSuccess(`You're already on the latest major version of @clerk/${sdk}`);
   } else if (config.needsUpgrade || options.canary) {
+    await checkUpgradeBlockers(sdk, config, options);
     await performUpgrade(sdk, packageManager, config, options);
   }
 
@@ -269,6 +270,26 @@ async function main() {
 
   // Step 9: Done
   renderComplete(sdk, config.docsUrl);
+}
+
+async function checkUpgradeBlockers(sdk, config, options) {
+  const changes = config.changes?.filter(change => change.blocksUpgrade);
+  const results = await runScans({ changes }, sdk, options);
+  const blockers = results.filter(result => result.instances.length > 0);
+  if (blockers.length === 0) {
+    return;
+  }
+
+  renderScanResults(blockers, config.docsUrl);
+
+  if (options.dryRun) {
+    renderWarning(' [dry run] The upgrade would stop here until the issues above are fixed');
+    renderNewline();
+    return;
+  }
+
+  renderError('Upgrade stopped before changing any packages. Fix the issues above, then run @clerk/upgrade again.');
+  process.exit(1);
 }
 
 async function performUpgrade(sdk, packageManager, config, options) {

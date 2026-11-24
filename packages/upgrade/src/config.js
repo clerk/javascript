@@ -183,6 +183,7 @@ function loadChanges(versionDir, sdk) {
       packages,
       category: fm.category || 'breaking',
       warning: fm.warning || fm.category === 'warning',
+      blocksUpgrade: fm.blocksUpgrade === true,
       docsAnchor: fm.docsAnchor || file.replace('.md', ''),
       content: parsed.content,
     });

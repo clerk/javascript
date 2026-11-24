@@ -4,6 +4,7 @@ packages: ['expo']
 matcher: "expo\":\\s*\"(?:\\^|~|>|=|\\s)*(?:50|51|52)\\..*?"
 matcherFlags: 'm'
 category: 'version'
+blocksUpgrade: true
 ---
 
 Support for Expo 50, 51, and 52 has been dropped. Update your project to Expo 53 or later:

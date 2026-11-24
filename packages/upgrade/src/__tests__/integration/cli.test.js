@@ -193,7 +193,7 @@ describe('CLI Integration', () => {
       const result = await runCli(['--dir', fixture.path, '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('Minimum Next.js version increased to 15.2.8');
-      expect(result.stdout).toContain('Upgrade stopped before changing any packages');
+      expect(result.stderr).toContain('Upgrade stopped before changing any packages');
       expect(result.stdout).not.toContain('Upgrading @clerk/nextjs');
       expect(result.exitCode).toBe(1);
       expect(fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8')).toBe(pkgBefore);
@@ -203,7 +203,7 @@ describe('CLI Integration', () => {
       const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('Minimum Next.js version increased to 15.2.8');
-      expect(result.stdout).toContain('[dry run] The upgrade would stop here');
+      expect(result.stdout).toContain('[dry run] The upgrade would stop here until the issues above are fixed');
     });
   });
 
