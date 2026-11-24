@@ -1,5 +1,8 @@
+import { is4xxError } from '@clerk/shared/error';
 import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
+import { retry } from '@clerk/shared/retry';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
+import { AppState } from 'react-native';
 
 import { MemoryTokenCache } from '../cache/MemoryTokenCache';
 import type { TokenCache } from '../cache/types';
@@ -253,8 +256,8 @@ export function createNativeClientSync(
   const attach = (clerk: SyncableClerk): (() => void) => {
     let reconciling: Promise<void> | null = null;
 
-    // Refetches the JS client with the shared device token and follows native's active session.
-    const pull = async () => {
+    // Refetches the JS client with the shared device token.
+    const refetchClient = async () => {
       const client = clerk.client as FetchableClient | null | undefined;
       if (typeof client?.fetch === 'function') {
         let fetched = await client.fetch({ fetchMaxTries: 1 });
@@ -266,18 +269,51 @@ export function createNativeClientSync(
       } else {
         await clerk.__internal_reloadInitialResources?.();
       }
+    };
+
+    const activateDefaultSession = async () => {
       const target = defaultSession(clerk.client);
       if (target && clerk.session?.id !== target.id && !reconciling && !clerk.__internal_setActiveInProgress) {
         await clerk.setActive({ session: target });
       }
     };
 
+    const pull = async () => {
+      await refetchClient();
+      await activateDefaultSession();
+    };
+
+    let attached = true;
+    let needsRepair = false;
     const fromNative = singleFlight(async () => {
       if (await ready()) {
-        await pull();
+        try {
+          await retry(
+            async () => {
+              if (attached) {
+                await refetchClient();
+              }
+            },
+            {
+              initialDelay: 300,
+              maxDelayBetweenRetries: 2_000,
+              shouldRetry: (error, iterations) => attached && iterations <= 2 && !is4xxError(error),
+            },
+          );
+          if (!attached) {
+            return;
+          }
+          await activateDefaultSession();
+          needsRepair = false;
+        } catch (error) {
+          needsRepair = true;
+          throw error;
+        }
         await reconciling;
       }
     });
+    const pullInBackground = () =>
+      void fromNative.run().catch(error => warn('Failed to refresh the client from native.', error));
 
     const toNative = singleFlight(async () => {
       // Let an in-flight native pull settle first so one refresh covers what it applied.
@@ -354,10 +390,12 @@ export function createNativeClientSync(
     const removeClerkListener = clerk.addListener(
       () => void toNative.run().catch(error => warn('Failed to refresh the native client.', error)),
     );
-    const subscription = native.addListener?.(
-      INVALIDATED_EVENT,
-      () => void fromNative.run().catch(error => warn('Failed to refresh the client from native.', error)),
-    );
+    const subscription = native.addListener?.(INVALIDATED_EVENT, pullInBackground);
+    const appStateSubscription = AppState.addEventListener('change', state => {
+      if (state === 'active' && needsRepair) {
+        pullInBackground();
+      }
+    });
 
     const engine: Engine = {
       settled: async () => {
@@ -371,8 +409,10 @@ export function createNativeClientSync(
     activeEngine = engine;
 
     return () => {
+      attached = false;
       removeClerkListener();
       subscription?.remove();
+      appStateSubscription.remove();
       if (clerk.updateClient === updateClient) {
         clerk.updateClient = originalUpdateClient;
       }

@@ -107,6 +107,13 @@ export function homeLinks(screen: Screen) {
   };
 }
 
+export function clientFetchFault(screen: Screen) {
+  return {
+    drop: screen.getByTestId('verify.fault.dropClientFetch'),
+    dropped: screen.getByTestId('verify.fault.dropped'),
+  };
+}
+
 export function updateRequiredScreen(screen: Screen, platform: string) {
   const ios = platform === 'ios';
   return {
