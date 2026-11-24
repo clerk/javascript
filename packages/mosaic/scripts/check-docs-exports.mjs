@@ -10,10 +10,10 @@ const unpublished = new Set([
   'components/clerk-logo',
   'components/scroll-area',
 ]);
-const docPath = /^src\/(components|primitives)\/([a-z0-9-]+)\/\2\.doc\.ts$/;
+const docPath = /^src\/(components|primitives)\/([a-z0-9-]+)\/[a-z0-9-]+\.doc\.ts$/;
 
 const failures = [];
-const documentedUnits = new Set();
+const listedByUnit = new Map();
 const docFiles = globSync('src/{components,primitives}/**/*.doc.ts', { cwd: packageDir })
   .map(file => file.replaceAll('\\', '/'))
   .sort();
@@ -29,19 +29,26 @@ for (const file of docFiles) {
   if (!('parts' in doc)) {
     continue;
   }
-  documentedUnits.add(unit);
+  const listed = listedByUnit.get(unit) ?? new Set();
+  for (const name of [...Object.keys(doc.parts), ...Object.keys(doc.exports ?? {})]) {
+    listed.add(name);
+  }
+  listedByUnit.set(unit, listed);
+}
+
+for (const [unit, listed] of listedByUnit) {
   if (unpublished.has(unit)) {
     if (packageJson.exports[`./${unit}`]) {
       failures.push(`${unit} is not on the docs site but is exported`);
     }
     continue;
   }
-  failures.push(...(await checkUnit(unit, doc)));
+  failures.push(...(await checkUnit(unit, listed)));
 }
 
 for (const subpath of Object.keys(packageJson.exports)) {
   const unit = subpath.slice(2);
-  if (/^(components|primitives)\//.test(unit) && !documentedUnits.has(unit)) {
+  if (/^(components|primitives)\//.test(unit) && !listedByUnit.has(unit)) {
     failures.push(`${unit} is exported but has no doc`);
   }
 }
@@ -52,7 +59,7 @@ if (failures.length > 0) {
 
 console.log(`✅ Every documented Mosaic unit imports from @clerk/mosaic/<kind>/<slug>`);
 
-async function checkUnit(unit, doc) {
+async function checkUnit(unit, listed) {
   const target = packageJson.exports[`./${unit}`];
   if (!target) {
     return [`${unit} has no "./${unit}" export`];
@@ -61,7 +68,6 @@ async function checkUnit(unit, doc) {
     return [`${unit} has no types at ${target.types}`];
   }
   const module = await import(pathToFileURL(resolve(packageDir, target.import)).href);
-  const listed = new Set([...Object.keys(doc.parts), ...Object.keys(doc.exports ?? {})]);
   const exported = Object.entries(module).flatMap(([name, value]) =>
     isNamespace(value) ? Object.keys(value).map(member => `${name}.${member}`) : [name],
   );

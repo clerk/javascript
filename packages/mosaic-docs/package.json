@@ -13,6 +13,13 @@
     "test": "node --test 'scripts/*.test.mjs' 'src/**/*.test.ts'",
     "typecheck": "pnpm generate && next typegen && tsc --noEmit"
   },
+  "browserslist": [
+    "Chrome >= 123",
+    "Edge >= 123",
+    "Firefox >= 121",
+    "Safari >= 17.5",
+    "iOS >= 17.5"
+  ],
   "dependencies": {
     "@clerk/mosaic": "workspace:*",
     "@mdx-js/loader": "^3.1.1",
@@ -22,6 +29,7 @@
     "github-slugger": "^2.0.0",
     "mdast-util-to-string": "^4.0.0",
     "next": "^16.4.3",
+    "next-themes": "^0.4.6",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "shiki": "^4.1.0",

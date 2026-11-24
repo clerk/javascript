@@ -2,27 +2,28 @@ import Link from 'next/link';
 import { Fragment, type ReactNode } from 'react';
 
 import type { Doc, PropDocs } from '@/core/doc';
-import { type DocSection, docSections } from '@/core/doc-sections';
+import type { DocTabs, OverviewSection } from '@/core/doc-sections';
+import { playgroundContent, playgroundValues } from '@/core/playground';
 
 import { CodeBlock } from './code-block';
+import { PlaygroundControl, PlaygroundProvider } from './playground';
 
 export function DocContent({
   doc,
-  preview,
+  sections,
+  intro,
   hrefFor,
 }: {
   doc: Doc;
-  preview?: ReactNode;
+  sections: OverviewSection[];
+  intro?: ReactNode;
   hrefFor: (name: string) => string | undefined;
 }) {
   return (
     <>
-      <h1>{doc.name}</h1>
-      <p className='lead'>
-        <InlineCode text={doc.description} />
-      </p>
-      {preview}
-      {docSections(doc).map(section => (
+      <DocTitle doc={doc} />
+      {intro}
+      {sections.map(section => (
         <Fragment key={section.id}>
           <h2 id={section.id}>{section.title}</h2>
           <SectionBody
@@ -35,9 +36,60 @@ export function DocContent({
   );
 }
 
-function SectionBody({ section, hrefFor }: { section: DocSection; hrefFor: (name: string) => string | undefined }) {
+export function DocProperties({
+  doc,
+  intro,
+  tabs,
+  preview,
+}: {
+  doc: Doc;
+  intro: ReactNode;
+  tabs: DocTabs;
+  preview: ReactNode;
+}) {
+  const props = tabs.part.props ?? {};
+  return (
+    <>
+      <DocTitle doc={doc} />
+      {intro}
+      <div id={tabs.part.slug}>
+        <PlaygroundProvider
+          name={tabs.part.name}
+          props={props}
+          initial={playgroundValues(props, tabs.defaults)}
+          content={playgroundContent(tabs.defaults)}
+        >
+          {preview}
+          <PropTable
+            props={props}
+            controlled
+          />
+        </PlaygroundProvider>
+      </div>
+    </>
+  );
+}
+
+function DocTitle({ doc }: { doc: Doc }) {
+  return (
+    <>
+      <h1>{doc.name}</h1>
+      <p className='lead'>
+        <InlineCode text={doc.description} />
+      </p>
+    </>
+  );
+}
+
+function SectionBody({
+  section,
+  hrefFor,
+}: {
+  section: OverviewSection;
+  hrefFor: (name: string) => string | undefined;
+}) {
   switch (section.id) {
-    case 'use-for':
+    case 'usage':
       return (
         <ul>
           {section.items.map(item => (
@@ -47,7 +99,40 @@ function SectionBody({ section, hrefFor }: { section: DocSection; hrefFor: (name
           ))}
         </ul>
       );
-    case 'practices':
+    case 'parts':
+      return (
+        <div className='table-scroll'>
+          <table>
+            <thead>
+              <tr>
+                <th>Part</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section.parts.map(part => (
+                <tr
+                  key={part.name}
+                  id={part.slug}
+                >
+                  <td>
+                    <code>{part.name}</code>
+                  </td>
+                  <td>
+                    <InlineCode text={part.description} />
+                    {part.slot ? (
+                      <span className='text-muted-foreground mt-1 block'>
+                        Slot: <code>{part.slot}</code>
+                      </span>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    case 'best-practices':
       return (
         <div className='table-scroll'>
           <table>
@@ -76,34 +161,23 @@ function SectionBody({ section, hrefFor }: { section: DocSection; hrefFor: (name
           </table>
         </div>
       );
-    case 'api':
-      return section.parts.map(part => (
-        <section key={part.name}>
-          <h3 id={part.slug}>{part.name}</h3>
-          <p>
-            <InlineCode text={part.description} />
-          </p>
-          {part.slot ? (
-            <p className='text-muted-foreground text-sm'>
-              Slot: <code>{part.slot}</code>
-            </p>
-          ) : null}
-          {part.props ? <PropTable props={part.props} /> : null}
-        </section>
-      ));
     case 'options':
     case 'returns':
       return <PropTable props={section.props} />;
     case 'examples':
-      return section.examples.map(example => (
-        <section key={example.title}>
-          <h3>{example.title}</h3>
-          <CodeBlock
-            code={example.code.trim()}
-            lang='tsx'
-          />
-        </section>
-      ));
+      return (
+        <>
+          {section.examples.map(example => (
+            <section key={example.title}>
+              <h3>{example.title}</h3>
+              <CodeBlock
+                code={example.code.trim()}
+                lang='tsx'
+              />
+            </section>
+          ))}
+        </>
+      );
     case 'related':
       return (
         <ul>
@@ -120,7 +194,7 @@ function SectionBody({ section, hrefFor }: { section: DocSection; hrefFor: (name
   }
 }
 
-function PropTable({ props }: { props: PropDocs }) {
+function PropTable({ props, controlled = false }: { props: PropDocs; controlled?: boolean }) {
   const rows = Object.entries(props).flatMap(([name, prop]) => (prop ? [{ name, ...prop }] : []));
   return (
     <div className='table-scroll'>
@@ -130,6 +204,7 @@ function PropTable({ props }: { props: PropDocs }) {
             <th>Prop</th>
             <th>Type</th>
             <th>Description</th>
+            {controlled ? <th>Value</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -149,6 +224,14 @@ function PropTable({ props }: { props: PropDocs }) {
                   </span>
                 ) : null}
               </td>
+              {controlled ? (
+                <td>
+                  <PlaygroundControl
+                    prop={row.name}
+                    type={row.type}
+                  />
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>
