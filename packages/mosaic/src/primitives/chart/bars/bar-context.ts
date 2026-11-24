@@ -36,19 +36,19 @@ export function useBarChartContext(part: string) {
   return { chart, layout: chart[BAR_LAYOUT], ariaLabel };
 }
 
-export interface StackedBarsContextValue {
+export interface BarsContextValue {
   /** Registers the `Chart.Bar` element whose computed `color` paints bars. */
   setBar: (element: BarStyleElement | null) => void;
   /** Registers the `Chart.ProjectionOutline` element whose computed stroke outlines the projection. */
   setProjectionOutline: (element: BarStyleElement | null) => void;
 }
 
-export const StackedBarsContext = createContext<StackedBarsContextValue | null>(null);
+export const BarsContext = createContext<BarsContextValue | null>(null);
 
-export function useStackedBarsContext(part: string) {
-  const context = useContext(StackedBarsContext);
+export function useBarsContext(part: string) {
+  const context = useContext(BarsContext);
   if (!context) {
-    throw new Error(`<Chart.${part}> must be used within <Chart.StackedBars>`);
+    throw new Error(`<Chart.${part}> must be used within <Chart.Bars>`);
   }
   return context;
 }

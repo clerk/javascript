@@ -55,11 +55,11 @@ export function TestChart<TDatum>({
       height={height}
       aria-label={ariaLabel}
     >
-      <Chart.StackedBars>
+      <Chart.Bars>
         {bar ? <Chart.Bar className={barClassName} /> : null}
         <Chart.ProjectionOutline className={outlineClassName} />
         <Chart.YLine value={0} />
-      </Chart.StackedBars>
+      </Chart.Bars>
       <Chart.XAxis format={formatXTick}>
         {ticks =>
           ticks.map(tick => (

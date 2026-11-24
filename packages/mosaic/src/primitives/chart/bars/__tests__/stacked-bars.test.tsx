@@ -43,7 +43,7 @@ describe('composing parts', () => {
   it.each([
     ['Chart.Grid', <Chart.Grid key='grid' />],
     ['Chart.Selection', <Chart.Selection key='selection' />],
-    ['Chart.StackedBars', <Chart.StackedBars key='bars' />],
+    ['Chart.Bars', <Chart.Bars key='bars' />],
   ])('throws when %s is used outside Chart.Root', (part, element) => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() => renderComponent(element)).toThrow(`<${part}> must be used within <Chart.Root>`);
@@ -59,7 +59,7 @@ describe('composing parts', () => {
     );
   });
 
-  it('throws when Chart.Bar is used outside Chart.StackedBars', () => {
+  it('throws when Chart.Bar is used outside Chart.Bars', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>
       render(
@@ -67,7 +67,7 @@ describe('composing parts', () => {
           <Chart.Bar />
         </StackedChart>,
       ),
-    ).toThrow('<Chart.Bar> must be used within <Chart.StackedBars>');
+    ).toThrow('<Chart.Bar> must be used within <Chart.Bars>');
   });
 
   it.each([
@@ -76,7 +76,7 @@ describe('composing parts', () => {
   ])('renders a part as %s passed to render', (_, renderElement) => {
     const { container } = render(
       <StackedChart render={renderElement}>
-        <Chart.StackedBars />
+        <Chart.Bars />
       </StackedChart>,
     );
 
@@ -95,7 +95,7 @@ describe('composing parts', () => {
   it('is interactive with Chart.Selection and categories', () => {
     const { container, rerender } = render(
       <StackedChart>
-        <Chart.StackedBars />
+        <Chart.Bars />
         <Chart.Selection />
       </StackedChart>,
     );
@@ -105,7 +105,7 @@ describe('composing parts', () => {
 
     rerender(
       <StackedChart data={[]}>
-        <Chart.StackedBars />
+        <Chart.Bars />
         <Chart.Selection />
       </StackedChart>,
     );
