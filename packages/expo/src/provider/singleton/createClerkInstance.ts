@@ -40,7 +40,11 @@ type FapiRequestInit = RequestInit & {
 };
 
 type FapiResponse = Response & {
-  payload: { errors?: Array<{ code: string }> } | null;
+  payload: {
+    errors?: Array<{ code: string }>;
+    client?: { id?: string } | null;
+    meta?: { client?: { id?: string } };
+  } | null;
 };
 
 type ClerkRuntimeOptions = Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'>;
@@ -139,6 +143,14 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         return tokenCache.saveClientToken
           ? tokenCache.saveClientToken(token, requestToken)
           : tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, token);
+      };
+      const dropDiscardedClient = (payload: FapiResponse['payload']) => {
+        const tokenCache = __internal_tokenCache as TokenCache & Partial<ClientTokenCache>;
+        const clientId = payload?.client?.id ?? payload?.meta?.client?.id;
+        if (clientId && tokenCache.isDiscardedClient?.(clientId)) {
+          delete payload?.client;
+          delete payload?.meta?.client;
+        }
       };
       const requestTokens = new WeakMap<FapiRequestInit, string | null>();
       const appVersionRequestHooks = isNative() ? createAppVersionRequestHooks() : null;
@@ -332,6 +344,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
       __internal_clerk.__internal_onAfterResponse(async (requestInit: FapiRequestInit, response: FapiResponse) => {
+        dropDiscardedClient(response.payload);
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
