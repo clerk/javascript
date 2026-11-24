@@ -1,11 +1,4 @@
-import type {
-  ClientJSON,
-  SessionJSON,
-  SignUpField,
-  SignUpIdentificationField,
-  SignUpJSON,
-  SignUpVerificationJSON,
-} from '@clerk/shared/types';
+import type { ClientJSON, SessionJSON, SignUpField, SignUpIdentificationField, SignUpJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -14,6 +7,7 @@ import {
   fapiPhoneNumber,
   fapiSession,
   fapiSignUp,
+  fapiUnpreparedVerification,
   fapiUser,
   fapiVerification,
 } from '../fapi';
@@ -75,20 +69,6 @@ function rejected(code: string, message: string, paramName?: string, status = 42
   );
 }
 
-function verification(
-  attribute: { verifications: string[] },
-  overrides: Partial<SignUpVerificationJSON> = {},
-): SignUpVerificationJSON {
-  return {
-    ...fapiVerification(''),
-    strategy: null,
-    status: null,
-    next_action: 'needs_prepare',
-    supported_strategies: attribute.verifications,
-    ...overrides,
-  } as SignUpVerificationJSON;
-}
-
 export function signUpHandlers(
   state: { client: ClientJSON; environment: FapiEnvironment; signUp: FakeSignUpState },
   fapiUrl: (path: string) => string,
@@ -98,28 +78,6 @@ export function signUpHandlers(
   const store = (signUp: SignUpJSON) => {
     state.client = { ...state.client, sign_up: signUp.status === 'complete' ? null : signUp };
     return envelope(signUp, state.client);
-  };
-
-  // FAPI derives these from the instance, so a seeded sign-up gets them from the environment, as a created one does.
-  const withSupportedStrategies = (signUp: SignUpJSON): SignUpJSON => {
-    const { attributes } = settings();
-    if (!signUp.verifications) {
-      return signUp;
-    }
-    return {
-      ...signUp,
-      verifications: {
-        ...signUp.verifications,
-        email_address: {
-          ...signUp.verifications.email_address,
-          supported_strategies: attributes.email_address.verifications,
-        },
-        phone_number: {
-          ...signUp.verifications.phone_number,
-          supported_strategies: attributes.phone_number.verifications,
-        },
-      },
-    };
   };
 
   const combinesEmailOrPhone = () => {
@@ -190,6 +148,17 @@ export function signUpHandlers(
     ];
     const settled: SignUpJSON = {
       ...signUp,
+      verifications: signUp.verifications && {
+        ...signUp.verifications,
+        email_address: {
+          ...signUp.verifications.email_address,
+          supported_strategies: attributes.email_address.verifications,
+        },
+        phone_number: {
+          ...signUp.verifications.phone_number,
+          supported_strategies: attributes.phone_number.verifications,
+        },
+      },
       required_fields,
       optional_fields,
       missing_fields: missingFields,
@@ -227,10 +196,6 @@ export function signUpHandlers(
     return { ...settled, status: 'complete', created_session_id: session.id, created_user_id: user.id };
   };
 
-  if (state.client.sign_up) {
-    state.client = { ...state.client, sign_up: settle(withSupportedStrategies(state.client.sign_up)) };
-  }
-
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
     const { attributes, password_settings } = settings();
     let next = signUp;
@@ -257,7 +222,7 @@ export function signUpHandlers(
       if (body.get(field) !== null && body.get(field) !== signUp[field] && next.verifications) {
         next = {
           ...next,
-          verifications: { ...next.verifications, [field]: verification(attributes[field]) },
+          verifications: { ...next.verifications, [field]: fapiUnpreparedVerification() },
         };
       }
     }
@@ -285,6 +250,10 @@ export function signUpHandlers(
     return next;
   };
 
+  if (state.client.sign_up) {
+    state.client = { ...state.client, sign_up: settle(state.client.sign_up) };
+  }
+
   return [
     http.post(fapiUrl('/v1/client/sign_ups'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
@@ -298,7 +267,7 @@ export function signUpHandlers(
       if (state.signUp.rateLimited) {
         return rejected('signup_rate_limit_exceeded', 'Sign-up rate limit exceeded for this instance.', undefined, 429);
       }
-      const blank = withSupportedStrategies(fapiSignUp({ id: `sua_${state.signUp.creations.length}` }));
+      const blank = fapiSignUp({ id: `sua_${state.signUp.creations.length}` });
       const applied = apply(blank, body);
       return applied instanceof HttpResponse ? applied : store(settle(applied));
     }),
@@ -346,11 +315,7 @@ export function signUpHandlers(
         ...signUp,
         verifications: {
           ...signUp.verifications,
-          [field]: verification(attribute, {
-            ...fapiVerification(strategy),
-            next_action: 'needs_attempt',
-            supported_strategies: attribute.verifications,
-          }),
+          [field]: { ...signUp.verifications[field], ...fapiVerification(strategy), next_action: 'needs_attempt' },
         },
       });
     }),

@@ -494,7 +494,7 @@ export function fapiClient(sessions: SessionJSON[] = []): ClientJSON {
   };
 }
 
-function fapiUnpreparedVerification(): SignUpVerificationJSON {
+export function fapiUnpreparedVerification(): SignUpVerificationJSON {
   return {
     ...fapiVerification(''),
     strategy: null,
