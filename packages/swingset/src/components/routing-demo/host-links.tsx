@@ -1,6 +1,6 @@
 'use client';
 
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
+import type { RoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
 import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
@@ -23,7 +23,7 @@ export function hostUrl({
   entries,
   query = {},
 }: {
-  mode: MosaicRoutingMode;
+  mode: RoutingMode;
   pagePath: string;
   entries: readonly HostEntry[];
   query?: Record<string, string>;

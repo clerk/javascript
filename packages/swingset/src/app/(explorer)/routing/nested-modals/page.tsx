@@ -3,7 +3,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 
 import { dnsHelpModal, domainModal } from '@/components/routing-demo/demo-modal';
 import { DemoPage } from '@/components/routing-demo/demo-page';
@@ -25,7 +25,7 @@ function OpenButton() {
 
 export default function ModalPage() {
   const mode = useModeParam(modes);
-  const routing: MosaicRouting = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
+  const routing: RoutingOptions = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
 
   return (
     <MosaicProvider

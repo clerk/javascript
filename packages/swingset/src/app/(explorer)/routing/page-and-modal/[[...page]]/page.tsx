@@ -3,9 +3,9 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 import { isRouteName } from '@clerk/mosaic/routing/routes';
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
+import type { RoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
 import { useRouterScope } from '@clerk/mosaic/routing/use-router';
 
 import { dnsHelpModal, domainModal } from '@/components/routing-demo/demo-modal';
@@ -55,7 +55,7 @@ function DomainsTab() {
   );
 }
 
-function PageTabs({ mode }: { mode: MosaicRoutingMode }) {
+function PageTabs({ mode }: { mode: RoutingMode }) {
   const { route, go } = useRouterScope(pageRoutes, {
     routing: mode,
     path: mode === 'path' ? pagePath : '/page',
@@ -76,11 +76,11 @@ function PageTabs({ mode }: { mode: MosaicRoutingMode }) {
 export default function PageWithModalsPage() {
   const pageMode = useModeParam(pageModes);
   const modalMode = useModeParam(modalModes, 'modal');
-  const routing: MosaicRouting = {
+  const routing: RoutingOptions = {
     adapter: nextRouterAdapter,
     modals: modalMode === 'virtual' ? undefined : modalMode,
   };
-  const href = (page: MosaicRoutingMode, modal: ModalMode) => `${pagePath}?mode=${page}&modal=${modal}`;
+  const href = (page: RoutingMode, modal: ModalMode) => `${pagePath}?mode=${page}&modal=${modal}`;
   const query = { modal: modalMode };
   const pageBase = pageMode === 'path' ? pagePath : '/page';
   const sameMode = pageMode === modalMode && pageMode !== 'virtual';

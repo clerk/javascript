@@ -3,7 +3,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { isRouteName } from '@clerk/mosaic/routing/routes';
 import { MosaicRoutingScope } from '@clerk/mosaic/routing/routing-scope';
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
+import type { RoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
 import { useRouter, useRouterScope } from '@clerk/mosaic/routing/use-router';
 import { useEffect, useState } from 'react';
 
@@ -24,7 +24,7 @@ function Case({ title, children, note }: { title: string; note: string; children
 const tabRoutes = { members: '', invitations: 'invitations', settings: 'settings' } as const;
 
 /** The tab is the owner's whole segment. The first tab is the root, so it has no segment of its own. */
-export function TabsInLocation({ routing }: { routing: MosaicRoutingMode }) {
+export function TabsInLocation({ routing }: { routing: RoutingMode }) {
   const { route, go } = useRouterScope(tabRoutes, { routing, path: '/tabs', root: 'members' });
   return (
     <Case
@@ -81,7 +81,7 @@ function ProjectView({ project, back }: { project: string; back: () => void }) {
 }
 
 /** Tabs inside one step of a flow: the tab is the trailing part of the owner's segment, read by a nested router. */
-export function TabsInStep({ routing }: { routing: MosaicRoutingMode }) {
+export function TabsInStep({ routing }: { routing: RoutingMode }) {
   const { route, params, go, scope } = useRouterScope(projectRoutes, { routing, path: '/project', root: 'list' });
   return (
     <Case
@@ -114,7 +114,7 @@ export function TabsInStep({ routing }: { routing: MosaicRoutingMode }) {
 const laterTabs = ['usage', 'billing', 'limits'];
 
 /** Tabs whose list arrives after mount, the way a profile's pages do: the entry waits until the table can match it. */
-export function TabsArrivingLater({ routing }: { routing: MosaicRoutingMode }) {
+export function TabsArrivingLater({ routing }: { routing: RoutingMode }) {
   const [tabs, setTabs] = useState<readonly string[] | undefined>(undefined);
   useEffect(() => {
     const timer = setTimeout(() => setTabs(laterTabs), 1500);

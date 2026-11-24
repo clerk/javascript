@@ -1,7 +1,7 @@
 'use client';
 
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 import { isRouteName } from '@clerk/mosaic/routing/routes';
 import { useRouterScope } from '@clerk/mosaic/routing/use-router';
 
@@ -14,7 +14,7 @@ import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 const pagePath = '/routing/single-tabs';
 const modes = ['path', 'virtual', 'hash', 'query'] as const;
 type Mode = (typeof modes)[number];
-const routing: MosaicRouting = { adapter: nextRouterAdapter };
+const routing: RoutingOptions = { adapter: nextRouterAdapter };
 
 const routes = { members: '', invitations: 'invitations', settings: 'settings' } as const;
 

@@ -3,7 +3,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
 import type { HostEntry } from '@/components/routing-demo/host-links';
@@ -43,7 +43,7 @@ function TabsModalButtons() {
 export default function MultipleTabsPage() {
   const mode = useModeParam(modes);
   const link = (entries: HostEntry[]) => hostUrl({ mode, pagePath, entries });
-  const routing: MosaicRouting = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
+  const routing: RoutingOptions = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
 
   return (
     <MosaicProvider

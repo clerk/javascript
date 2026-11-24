@@ -2,7 +2,7 @@
 
 import { Button } from '@clerk/mosaic/components/button';
 import { MosaicRoutingScope } from '@clerk/mosaic/routing/routing-scope';
-import type { MosaicRoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
+import type { RoutingMode } from '@clerk/mosaic/routing/use-mosaic-location';
 import { useRouter, useRouterScope } from '@clerk/mosaic/routing/use-router';
 
 export const inviteRoutes = { start: '', teammate: 'teammates/:teammate', sent: 'sent' } as const;
@@ -23,7 +23,7 @@ function NestedReadout() {
 }
 
 /** A three-step invite flow with nothing behind it, routed like any Mosaic component: the step lives in the location. */
-export function InviteFlow({ label, routing, path }: { label: string; routing: MosaicRoutingMode; path?: string }) {
+export function InviteFlow({ label, routing, path }: { label: string; routing: RoutingMode; path?: string }) {
   const { route, params, go, scope } = useRouterScope(inviteRoutes, { routing, path, root: 'start' });
   const teammate = nameOf(params.teammate);
 

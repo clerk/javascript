@@ -1,7 +1,7 @@
 'use client';
 
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
+import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
 import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
@@ -11,7 +11,7 @@ import { nextRouterAdapter } from '@/lib/mosaic-next-router-adapter';
 
 const pagePath = '/routing/side-by-side';
 const modes = ['virtual', 'hash', 'query'] as const;
-const routing: MosaicRouting = { adapter: nextRouterAdapter };
+const routing: RoutingOptions = { adapter: nextRouterAdapter };
 
 export default function SideBySidePage() {
   const mode = useModeParam(modes);
