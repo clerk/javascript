@@ -426,6 +426,28 @@ export function StartOver() {
   return <ScreenPanel screen='startOver' />;
 }
 
+export function StartOverPending() {
+  return (
+    <ScreenPanel
+      screen='startOver'
+      startOver={{ isPending: true, onStartOver: noop }}
+    />
+  );
+}
+
+export function StartOverError() {
+  return (
+    <ScreenPanel
+      screen='startOver'
+      startOver={{
+        isPending: false,
+        globalErrorMessage: 'Something went wrong. Please try again.',
+        onStartOver: noop,
+      }}
+    />
+  );
+}
+
 export function ProtectCheck() {
   return (
     <ScreenPanel
