@@ -67,9 +67,6 @@ interface AuthSignals {
   signUpFetchSignal: Signal<{ status: 'idle' }>;
 }
 
-// clerk-js keeps these signals at module scope, so every `Clerk` a test creates shares the last test's sign-in and sign-up.
-// One instance made here reaches them. A new `Clerk` per test would become the one every resource calls through, and
-// hand the last test's late requests to this test's FAPI host.
 const signals = new Clerk(publishableKey()).__internal_state as unknown as AuthSignals;
 
 function resetAuthSignals() {

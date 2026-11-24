@@ -138,7 +138,6 @@ const MISSING_FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
 
 type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields'>;
 
-// TODO: Drop `email_address_or_phone_number` once every instance uses Progressive Sign Up; only FAPI's non-progressive `checkStatus` sends it.
 function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
   return missingFields.filter(
     field =>

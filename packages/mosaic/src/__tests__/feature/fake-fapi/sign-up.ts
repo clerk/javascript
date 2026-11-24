@@ -17,7 +17,6 @@ type Identifier = 'email_address' | 'phone_number';
 
 export interface FakeSignUpSeed {
   takenEmailAddresses?: string[];
-  // Email domains an enterprise connection owns. clerk_go then asks a new sign-up for enterprise SSO.
   enterpriseDomains?: string[];
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
@@ -31,7 +30,6 @@ export interface FakeSignUpState {
   creations: URLSearchParams[];
   updates: URLSearchParams[];
   preparations: string[];
-  attempts: { strategy: string; code: string }[];
 }
 
 export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
@@ -42,7 +40,6 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     creations: [],
     updates: [],
     preparations: [],
-    attempts: [],
     ...seed,
   };
 }
@@ -339,7 +336,6 @@ export function signUpHandlers(
           400,
         );
       }
-      state.signUp.attempts.push({ strategy, code });
       if (code !== VERIFICATION_CODE) {
         store({
           ...signUp,

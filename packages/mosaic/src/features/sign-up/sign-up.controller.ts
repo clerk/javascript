@@ -106,16 +106,12 @@ export function useSignUpController(
   const liveStep = liveModel.flow.step;
   const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
   const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
-  // Finishing this sign-up also reaches `signed_in`, so only the step at mount marks a visit by a signed-in user.
-  // `leave` is kept from mount so the visit leaves once. Only single-session mode has it.
   const [signedInVisit] = useState(() => (liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined));
   const arrivedSignedIn = signedInVisit !== undefined;
   const leavesOnArrival = signedInVisit?.leave !== undefined;
 
   useEffect(() => signedInVisit?.leave?.(), [signedInVisit]);
 
-  // TODO: If a second feature needs `recheck()` after its injected context changes, propose an opt-in recheck in
-  // `useMachine`, in its own PR, so both controllers drop this effect.
   useLayoutEffect(() => {
     finishActor.recheck();
   }, [isNextScreenLoading, finishActor]);
@@ -129,8 +125,6 @@ export function useSignUpController(
 
   useRouteGuard({ route, go }, shown);
 
-  // TODO: With a URL routing mode (#10860) a reload can mount on a sign-up that is already complete. Finalize it
-  // here, once per mount.
   const next = (nextStep: SignUpNextStep) => {
     if (nextStep.type === 'complete') {
       sendFinish({ type: 'FINISH', frozenModel: model });

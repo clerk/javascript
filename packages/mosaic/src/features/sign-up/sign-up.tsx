@@ -51,7 +51,6 @@ export function SignUp({
   );
 }
 
-// TODO: Explore a separate routing table for the combined sign-in and sign-up flow.
 function SignUpFlow({
   model,
   routing,
