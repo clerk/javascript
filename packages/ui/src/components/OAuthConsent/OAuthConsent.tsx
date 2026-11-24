@@ -34,7 +34,6 @@ import { getForwardedParams, getOAuthConsentFromSearch, getRedirectUriFromSearch
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 const USER_ORG_READ_SCOPE = 'user:org:read';
-const MAX_CONSENTED_ORGANIZATIONS = 5;
 
 function _OAuthConsent() {
   const ctx = useOAuthConsentContext();
@@ -99,7 +98,14 @@ function _OAuthConsent() {
     : [];
   const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
   const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-  const effectiveOrgs = selectedOrgs ?? (defaultOrg ? [defaultOrg] : []);
+  const reportedMaxOrganizations = data?.maxOrganizations;
+  const maxOrganizations =
+    reportedMaxOrganizations !== undefined &&
+    Number.isInteger(reportedMaxOrganizations) &&
+    reportedMaxOrganizations >= 1
+      ? reportedMaxOrganizations
+      : 1;
+  const effectiveOrgs = (selectedOrgs ?? (defaultOrg ? [defaultOrg] : [])).slice(0, maxOrganizations);
   const isMissingOrgSelection = orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
 
   const { t } = useLocalizations();
@@ -275,29 +281,35 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {orgSelectionEnabled && orgOptions.length > 0 && (
+            {orgSelectionEnabled && orgOptions.length > 0 && maxOrganizations > 1 && (
               <Col gap={1}>
                 <OrgSelect
                   multiple
                   options={orgOptions.map(option => ({
                     ...option,
-                    disabled:
-                      effectiveOrgs.length >= MAX_CONSENTED_ORGANIZATIONS && !effectiveOrgs.includes(option.value),
+                    disabled: effectiveOrgs.length >= maxOrganizations && !effectiveOrgs.includes(option.value),
                   }))}
                   value={effectiveOrgs}
                   onChange={setSelectedOrgs}
                 />
-                {orgOptions.length > MAX_CONSENTED_ORGANIZATIONS && (
+                {orgOptions.length > maxOrganizations && (
                   <Text
                     colorScheme='secondary'
                     variant='caption'
                     sx={{ textAlign: 'start' }}
                     localizationKey={localizationKeys('oauthConsent.organizationSelect.limit', {
-                      limit: MAX_CONSENTED_ORGANIZATIONS,
+                      limit: maxOrganizations,
                     })}
                   />
                 )}
               </Col>
+            )}
+            {orgSelectionEnabled && effectiveOrgs[0] && maxOrganizations <= 1 && (
+              <OrgSelect
+                options={orgOptions}
+                value={effectiveOrgs[0]}
+                onChange={org => setSelectedOrgs([org])}
+              />
             )}
             {displayedScopes.length > 0 && (
               <ListGroup>
