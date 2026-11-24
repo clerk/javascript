@@ -3,13 +3,8 @@ import * as ChartStories from './chart.component.stories';
 # Chart
 
 The styled Mosaic chart: the parts of the headless [`Chart` primitive](/primitives/chart) with Mosaic
-styles applied, plus a legend and tooltip content. The anatomy is the same in both layers, and the
-example below is the primitive page's example, styled. It inherits the primitive's pointer and
-keyboard selection and its announcements.
-
-The example is Dashboard's weekly "Active users" chart: retained, reactivated and new users above
-zero, their churn below, and the week in progress projected. Switch Swingset to the Clerk theme to
-see it in Dashboard's colors.
+styles applied, plus a legend and tooltip content. It inherits the primitive's pointer and keyboard
+selection and its announcements.
 
 ## Example
 
@@ -97,50 +92,6 @@ Children customize a part. `Chart.Tooltip` takes a render function that receives
 </Chart.Tooltip>
 ```
 
-## Parts
-
-| Part                      | Class                          | Description                                                                                                      |
-| ------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `Chart.Root`              | `.cl-chart`                    | The legend above the plot (`.cl-chart-plot`). Sets the series colors and owns the empty and error states.        |
-| `Chart.Legend`            | `.cl-chart-legend`             | The series, then a labelled projection as a dashed entry. Items are `.cl-chart-legend-item`.                     |
-| `Chart.Grid`              | `.cl-chart-grid`               | Dotted lines (`.cl-chart-grid-line`) at the Y ticks, below the bars.                                             |
-| `Chart.YLine`             | `.cl-chart-y-line`             | A solid line at a value, such as zero.                                                                           |
-| `Chart.Bars`              | `.cl-chart-bars`               | The Canvas, above the hover band. Defaults to `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.            |
-| `Chart.Bar`               | `.cl-chart-bar`                | The hidden element the Canvas reads for color and geometry.                                                      |
-| `Chart.ProjectionOutline` | `.cl-chart-projection-outline` | A dashed outline around the projected total, painted from this hidden element's `stroke` and `stroke-dasharray`. |
-| `Chart.YAxis`             | `.cl-chart-y-axis`             | Value labels (`Chart.YTick`, `.cl-chart-y-tick`).                                                                |
-| `Chart.XAxis`             | `.cl-chart-x-axis`             | Category labels (`Chart.XTick`, `.cl-chart-x-tick`).                                                             |
-| `Chart.Selection`         | `.cl-chart-selection`          | Pointer and keyboard selection. Defaults to `Chart.Cursor` and `Chart.Tooltip`.                                  |
-| `Chart.Cursor`            | `.cl-chart-cursor`             | The hover band, behind the bars.                                                                                 |
-| `Chart.Tooltip`           | `.cl-chart-tooltip`            | The tooltip surface. Defaults to `Chart.TooltipContent` with one row per series.                                 |
-| `Chart.TooltipContent`    | `.cl-chart-tooltip-content`    | Heading (`.cl-chart-tooltip-heading`), metrics (`.cl-chart-tooltip-metric`) and rows (`.cl-chart-tooltip-row`).  |
-
-## Styling
-
-`.cl-chart` carries `data-chart="bar"` and `data-state`: `ready`, `empty` or `error`. Legend items and
-tooltip rows carry `data-series` with the series key, and swatches (`.cl-chart-swatch`) carry
-`data-swatch`: `square`, `line` or `dashed`. A legend item with a description carries
-`data-described`. Ticks carry `data-active` while their period is selected.
-
-The palette is `--cl-color-chart-1` to `--cl-color-chart-6`. Dimmed bars keep 40% of their color,
-mixed with `--cl-color-surface`, so they stay opaque over the grid. The grid lines, the tick labels
-and the tooltip background read `--cl-color-border`, `--cl-color-foreground-secondary` and
-`--cl-color-surface`. To restyle them in one chart, target the part's class.
-
-```css
-.cl-chart {
-  --cl-color-chart-1: oklch(0.55 0.2 160);
-}
-.cl-chart-grid-line {
-  stroke: oklch(0.9 0 0);
-  stroke-dasharray: none;
-}
-```
-
----
-
-## Examples
-
 ### Palette
 
 The six slots in order. They pass the data-viz contrast and color-blind checks against the surface
@@ -186,8 +137,8 @@ with `renderEmptyState` on `Chart.Root`. Loading is the owner's: render a `Skele
 
 ### Render error
 
-When the Canvas cannot paint, the chart sets `data-state="error"`, calls `onRenderError` and offers a
-retry that mounts a fresh Canvas.
+When the Canvas cannot paint, the chart sets `data-state="error"`, calls `onRenderError` and shows a
+negative `Banner` with a retry that mounts a fresh Canvas.
 
 <Story
   name='RenderError'
@@ -203,3 +154,43 @@ when it changes.
   name='DarkMode'
   storyModule={ChartStories}
 />
+
+## Parts
+
+| Part                      | Class                          | Description                                                                                                      |
+| ------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `Chart.Root`              | `.cl-chart`                    | The legend above the plot (`.cl-chart-plot`). Sets the series colors and owns the empty and error states.        |
+| `Chart.Legend`            | `.cl-chart-legend`             | The series, then a labelled projection as a dashed entry. Items are `.cl-chart-legend-item`.                     |
+| `Chart.Grid`              | `.cl-chart-grid`               | Dotted lines (`.cl-chart-grid-line`) at the Y ticks, below the bars.                                             |
+| `Chart.YLine`             | `.cl-chart-y-line`             | A solid line at a value, such as zero.                                                                           |
+| `Chart.Bars`              | `.cl-chart-bars`               | The Canvas, above the hover band. Defaults to `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.            |
+| `Chart.Bar`               | `.cl-chart-bar`                | The hidden element the Canvas reads for color and geometry.                                                      |
+| `Chart.ProjectionOutline` | `.cl-chart-projection-outline` | A dashed outline around the projected total, painted from this hidden element's `stroke` and `stroke-dasharray`. |
+| `Chart.YAxis`             | `.cl-chart-y-axis`             | Value labels (`Chart.YTick`, `.cl-chart-y-tick`).                                                                |
+| `Chart.XAxis`             | `.cl-chart-x-axis`             | Category labels (`Chart.XTick`, `.cl-chart-x-tick`).                                                             |
+| `Chart.Selection`         | `.cl-chart-selection`          | Pointer and keyboard selection. Defaults to `Chart.Cursor` and `Chart.Tooltip`.                                  |
+| `Chart.Cursor`            | `.cl-chart-cursor`             | The hover band, behind the bars.                                                                                 |
+| `Chart.Tooltip`           | `.cl-chart-tooltip`            | The tooltip surface. Defaults to `Chart.TooltipContent` with one row per series.                                 |
+| `Chart.TooltipContent`    | `.cl-chart-tooltip-content`    | Heading (`.cl-chart-tooltip-heading`), metrics (`.cl-chart-tooltip-metric`) and rows (`.cl-chart-tooltip-row`).  |
+
+## Styling
+
+`.cl-chart` carries `data-chart="bar"` and `data-state`: `ready`, `empty` or `error`. Legend items and
+tooltip rows carry `data-series` with the series key, and swatches (`.cl-chart-swatch`) carry
+`data-swatch`: `square`, `line` or `dashed`. A legend item with a description carries
+`data-described`. Ticks carry `data-active` while their period is selected.
+
+The palette is `--cl-color-chart-1` to `--cl-color-chart-6`. Dimmed bars keep 40% of their color,
+mixed with `--cl-color-surface`, so they stay opaque over the grid. The grid lines, the tick labels
+and the tooltip background read `--cl-color-border`, `--cl-color-foreground-secondary` and
+`--cl-color-surface`. To restyle them in one chart, target the part's class.
+
+```css
+.cl-chart {
+  --cl-color-chart-1: oklch(0.55 0.2 160);
+}
+.cl-chart-grid-line {
+  stroke: oklch(0.9 0 0);
+  stroke-dasharray: none;
+}
+```
