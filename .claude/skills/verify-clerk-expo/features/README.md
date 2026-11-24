@@ -56,7 +56,7 @@ Each feature file starts with an H1 title and one paragraph describing the user-
 - [Custom sign-in flow](./custom-flow-sign-in.md) covers an email code sign-in built on `useSignIn`.
 - [Custom sign-up flow](./custom-flow-sign-up.md) covers an email and password sign-up built on `useSignUp`.
 - [Token cache persistence](./token-cache-persistence.md) covers restoring the same session after a relaunch.
-- [Native and JS session sync](./native-js-sync.md) covers a native sign-out and a native password sign-in reaching `useAuth`, `useUser`, and `useSession`, that sign-in surviving a relaunch, a second native sign-in in one process, a native sign-in whose first client fetch fails, a ticket sign-in reaching the native profile, and a JS sign-out clearing the hooks.
+- [Native and JS session sync](./native-js-sync.md) covers a native sign-out and a native password sign-in reaching `useAuth`, `useUser`, and `useSession`, that sign-in surviving a relaunch, a second native sign-in in one process, a native sign-in whose first client fetch fails, a ticket sign-in reaching the native profile, a JS sign-out clearing the hooks, and a JS sign-out whose request fails letting another user sign in.
 - [Native modules](./native-modules.md) covers `useSignInWithGoogle` opening the native Google sign-in, a cancel of it on iOS, and on Android when back closes Google's page, and `useBiometricCredentials` reporting what its native module found on the device.
 - [Update required](./update-required.md) covers the update screen for a signed-in and a signed-out user on a build below the minimum, the same session returning once the minimum is lowered, and a build at the minimum, on both platforms, and it lists the states no spec reaches.
 

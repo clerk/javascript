@@ -508,6 +508,116 @@ describe('native client sync behavior', () => {
     });
   });
 
+  describe('sign-out that never reaches the server', () => {
+    it('lets another user sign in on a single-session instance', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      server.singleSessionMode = true;
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      await h.settle();
+      expect(h.js.session).toBeNull();
+
+      const sessionId = await h.run(() => h.js.signIn('user_2'));
+
+      expect(h.js.session?.id).toBe(sessionId);
+      expect(h.js.client?.signedInSessions.map(session => session.id)).toEqual([sessionId]);
+      await expectConverged(h);
+    });
+
+    it('lets another user sign in when clerk-js signs out locally instead of throwing', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      server.singleSessionMode = true;
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      h.js.rethrowOfflineNetworkErrors = true;
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await h.run(() => h.js.signOut());
+      await h.settle();
+      expect(h.js.session).toBeNull();
+
+      const sessionId = await h.run(() => h.js.signIn('user_2'));
+
+      expect(h.js.session?.id).toBe(sessionId);
+      await expectConverged(h);
+    });
+
+    it('keeps JS signed out when native reports a change afterwards', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      await h.settle();
+      expect(h.js.session).toBeNull();
+
+      await h.run(() => h.native.emitChange({ client: true, deviceToken: false }, { kind: 'native' }));
+      await h.settle();
+
+      expect(h.js.session).toBeNull();
+      await expectConverged(h);
+    });
+
+    it('keeps the old device token out of the app token cache when an earlier request lands afterwards', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const held = server.holdNextResponse('js', 'PATCH /me');
+      const update = h.run(() => h.js.updateProfile());
+      await held.handled;
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      await h.settle();
+      held.release();
+      await update;
+      await h.settle();
+
+      expect(h.native.token).toBeNull();
+      expect(h.persistentTokenCache?.read(CLERK_CLIENT_JWT_KEY)).toBeNull();
+    });
+
+    it('keeps the next sign-in when an earlier request rotates the signed-out token afterwards', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      server.rotateTokenOnNextResponse(token);
+      const held = server.holdNextResponse('js', 'PATCH /me');
+      const update = h.run(() => h.js.updateProfile());
+      await held.handled;
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      await h.settle();
+      const sessionId = await h.run(() => h.js.signIn('user_2'));
+      const signedInClientId = server.clientIdForToken(h.native.token);
+
+      held.release();
+      await update;
+      await h.settle();
+
+      expect(h.js.session?.id).toBe(sessionId);
+      expect(server.clientIdForToken(h.native.token)).toBe(signedInClientId);
+      await expectConverged(h);
+    });
+
+    it('keeps the device token and the other sessions when signing out of one of several', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.failNextRequests('js', 'POST /client/sessions/:id/remove');
+      await expect(h.run(() => h.js.signOut({ sessionId: sessionIds.user_1 }))).rejects.toThrow(
+        'Network request failed',
+      );
+      await h.settle();
+
+      expect(await h.jsDeviceToken()).toBe(token);
+      expect(server.inspectClient(token)?.sessions.map(session => session.id)).toEqual([
+        sessionIds.user_1,
+        sessionIds.user_2,
+      ]);
+    });
+  });
+
   describe('startup', () => {
     it('signs JS in from the native device token when the default in-memory JS cache is empty', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1']);
