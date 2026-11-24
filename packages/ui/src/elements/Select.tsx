@@ -143,7 +143,14 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   // `virtual` keeps DOM focus on the listbox (or the search input in combobox
   // mode) and exposes the active option via `aria-activedescendant`.
   const navigableOptions = props.multiple ? searchInputCtx.filteredItems : options;
-  const selectedIndex = navigableOptions.findIndex(o => !o.disabled && selectedValues.includes(o.value));
+  const liveSelectedIndex = navigableOptions.findIndex(o => !o.disabled && selectedValues.includes(o.value));
+  const [openedSelectedIndex, setOpenedSelectedIndex] = React.useState(liveSelectedIndex);
+  const [trackedIsOpen, setTrackedIsOpen] = React.useState(popoverCtx.isOpen);
+  if (trackedIsOpen !== popoverCtx.isOpen) {
+    setTrackedIsOpen(popoverCtx.isOpen);
+    setOpenedSelectedIndex(liveSelectedIndex);
+  }
+  const selectedIndex = props.multiple && popoverCtx.isOpen ? openedSelectedIndex : liveSelectedIndex;
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -361,14 +368,16 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
   // Reset the highlighted option to the top of the list whenever the filtered
   // results change while searching. Intentionally keyed only on the result
-  // count so it does not fight floating-ui's highlight-on-open behavior.
+  // count (or, in multiple mode, the result values) so it does not fight
+  // floating-ui's highlight-on-open behavior.
+  const resultsKey = multiple ? options.map(o => o.value).join('\u0000') : options.length;
   React.useEffect(() => {
     if (isOpen) {
       const firstEnabledIndex = options.findIndex(o => !o.disabled);
       setActiveIndex(firstEnabledIndex === -1 ? 0 : firstEnabledIndex);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.length]);
+  }, [resultsKey]);
 
   React.useEffect(() => {
     if (isOpen && !comparator) {

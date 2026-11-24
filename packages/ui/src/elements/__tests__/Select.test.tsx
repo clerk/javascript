@@ -542,6 +542,40 @@ describe('Select', () => {
     });
   });
 
+  it('keeps the highlight on a toggled option in multiple mode', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const fruits = [
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' },
+    ];
+    const Controlled = () => {
+      const [value, setValue] = useState<Array<string | null>>(['apple', 'cherry']);
+      return (
+        <Select
+          multiple
+          options={fruits}
+          value={value}
+          onChange={next => {
+            onChange(next);
+            setValue(next);
+          }}
+        />
+      );
+    };
+    renderSelect(<Controlled />);
+
+    screen.getByRole('button', { name: 'Apple, Cherry' }).focus();
+    await user.keyboard('{ArrowDown}');
+    await screen.findByRole('listbox');
+    await user.keyboard('{Enter}');
+    await user.keyboard('{Enter}');
+
+    expect(onChange).toHaveBeenNthCalledWith(1, ['cherry']);
+    expect(onChange).toHaveBeenNthCalledWith(2, ['cherry', 'apple']);
+  });
+
   describe('search', () => {
     const fruits = [
       { value: 'apple', label: 'Apple' },
@@ -584,6 +618,34 @@ describe('Select', () => {
 
       expect(onChange).toHaveBeenNthCalledWith(1, ['cherry']);
       expect(onChange).toHaveBeenNthCalledWith(2, []);
+    });
+
+    it('keeps the highlight under the pointer on a disabled option', async () => {
+      const user = userEvent.setup();
+      renderSelect(<ControlledMultiple onChange={vi.fn()} />);
+
+      await user.click(screen.getByRole('button', { name: 'Select an option' }));
+      const banana = screen.getByRole('option', { name: 'Banana' });
+      await user.hover(banana);
+
+      expect(banana.querySelector('[data-focused="true"]')).not.toBeNull();
+    });
+
+    it('moves the highlight off a disabled result when the filter changes but the count does not', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(<ControlledMultiple onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: 'Select an option' }));
+      const search = screen.getByRole('combobox');
+      await user.type(search, 'a');
+      expect(screen.getAllByRole('option').map(o => o.textContent)).toEqual(['Apple', 'Banana']);
+      await user.tripleClick(search);
+      await user.keyboard('b');
+      expect(screen.getAllByRole('option').map(o => o.textContent)).toEqual(['Banana', 'Blueberry']);
+      await user.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenCalledWith(['blueberry']);
     });
 
     it('highlights the first enabled result when the filter changes', async () => {
