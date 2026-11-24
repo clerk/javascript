@@ -741,6 +741,29 @@ describe('SignUp', () => {
       expect(continueButton()).not.toHaveAttribute('aria-busy', 'true');
       expect(navigate).not.toHaveBeenCalled();
     });
+
+    it('leaves once and shows nothing after a visitor who arrived with the organization task pending picks one', async () => {
+      const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
+      const pendingSession = fapiSession({
+        id: 'sess_pending',
+        user: fapiUser({ id: 'user_existing' }),
+        status: 'pending',
+        tasks: [{ key: 'choose-organization' }],
+      });
+      const { user, navigate, container } = await renderSignUp(
+        { client: fapiClient([pendingSession]), memberships: [fapiMembership(acme)] },
+        {},
+        { signUpFallbackRedirectUrl: '/welcome' },
+      );
+
+      await user.click(await screen.findByRole('button', { name: 'Acme' }));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
+      await tick();
+      await tick();
+      expect(navigate.mock.calls).toEqual([[expect.stringContaining('/welcome')]]);
+      expect(container).toBeEmptyDOMElement();
+    });
   });
 
   describe('opening a route directly', () => {
