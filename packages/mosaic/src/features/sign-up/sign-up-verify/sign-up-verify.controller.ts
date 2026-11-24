@@ -1,4 +1,3 @@
-import type { PhoneCodeChannel } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
 
 import { usePendingAction } from '../../../hooks/use-pending-action';
@@ -15,7 +14,6 @@ import type { SignUpVerifyScreen } from '../sign-up.types';
 
 interface CodeContext {
   sendCode: SignUpVerificationModel['send'];
-  channel: PhoneCodeChannel | undefined;
   resendAvailableAt: number | undefined;
   error: ErrorDescription | undefined;
 }
@@ -24,22 +22,28 @@ type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'SEND_SMS' } | 
 
 const code = setup<CodeContext, CodeEvent>();
 
-// Without a channel, a send goes out over the channel the last code used, which the model reads from the sign-up.
-const clearError = code.assign(() => ({ error: undefined, channel: undefined }));
+const clearError = code.assign(() => ({ error: undefined }));
 
-const sendBySms = {
-  target: 'sending' as const,
-  actions: code.assign(() => ({ error: undefined, channel: 'sms' as const })),
-};
+const sendBySms = { target: 'sendingSms' as const, actions: clearError };
 
 const startCooldown = code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) }));
+
+const settleSend = {
+  onDone: { target: 'sent' as const, actions: startCooldown },
+  onError: {
+    target: 'sent' as const,
+    actions: code.assign<ErrorInvokeEvent>((_, event) => ({
+      error: toLocalizableError(event.error),
+      resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS),
+    })),
+  },
+};
 
 const codeMachine = code.createMachine({
   id: 'signUpCode',
   initial: 'idle',
   context: {
     sendCode: () => Promise.resolve(),
-    channel: undefined,
     resendAvailableAt: undefined,
     error: undefined,
   },
@@ -52,21 +56,9 @@ const codeMachine = code.createMachine({
         ALREADY_SENT: { target: 'sent', actions: startCooldown },
       },
     },
-    sending: {
-      invoke: code.fromPromise(
-        context => context.sendCode(context.channel ? { channel: context.channel } : undefined),
-        {
-          onDone: { target: 'sent', actions: startCooldown },
-          onError: {
-            target: 'sent',
-            actions: code.assign<ErrorInvokeEvent>((_, event) => ({
-              error: toLocalizableError(event.error),
-              resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS),
-            })),
-          },
-        },
-      ),
-    },
+    // With no channel, the code goes out over the channel the last code used, which the model reads from the sign-up.
+    sending: { invoke: code.fromPromise(context => context.sendCode(), settleSend) },
+    sendingSms: { invoke: code.fromPromise(context => context.sendCode({ channel: 'sms' }), settleSend) },
     sent: {
       on: {
         SEND: { target: 'sending', actions: clearError },
@@ -100,7 +92,7 @@ export function useSignUpVerifyController({
     send({ type: needsCode ? 'SEND' : 'ALREADY_SENT' });
   }, [needsCode, send]);
 
-  const isSwitchingToSms = snapshot.value === 'sending' && snapshot.context.channel === 'sms';
+  const isSwitchingToSms = snapshot.value === 'sendingSms';
   const isPending = actions.isPending || isFlowPending || isSwitchingToSms;
   const submit = (submitted: string) =>
     void actions.run('code', async () => onNext(await verification.verify(submitted)));
