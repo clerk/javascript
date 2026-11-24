@@ -109,6 +109,7 @@ Planned, not built. Sign-up does none of these yet. The controller will call the
 - Email-link return (`__clerk_status`): `verified` with a `__clerk_created_session` this client has activates that session (`clerk-js/src/core/clerk.ts:2620-2636`); any other `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
 - Redirect URLs for email links and OAuth/SAML returns come from the router (the planned `useReturnUrl(name, params)`), never hand-built. That part waits for the routing follow-up.
 - A step that is already `complete` or `transfer` on mount, such as a reload before it ran: `next(step)` runs it once, with the same guard as a ticket. The email-link return is handled first.
+- Hash params: Clerk's URL builders (`redirectToSignUp()`, `buildSignUpUrl`) put the redirect params and initial values in the URL hash, and sign-up reads only the query, so they are not read until path routing lands (#10860).
 
 ## Bridge
 
