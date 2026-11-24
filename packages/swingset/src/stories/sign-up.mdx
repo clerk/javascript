@@ -38,11 +38,11 @@ import { SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
   verifyEmail={<SignUpVerify key={signUpId} channel='email' verification={emailVerification} onNext={onNext} isPending={isPending} onEditIdentifier={onEditIdentifier} />}
   verifyPhone={<SignUpVerify key={signUpId} channel='phone' verification={phoneVerification} onNext={onNext} isPending={isPending} onEditIdentifier={onEditIdentifier} />}
   restricted={{ onSignIn }}
-  onStartOver={startOver}
+  startOver={{ isPending, onStartOver }}
 />;
 ```
 
-## Screens
+## Steps
 
 ### Start
 
