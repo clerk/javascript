@@ -1,3 +1,4 @@
+import { is4xxError } from '@clerk/shared/error';
 import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
 import { retry } from '@clerk/shared/retry';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
@@ -255,8 +256,8 @@ export function createNativeClientSync(
   const attach = (clerk: SyncableClerk): (() => void) => {
     let reconciling: Promise<void> | null = null;
 
-    // Refetches the JS client with the shared device token and follows native's active session.
-    const pull = async () => {
+    // Refetches the JS client with the shared device token.
+    const refetchClient = async () => {
       const client = clerk.client as FetchableClient | null | undefined;
       if (typeof client?.fetch === 'function') {
         let fetched = await client.fetch({ fetchMaxTries: 1 });
@@ -268,21 +269,30 @@ export function createNativeClientSync(
       } else {
         await clerk.__internal_reloadInitialResources?.();
       }
+    };
+
+    const activateDefaultSession = async () => {
       const target = defaultSession(clerk.client);
       if (target && clerk.session?.id !== target.id && !reconciling && !clerk.__internal_setActiveInProgress) {
         await clerk.setActive({ session: target });
       }
     };
 
+    const pull = async () => {
+      await refetchClient();
+      await activateDefaultSession();
+    };
+
     let needsRepair = false;
     const fromNative = singleFlight(async () => {
       if (await ready()) {
         try {
-          await retry(pull, {
+          await retry(refetchClient, {
             initialDelay: 300,
             maxDelayBetweenRetries: 2_000,
-            shouldRetry: (_, iterations) => iterations <= 2,
+            shouldRetry: (error, iterations) => iterations <= 2 && !is4xxError(error),
           });
+          await activateDefaultSession();
           needsRepair = false;
         } catch (error) {
           needsRepair = true;
