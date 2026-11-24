@@ -66,12 +66,12 @@ export interface SignUpFlowModel {
 export interface SignUpAppModel {
   applicationName: string;
   applicationLogoUrl?: string;
-  supportEmail?: string;
 }
 
 export interface SignUpNavigationModel {
   goToSignIn: () => void;
   joinWaitlist?: () => void;
+  emailSupport?: () => void;
 }
 
 export interface SignUpDetailsModel {
@@ -187,6 +187,13 @@ function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier):
     }
   }
   return fields;
+}
+
+function emailSupportFor(mode: SignUpFlowModel['mode'], address: string | undefined): (() => void) | undefined {
+  if (mode !== 'restricted' || !address) {
+    return undefined;
+  }
+  return () => window.location.assign(`mailto:${address}`);
 }
 
 async function run(call: () => Promise<{ error: ClerkError | null }>): Promise<void> {
@@ -368,7 +375,6 @@ export function useSignUpModel({
     app: {
       applicationName: displayConfig.applicationName,
       applicationLogoUrl: displayConfig.logoImageUrl || undefined,
-      supportEmail: mode === 'restricted' ? supportEmail : undefined,
     },
     navigation: {
       goToSignIn: () => void router.navigate(signInUrl()),
@@ -379,6 +385,7 @@ export function useSignUpModel({
                 clerk.buildWaitlistUrl(returnUrl ? { initialValues: { redirect_url: returnUrl } } : undefined),
               )
           : undefined,
+      emailSupport: emailSupportFor(mode, supportEmail),
     },
     details: {
       initialIdentifier:

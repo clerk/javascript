@@ -121,7 +121,7 @@ export function useSignUpController(
   }, [isNextScreenLoading, finishActor]);
 
   const model = finishSnapshot.context.frozenModel ?? liveModel;
-  const { flow, app, navigation, verification } = model;
+  const { flow, navigation, verification } = model;
   const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
   const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || finishSnapshot.value === 'finished');
   const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
@@ -172,7 +172,7 @@ export function useSignUpController(
     verifyPhone: { ...verify, verification: verification.phone },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
-      onEmailSupport: app.supportEmail ? () => window.location.assign(`mailto:${app.supportEmail}`) : undefined,
+      onEmailSupport: navigation.emailSupport,
       onJoinWaitlist: navigation.joinWaitlist,
       onSignIn: navigation.goToSignIn,
     },
