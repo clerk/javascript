@@ -2,6 +2,7 @@ import { ClerkInstanceContext } from '@clerk/shared/react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PropsWithChildren, ReactElement } from 'react';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { EnvironmentProvider } from '../../contexts';
@@ -538,6 +539,63 @@ describe('Select', () => {
       await user.click(await screen.findByRole('option', { name: 'Cherry' }));
 
       expect(onChange).toHaveBeenCalledWith(['apple']);
+    });
+  });
+
+  describe('search', () => {
+    const fruits = [
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana', disabled: true },
+      { value: 'blueberry', label: 'Blueberry' },
+      { value: 'cherry', label: 'Cherry' },
+    ];
+    const comparator = (term: string, option: { label?: string }) =>
+      (option.label ?? '').toLowerCase().includes(term.toLowerCase());
+
+    const ControlledMultiple = ({ onChange }: { onChange: (value: Array<string | null>) => void }) => {
+      const [value, setValue] = useState<Array<string | null>>([]);
+      return (
+        <Select
+          multiple
+          options={fruits}
+          value={value}
+          onChange={next => {
+            onChange(next);
+            setValue(next);
+          }}
+          searchPlaceholder='Search'
+          comparator={comparator}
+        >
+          <SelectButton />
+          <SelectOptionList />
+        </Select>
+      );
+    };
+
+    it('toggles a filtered option off with a second Enter in multiple mode', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(<ControlledMultiple onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: 'Select an option' }));
+      await user.type(screen.getByRole('combobox'), 'cher');
+      await user.keyboard('{Enter}');
+      await user.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenNthCalledWith(1, ['cherry']);
+      expect(onChange).toHaveBeenNthCalledWith(2, []);
+    });
+
+    it('highlights the first enabled result when the filter changes', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderSelect(<ControlledMultiple onChange={onChange} />);
+
+      await user.click(screen.getByRole('button', { name: 'Select an option' }));
+      await user.type(screen.getByRole('combobox'), 'b');
+      await user.keyboard('{Enter}');
+
+      expect(onChange).toHaveBeenCalledWith(['blueberry']);
     });
   });
 });

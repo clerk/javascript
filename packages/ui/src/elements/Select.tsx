@@ -133,11 +133,16 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   const elementsRef = React.useRef<Array<HTMLElement | null>>([]);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
+  const searchInputCtx = useSearchInput({
+    items: options,
+    comparator: comparator || (() => true),
+  });
+
   // Delegate keyboard interactions to floating-ui so the trigger opens the
   // listbox on ArrowUp/ArrowDown and navigation stays a single source of truth.
   // `virtual` keeps DOM focus on the listbox (or the search input in combobox
   // mode) and exposes the active option via `aria-activedescendant`.
-  const selectedIndex = options.findIndex(o => !o.disabled && selectedValues.includes(o.value));
+  const selectedIndex = searchInputCtx.filteredItems.findIndex(o => !o.disabled && selectedValues.includes(o.value));
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -152,10 +157,6 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   const generatedListboxId = React.useId();
   const [triggerId, setTriggerId] = React.useState(generatedTriggerId);
   const [listboxId, setListboxId] = React.useState(generatedListboxId);
-  const searchInputCtx = useSearchInput({
-    items: options,
-    comparator: comparator || (() => true),
-  });
 
   const { multiple, value, onChange } = props;
   const select = React.useCallback(
@@ -362,7 +363,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   // count so it does not fight floating-ui's highlight-on-open behavior.
   React.useEffect(() => {
     if (isOpen) {
-      setActiveIndex(0);
+      const firstEnabledIndex = options.findIndex(o => !o.disabled);
+      setActiveIndex(firstEnabledIndex === -1 ? null : firstEnabledIndex);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options.length]);
