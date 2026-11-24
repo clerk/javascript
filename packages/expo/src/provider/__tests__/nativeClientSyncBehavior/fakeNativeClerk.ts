@@ -115,6 +115,14 @@ export class FakeNativeClerk {
     await this.#observe(() => this.server.touchSession('native', this.token, sessionId));
   }
 
+  async setActiveOrganization(organizationId: string | null): Promise<void> {
+    const sessionId = this.activeSessionId;
+    if (!sessionId) {
+      throw new Error('Native has no active session to switch the organization of.');
+    }
+    await this.#observe(() => this.server.touchSession('native', this.token, sessionId, organizationId));
+  }
+
   async signOutSession(sessionId: string): Promise<void> {
     await this.#observe(() => this.server.removeSession('native', this.token, sessionId));
   }
