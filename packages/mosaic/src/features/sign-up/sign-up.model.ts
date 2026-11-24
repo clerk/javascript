@@ -289,6 +289,7 @@ export function useSignUpModel({
   const query = router.getSearchParams();
   const returnUrl = query.get('redirect_url') ?? undefined;
   const afterSignUpUrl = clerk.buildAfterSignUpUrl({ params: query });
+  const afterSignInUrl = clerk.buildAfterSignInUrl({ params: query });
   const signInUrl = () => clerk.buildSignInUrl(returnUrl ? { redirectUrl: returnUrl } : undefined);
   const taskInFlow = (task: SessionTask | undefined): SignUpTaskKey | undefined =>
     task?.key === 'choose-organization' && !clerk.__internal_getOption('taskUrls')?.[task.key] ? task.key : undefined;
@@ -507,16 +508,14 @@ export function useSignUpModel({
             );
             return undefined;
           }
-          await run(() =>
-            signIn.finalize({ navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }) }),
-          );
+          await run(() => signIn.finalize({ navigate: navigateAfter(afterSignInUrl, { keepsTaskInFlow: false }) }));
           return undefined;
         }
         const existingSession = signUp.existingSession?.sessionId;
         if (existingSession) {
           await clerk.setActive({
             session: existingSession,
-            navigate: navigateAfter(clerk.buildAfterSignInUrl(), { keepsTaskInFlow: false }),
+            navigate: navigateAfter(afterSignInUrl, { keepsTaskInFlow: false }),
           });
           return undefined;
         }
