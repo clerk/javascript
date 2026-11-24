@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import type {} from '@vitest/browser-playwright';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { cdp, page } from 'vitest/browser';
@@ -235,7 +235,7 @@ describe('Chart parts', () => {
     HTMLCanvasElement.prototype.getContext = () => null;
     try {
       render(<GrowthChart onRenderError={error => errors.push(error)} />);
-      await expect.poll(() => screen.queryByText('The chart could not be displayed.')).toBeTruthy();
+      expect(within(await screen.findByRole('alert')).getByText('The chart could not be displayed.')).toBeVisible();
       expect(document.querySelector('.cl-chart')).toHaveAttribute('data-state', 'error');
       expect(errors.map(error => error.name)).toEqual(['CanvasRenderError']);
     } finally {

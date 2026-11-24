@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, space, typeScaleVars } from '../../tokens.stylex';
+import { space, typeScaleVars } from '../../tokens.stylex';
 
 export const rootStyles = stylex.create({
   root: {
@@ -32,12 +32,7 @@ export const rootStyles = stylex.create({
     position: 'absolute',
     zIndex: 2,
   },
-  error: {
-    gap: space['3'],
-    alignItems: 'center',
-    color: colorVars['--cl-color-foreground-secondary'],
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'center',
+  retry: {
+    alignSelf: 'flex-start',
   },
 });

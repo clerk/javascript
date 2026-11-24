@@ -8,6 +8,7 @@ import { Chart as Primitive } from '../../primitives/chart';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { Banner } from '../banner';
 import { Button } from '../button';
 import { EmptyState } from '../empty-state';
 import { rootStyles } from './chart-root.styles';
@@ -78,11 +79,15 @@ export const ChartRoot = React.forwardRef<HTMLDivElement, ChartRootProps>(functi
       <div {...stylex.props(rootStyles.plotArea)}>
         {renderError ? (
           <ChartOverlay slot='chart-error'>
-            <div {...stylex.props(rootStyles.error)}>
-              <p>{messages.renderError}</p>
+            <Banner.Root
+              color='negative'
+              role='alert'
+            >
+              <Banner.Label>{messages.renderError}</Banner.Label>
               <Button
                 variant='outline'
                 size='sm'
+                xstyle={rootStyles.retry}
                 onClick={() => {
                   setRenderError(null);
                   setAttempt(count => count + 1);
@@ -90,7 +95,7 @@ export const ChartRoot = React.forwardRef<HTMLDivElement, ChartRootProps>(functi
               >
                 {messages.retry}
               </Button>
-            </div>
+            </Banner.Root>
           </ChartOverlay>
         ) : (
           <CanvasErrorBoundary
