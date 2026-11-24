@@ -56,4 +56,4 @@ A flow such as sign-up keeps one model and splits its screens into folders, so o
 - **The model stays whole and is grouped by screen.** It reads Clerk in one place and returns a group per screen (`details`, `verification.email`, `verification.phone`) and the groups the whole flow shares (`flow`, `app`, `navigation`) ([Models → Shape](models.md#shape)).
 - **Each screen gets a folder,** named `<feature>-<screen>/` like a profile section, holding that screen's controller and view (`sign-up-verify/`). It takes its group from the model whole.
 - **The flow controller keeps what outlives a screen:** the route and its guard, the next step, finishing, and state two screens share, such as the details form that start and continue both render.
-- **A screen that runs its own controller reaches the view as a slot** the wrapper builds, so the flow's view renders plain props only ([Views → Moving between screens](views.md#moving-between-screens-on-one-surface)).
+- **A screen that runs its own controller** follows [Sign-in and sign-up flow → Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).

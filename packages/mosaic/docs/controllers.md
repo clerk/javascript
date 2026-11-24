@@ -150,7 +150,7 @@ return {
 
 The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
-**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)). Sign-up mounts one component per screen: its controller holds what outlives a screen, and a screen with work to do on arrival owns its own ([Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen)).
+**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)). How sign-up splits its controllers across screens is in [Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
 
 ## Wrapping actions
 
