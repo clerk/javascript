@@ -6,6 +6,7 @@ import type { MosaicRouting } from '@clerk/mosaic/routing/router-adapter';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { AddressBar } from '@/components/address-bar';
 import { buttonVariants } from '@/components/ui/button';
@@ -22,6 +23,14 @@ function toMode(value: string | null): ModalMode {
 }
 
 export default function SwitcherLivePage() {
+  return (
+    <Suspense>
+      <SwitcherLive />
+    </Suspense>
+  );
+}
+
+function SwitcherLive() {
   const { isLoaded, isSignedIn } = useUser();
   const mode = toMode(useSearchParams().get('mode'));
   const routing: MosaicRouting = {
