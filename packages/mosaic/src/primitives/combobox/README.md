@@ -16,13 +16,13 @@ import { Combobox } from '../../primitives/combobox';
       <Combobox.Empty>No fruit found</Combobox.Empty>
       <Combobox.Collection>
         {(item: string) => (
-          <Combobox.Option
+          <Combobox.Item
             key={item}
             value={item}
           >
             {item}
-            <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
-          </Combobox.Option>
+            <Combobox.ItemIndicator>✓</Combobox.ItemIndicator>
+          </Combobox.Item>
         )}
       </Combobox.Collection>
     </Combobox.Popup>

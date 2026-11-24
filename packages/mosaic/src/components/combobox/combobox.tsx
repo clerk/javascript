@@ -189,28 +189,28 @@ export const ComboboxList = React.forwardRef<HTMLDivElement, ComboboxListProps>(
   );
 });
 
-export interface ComboboxOptionProps extends MosaicComponentProps<'div'> {
+export interface ComboboxItemProps extends MosaicComponentProps<'div'> {
   value: string;
   label?: string;
   disabled?: boolean;
 }
 
-export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionProps>(function MosaicComboboxOption(
+export const ComboboxItem = React.forwardRef<HTMLDivElement, ComboboxItemProps>(function MosaicComboboxItem(
   { xstyle, ...rest },
   ref,
 ) {
   return (
-    <HeadlessCombobox.Option
+    <HeadlessCombobox.Item
       ref={ref}
-      {...mergeStyleProps(themeProps('combobox-option'), stylex.props(reset.base, styles.option, xstyle), rest)}
+      {...mergeStyleProps(themeProps('combobox-item'), stylex.props(reset.base, styles.item, xstyle), rest)}
     />
   );
 });
 
-/** `span`, not `div`: the option's children are phrasing content. */
+/** `span`, not `div`: the item's children are phrasing content. */
 export type ComboboxMediaProps = MosaicComponentProps<'span'>;
 
-/** Square leading column that centers an icon, flag or avatar, so every option's label starts on one line. */
+/** Square leading column that centers an icon, flag or avatar, so every item's label starts on one line. */
 export const ComboboxMedia = React.forwardRef<HTMLSpanElement, ComboboxMediaProps>(function MosaicComboboxMedia(
   { render, xstyle, ...rest },
   ref,
@@ -219,13 +219,13 @@ export const ComboboxMedia = React.forwardRef<HTMLSpanElement, ComboboxMediaProp
     defaultTagName: 'span',
     render,
     ref,
-    props: mergeStyleProps(themeProps('combobox-option-media'), stylex.props(reset.base, styles.media, xstyle), rest),
+    props: mergeStyleProps(themeProps('combobox-item-media'), stylex.props(reset.base, styles.media, xstyle), rest),
   });
 });
 
 export type ComboboxLabelProps = MosaicComponentProps<'span'>;
 
-/** The option's name. Takes the space between the media and whatever trails it, truncating to one line. */
+/** The item's name. Takes the space between the media and whatever trails it, truncating to one line. */
 export const ComboboxLabel = React.forwardRef<HTMLSpanElement, ComboboxLabelProps>(function MosaicComboboxLabel(
   { render, xstyle, ...rest },
   ref,
@@ -235,7 +235,7 @@ export const ComboboxLabel = React.forwardRef<HTMLSpanElement, ComboboxLabelProp
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('combobox-option-label'),
+      themeProps('combobox-item-label'),
       stylex.props(reset.base, styles.label, truncationStyles.singleLine, xstyle),
       rest,
     ),
@@ -253,23 +253,25 @@ export const ComboboxDetail = React.forwardRef<HTMLSpanElement, ComboboxDetailPr
     defaultTagName: 'span',
     render,
     ref,
-    props: mergeStyleProps(themeProps('combobox-option-detail'), stylex.props(reset.base, styles.detail, xstyle), rest),
+    props: mergeStyleProps(themeProps('combobox-item-detail'), stylex.props(reset.base, styles.detail, xstyle), rest),
   });
 });
 
 export type ComboboxEmptyProps = MosaicComponentProps<'div'>;
 
-export type ComboboxOptionIndicatorProps = MosaicComponentProps<'span'>;
+export interface ComboboxItemIndicatorProps extends MosaicComponentProps<'span'> {
+  keepMounted?: boolean;
+}
 
-export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, ComboboxOptionIndicatorProps>(
-  function MosaicComboboxOptionIndicator({ xstyle, children, ...rest }, ref) {
+export const ComboboxItemIndicator = React.forwardRef<HTMLSpanElement, ComboboxItemIndicatorProps>(
+  function MosaicComboboxItemIndicator({ xstyle, children, ...rest }, ref) {
     return (
-      <HeadlessCombobox.OptionIndicator
+      <HeadlessCombobox.ItemIndicator
         ref={ref}
-        {...mergeStyleProps(themeProps('combobox-option-indicator'), stylex.props(styles.indicator, xstyle), rest)}
+        {...mergeStyleProps(themeProps('combobox-item-indicator'), stylex.props(styles.indicator, xstyle), rest)}
       >
         {children ?? <Icon glyph={Checkmark} />}
-      </HeadlessCombobox.OptionIndicator>
+      </HeadlessCombobox.ItemIndicator>
     );
   },
 );

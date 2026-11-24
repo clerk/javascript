@@ -51,13 +51,13 @@ export function useComboboxContext() {
   return ctx;
 }
 
-export interface ComboboxOptionsContextValue {
+export interface ComboboxItemsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: string, index: number, label: string) => void;
   refs: ExtendedRefs<ReferenceType>;
   valuesByIndexRef: React.MutableRefObject<Map<number, string>>;
   registerSelectedIndex: (index: number, value: string, label: string, selected: boolean) => (() => void) | undefined;
-  registerOption: (index: number) => void;
+  registerItem: (index: number) => void;
 }
 
 export interface ComboboxHighlightContextValue {
@@ -69,17 +69,17 @@ export const ComboboxHighlightContext = createContext<ComboboxHighlightContextVa
 export function useComboboxHighlightContext() {
   const ctx = useContext(ComboboxHighlightContext);
   if (!ctx) {
-    throw new Error('Combobox.Option must be used within <Combobox>');
+    throw new Error('Combobox.Item must be used within <Combobox>');
   }
   return ctx;
 }
 
-export const ComboboxOptionsContext = createContext<ComboboxOptionsContextValue | null>(null);
+export const ComboboxItemsContext = createContext<ComboboxItemsContextValue | null>(null);
 
-export function useComboboxOptionsContext() {
-  const ctx = useContext(ComboboxOptionsContext);
+export function useComboboxItemsContext() {
+  const ctx = useContext(ComboboxItemsContext);
   if (!ctx) {
-    throw new Error('Combobox.Option must be used within <Combobox>');
+    throw new Error('Combobox.Item must be used within <Combobox>');
   }
   return ctx;
 }

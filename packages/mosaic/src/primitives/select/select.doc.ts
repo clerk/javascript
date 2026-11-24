@@ -1,7 +1,8 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { SelectArrowProps } from './select-arrow';
 import type { SelectGroupLabelProps, SelectGroupProps } from './select-group';
-import type { SelectOptionProps } from './select-option';
+import type { SelectItemProps } from './select-item';
+import type { SelectItemIndicatorProps } from './select-item-indicator';
 import type { SelectPopupProps } from './select-popup';
 import type { SelectPortalProps } from './select-portal';
 import type { SelectPositionerProps } from './select-positioner';
@@ -12,7 +13,7 @@ import type { SelectValueProps } from './select-value';
 export default {
   name: 'Select',
   description:
-    'Headless, unstyled replacement for a native `<select>`: pick one value, or several with `multiple`, from a fixed list. Has typeahead and arrow-key navigation, and by default lays the selected option over the trigger.',
+    'Headless, unstyled replacement for a native `<select>`: pick one value, or several with `multiple`, from a fixed list. Has typeahead and arrow-key navigation, and by default lays the selected item over the trigger.',
   useFor: [
     'picking one value from a fixed list of options',
     'picking several values from a fixed list',
@@ -22,18 +23,18 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Pass `label` on each `Select.Option` whose value is not display text. It falls back to `String(value)`.',
+      text: 'Pass `label` on each `Select.Item` whose value is not display text. It falls back to `String(value)`.',
     },
     {
       do: true,
-      text: 'Pass `items` when `Select.Value` must show a label before the options mount, such as on first render.',
+      text: 'Pass `items` when `Select.Value` must show a label before the items mount, such as on first render.',
     },
     { do: true, text: 'Put a `Select.GroupLabel` inside every `Select.Group`. It throws outside one.' },
     {
       do: false,
       text: 'Pass `id` to `Select.Positioner`. The primitive owns it to pair the trigger’s `aria-controls`.',
     },
-    { do: false, text: 'Expect `items` to render options. It only resolves labels; render each `Select.Option`.' },
+    { do: false, text: 'Expect `items` to render items. It only resolves labels; render each `Select.Item`.' },
     { do: false, text: 'Use it when the user types to filter. Use `Combobox` instead.' },
   ],
   parts: {
@@ -42,7 +43,7 @@ export default {
       props: {
         multiple: {
           type: 'boolean',
-          doc: 'Makes the value an array. Picking toggles an option and keeps the popup open.',
+          doc: 'Makes the value an array. Picking toggles an item and keeps the popup open.',
           default: 'false',
         },
         value: {
@@ -63,11 +64,11 @@ export default {
         onOpenChange: { type: '(open: boolean) => void', doc: 'Called with the new open state.' },
         items: {
           type: 'SelectItem<Value>[]',
-          doc: '`{ label, value }` pairs that resolve labels before options mount.',
+          doc: '`{ label, value }` pairs that resolve labels before items mount.',
         },
         alignItemWithTrigger: {
           type: 'boolean',
-          doc: 'Lays the selected option over the trigger. Falls back to a dropdown on touch, with nothing selected, or near a viewport edge.',
+          doc: 'Lays the selected item over the trigger. Falls back to a dropdown on touch, with nothing selected, or near a viewport edge.',
           default: 'true',
         },
         placement: {
@@ -105,15 +106,26 @@ export default {
     },
     'Select.Popup': {
       description:
-        'Wraps the options. Carries `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`. Its children freeze while it closes.',
+        'Wraps the items. Carries `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`. Its children freeze while it closes.',
     },
-    'Select.Option': {
+    'Select.Item': {
       description:
         'A `button` with `role="option"` and `aria-selected`. Carries `data-selected`, `data-active` and `data-disabled`.',
       props: {
-        value: { type: 'unknown', doc: 'The option value, compared with `Object.is`.' },
+        value: { type: 'unknown', doc: 'The item value, compared with `Object.is`.' },
         label: { type: 'string', doc: 'Shown in `Select.Value` and matched by typeahead.', default: 'String(value)' },
-        disabled: { type: 'boolean', doc: 'Sets `aria-disabled` and blocks selection. The option stays focusable.' },
+        disabled: { type: 'boolean', doc: 'Sets `aria-disabled` and blocks selection. The item stays focusable.' },
+      },
+    },
+    'Select.ItemIndicator': {
+      description:
+        'An `aria-hidden` `span` that renders only inside the selected item, such as a check mark. Carries `data-selected`.',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Keeps it rendered in unselected items too, with `data-selected` only on the selected one.',
+          default: 'false',
+        },
       },
     },
     'Select.Group': { description: 'A `div` with `role="group"`, labelled by its `Select.GroupLabel`.' },
@@ -132,12 +144,12 @@ export default {
   </Select.Trigger>
   <Select.Positioner>
     <Select.Popup>
-      <Select.Option value='apple' label='Apple'>
+      <Select.Item value='apple' label='Apple'>
         Apple
-      </Select.Option>
-      <Select.Option value='banana' label='Banana'>
+      </Select.Item>
+      <Select.Item value='banana' label='Banana'>
         Banana
-      </Select.Option>
+      </Select.Item>
     </Select.Popup>
   </Select.Positioner>
 </Select.Root>
@@ -152,7 +164,8 @@ export default {
   'Select.Portal': SelectPortalProps;
   'Select.Positioner': SelectPositionerProps;
   'Select.Popup': SelectPopupProps;
-  'Select.Option': SelectOptionProps;
+  'Select.Item': SelectItemProps;
+  'Select.ItemIndicator': SelectItemIndicatorProps;
   'Select.Group': SelectGroupProps;
   'Select.GroupLabel': SelectGroupLabelProps;
   'Select.Arrow': SelectArrowProps;

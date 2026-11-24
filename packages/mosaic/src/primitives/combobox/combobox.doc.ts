@@ -5,9 +5,9 @@ import type { ComboboxCollectionProps } from './combobox-collection';
 import type { ComboboxEmptyProps } from './combobox-empty';
 import type { ComboboxInputProps } from './combobox-input';
 import type { ComboboxInputGroupProps } from './combobox-input-group';
+import type { ComboboxItemProps } from './combobox-item';
+import type { ComboboxItemIndicatorProps } from './combobox-item-indicator';
 import type { ComboboxListProps } from './combobox-list';
-import type { ComboboxOptionProps } from './combobox-option';
-import type { ComboboxOptionIndicatorProps } from './combobox-option-indicator';
 import type { ComboboxPopupProps } from './combobox-popup';
 import type { ComboboxPortalProps } from './combobox-portal';
 import type { ComboboxPositionerProps } from './combobox-positioner';
@@ -17,7 +17,7 @@ import type { ComboboxTriggerProps } from './combobox-trigger';
 export default {
   name: 'Combobox',
   description:
-    'Headless, unstyled single-select input: typing searches the options and choosing one keeps its value. Focus stays on the input while the arrow keys move a virtual highlight. Given `items`, it filters them by label and shows `Empty` when none match.',
+    'Headless, unstyled single-select input: typing searches the items and choosing one keeps its value. Focus stays on the input while the arrow keys move a virtual highlight. Given `items`, it filters them by label and shows `Empty` when none match.',
   useFor: [
     'the base for a styled select with search',
     'picking one value from a long list by typing',
@@ -31,7 +31,7 @@ export default {
     },
     {
       do: true,
-      text: 'Pass `items` and `itemToStringLabel` on the root, render options through `Combobox.Collection`, and annotate its `children` parameter with the item type.',
+      text: 'Pass `items` and `itemToStringLabel` on the root, render items through `Combobox.Collection`, and annotate its `children` parameter with the item type.',
     },
     { do: true, text: 'Keep `Combobox.Empty` mounted, so screen readers announce the message when it appears.' },
     {
@@ -46,7 +46,7 @@ export default {
       do: true,
       text: 'For search inside another popup, pass `inline`, render `Combobox.List`, and bind `open` to the outer popup.',
     },
-    { do: false, text: 'Pass `id` to an option or the list. The primitive owns them to wire the ARIA pairing.' },
+    { do: false, text: 'Pass `id` to an item or the list. The primitive owns them to wire the ARIA pairing.' },
   ],
   parts: {
     'Combobox.Root': {
@@ -55,7 +55,7 @@ export default {
       props: {
         items: {
           type: 'readonly Item[]',
-          doc: 'Every option item. `Collection` renders the ones whose label contains the search text.',
+          doc: 'Every item. `Collection` renders the ones whose label contains the search text.',
         },
         itemToStringLabel: {
           type: '(item: Item) => string',
@@ -128,7 +128,7 @@ export default {
     },
     'Combobox.Popup': {
       description:
-        'Wraps the options with transition attributes. Its children stay frozen while it closes, so the list does not change mid-exit.',
+        'Wraps the items with transition attributes. Its children stay frozen while it closes, so the list does not change mid-exit.',
     },
     'Combobox.List': {
       description:
@@ -144,17 +144,25 @@ export default {
         },
       },
     },
-    'Combobox.Option': {
+    'Combobox.Item': {
       description:
         'One `role="option"`. Carries `data-selected`, `data-active` while highlighted, and `data-disabled`. A click selects it and returns focus to the input.',
       props: {
         value: { type: 'string', doc: 'The value passed to `onValueChange`.' },
         label: { type: 'string', doc: 'The text shown in the input once selected.', default: '`value`' },
-        disabled: { type: 'boolean', doc: 'Skips the option on Enter and ignores clicks.' },
+        disabled: { type: 'boolean', doc: 'Skips the item on Enter and ignores clicks.' },
       },
     },
-    'Combobox.OptionIndicator': {
-      description: 'An `aria-hidden` `span` that renders only inside the selected option, such as a check mark.',
+    'Combobox.ItemIndicator': {
+      description:
+        'An `aria-hidden` `span` that renders only inside the selected item, such as a check mark. Carries `data-selected`.',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Keeps it rendered in unselected items too, with `data-selected` only on the selected one.',
+          default: 'false',
+        },
+      },
     },
     'Combobox.Empty': {
       description:
@@ -178,10 +186,10 @@ export default {
       <Combobox.Empty>No fruit found</Combobox.Empty>
       <Combobox.Collection>
         {(fruit: string) => (
-          <Combobox.Option key={fruit} value={fruit}>
+          <Combobox.Item key={fruit} value={fruit}>
             {fruit}
-            <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
-          </Combobox.Option>
+            <Combobox.ItemIndicator>✓</Combobox.ItemIndicator>
+          </Combobox.Item>
         )}
       </Combobox.Collection>
     </Combobox.Popup>
@@ -202,8 +210,8 @@ export default {
   'Combobox.Popup': ComboboxPopupProps;
   'Combobox.List': ComboboxListProps;
   'Combobox.Collection': ComboboxCollectionProps<unknown>;
-  'Combobox.Option': ComboboxOptionProps;
-  'Combobox.OptionIndicator': ComboboxOptionIndicatorProps;
+  'Combobox.Item': ComboboxItemProps;
+  'Combobox.ItemIndicator': ComboboxItemIndicatorProps;
   'Combobox.Empty': ComboboxEmptyProps;
   'Combobox.Arrow': ComboboxArrowProps;
 }>;

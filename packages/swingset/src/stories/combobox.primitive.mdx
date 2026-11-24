@@ -27,10 +27,10 @@ import { Combobox } from '@clerk/mosaic/primitives/combobox';
         <Combobox.Empty>No fruit found</Combobox.Empty>
         <Combobox.Collection>
           {(fruit: string) => (
-            <Combobox.Option key={fruit} value={fruit}>
+            <Combobox.Item key={fruit} value={fruit}>
               {fruit}
-              <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
-            </Combobox.Option>
+              <Combobox.ItemIndicator>✓</Combobox.ItemIndicator>
+            </Combobox.Item>
           )}
         </Combobox.Collection>
       </Combobox.Popup>
@@ -52,22 +52,22 @@ const [value, setValue] = useState<string | null>(null);
 
 ## Parts
 
-| Part                       | Default element | Description                                                    |
-| -------------------------- | --------------- | -------------------------------------------------------------- |
-| `Combobox.Root`            | none (context)  | Owns selection, search, navigation, and open state             |
-| `Combobox.Input`           | `input`         | Search input and keyboard focus target                         |
-| `Combobox.Trigger`         | `button`        | Toggles the popup and focuses the input                        |
-| `Combobox.Portal`          | none (portal)   | Portals the floating content                                   |
-| `Combobox.Positioner`      | `div`           | Positions the listbox relative to the input or supplied anchor |
-| `Combobox.Popup`           | `div`           | Wraps popup content and preserves it during exit transitions   |
-| `Combobox.Collection`      | none            | Renders the root's items that match the search                 |
-| `Combobox.Empty`           | `div`           | Status region that shows its children when no items match      |
-| `Combobox.Option`          | `div`           | Selectable option                                              |
-| `Combobox.OptionIndicator` | `span`          | Renders its children only for the selected option              |
-| `Combobox.List`            | `div`           | Inline listbox inside another floating surface                 |
-| `Combobox.Arrow`           | `svg`           | Optional arrow pointing toward the anchor                      |
+| Part                     | Default element | Description                                                           |
+| ------------------------ | --------------- | --------------------------------------------------------------------- |
+| `Combobox.Root`          | none (context)  | Owns selection, search, navigation, and open state                    |
+| `Combobox.Input`         | `input`         | Search input and keyboard focus target                                |
+| `Combobox.Trigger`       | `button`        | Toggles the popup and focuses the input                               |
+| `Combobox.Portal`        | none (portal)   | Portals the floating content                                          |
+| `Combobox.Positioner`    | `div`           | Positions the listbox relative to the input or supplied anchor        |
+| `Combobox.Popup`         | `div`           | Wraps popup content and preserves it during exit transitions          |
+| `Combobox.Collection`    | none            | Renders the root's items that match the search                        |
+| `Combobox.Empty`         | `div`           | Status region that shows its children when no items match             |
+| `Combobox.Item`          | `div`           | Selectable item (`role="option"`)                                     |
+| `Combobox.ItemIndicator` | `span`          | Renders its children only for the selected item, unless `keepMounted` |
+| `Combobox.List`          | `div`           | Inline listbox inside another floating surface                        |
+| `Combobox.Arrow`         | `svg`           | Optional arrow pointing toward the anchor                             |
 
-Parts belong inside `Combobox.Root`; `OptionIndicator` belongs inside `Option`.
+Parts belong inside `Combobox.Root`; `ItemIndicator` belongs inside `Item`.
 DOM parts using `useRender` accept `render` and standard HTML attributes.
 `Arrow` accepts Floating UI's `FloatingArrow` props.
 
@@ -103,13 +103,19 @@ DOM parts using `useRender` accept `render` and standard HTML attributes.
 Renders `role="status"` with `aria-live="polite"`. It stays mounted and shows its children only when none of the root's
 `items` match, so screen readers announce the message. Without `items` it always shows its children.
 
-### `Combobox.Option`
+### `Combobox.Item`
 
 | Prop       | Type      | Default               | Description                 |
 | ---------- | --------- | --------------------- | --------------------------- |
-| `value`    | `string`  | — (required)          | Option value                |
+| `value`    | `string`  | — (required)          | Item value                  |
 | `label`    | `string`  | falls back to `value` | Text displayed on selection |
 | `disabled` | `boolean` | —                     | Prevents selection          |
+
+### `Combobox.ItemIndicator`
+
+| Prop          | Type      | Default | Description                                                                   |
+| ------------- | --------- | ------- | ----------------------------------------------------------------------------- |
+| `keepMounted` | `boolean` | `false` | Render in unselected items too, with `data-selected` only on the selected one |
 
 ### `Combobox.Positioner`
 
@@ -131,9 +137,9 @@ For an inline list, use `List` in place of `Portal` and `Positioner` so the oute
 | Attribute                  | Parts             | Description                           |
 | -------------------------- | ----------------- | ------------------------------------- |
 | `data-open`, `data-closed` | Input, Trigger    | Popup state                           |
-| `data-selected`            | Option            | Matches the selected value            |
-| `data-active`              | Option            | Current keyboard or pointer highlight |
-| `data-disabled`            | Option            | Disabled option                       |
+| `data-selected`            | Item              | Matches the selected value            |
+| `data-active`              | Item              | Current keyboard or pointer highlight |
+| `data-disabled`            | Item              | Disabled option                       |
 | `data-side`                | Positioner, Arrow | Resolved popup side                   |
 
 The positioner matches the anchor width and exposes `--cl-anchor-width`, `--cl-anchor-height`,

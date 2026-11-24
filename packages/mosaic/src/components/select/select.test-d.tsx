@@ -72,7 +72,7 @@ describe('Select.Root onValueChange', () => {
           expectTypeOf(value).toEqualTypeOf<number>();
         }}
       >
-        <Select.Option
+        <Select.Item
           value={10}
           label='10'
         />

@@ -30,13 +30,13 @@ export function Default() {
             <Combobox.Empty>No fruit found</Combobox.Empty>
             <Combobox.Collection>
               {(fruit: string) => (
-                <Combobox.Option
+                <Combobox.Item
                   key={fruit}
                   value={fruit}
                 >
                   {fruit}
-                  <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
-                </Combobox.Option>
+                  <Combobox.ItemIndicator>✓</Combobox.ItemIndicator>
+                </Combobox.Item>
               )}
             </Combobox.Collection>
           </Combobox.Popup>

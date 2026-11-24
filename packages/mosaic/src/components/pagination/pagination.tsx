@@ -145,9 +145,9 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                   />
                   <Select.Popup>
                     {pageSizeItems.map(item => (
-                      <Select.Option
+                      <Select.Item
                         key={item.value}
-                        xstyle={styles.pageSizeOption}
+                        xstyle={styles.pageSizeItem}
                         {...item}
                       />
                     ))}

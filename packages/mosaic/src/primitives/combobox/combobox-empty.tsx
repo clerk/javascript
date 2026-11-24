@@ -12,7 +12,7 @@ const MARKER_DELAY_MS = 200;
 
 /**
  * Status region that shows its children only when no `items` on the root match the search.
- * Keep it mounted while options are shown, so screen readers announce the message when it appears.
+ * Keep it mounted while items are shown, so screen readers announce the message when it appears.
  */
 export const ComboboxEmpty = React.forwardRef<HTMLDivElement, ComboboxEmptyProps>(function ComboboxEmpty(props, ref) {
   const { render, children, ...otherProps } = props;

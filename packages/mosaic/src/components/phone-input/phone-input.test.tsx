@@ -244,7 +244,7 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
   });
 
-  it('links the country search to its list and active option through selection', async () => {
+  it('links the country search to its list and active item through selection', async () => {
     const user = userEvent.setup();
     render(
       <PhoneInput
@@ -256,13 +256,13 @@ describe('Mosaic PhoneInput', () => {
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
     const list = screen.getByRole('listbox');
-    const option = screen.getByRole('option', { name: /United Kingdom/ });
+    const item = screen.getByRole('option', { name: /United Kingdom/ });
     expect(list.id).toBeTruthy();
     expect(searchInput).toHaveAttribute('aria-controls', list.id);
 
     await user.keyboard('{ArrowDown}');
-    expect(option.id).toBeTruthy();
-    expect(searchInput).toHaveAttribute('aria-activedescendant', option.id);
+    expect(item.id).toBeTruthy();
+    expect(searchInput).toHaveAttribute('aria-activedescendant', item.id);
 
     await user.keyboard('{Enter}');
     expect(screen.getByRole('button', { name: 'Country, United Kingdom' })).toBeInTheDocument();
@@ -368,7 +368,7 @@ describe('Mosaic PhoneInput', () => {
     expect(popup).toContainElement(list);
   });
 
-  it('builds each country option from the combobox option parts', async () => {
+  it('builds each country item from the combobox item parts', async () => {
     const user = userEvent.setup();
     render(
       <PhoneInput
@@ -380,11 +380,11 @@ describe('Mosaic PhoneInput', () => {
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Algeria');
 
-    const option = await screen.findByRole('option', { name: /Algeria/ });
-    expect(option).toHaveClass('cl-combobox-option', 'cl-phone-input-country-option');
-    expect(option.querySelector('.cl-combobox-option-media')).toHaveTextContent('🇩🇿');
-    expect(option.querySelector('.cl-combobox-option-label')).toHaveTextContent('Algeria');
-    expect(option.querySelector('.cl-combobox-option-detail')).toHaveTextContent('+213');
+    const item = await screen.findByRole('option', { name: /Algeria/ });
+    expect(item).toHaveClass('cl-combobox-item', 'cl-phone-input-country-item');
+    expect(item.querySelector('.cl-combobox-item-media')).toHaveTextContent('🇩🇿');
+    expect(item.querySelector('.cl-combobox-item-label')).toHaveTextContent('Algeria');
+    expect(item.querySelector('.cl-combobox-item-detail')).toHaveTextContent('+213');
   });
 
   it('keeps the country search in its own Field scope', async () => {

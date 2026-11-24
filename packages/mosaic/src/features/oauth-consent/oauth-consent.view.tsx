@@ -331,7 +331,7 @@ function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrgan
   return (
     <Select.Popup>
       {organizations.map(organization => (
-        <Select.Option
+        <Select.Item
           key={organization.value}
           value={organization.value}
           label={organization.label}
@@ -347,7 +347,8 @@ function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrgan
           <Select.Content>
             <Select.Label>{organization.label}</Select.Label>
           </Select.Content>
-        </Select.Option>
+          <Select.ItemIndicator keepMounted />
+        </Select.Item>
       ))}
     </Select.Popup>
   );

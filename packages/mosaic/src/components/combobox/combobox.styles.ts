@@ -15,7 +15,7 @@ import { inputGroupScope } from '../input-group/input-group.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const inset = space['1.5'];
-const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 export const styles = stylex.create({
   positioner: {
@@ -71,8 +71,8 @@ export const styles = stylex.create({
     flexDirection: 'column',
     maxHeight: '16rem',
   },
-  option: {
-    borderRadius: optionRadius,
+  item: {
+    borderRadius: itemRadius,
     gap: space['1'],
     outline: {
       default: 'none',
