@@ -1,9 +1,13 @@
+import type { SignUpField } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { signUpMessages } from '../sign-up.messages';
 import type { SignUpDetails } from '../sign-up.types';
 import {
+  continueCanSatisfy,
+  continueFields,
   legalConsentLabel,
+  missesEitherIdentifier,
   signUpCodeCopy,
   signUpCodeIdentity,
   signUpCodeSecondaryAction,
@@ -84,5 +88,93 @@ describe('code step copy', () => {
       label: 'Send code via SMS instead',
       onClick: onCancel,
     });
+  });
+});
+
+describe('continue screen rules', () => {
+  const required = { required: true };
+  const lists = (missingFields: SignUpField[], optionalFields: SignUpField[] = []) => ({
+    missingFields,
+    optionalFields,
+  });
+
+  it.each([
+    {
+      name: 'asks for each missing required field',
+      signUp: lists(['username', 'password']),
+      asks: { username: required, password: required },
+      asksOnPhone: { username: required, password: required },
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for an email or a phone, not a username, when every identifier is optional and none was given',
+      signUp: lists(['email_address', 'phone_number', 'username'], ['email_address', 'phone_number', 'username']),
+      asks: { emailAddress: required },
+      asksOnPhone: { phoneNumber: required },
+      canSwitch: true,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for an email or a phone beside the other missing fields on an instance that combines them',
+      signUp: lists(['email_address_or_phone_number', 'password']),
+      asks: { password: required, emailAddress: required },
+      asksOnPhone: { password: required, phoneNumber: required },
+      canSwitch: true,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for a username when it is the only identifier to choose',
+      signUp: lists(['username'], ['username']),
+      asks: { username: required },
+      asksOnPhone: { username: required },
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for the email alone when the choice is an email or a username',
+      signUp: lists(['email_address', 'username'], ['email_address', 'username']),
+      asks: { emailAddress: required },
+      asksOnPhone: { emailAddress: required },
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for the identifier when an optional provider is listed beside it',
+      signUp: lists(['email_address', 'oauth_google'], ['email_address', 'oauth_google']),
+      asks: { emailAddress: required },
+      asksOnPhone: { emailAddress: required },
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'asks for no field when only legal consent is missing',
+      signUp: lists(['legal_accepted']),
+      asks: {},
+      asksOnPhone: {},
+      canSwitch: false,
+      canSatisfy: true,
+    },
+    {
+      name: 'cannot finish a sign-up that needs a required provider',
+      signUp: lists(['username', 'oauth_google']),
+      asks: { username: required },
+      asksOnPhone: { username: required },
+      canSwitch: false,
+      canSatisfy: false,
+    },
+    {
+      name: 'cannot finish a sign-up whose only identifier is an optional provider',
+      signUp: lists(['oauth_google'], ['oauth_google']),
+      asks: {},
+      asksOnPhone: {},
+      canSwitch: false,
+      canSatisfy: false,
+    },
+  ])('$name', ({ signUp, asks, asksOnPhone, canSwitch, canSatisfy }) => {
+    expect(continueFields(signUp, 'emailAddress')).toEqual(asks);
+    expect(continueFields(signUp, 'phoneNumber')).toEqual(asksOnPhone);
+    expect(missesEitherIdentifier(signUp)).toBe(canSwitch);
+    expect(continueCanSatisfy(signUp)).toBe(canSatisfy);
   });
 });
