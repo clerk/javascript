@@ -1037,6 +1037,24 @@ describe('SignUp', () => {
       expect(screen.queryByRole('progressbar', { name: 'Loading…' })).toBeNull();
     });
 
+    it('reloads an expired Protect check again each time the user clicks Try again', async () => {
+      const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 1, protectCheckExpired: true } });
+      const timedOut = () =>
+        waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent(
+            "Verification didn't complete in time. Please try again.",
+          ),
+        );
+
+      await submitStart(user);
+      await timedOut();
+      for (const reloads of [2, 3]) {
+        await user.click(screen.getByRole('button', { name: 'Try again' }));
+        await waitFor(() => expect(fapi.signUp.reloads).toBe(reloads));
+        await timedOut();
+      }
+    });
+
     it('runs the replacement Protect check Clerk issues for a rejected proof', async () => {
       const { fapi, user } = await renderSignUp({
         signUp: {
