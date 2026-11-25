@@ -118,7 +118,7 @@ export function ModalSurfaceHost<Options>({
     // full state here as we need it around for the exit transition
     setState(previous => ({ ...previous, wasOpen: false }));
   }
-  // The entry may appear without `open` being called, written from outside or restored by a URL,
+  // The segment may appear without `open` being called, written from outside or restored by a URL,
   // so the content loads whenever the modal is open, not only when the handle opened it.
   React.useEffect(() => {
     if (isOpen) {
@@ -232,7 +232,7 @@ interface ModalState<Options> {
   // Set by `open()` until the opening it asked for happens. An opening without it came from outside.
   openRequested: boolean;
   // `isOpen` as of the previous render, kept only to tell the opening and closing edges apart. The
-  // entry alone decides whether the modal renders.
+  // segment alone decides whether the modal renders.
   wasOpen: boolean;
   openedOn: string | undefined;
 }

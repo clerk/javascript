@@ -1,35 +1,35 @@
 import { describe, expect, it } from 'vitest';
 
-import { decodeSegment, encodeSegment, paramKey, readParam, writeParam } from '../url-params';
+import { decodeParts, encodeParts, paramKey, readParam, writeParam } from '../url-params';
 
 const awkward = ['a/b', '100%', 'two words', 'a+b', 'a&b', 'a=b', 'a#b', 'a?b', 'åäö', '日本', '%2F'];
 
-describe('encodeSegment and decodeSegment', () => {
+describe('encodeParts and decodeParts', () => {
   it.each(awkward)('round-trips %j as one part', value => {
     const parts = ['billing', value];
-    expect(decodeSegment(encodeSegment(parts))).toEqual(parts);
+    expect(decodeParts(encodeParts(parts))).toEqual(parts);
   });
 
   it('splits on the encoded form, so an encoded slash stays inside its part', () => {
-    expect(decodeSegment('billing/st%2F1')).toEqual(['billing', 'st/1']);
+    expect(decodeParts('billing/st%2F1')).toEqual(['billing', 'st/1']);
   });
 
   it('decodes each part exactly once', () => {
-    expect(decodeSegment('a%2520b')).toEqual(['a%20b']);
+    expect(decodeParts('a%2520b')).toEqual(['a%20b']);
   });
 
   it('reads the empty segment as no parts', () => {
-    expect(decodeSegment('')).toEqual([]);
-    expect(encodeSegment([])).toBe('');
+    expect(decodeParts('')).toEqual([]);
+    expect(encodeParts([])).toBe('');
   });
 
   it('reads a malformed escape as no parts', () => {
-    expect(decodeSegment('billing/%E0%A4%A')).toEqual([]);
-    expect(decodeSegment('%')).toEqual([]);
+    expect(decodeParts('billing/%E0%A4%A')).toEqual([]);
+    expect(decodeParts('%')).toEqual([]);
   });
 
   it('leaves a plus sign as it is', () => {
-    expect(decodeSegment('a+b')).toEqual(['a+b']);
+    expect(decodeParts('a+b')).toEqual(['a+b']);
   });
 });
 
@@ -94,8 +94,8 @@ describe('writeParam', () => {
   });
 
   it('encodes the value as a param, so an encoded segment is encoded twice', () => {
-    expect(writeParam('', '.user', encodeSegment(['billing', 'st/1']))).toBe('.user=billing%2Fst%252F1');
-    expect(decodeSegment(readParam('.user=billing%2Fst%252F1', '.user') ?? '')).toEqual(['billing', 'st/1']);
+    expect(writeParam('', '.user', encodeParts(['billing', 'st/1']))).toBe('.user=billing%2Fst%252F1');
+    expect(decodeParts(readParam('.user=billing%2Fst%252F1', '.user') ?? '')).toEqual(['billing', 'st/1']);
   });
 
   it('writes the key encoded', () => {

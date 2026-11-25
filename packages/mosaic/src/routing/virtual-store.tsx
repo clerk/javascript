@@ -21,12 +21,12 @@ import type { SegmentParts } from './location';
   in a map instead of trying to cram it into a single "url"-like string. Nothing is encoded since it
   never goes into a real url.
 
-  An entry lives for as long as its base has an owner, the way a URL segment lives for as long as
-  the host is on that route. A mounted router scope counts itself in with `own`; when the last
-  owner of a base leaves, the sweep below drops the entry. Only a base that has had an owner is
-  swept, so an entry written ahead of a later mount survives until that owner has come and gone.
+  A segment lives for as long as its base has an owner, the way a pathname lives for as long as the
+  host is on that route. A mounted router scope counts itself in with `own`; when the last
+  owner of a base leaves, the sweep below drops the segment. Only a base that has had an owner is
+  swept, so a segment written ahead of a later mount survives until that owner has come and gone.
   Counting in store state, and sweeping after the commit, is what makes an owner replaced in the
-  same commit (a modal reopened mid-exit, StrictMode's doubled effects) keep its entry: the count
+  same commit (a modal reopened mid-exit, StrictMode's doubled effects) keep its segment: the count
   never reaches zero in a committed state.
 */
 
@@ -82,7 +82,7 @@ export function VirtualStoreProvider({ initial, children }: VirtualStoreProvider
 
   // The sweep runs after the commit in which a count reached zero. A write can land in between,
   // when a click opens a modal before the passive effects of the unmount commit have flushed, so
-  // it only deletes the entry that was committed with the zero count, never a newer one.
+  // it only deletes the segment that was committed with the zero count, never a newer one.
   const previousOwners = useRef(owners);
   useEffect(() => {
     const previous = previousOwners.current;
@@ -125,8 +125,8 @@ export function useVirtualWrite(): VirtualWrite {
   return useVirtualActions().write;
 }
 
-// The entry for a base, or undefined when the base has none. The array comes straight from the map,
-// so it keeps its identity until that entry is written again.
+// The parts of a base's segment, or undefined when it has none. The array comes straight from the
+// map, so it keeps its identity until that segment is written again.
 export function useVirtualSegment(base: string): SegmentParts | undefined {
   return useVirtualEntries().get(normalizeBase(base));
 }

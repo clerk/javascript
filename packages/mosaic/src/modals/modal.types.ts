@@ -19,9 +19,9 @@ export interface ModalSurfaceConfig<Options> {
   id: string;
   variant: DialogVariant;
   load: () => Promise<{ default: ComponentType<ModalContentProps<Options>> }>;
-  // The base of the entry that keeps the modal open, `/modal/<id>` by default
+  // The base of the segment that keeps the modal open, `/modal/<id>` by default
   path?: string;
-  // The parts written on open, derived from the open options; an empty entry by default.
+  // The parts written on open, derived from the open options; an empty segment by default.
   initialParts?: (options: Options | undefined) => SegmentParts;
 }
 

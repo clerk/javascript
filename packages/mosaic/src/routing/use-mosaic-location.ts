@@ -104,10 +104,10 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
     via.current = { push, replace };
   });
 
-  // A base's entry in the page's URL. It holds nothing of its own: it hands out the parts decoded
-  // from the host's URL for this render, and a write goes straight to the host as a full URL built
-  // from the address bar. There are no owners to count, since the URL outlives a component by
-  // itself, and clearing replaces, so closing a modal leaves no entry to go back to.
+  // A segment kept in the page's URL. The location holds nothing of its own: it hands out the parts
+  // decoded from the host's URL for this render, and a write goes straight to the host as a full URL
+  // built from the address bar. There are no owners to count, since the URL outlives a component by
+  // itself, and clearing replaces, so closing a modal leaves no segment to go back to.
   return useMemo<MosaicLocation>(
     () => ({
       useSegmentParts: () => parts,

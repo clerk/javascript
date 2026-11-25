@@ -2,7 +2,7 @@ import { logger } from '@clerk/shared/logger';
 
 import { normalizeBase } from './base-path';
 import type { SegmentParts } from './location';
-import { decodeSegment, encodeSegment, paramKey, readParam, writeParam } from './url-params';
+import { decodeParts, encodeParts, paramKey, readParam, writeParam } from './url-params';
 import type { HostUrl } from './window-location';
 
 export type UrlRoutingMode = 'path' | 'hash' | 'query';
@@ -15,9 +15,9 @@ export type UrlRoutingMode = 'path' | 'hash' | 'query';
 export interface UrlCarrier {
   field: keyof HostUrl;
   read: (value: string) => string | undefined;
-  write: (value: string, segment: string) => string;
+  write: (value: string, encoded: string) => string;
   clear: (value: string) => string;
-  decode: (segment: string) => SegmentParts;
+  decode: (encoded: string) => SegmentParts;
   encode: (parts: SegmentParts) => string;
   refuse?: (parts: SegmentParts) => string | undefined;
 }
@@ -45,7 +45,7 @@ function pathCarrier(basePath: string): UrlCarrier {
       `[Clerk] "${basePath}" cannot be routed under in the pathname: a "?" or "#", or a part that is "." or "..", does not survive a URL. Nothing written under it will come back.`,
     );
   }
-  const write = (_pathname: string, segment: string) => (segment === '' ? base || '/' : `${base}/${segment}`);
+  const write = (_pathname: string, encoded: string) => (encoded === '' ? base || '/' : `${base}/${encoded}`);
   return {
     field: 'pathname',
     read: pathname => {
@@ -60,8 +60,8 @@ function pathCarrier(basePath: string): UrlCarrier {
     },
     write,
     clear: pathname => write(pathname, ''),
-    decode: decodeSegment,
-    encode: encodeSegment,
+    decode: decodeParts,
+    encode: encodeParts,
     refuse: parts => {
       if (parts.some(isDotPart)) {
         return `[Clerk] "${parts.join('/')}" was not navigated to: a part that is "." or ".." resolves away in a pathname.`;
@@ -74,7 +74,7 @@ function pathCarrier(basePath: string): UrlCarrier {
   };
 }
 
-// One pair of the query string or the hash, `.user=billing%2Fst_1`.
+// The segment spelled as one pair of the query string or the hash, `.user=billing%2Fst_1`.
 function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
   if (key === '') {
     logger.warnOnce(
@@ -84,10 +84,10 @@ function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
   return {
     field,
     read: body => readParam(body, key),
-    write: (body, segment) => writeParam(body, key, segment),
+    write: (body, encoded) => writeParam(body, key, encoded),
     clear: body => writeParam(body, key, undefined),
-    decode: decodeSegment,
-    encode: encodeSegment,
+    decode: decodeParts,
+    encode: encodeParts,
     refuse: parts =>
       parts.includes('')
         ? `[Clerk] "${parts.join('/')}" was not navigated to: an empty part reads back as no part at all.`

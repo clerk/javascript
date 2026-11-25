@@ -1,14 +1,14 @@
 import { normalizeBase } from './base-path';
 import type { SegmentParts } from './location';
 
-// The pathname's segment: parts encoded one by one and joined with `/`. The split happens on the
-// encoded form, so an encoded slash stays inside its part, and each part is decoded exactly once.
-// The URL is anyone's to write, so a malformed escape reads as no parts rather than throwing.
-export function encodeSegment(parts: SegmentParts): string {
+// Parts as text: encoded one by one and joined with `/`. The split happens on the encoded form, so
+// an encoded slash stays inside its part, and each part is decoded exactly once. The URL is anyone's
+// to write, so a malformed escape reads as no parts rather than throwing.
+export function encodeParts(parts: SegmentParts): string {
   return parts.map(encodeURIComponent).join('/');
 }
 
-export function decodeSegment(raw: string): SegmentParts {
+export function decodeParts(raw: string): SegmentParts {
   if (raw === '') {
     return [];
   }
@@ -24,9 +24,9 @@ export function paramKey(prefix: string, base: string): string {
   return prefix + normalizeBase(base).replaceAll('/', '.');
 }
 
-// The query string and the hash keep one pair per base, `.user=security&.modal.user=`, read and
-// written as URLSearchParams, so every pair comes out in its canonical spelling and a segment's
-// parts are encoded twice: once by the segment, once by the param.
+// The query string and the hash spell a segment as one pair, `.user=security&.modal.user=`, read
+// and written as URLSearchParams, so every pair comes out in its canonical spelling and the parts
+// are encoded twice: once as parts text, once by the param.
 export function readParam(body: string, key: string): string | undefined {
   return new URLSearchParams(body).get(key) ?? undefined;
 }
