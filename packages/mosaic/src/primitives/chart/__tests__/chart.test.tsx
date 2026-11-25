@@ -355,7 +355,10 @@ describe('activating a period', () => {
     if (click) {
       fireEvent.click(interaction, { detail: 0 });
     }
-    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ datumIndex: 1 }));
+    expect(onActivate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ datumIndex: 1 }),
+      expect.objectContaining({ type: click ? 'click' : 'keydown' }),
+    );
   });
 
   it('reselects a dismissed period on Enter before opening it', () => {
@@ -366,7 +369,7 @@ describe('activating a period', () => {
     expect(active()).toMatchObject({ category: 'Mar' });
 
     fireEvent.keyDown(interaction, { key: 'Enter' });
-    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ category: 'Mar' }));
+    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ category: 'Mar' }), expect.anything());
   });
 
   it('selects and activates a projection-only period with the keyboard', () => {
@@ -385,6 +388,7 @@ describe('activating a period', () => {
     expect(active()).toMatchObject({ category: 'Mar', section: 'positive' });
     expect(onActivate).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ datum, datumIndex: 0, section: 'positive' }),
+      expect.anything(),
     );
   });
 
@@ -435,7 +439,10 @@ describe('keeping the selection when data changes', () => {
     expect(active()).toMatchObject({ category: 'Jan', datumIndex: 1 });
     expect(getByRole('status')).toHaveTextContent('Jan, value 99');
     fireEvent.keyDown(getByRole('button'), { key: 'Enter' });
-    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ datum: refreshed, datumIndex: 1 }));
+    expect(onActivate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ datum: refreshed, datumIndex: 1 }),
+      expect.anything(),
+    );
   });
 
   it('keeps a consumer that stores the selection in sync as its data changes', () => {
@@ -476,7 +483,10 @@ describe('keeping the selection when data changes', () => {
       fireEvent.keyDown(interaction, { key });
       expect(active()).toMatchObject({ datumIndex: 0, category: 'Jan' });
       if (key !== 'ArrowDown') {
-        expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ datumIndex: 0, datum: quarter[0] }));
+        expect(onActivate).toHaveBeenLastCalledWith(
+          expect.objectContaining({ datumIndex: 0, datum: quarter[0] }),
+          expect.anything(),
+        );
       }
     },
   );
@@ -571,7 +581,7 @@ describe('controlling the selection', () => {
     expect(selectedTick()).toBe('Mar');
 
     fireEvent.keyDown(interaction, { key: 'Enter' });
-    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ category: 'Mar' }));
+    expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ category: 'Mar' }), expect.anything());
   });
 });
 
@@ -600,5 +610,57 @@ describe('rendering from the chart object', () => {
     press(surface, 'End');
 
     expect(screen.getByRole('status', { name: 'Selected period' })).toHaveTextContent('Mar');
+  });
+
+  it('runs handlers passed to getInteractionProps after its own', () => {
+    const onKeyDown = vi.fn();
+    function CustomChart() {
+      const chart = Chart.useBarChart({ ...chartFixture, data: quarter, onSelectionChange: () => {} });
+      const { rootRef } = chart;
+      return (
+        <div ref={rootRef}>
+          <div
+            {...chart.getInteractionProps({ onKeyDown })}
+            aria-label='Growth'
+          />
+          <output aria-label='Selected period'>{chart.selected?.category}</output>
+        </div>
+      );
+    }
+    render(<CustomChart />);
+
+    press(screen.getByRole('group', { name: 'Growth' }), 'End');
+
+    expect(screen.getByRole('status', { name: 'Selected period' })).toHaveTextContent('Mar');
+    expect(onKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key: 'End' }));
+  });
+});
+
+describe('starting and disabling the selection', () => {
+  it('starts from `defaultSelection` and then holds the selection itself', () => {
+    const onSelectionChange = vi.fn();
+    const { interaction, active } = renderChart({
+      data: quarter,
+      onSelectionChange,
+      defaultSelection: { category: 'Feb', section: 'positive' },
+    });
+    expect(active()).toMatchObject({ category: 'Feb' });
+    expect(onSelectionChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(interaction, { key: 'End' });
+    expect(active()).toMatchObject({ category: 'Mar' });
+  });
+
+  it('ignores the pointer and keyboard and leaves the tab order while `disabled`', () => {
+    const onActivate = vi.fn();
+    const { interaction, active } = renderChart({ data: quarter, onActivate, disabled: true });
+    expect(interaction).not.toHaveAttribute('tabindex');
+    expect(interaction).toHaveAttribute('aria-disabled', 'true');
+
+    press(interaction, 'End', 'Enter');
+    fireEvent.click(interaction, { detail: 0 });
+
+    expect(active()).toBeNull();
+    expect(onActivate).not.toHaveBeenCalled();
   });
 });

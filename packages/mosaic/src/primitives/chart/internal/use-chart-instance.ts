@@ -3,10 +3,12 @@
 import React from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
+import { mergeProps } from '../../utils';
 import type {
   ChartActive,
   ChartCategory,
   ChartInstance,
+  ChartInteractionInput,
   ChartInteractionProps,
   ChartMargin,
   ChartOptions,
@@ -148,7 +150,11 @@ export function useChartInstance<
     [categories, plot, size.width],
   );
 
-  const [value, setValue] = useControllableState<TSelection | null>(options.selection, null, options.onSelectionChange);
+  const [value, setValue] = useControllableState<TSelection | null>(
+    options.selection,
+    options.defaultSelection ?? null,
+    options.onSelectionChange,
+  );
   const [stored, setStored] = React.useState<SelectionState<TSelection>>(NO_SELECTION);
   const state = reconcileSelection(stored, value);
   const stateRef = React.useRef(state);
@@ -267,27 +273,25 @@ export function useChartInstance<
     });
   };
 
-  const activate = (selection: TSelection | null) => {
+  type ActivationEvent = React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
+  const activate = (selection: TSelection | null, event: ActivationEvent) => {
     const active = resolve(selection);
     if (active) {
-      onActivate?.(active);
+      onActivate?.(active, event);
     }
   };
 
-  const activateKeyboardSelection = () => {
+  const activateKeyboardSelection = (event: ActivationEvent) => {
     const dismissed = stateRef.current.status === 'dismissed';
     const next = selectKeyboardIndex(keyboardIndex(), undefined, currentSelection);
     if (!dismissed) {
-      activate(toPublicSelection(next));
+      activate(toPublicSelection(next), event);
     }
   };
 
+  const { disabled = false } = options;
   const reads = options.selection !== undefined || !!options.onSelectionChange || !!onActivate;
-  const getInteractionProps = (): ChartInteractionProps => ({
-    ...model.surfaceAttributes(currentSelection),
-    role: onActivate ? 'button' : 'group',
-    tabIndex: reads ? 0 : undefined,
-    ref: attachSurface,
+  const handlers = (): React.HTMLAttributes<HTMLElement> => ({
     onPointerDown: event => {
       event.preventDefault();
       // A tap fires no pointermove, so touch selects on contact and survives the pointerleave that
@@ -320,10 +324,10 @@ export function useChartInstance<
     onClick: event => {
       // Assistive technology activates the chart with a synthetic click that has no coordinates.
       if (event.detail === 0 && event.clientX === 0 && event.clientY === 0) {
-        activateKeyboardSelection();
+        activateKeyboardSelection(event);
         return;
       }
-      activate(pointerSelection(event.clientX, event.clientY));
+      activate(pointerSelection(event.clientX, event.clientY), event);
     },
     onKeyDown: event => {
       const intent = getKeyIntent(event.key, keyboardIndex(), categories.length - 1, !!onActivate);
@@ -334,12 +338,26 @@ export function useChartInstance<
       if (intent.type === 'dismiss') {
         dispatch({ type: 'dismiss' });
       } else if (intent.activate) {
-        activateKeyboardSelection();
+        activateKeyboardSelection(event);
       } else {
         selectKeyboardIndex(intent.index, intent.move, currentSelection);
       }
     },
   });
+  const getInteractionProps = (props: ChartInteractionInput = {}): ChartInteractionProps => {
+    const own = {
+      ...(disabled ? null : handlers()),
+      ...model.surfaceAttributes(currentSelection),
+      'aria-disabled': disabled ? (true as const) : undefined,
+    };
+    return {
+      ...mergeProps<'div'>(own, props),
+      role: onActivate ? 'button' : 'group',
+      tabIndex: reads && !disabled ? 0 : undefined,
+      ref: attachSurface,
+      'aria-disabled': own['aria-disabled'],
+    };
+  };
 
   return {
     rootRef,

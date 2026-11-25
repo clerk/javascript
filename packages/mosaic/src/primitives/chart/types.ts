@@ -59,10 +59,17 @@ export interface ChartOptions<TSelection extends ChartSelection, TActive extends
   margin?: Partial<ChartMargin>;
   /** The selection, or null. Leave it undefined to let the chart hold the selection. */
   selection?: TSelection | null;
+  /** The selection the chart starts with when it holds the selection. Default: null */
+  defaultSelection?: TSelection | null;
   /** Called when the user or `select`/`clear` changes the selection. */
   onSelectionChange?: (selection: TSelection | null) => void;
-  /** Called on click, Enter or Space. Makes the interaction surface a button. */
-  onActivate?: (active: TActive) => void;
+  /**
+   * Called on click, Enter or Space, with the event that activated it. Makes the interaction surface
+   * a button.
+   */
+  onActivate?: (active: TActive, event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => void;
+  /** Ignores the pointer and keyboard and leaves the tab order. `select` and `selection` still apply. Default: false */
+  disabled?: boolean;
   /** Names a category in announcements. Default: the category key */
   formatCategory?: (category: string) => string | null;
   /** Formats a value in announcements. Default: `String(value)` */
@@ -93,23 +100,21 @@ export type XTicksOptions = Readonly<{
 }>;
 
 /** Props for the element that takes pointer and keyboard selection, usually the plot. */
-export type ChartInteractionProps = Readonly<{
-  role: 'button' | 'group';
-  /** 0 while something reads the selection: `selection`, `onSelectionChange` or `onActivate`. */
-  tabIndex: 0 | undefined;
-  /** Removing the surface ends a pointer or keyboard selection, as leaving or blurring it does. */
-  ref: React.RefCallback<HTMLElement>;
-  onPointerDown: React.PointerEventHandler<HTMLElement>;
-  onPointerLeave: React.PointerEventHandler<HTMLElement>;
-  onPointerCancel: React.PointerEventHandler<HTMLElement>;
-  onPointerMove: React.PointerEventHandler<HTMLElement>;
-  onFocus: React.FocusEventHandler<HTMLElement>;
-  onBlur: React.FocusEventHandler<HTMLElement>;
-  onClick: React.MouseEventHandler<HTMLElement>;
-  onKeyDown: React.KeyboardEventHandler<HTMLElement>;
-  /** State the chart type exposes on the surface, such as `data-active-section`. */
-  [attribute: `data-${string}`]: string | undefined;
-}>;
+export type ChartInteractionProps = Omit<React.HTMLAttributes<HTMLElement>, 'role' | 'tabIndex'> &
+  Readonly<{
+    role: 'button' | 'group';
+    /** 0 while something reads the selection: `selection`, `onSelectionChange` or `onActivate`. Never while disabled. */
+    tabIndex: 0 | undefined;
+    /** Removing the surface ends a pointer or keyboard selection, as leaving or blurring it does. */
+    ref: React.RefCallback<HTMLElement>;
+    'aria-disabled': true | undefined;
+    /** State the chart type exposes on the surface, such as `data-active-section`. */
+    [attribute: `data-${string}`]: string | undefined;
+  }>;
+
+/** Props a custom surface passes to `getInteractionProps`. Its handlers run after the chart's. */
+export type ChartInteractionInput = Omit<React.HTMLAttributes<HTMLElement>, 'role' | 'tabIndex'> &
+  Readonly<{ [attribute: `data-${string}`]: string | undefined }>;
 
 /**
  * The measured layout and selection of one chart, returned by a chart-type hook such as
@@ -138,7 +143,7 @@ export type ChartInstance<
   keyboardInstructions: string;
   select: (selection: TSelection) => void;
   clear: () => void;
-  getInteractionProps: () => ChartInteractionProps;
+  getInteractionProps: (props?: ChartInteractionInput) => ChartInteractionProps;
 }>;
 
 /**

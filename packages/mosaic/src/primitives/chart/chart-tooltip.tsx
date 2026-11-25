@@ -1,77 +1,124 @@
 'use client';
 
-import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/react';
+import { arrow, autoUpdate, flip, offset, shift, size, useFloating, useInteractions } from '@floating-ui/react';
 import React from 'react';
 
 import { useTransition } from '../hooks/use-transition';
-import { Portal } from '../portal';
-import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
+import { TooltipContext, type TooltipContextValue } from '../tooltip/tooltip-context';
+import { cssVars } from '../utils/css-vars';
 import { getWindow } from '../utils/dom';
 import { parsePlacement } from '../utils/side-offset';
 import { useChartContext, useSelectionContext } from './chart-context';
 import type { ChartActive } from './types';
 
-const EDGE = 8;
-const SIDE_OFFSET = 16;
 const PINNED_BELOW_PLOT_WIDTH = 416;
-
-export type ChartTooltipProps<TActive extends ChartActive = ChartActive> = Omit<ComponentProps<'div'>, 'children'> & {
-  /** Content for the selected category, such as an `ActiveBar` from a bar chart. Return null to hide the tooltip. */
-  children: (active: TActive) => React.ReactNode;
-  /** Element the tooltip stays inside. Default: the chart */
-  boundaryRef?: React.RefObject<HTMLElement | null>;
-};
 
 type Side = 'left' | 'right';
 
-function tooltipMiddleware(getBoundary: () => Element | undefined, pinned: boolean) {
+export interface ChartTooltipProps<TActive extends ChartActive = ChartActive> {
+  /**
+   * Renders the tooltip for the selected category, usually `Chart.TooltipPortal`,
+   * `Chart.TooltipPositioner` and `Chart.TooltipPopup`. While the tooltip closes it receives the
+   * last selection, so the content does not change under the exit.
+   */
+  children: (active: TActive) => React.ReactNode;
+  /** The side tried first. The tooltip flips to the other side when this one does not fit. Default: 'right' */
+  side?: Side;
+  /** Distance in px from the selected category's center. Default: 16 */
+  sideOffset?: number;
+  /** Space in px kept between the tooltip and the edges of `collisionBoundary`. Default: 8 */
+  collisionPadding?: number;
+  /** Element the tooltip stays inside. Default: the chart */
+  collisionBoundary?: React.RefObject<HTMLElement | null>;
+  /**
+   * Pins the tooltip to the top left of `collisionBoundary` instead of beside the selection.
+   * `'auto'` pins it while the plot is narrower than 416px. Default: 'auto'
+   */
+  pinned?: boolean | 'auto';
+}
+
+type BoundaryRef = React.RefObject<HTMLElement | null>;
+
+/** Reads the boundary when floating-ui computes a position, not during render. */
+function boundaryReader(collisionBoundary: BoundaryRef | undefined, chartBoxRef: BoundaryRef) {
+  return () => collisionBoundary?.current ?? chartBoxRef.current ?? undefined;
+}
+
+function tooltipMiddleware(
+  getBoundary: () => Element | undefined,
+  pinned: boolean,
+  sideOffset: number,
+  padding: number,
+  arrowRef: React.RefObject<SVGSVGElement | null>,
+) {
   return [
-    offset(pinned ? 0 : SIDE_OFFSET),
-    flip(() => ({ boundary: getBoundary(), padding: EDGE, crossAxis: false })),
-    shift(() => ({ boundary: getBoundary(), padding: EDGE, crossAxis: true })),
+    offset(pinned ? 0 : sideOffset),
+    flip(() => ({ boundary: getBoundary(), padding, crossAxis: false })),
+    shift(() => ({ boundary: getBoundary(), padding, crossAxis: true })),
     size(() => ({
       boundary: getBoundary(),
-      padding: EDGE,
+      padding,
       apply({ elements }) {
         const boundary = getBoundary()?.getBoundingClientRect();
         const viewportWidth = getWindow(elements.floating).document.documentElement.clientWidth;
-        const left = Math.max(EDGE, (boundary?.left ?? 0) + EDGE);
-        const right = Math.min(viewportWidth - EDGE, (boundary?.right ?? viewportWidth) - EDGE);
+        const left = Math.max(padding, (boundary?.left ?? 0) + padding);
+        const right = Math.min(viewportWidth - padding, (boundary?.right ?? viewportWidth) - padding);
         elements.floating.style.maxWidth = `${Math.max(0, right - left)}px`;
       },
     })),
+    arrow({ element: arrowRef }),
+    cssVars({ sideOffset }),
   ];
 }
 
-// eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the active type parameter; the caller names the type its chart-type hook selects.
-export const ChartTooltip = React.forwardRef<HTMLDivElement, ChartTooltipProps>(function ChartTooltip(props, ref) {
-  const { children, boundaryRef, render, ...otherProps } = props;
+/**
+ * Positions a tooltip beside the selected category. It renders no element: it provides the
+ * Tooltip primitive's context, so `Chart.TooltipPortal`, `Chart.TooltipPositioner`,
+ * `Chart.TooltipPopup` and `Chart.TooltipArrow` are the Tooltip parts, anchored to the chart.
+ */
+export function ChartTooltip<TActive extends ChartActive = ChartActive>(props: ChartTooltipProps<TActive>) {
+  const {
+    children,
+    side = 'right',
+    sideOffset = 16,
+    collisionPadding = 8,
+    collisionBoundary,
+    pinned: pinnedProp = 'auto',
+  } = props;
   const { registerTooltip, chartBoxRef } = useSelectionContext('Tooltip');
   const { chart } = useChartContext('Tooltip');
-  const { plot, selected: active } = chart;
-  const chartWidth = chart.size.width;
   React.useLayoutEffect(registerTooltip, [registerTooltip]);
 
+  const { plot } = chart;
+  const chartWidth = chart.size.width;
   const anchor = chart.tooltipAnchor;
-  const content = active && anchor ? children(active) : null;
-  const open = content !== null && content !== undefined;
+  // eslint-disable-next-line typescript/consistent-type-assertions -- The context holds the chart without its active type; the caller names the type its chart-type hook selects.
+  const active = chart.selected as TActive | null;
+  const open = active !== null && anchor !== null;
   const anchorX = anchor?.x;
   const anchorY = anchor?.y;
 
-  const pinned = plot.width < PINNED_BELOW_PLOT_WIDTH;
-  const popupRef = React.useRef<HTMLDivElement | null>(null);
-  const getBoundary = React.useCallback(
-    () => boundaryRef?.current ?? chartBoxRef.current ?? undefined,
-    [boundaryRef, chartBoxRef],
-  );
-  // eslint-disable-next-line react/refs -- The middleware reads the boundary refs when floating-ui computes a position, not during render.
-  const middleware = React.useMemo(() => tooltipMiddleware(getBoundary, pinned), [getBoundary, pinned]);
+  const [held, setHeld] = React.useState<TActive | null>(active);
+  if (open && !Object.is(held, active)) {
+    setHeld(active);
+  }
 
-  const [lastSide, setLastSide] = React.useState<Side>('right');
+  const pinned = pinnedProp === 'auto' ? plot.width < PINNED_BELOW_PLOT_WIDTH : pinnedProp;
+  const popupRef = React.useRef<HTMLDivElement | null>(null);
+  const arrowRef = React.useRef<SVGSVGElement | null>(null);
+  const middleware = React.useMemo(
+    () =>
+      // eslint-disable-next-line react/refs -- The middleware reads the boundary and arrow refs when floating-ui computes a position, not during render.
+      tooltipMiddleware(boundaryReader(collisionBoundary, chartBoxRef), pinned, sideOffset, collisionPadding, arrowRef),
+    [chartBoxRef, collisionBoundary, collisionPadding, pinned, sideOffset],
+  );
+
+  const [lastSide, setLastSide] = React.useState<Side>(side);
   const {
     refs,
     floatingStyles,
-    placement: resolvedPlacement,
+    context: floatingContext,
+    placement,
     isPositioned,
   } = useFloating({
     open,
@@ -81,52 +128,53 @@ export const ChartTooltip = React.forwardRef<HTMLDivElement, ChartTooltipProps>(
     middleware,
     whileElementsMounted: autoUpdate,
   });
-  const resolvedSide = parsePlacement(resolvedPlacement).side;
+  const resolvedSide = parsePlacement(placement).side;
   // Starting from the side chosen last time stops the tooltip crossing the selection twice near an edge.
   if (!pinned && (resolvedSide === 'left' || resolvedSide === 'right') && resolvedSide !== lastSide) {
     setLastSide(resolvedSide);
   }
 
   React.useLayoutEffect(() => {
-    const chart = chartBoxRef.current;
-    if (anchorX === undefined || anchorY === undefined || !chart || chartWidth <= 0) {
+    const box = chartBoxRef.current;
+    if (anchorX === undefined || anchorY === undefined || !box || chartWidth <= 0) {
       return;
     }
     const getBoundingClientRect = () => {
-      const chartRect = chart.getBoundingClientRect();
+      const chartRect = box.getBoundingClientRect();
       if (pinned) {
-        const boundary = getBoundary()?.getBoundingClientRect() ?? chartRect;
-        return new DOMRect(boundary.left + EDGE, boundary.top + EDGE, 0, 0);
+        const boundary = boundaryReader(collisionBoundary, chartBoxRef)()?.getBoundingClientRect() ?? chartRect;
+        return new DOMRect(boundary.left + collisionPadding, boundary.top + collisionPadding, 0, 0);
       }
       const x = Math.round((chartRect.left + (anchorX / chartWidth) * chartRect.width) * 2) / 2;
       return new DOMRect(x, chartRect.top + anchorY, 0, 0);
     };
-    refs.setReference({ getBoundingClientRect, contextElement: chart });
-  }, [anchorX, anchorY, chartBoxRef, chartWidth, getBoundary, pinned, refs]);
+    refs.setReference({ getBoundingClientRect, contextElement: box });
+  }, [anchorX, anchorY, chartBoxRef, chartWidth, collisionBoundary, collisionPadding, pinned, refs]);
 
   const { mounted, transitionProps } = useTransition({ open, ref: popupRef });
+  const { getReferenceProps, getFloatingProps } = useInteractions([]);
 
-  const ownProps = {
-    ...transitionProps,
-    'data-side': resolvedSide,
-    style: {
-      ...floatingStyles,
-      pointerEvents: 'none',
-      ...(isPositioned ? null : { visibility: 'hidden' }),
-      ...transitionProps.style,
-    },
-    children: <Freeze frozen={!open}>{open ? content : null}</Freeze>,
-  } satisfies DefaultProps<'div'>;
+  const style = React.useMemo<React.CSSProperties>(
+    () => ({ ...floatingStyles, pointerEvents: 'none', ...(isPositioned ? null : { visibility: 'hidden' }) }),
+    [floatingStyles, isPositioned],
+  );
+  const context = React.useMemo<TooltipContextValue>(
+    () => ({
+      open,
+      floatingContext,
+      refs,
+      floatingStyles: style,
+      placement,
+      getReferenceProps,
+      getFloatingProps,
+      popupRef,
+      arrowRef,
+      mounted,
+      transitionProps,
+    }),
+    [floatingContext, getFloatingProps, getReferenceProps, mounted, open, placement, refs, style, transitionProps],
+  );
 
-  const element = useRender({
-    defaultTagName: 'div',
-    render,
-    enabled: mounted,
-    ref: [refs.setFloating, popupRef, ref],
-    props: mergeProps<'div'>(ownProps, otherProps),
-  });
-
-  return mounted ? <Portal>{element}</Portal> : null;
-}) as <TActive extends ChartActive = ChartActive>(
-  props: ChartTooltipProps<TActive> & { ref?: React.Ref<HTMLDivElement> },
-) => React.ReactElement | null;
+  const shown = open ? active : held;
+  return <TooltipContext.Provider value={context}>{mounted && shown ? children(shown) : null}</TooltipContext.Provider>;
+}

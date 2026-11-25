@@ -66,7 +66,17 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   </Chart.XAxis>
   <Chart.Selection>
     <Chart.Cursor className='cursor' />
-    <Chart.Tooltip<ActiveBar<Row>> className='tooltip'>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+    <Chart.Tooltip<ActiveBar<Row>>>
+      {active => (
+        <Chart.TooltipPortal>
+          <Chart.TooltipPositioner>
+            <Chart.TooltipPopup className='tooltip'>
+              <PeriodSummary row={active.datum} />
+            </Chart.TooltipPopup>
+          </Chart.TooltipPositioner>
+        </Chart.TooltipPortal>
+      )}
+    </Chart.Tooltip>
   </Chart.Selection>
 </Chart.Root>;
 ```
@@ -89,7 +99,11 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.XTick`             | `<text>`        | One category label                                                   |
 | `Chart.Selection`         | `<div>`         | Pointer and keyboard selection over the whole chart                  |
 | `Chart.Cursor`            | `<div>`         | Covers the selected category                                         |
-| `Chart.Tooltip`           | `<div>`         | The tooltip for the selected category, portaled                      |
+| `Chart.Tooltip`           | (none)          | Positions a tooltip at the selected category                         |
+| `Chart.TooltipPortal`     | (none)          | Portals the tooltip while it is mounted                              |
+| `Chart.TooltipPositioner` | `<div>`         | The positioned element. Carries `data-side`                          |
+| `Chart.TooltipPopup`      | `<div>`         | The element that animates. Carries `data-open` and `data-closed`     |
+| `Chart.TooltipArrow`      | `<svg>`         | An arrow pointing at the selected category                           |
 
 Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
 
@@ -124,30 +138,38 @@ The namespace also holds `Chart.useBarChart` and `Chart.CanvasRenderError`.
 
 ### `Chart.Tooltip`
 
-| Prop          | Type                             | Default   | Description                                                        |
-| ------------- | -------------------------------- | --------- | ------------------------------------------------------------------ |
-| `children`    | `(active: TActive) => ReactNode` | —         | Content for the selected category. Return null to hide the tooltip |
-| `boundaryRef` | `RefObject<HTMLElement \| null>` | the chart | Element the tooltip stays inside                                   |
+| Prop                | Type                             | Default   | Description                                                                 |
+| ------------------- | -------------------------------- | --------- | --------------------------------------------------------------------------- |
+| `children`          | `(active: TActive) => ReactNode` | —         | Renders the tooltip parts. While it closes, receives the last selection     |
+| `side`              | `'left' \| 'right'`              | `'right'` | The side tried first                                                        |
+| `sideOffset`        | `number`                         | `16`      | Distance in px from the category center                                     |
+| `collisionPadding`  | `number`                         | `8`       | Space in px kept from the edges of `collisionBoundary`                      |
+| `collisionBoundary` | `RefObject<HTMLElement \| null>` | the chart | Element the tooltip stays inside                                            |
+| `pinned`            | `boolean \| 'auto'`              | `'auto'`  | Pins the tooltip to the top left of the boundary. `auto` below a 416px plot |
+
+`Chart.Tooltip` renders no element. It provides the context of the [Tooltip primitive](../tooltip/README.md), so `Chart.TooltipPortal`, `Chart.TooltipPositioner`, `Chart.TooltipPopup` and `Chart.TooltipArrow` are the Tooltip parts, anchored to the chart instead of a trigger. Style the popup, not the positioner, which keeps `pointer-events: none` so the tooltip never takes the pointer from the chart.
 
 Name the active type the chart's hook selects, such as `<Chart.Tooltip<ActiveBar<Row>>>`. It defaults to `ChartActive`: the selected `category`, `datumIndex` and `datum`.
 
 ### `Chart.useBarChart`
 
-| Option              | Type                                        | Default         | Description                                                        |
-| ------------------- | ------------------------------------------- | --------------- | ------------------------------------------------------------------ |
-| `data`              | `readonly TDatum[]`                         | (required)      | The rows                                                           |
-| `series`            | `readonly BarSeries<TDatum>[]`              | (required)      | Stack order and each series' value                                 |
-| `index`             | `(datum: TDatum, index: number) => string`  | (required)      | A unique, stable category key                                      |
-| `categoryGap`       | `number`                                    | `0.28`          | Fraction of each category band left empty                          |
-| `margin`            | `Partial<ChartMargin>`                      | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)      |
-| `projection`        | `BarProjection`                             | —               | A projected total, drawn when it rises above its category's stack  |
-| `isBarActive`       | `(bar: BarIdentity<TDatum>) => boolean`     | every bar       | Returns false for a bar that `Chart.Bar` styles as `data-inactive` |
-| `selection`         | `BarSelection \| null`                      | uncontrolled    | The selected category and section. `null` selects nothing          |
-| `onSelectionChange` | `(selection: BarSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection    |
-| `onActivate`        | `(active: ActiveBar<TDatum>) => void`       | —               | Called on click, Enter or Space. Makes the surface a button        |
-| `formatCategory`    | `(key: string) => string \| null`           | the key         | Names a period in keyboard announcements                           |
-| `formatValue`       | `(value: number) => string`                 | `String`        | Formats a value in keyboard announcements                          |
-| `messages`          | `Partial<BarChartMessages>`                 | English         | Screen reader text, including how Up and Down move                 |
+| Option              | Type                                         | Default         | Description                                                        |
+| ------------------- | -------------------------------------------- | --------------- | ------------------------------------------------------------------ |
+| `data`              | `readonly TDatum[]`                          | (required)      | The rows                                                           |
+| `series`            | `readonly BarSeries<TDatum>[]`               | (required)      | Stack order and each series' value                                 |
+| `index`             | `(datum: TDatum, index: number) => string`   | (required)      | A unique, stable category key                                      |
+| `categoryGap`       | `number`                                     | `0.28`          | Fraction of each category band left empty                          |
+| `margin`            | `Partial<ChartMargin>`                       | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)      |
+| `projection`        | `BarProjection`                              | —               | A projected total, drawn when it rises above its category's stack  |
+| `isBarActive`       | `(bar: BarIdentity<TDatum>) => boolean`      | every bar       | Returns false for a bar that `Chart.Bar` styles as `data-inactive` |
+| `selection`         | `BarSelection \| null`                       | uncontrolled    | The selected category and section. `null` selects nothing          |
+| `onSelectionChange` | `(selection: BarSelection \| null) => void`  | —               | Called when the user, `select` or `clear` changes the selection    |
+| `defaultSelection`  | `BarSelection \| null`                       | `null`          | The selection the chart starts with when it holds the selection    |
+| `onActivate`        | `(active: ActiveBar<TDatum>, event) => void` | —               | Called on click, Enter or Space, with the event. Makes a button    |
+| `disabled`          | `boolean`                                    | `false`         | Ignores the pointer and keyboard and leaves the tab order          |
+| `formatCategory`    | `(key: string) => string \| null`            | the key         | Names a period in keyboard announcements                           |
+| `formatValue`       | `(value: number) => string`                  | `String`        | Formats a value in keyboard announcements                          |
+| `messages`          | `Partial<BarChartMessages>`                  | English         | Screen reader text, including how Up and Down move                 |
 
 A `BarSeries` is `{ key, label?, value }`, and a `BarProjection` is `{ datumIndex, value, label? }`. Announcements name each by its `label`, or by `key` and `messages.projected`. `BarSelection` is `{ category, section }`. A new `isBarActive` function repaints the Canvas. `margin` and the last six options are the [options every chart type takes](#options-every-chart-type-takes). `BarChartMessages` adds `vertical`, `positiveValues`, `negativeValues` and `projected` to `ChartMessages`.
 
@@ -159,35 +181,37 @@ The hook returns a `BarChartInstance<TDatum>`: the [chart object](#the-chart-obj
 
 A chart-type hook returns a `ChartInstance` plus what its own marks need. A chart with a value axis, such as bars, returns a `CartesianChartInstance`, which adds `scaleY` and `yTicks`:
 
-| Field                   | Type                                     | Description                                                                     |
-| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| `rootRef`               | `(element: HTMLElement \| null) => void` | Measures the element. `Chart.Root` attaches it                                  |
-| `size`                  | `ChartSize`                              | The measured container, zero until the first measurement                        |
-| `plot`                  | `ChartPlot`                              | The plot rectangle inside the margin                                            |
-| `scaleY`                | `(value: number) => number`              | Cartesian only. Maps a value to a Y coordinate                                  |
-| `yTicks`                | `readonly ChartTick[]`                   | Cartesian only. The Y ticks                                                     |
-| `categories`            | `readonly ChartCategory[]`               | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`               |
-| `xTicks`                | `(options?: XTicksOptions) => XTick[]`   | The X labels for a tick mode, as `Chart.XAxis` computes them                    |
-| `selected`              | `TActive \| null`                        | The selection in the current data                                               |
-| `tooltipAnchor`         | `{ x, y } \| null`                       | Where a tooltip for `selected` points                                           |
-| `announcement`          | `string`                                 | The status text for the keyboard selection                                      |
-| `keyboardInstructions`  | `string`                                 | The keys the chart answers to                                                   |
-| `select`, `clear`       | `(selection) => void`, `() => void`      | Change the selection and call `onSelectionChange`                               |
-| `getInteractionProps()` | `ChartInteractionProps`                  | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers |
+| Field                   | Type                                     | Description                                                                                          |
+| ----------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `rootRef`               | `(element: HTMLElement \| null) => void` | Measures the element. `Chart.Root` attaches it                                                       |
+| `size`                  | `ChartSize`                              | The measured container, zero until the first measurement                                             |
+| `plot`                  | `ChartPlot`                              | The plot rectangle inside the margin                                                                 |
+| `scaleY`                | `(value: number) => number`              | Cartesian only. Maps a value to a Y coordinate                                                       |
+| `yTicks`                | `readonly ChartTick[]`                   | Cartesian only. The Y ticks                                                                          |
+| `categories`            | `readonly ChartCategory[]`               | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`                                    |
+| `xTicks`                | `(options?: XTicksOptions) => XTick[]`   | The X labels for a tick mode, as `Chart.XAxis` computes them                                         |
+| `selected`              | `TActive \| null`                        | The selection in the current data                                                                    |
+| `tooltipAnchor`         | `{ x, y } \| null`                       | Where a tooltip for `selected` points                                                                |
+| `announcement`          | `string`                                 | The status text for the keyboard selection                                                           |
+| `keyboardInstructions`  | `string`                                 | The keys the chart answers to                                                                        |
+| `select`, `clear`       | `(selection) => void`, `() => void`      | Change the selection and call `onSelectionChange`                                                    |
+| `getInteractionProps()` | `(props?) => ChartInteractionProps`      | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers, merged with `props` |
 
 A category's `x` and `width` are the extent its marks occupy: a band for bars. Its `center` is where the pointer snaps, the X tick sits and the tooltip anchors. `Chart.Root` and the shared parts hold the chart as a `ChartInstance`, whose `select` takes no value, so only the code that called the hook can select. `Chart.Grid`, `Chart.YAxis` and `Chart.YLine` throw when the chart has no value axis.
 
 ## Options every chart type takes
 
-| Option              | Type                                      | Default         | Description                                                       |
-| ------------------- | ----------------------------------------- | --------------- | ----------------------------------------------------------------- |
-| `margin`            | `Partial<ChartMargin>`                    | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)     |
-| `selection`         | `TSelection \| null`                      | uncontrolled    | The selection. `null` selects nothing                             |
-| `onSelectionChange` | `(selection: TSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection   |
-| `onActivate`        | `(active: TActive) => void`               | —               | Called on click, Enter or Space. Makes the surface a button       |
-| `formatCategory`    | `(key: string) => string \| null`         | the key         | Names a period in keyboard announcements                          |
-| `formatValue`       | `(value: number) => string`               | `String`        | Formats a value in keyboard announcements                         |
-| `messages`          | `Partial<ChartMessages>`                  | English         | Screen reader text: `navigate`, `activate`, `dismiss`, `noValues` |
+| Option              | Type                                      | Default         | Description                                                                                     |
+| ------------------- | ----------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------- |
+| `margin`            | `Partial<ChartMargin>`                    | `8, 16, 36, 52` | Space around the plot for the axes (top, right, bottom, left)                                   |
+| `selection`         | `TSelection \| null`                      | uncontrolled    | The selection. `null` selects nothing                                                           |
+| `onSelectionChange` | `(selection: TSelection \| null) => void` | —               | Called when the user, `select` or `clear` changes the selection                                 |
+| `defaultSelection`  | `TSelection \| null`                      | `null`          | The selection the chart starts with when it holds the selection                                 |
+| `onActivate`        | `(active: TActive, event) => void`        | —               | Called on click, Enter or Space, with the mouse or keyboard event. Makes the surface a button   |
+| `disabled`          | `boolean`                                 | `false`         | Ignores the pointer and keyboard and leaves the tab order. `select` and `selection` still apply |
+| `formatCategory`    | `(key: string) => string \| null`         | the key         | Names a period in keyboard announcements                                                        |
+| `formatValue`       | `(value: number) => string`               | `String`        | Formats a value in keyboard announcements                                                       |
+| `messages`          | `Partial<ChartMessages>`                  | English         | Screen reader text: `navigate`, `activate`, `dismiss`, `noValues`                               |
 
 ## Keyboard
 
@@ -207,7 +231,7 @@ A pointer selects what the chart type hit-tests under it, and nothing over empty
 
 ## Selection
 
-The chart holds the selection unless you pass `selection`. `onSelectionChange` is called whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. A data change alone does not call it: `chart.selected` resolves the selection against the current data, so a selection whose category disappears reads as null until the user moves. The exception is data that empties, covered below.
+The chart holds the selection unless you pass `selection`, starting from `defaultSelection`. `onSelectionChange` is called whenever a pointer move, a key, a focus change, `select` or `clear` changes it, in both modes. A data change alone does not call it: `chart.selected` resolves the selection against the current data, so a selection whose category disappears reads as null until the user moves. The exception is data that empties, covered below.
 
 Removing the interaction surface, such as unmounting `Chart.Selection`, ends a pointer or keyboard selection and calls `onSelectionChange` with null, as leaving or blurring the surface does. A selection set through `selection` or `select` stays. `Chart.Selection` also removes its surface when the data has no categories.
 
@@ -240,7 +264,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
 
 ## Rendering from the chart object
 
-The parts are optional. Attach `rootRef` to the measured element, spread `getInteractionProps()` on the element that takes selection, and render from the layout fields. Read `rootRef` into its own variable first: the React Compiler lint treats an object whose member is passed to `ref` as a ref, and then flags calls on it during render.
+The parts are optional. Attach `rootRef` to the measured element, spread `getInteractionProps()` on the element that takes selection (pass your own handlers to it, and they run after the chart's), and render from the layout fields. Read `rootRef` into its own variable first: the React Compiler lint treats an object whose member is passed to `ref` as a ref, and then flags calls on it during render.
 
 ```tsx
 const chart = Chart.useBarChart({ data, series, index, onSelectionChange });
@@ -265,20 +289,20 @@ Painting the bars is the one thing the chart object does not do, because their c
 
 ## Data attributes
 
-| Attribute                     | Part              | Description                                                                                                          |
-| ----------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `data-chart-interaction-mode` | `Chart.Root`      | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
-| `data-active`                 | `Chart.XTick`     | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
-| `data-active-section`         | `Chart.Selection` | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
-| `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
-| `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
+| Attribute                     | Part                      | Description                                                                                                          |
+| ----------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `data-chart-interaction-mode` | `Chart.Root`              | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
+| `data-active`                 | `Chart.XTick`             | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
+| `data-active-section`         | `Chart.Selection`         | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
+| `data-side`                   | `Chart.TooltipPositioner` | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
+| `data-open` / `data-closed`   | `Chart.TooltipPopup`      | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
 
 The interaction surface also carries the chart type's state, such as `data-active-section` for bars. `Chart.Bar` takes its own attributes before each paint, listed under [Styling](#styling).
 
 ## Accessibility
 
 - The chart type's marks carry `role="img"` and the `aria-label` from `Chart.Root`: for bars, the Canvas. The grid, axes, cursor, lines and projection outline are `aria-hidden`.
-- The interaction surface sits outside the image role, so assistive technology can reach it. It is a `button` with `onActivate`, otherwise a `group`, and takes the same `aria-label`.
+- The interaction surface sits outside the image role, so assistive technology can reach it. It is a `button` with `onActivate`, otherwise a `group`, and takes the same `aria-label`. With `disabled` it carries `aria-disabled="true"` and leaves the tab order.
 - Visually hidden text describes the keys. A `status` region announces the selected period, named through `formatCategory`, and what the chart type adds. Pass `messages` to localize both.
 - An assistive-technology click without coordinates activates the selected period.
 
@@ -373,7 +397,7 @@ A lost or missing 2D context throws `Chart.CanvasRenderError`, with the original
 
 ## Tooltip
 
-`Chart.Tooltip` positions with Floating UI against a virtual element at the chart's `tooltipAnchor`: the selected category's center, at the Y the chart type gives (the top of the plot for bars). It opens to the right, flips left when the right side does not fit inside `boundaryRef`, and keeps the side it chose last until that side stops fitting, so it does not cross the selection twice near an edge. When the plot is narrower than 416px, it pins to the top-left of the boundary instead. It portals through Mosaic's `Portal`, so a `PortalProvider` decides where. It animates through `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`, and holds its last content while it closes.
+`Chart.Tooltip` positions with Floating UI against a virtual element at the chart's `tooltipAnchor`: the selected category's center, at the Y the chart type gives (the top of the plot for bars). It opens on `side`, flips to the other side when that one does not fit inside `collisionBoundary`, and keeps the side it chose last until that side stops fitting, so it does not cross the selection twice near an edge. A keyboard selection starts at the first period, so near the left edge it usually settles on the right. When `pinned`, or by default when the plot is narrower than 416px, it pins to the top-left of the boundary instead. `Chart.TooltipPortal` portals through Mosaic's `Portal`, so a `PortalProvider` decides where. `Chart.TooltipPopup` animates through `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`, and `Chart.Tooltip` passes its children the last selection while the popup closes.
 
 ## Dependencies and bundle size
 
