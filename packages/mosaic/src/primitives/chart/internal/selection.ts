@@ -1,4 +1,4 @@
-import type { ChartActive, ChartCategory, ChartMessages, ChartSelection } from '../types';
+import type { ChartActive, ChartCategory, ChartMessages, ChartPoint, ChartSelection } from '../types';
 
 export const DEFAULT_CHART_MESSAGES = {
   navigate: 'Use Left and Right to choose a period, or Home and End to jump to the first or last.',
@@ -18,8 +18,11 @@ export type SelectionModel<
   TActive extends ChartActive,
   TCategory extends ChartCategory = ChartCategory,
 > = Readonly<{
-  /** The selection under a pointer at plot-space `y` over `category`. `current` lets a model hold its pick near a boundary. */
-  hitTest: (category: TCategory, y: number, current: TSelection | null) => TSelection | null;
+  /**
+   * The selection under a pointer, or null when the pointer is off every mark. `current` lets a
+   * model hold its pick near a boundary.
+   */
+  hitTest: (point: ChartPoint, current: TSelection | null) => TSelection | null;
   /**
    * Where the keyboard lands on `category`. Up and Down pass `move`; otherwise the model keeps what it
    * can of `current`. Null when the category has nothing to select.
@@ -27,12 +30,12 @@ export type SelectionModel<
   land: (category: TCategory, move: VerticalMove | undefined, current: TSelection | null) => TSelection | null;
   /** The selection read against the current data, or null when the data no longer has it. */
   resolve: (selection: TSelection, category: TCategory) => TActive | null;
-  /** Follows the category name in an announcement, such as `positive values`. */
-  describe: (selection: TSelection) => string;
+  /** Follows the category name in an announcement: the selected values, such as `Sign-ups 20`. */
+  describe: (active: TActive) => string;
   /** The sentence about Up and Down in the keyboard instructions. */
   verticalInstructions: string;
-  /** Where a tooltip points on the Y axis, in chart coordinates. */
-  anchorY: (selection: TSelection, category: TCategory) => number;
+  /** Where a tooltip for the selection points. */
+  anchor: (selection: TSelection, category: TCategory) => ChartPoint;
   /** State the interaction surface carries for styling, such as `data-active-section`. */
   surfaceAttributes: (selection: TSelection | null) => Readonly<Record<`data-${string}`, string | undefined>>;
 }>;
@@ -170,19 +173,24 @@ export function getKeyIntent(key: string, index: number, lastIndex: number, canA
   }
 }
 
-export function getKeyboardAnnouncement<TSelection extends ChartSelection, TCategory extends ChartCategory>(
+export function getKeyboardAnnouncement<
+  TSelection extends ChartSelection,
+  TActive extends ChartActive,
+  TCategory extends ChartCategory,
+>(
   selected: Selected<TSelection> | null,
+  active: TActive | null,
   category: TCategory | undefined,
-  model: Pick<SelectionModel<TSelection, ChartActive, TCategory>, 'describe' | 'land'>,
+  model: Pick<SelectionModel<TSelection, TActive, TCategory>, 'describe' | 'land'>,
   formatCategory: (category: string) => string | null,
   messages: ChartMessages,
 ) {
   if (selected?.source !== 'keyboard') {
     return '';
   }
-  if (selected.selection) {
+  if (active) {
     const label = formatCategory(selected.category) ?? selected.category;
-    return `${label}, ${model.describe(selected.selection)}`;
+    return [label, model.describe(active)].filter(Boolean).join(', ');
   }
   const hasValues = !!category && model.land(category, undefined, null) !== null;
   return hasValues ? '' : messages.noValues;

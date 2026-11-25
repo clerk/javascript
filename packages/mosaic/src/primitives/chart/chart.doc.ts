@@ -257,7 +257,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   exports: {
     'Chart.useBarChart': {
       description:
-        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate`, `formatCategory` and `messages`. Returns the chart object for `Chart.Root`.',
+        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate`, `formatCategory`, `formatValue` and `messages`. Give each series a `label` so announcements name it. Returns the chart object for `Chart.Root`.',
     },
     'Chart.CanvasRenderError': {
       description:

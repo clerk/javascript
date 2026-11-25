@@ -71,6 +71,35 @@ describe('composing parts', () => {
     ).toThrow('<Chart.Bar> must be used within <Chart.Bars>');
   });
 
+  function ChartWithoutValueAxis({ children }: { children: React.ReactNode }) {
+    const { scaleY: _scaleY, yTicks: _yTicks, ...chart } = Chart.useBarChart(chartFixture);
+    return (
+      <Chart.Root
+        chart={chart}
+        aria-label='Growth'
+      >
+        {children}
+      </Chart.Root>
+    );
+  }
+
+  it.each([
+    ['Grid', <Chart.Grid key='grid' />],
+    ['YAxis', <Chart.YAxis key='y-axis' />],
+    [
+      'YLine',
+      <Chart.YLine
+        key='y-line'
+        value={0}
+      />,
+    ],
+  ])('throws when Chart.%s is given a chart without a value axis', (part, element) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => render(<ChartWithoutValueAxis>{element}</ChartWithoutValueAxis>)).toThrow(
+      `<Chart.${part}> needs a chart with a value axis, such as one from Chart.useBarChart`,
+    );
+  });
+
   it.each([
     ['an element', <section key='element' />],
     ['a function', (props: RenderProps) => <section {...props} />],
@@ -182,21 +211,42 @@ describe('choosing a period with the keyboard', () => {
     expect(active()).toMatchObject({ datumIndex: 0, section });
   });
 
+  const signups = [{ key: 'signups', label: 'Sign-ups', value: (row: ChartRow) => row.value }];
+  const gainedAndLost = [
+    { key: 'gained', label: 'Gained', value: (row: (typeof twoSided)[number]) => row.gained },
+    { key: 'lost', label: 'Lost', value: (row: (typeof twoSided)[number]) => row.lost },
+    { key: 'paused', label: 'Paused', value: () => 0 },
+  ];
+
   it.each([
     {
-      name: 'the selected period and section',
-      props: { data: quarter },
+      name: 'the period and its value, without a section, when no value is negative',
+      props: { data: quarter, series: signups },
       keys: ['ArrowRight'],
-      announcement: 'Feb, positive values',
+      announcement: 'Feb, Sign-ups 20',
     },
     {
-      name: 'the formatted period name',
+      name: 'the series key when a series has no label',
+      props: { data: quarter },
+      keys: ['ArrowRight'],
+      announcement: 'Feb, value 20',
+    },
+    {
+      name: 'the formatted period name and value',
       props: {
         data: quarter,
+        series: signups,
         formatXTick: (period: string) => `${period} 2026`,
+        formatValue: (value: number) => `${value} people`,
       },
       keys: [],
-      announcement: 'Jan 2026, positive values',
+      announcement: 'Jan 2026, Sign-ups 10 people',
+    },
+    {
+      name: 'the projection beside the values',
+      props: { data: quarter, series: signups, projection: { datumIndex: 2, value: 50, label: 'Projected' } },
+      keys: ['End'],
+      announcement: 'Mar, Sign-ups 30, Projected 50',
     },
     {
       name: 'a period that has no values',
@@ -210,17 +260,31 @@ describe('choosing a period with the keyboard', () => {
       announcement: 'No values for this period',
     },
   ])('announces $name', ({ props, keys, announcement }) => {
-    const { interaction, getByRole } = renderChart(props);
+    const { interaction, getByRole } = renderChart<ChartRow>(props);
     press(interaction, ...keys);
-    expect(getByRole('status')).toHaveTextContent(announcement);
+    expect(getByRole('status').textContent).toBe(announcement);
+  });
+
+  it.each([
+    { keys: [], announcement: 'Jan, positive values, Gained 12' },
+    { keys: ['ArrowDown'], announcement: 'Jan, negative values, Lost -4' },
+  ])('announces the section and its nonzero values after $keys on a stacked chart', ({ keys, announcement }) => {
+    const { interaction, getByRole } = renderChart({ ...growthChart, series: gainedAndLost, data: twoSided });
+    press(interaction, ...keys);
+    expect(getByRole('status').textContent).toBe(announcement);
   });
 
   const french = { negativeValues: 'valeurs négatives', noValues: 'Aucune valeur pour cette période' };
 
   it('announces a section in the language of `messages`', () => {
-    const { interaction, getByRole } = renderChart({ ...growthChart, data: twoSided, messages: french });
+    const { interaction, getByRole } = renderChart({
+      ...growthChart,
+      series: gainedAndLost,
+      data: twoSided,
+      messages: french,
+    });
     press(interaction, 'ArrowDown');
-    expect(getByRole('status')).toHaveTextContent('Jan, valeurs négatives');
+    expect(getByRole('status').textContent).toBe('Jan, valeurs négatives, Lost -4');
   });
 
   it('announces a period with no values in the language of `messages`', () => {
@@ -235,9 +299,17 @@ describe('choosing a period with the keyboard', () => {
     expect(getByRole('status')).toHaveTextContent('Aucune valeur pour cette période');
   });
 
+  it('leaves Up and Down out of the keys when no value is negative', () => {
+    const { interaction } = renderChart({ data: quarter });
+    expect(interaction).toHaveAccessibleDescription(
+      'Use Left and Right to choose a period, or Home and End to jump to the first or last. Press Escape to dismiss.',
+    );
+  });
+
   it('describes the keys in the language of `messages`', () => {
     const { interaction } = renderChart({
-      data: quarter,
+      ...growthChart,
+      data: twoSided,
       onActivate: () => {},
       messages: {
         navigate: 'Gauche et Droite choisissent une période.',
@@ -308,7 +380,7 @@ describe('activating a period', () => {
     });
 
     fireEvent.focus(interaction);
-    expect(getByRole('status')).toHaveTextContent('Mar, positive values');
+    expect(getByRole('status')).toHaveTextContent('Mar, Projected 20');
     fireEvent.keyDown(interaction, { key: 'Enter' });
     expect(active()).toMatchObject({ category: 'Mar', section: 'positive' });
     expect(onActivate).toHaveBeenCalledExactlyOnceWith(
@@ -361,7 +433,7 @@ describe('keeping the selection when data changes', () => {
     const refreshed = { period: 'Jan', value: 99 };
     rerenderChart({ data: [data[1], refreshed] });
     expect(active()).toMatchObject({ category: 'Jan', datumIndex: 1 });
-    expect(getByRole('status')).toHaveTextContent('Jan, positive values');
+    expect(getByRole('status')).toHaveTextContent('Jan, value 99');
     fireEvent.keyDown(getByRole('button'), { key: 'Enter' });
     expect(onActivate).toHaveBeenLastCalledWith(expect.objectContaining({ datum: refreshed, datumIndex: 1 }));
   });
@@ -416,12 +488,12 @@ describe('keeping the selection when data changes', () => {
     });
     const control = getByRole('group');
     press(control, 'ArrowDown');
-    expect(getByRole('status')).toHaveTextContent('Jan, negative values');
+    expect(getByRole('status')).toHaveTextContent('Jan, negative values, lost -10');
     rerenderChart({ data: [{ period: 'Jan', gained: 10, lost: 0 }] });
     expect(active()).toBeNull();
     expect(getByRole('status')).toBeEmptyDOMElement();
     fireEvent.keyDown(control, { key: 'ArrowDown' });
-    expect(getByRole('status')).toHaveTextContent('Jan, positive values');
+    expect(getByRole('status').textContent).toBe('Jan, gained 10');
   });
 });
 
@@ -431,13 +503,13 @@ describe('reading the selected period as data changes', () => {
       data: [{ period: 'Jan', value: 10 }],
     });
     fireEvent.focus(interaction);
-    expect(getByRole('status')).toHaveTextContent('Jan, positive values');
+    expect(getByRole('status')).toHaveTextContent('Jan, value 10');
 
     rerenderChart({ data: [{ period: 'Feb', value: 25 }] });
     expect(getByRole('status')).toBeEmptyDOMElement();
 
     fireEvent.keyDown(interaction, { key: 'Home' });
-    expect(getByRole('status')).toHaveTextContent('Feb, positive values');
+    expect(getByRole('status')).toHaveTextContent('Feb, value 25');
   });
 });
 

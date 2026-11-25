@@ -55,12 +55,43 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
     vertical = DEFAULT_BAR_MESSAGES.vertical,
     positiveValues = DEFAULT_BAR_MESSAGES.positiveValues,
     negativeValues = DEFAULT_BAR_MESSAGES.negativeValues,
+    projected = DEFAULT_BAR_MESSAGES.projected,
   } = options.messages ?? {};
+  const projectionLabel = projection?.label;
+  const { formatValue = String } = options;
   const model = React.useMemo(
-    () => barSelectionModel(layout, data, { vertical, positiveValues, negativeValues }),
-    [data, layout, vertical, positiveValues, negativeValues],
+    () =>
+      barSelectionModel({
+        layout,
+        data,
+        series,
+        projection:
+          projectionIndex === undefined || projectionValue === undefined
+            ? undefined
+            : { datumIndex: projectionIndex, value: projectionValue, label: projectionLabel },
+        formatValue,
+        messages: { vertical, positiveValues, negativeValues, projected },
+      }),
+    [
+      data,
+      formatValue,
+      layout,
+      negativeValues,
+      positiveValues,
+      projectionIndex,
+      projectionLabel,
+      projectionValue,
+      projected,
+      series,
+      vertical,
+    ],
   );
   const instance = useChartInstance({ frame, layout, model, options });
 
-  return { ...instance, [BAR_LAYOUT]: { prepared, projection: layout.projection, isBarActive } };
+  return {
+    ...instance,
+    scaleY: layout.scaleY,
+    yTicks: layout.yTicks,
+    [BAR_LAYOUT]: { prepared, projection: layout.projection, isBarActive },
+  };
 }

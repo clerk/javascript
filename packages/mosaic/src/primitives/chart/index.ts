@@ -18,6 +18,7 @@ export type {
   UseBarChartOptions,
 } from './parts';
 export type {
+  CartesianChartInstance,
   ChartActive,
   ChartCategory,
   ChartInstance,
@@ -26,6 +27,7 @@ export type {
   ChartMessages,
   ChartOptions,
   ChartPlot,
+  ChartPoint,
   ChartSelection,
   ChartSize,
   ChartTick,

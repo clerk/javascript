@@ -13,7 +13,6 @@ import type {
   ChartPlot,
   ChartSelection,
   ChartSize,
-  ChartTick,
   XTick,
   XTicksOptions,
 } from '../types';
@@ -22,7 +21,6 @@ import {
   getKeyboardAnnouncement,
   getKeyboardInstructions,
   getKeyIntent,
-  nearestCategory,
   NO_SELECTION,
   reconcileSelection,
   sameSelection,
@@ -47,8 +45,6 @@ export const DEFAULT_CHART_MARGIN: ChartMargin = {
 /** What a chart type's layout gives the shared instance. */
 export type ChartLayout<TCategory extends ChartCategory> = Readonly<{
   plot: ChartPlot;
-  scaleY: (value: number) => number;
-  yTicks: readonly ChartTick[];
   categories: readonly TCategory[];
 }>;
 
@@ -174,12 +170,17 @@ export function useChartInstance<
   // A selection whose category or value left the data reads as none until the user moves.
   const valid = current && currentCategory && (current.selection === null || selected) ? current : null;
   const messages = { ...DEFAULT_CHART_MESSAGES, ...options.messages };
-  const announcement = getKeyboardAnnouncement(valid, currentCategory, model, formatCategory, messages);
+  const announcement = getKeyboardAnnouncement(
+    valid,
+    valid?.selection ? selected : null,
+    currentCategory,
+    model,
+    formatCategory,
+    messages,
+  );
   const keyboardInstructions = getKeyboardInstructions(messages, model.verticalInstructions, !!onActivate);
   const tooltipAnchor =
-    valid?.selection && currentCategory && selected
-      ? { x: currentCategory.center, y: model.anchorY(valid.selection, currentCategory) }
-      : null;
+    valid?.selection && currentCategory && selected ? model.anchor(valid.selection, currentCategory) : null;
 
   const lastIndexRef = React.useRef(0);
   const selectedIndex = valid ? currentCategory?.datumIndex : undefined;
@@ -250,10 +251,11 @@ export function useChartInstance<
     if (!bounds || bounds.width <= 0 || bounds.height <= 0) {
       return null;
     }
-    const x = ((clientX - bounds.left) / bounds.width) * size.width;
-    const y = ((clientY - bounds.top) / bounds.height) * size.height;
-    const category = categories[nearestCategory(categories, x)];
-    return category ? model.hitTest(category, y, pointerUpdates.pending() ?? currentSelection) : null;
+    const point = {
+      x: ((clientX - bounds.left) / bounds.width) * size.width,
+      y: ((clientY - bounds.top) / bounds.height) * size.height,
+    };
+    return model.hitTest(point, pointerUpdates.pending() ?? currentSelection);
   };
 
   const selectKeyboardIndex = (target: number, move: VerticalMove | undefined, from: TSelection | null) => {
@@ -343,8 +345,6 @@ export function useChartInstance<
     rootRef,
     size,
     plot,
-    scaleY: layout.scaleY,
-    yTicks: layout.yTicks,
     categories,
     xTicks,
     selected,

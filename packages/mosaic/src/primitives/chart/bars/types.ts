@@ -6,10 +6,14 @@ export type CornerRadii = readonly [number, number, number, number];
 export type BarProjection = Readonly<{
   datumIndex: number;
   value: number;
+  /** Names the projection in announcements. Default: `messages.projected` */
+  label?: string;
 }>;
 
 export type BarSeries<TDatum> = Readonly<{
   key: string;
+  /** Names the series in announcements. Default: `key` */
+  label?: string;
   value: (datum: TDatum) => number | null | undefined;
 }>;
 
@@ -43,6 +47,8 @@ export type BarChartMessages = ChartMessages &
     positiveValues: string;
     /** Follows the period name when the negative section is selected. */
     negativeValues: string;
+    /** Names the projection in announcements when it has no `label`. */
+    projected: string;
   }>;
 
 export type BarCategory = ChartCategory &
