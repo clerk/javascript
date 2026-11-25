@@ -11,7 +11,7 @@ import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useRouterScope } from '../use-router';
 import { useVirtualEntries, useVirtualWrite, VirtualStoreProvider } from '../virtual-store';
 import type { HostUrl } from '../window-location';
-import { useWindowUrl } from '../window-location';
+import { markSettled, useWindowUrl } from '../window-location';
 
 // The contract every location mode keeps towards the components above it. A mode plugs in a
 // provider, a way to read an entry and a way to write one from outside, the way a host or a modal
@@ -168,7 +168,10 @@ function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: 
 
 const modes: LocationMode[] = [virtual, path, paramMode('hash', 'hash', ''), paramMode('query', 'search', '')];
 
-beforeEach(() => window.history.replaceState(null, '', '/'));
+beforeEach(() => {
+  markSettled();
+  window.history.replaceState(null, '', '/');
+});
 
 const routes = {
   index: '',

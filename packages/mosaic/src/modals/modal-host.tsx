@@ -70,13 +70,16 @@ export function ModalSurfaceHost<Options>({
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
-  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? 'virtual');
+  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? 'virtual', {
+    name: '"routing.modals"',
+    remount: 'Remount the provider to change it.',
+  });
   const base = surface.path ?? `/modal/${surface.id}`;
   const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
-  const page = useHostPathname();
+  const page = useHostPathname(routing);
 
-  // Close virtual modals when pathname changes
+  // Close the modal when the host moves to another pathname, in every mode
   const leftPage = isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
   React.useEffect(() => {
     if (leftPage) {

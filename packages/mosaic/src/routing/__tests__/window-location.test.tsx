@@ -46,9 +46,12 @@ describe('useWindowUrl', () => {
     Object.defineProperty(window, 'navigation', { value: navigation, configurable: true });
     try {
       const { result, unmount } = renderHook(() => useWindowUrl(true));
-      await act(async () => {
+      act(() => {
         window.history.pushState({ __NA: true }, '', '/page#.tabs=settings');
         navigation.dispatchEvent(new Event('currententrychange'));
+      });
+      expect(result.current?.hash).toBe('');
+      await act(async () => {
         await Promise.resolve();
       });
       expect(result.current?.hash).toBe('.tabs=settings');

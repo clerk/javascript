@@ -11,8 +11,12 @@ import { RoutingConfigProvider } from '../router-adapter';
 import type { MosaicLocationOptions } from '../use-mosaic-location';
 import { useMosaicLocation } from '../use-mosaic-location';
 import { VirtualStoreProvider } from '../virtual-store';
+import { markSettled } from '../window-location';
 
-beforeEach(() => window.history.replaceState(null, '', '/'));
+beforeEach(() => {
+  markSettled();
+  window.history.replaceState(null, '', '/');
+});
 afterEach(() => vi.restoreAllMocks());
 
 const warnings = () => vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
@@ -495,6 +499,12 @@ describe('with an adapter', () => {
     renderLocation({ routing: 'path', path: '/user' }, { adapter });
     expect(usePathname).toHaveBeenCalled();
     expect(useSearchParams).not.toHaveBeenCalled();
+    expect(useHash).not.toHaveBeenCalled();
+
+    usePathname.mockClear();
+    renderLocation({ routing: 'query', path: '/user' }, { adapter });
+    expect(useSearchParams).toHaveBeenCalled();
+    expect(usePathname).not.toHaveBeenCalled();
     expect(useHash).not.toHaveBeenCalled();
   });
 

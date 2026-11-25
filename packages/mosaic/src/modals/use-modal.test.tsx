@@ -1,17 +1,19 @@
 import { logger } from '@clerk/shared/logger';
 import { act, cleanup, configure, render, renderHook, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
 import { useRouterScope } from '../routing/use-router';
 import { useVirtualSegment, useVirtualWrite } from '../routing/virtual-store';
+import { markSettled } from '../routing/window-location';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
 import { useModal } from './use-modal';
 
+beforeEach(() => markSettled());
 afterEach(() => cleanup());
 
 interface StubOptions {
@@ -896,8 +898,25 @@ describe('a modal surface in query mode', () => {
     await flush();
     expect(ref.handle?.isOpen).toBe(true);
     expect(window.location.hash).toBe('');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"routing" changed'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"routing.modals" changed'));
     warn.mockRestore();
+  });
+
+  it('hides as soon as the host leaves the page, before a slow router has removed the param', async () => {
+    const replace = vi.fn<(url: string) => void>();
+    const { ref } = renderCaller(querySurface(), { routing: { adapter: { replace }, modals: 'query' } });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere?q=1&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(replace).toHaveBeenCalledWith('/elsewhere?q=1');
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+    expect(screen.queryByTestId('route')).toBeNull();
   });
 
   it('closes when the host moves to another pathname and carries the param along', async () => {
@@ -967,5 +986,104 @@ describe('a modal surface in query mode', () => {
     await flush();
     expect(ref.handle?.isOpen).toBe(false);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+});
+
+describe('a modal surface in hash mode', () => {
+  function hashSurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'hashed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: StubContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+  }
+
+  function laggingHost(pathname: string) {
+    const listeners = new Set<() => void>();
+    const host = {
+      pathname,
+      set(next: string) {
+        host.pathname = next;
+        listeners.forEach(listener => listener());
+      },
+      usePathname: () =>
+        useSyncExternalStore(
+          listener => {
+            listeners.add(listener);
+            return () => listeners.delete(listener);
+          },
+          () => host.pathname,
+        ),
+    };
+    return host;
+  }
+
+  beforeEach(() => window.history.replaceState(null, '', '/a'));
+
+  it('opens with a push to its hash param and closes by replacing it away', async () => {
+    const { ref } = renderCaller(hashSurface(), { routing: { modals: 'hash' } });
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('#.modal.stub=security');
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.hash).toBe('');
+  });
+
+  it('stays open on Back when the adapter pathname lags the restored hash by a commit', async () => {
+    const host = laggingHost('/a');
+    const { ref } = renderCaller(hashSurface(), {
+      routing: { adapter: { usePathname: host.usePathname }, modals: 'hash' },
+    });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      host.set('/b');
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => {
+      window.history.pushState(null, '', '/a#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => host.set('/a'));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('#.modal.stub=');
+  });
+
+  it('closes when the host moves to another pathname with the hash carried along', async () => {
+    const { ref } = renderCaller(hashSurface(), { routing: { modals: 'hash' } });
+    act(() => ref.handle?.open());
+    await flush();
+
+    act(() => {
+      window.history.pushState(null, '', '/a?q=2#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.hash).toBe('');
   });
 });

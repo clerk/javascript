@@ -85,17 +85,22 @@ function useVirtualModeLocation(path: string): MosaicLocation {
 }
 
 /**
- * Low level hook to read the pathname, should not be used directly by components.
+ * Low level hook to read the pathname, should not be used directly by components. It reads from the
+ * source a segment in `routing` comes from, so that a caller comparing the two sees them change in
+ * the same commit: `window` for hash mode, whose segment never comes from the adapter, and the
+ * adapter otherwise. The adapter hook is called either way, so the hooks stay unconditional.
  */
-export function useHostPathname(): string | undefined {
+export function useHostPathname(routing: RoutingMode): string | undefined {
   const { reads } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
-  return useAdapterRead(reads.usePathname, '') ?? fromWindow?.pathname;
+  const fromAdapter = useAdapterRead(reads.usePathname, '');
+  return routing === 'hash' ? fromWindow?.pathname : (fromAdapter ?? fromWindow?.pathname);
 }
 
 // Each mode renders from the one field of the URL it owns, read through the adapter when it has
 // that hook so the route agrees with what the host has rendered, and from `window` otherwise. The
-// other fields matter only to a write, which preserves them from the address bar.
+// other fields matter only to a write, which preserves them from the address bar, or from the
+// adapter's `readUrl` when it has one.
 function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocation {
   const { reads, push, replace, readUrl, queryPrefix, hashPrefix } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
@@ -117,7 +122,7 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
 
   // A segment kept in the page's URL. The location holds nothing of its own: it hands out the parts
   // decoded from the host's URL for this render, and a write goes straight to the host as a full URL
-  // built from the address bar. There are no owners to count, since the URL outlives a component by
+  // built from the address bar, or from the adapter's `readUrl`. There are no owners to count, since the URL outlives a component by
   // itself, and clearing replaces, so closing a modal leaves no segment to go back to.
   return useMemo<MosaicLocation>(
     () => ({
@@ -136,11 +141,14 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
 
 // The mode is fixed on the first render: each mode calls its own hooks, so a component changes mode
 // by remounting, which the profiles do by keying on `routing`.
-export function useFixedRoutingMode<Mode extends RoutingMode>(routing: Mode): Mode {
+export function useFixedRoutingMode<Mode extends RoutingMode>(
+  routing: Mode,
+  { name = '"routing"', remount = 'Key the component on its routing to change it.' } = {},
+): Mode {
   const [mode] = useState(routing);
   if (mode !== routing) {
     logger.warnOnce(
-      `[Clerk] "routing" changed from "${mode}" to "${routing}" without a remount, so it stays "${mode}". Key the component on its routing to change it.`,
+      `[Clerk] ${name} changed from "${mode}" to "${routing}" without a remount, so it stays "${mode}". ${remount}`,
     );
   }
   return mode;

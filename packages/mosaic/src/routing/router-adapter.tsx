@@ -9,11 +9,13 @@ import { markSettled } from './window-location';
 
 export type ModalRoutingMode = Exclude<RoutingMode, 'path'>;
 
-// What a host hands Mosaic so the URL modes read and write the host router's location instead of
-// `window`. It is a plain object the host writes from their own framework's hooks, so no framework
-// is a dependency of Mosaic. Every method is optional, and a missing one falls back to `window` on
-// its own. The pathname comes back as the address bar has it, percent-encoded, because Mosaic
-// splits it before it decodes it; the query string is the host's and its values are read decoded.
+/**
+ * What a host hands Mosaic so the URL modes read and write the host router's location instead of
+ * `window`. It is a plain object the host writes from their own framework's hooks, so no framework
+ * is a dependency of Mosaic. Every member is optional, and a missing one falls back to `window` on
+ * its own. The pathname comes back as the address bar has it, percent-encoded, because Mosaic
+ * splits it before it decodes it; the query string is the host's and its values are read decoded.
+ */
 export interface RouterAdapter {
   /**
    * A hook returning the current pathname, percent-encoded, as `location.pathname` does. `null` or
@@ -29,14 +31,14 @@ export interface RouterAdapter {
   useSearchParams?: () => string | URLSearchParams | null | undefined;
   /**
    * A hook returning the current hash, percent-encoded, as `location.hash` does. A leading `#` is
-   * optional. It is read only once the page has hydrated, since a server has no hash.
+   * optional. Its value is used only once the page has hydrated, since a server has no hash.
    */
   useHash?: () => string;
   /**
    * Navigates the host router to a URL made of a pathname, query string and hash, adding a history entry.
    *
    * Not providing this makes the push go through `history.pushState`, which is sometimes desirable
-   * even if your framework has it's own push, for example for Next where this is the mechanism to do
+   * even if your framework has its own push, for example for Next where this is the mechanism to do
    * a shallow navigation rather than one that hits the server.
    */
   push?: (url: string) => void;
@@ -56,7 +58,7 @@ export interface RouterAdapter {
 export interface RoutingOptions {
   /**
    * The host router's location and navigation. Without it, the URL modes read and write
-   * `window.location`. Its hooks are taken from the first render under the provider, so build the
+   * `window.location`. It is taken whole from the first render under the provider, so build the
    * adapter once, outside render.
    */
   adapter?: RouterAdapter;
@@ -142,7 +144,7 @@ export function RoutingConfigProvider({
   }));
   if (shapeOf(adapter) !== shape) {
     logger.warnOnce(
-      '[Clerk] The routing adapter changed which hooks it has after the first render, so the first set stays in use. Build the adapter once, outside render.',
+      '[Clerk] The routing adapter changed which hooks it has after the first render, so the first adapter stays in use. Build the adapter once, outside render.',
     );
   }
   useEffect(() => {
