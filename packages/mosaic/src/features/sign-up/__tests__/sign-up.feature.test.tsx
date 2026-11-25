@@ -730,6 +730,25 @@ describe('SignUp', () => {
       expect(sawForm()).toBe(false);
     });
 
+    it('leaves without resuming an unfinished sign-up when a user is signed in, in single-session mode', async () => {
+      const sawForm = watchForHeading('Create your account');
+      const { navigate } = await renderSignUp(
+        {
+          environment: environment({ auth_config: { single_session_mode: true } }),
+          client: {
+            ...fapiClient([signedInSession]),
+            sign_up: fapiSignUp({ email_address: EMAIL, has_password: true }),
+          },
+        },
+        {},
+        { signUpFallbackRedirectUrl: '/welcome' },
+      );
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/welcome'));
+
+      expect(sawForm()).toBe(false);
+    });
+
     it('shows the form to add another account when a user is signed in, in multi-session mode', async () => {
       const { navigate } = await renderSignUp({ client: fapiClient([signedInSession]) });
 
