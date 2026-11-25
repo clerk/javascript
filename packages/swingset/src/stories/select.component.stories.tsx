@@ -82,7 +82,7 @@ export function Media() {
         <Select.Trigger />
         <Select.Popup>
           {organizations.map(organization => (
-            <Select.Option
+            <Select.Item
               key={organization.value}
               value={organization.value}
               label={organization.label}
@@ -99,7 +99,8 @@ export function Media() {
                 <Select.Label>{organization.label}</Select.Label>
                 {organization.description ? <Select.Description>{organization.description}</Select.Description> : null}
               </Select.Content>
-            </Select.Option>
+              <Select.ItemIndicator />
+            </Select.Item>
           ))}
         </Select.Popup>
       </Select.Root>

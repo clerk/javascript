@@ -30,7 +30,7 @@ export interface SelectContextValue {
   multiple: boolean;
   /** The selection in the order it was made; at most one value unless `multiple`. */
   selectedValues: unknown[];
-  /** Labels of values picked while uncontrolled, kept after the options unmount; `null` when controlled. */
+  /** Labels of values picked while uncontrolled, kept after the items unmount; `null` when controlled. */
   cachedLabels: ReadonlyMap<unknown, string> | null;
   elementsRef: React.MutableRefObject<Array<HTMLElement | null>>;
   labelsRef: React.MutableRefObject<Array<string | null>>;
@@ -42,7 +42,7 @@ export interface SelectContextValue {
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
   /** The pointer type of the last press on the trigger, or `'keyboard'`; read when the popup opens. */
   openMethodRef: React.MutableRefObject<string | null>;
-  /** Whether the popup is currently overlaying the selected option on the trigger. */
+  /** Whether the popup is currently overlaying the selected item on the trigger. */
   alignItemWithTrigger: boolean;
   handleSelect: (value: unknown, index: number) => void;
   mounted: boolean;
@@ -68,12 +68,12 @@ export const SelectHighlightContext = createContext<SelectHighlightContextValue 
 export function useSelectHighlightContext() {
   const ctx = useContext(SelectHighlightContext);
   if (!ctx) {
-    throw new Error('Select.Option must be used within <Select>');
+    throw new Error('Select.Item must be used within <Select>');
   }
   return ctx;
 }
 
-export interface SelectOptionsContextValue {
+export interface SelectItemsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: unknown, index: number) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
@@ -81,12 +81,12 @@ export interface SelectOptionsContextValue {
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const SelectOptionsContext = createContext<SelectOptionsContextValue | null>(null);
+export const SelectItemsContext = createContext<SelectItemsContextValue | null>(null);
 
-export function useSelectOptionsContext() {
-  const ctx = useContext(SelectOptionsContext);
+export function useSelectItemsContext() {
+  const ctx = useContext(SelectItemsContext);
   if (!ctx) {
-    throw new Error('Select.Option must be used within <Select.Root>');
+    throw new Error('Select.Item must be used within <Select.Root>');
   }
   return ctx;
 }

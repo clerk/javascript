@@ -1,9 +1,13 @@
 import type { ComponentDoc } from '../../docs-schema';
 import type { MenuArrowProps } from './menu-arrow';
+import type { MenuCheckboxItemProps } from './menu-checkbox-item';
 import type { MenuItemProps } from './menu-item';
+import type { MenuCheckboxItemIndicatorProps, MenuRadioItemIndicatorProps } from './menu-item-indicator';
 import type { MenuPopupProps } from './menu-popup';
 import type { MenuPortalProps } from './menu-portal';
 import type { MenuPositionerProps } from './menu-positioner';
+import type { MenuRadioGroupProps } from './menu-radio-group';
+import type { MenuRadioItemProps } from './menu-radio-item';
 import type { MenuProps } from './menu-root';
 import type { MenuSeparatorProps } from './menu-separator';
 import type { MenuTriggerProps } from './menu-trigger';
@@ -11,12 +15,14 @@ import type { MenuTriggerProps } from './menu-trigger';
 export default {
   name: 'Menu',
   description:
-    'Headless, unstyled dropdown menu of actions, with arrow-key navigation, typeahead and nested submenus. Wires `role="menu"`, `role="menuitem"` and the trigger’s `aria-expanded`, `aria-haspopup` and `aria-controls`.',
+    'Headless, unstyled dropdown menu of actions, with arrow-key navigation, typeahead and nested submenus. Wires `role="menu"`, `role="menuitem"`, `menuitemcheckbox` and `menuitemradio` with `aria-checked`, and the trigger’s `aria-expanded`, `aria-haspopup` and `aria-controls`.',
   useFor: [
     'an actions menu opened from a button',
     'a dropdown of commands, such as edit, duplicate and delete',
     'a nested submenu inside a menu',
     'a menu that opens on hover',
+    'a setting toggled on or off from a menu',
+    'picking one option, such as the active account, from a menu',
   ],
   keywords: ['menu', 'dropdown', 'actions', 'context menu', 'submenu', 'kebab', 'overflow menu'],
   practices: [
@@ -32,6 +38,10 @@ export default {
     {
       do: true,
       text: 'Animate with `data-starting-style` and `data-ending-style` on `Menu.Popup`. The popup unmounts once its exit transition ends.',
+    },
+    {
+      do: true,
+      text: 'Use `Menu.RadioItem` or `Menu.CheckboxItem` for an item that shows a selected state, so `aria-checked` announces it. Pass `closeOnClick` when picking one should close the menu.',
     },
     { do: false, text: 'Pass `id` to `Menu.Positioner`. The primitive owns it to pair the trigger’s `aria-controls`.' },
     { do: false, text: 'Use it for arbitrary content or a form. Use `Popover` instead.' },
@@ -97,6 +107,60 @@ export default {
         closeOnClick: { type: 'boolean', doc: 'Whether a click closes the whole menu tree.', default: 'true' },
       },
     },
+    'Menu.CheckboxItem': {
+      description:
+        'A `button` with `role="menuitemcheckbox"` that toggles `aria-checked` on click. Carries `data-checked` or `data-unchecked`. Keeps the menu open by default.',
+      props: {
+        checked: { type: 'boolean', doc: 'Whether the item is checked, when controlled.' },
+        defaultChecked: {
+          type: 'boolean',
+          doc: 'Whether the item is checked on mount, when uncontrolled.',
+          default: 'false',
+        },
+        onCheckedChange: { type: '(checked: boolean) => void', doc: 'Called with the new checked state.' },
+        closeOnClick: { type: 'boolean', doc: 'Whether a click closes the whole menu tree.', default: 'false' },
+      },
+    },
+    'Menu.RadioGroup': {
+      description: 'A `div` with `role="group"` that holds the value of its radio items. Name it with `aria-label`.',
+      props: {
+        value: { type: 'string', doc: "The checked item's value, when controlled." },
+        defaultValue: { type: 'string', doc: "The checked item's value on mount, when uncontrolled." },
+        onValueChange: {
+          type: '(value: string) => void',
+          doc: "Called with the picked item's value, even when it is already checked.",
+        },
+        disabled: { type: 'boolean', doc: 'Disables every item in the group.' },
+      },
+    },
+    'Menu.RadioItem': {
+      description:
+        'A `button` with `role="menuitemradio"`, checked when its `value` is the group\'s. Carries `data-checked` or `data-unchecked`. Keeps the menu open by default.',
+      props: {
+        value: { type: 'string', doc: 'The value the group takes when this item is picked.' },
+        closeOnClick: { type: 'boolean', doc: 'Whether a click closes the whole menu tree.', default: 'false' },
+      },
+    },
+    'Menu.CheckboxItemIndicator': {
+      description: 'An `aria-hidden` `span` rendered only while its checkbox item is checked.',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Keeps it in the DOM while unchecked, marked `data-unchecked`.',
+          default: 'false',
+        },
+      },
+    },
+    'Menu.RadioItemIndicator': {
+      description: 'An `aria-hidden` `span` rendered only while its radio item is checked.',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Keeps it in the DOM while unchecked, marked `data-unchecked`.',
+          default: 'false',
+        },
+      },
+    },
     'Menu.Separator': { description: 'A `div` with `role="separator"` between items.' },
     'Menu.Arrow': { description: 'An optional `FloatingArrow` `svg` pointing at the trigger. Carries `data-side`.' },
   },
@@ -129,6 +193,11 @@ export default {
   'Menu.Positioner': MenuPositionerProps;
   'Menu.Popup': MenuPopupProps;
   'Menu.Item': MenuItemProps;
+  'Menu.CheckboxItem': MenuCheckboxItemProps;
+  'Menu.RadioGroup': MenuRadioGroupProps;
+  'Menu.RadioItem': MenuRadioItemProps;
+  'Menu.CheckboxItemIndicator': MenuCheckboxItemIndicatorProps;
+  'Menu.RadioItemIndicator': MenuRadioItemIndicatorProps;
   'Menu.Separator': MenuSeparatorProps;
   'Menu.Arrow': MenuArrowProps;
 }>;

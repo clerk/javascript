@@ -33,13 +33,13 @@ describe('FloatingTree integration', () => {
                 <Select.Positioner>
                   <Select.Popup>
                     {fruits.map(f => (
-                      <Select.Option
+                      <Select.Item
                         key={f.value}
                         value={f.value}
                         label={f.label}
                       >
                         {f.label}
-                      </Select.Option>
+                      </Select.Item>
                     ))}
                   </Select.Popup>
                 </Select.Positioner>
@@ -93,13 +93,13 @@ describe('FloatingTree integration', () => {
                 <Select.Positioner>
                   <Select.Popup>
                     {fruits.map(f => (
-                      <Select.Option
+                      <Select.Item
                         key={f.value}
                         value={f.value}
                         label={f.label}
                       >
                         {f.label}
-                      </Select.Option>
+                      </Select.Item>
                     ))}
                   </Select.Popup>
                 </Select.Positioner>

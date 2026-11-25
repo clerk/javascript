@@ -247,7 +247,7 @@ describe('Mosaic Pagination', () => {
     );
     await userEvent.click(screen.getByRole('combobox'));
     expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['12', '15', '20']);
-    expect(screen.getByRole('option', { name: '15' })).toHaveClass(stylex.props(styles.pageSizeOption).className ?? '');
+    expect(screen.getByRole('option', { name: '15' })).toHaveClass(stylex.props(styles.pageSizeItem).className ?? '');
   });
 
   it('renders an empty range as a single disabled page', () => {

@@ -12,7 +12,7 @@ import {
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const listInset = space['1.5'];
-const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
+const itemRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
 
 export const styles = stylex.create({
   triggerStart: {
@@ -131,8 +131,8 @@ export const styles = stylex.create({
     flexDirection: 'column',
     maxHeight: '16rem',
   },
-  option: {
-    borderRadius: optionRadius,
+  item: {
+    borderRadius: itemRadius,
     gap: space['2'],
     outline: {
       default: 'none',
@@ -173,11 +173,11 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     textAlign: 'center',
   },
-  optionFlag: {
+  itemFlag: {
     fontSize: '1rem',
     lineHeight: 1,
   },
-  optionCode: {
+  itemCode: {
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],

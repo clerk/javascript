@@ -30,13 +30,13 @@ describe('Combobox', () => {
             <Combobox.Trigger aria-label='Toggle' />
             <Combobox.List>
               {items.map(item => (
-                <Combobox.Option
+                <Combobox.Item
                   key={item.value}
                   value={item.value}
                   label={item.label}
                 >
                   {item.label}
-                </Combobox.Option>
+                </Combobox.Item>
               ))}
             </Combobox.List>
           </Combobox.Root>
@@ -111,9 +111,9 @@ describe('Combobox', () => {
           <Combobox.Input aria-label='Fruit' />
           <Combobox.Trigger aria-label='Open' />
           <Combobox.List>
-            <Combobox.Option value='apple'>Apple</Combobox.Option>
-            {showBanana && <Combobox.Option value='banana'>Banana</Combobox.Option>}
-            <Combobox.Option value='cherry'>Cherry</Combobox.Option>
+            <Combobox.Item value='apple'>Apple</Combobox.Item>
+            {showBanana && <Combobox.Item value='banana'>Banana</Combobox.Item>}
+            <Combobox.Item value='cherry'>Cherry</Combobox.Item>
           </Combobox.List>
         </Combobox.Root>
       );
@@ -135,10 +135,66 @@ describe('Combobox', () => {
     }
   });
 
-  it('requires an option around the selection indicator', () => {
+  describe('ItemIndicator', () => {
+    function Fixture({ keepMounted }: { keepMounted?: boolean }) {
+      return (
+        <Combobox.Root defaultValue='banana'>
+          <Combobox.Input aria-label='Fruit' />
+          <Combobox.Trigger aria-label='Open' />
+          <Combobox.List>
+            {fruits.map(fruit => (
+              <Combobox.Item
+                key={fruit.value}
+                value={fruit.value}
+                label={fruit.label}
+              >
+                {fruit.label}
+                <Combobox.ItemIndicator
+                  data-testid={`indicator-${fruit.value}`}
+                  keepMounted={keepMounted}
+                />
+              </Combobox.Item>
+            ))}
+          </Combobox.List>
+        </Combobox.Root>
+      );
+    }
+
+    it('renders only inside the selected item, hidden from assistive technology', async () => {
+      const user = userEvent.setup();
+      render(<Fixture />);
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(screen.queryByTestId('indicator-apple')).not.toBeInTheDocument();
+      expect(screen.getByTestId('indicator-banana')).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('renders in every item with keepMounted, marking only the selected one', async () => {
+      const user = userEvent.setup();
+      render(<Fixture keepMounted />);
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(screen.getByTestId('indicator-apple')).not.toHaveAttribute('data-selected');
+      expect(screen.getByTestId('indicator-apple')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByTestId('indicator-banana')).toHaveAttribute('data-selected', '');
+    });
+
+    it('moves to the item the user picks', async () => {
+      const user = userEvent.setup();
+      render(<Fixture />);
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+      await user.click(screen.getByRole('option', { name: 'Cherry' }));
+      await user.click(screen.getByRole('button', { name: 'Open' }));
+
+      expect(screen.queryByTestId('indicator-banana')).not.toBeInTheDocument();
+      expect(screen.getByTestId('indicator-cherry')).toBeInTheDocument();
+    });
+  });
+
+  it('requires an item around the selection indicator', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() => render(<Combobox.OptionIndicator />)).toThrow(
-      'Combobox.OptionIndicator must be used within Combobox.Option',
+    expect(() => render(<Combobox.ItemIndicator />)).toThrow(
+      'Combobox.ItemIndicator must be used within Combobox.Item',
     );
   });
 
@@ -154,7 +210,7 @@ describe('Combobox', () => {
           <Combobox.Input aria-label='Fruit' />
           <Combobox.Positioner anchor={anchor}>
             <Combobox.Popup>
-              <Combobox.Option value='apple'>Apple</Combobox.Option>
+              <Combobox.Item value='apple'>Apple</Combobox.Item>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Root>
@@ -187,7 +243,7 @@ describe('Combobox', () => {
           </Combobox.InputGroup>
           <Combobox.Positioner anchor={anchor}>
             <Combobox.Popup>
-              <Combobox.Option value='apple'>Apple</Combobox.Option>
+              <Combobox.Item value='apple'>Apple</Combobox.Item>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Root>
@@ -246,7 +302,7 @@ describe('Combobox', () => {
             <Combobox.Input aria-label='Fruit' />
           </Combobox.InputGroup>
           <Combobox.List>
-            <Combobox.Option value='apple'>Apple</Combobox.Option>
+            <Combobox.Item value='apple'>Apple</Combobox.Item>
           </Combobox.List>
         </Combobox.Root>,
       );
@@ -268,7 +324,7 @@ describe('Combobox', () => {
         <Combobox.Trigger {...triggerProps} />
         <Combobox.Positioner>
           <Combobox.Popup>
-            <Combobox.Option value='apple'>Apple</Combobox.Option>
+            <Combobox.Item value='apple'>Apple</Combobox.Item>
           </Combobox.Popup>
         </Combobox.Positioner>
       </Combobox.Root>,
@@ -301,7 +357,7 @@ describe('Combobox', () => {
           <Combobox.Input aria-label='Fruit' />
           <Combobox.Positioner>
             <Combobox.Popup>
-              <Combobox.Option value='apple'>Apple</Combobox.Option>
+              <Combobox.Item value='apple'>Apple</Combobox.Item>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Root>
@@ -324,7 +380,7 @@ describe('Combobox', () => {
           <Combobox.Input aria-label='Fruit' />
           <Combobox.Positioner>
             <Combobox.Popup data-testid='combobox-popup'>
-              <Combobox.Option value={label}>{label}</Combobox.Option>
+              <Combobox.Item value={label}>{label}</Combobox.Item>
             </Combobox.Popup>
           </Combobox.Positioner>
         </Combobox.Root>
@@ -373,13 +429,13 @@ describe('Combobox', () => {
         <Combobox.Positioner>
           <Combobox.Popup>
             {fruits.map(fruit => (
-              <Combobox.Option
+              <Combobox.Item
                 key={fruit.value}
                 value={fruit.value}
                 label={fruit.label}
               >
                 {fruit.label}
-              </Combobox.Option>
+              </Combobox.Item>
             ))}
           </Combobox.Popup>
         </Combobox.Positioner>
@@ -407,13 +463,13 @@ describe('Combobox', () => {
           {query ? (
             <Combobox.List>
               {fruits.map(fruit => (
-                <Combobox.Option
+                <Combobox.Item
                   key={fruit.value}
                   value={fruit.value}
                   label={fruit.label}
                 >
                   {fruit.label}
-                </Combobox.Option>
+                </Combobox.Item>
               ))}
             </Combobox.List>
           ) : null}
@@ -457,13 +513,13 @@ describe('Combobox', () => {
             <Combobox.Popup>
               <Combobox.Collection>
                 {(fruit: (typeof fruits)[number]) => (
-                  <Combobox.Option
+                  <Combobox.Item
                     key={fruit.value}
                     value={fruit.value}
                     label={fruit.label}
                   >
                     {fruit.label}
-                  </Combobox.Option>
+                  </Combobox.Item>
                 )}
               </Combobox.Collection>
             </Combobox.Popup>
@@ -602,13 +658,13 @@ describe('Combobox', () => {
                 <Combobox.List>
                   <Combobox.Collection>
                     {(fruit: (typeof fruits)[number]) => (
-                      <Combobox.Option
+                      <Combobox.Item
                         key={fruit.value}
                         value={fruit.value}
                         label={fruit.label}
                       >
                         {fruit.label}
-                      </Combobox.Option>
+                      </Combobox.Item>
                     )}
                   </Combobox.Collection>
                 </Combobox.List>
@@ -654,12 +710,12 @@ describe('Combobox', () => {
             <Combobox.Input aria-label='Fruit' />
             <Combobox.Positioner>
               <Combobox.Popup>
-                <Combobox.Option
+                <Combobox.Item
                   value='apple'
                   label='Apple'
                 >
                   Apple
-                </Combobox.Option>
+                </Combobox.Item>
               </Combobox.Popup>
             </Combobox.Positioner>
           </Combobox.Root>
@@ -690,18 +746,18 @@ describe('Combobox', () => {
             <Combobox.Input aria-label='Fruit' />
             <Combobox.Positioner>
               <Combobox.Popup>
-                <Combobox.Option
+                <Combobox.Item
                   value='apple'
                   label='Apple'
                 >
                   Apple
-                </Combobox.Option>
-                <Combobox.Option
+                </Combobox.Item>
+                <Combobox.Item
                   value='banana'
                   label='Banana'
                 >
                   Banana
-                </Combobox.Option>
+                </Combobox.Item>
               </Combobox.Popup>
             </Combobox.Positioner>
           </Combobox.Root>
@@ -724,13 +780,13 @@ describe('Combobox.Empty', () => {
 
   function FruitOption({ fruit }: { fruit: Fruit }) {
     return (
-      <Combobox.Option
+      <Combobox.Item
         key={fruit.value}
         value={fruit.value}
         label={fruit.label}
       >
         {fruit.label}
-      </Combobox.Option>
+      </Combobox.Item>
     );
   }
 
@@ -822,7 +878,7 @@ describe('Combobox.Empty', () => {
         <Combobox.Input aria-label='Search fruit' />
         <Combobox.Empty>No fruit found</Combobox.Empty>
         <Combobox.List aria-label='Fruits'>
-          <Combobox.Option value='apple'>Apple</Combobox.Option>
+          <Combobox.Item value='apple'>Apple</Combobox.Item>
         </Combobox.List>
       </Combobox.Root>,
     );
@@ -882,7 +938,7 @@ describe('Combobox option renders', () => {
           <Combobox.Positioner>
             <Combobox.Popup>
               {fruits.map(fruit => (
-                <Combobox.Option
+                <Combobox.Item
                   key={fruit.value}
                   value={fruit.value}
                   label={fruit.label}
@@ -892,7 +948,7 @@ describe('Combobox option renders', () => {
                   }}
                 >
                   {fruit.label}
-                </Combobox.Option>
+                </Combobox.Item>
               ))}
             </Combobox.Popup>
           </Combobox.Positioner>
@@ -930,19 +986,19 @@ describe('Combobox selection in a transition', () => {
     throw neverResolves;
   }
 
-  type HoverRender = { option: string; hovered: string | null; active: boolean };
-  type OptionRender = { option: string; parentValue: string | null; selected: unknown };
+  type HoverRender = { item: string; hovered: string | null; active: boolean };
+  type ItemRender = { item: string; parentValue: string | null; selected: unknown };
 
   function Fixture({
     update = 'transition',
-    onRenderOption,
+    onRenderItem,
     suspendSelected = false,
     hoverInTransition = false,
     onRenderHover,
     suspendWhenActive,
   }: {
     update?: 'transition' | 'deferred';
-    onRenderOption?: (render: OptionRender) => void;
+    onRenderItem?: (render: ItemRender) => void;
     suspendSelected?: boolean;
     hoverInTransition?: boolean;
     onRenderHover?: (render: HoverRender) => void;
@@ -974,15 +1030,15 @@ describe('Combobox selection in a transition', () => {
           >
             <Combobox.Input aria-label='Fruit' />
             <Combobox.List>
-              {fruits.map(option => (
-                <Combobox.Option
-                  key={option.value}
-                  value={option.value}
-                  label={option.label}
+              {fruits.map(fruit => (
+                <Combobox.Item
+                  key={fruit.value}
+                  value={fruit.value}
+                  label={fruit.label}
                   render={props => {
-                    onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                    onRenderItem?.({ item: fruit.value, parentValue, selected: props['aria-selected'] });
                     const active = 'data-active' in props;
-                    onRenderHover?.({ option: option.value, hovered, active });
+                    onRenderHover?.({ item: fruit.value, hovered, active });
                     return (
                       <div
                         {...props}
@@ -990,7 +1046,7 @@ describe('Combobox selection in a transition', () => {
                           hoverInTransition
                             ? event =>
                                 startTransition(() => {
-                                  setHovered(option.value);
+                                  setHovered(fruit.value);
                                   props.onMouseMove?.(event);
                                 })
                             : props.onMouseMove
@@ -998,13 +1054,13 @@ describe('Combobox selection in a transition', () => {
                       >
                         {props.children}
                         {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
-                        {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                        {active && suspendWhenActive === fruit.value ? <Suspends /> : null}
                       </div>
                     );
                   }}
                 >
-                  {option.label}
-                </Combobox.Option>
+                  {fruit.label}
+                </Combobox.Item>
               ))}
             </Combobox.List>
           </Combobox.Root>
@@ -1016,11 +1072,11 @@ describe('Combobox selection in a transition', () => {
   describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
     it('renders each option with the selection its parent passed down', async () => {
       const user = userEvent.setup();
-      const renders: OptionRender[] = [];
+      const renders: ItemRender[] = [];
       render(
         <Fixture
           update={update}
-          onRenderOption={entry => renders.push(entry)}
+          onRenderItem={entry => renders.push(entry)}
         />,
       );
 
@@ -1029,16 +1085,16 @@ describe('Combobox selection in a transition', () => {
       await waitFor(() =>
         expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
       );
-      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+      expect(renders).not.toContainEqual({ item: 'banana', parentValue: 'banana', selected: false });
     });
 
     it('renders the new selection in the same render as its parent, with no second pass', async () => {
       const user = userEvent.setup();
-      const renders: OptionRender[] = [];
+      const renders: ItemRender[] = [];
       render(
         <Fixture
           update={update}
-          onRenderOption={entry => renders.push(entry)}
+          onRenderItem={entry => renders.push(entry)}
         />,
       );
 
@@ -1047,8 +1103,8 @@ describe('Combobox selection in a transition', () => {
       await waitFor(() =>
         expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
       );
-      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
-        { option: 'banana', parentValue: 'banana', selected: true },
+      expect(renders.filter(entry => entry.item === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { item: 'banana', parentValue: 'banana', selected: true },
       ]);
     });
 
@@ -1099,7 +1155,7 @@ describe('Combobox selection in a transition', () => {
     await user.hover(screen.getByRole('option', { name: 'Banana' }));
 
     await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
-    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+    expect(renders).not.toContainEqual({ item: 'banana', hovered: 'banana', active: false });
   });
 
   it('keeps the current options on screen while a hover transition suspends', async () => {

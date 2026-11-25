@@ -3,7 +3,17 @@ import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import { Box, Button, descriptors, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
+import {
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flow,
+  Grid,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -35,7 +45,7 @@ function _OAuthConsent() {
   } = useEnvironment();
   const [isUriModalOpen, setIsUriModalOpen] = useState(false);
 
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const [selectedOrgs, setSelectedOrgs] = useState<string[] | null>(null);
   const [uncheckedScopes, setUncheckedScopes] = useState<string[]>([]);
 
   // onAllow and onDeny are always provided as a pair by the accounts portal.
@@ -48,6 +58,7 @@ function _OAuthConsent() {
 
   useEffect(() => {
     setUncheckedScopes([]);
+    setSelectedOrgs(null);
   }, [oauthClientId, scope]);
 
   // Public path: fetch via hook. Disabled on the accounts portal path
@@ -88,7 +99,24 @@ function _OAuthConsent() {
     : [];
   const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
   const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-  const effectiveOrg = selectedOrg ?? defaultOrg;
+  const reportedMaxOrganizations = hasContextCallbacks ? undefined : data?.maxOrganizations;
+  const maxOrganizations =
+    reportedMaxOrganizations !== undefined &&
+    Number.isInteger(reportedMaxOrganizations) &&
+    reportedMaxOrganizations >= 1
+      ? reportedMaxOrganizations
+      : 1;
+  const defaultOrgs = defaultOrg ? [defaultOrg] : [];
+  const availableSelectedOrgs = selectedOrgs?.filter(id => orgOptions.some(o => o.value === id)) ?? null;
+  const chosenOrgs =
+    maxOrganizations > 1 || availableSelectedOrgs?.length ? (availableSelectedOrgs ?? defaultOrgs) : defaultOrgs;
+  const effectiveOrgs = orgOptions
+    .map(o => o.value)
+    .filter(id => chosenOrgs.includes(id))
+    .sort((a, b) => Number(b === defaultOrg) - Number(a === defaultOrg))
+    .slice(0, maxOrganizations);
+  const isMissingOrgSelection =
+    !hasContextCallbacks && orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
 
   const { t } = useLocalizations();
   const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);
@@ -263,11 +291,34 @@ function _OAuthConsent() {
                 })}
               />
             </Header.Root>
-            {orgSelectionEnabled && orgOptions.length > 0 && effectiveOrg && (
+            {orgSelectionEnabled && orgOptions.length > 0 && maxOrganizations > 1 && (
+              <Col gap={1}>
+                <OrgSelect
+                  multiple
+                  options={orgOptions.map(option => ({
+                    ...option,
+                    disabled: effectiveOrgs.length >= maxOrganizations && !effectiveOrgs.includes(option.value),
+                  }))}
+                  value={effectiveOrgs}
+                  onChange={setSelectedOrgs}
+                />
+                {orgOptions.length > maxOrganizations && (
+                  <Text
+                    colorScheme='secondary'
+                    variant='caption'
+                    sx={{ textAlign: 'start' }}
+                    localizationKey={localizationKeys('oauthConsent.organizationSelect.limit', {
+                      limit: maxOrganizations,
+                    })}
+                  />
+                )}
+              </Col>
+            )}
+            {orgSelectionEnabled && effectiveOrgs[0] && maxOrganizations <= 1 && (
               <OrgSelect
                 options={orgOptions}
-                value={effectiveOrg}
-                onChange={setSelectedOrg}
+                value={effectiveOrgs[0]}
+                onChange={org => setSelectedOrgs([org])}
               />
             )}
             {displayedScopes.length > 0 && (
@@ -345,6 +396,7 @@ function _OAuthConsent() {
                 type='submit'
                 name='consented'
                 value='true'
+                isDisabled={isMissingOrgSelection}
                 localizationKey={localizationKeys('oauthConsent.action__allow')}
               />
               <Text
@@ -380,11 +432,11 @@ function _OAuthConsent() {
             value={selectedScope}
           />
         )}
-        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrg && (
+        {!hasContextCallbacks && orgSelectionEnabled && effectiveOrgs.length > 0 && (
           <input
             type='hidden'
             name='organization_id'
-            value={effectiveOrg}
+            value={effectiveOrgs.join(' ')}
           />
         )}
       </form>

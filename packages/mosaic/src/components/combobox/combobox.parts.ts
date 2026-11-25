@@ -7,10 +7,10 @@ export {
   ComboboxClear as Clear,
   ComboboxPopup as Popup,
   ComboboxList as List,
-  ComboboxOption as Option,
+  ComboboxItem as Item,
   ComboboxMedia as Media,
   ComboboxLabel as Label,
   ComboboxDetail as Detail,
-  ComboboxOptionIndicator as OptionIndicator,
+  ComboboxItemIndicator as ItemIndicator,
   ComboboxEmpty as Empty,
 } from './combobox';

@@ -21,11 +21,11 @@ import { Select } from '../../primitives/select';
   <Select.Trigger>Choose...</Select.Trigger>
   <Select.Positioner>
     <Select.Popup>
-      <Select.Option
+      <Select.Item
         value='a'
         label='Option A'
       />
-      <Select.Option
+      <Select.Item
         value='b'
         label='Option B'
       />

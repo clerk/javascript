@@ -32,20 +32,20 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
         </InputGroup.End>
       </Combobox.InputGroup>
       <Combobox.Popup anchor={props?.anchor}>
-        <Combobox.Option
+        <Combobox.Item
           value='apple'
           label='Apple'
         >
           Apple
-          <Combobox.OptionIndicator data-testid='apple-check' />
-        </Combobox.Option>
-        <Combobox.Option
+          <Combobox.ItemIndicator data-testid='apple-check' />
+        </Combobox.Item>
+        <Combobox.Item
           value='banana'
           label='Banana'
         >
           Banana
-          <Combobox.OptionIndicator data-testid='banana-check' />
-        </Combobox.Option>
+          <Combobox.ItemIndicator data-testid='banana-check' />
+        </Combobox.Item>
       </Combobox.Popup>
     </Combobox.Root>
   );
@@ -86,7 +86,7 @@ describe('Mosaic Combobox', () => {
     await user.click(screen.getByRole('option', { name: 'Apple' }));
     await user.clear(screen.getByRole('combobox'));
     expect(onValueChange).toHaveBeenLastCalledWith(null);
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
     expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'false');
     await user.keyboard('{Escape}');
     expect(screen.getByRole('combobox')).toHaveValue('');
@@ -96,18 +96,19 @@ describe('Mosaic Combobox', () => {
     render(<FloatingCombobox />);
     const trigger = screen.getByRole('button', { name: 'Toggle fruit options' });
     await user.click(trigger);
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
     await user.click(screen.getByRole('option', { name: 'Apple' }));
     await user.click(trigger);
     await user.hover(screen.getByRole('option', { name: 'Banana' }));
     expect(screen.getByTestId('apple-check')).toBeVisible();
     expect(screen.getByTestId('apple-check')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.queryByTestId('banana-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('apple-check')).toHaveAttribute('data-selected', '');
+    expect(screen.getByTestId('banana-check')).not.toHaveAttribute('data-selected');
     expect(screen.getByRole('option', { name: 'Apple' })).toHaveAttribute('aria-selected', 'true');
     await user.click(screen.getByRole('option', { name: 'Banana' }));
     await user.click(trigger);
-    expect(screen.getByTestId('banana-check')).toBeVisible();
-    expect(screen.queryByTestId('apple-check')).not.toBeInTheDocument();
+    expect(screen.getByTestId('banana-check')).toHaveAttribute('data-selected', '');
+    expect(screen.getByTestId('apple-check')).not.toHaveAttribute('data-selected');
   });
   it('positions the popup against the full input group', async () => {
     const user = userEvent.setup();
@@ -169,7 +170,7 @@ describe('Mosaic Combobox', () => {
       <Combobox.Root>
         <Combobox.Input aria-label='Fruit' />
         <Combobox.Popup>
-          <Combobox.Option value='apple'>Apple</Combobox.Option>
+          <Combobox.Item value='apple'>Apple</Combobox.Item>
         </Combobox.Popup>
       </Combobox.Root>,
     );
@@ -194,7 +195,7 @@ describe('Mosaic Combobox', () => {
         <Combobox.Root>
           <Combobox.Input size='lg' />
           <Combobox.Popup>
-            <Combobox.Option value='apple'>Apple</Combobox.Option>
+            <Combobox.Item value='apple'>Apple</Combobox.Item>
           </Combobox.Popup>
         </Combobox.Root>
         <Field.Error>Choose a fruit</Field.Error>
@@ -286,12 +287,12 @@ describe('Mosaic Combobox', () => {
           <Combobox.Empty>No matches</Combobox.Empty>
           <Combobox.Collection>
             {(item: string) => (
-              <Combobox.Option
+              <Combobox.Item
                 key={item}
                 value={item}
               >
                 {item}
-              </Combobox.Option>
+              </Combobox.Item>
             )}
           </Combobox.Collection>
         </Combobox.Popup>
@@ -320,18 +321,18 @@ describe('Mosaic Combobox', () => {
       >
         <Combobox.Input aria-label='Fruit' />
         <Combobox.Popup>
-          <Combobox.Option
+          <Combobox.Item
             value='apple'
             disabled
           >
             Apple
-          </Combobox.Option>
+          </Combobox.Item>
         </Combobox.Popup>
       </Combobox.Root>,
     );
 
     const option = screen.getByRole('option', { name: 'Apple' });
-    expect(option).toHaveClass('cl-combobox-option');
+    expect(option).toHaveClass('cl-combobox-item');
     expect(option).toHaveAttribute('aria-disabled', 'true');
     await user.click(option);
     expect(onValueChange).not.toHaveBeenCalled();
@@ -350,7 +351,7 @@ describe('Mosaic Combobox', () => {
           />
         </InputGroup.Root>
         <Combobox.List>
-          <Combobox.Option value='us'>United States</Combobox.Option>
+          <Combobox.Item value='us'>United States</Combobox.Item>
         </Combobox.List>
       </Combobox.Root>,
     );
@@ -359,7 +360,7 @@ describe('Mosaic Combobox', () => {
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('data-size', 'lg');
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('data-variant', 'ghost');
     expect(screen.getByRole('listbox')).toHaveClass('cl-combobox-list');
-    expect(screen.getByRole('option', { name: 'United States' })).toHaveClass('cl-combobox-option');
+    expect(screen.getByRole('option', { name: 'United States' })).toHaveClass('cl-combobox-item');
   });
 
   it('composes an option from media, label and detail parts', async () => {
@@ -368,14 +369,14 @@ describe('Mosaic Combobox', () => {
       <Combobox.Root>
         <Combobox.Input aria-label='Country' />
         <Combobox.Popup>
-          <Combobox.Option
+          <Combobox.Item
             value='dz'
             label='Algeria'
           >
             <Combobox.Media data-testid='flag'>🇩🇿</Combobox.Media>
             <Combobox.Label>Algeria</Combobox.Label>
             <Combobox.Detail>+213</Combobox.Detail>
-          </Combobox.Option>
+          </Combobox.Item>
         </Combobox.Popup>
       </Combobox.Root>,
     );
@@ -383,9 +384,9 @@ describe('Mosaic Combobox', () => {
     await user.click(screen.getByRole('combobox', { name: 'Country' }));
 
     const option = screen.getByRole('option', { name: /Algeria/ });
-    expect(screen.getByTestId('flag')).toHaveClass('cl-combobox-option-media');
-    expect(option).toContainElement(screen.getByText('Algeria', { selector: '.cl-combobox-option-label' }));
-    expect(option).toContainElement(screen.getByText('+213', { selector: '.cl-combobox-option-detail' }));
+    expect(screen.getByTestId('flag')).toHaveClass('cl-combobox-item-media');
+    expect(option).toContainElement(screen.getByText('Algeria', { selector: '.cl-combobox-item-label' }));
+    expect(option).toContainElement(screen.getByText('+213', { selector: '.cl-combobox-item-detail' }));
   });
 
   it('renders the empty state as a styled status region', () => {
@@ -420,12 +421,12 @@ describe('Mosaic Combobox', () => {
           </InputGroup.End>
         </Combobox.InputGroup>
         <Combobox.Popup>
-          <Combobox.Option
+          <Combobox.Item
             value='apple'
             label='Apple'
           >
             Apple
-          </Combobox.Option>
+          </Combobox.Item>
         </Combobox.Popup>
       </Combobox.Root>
     );

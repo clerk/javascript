@@ -41,10 +41,11 @@ export type {
   ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxItemIndicatorProps,
+  ComboboxItemProps,
   ComboboxLabelProps,
   ComboboxListProps,
   ComboboxMediaProps,
-  ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
   ComboboxSize,
@@ -90,12 +91,16 @@ export type { TagInputProps } from '../components/tag-input';
 export { Otp } from '../components/otp';
 export type { OtpProps, OtpStatus } from '../components/otp';
 export type {
+  MenuCheckboxItemIndicatorProps,
+  MenuCheckboxItemProps,
   MenuItemProps,
   MenuLabelProps,
   MenuMediaProps,
-  MenuMediaSize,
   MenuPopupProps,
   MenuProps,
+  MenuRadioGroupProps,
+  MenuRadioItemIndicatorProps,
+  MenuRadioItemProps,
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
@@ -108,7 +113,8 @@ export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
 export type {
   SelectItem,
-  SelectOptionProps,
+  SelectItemIndicatorProps,
+  SelectItemProps,
   SelectPopupProps,
   SelectProps,
   SelectTriggerProps,

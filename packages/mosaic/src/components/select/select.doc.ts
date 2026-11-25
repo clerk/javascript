@@ -2,9 +2,10 @@ import type { ComponentDoc } from '../../docs-schema';
 import type {
   SelectContentProps,
   SelectDescriptionProps,
+  SelectItemIndicatorProps,
+  SelectItemProps,
   SelectLabelProps,
   SelectMediaProps,
-  SelectOptionProps,
   SelectPopupProps,
   SelectProps,
   SelectTriggerProps,
@@ -40,7 +41,7 @@ export default {
         },
         multiple: {
           type: 'boolean',
-          doc: 'Makes the value an array. Picking an option toggles it and keeps the popup open.',
+          doc: 'Makes the value an array. Picking an item toggles it and keeps the popup open.',
           default: 'false',
         },
         value: { type: 'Value | Value[] | null', doc: 'The selection, when controlled. An array with `multiple`.' },
@@ -54,7 +55,7 @@ export default {
         onOpenChange: { type: '(open: boolean) => void', doc: 'Called with the new open state.' },
         alignItemWithTrigger: {
           type: 'boolean',
-          doc: 'Overlays the selected option on the trigger, like a native `select`. Falls back below the trigger on touch or near an edge.',
+          doc: 'Overlays the selected item on the trigger, like a native `select`. Falls back below the trigger on touch or near an edge.',
           default: 'true, or false when `multiple` or any item has a description',
         },
         placement: {
@@ -84,7 +85,7 @@ export default {
     },
     'Select.Popup': {
       description:
-        "The floating `role='listbox'`, with a scrolling viewport (`cl-select-viewport`) in a positioner (`cl-select-positioner`). Renders one `Select.Option` per item unless given children.",
+        "The floating `role='listbox'`, with a scrolling viewport (`cl-select-viewport`) in a positioner (`cl-select-positioner`). Renders one `Select.Item` per item unless given children.",
       slot: 'cl-select-popup',
       props: {
         portalRoot: {
@@ -94,36 +95,48 @@ export default {
         },
       },
     },
-    'Select.Option': {
+    'Select.Item': {
       description:
-        "One `role='option'` with a check (`cl-select-option-indicator`) when selected. Carries `data-selected`, `data-active`, `data-disabled`, and `data-described` when it has a description.",
-      slot: 'cl-select-option',
+        "One `role='option'`. Without children it renders its label, description, and a `Select.ItemIndicator` check; with children it renders only them, so a composed row places its own `Select.ItemIndicator`. Carries `data-selected`, `data-active`, `data-disabled`, and `data-described` when it has a description.",
+      slot: 'cl-select-item',
       props: {
-        value: { type: 'unknown', doc: 'The value this option selects.' },
+        value: { type: 'unknown', doc: 'The value this item selects.' },
         label: { type: 'string', doc: 'Shown in the row and the trigger; drives typeahead.' },
         description: { type: 'string', doc: 'A secondary line under the label.' },
-        disabled: { type: 'boolean', doc: 'Keeps the option focusable but not selectable.' },
+        disabled: { type: 'boolean', doc: 'Keeps the item focusable but not selectable.' },
         children: {
           type: 'React.ReactNode',
           doc: 'Composes the row from `Select.Media` and `Select.Content`. Without it the row shows `label` and `description`.',
         },
       },
     },
+    'Select.ItemIndicator': {
+      description:
+        'The check. Every row keeps room for it and only the selected rows show it. A checkmark when given no children.',
+      slot: 'cl-select-item-indicator',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Renders it in every item, hidden but holding its width, with `data-selected` and visible only on the selected one. `false` renders it only in the selected item.',
+          default: 'true',
+        },
+      },
+    },
     'Select.Media': {
       description: 'A square leading column for an icon, image or avatar.',
-      slot: 'cl-select-option-media',
+      slot: 'cl-select-item-media',
     },
     'Select.Content': {
       description: 'Stacks the label and description beside the media.',
-      slot: 'cl-select-option-content',
+      slot: 'cl-select-item-content',
     },
     'Select.Label': {
-      description: "The option's name, on one line. Names the option.",
-      slot: 'cl-select-option-label',
+      description: "The item's name, on one line. Names the item.",
+      slot: 'cl-select-item-label',
     },
     'Select.Description': {
-      description: 'A secondary line under the label. Describes the option without joining its name.',
-      slot: 'cl-select-option-description',
+      description: 'A secondary line under the label. Describes the item without joining its name.',
+      slot: 'cl-select-item-description',
     },
   },
   examples: [
@@ -154,7 +167,8 @@ export default {
   'Select.Root': SelectProps;
   'Select.Trigger': SelectTriggerProps;
   'Select.Popup': SelectPopupProps;
-  'Select.Option': SelectOptionProps;
+  'Select.Item': SelectItemProps;
+  'Select.ItemIndicator': SelectItemIndicatorProps;
   'Select.Media': SelectMediaProps;
   'Select.Content': SelectContentProps;
   'Select.Label': SelectLabelProps;

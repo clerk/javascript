@@ -42,14 +42,14 @@ export function Default() {
         <Combobox.Empty>No fruit found</Combobox.Empty>
         <Combobox.Collection>
           {(option: string) => (
-            <Combobox.Option
+            <Combobox.Item
               key={option}
               value={option.toLowerCase()}
               label={option}
             >
               {option}
-              <Combobox.OptionIndicator />
-            </Combobox.Option>
+              <Combobox.ItemIndicator />
+            </Combobox.Item>
           )}
         </Combobox.Collection>
       </Combobox.Popup>
@@ -79,14 +79,14 @@ export function Scrolling() {
         <Combobox.Empty>No fruit found</Combobox.Empty>
         <Combobox.Collection>
           {(option: string) => (
-            <Combobox.Option
+            <Combobox.Item
               key={option}
               value={option.toLowerCase()}
               label={option}
             >
               {option}
-              <Combobox.OptionIndicator />
-            </Combobox.Option>
+              <Combobox.ItemIndicator />
+            </Combobox.Item>
           )}
         </Combobox.Collection>
       </Combobox.Popup>
@@ -94,7 +94,7 @@ export function Scrolling() {
   );
 }
 
-export function OptionParts() {
+export function ItemParts() {
   const currencies = [
     { code: 'USD', name: 'US Dollar', symbol: '$' },
     { code: 'EUR', name: 'Euro', symbol: '€' },
@@ -121,7 +121,7 @@ export function OptionParts() {
         <Combobox.Empty>No currency found</Combobox.Empty>
         <Combobox.Collection>
           {(currency: (typeof currencies)[number]) => (
-            <Combobox.Option
+            <Combobox.Item
               key={currency.code}
               value={currency.code}
               label={currency.name}
@@ -129,8 +129,8 @@ export function OptionParts() {
               <Combobox.Media aria-hidden='true'>{currency.symbol}</Combobox.Media>
               <Combobox.Label>{currency.name}</Combobox.Label>
               <Combobox.Detail>{currency.code}</Combobox.Detail>
-              <Combobox.OptionIndicator />
-            </Combobox.Option>
+              <Combobox.ItemIndicator />
+            </Combobox.Item>
           )}
         </Combobox.Collection>
       </Combobox.Popup>

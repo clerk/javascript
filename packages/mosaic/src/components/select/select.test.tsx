@@ -52,7 +52,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger variant='ghost' />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='member'
             label='Member'
           />
@@ -79,7 +79,7 @@ describe('Mosaic Select', () => {
           )}
         />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='all'
             label='All roles'
           />
@@ -107,7 +107,7 @@ describe('Mosaic Select', () => {
     expect(screen.getAllByRole('option')).toHaveLength(3);
   });
 
-  it('marks the selected option and reserves the check on every row', async () => {
+  it('marks the selected item and reserves the check on every row', async () => {
     const user = userEvent.setup();
     renderSelect();
 
@@ -116,11 +116,91 @@ describe('Mosaic Select', () => {
     const selected = screen.getByRole('option', { name: 'All roles' });
     expect(selected).toHaveAttribute('aria-selected', 'true');
     expect(selected).toHaveAttribute('data-selected', '');
-    expect(selected.querySelector('.cl-select-option-indicator')).toBeInTheDocument();
+    const selectedIndicator = selected.querySelector('.cl-select-item-indicator');
+    expect(selectedIndicator).toHaveAttribute('data-selected', '');
+    expect(selectedIndicator).toHaveAttribute('aria-hidden', 'true');
 
     const other = screen.getByRole('option', { name: 'Admin' });
     expect(other).not.toHaveAttribute('data-selected');
-    expect(other.querySelector('.cl-select-option-indicator')).toBeInTheDocument();
+    const otherIndicator = other.querySelector('.cl-select-item-indicator');
+    expect(otherIndicator).toBeInTheDocument();
+    expect(otherIndicator).not.toHaveAttribute('data-selected');
+  });
+
+  it('keeps a composed row check mounted by default, marking only the selected one', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='admin'
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Item
+            value='admin'
+            label='Admin'
+          >
+            <Select.Content>
+              <Select.Label>Admin</Select.Label>
+            </Select.Content>
+            <Select.ItemIndicator />
+          </Select.Item>
+          <Select.Item
+            value='member'
+            label='Member'
+          >
+            <Select.Content>
+              <Select.Label>Member</Select.Label>
+            </Select.Content>
+            <Select.ItemIndicator />
+          </Select.Item>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const admin = screen.getByRole('option', { name: 'Admin' });
+    expect(admin.querySelector('.cl-select-item-indicator')).toHaveAttribute('data-selected', '');
+    const member = screen.getByRole('option', { name: 'Member' });
+    const memberIndicator = member.querySelector('.cl-select-item-indicator');
+    expect(memberIndicator).toBeInTheDocument();
+    expect(memberIndicator).not.toHaveAttribute('data-selected');
+  });
+
+  it('leaves the check to a composed row, which places its own', () => {
+    render(
+      <Select.Root
+        items={roles}
+        defaultValue='admin'
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Item
+            value='admin'
+            label='Admin'
+          >
+            <Select.Content>
+              <Select.Label>Admin</Select.Label>
+            </Select.Content>
+            <Select.ItemIndicator />
+          </Select.Item>
+          <Select.Item
+            value='member'
+            label='Member'
+          >
+            <Select.Content>
+              <Select.Label>Member</Select.Label>
+            </Select.Content>
+          </Select.Item>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const admin = screen.getByRole('option', { name: 'Admin' });
+    expect(admin.querySelectorAll('.cl-select-item-indicator')).toHaveLength(1);
+    expect(admin.querySelector('.cl-select-item-indicator')).toHaveAttribute('data-selected', '');
+    const member = screen.getByRole('option', { name: 'Member' });
+    expect(member.querySelector('.cl-select-item-indicator')).not.toBeInTheDocument();
   });
 
   it('selects an option on click, closes, and updates the trigger', async () => {
@@ -236,7 +316,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='admin'
             label='Admin'
             description='Can manage members and settings'
@@ -247,8 +327,8 @@ describe('Mosaic Select', () => {
 
     const option = screen.getByRole('option', { name: 'Admin' });
     expect(option).toHaveAttribute('data-described', '');
-    expect(option.querySelector('.cl-select-option-label')).toHaveTextContent('Admin');
-    expect(option.querySelector('.cl-select-option-description')).toHaveTextContent('Can manage members and settings');
+    expect(option.querySelector('.cl-select-item-label')).toHaveTextContent('Admin');
+    expect(option.querySelector('.cl-select-item-description')).toHaveTextContent('Can manage members and settings');
   });
 
   it('composes media beside a content column of label and description', () => {
@@ -259,7 +339,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='acme'
             label='Acme'
           >
@@ -270,7 +350,7 @@ describe('Mosaic Select', () => {
               <Select.Label>Acme</Select.Label>
               <Select.Description>Owner</Select.Description>
             </Select.Content>
-          </Select.Option>
+          </Select.Item>
         </Select.Popup>
       </Select.Root>,
     );
@@ -281,13 +361,13 @@ describe('Mosaic Select', () => {
 
     const media = screen.getByTestId('acme-logo').parentElement;
     expect(media?.tagName).toBe('SPAN');
-    expect(media).toHaveClass('cl-select-option-media');
+    expect(media).toHaveClass('cl-select-item-media');
     expect(media?.parentElement).toBe(option);
 
-    const content = option.querySelector('.cl-select-option-content');
+    const content = option.querySelector('.cl-select-item-content');
     expect(content?.previousElementSibling).toBe(media);
-    expect(content?.querySelector('.cl-select-option-label')).toHaveTextContent('Acme');
-    expect(content?.querySelector('.cl-select-option-description')).toHaveTextContent('Owner');
+    expect(content?.querySelector('.cl-select-item-label')).toHaveTextContent('Acme');
+    expect(content?.querySelector('.cl-select-item-description')).toHaveTextContent('Owner');
   });
 
   it('leaves a composed option without a description undescribed', () => {
@@ -298,7 +378,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='acme'
             label='Acme'
           >
@@ -306,7 +386,7 @@ describe('Mosaic Select', () => {
             <Select.Content>
               <Select.Label>Acme</Select.Label>
             </Select.Content>
-          </Select.Option>
+          </Select.Item>
         </Select.Popup>
       </Select.Root>,
     );
@@ -325,7 +405,7 @@ describe('Mosaic Select', () => {
         >
           <Select.Trigger />
           <Select.Popup>
-            <Select.Option
+            <Select.Item
               value='acme'
               label='Acme'
             >
@@ -334,7 +414,7 @@ describe('Mosaic Select', () => {
                 <Select.Description>Owner</Select.Description>
                 {showSecond ? <Select.Description>Billing</Select.Description> : null}
               </Select.Content>
-            </Select.Option>
+            </Select.Item>
           </Select.Popup>
         </Select.Root>
       );
@@ -356,7 +436,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='acme'
             label='Acme'
           >
@@ -367,13 +447,13 @@ describe('Mosaic Select', () => {
             <Select.Content>
               <Select.Label>Acme</Select.Label>
             </Select.Content>
-          </Select.Option>
+          </Select.Item>
         </Select.Popup>
       </Select.Root>,
     );
 
     expect(ref.current).toBe(screen.getByTestId('custom-media'));
-    expect(ref.current).toHaveClass('cl-select-option-media');
+    expect(ref.current).toHaveClass('cl-select-item-media');
   });
 
   it('marks a disabled option as aria-disabled and does not select it', async () => {
@@ -387,7 +467,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='admin'
             label='Admin'
             disabled
@@ -403,8 +483,8 @@ describe('Mosaic Select', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it('composes consumer xstyle onto the popup and options', () => {
-    const caller = stylex.create({ popup: { marginTop: '8px' }, option: { paddingInline: 0 } });
+  it('composes consumer xstyle onto the popup and items', () => {
+    const caller = stylex.create({ popup: { marginTop: '8px' }, item: { paddingInline: 0 } });
     render(
       <Select.Root
         items={[{ value: 'admin', label: 'Admin' }]}
@@ -412,10 +492,10 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup xstyle={caller.popup}>
-          <Select.Option
+          <Select.Item
             value='admin'
             label='Admin'
-            xstyle={caller.option}
+            xstyle={caller.item}
           />
         </Select.Popup>
       </Select.Root>,
@@ -426,8 +506,8 @@ describe('Mosaic Select', () => {
       stylex.props(caller.popup).className ?? '',
     );
     expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass(
-      'cl-select-option',
-      stylex.props(caller.option).className ?? '',
+      'cl-select-item',
+      stylex.props(caller.item).className ?? '',
     );
   });
 
@@ -439,7 +519,7 @@ describe('Mosaic Select', () => {
       >
         <Select.Trigger />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='admin'
             label='Admin'
             render={<div className='from-render' />}
@@ -448,7 +528,7 @@ describe('Mosaic Select', () => {
       </Select.Root>,
     );
 
-    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass('cl-select-option', 'from-render');
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveClass('cl-select-item', 'from-render');
   });
 
   it('forwards the trigger ref', () => {
@@ -457,7 +537,7 @@ describe('Mosaic Select', () => {
       <Select.Root items={[{ value: 'admin', label: 'Admin' }]}>
         <Select.Trigger ref={ref} />
         <Select.Popup>
-          <Select.Option
+          <Select.Item
             value='admin'
             label='Admin'
           />

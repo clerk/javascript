@@ -103,13 +103,13 @@ function ScrollingSelect() {
             style={{ display: 'flex', flexDirection: 'column', maxHeight: '100px', overflow: 'auto' }}
           >
             {manyItems.map(({ label, value }) => (
-              <Select.Option
+              <Select.Item
                 key={value}
                 value={value}
                 label={label}
               >
                 {label}
-              </Select.Option>
+              </Select.Item>
             ))}
           </div>
         </Select.Popup>
@@ -133,13 +133,13 @@ function AlignedSelect(props: { defaultValue: string; defaultOpen?: boolean }) {
           style={{ display: 'flex', flexDirection: 'column' }}
         >
           {manyItems.map(({ label, value }) => (
-            <Select.Option
+            <Select.Item
               key={value}
               value={value}
               label={label}
             >
               {label}
-            </Select.Option>
+            </Select.Item>
           ))}
         </Select.Popup>
       </Select.Positioner>

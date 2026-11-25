@@ -28,12 +28,12 @@ import {
   type ComboboxContextValue,
   ComboboxHighlightContext,
   type ComboboxHighlightContextValue,
-  ComboboxOptionsContext,
-  type ComboboxOptionsContextValue,
+  ComboboxItemsContext,
+  type ComboboxItemsContextValue,
 } from './combobox-context';
 
 interface ComboboxItemsProps<Item> {
-  /** Every option's item. `Collection` renders the ones that match the search and `Empty` shows when none do. */
+  /** Every item. `Collection` renders the ones that match the search and `Empty` shows when none do. */
   items: readonly Item[];
   itemToStringLabel: (item: Item) => string;
 }
@@ -143,7 +143,7 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [inputGroup, setInputGroup] = useState<HTMLElement | null>(null);
   const valuesByIndexRef = useRef<Map<number, string>>(new Map());
-  const registerOption = useCallback((index: number) => {
+  const registerItem = useCallback((index: number) => {
     if (index === 0 && highlightFirstRef.current) {
       highlightFirstRef.current = false;
       setActiveIndex(0);
@@ -339,16 +339,16 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
     ],
   );
 
-  const optionsContextValue = useMemo<ComboboxOptionsContextValue>(
+  const itemsContextValue = useMemo<ComboboxItemsContextValue>(
     () => ({
       getItemProps,
       handleSelect,
       refs,
       valuesByIndexRef,
       registerSelectedIndex,
-      registerOption,
+      registerItem,
     }),
-    [getItemProps, handleSelect, refs, registerSelectedIndex, registerOption],
+    [getItemProps, handleSelect, refs, registerSelectedIndex, registerItem],
   );
 
   const highlightContextValue = useMemo<ComboboxHighlightContextValue>(
@@ -359,11 +359,11 @@ function ComboboxInner<Item>(props: ComboboxProps<Item>) {
   return (
     <FloatingNode id={nodeId}>
       <ComboboxContext.Provider value={contextValue}>
-        <ComboboxOptionsContext.Provider value={optionsContextValue}>
+        <ComboboxItemsContext.Provider value={itemsContextValue}>
           <ComboboxHighlightContext.Provider value={highlightContextValue}>
             {children}
           </ComboboxHighlightContext.Provider>
-        </ComboboxOptionsContext.Provider>
+        </ComboboxItemsContext.Provider>
       </ComboboxContext.Provider>
     </FloatingNode>
   );

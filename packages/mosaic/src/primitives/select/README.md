@@ -19,15 +19,15 @@ import { Select } from '@/primitives/select';
   </Select.Trigger>
   <Select.Positioner>
     <Select.Popup>
-      <Select.Option
+      <Select.Item
         value='apple'
         label='Apple'
       />
-      <Select.Option
+      <Select.Item
         value='banana'
         label='Banana'
       />
-      <Select.Option
+      <Select.Item
         value='cherry'
         label='Cherry'
       />
@@ -81,7 +81,7 @@ const items = [
   items={items}
   defaultValue='apple'
 >
-  {/* Select.Value will display "Apple" even before Options mount */}
+  {/* Select.Value will display "Apple" even before Items mount */}
 </Select.Root>;
 ```
 
@@ -95,18 +95,19 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ## Parts
 
-| Part                | Default Element | Description                                |
-| ------------------- | --------------- | ------------------------------------------ |
-| `Select.Root`       | —               | Root context provider                      |
-| `Select.Trigger`    | `<button>`      | Toggles the dropdown on click              |
-| `Select.Value`      | `<span>`        | Displays the selected label or placeholder |
-| `Select.Portal`     | —               | Portals children (accepts `root` prop)     |
-| `Select.Positioner` | `<div>`         | Floating positioned container              |
-| `Select.Popup`      | `<div>`         | Visual wrapper for the option list         |
-| `Select.Option`     | `<button>`      | A selectable option                        |
-| `Select.Group`      | `<div>`         | Groups options, named by its label         |
-| `Select.GroupLabel` | `<div>`         | Names the enclosing `Select.Group`         |
-| `Select.Arrow`      | `<svg>`         | Optional floating arrow                    |
+| Part                   | Default Element | Description                                          |
+| ---------------------- | --------------- | ---------------------------------------------------- |
+| `Select.Root`          | —               | Root context provider                                |
+| `Select.Trigger`       | `<button>`      | Toggles the dropdown on click                        |
+| `Select.Value`         | `<span>`        | Displays the selected label or placeholder           |
+| `Select.Portal`        | —               | Portals children (accepts `root` prop)               |
+| `Select.Positioner`    | `<div>`         | Floating positioned container                        |
+| `Select.Popup`         | `<div>`         | Visual wrapper for the option list                   |
+| `Select.Item`          | `<button>`      | A selectable option                                  |
+| `Select.ItemIndicator` | `<span>`        | Renders inside the selected item only, `aria-hidden` |
+| `Select.Group`         | `<div>`         | Groups options, named by its label                   |
+| `Select.GroupLabel`    | `<div>`         | Names the enclosing `Select.Group`                   |
+| `Select.Arrow`         | `<svg>`         | Optional floating arrow                              |
 
 ## Props
 
@@ -133,13 +134,19 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | `placeholder` | `ReactNode`                                      | —       | Shown when no value is selected                                                                                                    |
 | `children`    | `ReactNode \| ((value: unknown[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values, and the placeholder shows instead while nothing is selected |
 
-### `Select.Option`
+### `Select.Item`
 
-| Prop       | Type      | Default         | Description                                   |
-| ---------- | --------- | --------------- | --------------------------------------------- |
-| `value`    | `unknown` | **required**    | The option's value, compared with `Object.is` |
-| `label`    | `string`  | `String(value)` | Display label, also used for typeahead        |
-| `disabled` | `boolean` | —               | Prevents selection                            |
+| Prop       | Type      | Default         | Description                                 |
+| ---------- | --------- | --------------- | ------------------------------------------- |
+| `value`    | `unknown` | **required**    | The item's value, compared with `Object.is` |
+| `label`    | `string`  | `String(value)` | Display label, also used for typeahead      |
+| `disabled` | `boolean` | —               | Prevents selection                          |
+
+### `Select.ItemIndicator`
+
+| Prop          | Type      | Default | Description                                                                   |
+| ------------- | --------- | ------- | ----------------------------------------------------------------------------- |
+| `keepMounted` | `boolean` | `false` | Render in unselected items too, with `data-selected` only on the selected one |
 
 ### `Select.Trigger`, `Select.Positioner`, `Select.Popup`
 
@@ -166,21 +173,21 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 | Attribute                   | Applies To | Description                                                                       |
 | --------------------------- | ---------- | --------------------------------------------------------------------------------- |
 | `data-open` / `data-closed` | Trigger    | Popup open state                                                                  |
-| `data-selected`             | Option     | Each selected option                                                              |
-| `data-active`               | Option     | The keyboard-highlighted option                                                   |
-| `data-disabled`             | Option     | Disabled option                                                                   |
+| `data-selected`             | Item       | Each selected option                                                              |
+| `data-active`               | Item       | The keyboard-highlighted option                                                   |
+| `data-disabled`             | Item       | Disabled option                                                                   |
 | `data-side`                 | Positioner | Resolved placement side, or `none` while the selected option overlays the trigger |
 
 ## Important Notes
 
-- **`label` on `Select.Option`** drives both display in `Select.Value` and typeahead matching. If omitted, `String(value)` is used for both.
+- **`label` on `Select.Item`** drives both display in `Select.Value` and typeahead matching. If omitted, `String(value)` is used for both.
 - **Values can be any type.** They are compared with `Object.is`, and `Value` is inferred from `items`, `value`, `defaultValue` or `onValueChange`.
-- **`items` prop** is only for label resolution — it does not control which options render. You still render `Select.Option` children yourself.
+- **`items` prop** is only for label resolution — it does not control which options render. You still render `Select.Item` children yourself.
 - **Disabled options** can still receive keyboard focus but cannot be selected.
 - **Popup contents freeze while closing.** The popup outlives `open` by its exit animation, so its children are wrapped in `Freeze` (`../utils`) and hold their last frame: picking an option does not move `data-selected` to the new row under the animation. The popup element itself keeps updating, so `data-closed` / `data-ending-style` still land.
 
 ## ARIA
 
 - Popup: `role="listbox"`, `aria-multiselectable` when `multiple`
-- Option: `role="option"`, `aria-selected`, `aria-disabled`
+- Item: `role="option"`, `aria-selected`, `aria-disabled`
 - Trigger: `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`

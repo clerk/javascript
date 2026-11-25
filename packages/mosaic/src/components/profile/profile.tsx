@@ -247,7 +247,7 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
 
 export type ProfileNavProps = MosaicComponentProps<'nav'>;
 
-type NavItemMode = 'tab' | 'option';
+type NavItemMode = 'tab' | 'select';
 
 // `Profile.Nav` children render again as the select's options.
 const NavItemModeContext = React.createContext<NavItemMode>('tab');
@@ -384,7 +384,7 @@ const NavGroup = React.forwardRef<HTMLDivElement, ProfileNavGroupProps>(function
     themeProps('profile-nav-group-label'),
     stylex.props(reset.base, styles.navGroupLabel),
   );
-  if (mode === 'option') {
+  if (mode === 'select') {
     return (
       <SelectPrimitive.Group
         ref={ref}
@@ -460,7 +460,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   const groupLabelId = React.useContext(NavGroupLabelContext);
   const styleProps = mergeStyleProps(
     themeProps('profile-nav-item'),
-    stylex.props(reset.base, styles.navItem, focusOutline.visible, mode === 'option' && styles.navItemOption, xstyle),
+    stylex.props(reset.base, styles.navItem, focusOutline.visible, mode === 'select' && styles.navItemSelect, xstyle),
     rest,
   );
   const content = (
@@ -488,9 +488,9 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
       ) : null}
     </>
   );
-  if (mode === 'option') {
+  if (mode === 'select') {
     return (
-      <SelectPrimitive.Option
+      <SelectPrimitive.Item
         value={value}
         label={typeof children === 'string' ? children : undefined}
         disabled={disabled}
@@ -500,7 +500,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
         {...styleProps}
       >
         {content}
-      </SelectPrimitive.Option>
+      </SelectPrimitive.Item>
     );
   }
   return (
@@ -601,7 +601,7 @@ function PageTitle({ title, claim }: { title: React.ReactNode; claim: boolean })
         </SelectPrimitive.Trigger>,
       )}
       <SelectPopup xstyle={styles.navPopup}>
-        <NavItemModeContext.Provider value='option'>{navItems}</NavItemModeContext.Provider>
+        <NavItemModeContext.Provider value='select'>{navItems}</NavItemModeContext.Provider>
       </SelectPopup>
     </SelectPrimitive.Root>
   );

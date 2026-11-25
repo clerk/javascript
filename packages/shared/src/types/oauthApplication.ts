@@ -42,6 +42,7 @@ export interface OAuthConsentInfoJSON extends ClerkResourceJSON {
   redirect_domain: string | null;
   client_registration?: OAuthClientRegistration;
   client_metadata_host?: string | null;
+  max_organizations?: number;
   scopes: OAuthConsentScopeJSON[];
 }
 
@@ -116,6 +117,10 @@ export type OAuthConsentInfo = {
    * The host that serves the client's Client ID Metadata Document. Null unless `clientRegistration` is `metadata_document`.
    */
   clientMetadataHost?: string | null;
+  /**
+   * The most organizations one consent can grant. `1` unless the instance allows a consent for several organizations. Undefined when the value is not reported; treat that as `1`.
+   */
+  maxOrganizations?: number;
   /**
    * A list of scopes the application is requesting, with descriptions and consent requirements.
    */

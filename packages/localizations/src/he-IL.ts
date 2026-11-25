@@ -1107,6 +1107,11 @@ export const heIL: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: 'תישאר מחובר עד שתתנתק או תבטל את הגישה.',
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: 'אם תאשר גישה, האפליקציה תעביר אותך אל {{domainAction}}.',
     redirectUriModal: {
       subtitle: 'ודא שאתה סומך על {{applicationName}} ושכתובת URL זו שייכת ל-{{applicationName}}.',

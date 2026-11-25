@@ -6,11 +6,11 @@ import type {
   ComboboxEmptyProps,
   ComboboxInputGroupProps,
   ComboboxInputProps,
+  ComboboxItemIndicatorProps,
+  ComboboxItemProps,
   ComboboxLabelProps,
   ComboboxListProps,
   ComboboxMediaProps,
-  ComboboxOptionIndicatorProps,
-  ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
   ComboboxTriggerProps,
@@ -29,7 +29,7 @@ export default {
   practices: [
     {
       do: true,
-      text: 'Pass `items` and `itemToStringLabel` to `Combobox.Root` and render options with `Combobox.Collection`, so the search filters them.',
+      text: 'Pass `items` and `itemToStringLabel` to `Combobox.Root` and render items with `Combobox.Collection`, so the search filters them.',
     },
     { do: true, text: 'Keep `Combobox.Empty` mounted, so screen readers announce it when nothing matches.' },
     {
@@ -49,7 +49,7 @@ export default {
       props: {
         items: {
           type: 'readonly Item[]',
-          doc: "Every option's item. `Collection` renders those that match the search.",
+          doc: 'Every item. `Collection` renders those that match the search.',
         },
         itemToStringLabel: { type: '(item: Item) => string', doc: 'The label an item is searched by.' },
         value: { type: 'string | null', doc: 'The selected value, when controlled.' },
@@ -136,30 +136,38 @@ export default {
       description: 'A scrollable listbox in flow, for a combobox embedded in another surface. Turns on inline mode.',
       slot: 'cl-combobox-list',
     },
-    'Combobox.Option': {
-      description: 'One option.',
-      slot: 'cl-combobox-option',
+    'Combobox.Item': {
+      description: 'One item.',
+      slot: 'cl-combobox-item',
       props: {
-        value: { type: 'string', doc: 'The value selected when the option is chosen.' },
+        value: { type: 'string', doc: 'The value selected when the item is chosen.' },
         label: { type: 'string', doc: 'The text typeahead matches.', default: '`value`' },
-        disabled: { type: 'boolean', doc: 'Makes the option unselectable.' },
+        disabled: { type: 'boolean', doc: 'Makes the item unselectable.' },
       },
     },
     'Combobox.Media': {
       description: 'A square leading column for an icon, flag or avatar, as a `span`.',
-      slot: 'cl-combobox-option-media',
+      slot: 'cl-combobox-item-media',
     },
     'Combobox.Label': {
-      description: "The option's name, as a `span`. Truncates to one line.",
-      slot: 'cl-combobox-option-label',
+      description: "The item's name, as a `span`. Truncates to one line.",
+      slot: 'cl-combobox-item-label',
     },
     'Combobox.Detail': {
       description: 'Secondary trailing text, such as a code or count. Stays whole while the label truncates.',
-      slot: 'cl-combobox-option-detail',
+      slot: 'cl-combobox-item-detail',
     },
-    'Combobox.OptionIndicator': {
-      description: 'Shows on the selected option. A checkmark when given no children.',
-      slot: 'cl-combobox-option-indicator',
+    'Combobox.ItemIndicator': {
+      description:
+        'The check. Every item keeps room for it and only the selected item shows it. A checkmark when given no children.',
+      slot: 'cl-combobox-item-indicator',
+      props: {
+        keepMounted: {
+          type: 'boolean',
+          doc: 'Renders it in every item, hidden but holding its width, with `data-selected` and visible only on the selected one. `false` renders it only in the selected item.',
+          default: 'true',
+        },
+      },
     },
     'Combobox.Empty': {
       description: 'A polite `role="status"` region that shows its children only when nothing matches.',
@@ -179,10 +187,10 @@ export default {
     <Combobox.Empty>{m.noResults}</Combobox.Empty>
     <Combobox.Collection>
       {(country: Country) => (
-        <Combobox.Option key={country.code} value={country.code} label={country.name}>
+        <Combobox.Item key={country.code} value={country.code} label={country.name}>
           <Combobox.Label>{country.name}</Combobox.Label>
-          <Combobox.OptionIndicator />
-        </Combobox.Option>
+          <Combobox.ItemIndicator />
+        </Combobox.Item>
       )}
     </Combobox.Collection>
   </Combobox.Popup>
@@ -200,10 +208,10 @@ export default {
   'Combobox.Clear': ComboboxClearProps;
   'Combobox.Popup': ComboboxPopupProps;
   'Combobox.List': ComboboxListProps;
-  'Combobox.Option': ComboboxOptionProps;
+  'Combobox.Item': ComboboxItemProps;
   'Combobox.Media': ComboboxMediaProps;
   'Combobox.Label': ComboboxLabelProps;
   'Combobox.Detail': ComboboxDetailProps;
-  'Combobox.OptionIndicator': ComboboxOptionIndicatorProps;
+  'Combobox.ItemIndicator': ComboboxItemIndicatorProps;
   'Combobox.Empty': ComboboxEmptyProps;
 }>;

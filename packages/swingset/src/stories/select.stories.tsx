@@ -25,24 +25,24 @@ export function Default() {
       <Select.Portal>
         <Select.Positioner>
           <Select.Popup>
-            <Select.Option
+            <Select.Item
               value='apple'
               label='Apple'
             >
               Apple
-            </Select.Option>
-            <Select.Option
+            </Select.Item>
+            <Select.Item
               value='banana'
               label='Banana'
             >
               Banana
-            </Select.Option>
-            <Select.Option
+            </Select.Item>
+            <Select.Item
               value='cherry'
               label='Cherry'
             >
               Cherry
-            </Select.Option>
+            </Select.Item>
           </Select.Popup>
         </Select.Positioner>
       </Select.Portal>
@@ -63,24 +63,24 @@ export function Multiple() {
       <Select.Portal>
         <Select.Positioner>
           <Select.Popup>
-            <Select.Option
+            <Select.Item
               value='apple'
               label='Apple'
             >
               Apple
-            </Select.Option>
-            <Select.Option
+            </Select.Item>
+            <Select.Item
               value='banana'
               label='Banana'
             >
               Banana
-            </Select.Option>
-            <Select.Option
+            </Select.Item>
+            <Select.Item
               value='cherry'
               label='Cherry'
             >
               Cherry
-            </Select.Option>
+            </Select.Item>
           </Select.Popup>
         </Select.Positioner>
       </Select.Portal>
