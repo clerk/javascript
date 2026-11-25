@@ -60,6 +60,17 @@ describe('composing parts', () => {
     );
   });
 
+  it('throws when Chart.FocusOutline is used outside Chart.Bars', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() =>
+      render(
+        <StackedChart>
+          <Chart.FocusOutline />
+        </StackedChart>,
+      ),
+    ).toThrow('<Chart.FocusOutline> must be used within <Chart.Bars>');
+  });
+
   it('throws when Chart.Bar is used outside Chart.Bars', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>

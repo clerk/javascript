@@ -1,4 +1,4 @@
-import type { ChartActive, ChartCategory, ChartMessages, ChartPoint, ChartRect, ChartSelection } from '../types';
+import type { ChartActive, ChartCategory, ChartMessages, ChartPoint, ChartSelection } from '../types';
 
 export const DEFAULT_CHART_MESSAGES = {
   navigate: 'Use Left and Right to choose a period, or Home and End to jump to the first or last.',
@@ -36,8 +36,6 @@ export type SelectionModel<
   verticalInstructions: string;
   /** Where a tooltip for the selection points. */
   anchor: (selection: TSelection, category: TCategory) => ChartPoint;
-  /** The box a focus ring for the selection outlines, large enough to find on dense data. */
-  focusRect: (selection: TSelection, category: TCategory) => ChartRect;
   /** State the interaction surface carries for styling, such as `data-active-section`. */
   surfaceAttributes: (selection: TSelection | null) => Readonly<Record<`data-${string}`, string | undefined>>;
 }>;

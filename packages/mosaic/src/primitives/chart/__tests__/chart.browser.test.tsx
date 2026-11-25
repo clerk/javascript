@@ -414,16 +414,23 @@ describe('resizing', () => {
   });
 });
 
-describe('the keyboard focus on a section', () => {
+describe('the keyboard focus outline', () => {
   type Signed = { period: string; gained: number; lost: number };
   const signedSeries = [
     { key: 'gained', value: (row: Signed) => row.gained },
     { key: 'lost', value: (row: Signed) => row.lost },
   ];
   const signedIndex = (row: Signed) => row.period;
-  const cursor = () => screen.getByTestId('cursor').getBoundingClientRect();
+  const outline = () => screen.queryByTestId('focus-outline');
+  const box = () => {
+    const element = outline();
+    if (!element) {
+      throw new Error('No focus outline');
+    }
+    return element.getBoundingClientRect();
+  };
 
-  it('covers the selected section from the zero line to its far edge', async () => {
+  it('outlines the painted bars of the selected section, not the column', async () => {
     await render(
       <div style={{ width: 600 }}>
         <TestChart
@@ -435,7 +442,7 @@ describe('the keyboard focus on a section', () => {
           index={signedIndex}
           ariaLabel='Growth'
           height={300}
-          barClassName='red'
+          barClassName='projected'
           onSelectionChange={() => {}}
         />
       </div>,
@@ -443,33 +450,38 @@ describe('the keyboard focus on a section', () => {
     const plot = surface().getBoundingClientRect();
 
     surface().focus();
-    await expect.poll(() => screen.queryByTestId('cursor')?.hasAttribute('data-focus-visible')).toBe(true);
-    const positive = cursor();
+    await expect.poll(outline).toBeTruthy();
+    const positive = box();
     await userEvent.keyboard('{ArrowDown}');
-    await expect.poll(() => cursor().top).toBeGreaterThan(positive.top);
-    const negative = cursor();
+    await expect.poll(() => box().top).toBeGreaterThan(positive.top);
+    const negative = box();
 
-    expect(positive.top).toBeCloseTo(plot.top, -1);
-    expect(negative.top).toBeCloseTo(positive.bottom, 0);
-    expect(negative.bottom).toBeCloseTo(plot.bottom, -1);
-    expect(positive.height).toBeLessThan(plot.height);
+    expect(positive.width).toBeCloseTo(32 + 2 * 2, 0);
+    expect(positive.width).toBeLessThan(plot.width / 4);
+    expect(Math.abs(positive.bottom - negative.top)).toBeLessThanOrEqual(5);
+    expect(negative.bottom).toBeGreaterThan(negative.top);
   });
 
-  it('keeps a minimum width on dense data', async () => {
+  it('keeps a minimum size on dense data', async () => {
     const dense = Array.from({ length: 400 }, (_, i) => ({ period: `P${i}`, value: 10 + (i % 7) }));
     await render(<Chart data={dense} />);
     surface().focus();
-    await expect.poll(() => screen.queryByTestId('cursor')?.hasAttribute('data-focus-visible')).toBe(true);
-    expect(cursor().width).toBeGreaterThanOrEqual(12);
+    await expect.poll(outline).toBeTruthy();
+    expect(box().width).toBeGreaterThanOrEqual(12);
   });
 
-  it('keeps the full-height band for a mouse hover', async () => {
+  it('shows only for the keyboard and goes away on Escape', async () => {
     await render(<Chart />);
     const plot = surface().getBoundingClientRect();
     await userEvent.hover(surface(), { position: { x: centerOfCategory(0).x - plot.left, y: plot.height - 4 } });
     await expect.poll(() => screen.queryByTestId('cursor')).toBeTruthy();
-    expect(cursor().height).toBeCloseTo(plot.height, 0);
+    expect(outline()).toBeNull();
     await userEvent.unhover(surface());
+
+    surface().focus();
+    await expect.poll(outline).toBeTruthy();
+    await userEvent.keyboard('{Escape}');
+    await expect.poll(outline).toBeNull();
   });
 });
 
