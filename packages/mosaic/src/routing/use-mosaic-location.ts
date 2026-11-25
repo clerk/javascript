@@ -58,10 +58,14 @@ const release = () => {};
 // use.
 function navigateTo(build: (from: HostUrl) => string | undefined, replace: boolean, via: Via, readUrl: ReadUrl): void {
   if (via === undefined) {
-    writeWindowUrl(() => build(readWindowUrl()), replace);
+    writeWindowUrl(() => {
+      const from = readWindowUrl();
+      return from === undefined ? undefined : build(from);
+    }, replace);
     return;
   }
-  const url = build(readUrl === undefined ? readWindowUrl() : hostUrlOf(readUrl()));
+  const from = readUrl === undefined ? readWindowUrl() : hostUrlOf(readUrl());
+  const url = from === undefined ? undefined : build(from);
   if (url === undefined) {
     return;
   }

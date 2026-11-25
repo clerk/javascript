@@ -17,12 +17,20 @@ const parked: Array<() => void> = [];
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
+// Without a window, as on a server or in a native app, the store has nothing to subscribe to, read
+// or write, and every function here says so instead of throwing. Virtual mode then works on its
+// own; a URL mode needs an adapter that is the location.
+const hasWindow = () => typeof window !== 'undefined';
+
 // A host router's own `pushState` fires neither `popstate` nor `hashchange`, so where the browser
 // has the Navigation API its `currententrychange` is listened to as well; it fires for every
 // same-document navigation, whoever made it. It fires synchronously inside the `pushState` call,
 // which a host router may make from an insertion effect, where React allows no update, so the
 // store is told a microtask later.
 function subscribe(listener: Listener): () => void {
+  if (!hasWindow()) {
+    return () => {};
+  }
   const later = () => queueMicrotask(listener);
   listeners.add(listener);
   window.addEventListener('popstate', listener);
@@ -48,7 +56,10 @@ function readNothing(): undefined {
 // Do not see this as a store or as state syncing, we always read directly from window.location,
 // just in memoized form
 let memoizedUrl: { href: string; url: HostUrl } | undefined;
-export function readWindowUrl(): HostUrl {
+export function readWindowUrl(): HostUrl | undefined {
+  if (!hasWindow()) {
+    return undefined;
+  }
   const { href, pathname, search, hash } = window.location;
   if (memoizedUrl?.href !== href) {
     memoizedUrl = { href, url: { pathname, search: search.slice(1), hash: hash.slice(1) } };
@@ -80,6 +91,9 @@ export function markSettled(): void {
 }
 
 export function isSameOrigin(url: string): boolean {
+  if (!hasWindow()) {
+    return true;
+  }
   try {
     return new URL(url, window.location.href).origin === window.location.origin;
   } catch {
@@ -88,6 +102,9 @@ export function isSameOrigin(url: string): boolean {
 }
 
 export function writeWindowUrl(target: string | (() => string | undefined), replace: boolean): void {
+  if (!hasWindow()) {
+    return;
+  }
   const write = () => {
     const url = typeof target === 'string' ? target : target();
     if (url === undefined) {
