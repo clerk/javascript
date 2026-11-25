@@ -64,8 +64,18 @@ export const partStyles = stylex.create({
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
     },
-    transitionDuration: durationVars['--cl-duration-fast'],
-    transitionProperty: 'opacity',
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      ':where([data-moving])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
+    },
+    transitionProperty: {
+      default: 'opacity',
+      ':where([data-moving])': 'opacity, top, left',
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 'opacity',
+        ':where([data-moving])': 'opacity',
+      },
+    },
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
       ':where([data-ending-style])': easingVars['--cl-ease-exit'],

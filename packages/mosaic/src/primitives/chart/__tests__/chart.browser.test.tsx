@@ -1,7 +1,7 @@
 import { cleanup, render as renderComponent, screen } from '@testing-library/react';
 import type {} from '@vitest/browser-playwright';
 import type { ReactElement } from 'react';
-import { useRef } from 'react';
+import { Profiler, useRef } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 
@@ -83,6 +83,13 @@ function insideLastBar() {
 
 function pointer(type: string, target: Element, clientX: number, clientY: number, pointerType = 'mouse') {
   target.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX, clientY, pointerType }));
+}
+
+function nextFrames(count: number) {
+  return new Promise<void>(resolve => {
+    const step = (left: number) => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
+    step(count);
+  });
 }
 
 function centerOfCategory(categoryIndex: number) {
@@ -434,6 +441,35 @@ describe('choosing a period with a pointer', () => {
     expect(screen.queryByTestId('cursor')).toBeNull();
   });
 
+  it('does not rerender while the mouse moves within the selected period', async () => {
+    let commits = 0;
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(
+      <Profiler
+        id='chart'
+        onRender={() => {
+          commits++;
+        }}
+      >
+        <Chart onSelectionChange={onSelectionChange} />
+      </Profiler>,
+    );
+    const { x, y } = centerOfCategory(3);
+    pointer('pointermove', surface(), x, y);
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Apr' });
+    await nextFrames(3);
+    const settled = commits;
+
+    for (const dx of [-6, -3, 3, 6]) {
+      pointer('pointermove', surface(), x + dx, y + dx);
+      await nextFrames(1);
+    }
+    await nextFrames(2);
+
+    expect(onSelectionChange).toHaveBeenCalledTimes(1);
+    expect(commits).toBe(settled);
+  });
+
   it('selects on touch contact, keeps it after the finger lifts, and dismisses on a touch elsewhere', async () => {
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
     await render(<Chart onSelectionChange={onSelectionChange} />);
@@ -604,6 +640,57 @@ describe('the tooltip', () => {
     expect(tooltip.left).toBe(boundary.left + 8);
     expect(tooltip.top).toBe(boundary.top + 8);
     expect(contains(boundary, tooltip)).toBe(true);
+  });
+
+  it('marks the tooltip as moving from the first change of period until it closes', async () => {
+    await render(
+      <BoundedChart
+        width={800}
+        chartWidth={800}
+      />,
+    );
+    const tooltip = await focusPeriod(0);
+    expect(tooltip).toHaveTextContent('Jan: 10');
+    expect(tooltip).not.toHaveAttribute('data-moving');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(() => tooltip.textContent).toBe('Feb: 20');
+    expect(tooltip).toHaveAttribute('data-moving');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect.poll(() => tooltip.textContent).toBe('Jan: 10');
+    expect(tooltip).toHaveAttribute('data-moving');
+
+    surface().blur();
+    await expect.poll(() => screen.queryByTestId('tooltip')).toBeNull();
+    const reopened = await focusPeriod(0);
+    expect(reopened).not.toHaveAttribute('data-moving');
+  });
+
+  it('hides the tooltip while its chart is scrolled out of view and shows it again once it is back', async () => {
+    await render(
+      <div
+        data-testid='scroller'
+        style={{ height: 300, overflow: 'auto' }}
+      >
+        <BoundedChart
+          width={800}
+          chartWidth={800}
+        />
+        <div style={{ height: 2000 }} />
+      </div>,
+    );
+    const tooltip = await focusPeriod(1);
+    expect(tooltip).not.toHaveAttribute('data-anchor-hidden');
+
+    const scroller = screen.getByTestId('scroller');
+    scroller.scrollTop = 1000;
+    await expect.poll(() => tooltip.hasAttribute('data-anchor-hidden')).toBe(true);
+    expect(tooltip.style.visibility).toBe('hidden');
+
+    scroller.scrollTop = 0;
+    await expect.poll(() => tooltip.hasAttribute('data-anchor-hidden')).toBe(false);
+    expect(tooltip.style.visibility).toBe('');
   });
 
   it('closes when the selection is dismissed', async () => {

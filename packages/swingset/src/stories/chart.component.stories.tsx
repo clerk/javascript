@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@clerk/mosaic/components/button';
-import { Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
-import { useRef } from 'react';
+import { type BarSelection, Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
+import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -288,15 +288,21 @@ export function Palette() {
   );
 }
 
-const busiestDay = { category: '2026-11-24' };
-
 export function Highlight() {
-  const chart = Chart.useBarChart({ data: dailyAgents, series: agentsByDay, index: getDay, highlight: busiestDay });
+  const [highlight, setHighlight] = useState<BarSelection | null>(null);
+  const chart = Chart.useBarChart({
+    data: growth,
+    series: growthSeries,
+    index: getWeek,
+    onSelectionChange: setHighlight,
+    highlight,
+  });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Active agents by day'
+      aria-label='Weekly active users'
     >
+      <Chart.Legend />
       <Chart.Grid />
       <Chart.Bars />
       <Chart.YAxis />
