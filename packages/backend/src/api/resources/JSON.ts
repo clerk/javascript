@@ -1050,12 +1050,19 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   updated_at: number;
   aud?: string[];
   act?: IdPOAuthAccessTokenActorJSON;
+  org_id?: string;
+  granted_orgs?: IdPOAuthAccessTokenGrantedOrgJSON[];
 }
 
 export interface IdPOAuthAccessTokenActorJSON {
   iss?: string;
   sub: string;
   act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenGrantedOrgJSON {
+  id: string;
+  name: string;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

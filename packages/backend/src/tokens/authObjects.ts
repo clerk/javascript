@@ -14,6 +14,7 @@ import type {
 
 import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api';
+import type { IdPOAuthAccessTokenGrantedOrgJSON } from '../api/resources/JSON';
 import { isTokenTypeAccepted } from '../internal';
 import type { AuthenticateContext } from './authenticateContext';
 import { isMachineTokenType } from './machine';
@@ -117,6 +118,8 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
   oauth_token: {
     userId: TAuthenticated extends true ? string : null;
     clientId: TAuthenticated extends true ? string : null;
+    orgId: TAuthenticated extends true ? string | null : null;
+    grantedOrgs: TAuthenticated extends true ? IdPOAuthAccessTokenGrantedOrgJSON[] | null : null;
   };
 };
 
@@ -328,6 +331,8 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         scopes: result.scopes,
         userId: result.subject,
         clientId: result.clientId,
+        orgId: result.orgId ?? null,
+        grantedOrgs: result.grantedOrgs ?? null,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     default:
@@ -380,6 +385,8 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         scopes: null,
         userId: null,
         clientId: null,
+        orgId: null,
+        grantedOrgs: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     default:
