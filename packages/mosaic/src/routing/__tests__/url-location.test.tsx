@@ -451,6 +451,21 @@ describe('with an adapter', () => {
     expect(read('hash')).toEqual(['billing']);
   });
 
+  it("starts a write from the adapter's readUrl when it has one, with or without the leading ? and #", () => {
+    at('/elsewhere?w=1#w');
+    const push = vi.fn<(next: string) => void>();
+    const replace = vi.fn<(next: string) => void>();
+    const readUrl = () => ({ pathname: '/memory', search: '?m=1', hash: '#top' });
+    const { result } = renderLocation({ routing: 'query', path: '/user' }, { adapter: { push, replace, readUrl } });
+
+    act(() => result.current.location.write(['security']));
+    act(() => result.current.location.clear());
+
+    expect(push).toHaveBeenCalledWith('/memory?m=1&.user=security#top');
+    expect(replace).toHaveBeenCalledWith('/memory?m=1#top');
+    expect(url()).toBe('/elsewhere?w=1#w');
+  });
+
   it('navigates through the host router with a URL built from the address bar', () => {
     at('/page?q=1&.user=x#top');
     const { adapter } = hostRouter({ pathname: '/stale', search: 'stale=1', hash: 'stale' });

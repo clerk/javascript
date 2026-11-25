@@ -2,7 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import { useInsertionEffect, useMemo, useRef, useState } from 'react';
 
 import type { MosaicLocation } from './location';
-import type { AdapterRead, AdapterReads } from './router-adapter';
+import type { AdapterRead, AdapterReads, RouterAdapter } from './router-adapter';
 import { useRoutingConfig } from './router-adapter';
 import type { UrlRoutingMode } from './url-location';
 import { createSegmentCodec, urlWith, urlWithout } from './url-location';
@@ -26,7 +26,6 @@ const ADAPTER_READS: Record<keyof HostUrl, keyof AdapterReads> = {
 
 const LEADING: Record<keyof HostUrl, string> = { pathname: '', search: '?', hash: '#' };
 
-// The provider fixes which hooks the adapter has, so the hook this calls is fixed too.
 function useAdapterRead(useRead: AdapterRead, leading: string): string | undefined {
   const value = useRead() ?? undefined;
   const text = typeof value === 'object' ? value.toString() : value;
@@ -34,18 +33,35 @@ function useAdapterRead(useRead: AdapterRead, leading: string): string | undefin
 }
 
 type Via = ((url: string) => void) | undefined;
+type ReadUrl = RouterAdapter['readUrl'];
+
+function hostUrlOf({ pathname, search, hash }: ReturnType<NonNullable<ReadUrl>>): HostUrl {
+  return {
+    pathname,
+    search: search.startsWith('?') ? search.slice(1) : search,
+    hash: hash.startsWith('#') ? hash.slice(1) : hash,
+  };
+}
 
 const release = () => {};
 
-// A write is "the URL in the address bar, plus our change", never "the URL the host last rendered,
-// plus our change": the address bar is what the write lands on, and a host updates it before or in
-// the same commit as the tree it renders for it, so it is never behind the host and may be ahead.
-function navigateTo(build: (from: HostUrl) => string | undefined, replace: boolean, via: Via): void {
+// A write composes from where it lands, plus our change. Without `push` and `replace` it lands in
+// `history`, so it starts from the address bar; a parked write starts from the address bar as it is
+// when it lands. Through `push` or `replace` it starts from the router's own location when the
+// adapter has `readUrl`, which a memory router needs, and from the address bar otherwise, since every
+// other router's location is the address bar. It never starts from the adapter's hooks as this
+// component last rendered them: the address bar is updated before or in the same commit as the
+// tree, so it is never behind the host, and the hooks already tell the route what the host has
+// committed, which is a render concern, not a write concern. That is also what lets each mode call
+// only the adapter hook for the field it owns; reading all three to compose a write would make hash
+// and path mode call Next's `useSearchParams`, and its Suspense requirement, for a field they never
+// use.
+function navigateTo(build: (from: HostUrl) => string | undefined, replace: boolean, via: Via, readUrl: ReadUrl): void {
   if (via === undefined) {
     writeWindowUrl(() => build(readWindowUrl()), replace);
     return;
   }
-  const url = build(readWindowUrl());
+  const url = build(readUrl === undefined ? readWindowUrl() : hostUrlOf(readUrl()));
   if (url === undefined) {
     return;
   }
@@ -81,7 +97,7 @@ export function useHostPathname(): string | undefined {
 // that hook so the route agrees with what the host has rendered, and from `window` otherwise. The
 // other fields matter only to a write, which preserves them from the address bar.
 function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocation {
-  const { reads, push, replace, queryPrefix, hashPrefix } = useRoutingConfig();
+  const { reads, push, replace, readUrl, queryPrefix, hashPrefix } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
   const codec = useMemo(
     () => createSegmentCodec(routing, path, { query: queryPrefix, hash: hashPrefix }),
@@ -99,9 +115,9 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
   const raw = value === undefined ? undefined : codec.read(value);
   const parts = useMemo(() => (raw === undefined ? undefined : codec.decode(raw)), [codec, raw]);
 
-  const via = useRef({ push, replace });
+  const via = useRef({ push, replace, readUrl });
   useInsertionEffect(() => {
-    via.current = { push, replace };
+    via.current = { push, replace, readUrl };
   });
 
   // A segment kept in the page's URL. The location holds nothing of its own: it hands out the parts
@@ -116,10 +132,11 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
           from => urlWith(codec, from, next),
           shouldReplace,
           shouldReplace ? via.current.replace : via.current.push,
+          via.current.readUrl,
         );
       },
       clear: () => {
-        navigateTo(from => urlWithout(codec, from), true, via.current.replace);
+        navigateTo(from => urlWithout(codec, from), true, via.current.replace, via.current.readUrl);
       },
       own: () => release,
     }),

@@ -42,6 +42,15 @@ export interface RouterAdapter {
   push?: (url: string) => void;
   /** As `push`, replacing the current history entry. */
   replace?: (url: string) => void;
+  /**
+   * Reads the host router's current location, for a write to start from. Without it a write starts
+   * from `window.location`, which is right for every router whose location is the address bar.
+   * Provide it, with `push` and `replace`, for a router whose location is not, such as a memory
+   * router. It is a plain function, not a hook: it is called when a write happens, so it has to be
+   * synchronous, as current as the hooks, and spelled the way `push` expects. A leading `?` on
+   * `search` and `#` on `hash` are optional.
+   */
+  readUrl?: () => { pathname: string; search: string; hash: string };
 }
 
 export interface RoutingOptions {
@@ -82,6 +91,7 @@ export interface RoutingConfig {
   reads: AdapterReads;
   push: RouterAdapter['push'];
   replace: RouterAdapter['replace'];
+  readUrl: RouterAdapter['readUrl'];
   queryPrefix: string;
   hashPrefix: string;
   modals: ModalRoutingMode | undefined;
@@ -91,6 +101,7 @@ const defaultConfig: RoutingConfig = {
   reads: { usePathname: useNothing, useSearchParams: useNothing, useHash: useNothing },
   push: undefined,
   replace: undefined,
+  readUrl: undefined,
   queryPrefix: '',
   hashPrefix: '',
   modals: undefined,
@@ -113,7 +124,7 @@ function shapeOf(adapter: RouterAdapter | undefined): string {
 }
 
 // The hooks an adapter has are fixed on the first render, because the components under the provider
-// call them in their own hook order. A later adapter may change what `push` and `replace` do.
+// call them in their own hook order. A later adapter may change what `push`, `replace` and `readUrl` do.
 export function RoutingConfigProvider({
   adapter,
   keyPrefix,
@@ -131,6 +142,7 @@ export function RoutingConfigProvider({
   }, []);
   const push = adapter?.push;
   const replace = adapter?.replace;
+  const readUrl = adapter?.readUrl;
   const queryPrefix = keyPrefix?.query ?? defaultConfig.queryPrefix;
   const hashPrefix = keyPrefix?.hash ?? defaultConfig.hashPrefix;
   const value = useMemo(
@@ -138,11 +150,12 @@ export function RoutingConfigProvider({
       reads,
       push,
       replace,
+      readUrl,
       queryPrefix,
       hashPrefix,
       modals,
     }),
-    [reads, push, replace, queryPrefix, hashPrefix, modals],
+    [reads, push, replace, readUrl, queryPrefix, hashPrefix, modals],
   );
   return <RoutingConfigContext.Provider value={value}>{children}</RoutingConfigContext.Provider>;
 }
