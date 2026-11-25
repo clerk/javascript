@@ -135,6 +135,11 @@ export type ChartInstance<
   xTicks: (options?: XTicksOptions) => XTick[];
   /** The selection in the current data, or null. */
   selected: TActive | null;
+  /**
+   * What made `selected`: a pointer, the keyboard, or `selection`/`select`. Null with no selection.
+   * `keyboard` is when a focus ring belongs on the selected category.
+   */
+  selectionSource: 'pointer' | 'keyboard' | 'external' | null;
   /** Where a tooltip for `selected` points, in chart coordinates. */
   tooltipAnchor: ChartPoint | null;
   /** The text of the keyboard selection's status announcement. */
