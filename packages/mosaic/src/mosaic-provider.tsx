@@ -35,10 +35,10 @@ export interface MosaicProviderProps {
   /** The profile `UserButton`, `OrganizationSwitcher`, `UserProfile` and `OrganizationProfile` share: its shape, and the options it takes. */
   profile?: MosaicProfile;
   /**
-   * How components with `routing` set to `path`, `hash` or `query` reach the page's URL. `adapter`
-   * reads and writes it through your router, so the page and the component change together; without
-   * one they use `window.location`. `keyPrefix` sets what the names of their params start with, and
-   * `modals` puts Mosaic's own modals in the hash or the query string.
+   * Routing options that define how we should interact with the URL. By default `window.location` is
+   * used, define `adapter` to make reads and/or writes go through your own router. Define `keyPrefix`
+   * to control what query/hash param keys start with, and `modals` if you want the built in modal state
+   * to be reflected in the URL.
    */
   routing?: RoutingOptions;
 }

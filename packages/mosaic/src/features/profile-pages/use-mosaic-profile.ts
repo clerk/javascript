@@ -19,7 +19,7 @@ export interface MosaicProfile {
   combined?: boolean;
   /**
    * Options for the user profile, whichever component opens or mounts it. `routing` and `path`
-   * apply to a mounted profile; a modal's base and mode come from the modal and `routing.modals`.
+   * apply when the profile is mounted on a page, they are ignored for the modal version.
    */
   userProfileProps?: ProfileUserProps;
   /**

@@ -14,8 +14,9 @@ import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from 
 
 // The open modals in the order they opened. Modals are hosted side by side rather than inside
 // one another, so the dialogs cannot tell through the floating tree that one is on top of
-// another: to the one beneath, a press inside the one on top is an outside press, and Escape
-// reaches both. Only the modal on top takes a dismissal.
+// another. This means that to the one beneath, a press inside the one on top is an outside press,
+// and Escape reaches both so we use this to make sure only the modal on top takes a dismissal.
+// This shouldn't normally happen, but it could so we might as well handle it.
 interface ModalStack {
   top: string | undefined;
   register: (id: string) => () => void;
@@ -74,6 +75,8 @@ export function ModalSurfaceHost<Options>({
   const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
   const page = useHostPathname();
+
+  // Close virtual modals when pathname changes
   const leftPage =
     routing === 'virtual' && isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
   React.useEffect(() => {
@@ -82,10 +85,16 @@ export function ModalSurfaceHost<Options>({
     }
   }, [leftPage, location]);
   const shown = isOpen && !leftPage;
+
+  // Register/unregister the modal to the stack and determine if it's the top one
   const stack = React.useContext(ModalStackContext);
   const register = stack?.register;
-  React.useEffect(() => (shown ? register?.(surface.id) : undefined), [shown, register, surface.id]);
+  React.useEffect(() => {
+    // Note that register returns an unregister function, so return is necessary here
+    return shown ? register?.(surface.id) : undefined;
+  }, [shown, register, surface.id]);
   const isTop = stack === null || stack.top === surface.id;
+
   // wasOpen guarantees this only runs once as we are opening the modal
   if (isOpen && !state.wasOpen) {
     setState(previous =>

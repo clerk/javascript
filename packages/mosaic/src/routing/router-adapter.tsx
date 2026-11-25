@@ -23,8 +23,8 @@ export interface RouterAdapter {
   usePathname?: () => string | null | undefined;
   /**
    * A hook returning the current query string, as a string with or without the leading `?` or as
-   * `URLSearchParams`, so Next's `useSearchParams` serves as it is. `null` or `undefined` means it
-   * cannot be read here, as on the server, and that read falls back to `window`.
+   * `URLSearchParams`. `null` or `undefined` means it cannot be read here, and that read falls back
+   * to `window`.
    */
   useSearchParams?: () => string | URLSearchParams | null | undefined;
   /**
@@ -34,8 +34,10 @@ export interface RouterAdapter {
   useHash?: () => string;
   /**
    * Navigates the host router to a URL made of a pathname, query string and hash, adding a history entry.
-   * The component sees the result through the adapter's hooks, and through `window.location` for a
-   * hook the adapter does not have, read right after the call returns.
+   *
+   * Not providing this makes the push go through `history.pushState`, which is sometimes desirable
+   * even if your framework has it's own push, for example for Next where this is the mechanism to do
+   * a shallow navigation rather than one that hits the server.
    */
   push?: (url: string) => void;
   /** As `push`, replacing the current history entry. */
@@ -53,6 +55,8 @@ export interface RoutingOptions {
    * What the names of the params Mosaic keeps in the query string or the hash start with. A
    * component's param is this prefix and its base with dots for slashes, `.user` for `/user` and
    * `.modal.user` for the profile modal, so a leading dot keeps them apart from the host's params.
+   *
+   * For example, providing `query: 'prefix'` would make `/user` be represented by `?prefix.user`.
    *
    * @default { query: '', hash: '' }
    */

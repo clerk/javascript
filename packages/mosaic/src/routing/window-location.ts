@@ -1,12 +1,6 @@
 import { logger } from '@clerk/shared/logger';
 import { useSyncExternalStore } from 'react';
 
-// The page's URL as `window` holds it, for the URL modes when the host's adapter does not supply a
-// read. It is one store for the whole page: it learns about the browser's own navigations from
-// `popstate` and `hashchange`, about any same-document navigation from the Navigation API where
-// the browser has it, and about Mosaic's from the writes below, which notify as soon as history
-// has changed. Elsewhere a host router's own `pushState` reaches it only through an adapter. The
-// server has no window, so its snapshot is undefined and a URL-mode component renders its root.
 export interface HostUrl {
   pathname: string;
   // The query string and the hash, without their leading `?` and `#`.
@@ -14,12 +8,14 @@ export interface HostUrl {
   hash: string;
 }
 
-type Listener = () => void;
-
-const listeners = new Set<Listener>();
-let cached: { href: string; url: HostUrl } | undefined;
+// We don't want to do window writes until the host router has had time to settle/patch
+// history if it needs to, so we park them until then
+// We assume writes through a router already handles this
 let settled = false;
 const parked: Array<() => void> = [];
+
+type Listener = () => void;
+const listeners = new Set<Listener>();
 
 // A host router's own `pushState` fires neither `popstate` nor `hashchange`, so where the browser
 // has the Navigation API its `currententrychange` is listened to as well; it fires for every
@@ -48,13 +44,16 @@ function readNothing(): undefined {
   return undefined;
 }
 
-// The same object for as long as the URL is unchanged, as useSyncExternalStore requires.
+// The same object for as long as the URL is unchanged, as useSyncExternalStore requires
+// Do not see this as a store or as state syncing, we always read directly from window.location,
+// just in memoized form
+let memoizedUrl: { href: string; url: HostUrl } | undefined;
 export function readWindowUrl(): HostUrl {
   const { href, pathname, search, hash } = window.location;
-  if (cached?.href !== href) {
-    cached = { href, url: { pathname, search: search.slice(1), hash: hash.slice(1) } };
+  if (memoizedUrl?.href !== href) {
+    memoizedUrl = { href, url: { pathname, search: search.slice(1), hash: hash.slice(1) } };
   }
-  return cached.url;
+  return memoizedUrl.url;
 }
 
 // Disabled, it neither subscribes nor reads, so a component in virtual mode does not re-render on
@@ -105,11 +104,11 @@ export function writeWindowUrl(target: string | (() => string | undefined), repl
     } else {
       window.history.pushState(null, '', url);
     }
+    // When we do the write we can notify immediately without the microtask gap
     notifyWindowUrl();
   };
-  // This is necessary because Next and possibly other frameworks don't patch
-  // history.pushState/replaceState until an effect, so we need to guarantee we
-  // don't write until after that has happened, after that writes are sync
+
+  // See comment about settled/parked up top
   if (settled) {
     write();
   } else {
