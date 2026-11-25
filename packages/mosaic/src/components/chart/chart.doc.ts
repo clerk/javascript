@@ -198,18 +198,27 @@ export default {
       slot: 'cl-chart-cursor',
     },
     'Chart.Tooltip': {
-      description: 'The tooltip surface for the selected period, fading in and out.',
+      description:
+        'The tooltip for the selected period: the primitive `Chart.Tooltip` with its portal, positioner and a styled popup (`cl-chart-tooltip`) that fades in and out. `xstyle` styles the popup.',
       slot: 'cl-chart-tooltip',
       props: {
         children: {
           type: '(tooltip: ChartTooltipData<TActive>) => React.ReactNode',
-          doc: 'Renders the body from `{ active, heading, metrics, rows }`. Return null to hide the tooltip.',
+          doc: 'Renders the body inside the popup from `{ active, heading, metrics, rows }`.',
           default: '`Chart.TooltipContent` with the heading, metrics and rows',
         },
-        boundaryRef: {
+        side: { type: "'left' | 'right'", doc: 'The side tried first.', default: "'right'" },
+        sideOffset: { type: 'number', doc: 'Distance in px from the period center.', default: '16' },
+        collisionPadding: { type: 'number', doc: 'Space in px kept from the boundary edges.', default: '8' },
+        collisionBoundary: {
           type: 'React.RefObject<HTMLElement | null>',
           doc: 'Element the tooltip stays inside.',
           default: 'the chart',
+        },
+        pinned: {
+          type: "boolean | 'auto'",
+          doc: 'Pins the tooltip to the top left of the boundary. `auto` below a 416px plot.',
+          default: "'auto'",
         },
       },
     },

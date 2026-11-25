@@ -77,7 +77,17 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   </Chart.XAxis>
   <Chart.Selection>
     <Chart.Cursor />
-    <Chart.Tooltip<ActiveBar<Row>>>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+    <Chart.Tooltip<ActiveBar<Row>>>
+      {active => (
+        <Chart.TooltipPortal>
+          <Chart.TooltipPositioner>
+            <Chart.TooltipPopup className='tooltip'>
+              <PeriodSummary row={active.datum} />
+            </Chart.TooltipPopup>
+          </Chart.TooltipPositioner>
+        </Chart.TooltipPortal>
+      )}
+    </Chart.Tooltip>
   </Chart.Selection>
 </Chart.Root>;
 ```
@@ -134,7 +144,11 @@ const chart = Chart.useBarChart({
 | `Chart.XTick`             | `<text>`        | One category label                                                   |
 | `Chart.Selection`         | `<div>`         | Pointer and keyboard selection                                       |
 | `Chart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
-| `Chart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
+| `Chart.Tooltip`           | (none)          | Positions a tooltip at the selected bar                              |
+| `Chart.TooltipPortal`     | (none)          | Portals the tooltip while it is mounted                              |
+| `Chart.TooltipPositioner` | `<div>`         | The positioned element, with `data-side`                             |
+| `Chart.TooltipPopup`      | `<div>`         | The element that animates, with `data-open` and `data-closed`        |
+| `Chart.TooltipArrow`      | `<svg>`         | Points at the selected bar                                           |
 
 Every part comes from `@clerk/mosaic/primitives/chart`.
 Every part accepts a `render` prop and the standard attributes of its default element. Every part
@@ -192,12 +206,20 @@ items. `Chart.YTick` and `Chart.XTick` take `tick`.
 
 ### `Chart.Tooltip`
 
-| Prop                     | Type                                              | Default      | Description                                 |
-| ------------------------ | ------------------------------------------------- | ------------ | ------------------------------------------- |
-| <code>children</code>    | <code>(active: TActive) => ReactNode</code>       | — (required) | Content for the selected bar; null hides it |
-| <code>boundaryRef</code> | <code>RefObject&lt;HTMLElement \| null&gt;</code> | the chart    | Element the tooltip stays inside            |
+| Prop                           | Type                                              | Default              | Description                                              |
+| ------------------------------ | ------------------------------------------------- | -------------------- | -------------------------------------------------------- |
+| <code>children</code>          | <code>(active: TActive) => ReactNode</code>       | — (required)         | Renders the tooltip parts for the selected bar           |
+| <code>side</code>              | <code>'left' \| 'right'</code>                    | <code>'right'</code> | The side tried first; it flips when that side won't fit  |
+| <code>sideOffset</code>        | <code>number</code>                               | <code>16</code>      | Distance in px from the bar's center                     |
+| <code>collisionPadding</code>  | <code>number</code>                               | <code>8</code>       | Space in px kept from the boundary edges                 |
+| <code>collisionBoundary</code> | <code>RefObject&lt;HTMLElement \| null&gt;</code> | the chart            | Element the tooltip stays inside                         |
+| <code>pinned</code>            | <code>boolean \| 'auto'</code>                    | <code>'auto'</code>  | Pins to the top left of the boundary; `auto` below 416px |
 
-Name the active type the hook selects: `<Chart.Tooltip<ActiveBar<Row>>>`.
+`Chart.Tooltip` renders no element. It provides the Tooltip primitive's context, so
+`Chart.TooltipPortal`, `Chart.TooltipPositioner` and `Chart.TooltipPopup` are the
+[Tooltip](/primitives/tooltip) parts, anchored to the chart. Return them from `children`: content
+returned without them renders unpositioned inside the chart. Name the active type the hook selects:
+`<Chart.Tooltip<ActiveBar<Row>>>`.
 
 ## Styling
 

@@ -50,9 +50,13 @@ export function Default() {
         <Chart.Cursor />
         <Chart.Tooltip<ActiveBar<DayRow>>>
           {({ datum }) => (
-            <p>
-              {datum.day}: {datum.agents} active agents
-            </p>
+            <Chart.TooltipPortal>
+              <Chart.TooltipPositioner>
+                <Chart.TooltipPopup>
+                  {datum.day}: {datum.agents} active agents
+                </Chart.TooltipPopup>
+              </Chart.TooltipPositioner>
+            </Chart.TooltipPortal>
           )}
         </Chart.Tooltip>
       </Chart.Selection>
@@ -197,14 +201,18 @@ export function Stacked() {
         <Chart.Cursor />
         <Chart.Tooltip<ActiveBar<GrowthRow>>>
           {({ datum }) => (
-            <>
-              <p>{datum.week}</p>
-              {growthSeries.map(s => (
-                <p key={s.key}>
-                  {s.key}: {s.value(datum)}
-                </p>
-              ))}
-            </>
+            <Chart.TooltipPortal>
+              <Chart.TooltipPositioner>
+                <Chart.TooltipPopup>
+                  <p>{datum.week}</p>
+                  {growthSeries.map(s => (
+                    <p key={s.key}>
+                      {s.label}: {s.value(datum)}
+                    </p>
+                  ))}
+                </Chart.TooltipPopup>
+              </Chart.TooltipPositioner>
+            </Chart.TooltipPortal>
           )}
         </Chart.Tooltip>
       </Chart.Selection>
