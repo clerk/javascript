@@ -111,6 +111,7 @@ describe('OAuthApplication', () => {
         oauthApplicationUrl: 'https://app.example',
         clientId: 'client_abc',
         state: 'st',
+        maxOrganizations: 1,
         scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
       });
     });
@@ -128,6 +129,7 @@ describe('OAuthApplication', () => {
         oauthApplicationUrl: 'https://app.example',
         clientId: 'client_abc',
         state: 'st',
+        maxOrganizations: 1,
         scopes: [{ scope: 'openid', description: 'OpenID', requiresConsent: true }],
       });
     });
@@ -146,6 +148,26 @@ describe('OAuthApplication', () => {
       const info = await oauthApp.getConsentInfo({ oauthClientId: 'client_abc' });
       expect(info.clientRegistration).toBe('metadata_document');
       expect(info.clientMetadataHost).toBe('claude.ai');
+    });
+
+    it('maps max_organizations', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
+        response: { ...consentPayload, max_organizations: 5 },
+      } as any);
+
+      BaseResource.clerk = {} as any;
+
+      const info = await oauthApp.getConsentInfo({ oauthClientId: 'client_abc' });
+      expect(info.maxOrganizations).toBe(5);
+    });
+
+    it('defaults maxOrganizations to 1 when the backend does not report it', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({ response: consentPayload } as any);
+
+      BaseResource.clerk = {} as any;
+
+      const info = await oauthApp.getConsentInfo({ oauthClientId: 'client_abc' });
+      expect(info.maxOrganizations).toBe(1);
     });
 
     it('defaults scopes to [] when absent', async () => {
