@@ -1,5 +1,5 @@
 import { logger } from '@clerk/shared/logger';
-import { useInsertionEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { MosaicLocation } from './location';
 import type { AdapterRead, AdapterReads, RouterAdapter } from './router-adapter';
@@ -115,11 +115,6 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
   const raw = value === undefined ? undefined : codec.read(value);
   const parts = useMemo(() => (raw === undefined ? undefined : codec.decode(raw)), [codec, raw]);
 
-  const via = useRef({ push, replace, readUrl });
-  useInsertionEffect(() => {
-    via.current = { push, replace, readUrl };
-  });
-
   // A segment kept in the page's URL. The location holds nothing of its own: it hands out the parts
   // decoded from the host's URL for this render, and a write goes straight to the host as a full URL
   // built from the address bar. There are no owners to count, since the URL outlives a component by
@@ -128,19 +123,14 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
     () => ({
       useSegmentParts: () => parts,
       write: (next, { replace: shouldReplace = false } = {}) => {
-        navigateTo(
-          from => urlWith(codec, from, next),
-          shouldReplace,
-          shouldReplace ? via.current.replace : via.current.push,
-          via.current.readUrl,
-        );
+        navigateTo(from => urlWith(codec, from, next), shouldReplace, shouldReplace ? replace : push, readUrl);
       },
       clear: () => {
-        navigateTo(from => urlWithout(codec, from), true, via.current.replace, via.current.readUrl);
+        navigateTo(from => urlWithout(codec, from), true, replace, readUrl);
       },
       own: () => release,
     }),
-    [codec, parts],
+    [codec, parts, push, replace, readUrl],
   );
 }
 

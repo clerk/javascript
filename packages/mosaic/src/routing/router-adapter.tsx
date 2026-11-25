@@ -123,15 +123,22 @@ function shapeOf(adapter: RouterAdapter | undefined): string {
   return [adapter?.usePathname, adapter?.useSearchParams, adapter?.useHash].map(read => (read ? '1' : '0')).join('');
 }
 
-// The hooks an adapter has are fixed on the first render, because the components under the provider
-// call them in their own hook order. A later adapter may change what `push`, `replace` and `readUrl` do.
+// The adapter is taken from the first render: its hooks have to be, because the components under the
+// provider call them in their own hook order, and its functions follow the same rule so that nothing
+// under the provider has to track a changing adapter.
 export function RoutingConfigProvider({
   adapter,
   keyPrefix,
   modals,
   children,
 }: RoutingOptions & { children: ReactNode }) {
-  const [{ reads, shape }] = useState(() => ({ reads: readsOf(adapter), shape: shapeOf(adapter) }));
+  const [{ reads, shape, push, replace, readUrl }] = useState(() => ({
+    reads: readsOf(adapter),
+    shape: shapeOf(adapter),
+    push: adapter?.push,
+    replace: adapter?.replace,
+    readUrl: adapter?.readUrl,
+  }));
   if (shapeOf(adapter) !== shape) {
     logger.warnOnce(
       '[Clerk] The routing adapter changed which hooks it has after the first render, so the first set stays in use. Build the adapter once, outside render.',
@@ -140,9 +147,6 @@ export function RoutingConfigProvider({
   useEffect(() => {
     queueMicrotask(markSettled);
   }, []);
-  const push = adapter?.push;
-  const replace = adapter?.replace;
-  const readUrl = adapter?.readUrl;
   const queryPrefix = keyPrefix?.query ?? defaultConfig.queryPrefix;
   const hashPrefix = keyPrefix?.hash ?? defaultConfig.hashPrefix;
   const value = useMemo(
