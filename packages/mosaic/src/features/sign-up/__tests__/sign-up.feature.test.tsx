@@ -2,7 +2,6 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
-import { tick } from '../../../__tests__/async';
 import { holdRequests, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -139,16 +138,37 @@ describe('SignUp', () => {
       expect(await screen.findByText('Your password must contain 8 or more characters.')).toBeInTheDocument();
     });
 
-    it('names the instance minimum when FAPI rejects a password as too short', async () => {
-      const { fapi, user } = await renderSignUp({ environment: minimumPasswordLength(12) });
+    it.each([
+      {
+        screen: 'the start form',
+        open: async () => {
+          const view = await renderSignUp({ environment: minimumPasswordLength(12) });
+          await view.user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+          return { user: view.user, sent: view.fapi.signUp.creations };
+        },
+      },
+      {
+        screen: 'the continue screen',
+        open: async () => {
+          const view = await renderSignUpWithRouteProbe({
+            environment: minimumPasswordLength(12),
+            client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL }) },
+          });
+          await view.user.click(screen.getByRole('button', { name: 'Open the verify route' }));
+          await enterCode(view.user);
+          expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
+          return { user: view.user, sent: view.fapi.signUp.updates };
+        },
+      },
+    ])('names the instance minimum when FAPI rejects a password as too short on $screen', async ({ open }) => {
+      const { user, sent } = await open();
 
-      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
       await user.type(passwordField(), SHORT_PASSWORD);
       await user.click(continueButton());
 
       await waitFor(() => expect(passwordField()).toBeInvalid());
       expect(passwordField()).toHaveAccessibleDescription('Your password must contain 12 or more characters.');
-      expect(fapi.signUp.creations).toHaveLength(1);
+      expect(sent).toHaveLength(1);
     });
 
     it('shows a taken email address beside the password FAPI rejected with it', async () => {
@@ -358,24 +378,6 @@ describe('SignUp', () => {
       expect(fapi.signUp.updates).toHaveLength(1);
       expect(fapi.signUp.updates[0].get('password')).toBe(PASSWORD);
       expect(fapi.client.sessions).toHaveLength(1);
-    });
-
-    it('names the instance minimum when FAPI rejects a too-short password from the continue screen', async () => {
-      const { fapi, user } = await renderSignUpWithRouteProbe({
-        environment: minimumPasswordLength(12),
-        client: { ...fapiClient(), sign_up: fapiSignUp({ email_address: EMAIL }) },
-      });
-
-      await user.click(screen.getByRole('button', { name: 'Open the verify route' }));
-      await enterCode(user);
-
-      expect(await screen.findByRole('heading', { name: 'Fill in missing fields' })).toBeInTheDocument();
-      await user.type(passwordField(), SHORT_PASSWORD);
-      await user.click(continueButton());
-
-      await waitFor(() => expect(passwordField()).toBeInvalid());
-      expect(passwordField()).toHaveAccessibleDescription('Your password must contain 12 or more characters.');
-      expect(fapi.signUp.updates).toHaveLength(1);
     });
 
     it('asks for an email or a phone number on the continue screen when the sign-up has no identifier', async () => {
@@ -592,23 +594,12 @@ describe('SignUp', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
 
-    it('shows nothing and is no longer busy when it stays mounted after the session is created', async () => {
-      const { user, navigate } = await renderSignUp();
-
-      await submitStart(user);
-      await enterCode(user);
-
-      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verify your email' })).toBeNull());
-      await tick();
-      await tick();
-      expect(navigate).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
-      expect(screen.queryByRole('button', { busy: true })).toBeNull();
-    });
-
-    it('leaves once and shows nothing when it stays mounted after the session is created in single-session mode', async () => {
-      const { user, navigate } = await renderSignUp(
-        { environment: environment({ auth_config: { single_session_mode: true } }) },
+    it.each([
+      { mode: 'multi-session', seed: {} },
+      { mode: 'single-session', seed: { environment: environment({ auth_config: { single_session_mode: true } }) } },
+    ])('leaves once, then shows nothing and is not busy while it stays mounted in $mode mode', async ({ seed }) => {
+      const { user, navigate, container, rerender } = await renderSignUp(
+        seed,
         {},
         { signUpFallbackRedirectUrl: '/welcome' },
       );
@@ -616,12 +607,13 @@ describe('SignUp', () => {
       await submitStart(user);
       await enterCode(user);
 
-      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Verify your email' })).toBeNull());
-      await tick();
-      await tick();
+      await waitFor(() => expect(container).toBeEmptyDOMElement());
+      rerender(<SignUp />);
+
       expect(navigate).toHaveBeenCalledTimes(1);
       expect(navigate).toHaveBeenCalledWith('/welcome');
       expect(screen.queryByRole('heading', { name: 'Create your account' })).toBeNull();
+      expect(screen.queryByRole('button', { busy: true })).toBeNull();
     });
   });
 
@@ -644,7 +636,7 @@ describe('SignUp', () => {
 
     it('leaves once an organization is chosen, without showing the create screen or another screen', async () => {
       const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
-      const { user, navigate } = await renderSignUp(
+      const { user, navigate, container } = await renderSignUp(
         { signUp: { sessionTasks: [{ key: 'choose-organization' }] }, memberships: [fapiMembership(acme)] },
         {},
         { signUpFallbackRedirectUrl: '/welcome' },
@@ -658,8 +650,7 @@ describe('SignUp', () => {
       await user.click(await screen.findByRole('button', { name: 'Acme' }));
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
-      await tick();
-      await tick();
+      await waitFor(() => expect(container).toBeEmptyDOMElement());
       expect(sawEmptyList()).toBe(false);
       expect(sawAnotherScreen()).toBe(false);
     });
@@ -691,7 +682,7 @@ describe('SignUp', () => {
   describe('arriving signed in', () => {
     it('leaves for the after sign-up URL without showing the form when a user is signed in, in single-session mode', async () => {
       const sawForm = watchForHeading('Create your account');
-      const { navigate } = await renderSignUp(
+      const { navigate, rerender } = await renderSignUp(
         {
           environment: environment({ auth_config: { single_session_mode: true } }),
           client: fapiClient([signedInSession]),
@@ -701,7 +692,8 @@ describe('SignUp', () => {
       );
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/welcome'));
-      await tick();
+      rerender(<SignUp />);
+
       expect(navigate).toHaveBeenCalledTimes(1);
       expect(sawForm()).toBe(false);
     });
@@ -731,8 +723,7 @@ describe('SignUp', () => {
       await user.click(await screen.findByRole('button', { name: 'Acme' }));
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
-      await tick();
-      await tick();
+      await waitFor(() => expect(container).toBeEmptyDOMElement());
       expect(navigate.mock.calls).toEqual([[expect.stringContaining('/welcome')]]);
       expect(container).toBeEmptyDOMElement();
     });
@@ -866,15 +857,14 @@ describe('SignUp', () => {
     });
   });
 
-  describe('branding', () => {
-    it('signs the card when the instance is branded', async () => {
-      await renderSignUp({ environment: environment({ display_config: { branded: true } }) });
+  describe('seeing the Clerk signature', () => {
+    it('signs the card when the instance is branded and carries no signature when the branding is paid off', async () => {
+      const branded = await renderSignUp({ environment: environment({ display_config: { branded: true } }) });
 
       await screen.findByRole('heading', { name: 'Create your account' });
       expect(screen.getByText(/Secured by/)).toBeInTheDocument();
-    });
+      branded.unmount();
 
-    it('carries no signature when the branding is paid off', async () => {
       await renderSignUp({ environment: environment({ display_config: { branded: false } }) });
 
       await screen.findByRole('heading', { name: 'Create your account' });
