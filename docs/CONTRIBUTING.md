@@ -222,7 +222,7 @@ In some cases, we might need to add new methods to our publicly exposed APIs tha
 
 ### Bundle size checks
 
-CI runs [bundlewatch](https://github.com/bundlewatch/bundlewatch) against `@clerk/clerk-js` and `@clerk/ui`. It fails when a built file grows past its `maxSize` in the package's `bundlewatch.config.json`. This can happen on a PR that was previously green, for example after rebasing on `main` brings in other size increases.
+CI runs [bundlewatch](https://github.com/bundlewatch/bundlewatch) against `@clerk/clerk-js`, `@clerk/ui`, and `@clerk/mosaic`. It fails when a built file grows past its `maxSize` in the package's `bundlewatch.config.json`. This can happen on a PR that was previously green, for example after rebasing on `main` brings in other size increases.
 
 The check exists so that size growth is acknowledged, not to block it. If the growth is expected, raise the limits:
 
@@ -231,7 +231,11 @@ pnpm turbo build --filter=@clerk/clerk-js
 pnpm --filter @clerk/clerk-js bundlewatch:fix
 ```
 
-Use `@clerk/ui` in place of `@clerk/clerk-js` for the UI package. The script measures the files in `dist/`, so build first. It sets each failing file's `maxSize` to its current size plus 1KB, rounded up to the nearest KB, and prints the diff. Commit the updated `bundlewatch.config.json` and mention the bump in your PR description.
+Use `@clerk/ui` or `@clerk/mosaic` in place of `@clerk/clerk-js` for the other packages. The command runs BundleWatch's `update-max-sizes --write --headroom 1KB` against the files already in `dist/`, so build first. It raises only exceeded limits to fit the largest matching file plus 1KB, rounded up to the next KB, and prints the diff. It runs locally without contacting GitHub or the BundleWatch service. Commit the updated `bundlewatch.config.json` and mention the bump in your PR description.
+
+To preview proposed limits without writing them, run `pnpm --filter @clerk/clerk-js exec bundlewatch update-max-sizes --headroom 1KB --config bundlewatch.config.json`.
+
+These checks use `compare: false` because CI runs on pull requests and merge queues without saving a baseline on `main`. Each package has its own status prefix (`clerk-js`, `ui`, or `mosaic`). The Bundle size job enforces the limits through its exit code and uses the `BUNDLEWATCH_GITHUB_TOKEN` secret to report results. Turbo can reuse successful checks when their inputs are unchanged; failed checks are not cached.
 
 If the growth is larger than your change explains, investigate before bumping.
 
