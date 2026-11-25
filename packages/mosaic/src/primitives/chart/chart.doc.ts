@@ -181,7 +181,7 @@ export default {
     },
     'Chart.Cursor': {
       description:
-        'An `aria-hidden` `div` that covers the selected category, with its width. Carries `data-focus-visible` while the keyboard selected the category, so the focus ring can sit on it. Throws outside `Chart.Selection`.',
+        'An `aria-hidden` `div` that covers the selected category, with its width. While the keyboard selected the category it carries `data-focus-visible` and covers just the selected section (`focusRect`, at least 12px wide and 24px tall), so the focus ring can sit on it. Throws outside `Chart.Selection`.',
     },
     'Chart.Tooltip': {
       description:

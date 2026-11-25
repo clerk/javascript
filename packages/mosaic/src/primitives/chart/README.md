@@ -88,7 +88,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.XAxis`             | `<svg>`         | Holds the category labels below the plot                             |
 | `Chart.XTick`             | `<text>`        | One category label                                                   |
 | `Chart.Selection`         | `<div>`         | Pointer and keyboard selection over the whole chart                  |
-| `Chart.Cursor`            | `<div>`         | Covers the selected category                                         |
+| `Chart.Cursor`            | `<div>`         | Covers the selected category, or its section for the keyboard        |
 | `Chart.Tooltip`           | `<div>`         | The tooltip for the selected category, portaled                      |
 
 Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
@@ -167,22 +167,23 @@ The hook returns a `BarChartInstance<TDatum>`: the [chart object](#the-chart-obj
 
 A chart-type hook returns a `ChartInstance` plus what its own marks need. A chart with a value axis, such as bars, returns a `CartesianChartInstance`, which adds `scaleY` and `yTicks`:
 
-| Field                   | Type                                            | Description                                                                                          |
-| ----------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `rootRef`               | `(element: HTMLElement \| null) => void`        | Measures the element. `Chart.Root` attaches it                                                       |
-| `size`                  | `ChartSize`                                     | The measured container, zero until the first measurement                                             |
-| `plot`                  | `ChartPlot`                                     | The plot rectangle inside the margin                                                                 |
-| `scaleY`                | `(value: number) => number`                     | Cartesian only. Maps a value to a Y coordinate                                                       |
-| `yTicks`                | `readonly ChartTick[]`                          | Cartesian only. The Y ticks                                                                          |
-| `categories`            | `readonly ChartCategory[]`                      | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`                                    |
-| `xTicks`                | `(options?: XTicksOptions) => XTick[]`          | The X labels for a tick mode, as `Chart.XAxis` computes them                                         |
-| `selected`              | `TActive \| null`                               | The selection in the current data                                                                    |
-| `selectionSource`       | `'pointer' \| 'keyboard' \| 'external' \| null` | What made `selected`. `keyboard` is when a focus ring belongs on the selected category               |
-| `tooltipAnchor`         | `{ x, y } \| null`                              | Where a tooltip for `selected` points                                                                |
-| `announcement`          | `string`                                        | The status text for the keyboard selection                                                           |
-| `keyboardInstructions`  | `string`                                        | The keys the chart answers to                                                                        |
-| `select`, `clear`       | `(selection) => void`, `() => void`             | Change the selection and call `onSelectionChange`                                                    |
-| `getInteractionProps()` | `(props?) => ChartInteractionProps`             | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers, merged with `props` |
+| Field                   | Type                                            | Description                                                                                                    |
+| ----------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `rootRef`               | `(element: HTMLElement \| null) => void`        | Measures the element. `Chart.Root` attaches it                                                                 |
+| `size`                  | `ChartSize`                                     | The measured container, zero until the first measurement                                                       |
+| `plot`                  | `ChartPlot`                                     | The plot rectangle inside the margin                                                                           |
+| `scaleY`                | `(value: number) => number`                     | Cartesian only. Maps a value to a Y coordinate                                                                 |
+| `yTicks`                | `readonly ChartTick[]`                          | Cartesian only. The Y ticks                                                                                    |
+| `categories`            | `readonly ChartCategory[]`                      | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`                                              |
+| `xTicks`                | `(options?: XTicksOptions) => XTick[]`          | The X labels for a tick mode, as `Chart.XAxis` computes them                                                   |
+| `selected`              | `TActive \| null`                               | The selection in the current data                                                                              |
+| `selectionSource`       | `'pointer' \| 'keyboard' \| 'external' \| null` | What made `selected`. `keyboard` is when a focus ring belongs on the selected category                         |
+| `tooltipAnchor`         | `{ x, y } \| null`                              | Where a tooltip for `selected` points                                                                          |
+| `focusRect`             | `{ x, y, width, height } \| null`               | The box a focus ring for `selected` outlines: for bars, the selected section, at least 12px wide and 24px tall |
+| `announcement`          | `string`                                        | The status text for the keyboard selection                                                                     |
+| `keyboardInstructions`  | `string`                                        | The keys the chart answers to                                                                                  |
+| `select`, `clear`       | `(selection) => void`, `() => void`             | Change the selection and call `onSelectionChange`                                                              |
+| `getInteractionProps()` | `(props?) => ChartInteractionProps`             | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers, merged with `props`           |
 
 A category's `x` and `width` are the extent its marks occupy: a band for bars. Its `center` is where the pointer snaps, the X tick sits and the tooltip anchors. `Chart.Root` and the shared parts hold the chart as a `ChartInstance`, whose `select` takes no value, so only the code that called the hook can select. `Chart.Grid`, `Chart.YAxis` and `Chart.YLine` throw when the chart has no value axis.
 
@@ -281,7 +282,7 @@ Painting the bars is the one thing the chart object does not do, because their c
 | `data-chart-interaction-mode` | `Chart.Root`      | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
 | `data-active`                 | `Chart.XTick`     | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
 | `data-active-section`         | `Chart.Selection` | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
-| `data-focus-visible`          | `Chart.Cursor`    | Present while the keyboard selected the category. Ring the cursor then, not the whole chart                          |
+| `data-focus-visible`          | `Chart.Cursor`    | Present while the keyboard selected the category. The cursor then covers `focusRect`; ring it, not the whole chart   |
 | `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
 | `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
 | `data-moving`                 | `Chart.Tooltip`   | Present from the first change of category while open until it closes, so a position transition skips the first open  |
@@ -395,4 +396,4 @@ A lost or missing 2D context throws `Chart.CanvasRenderError`, with the original
 
 ## Adding a chart type
 
-A chart type lives in its own folder under `src/primitives/chart/`, as stacked bars live in `bars/`. Its hook measures with `useChartFrame`, lays out its categories, and passes a pure `SelectionModel` to `useChartInstance`, both from `chart/internal/`. Lint lets only files under `chart/` import `chart/internal/`, and keeps the shared parts at the top of `chart/` out of it. The model owns the hit test from a chart point, where the keyboard lands, how a selection resolves against the data, the announcement and the tooltip's anchor. A chart with a value axis adds `scaleY` and `yTicks` to the instance, as `Chart.useBarChart` does; a chart without one, such as a donut, leaves them out. Its marks read their own layout from a module-private symbol on the instance, as `Chart.Bars` does. Its hook and parts join the `Chart` namespace in `parts.ts`. `line-chart-contract.test-d.ts` checks that a point chart and a chart without a value axis fit the contract.
+A chart type lives in its own folder under `src/primitives/chart/`, as stacked bars live in `bars/`. Its hook measures with `useChartFrame`, lays out its categories, and passes a pure `SelectionModel` to `useChartInstance`, both from `chart/internal/`. Lint lets only files under `chart/` import `chart/internal/`, and keeps the shared parts at the top of `chart/` out of it. The model owns the hit test from a chart point, where the keyboard lands, how a selection resolves against the data, the announcement, the tooltip's anchor and the focus ring's box. A chart with a value axis adds `scaleY` and `yTicks` to the instance, as `Chart.useBarChart` does; a chart without one, such as a donut, leaves them out. Its marks read their own layout from a module-private symbol on the instance, as `Chart.Bars` does. Its hook and parts join the `Chart` namespace in `parts.ts`. `line-chart-contract.test-d.ts` checks that a point chart and a chart without a value axis fit the contract.

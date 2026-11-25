@@ -14,18 +14,30 @@ export const ChartCursor = React.forwardRef<HTMLDivElement, ChartCursorProps>(fu
   const { plot, selected } = chart;
   const selectedCategory = selected ? chart.categories[selected.datumIndex] : undefined;
 
+  // A keyboard selection outlines just its section, such as one side of a stacked bar; a pointer
+  // shows the whole column.
+  const focusRect = chart.selectionSource === 'keyboard' ? chart.focusRect : null;
   const ownProps = {
     'aria-hidden': 'true',
-    style: selectedCategory
+    style: focusRect
       ? {
           position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: selectedCategory.x - plot.x,
-          width: selectedCategory.width,
+          top: focusRect.y - plot.y,
+          left: focusRect.x - plot.x,
+          width: focusRect.width,
+          height: focusRect.height,
           pointerEvents: 'none',
         }
-      : undefined,
+      : selectedCategory
+        ? {
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: selectedCategory.x - plot.x,
+            width: selectedCategory.width,
+            pointerEvents: 'none',
+          }
+        : undefined,
   } satisfies DefaultProps<'div'>;
 
   return useRender({

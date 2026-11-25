@@ -421,6 +421,65 @@ describe('resizing', () => {
   });
 });
 
+describe('the keyboard focus on a section', () => {
+  type Signed = { period: string; gained: number; lost: number };
+  const signedSeries = [
+    { key: 'gained', value: (row: Signed) => row.gained },
+    { key: 'lost', value: (row: Signed) => row.lost },
+  ];
+  const signedIndex = (row: Signed) => row.period;
+  const cursor = () => screen.getByTestId('cursor').getBoundingClientRect();
+
+  it('covers the selected section from the zero line to its far edge', async () => {
+    await render(
+      <div style={{ width: 600 }}>
+        <TestChart
+          data={[
+            { period: 'Jan', gained: 40, lost: -20 },
+            { period: 'Feb', gained: 30, lost: -10 },
+          ]}
+          series={signedSeries}
+          index={signedIndex}
+          ariaLabel='Growth'
+          height={300}
+          barClassName='red'
+          onSelectionChange={() => {}}
+        />
+      </div>,
+    );
+    const plot = surface().getBoundingClientRect();
+
+    surface().focus();
+    await expect.poll(() => screen.queryByTestId('cursor')?.hasAttribute('data-focus-visible')).toBe(true);
+    const positive = cursor();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect.poll(() => cursor().top).toBeGreaterThan(positive.top);
+    const negative = cursor();
+
+    expect(positive.top).toBeCloseTo(plot.top, -1);
+    expect(negative.top).toBeCloseTo(positive.bottom, 0);
+    expect(negative.bottom).toBeCloseTo(plot.bottom, -1);
+    expect(positive.height).toBeLessThan(plot.height);
+  });
+
+  it('keeps a minimum width on dense data', async () => {
+    const dense = Array.from({ length: 400 }, (_, i) => ({ period: `P${i}`, value: 10 + (i % 7) }));
+    await render(<Chart data={dense} />);
+    surface().focus();
+    await expect.poll(() => screen.queryByTestId('cursor')?.hasAttribute('data-focus-visible')).toBe(true);
+    expect(cursor().width).toBeGreaterThanOrEqual(12);
+  });
+
+  it('keeps the full-height band for a mouse hover', async () => {
+    await render(<Chart />);
+    const plot = surface().getBoundingClientRect();
+    await userEvent.hover(surface(), { position: { x: centerOfCategory(0).x - plot.left, y: plot.height - 4 } });
+    await expect.poll(() => screen.queryByTestId('cursor')).toBeTruthy();
+    expect(cursor().height).toBeCloseTo(plot.height, 0);
+    await userEvent.unhover(surface());
+  });
+});
+
 describe('choosing a period with a pointer', () => {
   it('selects the period under a mouse and clears it when the mouse leaves', async () => {
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
