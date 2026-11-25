@@ -61,7 +61,6 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
         applicationName={props.applicationName}
         logo={props.logo}
         form={props.form}
-        errorMessage={props.errorMessage}
         globalErrorMessage={props.globalErrorMessage}
         isPending={props.isPending}
         isDisabled={props.isDisabled}
