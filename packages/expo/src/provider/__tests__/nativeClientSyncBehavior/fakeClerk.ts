@@ -2,9 +2,10 @@ import type { FakeClerkServer, FakeServerClientJSON, FapiResponse } from './fake
 
 type FakeRequestInit = { url: URL; headers: Headers };
 type BeforeRequestHook = (requestInit: FakeRequestInit) => unknown;
+type FakePayload = { client?: FakeServerClientJSON | null; response?: FakeServerClientJSON | null };
 type AfterResponseHook = (
   requestInit: FakeRequestInit,
-  response: { headers: Headers; payload: { client?: FakeServerClientJSON | null } },
+  response: { headers: Headers; payload: FakePayload },
 ) => unknown;
 
 export type FakeSessionResource = {
@@ -54,8 +55,8 @@ export class FakeClientResource {
   }
 
   fetch = async (_options?: { fetchMaxTries?: number }): Promise<FakeClientResource> => {
-    const response = await this.clerk.fapi(token => this.clerk.server.getClient('js', token));
-    return response.client === undefined ? this : this.fromJSON(response.client);
+    const response = await this.clerk.fapi(token => this.clerk.server.getClient('js', token), 'response');
+    return this.fromJSON(response.client);
   };
 
   fromJSON(data: FakeServerClientJSON | null): this {
@@ -110,15 +111,18 @@ export class FakeClerk {
     this.#afterResponseHooks.push(hook);
   }
 
-  async fapi<T extends FapiResponse>(request: (token: string | null) => Promise<T>): Promise<T> {
+  async fapi<T extends FapiResponse>(
+    request: (token: string | null) => Promise<T>,
+    clientField: 'client' | 'response' = 'client',
+  ): Promise<T> {
     const requestInit = await this.#prepareRequest();
     const response = await request(requestInit.headers.get('authorization') || null);
     const headers = new Headers(response.token ? { authorization: response.token } : {});
-    const payload: { client?: FakeServerClientJSON | null } = { client: response.client };
+    const payload: FakePayload = { [clientField]: response.client };
     for (const hook of this.#afterResponseHooks) {
       await hook(requestInit, { headers, payload });
     }
-    return { ...response, client: payload.client };
+    return { ...response, client: clientField === 'response' ? (payload.response ?? null) : payload.client };
   }
 
   async currentDeviceToken(): Promise<string | null> {
@@ -246,8 +250,12 @@ export class FakeClerk {
 
   signOut = async (options?: { sessionId?: string }): Promise<void> => {
     const sessionId = options?.sessionId;
-    this.session = undefined;
-    this.#emit();
+    const signsOutCurrent =
+      !sessionId || (this.client?.signedInSessions.length ?? 0) <= 1 || this.session?.id === sessionId;
+    if (signsOutCurrent) {
+      this.session = undefined;
+      this.#emit();
+    }
     let response: FapiResponse;
     try {
       response = await this.fapi(token =>

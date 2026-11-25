@@ -44,6 +44,7 @@ type FapiResponse = Response & {
     errors?: Array<{ code: string }>;
     client?: { id?: string } | null;
     meta?: { client?: { id?: string } };
+    response?: { id?: string } | null;
   } | null;
 };
 
@@ -146,10 +147,19 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       };
       const dropDiscardedClient = (payload: FapiResponse['payload']) => {
         const tokenCache = __internal_tokenCache as TokenCache & Partial<ClientTokenCache>;
-        const clientId = payload?.client?.id ?? payload?.meta?.client?.id;
-        if (clientId && tokenCache.isDiscardedClient?.(clientId)) {
-          delete payload?.client;
-          delete payload?.meta?.client;
+        const isDiscarded = (client: { id?: string } | null | undefined) =>
+          !!client?.id && !!tokenCache.isDiscardedClient?.(client.id);
+        if (!payload) {
+          return;
+        }
+        if (isDiscarded(payload.client)) {
+          delete payload.client;
+        }
+        if (isDiscarded(payload.meta?.client)) {
+          delete payload.meta?.client;
+        }
+        if (isDiscarded(payload.response)) {
+          payload.response = null;
         }
       };
       const requestTokens = new WeakMap<FapiRequestInit, string | null>();

@@ -471,11 +471,11 @@ export function createNativeClientSync(
         }
         if (signsOutEverySession && !clerk.session && clerk.client?.signedInSessions.length) {
           await discardDeviceToken(clerk.client.id || null);
-          if (failure) {
-            await clerk
-              .setActive({ session: null })
-              .catch(error => warn('Failed to finish signing out after the sign-out request failed.', error));
-          }
+        }
+        if (failure && clerk.session === undefined) {
+          await clerk
+            .setActive({ session: null })
+            .catch(error => warn('Failed to finish signing out after the sign-out request failed.', error));
         }
         if (failure) {
           throw failure.error;

@@ -577,6 +577,24 @@ describe('native client sync behavior', () => {
       expect(h.persistentTokenCache?.read(CLERK_CLIENT_JWT_KEY)).toBeNull();
     });
 
+    it('keeps JS signed out when a client fetch sent before the sign-out lands afterwards', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const held = server.holdNextResponse('js', 'GET /client');
+      await h.run(() => h.native.emitChange({ client: true, deviceToken: false }, { kind: 'native' }));
+      await held.handled;
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      const emissionIndex = h.js.emissions.length;
+      held.release();
+      await h.settle();
+
+      expect(h.js.emissions.slice(emissionIndex).filter(emission => emission.signedInSessionIds.length)).toEqual([]);
+      expect(h.js.session).toBeNull();
+      expect(h.native.token).toBeNull();
+    });
+
     it('keeps the next sign-in when an earlier request rotates the signed-out token afterwards', async () => {
       const { server, token } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
@@ -610,6 +628,7 @@ describe('native client sync behavior', () => {
       );
       await h.settle();
 
+      expect(h.js.session).toBeNull();
       expect(await h.jsDeviceToken()).toBe(token);
       expect(server.inspectClient(token)?.sessions.map(session => session.id)).toEqual([
         sessionIds.user_1,
