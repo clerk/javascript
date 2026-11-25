@@ -15,7 +15,7 @@ import { useWindowUrl } from '../window-location';
 
 // The contract every location mode keeps towards the components above it. A mode plugs in a
 // provider, a way to read an entry and a way to write one from outside, the way a host or a modal
-// host would. Inherent differences between carriers are declared in `excludes`, so a difference is
+// host would. Inherent differences between codecs are declared in `excludes`, so a difference is
 // stated here rather than discovered in a review.
 interface LocationMode {
   name: string;
@@ -30,7 +30,7 @@ interface LocationMode {
     back: (remount: () => void) => void;
   };
   excludes: {
-    // A carrier that holds exactly one entry, such as the pathname, cannot host two bases at once.
+    // A codec that holds exactly one entry, such as the pathname, cannot host two bases at once.
     severalBases?: boolean;
     // A URL keeps what was written under a base until the host navigates; nothing counts owners,
     // so a base the owner moved away from keeps its entry.
@@ -51,7 +51,7 @@ const virtual: LocationMode = {
 };
 
 // What a host does: write the URL it wants and tell the page with `popstate`. The URL modes are
-// read back here on their own terms rather than through the carriers under test.
+// read back here on their own terms rather than through the codecs under test.
 const encode = (parts: SegmentParts) => parts.map(encodeURIComponent).join('/');
 const decode = (raw: string): SegmentParts => (raw === '' ? [] : raw.split('/').map(decodeURIComponent));
 const paramName = (prefix: string, base: string) => prefix + normalizeBase(base).replaceAll('/', '.');

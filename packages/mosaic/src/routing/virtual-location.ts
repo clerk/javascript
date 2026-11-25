@@ -3,7 +3,7 @@ import type { MosaicLocation } from './location';
 import { useVirtualSegment, type VirtualActions } from './virtual-store';
 
 // One segment of the page's virtual store, read and written as decoded parts. Nothing to encode:
-// virtual state has no URL form until a carrier projects it.
+// virtual state has no URL form until a codec projects it.
 export function createVirtualLocation(basePath: string, actions: VirtualActions): MosaicLocation {
   const base = normalizeBase(basePath);
   return {

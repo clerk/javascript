@@ -53,7 +53,7 @@ interface CarrierCase {
   elsewhere: string;
 }
 
-const carriers: CarrierCase[] = [
+const codecs: CarrierCase[] = [
   {
     routing: 'path',
     seeded: '/user/billing/st%2F1?q=a+b#top',
@@ -82,7 +82,7 @@ const carriers: CarrierCase[] = [
 // value comes back decoded and split, the way the host hands it over.
 const seededParts = (_routing: CarrierCase['routing']) => ['billing', 'st/1'];
 
-describe.each(carriers)('$routing location', ({ routing, seeded, written, cleared, malformed, elsewhere }) => {
+describe.each(codecs)('$routing location', ({ routing, seeded, written, cleared, malformed, elsewhere }) => {
   const options: MosaicLocationOptions = { routing, path: '/user' };
 
   it('reads its entry from the URL', () => {

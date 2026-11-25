@@ -5,7 +5,7 @@ import type { MosaicLocation } from './location';
 import type { AdapterRead, AdapterReads } from './router-adapter';
 import { useRoutingConfig } from './router-adapter';
 import type { UrlRoutingMode } from './url-location';
-import { urlCarrier, urlWith, urlWithout } from './url-location';
+import { createSegmentCodec, urlWith, urlWithout } from './url-location';
 import { createVirtualLocation } from './virtual-location';
 import { useVirtualActions } from './virtual-store';
 import type { HostUrl } from './window-location';
@@ -83,21 +83,21 @@ export function useHostPathname(): string | undefined {
 function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocation {
   const { reads, push, replace, queryPrefix, hashPrefix } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
-  const carrier = useMemo(
-    () => urlCarrier(routing, path, { query: queryPrefix, hash: hashPrefix }),
+  const codec = useMemo(
+    () => createSegmentCodec(routing, path, { query: queryPrefix, hash: hashPrefix }),
     [routing, path, queryPrefix, hashPrefix],
   );
   // We already lock this in RoutingConfigProvider to avoid conditional hooks, so this could
   // technically be removed, but keeping it to be very explicit about preventing conditional hooks
   const [useAdapterField] = useState(() => {
-    const useRead = reads[ADAPTER_READS[carrier.field]];
-    return () => useAdapterRead(useRead, LEADING[carrier.field]);
+    const useRead = reads[ADAPTER_READS[codec.field]];
+    return () => useAdapterRead(useRead, LEADING[codec.field]);
   });
   const fromAdapter = useAdapterField();
   const value =
-    carrier.field === 'hash' && fromWindow === undefined ? undefined : (fromAdapter ?? fromWindow?.[carrier.field]);
-  const raw = value === undefined ? undefined : carrier.read(value);
-  const parts = useMemo(() => (raw === undefined ? undefined : carrier.decode(raw)), [carrier, raw]);
+    codec.field === 'hash' && fromWindow === undefined ? undefined : (fromAdapter ?? fromWindow?.[codec.field]);
+  const raw = value === undefined ? undefined : codec.read(value);
+  const parts = useMemo(() => (raw === undefined ? undefined : codec.decode(raw)), [codec, raw]);
 
   const via = useRef({ push, replace });
   useInsertionEffect(() => {
@@ -113,17 +113,17 @@ function useUrlModeLocation(routing: UrlRoutingMode, path: string): MosaicLocati
       useSegmentParts: () => parts,
       write: (next, { replace: shouldReplace = false } = {}) => {
         navigateTo(
-          from => urlWith(carrier, from, next),
+          from => urlWith(codec, from, next),
           shouldReplace,
           shouldReplace ? via.current.replace : via.current.push,
         );
       },
       clear: () => {
-        navigateTo(from => urlWithout(carrier, from), true, via.current.replace);
+        navigateTo(from => urlWithout(codec, from), true, via.current.replace);
       },
       own: () => release,
     }),
-    [carrier, parts],
+    [codec, parts],
   );
 }
 

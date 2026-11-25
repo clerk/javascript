@@ -7,12 +7,11 @@ import type { HostUrl } from './window-location';
 
 export type UrlRoutingMode = 'path' | 'hash' | 'query';
 
-// Where a URL mode keeps a base's segment: the part of the URL it lives in, how to find the
-// segment there, how to put one back, and how the segment and the parts map onto each other in that
-// field. The pathname is split before it is decoded; a param's value is read as a param first and
-// then as a segment, so its parts are encoded twice. `refuse` names why parts cannot go into this
-// field.
-export interface UrlCarrier {
+// A codec for how to read and write a specific segment to the url
+// This gets created and works differently per routing mode and the field
+// holds 'pathname', 'search' or 'hash', so it can be used to pluck the
+// correct value from a Url.
+export interface SegmentCodec {
   field: keyof HostUrl;
   read: (value: string) => string | undefined;
   write: (value: string, encoded: string) => string;
@@ -32,12 +31,7 @@ function decodePart(part: string): string {
 
 const isDotPart = (part: string) => part === '.' || part === '..';
 
-// The pathname under the base: '/user/billing/st_1' -> 'billing/st_1' under '/user', and a pathname
-// outside the base has no entry. The base is compared part by part on the decoded form, because
-// browsers and host routers leave different characters raw in a pathname; the segment itself is
-// handed on raw. One trailing slash is the same pathname, as a host with trailing slashes on has it.
-// A pathname always says something, so clearing goes to the base.
-function pathCarrier(basePath: string): UrlCarrier {
+function createPathCodec(basePath: string): SegmentCodec {
   const base = normalizeBase(basePath);
   const prefix = base === '' ? [] : base.slice(1).split('/').map(decodePart);
   if (prefix.some(isDotPart) || /[?#]/.test(base)) {
@@ -74,8 +68,7 @@ function pathCarrier(basePath: string): UrlCarrier {
   };
 }
 
-// The segment spelled as one pair of the query string or the hash, `.user=billing%2Fst_1`.
-function paramCarrier(field: 'search' | 'hash', key: string): UrlCarrier {
+function createParamCodec(field: 'search' | 'hash', key: string): SegmentCodec {
   if (key === '') {
     logger.warnOnce(
       `[Clerk] ${field === 'hash' ? 'Hash' : 'Query'} routing with an empty key prefix needs a "path" other than "/" or a key prefix, or its param has no name.`,
@@ -100,14 +93,14 @@ export interface KeyPrefixes {
   hash: string;
 }
 
-export function urlCarrier(mode: UrlRoutingMode, basePath: string, prefixes: KeyPrefixes): UrlCarrier {
+export function createSegmentCodec(mode: UrlRoutingMode, basePath: string, prefixes: KeyPrefixes): SegmentCodec {
   switch (mode) {
     case 'path':
-      return pathCarrier(basePath);
+      return createPathCodec(basePath);
     case 'query':
-      return paramCarrier('search', paramKey(prefixes.query, basePath));
+      return createParamCodec('search', paramKey(prefixes.query, basePath));
     case 'hash':
-      return paramCarrier('hash', paramKey(prefixes.hash, basePath));
+      return createParamCodec('hash', paramKey(prefixes.hash, basePath));
   }
 }
 
@@ -115,17 +108,16 @@ export function urlOf({ pathname, search, hash }: HostUrl): string {
   return `${pathname}${search === '' ? '' : `?${search}`}${hash === '' ? '' : `#${hash}`}`;
 }
 
-// The URL with the parts written under the carrier's base, everything outside the segment as it
-// was, or nothing when the carrier cannot hold them.
-export function urlWith(carrier: UrlCarrier, url: HostUrl, parts: SegmentParts): string | undefined {
-  const refused = carrier.refuse?.(parts);
+// The URL with the parts written under the codec's base, everything outside the segment as it was
+export function urlWith(codec: SegmentCodec, url: HostUrl, parts: SegmentParts): string | undefined {
+  const refused = codec.refuse?.(parts);
   if (refused !== undefined) {
     logger.warnOnce(refused);
     return undefined;
   }
-  return urlOf({ ...url, [carrier.field]: carrier.write(url[carrier.field], carrier.encode(parts)) });
+  return urlOf({ ...url, [codec.field]: codec.write(url[codec.field], codec.encode(parts)) });
 }
 
-export function urlWithout(carrier: UrlCarrier, url: HostUrl): string {
-  return urlOf({ ...url, [carrier.field]: carrier.clear(url[carrier.field]) });
+export function urlWithout(codec: SegmentCodec, url: HostUrl): string {
+  return urlOf({ ...url, [codec.field]: codec.clear(url[codec.field]) });
 }
