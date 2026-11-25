@@ -57,6 +57,24 @@ describe('native module loader', () => {
     expect(ClerkExpoModule).toBe(mocks.nativeModule);
   });
 
+  test('returns null when a native module reports the expected bridge version without the bridge methods', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.nativeModule = { bridgeVersion: 1, configureNative: vi.fn() };
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBeNull();
+  });
+
+  test('returns null when the native bridge version is not an integer', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.nativeModule = makeNativeModule({ bridgeVersion: Number.NaN });
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBeNull();
+  });
+
   test('returns null when no native module satisfies the bootstrap contract', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     mocks.nativeModule = {

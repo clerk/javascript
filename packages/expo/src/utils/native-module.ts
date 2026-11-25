@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 
+import { NATIVE_BRIDGE_VERSION } from '../constants';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import type {
   NativeAuthFlowModule,
@@ -15,16 +16,24 @@ export type ClerkExpoNativeModule = {
   Partial<NativeAuthFlowModule> &
   Partial<NativeUpdateRequiredViewModule>;
 
-const NATIVE_BRIDGE_VERSION = 1;
+const BRIDGE_METHODS = ['configureNative', 'getDeviceToken', 'setDeviceToken', 'refreshClient'] as const;
 
-const BRIDGE_V1_METHODS = ['configureNative', 'getDeviceToken', 'setDeviceToken', 'refreshClient'] as const;
+function hasBridgeMethods(module: Record<string, unknown>) {
+  return BRIDGE_METHODS.every(name => typeof module[name] === 'function');
+}
 
-function readBridgeVersion(module: object): number | null {
-  const maybeModule = module as Record<string, unknown>;
-  if (typeof maybeModule.bridgeVersion === 'number') {
-    return maybeModule.bridgeVersion;
+function readBridgeVersion(module: Record<string, unknown>): number | null {
+  if (module.bridgeVersion === undefined) {
+    return hasBridgeMethods(module) ? 1 : null;
   }
-  return BRIDGE_V1_METHODS.every(name => typeof maybeModule[name] === 'function') ? 1 : null;
+  return Number.isInteger(module.bridgeVersion) ? (module.bridgeVersion as number) : null;
+}
+
+function isClerkExpoModule(
+  module: Record<string, unknown>,
+  bridgeVersion: number | null,
+): module is ClerkExpoNativeModule {
+  return bridgeVersion === NATIVE_BRIDGE_VERSION && hasBridgeMethods(module);
 }
 
 function loadNativeModule(): ClerkExpoNativeModule | null {
@@ -45,9 +54,10 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     return null;
   }
 
-  const bridgeVersion = readBridgeVersion(nativeModule);
-  if (bridgeVersion === NATIVE_BRIDGE_VERSION) {
-    return nativeModule as ClerkExpoNativeModule;
+  const module = nativeModule as Record<string, unknown>;
+  const bridgeVersion = readBridgeVersion(module);
+  if (isClerkExpoModule(module, bridgeVersion)) {
+    return module;
   }
 
   console.error(

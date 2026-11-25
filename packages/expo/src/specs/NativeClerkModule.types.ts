@@ -16,6 +16,7 @@ export type NativeUpdateRequiredViewModule = {
  * back with compare-and-set, and refetches its own client on `clerkNativeClientInvalidated`.
  */
 export type NativeClientSyncModule = {
+  bridgeVersion?: number;
   configureNative(publishableKey: string, seedDeviceToken: string | null, proxyUrl: string | null): Promise<void>;
   getDeviceToken(): Promise<string | null>;
   setDeviceToken(token: string | null, expected: string | null): Promise<boolean>;
