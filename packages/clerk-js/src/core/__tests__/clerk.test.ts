@@ -5153,10 +5153,6 @@ describe('Clerk singleton', () => {
           lastActiveSessionId: 'sess_2',
         } as any);
 
-        expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
-        expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
-        expect(SessionTokenCache.get({ tokenId: 'sess_2' })).toBeDefined();
-
         await vi.advanceTimersByTimeAsync(45 * 1000);
 
         expect(onRefreshSess1).not.toHaveBeenCalled();

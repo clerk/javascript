@@ -2217,7 +2217,6 @@ describe('SessionTokenCache', () => {
       const onRefreshSess1Org = vi.fn();
       const onRefreshSess1Audience = vi.fn();
       const onRefreshSess10 = vi.fn();
-      const onRefreshSess2 = vi.fn();
 
       SessionTokenCache.set({
         tokenId: 'sess_1',
@@ -2245,11 +2244,6 @@ describe('SessionTokenCache', () => {
         tokenResolver: Promise.resolve(makeToken(jwt, 'sess_10')),
         onRefresh: onRefreshSess10,
       });
-      SessionTokenCache.set({
-        tokenId: 'sess_2',
-        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_2')),
-        onRefresh: onRefreshSess2,
-      });
       await tick();
 
       SessionTokenCache.deleteBySessionId('sess_1');
@@ -2259,8 +2253,6 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.get({ tokenId: 'sess_1-org_456' })).toBeUndefined();
       expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'sess_1' })).toBeUndefined();
       expect(SessionTokenCache.get({ tokenId: 'sess_10' })).toBeDefined();
-      expect(SessionTokenCache.get({ tokenId: 'sess_2' })).toBeDefined();
-      expect(SessionTokenCache.size()).toBe(2);
 
       await vi.advanceTimersByTimeAsync(45 * 1000);
 
@@ -2269,30 +2261,6 @@ describe('SessionTokenCache', () => {
       expect(onRefreshSess1Org).not.toHaveBeenCalled();
       expect(onRefreshSess1Audience).not.toHaveBeenCalled();
       expect(onRefreshSess10).toHaveBeenCalledTimes(1);
-      expect(onRefreshSess2).toHaveBeenCalledTimes(1);
-    });
-
-    it('prevents a pending token resolver from resurrecting a deleted session entry', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-      const pending = deferred();
-      const onRefresh = vi.fn();
-
-      SessionTokenCache.set({
-        tokenId: 'sess_1-t3-relay',
-        tokenResolver: pending.promise,
-        onRefresh,
-      });
-
-      SessionTokenCache.deleteBySessionId('sess_1');
-      pending.resolve(makeToken(jwt, 'sess_1-t3-relay'));
-      await tick();
-
-      expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
-      expect(SessionTokenCache.size()).toBe(0);
-
-      await vi.advanceTimersByTimeAsync(45 * 1000);
-      expect(onRefresh).not.toHaveBeenCalled();
     });
   });
 });

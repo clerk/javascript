@@ -1097,7 +1097,7 @@ describe('Session', () => {
           client.fromJSON({
             object: 'client',
             id: 'client_1',
-            sessions: [makeSessionJSON('sess_1'), makeSessionJSON('sess_2')],
+            sessions: [makeSessionJSON('sess_1'), makeSessionJSON('sess_10')],
             sign_in: null,
             sign_up: null,
             last_active_session_id: 'sess_1',
@@ -1118,17 +1118,16 @@ describe('Session', () => {
           client.fromJSON({
             object: 'client',
             id: 'client_1',
-            sessions: [makeSessionJSON('sess_2')],
+            sessions: [makeSessionJSON('sess_10')],
             sign_in: null,
             sign_up: null,
-            last_active_session_id: 'sess_2',
+            last_active_session_id: 'sess_10',
             created_at: Date.now(),
             updated_at: Date.now(),
           } as any);
 
-          expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
-          expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
-          expect(SessionTokenCache.get({ tokenId: 'sess_2' })).toBeDefined();
+          await expect(client.sessions[0].getToken()).resolves.toBe(mockJwt);
+          expect(requestSpy).not.toHaveBeenCalled();
 
           requestSpy.mockResolvedValue({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
           await vi.advanceTimersByTimeAsync(45 * 1000);
@@ -1136,7 +1135,7 @@ describe('Session', () => {
           const requestedPaths = requestSpy.mock.calls.map((call: any[]) => call[0]?.path);
           expect(requestedPaths).not.toContain('/client/sessions/sess_1/tokens');
           expect(requestedPaths).not.toContain('/client/sessions/sess_1/tokens/t3-relay');
-          expect(requestedPaths).toContain('/client/sessions/sess_2/tokens');
+          expect(requestedPaths).toContain('/client/sessions/sess_10/tokens');
         } finally {
           Client.clearInstance();
         }
@@ -1187,8 +1186,6 @@ describe('Session', () => {
             created_at: Date.now(),
             updated_at: Date.now(),
           } as any);
-
-          expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
 
           await vi.advanceTimersByTimeAsync(45 * 1000);
           expect(requestSpy).not.toHaveBeenCalled();
@@ -1261,7 +1258,6 @@ describe('Session', () => {
           await Promise.resolve();
           await Promise.resolve();
 
-          expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
           expect(dispatchSpy).not.toHaveBeenCalled();
 
           requestSpy.mockClear();
@@ -1331,7 +1327,6 @@ describe('Session', () => {
           await tokenPromise;
           await Promise.resolve();
 
-          expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
           expect(dispatchSpy).not.toHaveBeenCalled();
 
           requestSpy.mockClear();

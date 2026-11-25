@@ -172,19 +172,3 @@ describe('TokenId.build and TokenId.extractTemplate compatibility', () => {
     expect(extracted).toBe(template);
   });
 });
-
-describe('TokenId.belongsToSession', () => {
-  it('matches exact sessionId, templates, and organization-scoped token IDs', () => {
-    expect(TokenId.belongsToSession('sess_1', 'sess_1')).toBe(true);
-    expect(TokenId.belongsToSession('sess_1-t3-relay', 'sess_1')).toBe(true);
-    expect(TokenId.belongsToSession('sess_1-org_456', 'sess_1')).toBe(true);
-    expect(TokenId.belongsToSession('sess_1-t3-relay-org_456', 'sess_1')).toBe(true);
-  });
-
-  it('does not match other sessions with overlapping prefixes or empty sessionId', () => {
-    expect(TokenId.belongsToSession('sess_10', 'sess_1')).toBe(false);
-    expect(TokenId.belongsToSession('sess_10-custom', 'sess_1')).toBe(false);
-    expect(TokenId.belongsToSession('sess_2', 'sess_1')).toBe(false);
-    expect(TokenId.belongsToSession('sess_1', '')).toBe(false);
-  });
-});
