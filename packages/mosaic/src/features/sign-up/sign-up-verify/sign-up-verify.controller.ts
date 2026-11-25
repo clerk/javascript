@@ -71,7 +71,7 @@ export function useSignUpVerifyController({
   const [value, setValue] = useState('');
   const actions = usePendingAction<'code'>();
   const errorText = useErrorText();
-  const [snapshot, send, actor] = useMachine(codeMachine, { context: { sendCode } });
+  const [snapshot, send] = useMachine(codeMachine, { context: { sendCode } });
   const resendSeconds = useResendSeconds(snapshot.context.resendAvailableAt, CODE_RESEND_SECONDS);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export function useSignUpVerifyController({
     errorMessage: actions.error,
     globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
     onResend: () => send({ type: 'RESEND' }),
-    canResend: actor.can({ type: 'RESEND' }) && !isPending,
+    canResend: snapshot.value === 'sent' && resendSeconds === 0 && !isPending,
     resendRemainingSeconds: resendSeconds || undefined,
   };
 }
