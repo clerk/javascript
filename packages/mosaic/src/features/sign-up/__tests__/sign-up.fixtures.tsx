@@ -27,25 +27,6 @@ export function minimumPasswordLength(min_length: number) {
   });
 }
 
-export function phoneEnvironment(authConfig: FapiEnvironmentOverrides['auth_config'] = {}) {
-  return fapiEnvironment({
-    attributes: {
-      email_address: { enabled: false },
-      password: { enabled: false },
-      phone_number: {
-        enabled: true,
-        required: true,
-        verifications: ['phone_code'],
-        used_for_first_factor: true,
-        first_factors: ['phone_code'],
-        verify_at_sign_up: true,
-        channels: ['sms', 'whatsapp'],
-      },
-    },
-    auth_config: authConfig,
-  });
-}
-
 export async function renderSignUp(
   seed: FakeFapiSeed = {},
   props: SignUpProps = {},
