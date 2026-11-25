@@ -448,6 +448,47 @@ describe('OAuthConsent', () => {
       expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1 org_2']);
     });
 
+    it('submits the default organization first, then the rest in list order', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 5 }) }),
+      );
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Acme' }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+      await user.click(await screen.findByRole('option', { name: 'Acme' }));
+
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1 org_2']);
+    });
+
+    it('drops a picked organization the user is no longer a member of', async () => {
+      visitOAuthConsent();
+      const { user, fapi, clerk } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 5 }) }),
+      );
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+      await user.keyboard('{Escape}');
+
+      fapi.client = fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: { ...alice, organization_memberships: [fapiMembership(acme)] },
+          last_active_organization_id: null,
+        }),
+      ]);
+      await act(async () => {
+        await clerk.client?.reload();
+        await clerk.setActive({ session: 'sess_1' });
+      });
+
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1']);
+    });
+
     it('shows each organization logo', async () => {
       visitOAuthConsent();
       const initech = fapiOrganization({ id: 'org_3', name: 'Initech', image_url: PIXEL, has_image: true });

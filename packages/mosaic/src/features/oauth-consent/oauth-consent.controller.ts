@@ -29,6 +29,14 @@ export function useOAuthConsentController(
     .map(item => item.scope)
     .filter(scope => scope === OFFLINE_ACCESS_SCOPE || !uncheckedScopes.includes(scope));
   const sharesOrganizations = checked.includes(USER_ORG_READ_SCOPE);
+  const pickedOrganizationIds =
+    selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]);
+  const organizationIds = sharesOrganizations
+    ? organizations
+        .map(organization => organization.value)
+        .filter(id => pickedOrganizationIds.includes(id))
+        .sort((a, b) => Number(b === defaultOrganizationId) - Number(a === defaultOrganizationId))
+    : [];
 
   return {
     ...model,
@@ -52,14 +60,12 @@ export function useOAuthConsentController(
       maxOrganizations > 1
         ? {
             multiple: true,
-            organizationIds: sharesOrganizations
-              ? (selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]))
-              : [],
+            organizationIds,
             onOrganizationIdsChange: setSelectedOrganizationIds,
             limit: maxOrganizations,
           }
         : {
-            organizationId: sharesOrganizations ? (selectedOrganizationIds?.[0] ?? defaultOrganizationId) : null,
+            organizationId: sharesOrganizations ? (organizationIds[0] ?? defaultOrganizationId) : null,
             onOrganizationIdChange: organizationId => setSelectedOrganizationIds([organizationId]),
           },
     isRedirectUrlOpen,
