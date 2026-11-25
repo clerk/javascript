@@ -1,0 +1,46 @@
+# Native to Web SSO
+
+A signed-in user of the app opens one of the developer's web pages already signed in as the same user, with no second sign-in. The SDK creates a one-time session transfer for the active session and opens a Clerk page that redeems it and then redirects to the destination. `useAuthenticatedWebView` from `@clerk/expo/native-to-web` returns props for a `react-native-webview` `<WebView>` that loads it. The test app has a small screen of its own for this, `NativeToWeb.tsx`, which loads the instance's Account Portal and shows in a native text which user the page is signed in as.
+
+## Sub-features
+
+- `web-view` loads the Account Portal's `/user` page in a WebView through `useAuthenticatedWebView`, and the page is signed in as the native user. `Done` returns to the home, still signed in as that user. Its second test shows that an instance with session transfers off refuses the transfer with `feature_not_enabled`.
+
+## How to get to it (user POV)
+
+- Launch the app signed in and tap `Native to Web SSO` on the home. The screen shows its title and a `Done` button at the top, the web page's user ID or the transfer's error code below them, and the WebView under that.
+
+## Driving it with verify
+
+Preconditions:
+
+- Clerk's `session_transfers` flag must be on for the instance. It's on globally. With it off, the first test cannot turn the feature on.
+- Session transfers are off on the standard settings, so the first test calls `host.useSettings({ config: { 'session_transfers.enabled': true } })`. The leaf moves nothing in the public `/v1/environment` that the CLI reads, so the call names no `environment` and goes on after the CLI's 15-second wait.
+- The Native API is on in the standard settings (`auth_config.native_settings.api_enabled`), which a session transfer needs.
+- The test app installs `react-native-webview` at the version each Expo SDK bundles, `13.16.0` in `integration/templates/expo-native/package.sdk-55.json` and `14.0.1` in `package.sdk-58.json`.
+- The landing page is the instance's own Account Portal, a Clerk web app on the same instance, so no web app needs hosting. The screen takes the origin of `clerk.__internal_environment.displayConfig.homeUrl`, `https://<slug>.accounts.dev/default-redirect` on a development instance, and sets the path to `/user`.
+
+- **Signed in on the web.** Run `integration/expo-native/bin/control-clerk-expo run native-to-web-sso --platform ios --grep "same user"` (or `android`). The test turns session transfers on, launches signed in with a ticket, reads the user ID from `e2e.auth.userId`, and taps `e2e.home.nativeToWeb`. It expects `verify.nativeToWeb.webUserId` to read that ID within 30 seconds, with no `verify.nativeToWeb.error`. Screenshot `web-view-signed-in`. It then taps `verify.nativeToWeb.done` and expects the home with the same user.
+- **Turned off.** Run `integration/expo-native/bin/control-clerk-expo run native-to-web-sso --platform ios --grep "turned off"` (or `android`). The test keeps the standard settings, launches signed in, taps `e2e.home.nativeToWeb`, and expects `verify.nativeToWeb.error` to read `feature_not_enabled`. Screenshot `web-view-feature-off`.
+- **Proof.** `specs/features/native-to-web-sso/web-view.e2e.ts` passes on each platform. The video shows the Account Portal's profile page in the WebView under the native user's ID.
+
+## States a spec cannot reach
+
+| State                                           | Where the app decides                                                                                             | What it takes                                                                                                                                                                                                                                  |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Opening the page in the user's browser          | `openInBrowser.ts`, `openInBrowser`                                                                               | The app hands the URL to the system browser, so the page is in another app that the harness does not read. The test app does not call it                                                                                                       |
+| A URL the app presents itself                   | `sessionTransfer.ts`, `prepareSessionTransfer`                                                                    | A screen of the app's own that opens `transfer.url`. `useAuthenticatedWebView` calls it, so the WebView test covers the request, but nothing tests a caller that presents the URL itself                                                       |
+| A destination refused for its scheme or host    | Clerk's checks of `destination`                                                                                   | A production instance, which requires `https` and a host on one of its domains. The harness creates development instances only, which allow any `http` or `https` URL                                                                          |
+| A refused sign-in that lands on the destination | `webViewNavigation.ts`, `judgeNavigation`, from `__clerk_status=session_transfer_failed` and `__clerk_error_code` | A transfer that Clerk creates and then refuses to redeem, such as an `expired` or `already_used` token. The spec's refusal comes before loading, from the create request. `webViewNavigation.test.ts` covers the redirect with unit tests only |
+| The web session ending at native sign-out       | Clerk's revocation of a transferred web session when its native session ends                                      | A WebView that outlives the native session. The hook returns no `webViewProps` once the app signs out, the screen's WebView is `incognito`, and `Done` drops the WebView before a sign-out                                                     |
+
+## Gotchas
+
+- The web user ID comes from JavaScript that the screen injects into the page, `window.Clerk.user.id` once `window.Clerk.loaded` is true, posted back with `window.ReactNativeWebView.postMessage`. It does not come from the WebView's accessibility tree. The script waits up to 15 seconds for `window.Clerk.loaded`. A change to how the Account Portal loads `window.Clerk` changes what the text shows.
+- The screen passes its `onLoadEnd` to `useAuthenticatedWebView`, not to `<WebView>`, because a callback set after the spread replaces the hook's. The hook calls it for every page except Clerk's sign-in page.
+- The page can finish loading more than once, with redirects after the transfer, so the screen reads the user again after each load and shows the result for the latest one.
+- The hook itself detects a refused redeem in `webViewNavigation.ts`, from the `__clerk_status` and `__clerk_error_code` of the page it lands on. The screen shows `error.code` for any hook error, from the create request or the redeem.
+- On an error the hook returns no `webViewProps`, so the WebView unmounts and the screenshot shows only `Transfer failed` and the code.
+- The WebView is `incognito`, so no web session survives between tests or launches. A signed-in text always comes from this screen's transfer. Without it, the WebView keeps its cookies and a later user gets `other_user_signed_in`.
+- The screen never logs or stores the transfer URL. It works once, for about a minute, and signs the user in.
+- The screen shows `Signed out on the web` when the page loaded but has no user, and `Loading the Account Portal` until the first answer. Neither has an identifier, so a failing wait shows them only in the screenshot.
