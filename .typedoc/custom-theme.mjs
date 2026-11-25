@@ -1338,6 +1338,22 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       parametersTable: model => {
         return clerkParametersTable.call(this, model);
       },
+      signatures: (model, options) => {
+        if (
+          !this.page?.url?.endsWith('/use-reverification.mdx') ||
+          model.name !== 'useReverification' ||
+          model.signatures?.length !== 2
+        ) {
+          return superPartials.signatures(model, options);
+        }
+        const originalSignatures = model.signatures;
+        model.signatures = [originalSignatures[1]];
+        try {
+          return superPartials.signatures(model, options);
+        } finally {
+          model.signatures = originalSignatures;
+        }
+      },
       /**
        * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows.
        * Delegate to {@link clerkTypeDeclarationTable} which always flattens and applies {@link appendUnionObjectChildPropertyRows}.

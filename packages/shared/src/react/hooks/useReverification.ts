@@ -84,14 +84,14 @@ export type UseReverificationOptions<Args extends any[] = any[]> = {
 };
 
 /**
- * Options for a fetcher that takes the reverification result as its first argument.
+ * Options for the `passReverificationResult: true` overload.
  *
  * @interface
  */
 export type UseReverificationWithResultOptions<Args extends any[] = any[]> = UseReverificationOptions<Args> & {
   /**
-   * When `true`, the fetcher's first argument is a `ReverificationResult` (`undefined` on the first call), and the
-   * returned function takes the remaining arguments.
+   * Must be `true` to pass the reverification result as the fetcher's first argument (`undefined` on the first call).
+   * The returned function takes the remaining arguments.
    */
   passReverificationResult: true;
 };
@@ -127,7 +127,8 @@ type UseReverification = {
      */
     fetcher: Fetcher,
     /**
-     * Optional configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#usereverificationoptions).
+     * Optional configuration. See [`UseReverificationWithResultOptions`](#usereverificationwithresultoptions) below for the `passReverificationResult: true`
+     * overload.
      */
     options?: UseReverificationOptions<Parameters<Fetcher>> & { passReverificationResult?: undefined },
   ): UseReverificationResult<Fetcher>;

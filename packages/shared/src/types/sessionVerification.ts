@@ -51,7 +51,9 @@ export type ReverificationPrefill = {
    * the reset code instead of asking for a new password, and doesn't ask whether to sign out of other sessions.
    */
   passwordReset?: {
+    /** The new password to save when the reset code is verified. */
     newPassword: string;
+    /** Whether to sign out of the user's other sessions after the password reset. */
     signOutOfOtherSessions: boolean;
   };
 };
