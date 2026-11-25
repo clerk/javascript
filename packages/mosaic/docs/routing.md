@@ -93,7 +93,7 @@ export const userProfileModal = defineModalSurface<UserProfileModalOptions>({
 
 `useModal(userProfileModal).open({ page: 'security' })` opens a profile on a page. A segment written from outside, by a link or a URL, opens the modal too, and its content loads whenever it is open.
 
-Mosaic's own modals are virtual by default; `routing={{ modals: 'query' }}` on the provider puts them in the query string, `'hash'` in the hash, for every modal at once. In those modes opening pushes a history entry and closing replaces it, so Back closes the modal and a URL with the param opens it. Modals never use the pathname. A virtual modal closes when the host moves to another pathname; a change of the query string or the hash leaves it open. A URL in hash or query mode can carry segments for more than one modal, so two can be open at once; the host keeps them in opening order and an outside press or Escape closes the one on top only.
+Mosaic's own modals are virtual by default; `routing={{ modals: 'query' }}` on the provider puts them in the query string, `'hash'` in the hash, for every modal at once. In those modes opening pushes a history entry and closing replaces it, so Back closes the modal and a URL with the param opens it. Modals never use the pathname. In every mode a modal closes when the host moves to another pathname, even when the navigation carries its param along; a change of the query string or the hash alone leaves it open. A URL in hash or query mode can carry segments for more than one modal, so two can be open at once; the host keeps them in opening order and an outside press or Escape closes the one on top only.
 
 ## Links
 
