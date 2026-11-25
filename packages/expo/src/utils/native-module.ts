@@ -60,9 +60,13 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     return module;
   }
 
+  const reason =
+    bridgeVersion === NATIVE_BRIDGE_VERSION
+      ? `native bridge version ${bridgeVersion} is missing bridge methods`
+      : `native bridge version ${bridgeVersion ?? 'unknown'}, expected ${NATIVE_BRIDGE_VERSION}`;
   console.error(
     `Clerk: Native components are disabled because this app's native build doesn't match @clerk/expo ${PACKAGE_VERSION} ` +
-      `(native bridge version ${bridgeVersion ?? 'unknown'}, expected ${NATIVE_BRIDGE_VERSION}). ` +
+      `(${reason}). ` +
       'Update @clerk/expo and @clerk/expo-native-components together to their latest versions, then rebuild the app.',
   );
 

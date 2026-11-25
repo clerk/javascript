@@ -58,12 +58,13 @@ describe('native module loader', () => {
   });
 
   test('returns null when a native module reports the expected bridge version without the bridge methods', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     mocks.nativeModule = { bridgeVersion: 1, configureNative: vi.fn() };
 
     const { ClerkExpoModule } = await importNativeModule();
 
     expect(ClerkExpoModule).toBeNull();
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('native bridge version 1 is missing bridge methods'));
   });
 
   test('returns null when the native bridge version is not an integer', async () => {
