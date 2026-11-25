@@ -159,7 +159,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           delete payload.meta?.client;
         }
         if (isDiscarded(payload.response)) {
-          payload.response = null;
+          throw new Error('Clerk: Ignored a response for a client that was signed out.');
         }
       };
       const requestTokens = new WeakMap<FapiRequestInit, string | null>();

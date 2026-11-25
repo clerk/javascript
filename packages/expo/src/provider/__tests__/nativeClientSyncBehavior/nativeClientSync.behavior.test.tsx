@@ -595,6 +595,25 @@ describe('native client sync behavior', () => {
       expect(h.native.token).toBeNull();
     });
 
+    it('keeps the next sign-in when a client fetch sent before the sign-out lands afterwards', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const held = server.holdNextResponse('js', 'GET /client');
+      await h.run(() => h.native.emitChange({ client: true, deviceToken: false }, { kind: 'native' }));
+      await held.handled;
+
+      server.failNextRequests('js', 'DELETE /client/sessions');
+      await expect(h.run(() => h.js.signOut())).rejects.toThrow('Network request failed');
+      const sessionId = await h.run(() => h.js.signIn('user_2'));
+      const emissionIndex = h.js.emissions.length;
+      held.release();
+      await h.settle();
+
+      expect(signedOutEmissionsSince(h, emissionIndex)).toEqual([]);
+      expect(h.js.session?.id).toBe(sessionId);
+      await expectConverged(h);
+    });
+
     it('keeps the next sign-in when an earlier request rotates the signed-out token afterwards', async () => {
       const { server, token } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
