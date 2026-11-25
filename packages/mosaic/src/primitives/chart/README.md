@@ -284,6 +284,8 @@ Painting the bars is the one thing the chart object does not do, because their c
 | `data-focus-visible`          | `Chart.Cursor`    | Present while the keyboard selected the category. Ring the cursor then, not the whole chart                          |
 | `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
 | `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
+| `data-moving`                 | `Chart.Tooltip`   | Present from the first change of category while open until it closes, so a position transition skips the first open  |
+| `data-anchor-hidden`          | `Chart.Tooltip`   | Present while the selected point is scrolled out of view. The tooltip is hidden                                      |
 
 The interaction surface also carries the chart type's state, such as `data-active-section` for bars. `Chart.Bar` takes its own attributes before each paint, listed under [Styling](#styling).
 

@@ -123,8 +123,9 @@ in one stack.
 ### Highlight
 
 `highlight` keeps the matching bars at full strength and dims the rest with an opaque mix toward
-`--cl-color-surface`, so grid lines never show through. It is separate from the selection, so the
-tooltip still opens and closes as the pointer moves. Without `highlight`, nothing is dimmed.
+`--cl-color-surface`, so grid lines never show through. Here the selection drives it: hover a bar,
+or move to one with the keyboard, to dim the rest, and leave to clear it. Without `highlight`,
+hovering shows the band and tooltip and dims nothing.
 
 <Story
   name='Highlight'

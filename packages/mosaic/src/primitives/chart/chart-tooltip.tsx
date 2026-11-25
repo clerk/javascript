@@ -1,6 +1,6 @@
 'use client';
 
-import { autoUpdate, flip, offset, shift, size, useFloating } from '@floating-ui/react';
+import { autoUpdate, flip, hide, offset, shift, size, useFloating } from '@floating-ui/react';
 import React from 'react';
 
 import { useTransition } from '../hooks/use-transition';
@@ -35,6 +35,22 @@ export type ChartTooltipProps<TActive extends ChartActive = ChartActive> = Omit<
 
 type BoundaryRef = React.RefObject<HTMLElement | null>;
 
+function useMoving(open: boolean, datumIndex: number | undefined) {
+  const [openedAt, setOpenedAt] = React.useState<number | undefined>(undefined);
+  const [moved, setMoved] = React.useState(false);
+  if (!open) {
+    if (openedAt !== undefined || moved) {
+      setOpenedAt(undefined);
+      setMoved(false);
+    }
+  } else if (openedAt === undefined) {
+    setOpenedAt(datumIndex);
+  } else if (!moved && datumIndex !== openedAt) {
+    setMoved(true);
+  }
+  return open && moved;
+}
+
 /** Reads the boundary when floating-ui computes a position, not during render. */
 function boundaryReader(collisionBoundary: BoundaryRef | undefined, chartBoxRef: BoundaryRef) {
   return () => collisionBoundary?.current ?? chartBoxRef.current ?? undefined;
@@ -61,6 +77,7 @@ function tooltipMiddleware(
         elements.floating.style.maxWidth = `${Math.max(0, right - left)}px`;
       },
     })),
+    hide(),
   ];
 }
 
@@ -103,6 +120,7 @@ export const ChartTooltip = React.forwardRef<HTMLDivElement, ChartTooltipProps>(
     floatingStyles,
     placement: resolvedPlacement,
     isPositioned,
+    middlewareData,
   } = useFloating({
     open,
     strategy: 'fixed',
@@ -135,14 +153,18 @@ export const ChartTooltip = React.forwardRef<HTMLDivElement, ChartTooltipProps>(
   }, [anchorX, anchorY, chartBoxRef, chartWidth, collisionBoundary, collisionPadding, pinned, refs]);
 
   const { mounted, transitionProps } = useTransition({ open, ref: popupRef });
+  const moving = useMoving(open, active?.datumIndex);
+  const anchorHidden = middlewareData.hide?.referenceHidden === true;
 
   const ownProps = {
     ...transitionProps,
     'data-side': resolvedSide,
+    ...(moving ? { 'data-moving': '' } : null),
+    ...(anchorHidden ? { 'data-anchor-hidden': '' } : null),
     style: {
       ...floatingStyles,
       pointerEvents: 'none',
-      ...(isPositioned ? null : { visibility: 'hidden' }),
+      ...(isPositioned && !anchorHidden ? null : { visibility: 'hidden' }),
       ...transitionProps.style,
     },
     children: <Freeze frozen={!open}>{open ? content : null}</Freeze>,
