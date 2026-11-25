@@ -212,7 +212,6 @@ import { ProtectCheckGate } from './protectCheckGate';
 import type { SignIn, SignUp } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
-import { SessionTokenCache } from './tokenCache';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -3401,8 +3400,6 @@ export class Clerk implements ClerkInterface {
   // and emitting, library consumers that both read state directly and set up listeners
   // could end up in a inconsistent state.
   updateClient = (newClient: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }): void => {
-    const previousClient = this.client;
-
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -3415,21 +3412,8 @@ export class Clerk implements ClerkInterface {
 
     this.client = newClient;
 
-    if (previousClient && previousClient !== newClient) {
-      const signedInSessionIds = new Set((newClient.signedInSessions || []).map(session => session.id));
-      for (const session of previousClient.sessions || previousClient.signedInSessions || []) {
-        if (!signedInSessionIds.has(session.id)) {
-          SessionTokenCache.deleteBySessionId(session.id);
-        }
-      }
-    }
-
     if (this.session) {
-      const previousSessionId = this.session.id;
-      const newSession = this.#getSessionFromClient(previousSessionId, newClient);
-      if (!newSession) {
-        SessionTokenCache.deleteBySessionId(previousSessionId);
-      }
+      const newSession = this.#getSessionFromClient(this.session.id, newClient);
 
       const hasTransitionedToPendingStatus = this.session.status === 'active' && newSession?.status === 'pending';
       if (hasTransitionedToPendingStatus) {

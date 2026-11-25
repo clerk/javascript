@@ -79,8 +79,6 @@ export interface TokenCache {
    */
   clear(): void;
 
-  deleteBySessionId(sessionId: string): void;
-
   /**
    * Closes the BroadcastChannel connection and releases resources.
    * Side effects: Disconnects from multi-tab synchronization channel.
@@ -194,25 +192,6 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       }
     });
     store.clear();
-  };
-
-  const deleteBySessionId = (sessionId: string) => {
-    if (!sessionId) {
-      return;
-    }
-
-    const keysToDelete: string[] = [];
-    store.forEach((entry, key) => {
-      if (TokenId.belongsToSession(entry.params.tokenId, sessionId)) {
-        clearTimeout(entry.timeoutId);
-        clearTimeout(entry.refreshTimeoutId);
-        keysToDelete.push(key);
-      }
-    });
-
-    for (const key of keysToDelete) {
-      store.delete(key);
-    }
   };
 
   const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheHit | undefined => {
@@ -534,7 +513,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     return store.size();
   };
 
-  return { clear, close, deleteBySessionId, get, set, size };
+  return { clear, close, get, set, size };
 };
 
 export const SessionTokenCache = MemoryTokenCache();

@@ -236,7 +236,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (token && this.#isSignedInStatus()) {
+    if (token && (this.status === 'active' || this.status === 'pending')) {
       const tokenId = this.#getCacheId();
       // Dispatch tokenUpdate for __session tokens with the session's active organization ID
       const shouldDispatchTokenUpdate = true;
@@ -722,12 +722,8 @@ export class Session extends BaseResource implements SessionResource {
       });
   }
 
-  #isSignedInStatus(): boolean {
-    return this.status === 'active' || this.status === 'pending';
-  }
-
   #isSignedInOnCurrentClient(): boolean {
-    if (!this.#isSignedInStatus()) {
+    if (this.status !== 'active' && this.status !== 'pending') {
       return false;
     }
 
