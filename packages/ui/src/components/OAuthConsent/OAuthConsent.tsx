@@ -58,6 +58,7 @@ function _OAuthConsent() {
 
   useEffect(() => {
     setUncheckedScopes([]);
+    setSelectedOrgs(null);
   }, [oauthClientId, scope]);
 
   // Public path: fetch via hook. Disabled on the accounts portal path
@@ -98,7 +99,7 @@ function _OAuthConsent() {
     : [];
   const lastActiveOrgId = clerk.session?.lastActiveOrganizationId;
   const defaultOrg = orgOptions.find(o => o.value === lastActiveOrgId)?.value ?? orgOptions[0]?.value ?? null;
-  const reportedMaxOrganizations = data?.maxOrganizations;
+  const reportedMaxOrganizations = hasContextCallbacks ? undefined : data?.maxOrganizations;
   const maxOrganizations =
     reportedMaxOrganizations !== undefined &&
     Number.isInteger(reportedMaxOrganizations) &&
@@ -106,9 +107,16 @@ function _OAuthConsent() {
       ? reportedMaxOrganizations
       : 1;
   const defaultOrgs = defaultOrg ? [defaultOrg] : [];
-  const chosenOrgs = maxOrganizations > 1 || selectedOrgs?.length ? (selectedOrgs ?? defaultOrgs) : defaultOrgs;
-  const effectiveOrgs = chosenOrgs.slice(0, maxOrganizations);
-  const isMissingOrgSelection = orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
+  const availableSelectedOrgs = selectedOrgs?.filter(id => orgOptions.some(o => o.value === id)) ?? null;
+  const chosenOrgs =
+    maxOrganizations > 1 || availableSelectedOrgs?.length ? (availableSelectedOrgs ?? defaultOrgs) : defaultOrgs;
+  const effectiveOrgs = orgOptions
+    .map(o => o.value)
+    .filter(id => chosenOrgs.includes(id))
+    .sort((a, b) => Number(b === defaultOrg) - Number(a === defaultOrg))
+    .slice(0, maxOrganizations);
+  const isMissingOrgSelection =
+    !hasContextCallbacks && orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
 
   const { t } = useLocalizations();
   const domainAction = data?.redirectDomain ?? getRedirectDisplay(redirectUrl);

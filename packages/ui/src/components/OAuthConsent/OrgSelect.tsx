@@ -47,7 +47,10 @@ export function OrgSelect(props: OrgSelectProps) {
       >
         <OrgSelectButton buttonRef={buttonRef}>
           {selected ? (
-            <OrgSelectLabel>{selected.label}</OrgSelectLabel>
+            <>
+              <OrgSelectLogo option={selected} />
+              <OrgSelectLabel>{selected.label}</OrgSelectLabel>
+            </>
           ) : (
             <OrgSelectLabel
               localizationKey={
@@ -75,17 +78,7 @@ export function OrgSelect(props: OrgSelectProps) {
       renderOption={renderOrgOption}
     >
       <OrgSelectButton buttonRef={buttonRef}>
-        <Image
-          src={selected?.logoUrl || ''}
-          alt={selected?.label || ''}
-          sx={theme => ({
-            width: theme.sizes.$5,
-            height: theme.sizes.$5,
-            borderRadius: theme.radii.$md,
-            objectFit: 'contain',
-            flexShrink: 0,
-          })}
-        />
+        <OrgSelectLogo option={selected} />
         <OrgSelectLabel>{selected?.label || 'Select an option'}</OrgSelectLabel>
       </OrgSelectButton>
       <SelectOptionList />
@@ -110,6 +103,22 @@ function OrgSelectButton({
     >
       {children}
     </SelectButton>
+  );
+}
+
+function OrgSelectLogo({ option }: { option?: OrgOption }) {
+  return (
+    <Image
+      src={option?.logoUrl || ''}
+      alt={option?.label || ''}
+      sx={theme => ({
+        width: theme.sizes.$5,
+        height: theme.sizes.$5,
+        borderRadius: theme.radii.$md,
+        objectFit: 'contain',
+        flexShrink: 0,
+      })}
+    />
   );
 }
 

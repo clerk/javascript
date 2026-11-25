@@ -510,6 +510,43 @@ describe('OAuthConsent', () => {
     expect(fixtures.clerk.oauthApplication.getConsentInfo).not.toHaveBeenCalled();
   });
 
+  it('keeps the single organization select and enables Allow on the accounts portal path', async () => {
+    const onAllowSpy = vi.fn();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['jane@example.com'],
+        organization_memberships: [
+          { id: 'org_1', name: 'Org 1' },
+          { id: 'org_2', name: 'Org 2' },
+        ],
+      });
+      f.withOrganizations();
+    });
+    props.setProps({
+      componentName: 'OAuthConsent',
+      scopes: [{ scope: 'user:org:read', description: 'Access your organizations', requires_consent: true }],
+      oAuthApplicationName: 'Accounts Portal App',
+      redirectUrl: 'https://example.com/callback',
+      onAllow: onAllowSpy,
+      onDeny: vi.fn(),
+    } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue({ ...fakeConsentInfoWithOrgScope, maxOrganizations: 5 }),
+    });
+
+    const { findByRole, queryByText, getByRole, baseElement, userEvent } = render(<OAuthConsent />, { wrapper });
+
+    await userEvent.click(await findByRole('button', { name: /Org 1$/ }));
+    expect(await findByRole('option', { name: /Org 2/ })).toBeVisible();
+    expect(queryByText(/organizations selected/)).toBeNull();
+    await userEvent.keyboard('{Escape}');
+    expect(baseElement.querySelector('input[name="organization_id"]')).toBeNull();
+    expect(getByRole('button', { name: 'Allow' })).toBeEnabled();
+    expect(fixtures.clerk.oauthApplication.getConsentInfo).not.toHaveBeenCalled();
+    await userEvent.click(getByRole('button', { name: 'Allow' }));
+    expect(onAllowSpy).toHaveBeenCalledWith();
+  });
+
   it('shows missing client_id error in the public flow', async () => {
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -850,6 +887,108 @@ describe('OAuthConsent', () => {
         await userEvent.click(await findByRole('option', { name: /Org 3/ }));
 
         expect(new FormData(form).getAll('organization_id')).toEqual(['org_1 org_3']);
+      });
+
+      it('posts the default organization first whatever the click order', async () => {
+        const { trigger, form, findByRole, userEvent } = await renderWithOrgs(3);
+        const organizationIds = () => new FormData(form).getAll('organization_id');
+
+        await userEvent.click(trigger);
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        expect(organizationIds()).toEqual(['org_2']);
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        expect(organizationIds()).toEqual(['org_1 org_2']);
+
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 3/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        expect(organizationIds()).toEqual(['org_3']);
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        expect(organizationIds()).toEqual(['org_2 org_3']);
+      });
+
+      it('posts the other organizations in list order after the default organization', async () => {
+        const { trigger, form, findByRole, userEvent } = await renderWithOrgs(4);
+
+        await userEvent.click(trigger);
+        await userEvent.click(await findByRole('option', { name: /Org 4/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 3/ }));
+
+        expect(new FormData(form).getAll('organization_id')).toEqual(['org_1 org_3 org_4']);
+      });
+
+      it('shows the logo of the organization when only one is selected', async () => {
+        const { trigger } = await renderWithOrgs(3);
+
+        expect(trigger.querySelector('img')).not.toBeNull();
+        expect(trigger.querySelector('img')).toHaveAttribute('alt', 'Org 1');
+      });
+
+      it('does not post or count an organization that is no longer a membership', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({
+            email_addresses: ['jane@example.com'],
+            organization_memberships: [
+              { id: 'org_1', name: 'Org 1' },
+              { id: 'org_2', name: 'Org 2' },
+              { id: 'org_3', name: 'Org 3' },
+            ],
+          });
+          f.withOrganizations();
+        });
+        fixtures.clerk.session.lastActiveOrganizationId = null;
+        props.setProps({ componentName: 'OAuthConsent' } as any);
+        mockOAuthApplication(fixtures.clerk, {
+          getConsentInfo: vi.fn().mockResolvedValue({ ...fakeConsentInfoWithOrgScope, maxOrganizations: 2 }),
+        });
+        const { baseElement, findByRole, rerender, userEvent } = render(<OAuthConsent />, { wrapper });
+        const organizationIds = () =>
+          new FormData(baseElement.querySelector('form') as HTMLFormElement).getAll('organization_id');
+
+        await userEvent.click(await findByRole('button', { name: /Org 1$/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        expect(organizationIds()).toEqual(['org_1 org_2']);
+        await userEvent.keyboard('{Escape}');
+
+        const user = fixtures.clerk.user as any;
+        user.organizationMemberships = user.organizationMemberships.filter((m: any) => m.organization.id !== 'org_2');
+        rerender(<OAuthConsent />);
+
+        await waitFor(() => expect(organizationIds()).toEqual(['org_1']));
+        await userEvent.click(await findByRole('button', { name: /Org 1$/ }));
+        expect(await findByRole('option', { name: /Org 3/ })).not.toHaveAttribute('aria-disabled', 'true');
+      });
+
+      it('resets the selection to the default organization when the client changes', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({
+            email_addresses: ['jane@example.com'],
+            organization_memberships: [
+              { id: 'org_1', name: 'Org 1' },
+              { id: 'org_2', name: 'Org 2' },
+            ],
+          });
+          f.withOrganizations();
+        });
+        fixtures.clerk.session.lastActiveOrganizationId = null;
+        props.setProps({ componentName: 'OAuthConsent' } as any);
+        mockOAuthApplication(fixtures.clerk, {
+          getConsentInfo: vi.fn().mockResolvedValue({ ...fakeConsentInfoWithOrgScope, maxOrganizations: 5 }),
+        });
+        const { baseElement, findByRole, rerender, userEvent } = render(<OAuthConsent />, { wrapper });
+        const organizationIds = () =>
+          new FormData(baseElement.querySelector('form') as HTMLFormElement).getAll('organization_id');
+
+        await userEvent.click(await findByRole('button', { name: /Org 1$/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 2/ }));
+        expect(organizationIds()).toEqual(['org_1 org_2']);
+        await userEvent.keyboard('{Escape}');
+
+        props.setProps({ componentName: 'OAuthConsent', oauthClientId: 'another_client' } as any);
+        rerender(<OAuthConsent />);
+
+        await waitFor(() => expect(organizationIds()).toEqual(['org_1']));
       });
 
       it('disables Allow while no organization is selected', async () => {
