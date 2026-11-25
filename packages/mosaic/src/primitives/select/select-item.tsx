@@ -4,19 +4,20 @@ import { useListItem } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useSelectHighlightContext, useSelectOptionsContext } from './select-context';
+import { useSelectHighlightContext, useSelectItemsContext } from './select-context';
+import { SelectItemContext } from './select-item-context';
 
-export interface SelectOptionProps extends Omit<ComponentProps<'button'>, 'value'> {
+export interface SelectItemProps extends Omit<ComponentProps<'button'>, 'value'> {
   value: unknown;
   label?: string;
   disabled?: boolean;
 }
 
-export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function SelectOption(props, ref) {
+export const SelectItem = React.forwardRef<HTMLButtonElement, SelectItemProps>(function SelectItem(props, ref) {
   const { activeIndex, selectedValues } = useSelectHighlightContext();
   const { ref: itemRef, index } = useListItem({ label: props.label ?? String(props.value) });
   return (
-    <SelectOptionBody
+    <SelectItemBody
       {...props}
       forwardedRef={ref}
       listItemRef={itemRef}
@@ -28,7 +29,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
   );
 });
 
-interface SelectOptionBodyProps extends SelectOptionProps {
+interface SelectItemBodyProps extends SelectItemProps {
   forwardedRef: React.ForwardedRef<HTMLButtonElement>;
   listItemRef: (node: HTMLElement | null) => void;
   index: number;
@@ -37,10 +38,10 @@ interface SelectOptionBodyProps extends SelectOptionProps {
   isAnchor: boolean;
 }
 
-const SelectOptionBody = React.memo(function SelectOptionBody(bodyProps: SelectOptionBodyProps) {
+const SelectItemBody = React.memo(function SelectItemBody(bodyProps: SelectItemBodyProps) {
   const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, isAnchor, ...props } = bodyProps;
   const { render, value, label, disabled, ...otherProps } = props;
-  const { setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } = useSelectOptionsContext();
+  const { setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } = useSelectItemsContext();
 
   const displayLabel = label ?? String(value);
 
@@ -83,7 +84,7 @@ const SelectOptionBody = React.memo(function SelectOptionBody(bodyProps: SelectO
     }),
   };
 
-  return useRender({
+  const element = useRender({
     defaultTagName: 'button',
     render,
     state,
@@ -95,4 +96,6 @@ const SelectOptionBody = React.memo(function SelectOptionBody(bodyProps: SelectO
     ref: [itemRef, isAnchor ? selectedItemRef : null, ref],
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
+
+  return <SelectItemContext.Provider value={isSelected}>{element}</SelectItemContext.Provider>;
 });

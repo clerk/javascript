@@ -28,11 +28,11 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
 import { styles } from './phone-input.styles';
 
-const countryOptions = [...IsoToCountryMap.values()];
+const countries = [...IsoToCountryMap.values()];
 
 function getCountry(iso: CountryIso | undefined): CountryEntry {
   const country = iso ? IsoToCountryMap.get(iso) : undefined;
-  const fallback = IsoToCountryMap.get('us') ?? countryOptions[0];
+  const fallback = IsoToCountryMap.get('us') ?? countries[0];
   if (!fallback) {
     throw new Error('PhoneInput requires at least one country');
   }
@@ -41,7 +41,7 @@ function getCountry(iso: CountryIso | undefined): CountryEntry {
 
 export function toCountryIso(value: string | null | undefined): CountryIso | undefined {
   const iso = value?.toLowerCase();
-  return iso ? countryOptions.find(country => country.iso === iso)?.iso : undefined;
+  return iso ? countries.find(country => country.iso === iso)?.iso : undefined;
 }
 
 function getInitialCountry(value: string | undefined, defaultCountry: CountryIso | undefined): CountryIso {
@@ -137,11 +137,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const filteredCountries = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) {
-      return countryOptions;
+      return countries;
     }
-    return countryOptions.filter(option =>
-      `${option.name} ${option.iso} +${option.code}`.toLowerCase().includes(normalizedQuery),
-    );
+    return countries.filter(item => `${item.name} ${item.iso} +${item.code}`.toLowerCase().includes(normalizedQuery));
   }, [query]);
 
   const setValue = React.useCallback(
@@ -257,7 +255,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               onInputValueChange={setQuery}
               value={country.iso}
               onValueChange={iso => {
-                const nextCountry = countryOptions.find(option => option.iso === iso);
+                const nextCountry = countries.find(item => item.iso === iso);
                 if (nextCountry) {
                   setCountry(nextCountry);
                 }
@@ -299,23 +297,23 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 )}
               >
                 {filteredCountries.length > 0 ? (
-                  filteredCountries.map(option => (
-                    <Combobox.Option
-                      key={option.iso}
-                      value={option.iso}
-                      label={option.name}
-                      {...themeProps('phone-input-country-option')}
-                      xstyle={styles.option}
+                  filteredCountries.map(item => (
+                    <Combobox.Item
+                      key={item.iso}
+                      value={item.iso}
+                      label={item.name}
+                      {...themeProps('phone-input-country-item')}
+                      xstyle={styles.item}
                     >
                       <Combobox.Media
                         aria-hidden='true'
-                        xstyle={styles.optionFlag}
+                        xstyle={styles.itemFlag}
                       >
-                        {getFlagEmojiFromCountryIso(option.iso)}
+                        {getFlagEmojiFromCountryIso(item.iso)}
                       </Combobox.Media>
-                      <Combobox.Label>{option.name}</Combobox.Label>
-                      <Combobox.Detail xstyle={styles.optionCode}>+{option.code}</Combobox.Detail>
-                    </Combobox.Option>
+                      <Combobox.Label>{item.name}</Combobox.Label>
+                      <Combobox.Detail xstyle={styles.itemCode}>+{item.code}</Combobox.Detail>
+                    </Combobox.Item>
                   ))
                 ) : (
                   <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>

@@ -10,7 +10,8 @@ export { type SelectValueProps, SelectValue as Value } from './select-value';
 export { type SelectPortalProps, SelectPortal as Portal } from './select-portal';
 export { type SelectPositionerProps, SelectPositioner as Positioner } from './select-positioner';
 export { type SelectPopupProps, SelectPopup as Popup } from './select-popup';
-export { type SelectOptionProps, SelectOption as Option } from './select-option';
+export { type SelectItemProps, SelectItem as Item } from './select-item';
+export { type SelectItemIndicatorProps, SelectItemIndicator as ItemIndicator } from './select-item-indicator';
 export {
   type SelectGroupLabelProps,
   type SelectGroupProps,

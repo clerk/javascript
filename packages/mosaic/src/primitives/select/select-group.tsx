@@ -8,7 +8,7 @@ const SelectGroupContext = createContext<string | undefined>(undefined);
 
 export type SelectGroupProps = ComponentProps<'div'>;
 
-/** A labelled set of options in the listbox, named by the `Select.GroupLabel` inside it. */
+/** A labelled set of items in the listbox, named by the `Select.GroupLabel` inside it. */
 export const SelectGroup = React.forwardRef<HTMLDivElement, SelectGroupProps>(function SelectGroup(props, ref) {
   const { render, ...otherProps } = props;
   const labelId = useId();

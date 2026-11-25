@@ -1769,12 +1769,12 @@ describe('Drawer', () => {
                   </Select.Trigger>
                   <Select.Positioner>
                     <Select.Popup>
-                      <Select.Option
+                      <Select.Item
                         value='a'
                         label='A'
                       >
                         A
-                      </Select.Option>
+                      </Select.Item>
                     </Select.Popup>
                   </Select.Positioner>
                 </Select.Root>

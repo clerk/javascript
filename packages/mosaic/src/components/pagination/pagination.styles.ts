@@ -69,7 +69,7 @@ export const styles = stylex.create({
   pageLabel: {
     paddingInline: space['1'],
   },
-  pageSizeOption: {
+  pageSizeItem: {
     paddingBlock: 0,
     paddingInline: space['2'],
     fontSize: typeScaleVars['--cl-text-xs-size'],

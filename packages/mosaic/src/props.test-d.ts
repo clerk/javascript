@@ -53,14 +53,14 @@ describe('MosaicElementProps', () => {
 });
 
 declare const xstyle: XStyle;
-declare const optionRest: Omit<MosaicComponentProps<'div'>, 'xstyle'> & { value: string };
+declare const itemRest: Omit<MosaicComponentProps<'div'>, 'xstyle'> & { value: string };
 
 describe('mergeStyleProps', () => {
   // The last bag is a part's `rest`, so the merged result must stay as strictly typed as the part's
-  // props: a required prop the part forwards (Combobox.Option's `value`) is still checked by the
+  // props: a required prop the part forwards (Combobox.Item's `value`) is still checked by the
   // element it lands on.
   test('keeps the incoming bag typed and adds the merged className/style', () => {
-    const merged = mergeStyleProps(themeProps('combobox-option'), { className: 'x1' }, optionRest);
+    const merged = mergeStyleProps(themeProps('combobox-item'), { className: 'x1' }, itemRest);
 
     expectTypeOf(merged).toHaveProperty('value').toEqualTypeOf<string>();
     expectTypeOf(merged).toHaveProperty('onClick').toEqualTypeOf<MosaicComponentProps<'div'>['onClick']>();

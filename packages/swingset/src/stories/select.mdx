@@ -31,14 +31,14 @@ import { Select } from '@clerk/mosaic/primitives/select';
   <Select.Portal>
     <Select.Positioner>
       <Select.Popup>
-        <Select.Option value='apple'>Apple</Select.Option>
-        <Select.Option value='banana'>Banana</Select.Option>
-        <Select.Option
+        <Select.Item value='apple'>Apple</Select.Item>
+        <Select.Item value='banana'>Banana</Select.Item>
+        <Select.Item
           value='cherry'
           disabled
         >
           Cherry
-        </Select.Option>
+        </Select.Item>
       </Select.Popup>
     </Select.Positioner>
   </Select.Portal>
@@ -85,16 +85,17 @@ its children to render the selection yourself.
 
 ## Parts
 
-| Part                | Default Element | Description                                                          |
-| ------------------- | --------------- | -------------------------------------------------------------------- |
-| `Select.Root`       | none (context)  | Owns value and open state plus positioning                           |
-| `Select.Trigger`    | `<button>`      | Toggles the dropdown; acts as the positioning anchor                 |
-| `Select.Value`      | `<span>`        | Displays the selected option's label, or the placeholder             |
-| `Select.Portal`     | none (portal)   | Portals its children; renders nothing until mounted                  |
-| `Select.Positioner` | `<div>`         | Floating-positioned container (`role="listbox"`)                     |
-| `Select.Popup`      | `<div>`         | Visual wrapper for the option list                                   |
-| `Select.Option`     | `<button>`      | A selectable option (`role="option"`)                                |
-| `Select.Arrow`      | `<svg>`         | Optional arrow (only positioned when `alignItemWithTrigger={false}`) |
+| Part                   | Default Element | Description                                                          |
+| ---------------------- | --------------- | -------------------------------------------------------------------- |
+| `Select.Root`          | none (context)  | Owns value and open state plus positioning                           |
+| `Select.Trigger`       | `<button>`      | Toggles the dropdown; acts as the positioning anchor                 |
+| `Select.Value`         | `<span>`        | Displays the selected option's label, or the placeholder             |
+| `Select.Portal`        | none (portal)   | Portals its children; renders nothing until mounted                  |
+| `Select.Positioner`    | `<div>`         | Floating-positioned container (`role="listbox"`)                     |
+| `Select.Popup`         | `<div>`         | Visual wrapper for the option list                                   |
+| `Select.Item`          | `<button>`      | A selectable option (`role="option"`)                                |
+| `Select.ItemIndicator` | `<span>`        | Renders inside the selected item only, `aria-hidden`                 |
+| `Select.Arrow`         | `<svg>`         | Optional arrow (only positioned when `alignItemWithTrigger={false}`) |
 
 All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
 attributes for their default element. `Select.Arrow` accepts floating-ui `FloatingArrow`
@@ -118,7 +119,7 @@ props. `Select.Portal` is optional.
 | <code>placement</code>            | <code>Placement</code>                 | <code>'bottom-start'</code> | Placement when not aligning to the item                              |
 | <code>sideOffset</code>           | <code>number</code>                    | <code>4</code>              | Gap in px (applies only when `alignItemWithTrigger={false}`)         |
 
-`SelectItem<Value>` is `{ label: string; value: Value }` — disabling is done per-`Option`.
+`SelectItem<Value>` is `{ label: string; value: Value }` — disabling is done per-`Item`.
 
 ### `Select.Value`
 
@@ -127,13 +128,19 @@ props. `Select.Portal` is optional.
 | <code>placeholder</code> | <code>ReactNode</code>                                      | —       | Rendered when no value is selected                                    |
 | <code>children</code>    | <code>ReactNode \| ((value: unknown[]) => ReactNode)</code> | —       | Replaces the selected labels; a function receives the selected values |
 
-### `Select.Option`
+### `Select.Item`
 
-| Prop                  | Type                 | Default         | Description                                   |
-| --------------------- | -------------------- | --------------- | --------------------------------------------- |
-| <code>value</code>    | <code>unknown</code> | — (required)    | The option's value, compared with `Object.is` |
-| <code>label</code>    | <code>string</code>  | `String(value)` | Display label, also used for typeahead        |
-| <code>disabled</code> | <code>boolean</code> | —               | Prevent selection (stays keyboard-focusable)  |
+| Prop                  | Type                 | Default         | Description                                  |
+| --------------------- | -------------------- | --------------- | -------------------------------------------- |
+| <code>value</code>    | <code>unknown</code> | — (required)    | The item's value, compared with `Object.is`  |
+| <code>label</code>    | <code>string</code>  | `String(value)` | Display label, also used for typeahead       |
+| <code>disabled</code> | <code>boolean</code> | —               | Prevent selection (stays keyboard-focusable) |
+
+### `Select.ItemIndicator`
+
+| Prop                     | Type                 | Default            | Description                                                                   |
+| ------------------------ | -------------------- | ------------------ | ----------------------------------------------------------------------------- |
+| <code>keepMounted</code> | <code>boolean</code> | <code>false</code> | Render in unselected items too, with `data-selected` only on the selected one |
 
 `Select.Trigger`, `Select.Positioner`, and `Select.Popup` take no additional props beyond
 standard HTML attributes for their default element. `Select.Portal` accepts `root`.
@@ -146,9 +153,9 @@ Each part emits `data-*` attributes you can target with any CSS solution:
 | --------------------- | ----------------- | -------------------------------------------------- |
 | `data-open`           | Trigger, Popup    | Present when the dropdown is open                  |
 | `data-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
-| `data-selected`       | Option            | Present on each selected option                    |
-| `data-active`         | Option            | Present on the keyboard-highlighted option         |
-| `data-disabled`       | Option            | Present on a disabled option                       |
+| `data-selected`       | Item              | Present on each selected option                    |
+| `data-active`         | Item              | Present on the keyboard-highlighted option         |
+| `data-disabled`       | Item              | Present on a disabled option                       |
 | `data-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |
 | `data-starting-style` | Popup             | Present on the entering frame                      |
 | `data-ending-style`   | Popup             | Present during the exit animation                  |

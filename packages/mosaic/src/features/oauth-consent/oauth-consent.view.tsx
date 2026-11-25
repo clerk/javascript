@@ -436,7 +436,7 @@ function OrganizationPopup({
   return (
     <Select.Popup>
       {organizations.map(organization => (
-        <Select.Option
+        <Select.Item
           key={organization.value}
           value={organization.value}
           label={organization.label}
@@ -453,7 +453,8 @@ function OrganizationPopup({
           <Select.Content>
             <Select.Label>{organization.label}</Select.Label>
           </Select.Content>
-        </Select.Option>
+          <Select.ItemIndicator />
+        </Select.Item>
       ))}
     </Select.Popup>
   );

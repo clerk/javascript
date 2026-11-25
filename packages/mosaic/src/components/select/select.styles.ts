@@ -11,12 +11,11 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { selectOptionScope } from './select.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const popupBorder = '1px';
 const inset = space['1.5'];
-const optionRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
+const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
 // boxes must inset their text and trailing icon identically: the trigger is a `md` Button (32px,
@@ -118,9 +117,9 @@ export const viewport = stylex.create({
   },
 });
 
-export const option = stylex.create({
+export const item = stylex.create({
   base: {
-    borderRadius: optionRadius,
+    borderRadius: itemRadius,
     borderStyle: 'none',
     gap: space['2'],
     outline: 'none',
@@ -195,12 +194,12 @@ export const description = stylex.create({
 // Rendered on every row and shown only on the selected one, so labels never shift with selection.
 export const indicator = stylex.create({
   base: {
+    alignItems: 'center',
     alignSelf: 'flex-start',
     color: colorVars['--cl-color-foreground-secondary'],
-    visibility: {
-      default: 'hidden',
-      [stylex.when.ancestor('[data-selected]', selectOptionScope)]: 'visible',
-    },
+    display: 'inline-flex',
+    flexShrink: 0,
+    visibility: { default: 'hidden', ':is([data-selected])': 'visible' },
     height: space['5'],
   },
 });

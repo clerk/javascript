@@ -48,7 +48,7 @@ const overlays: Array<[string, (open: boolean) => ReactElement]> = [
           <Select.Positioner>
             <Select.Popup>
               <div data-testid='content' />
-              <Select.Option
+              <Select.Item
                 value='a'
                 label='A'
               />

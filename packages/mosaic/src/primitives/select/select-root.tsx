@@ -33,14 +33,14 @@ import {
   SelectHighlightContext,
   type SelectHighlightContextValue,
   type SelectItem,
-  SelectOptionsContext,
-  type SelectOptionsContextValue,
+  SelectItemsContext,
+  type SelectItemsContextValue,
 } from './select-context';
 
 export type { SelectItem } from './select-context';
 
 interface SelectBaseProps<Value> {
-  /** Array of `{ label, value }` items for label resolution before options mount. */
+  /** Array of `{ label, value }` items for label resolution before items mount. */
   items?: SelectItem<Value>[];
   open?: boolean;
   defaultOpen?: boolean;
@@ -66,7 +66,7 @@ export interface SelectSingleProps<Value = string> extends SelectBaseProps<Value
 }
 
 export interface SelectMultipleProps<Value = string> extends SelectBaseProps<Value> {
-  /** Lets several options be selected. Picking an option toggles it and keeps the popup open. */
+  /** Lets several items be selected. Picking an item toggles it and keeps the popup open. */
   multiple: true;
   value?: Value[];
   defaultValue?: Value[];
@@ -328,7 +328,7 @@ function SelectInner(props: SelectProps<unknown>) {
     ],
   );
 
-  const optionsContextValue = useMemo<SelectOptionsContextValue>(
+  const itemsContextValue = useMemo<SelectItemsContextValue>(
     () => ({
       getItemProps,
       handleSelect,
@@ -347,9 +347,9 @@ function SelectInner(props: SelectProps<unknown>) {
   return (
     <FloatingNode id={nodeId}>
       <SelectContext.Provider value={contextValue}>
-        <SelectOptionsContext.Provider value={optionsContextValue}>
+        <SelectItemsContext.Provider value={itemsContextValue}>
           <SelectHighlightContext.Provider value={highlightContextValue}>{children}</SelectHighlightContext.Provider>
-        </SelectOptionsContext.Provider>
+        </SelectItemsContext.Provider>
       </SelectContext.Provider>
     </FloatingNode>
   );

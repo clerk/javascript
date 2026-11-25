@@ -31,13 +31,13 @@ function renderSelect(props: Partial<React.ComponentProps<typeof Select.Root>> =
       <Select.Positioner data-testid='select-positioner'>
         <Select.Popup data-testid='select-popup'>
           {fruits.map(({ label, value }) => (
-            <Select.Option
+            <Select.Item
               key={value}
               value={value}
               label={label}
             >
               {label}
-            </Select.Option>
+            </Select.Item>
           ))}
         </Select.Popup>
       </Select.Positioner>
@@ -63,13 +63,13 @@ describe('Select', () => {
           >
             <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -145,12 +145,12 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
-              <Select.Option
+              <Select.Item
                 value='banana'
                 label='Banana'
               >
                 Banana
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -172,12 +172,12 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
-              <Select.Option
+              <Select.Item
                 value='x'
                 label='Special Item'
               >
                 Special Item
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -273,13 +273,13 @@ describe('Select', () => {
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -326,7 +326,7 @@ describe('Select', () => {
     );
   });
 
-  describe('option state attributes', () => {
+  describe('item state attributes', () => {
     it('marks selected option with data-selected', () => {
       renderSelect({ defaultValue: 'banana', defaultOpen: true });
 
@@ -346,7 +346,7 @@ describe('Select', () => {
     });
   });
 
-  describe('disabled option', () => {
+  describe('disabled item', () => {
     it('renders disabled option with data-disabled', async () => {
       const user = userEvent.setup();
       render(
@@ -359,19 +359,19 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
-              <Select.Option
+              <Select.Item
                 value='apple'
                 label='Apple'
               >
                 Apple
-              </Select.Option>
-              <Select.Option
+              </Select.Item>
+              <Select.Item
                 value='banana'
                 label='Banana'
                 disabled
               >
                 Banana
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -400,19 +400,19 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
-              <Select.Option
+              <Select.Item
                 value='apple'
                 label='Apple'
               >
                 Apple
-              </Select.Option>
-              <Select.Option
+              </Select.Item>
+              <Select.Item
                 value='banana'
                 label='Banana'
                 disabled
               >
                 Banana
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -525,13 +525,13 @@ describe('Select', () => {
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -619,13 +619,13 @@ describe('Select', () => {
           <Select.Positioner>
             <Select.Popup>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -647,13 +647,13 @@ describe('Select', () => {
           <Select.Positioner>
             <Select.Popup>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -675,13 +675,13 @@ describe('Select', () => {
           <Select.Positioner>
             <Select.Popup>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -691,7 +691,7 @@ describe('Select', () => {
     });
   });
 
-  describe('option button type', () => {
+  describe('item button type', () => {
     it('renders options with type="button" so they do not submit a wrapping form', () => {
       renderSelect({ defaultOpen: true });
       const options = screen.getAllByRole('option');
@@ -717,12 +717,12 @@ describe('Select', () => {
           <Select.Positioner>
             <Select.Popup>
               <Select.Arrow ref={ref} />
-              <Select.Option
+              <Select.Item
                 value='apple'
                 label='Apple'
               >
                 Apple
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -750,25 +750,25 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
-              <Select.Option
+              <Select.Item
                 value='apple'
                 label='Apple'
                 aria-disabled={false}
               >
                 Apple
-              </Select.Option>
-              <Select.Option
+              </Select.Item>
+              <Select.Item
                 value='banana'
                 label='Banana'
               >
                 Banana
-              </Select.Option>
-              <Select.Option
+              </Select.Item>
+              <Select.Item
                 value='cherry'
                 label='Cherry'
               >
                 Cherry
-              </Select.Option>
+              </Select.Item>
             </Select.Popup>
           </Select.Positioner>
         </Select.Root>,
@@ -812,14 +812,14 @@ describe('Select', () => {
           <Select.Positioner data-testid='select-positioner'>
             <Select.Popup data-testid='select-popup'>
               {fruits.map(({ label, value }) => (
-                <Select.Option
+                <Select.Item
                   key={value}
                   value={value}
                   label={label}
                   disabled={value === disabledValue}
                 >
                   {label}
-                </Select.Option>
+                </Select.Item>
               ))}
             </Select.Popup>
           </Select.Positioner>
@@ -975,19 +975,107 @@ describe('Select', () => {
         </Select.Trigger>
         <Select.Positioner>
           <Select.Popup>
-            <Select.Option
+            <Select.Item
               ref={option}
               value='apple'
               label='Apple'
             >
               Apple
-            </Select.Option>
+            </Select.Item>
           </Select.Popup>
         </Select.Positioner>
       </Select.Root>,
     );
     expect(value.current).toBe(screen.getByTestId('select-value'));
     expect(option.current).toBe(screen.getByRole('option', { name: 'Apple' }));
+  });
+});
+
+describe('Select.ItemIndicator', () => {
+  function renderIndicators(props: { keepMounted?: boolean; multiple?: boolean; defaultValue?: string | string[] }) {
+    const { keepMounted, multiple, defaultValue } = props;
+    const items = fruits.map(({ label, value }) => (
+      <Select.Item
+        key={value}
+        value={value}
+        label={label}
+      >
+        {label}
+        <Select.ItemIndicator
+          data-testid={`indicator-${value}`}
+          keepMounted={keepMounted}
+        />
+      </Select.Item>
+    ));
+    const popup = (
+      <Select.Positioner>
+        <Select.Popup>{items}</Select.Popup>
+      </Select.Positioner>
+    );
+    if (multiple) {
+      return render(
+        <Select.Root
+          multiple
+          items={fruits}
+          alignItemWithTrigger={false}
+          defaultOpen
+          defaultValue={Array.isArray(defaultValue) ? defaultValue : []}
+        >
+          <Select.Trigger>
+            <Select.Value placeholder='Pick fruits...' />
+          </Select.Trigger>
+          {popup}
+        </Select.Root>,
+      );
+    }
+    return render(
+      <Select.Root
+        items={fruits}
+        alignItemWithTrigger={false}
+        defaultOpen
+        defaultValue={typeof defaultValue === 'string' ? defaultValue : null}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder='Pick a fruit...' />
+        </Select.Trigger>
+        {popup}
+      </Select.Root>,
+    );
+  }
+
+  it('renders only inside the selected item, hidden from assistive technology', () => {
+    renderIndicators({ defaultValue: 'banana' });
+
+    expect(screen.queryByTestId('indicator-apple')).not.toBeInTheDocument();
+    expect(screen.getByTestId('indicator-banana')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByTestId('indicator-cherry')).not.toBeInTheDocument();
+  });
+
+  it('renders in every item with keepMounted, marking only the selected one', () => {
+    renderIndicators({ keepMounted: true, defaultValue: 'banana' });
+
+    expect(screen.getByTestId('indicator-apple')).not.toHaveAttribute('data-selected');
+    expect(screen.getByTestId('indicator-apple')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('indicator-banana')).toHaveAttribute('data-selected', '');
+    expect(screen.getByTestId('indicator-cherry')).not.toHaveAttribute('data-selected');
+  });
+
+  it('follows the selection as items are toggled with multiple', async () => {
+    const user = userEvent.setup();
+    renderIndicators({ multiple: true, defaultValue: ['apple'] });
+
+    await user.click(screen.getByRole('option', { name: 'Banana' }));
+    expect(screen.getByTestId('indicator-apple')).toBeInTheDocument();
+    expect(screen.getByTestId('indicator-banana')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('option', { name: 'Apple' }));
+    expect(screen.queryByTestId('indicator-apple')).not.toBeInTheDocument();
+    expect(screen.getByTestId('indicator-banana')).toBeInTheDocument();
+  });
+
+  it('requires an item around it', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => render(<Select.ItemIndicator />)).toThrow('Select.ItemIndicator must be used within Select.Item');
   });
 });
 
@@ -1006,27 +1094,27 @@ describe('Select.Group', () => {
           <Select.Popup>
             <Select.Group>
               <Select.GroupLabel>Pome</Select.GroupLabel>
-              <Select.Option
+              <Select.Item
                 value='apple'
                 label='Apple'
               >
                 Apple
-              </Select.Option>
+              </Select.Item>
             </Select.Group>
             <Select.Group>
               <Select.GroupLabel>Other</Select.GroupLabel>
-              <Select.Option
+              <Select.Item
                 value='banana'
                 label='Banana'
               >
                 Banana
-              </Select.Option>
-              <Select.Option
+              </Select.Item>
+              <Select.Item
                 value='cherry'
                 label='Cherry'
               >
                 Cherry
-              </Select.Option>
+              </Select.Item>
             </Select.Group>
           </Select.Popup>
         </Select.Positioner>
@@ -1078,7 +1166,7 @@ describe('Select.Group', () => {
   });
 });
 
-describe('Select option renders', () => {
+describe('Select item renders', () => {
   it('re-renders only the options whose highlight changes in a multiple select', async () => {
     const user = userEvent.setup();
     const renders: string[] = [];
@@ -1096,7 +1184,7 @@ describe('Select option renders', () => {
         <Select.Positioner>
           <Select.Popup>
             {options.map(({ label, value }) => (
-              <Select.Option
+              <Select.Item
                 key={value}
                 value={value}
                 label={label}
@@ -1111,7 +1199,7 @@ describe('Select option renders', () => {
                 }}
               >
                 {label}
-              </Select.Option>
+              </Select.Item>
             ))}
           </Select.Popup>
         </Select.Positioner>
@@ -1146,7 +1234,7 @@ describe('Select option renders', () => {
         <Select.Positioner>
           <Select.Popup>
             {fruits.map(({ label, value }) => (
-              <Select.Option
+              <Select.Item
                 key={value}
                 value={value}
                 label={label}
@@ -1161,7 +1249,7 @@ describe('Select option renders', () => {
                 }}
               >
                 {label}
-              </Select.Option>
+              </Select.Item>
             ))}
           </Select.Popup>
         </Select.Positioner>
@@ -1184,19 +1272,19 @@ describe('Select selection in a transition', () => {
     throw neverResolves;
   }
 
-  type HoverRender = { option: string; hovered: string | null; active: boolean };
-  type OptionRender = { option: string; parentValue: string; selected: unknown };
+  type HoverRender = { item: string; hovered: string | null; active: boolean };
+  type ItemRender = { item: string; parentValue: string; selected: unknown };
 
   function Fixture({
     update = 'transition',
-    onRenderOption,
+    onRenderItem,
     suspendSelected = false,
     hoverInTransition = false,
     onRenderHover,
     suspendWhenActive,
   }: {
     update?: 'transition' | 'deferred';
-    onRenderOption?: (render: OptionRender) => void;
+    onRenderItem?: (render: ItemRender) => void;
     suspendSelected?: boolean;
     hoverInTransition?: boolean;
     onRenderHover?: (render: HoverRender) => void;
@@ -1233,15 +1321,15 @@ describe('Select selection in a transition', () => {
             </Select.Trigger>
             <Select.Positioner>
               <Select.Popup>
-                {fruits.map(option => (
-                  <Select.Option
-                    key={option.value}
-                    value={option.value}
-                    label={option.label}
+                {fruits.map(fruit => (
+                  <Select.Item
+                    key={fruit.value}
+                    value={fruit.value}
+                    label={fruit.label}
                     render={props => {
-                      onRenderOption?.({ option: option.value, parentValue, selected: props['aria-selected'] });
+                      onRenderItem?.({ item: fruit.value, parentValue, selected: props['aria-selected'] });
                       const active = 'data-active' in props;
-                      onRenderHover?.({ option: option.value, hovered, active });
+                      onRenderHover?.({ item: fruit.value, hovered, active });
                       return (
                         <button
                           type='button'
@@ -1250,7 +1338,7 @@ describe('Select selection in a transition', () => {
                             hoverInTransition
                               ? event =>
                                   startTransition(() => {
-                                    setHovered(option.value);
+                                    setHovered(fruit.value);
                                     props.onMouseMove?.(event);
                                   })
                               : props.onMouseMove
@@ -1258,13 +1346,13 @@ describe('Select selection in a transition', () => {
                         >
                           {props.children}
                           {suspendSelected && props['aria-selected'] ? <Suspends /> : null}
-                          {active && suspendWhenActive === option.value ? <Suspends /> : null}
+                          {active && suspendWhenActive === fruit.value ? <Suspends /> : null}
                         </button>
                       );
                     }}
                   >
-                    {option.label}
-                  </Select.Option>
+                    {fruit.label}
+                  </Select.Item>
                 ))}
               </Select.Popup>
             </Select.Positioner>
@@ -1277,11 +1365,11 @@ describe('Select selection in a transition', () => {
   describe.each(['transition', 'deferred'] as const)('when the parent updates the value with %s', update => {
     it('renders each option with the selection its parent passed down', async () => {
       const user = userEvent.setup();
-      const renders: OptionRender[] = [];
+      const renders: ItemRender[] = [];
       render(
         <Fixture
           update={update}
-          onRenderOption={entry => renders.push(entry)}
+          onRenderItem={entry => renders.push(entry)}
         />,
       );
 
@@ -1290,16 +1378,16 @@ describe('Select selection in a transition', () => {
       await waitFor(() =>
         expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
       );
-      expect(renders).not.toContainEqual({ option: 'banana', parentValue: 'banana', selected: false });
+      expect(renders).not.toContainEqual({ item: 'banana', parentValue: 'banana', selected: false });
     });
 
     it('renders the new selection in the same render as its parent, with no second pass', async () => {
       const user = userEvent.setup();
-      const renders: OptionRender[] = [];
+      const renders: ItemRender[] = [];
       render(
         <Fixture
           update={update}
-          onRenderOption={entry => renders.push(entry)}
+          onRenderItem={entry => renders.push(entry)}
         />,
       );
 
@@ -1308,8 +1396,8 @@ describe('Select selection in a transition', () => {
       await waitFor(() =>
         expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('aria-selected', 'true'),
       );
-      expect(renders.filter(entry => entry.option === 'banana' && entry.parentValue === 'banana')).toEqual([
-        { option: 'banana', parentValue: 'banana', selected: true },
+      expect(renders.filter(entry => entry.item === 'banana' && entry.parentValue === 'banana')).toEqual([
+        { item: 'banana', parentValue: 'banana', selected: true },
       ]);
     });
 
@@ -1357,7 +1445,7 @@ describe('Select selection in a transition', () => {
     await user.hover(screen.getByRole('option', { name: 'Banana' }));
 
     await waitFor(() => expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active'));
-    expect(renders).not.toContainEqual({ option: 'banana', hovered: 'banana', active: false });
+    expect(renders).not.toContainEqual({ item: 'banana', hovered: 'banana', active: false });
   });
 
   it('keeps the current options on screen while a hover transition suspends', async () => {

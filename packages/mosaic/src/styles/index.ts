@@ -41,10 +41,11 @@ export type {
   ComboboxDetailProps,
   ComboboxEmptyProps,
   ComboboxInputProps,
+  ComboboxItemIndicatorProps,
+  ComboboxItemProps,
   ComboboxLabelProps,
   ComboboxListProps,
   ComboboxMediaProps,
-  ComboboxOptionProps,
   ComboboxPopupProps,
   ComboboxRootProps,
   ComboboxSize,
@@ -112,7 +113,8 @@ export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
 export type {
   SelectItem,
-  SelectOptionProps,
+  SelectItemIndicatorProps,
+  SelectItemProps,
   SelectPopupProps,
   SelectProps,
   SelectTriggerProps,
