@@ -54,6 +54,7 @@ import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
+  navigatePopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
@@ -526,7 +527,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     return _authenticateWithPopup(SignUp.clerk, 'signUp', this.authenticateWithRedirectOrPopup, params, url => {
-      popup.location.href = url instanceof URL ? url.toString() : url;
+      navigatePopup(popup, url);
     });
   };
 
