@@ -4,7 +4,11 @@ const mocks = vi.hoisted(() => ({
   nativeModule: undefined as unknown,
 }));
 
-const makeNativeModule = ({ includeEventMethods = true } = {}) => ({
+const makeNativeModule = ({
+  includeEventMethods = true,
+  bridgeVersion,
+}: { includeEventMethods?: boolean; bridgeVersion?: number } = {}) => ({
+  ...(bridgeVersion === undefined ? {} : { bridgeVersion }),
   ...(includeEventMethods
     ? {
         addListener: vi.fn(),
@@ -33,7 +37,7 @@ async function importNativeModule() {
 describe('native module loader', () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     mocks.nativeModule = undefined;
   });
 
@@ -45,7 +49,16 @@ describe('native module loader', () => {
     expect(ClerkExpoModule).toBe(mocks.nativeModule);
   });
 
+  test('returns the native module when its bridge version matches', async () => {
+    mocks.nativeModule = makeNativeModule({ bridgeVersion: 1 });
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBe(mocks.nativeModule);
+  });
+
   test('returns null when no native module satisfies the bootstrap contract', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     mocks.nativeModule = {
       configureNative: vi.fn(),
     };
@@ -53,5 +66,29 @@ describe('native module loader', () => {
     const { ClerkExpoModule } = await importNativeModule();
 
     expect(ClerkExpoModule).toBeNull();
+    expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('rebuild the app'));
+  });
+
+  test('disables native components and tells the developer to update both packages when the bridge version differs', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.nativeModule = makeNativeModule({ bridgeVersion: 2 });
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBeNull();
+    expect(consoleError).toHaveBeenCalledOnce();
+    expect(consoleError.mock.calls[0][0]).toContain('@clerk/expo 0.0.0-test');
+    expect(consoleError.mock.calls[0][0]).toContain('@clerk/expo-native-components');
+    expect(consoleError.mock.calls[0][0]).toContain('rebuild the app');
+  });
+
+  test('stays silent when the app has no native Clerk module', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mocks.nativeModule = null;
+
+    const { ClerkExpoModule } = await importNativeModule();
+
+    expect(ClerkExpoModule).toBeNull();
+    expect(consoleError).not.toHaveBeenCalled();
   });
 });
