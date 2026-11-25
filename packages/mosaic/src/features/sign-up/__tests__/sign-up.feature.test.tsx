@@ -580,18 +580,50 @@ describe('SignUp', () => {
   });
 
   describe('finishing', () => {
-    it('keeps the code screen and shows why when the new session cannot be activated', async () => {
-      const { user, navigate } = await renderSignUp();
-      const hold = holdRequests('post', '/v1/client/sessions/:id/touch');
+    const ACTIVATION_ERROR = 'The session could not be activated.';
+    const ACTIVATION = '/v1/client/sessions/:id/touch';
 
+    async function failActivation(user: ReturnType<typeof userEvent.setup>) {
+      const hold = holdRequests('post', ACTIVATION);
       await submitStart(user);
       await enterCode(user);
       await waitFor(() => expect(hold.requests).toHaveLength(1));
-      hold.fail('form_param_invalid', 'The session could not be activated.');
+      hold.fail('form_param_invalid', ACTIVATION_ERROR);
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(ACTIVATION_ERROR));
+    }
 
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The session could not be activated.'));
+    it('keeps the code screen and shows why when the new session cannot be activated', async () => {
+      const { user, navigate } = await renderSignUp();
+
+      await failActivation(user);
+
       expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
       expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('activates the session when the user enters the code again after the activation failed', async () => {
+      const { user, navigate } = await renderSignUp({}, {}, { signUpFallbackRedirectUrl: '/welcome' });
+      await failActivation(user);
+      const retry = holdRequests('post', ACTIVATION);
+
+      const code = screen.getByRole('textbox', { name: 'Verification code' });
+      await user.clear(code);
+      await user.click(code);
+      await user.keyboard(VERIFICATION_CODE);
+      await waitFor(() => expect(retry.requests).toHaveLength(1));
+      retry.release();
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/welcome')));
+    });
+
+    it('drops the activation error when the user goes back to edit the address', async () => {
+      const { user } = await renderSignUp();
+      await failActivation(user);
+
+      await user.click(screen.getByRole('button', { name: 'Edit email address' }));
+
+      expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryAllByText(ACTIVATION_ERROR)).toHaveLength(0));
     });
 
     it.each([
