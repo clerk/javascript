@@ -22,7 +22,7 @@ const { route } = useRouterScope(signInRoutes, { routing, path, root: 'start' })
 const shown = step.type === 'unknown' ? undefined : allowedRoute(route, step) ? route : routeFor(step);
 ```
 
-The flow's `*.routes.ts` exports this rule as one function, so the controller and the unit test share it (`shownRoute` in `mosaic/src/features/sign-up/sign-up.routes.ts`). No route means "Start over".
+The flow's `*.routes.ts` exports this rule as one function, so the controller and the unit test share it (`shownRoute` in `mosaic/src/features/sign-up/sign-up.routes.ts`). Sign-up's also takes the flow outcome and reads the step only when the outcome is `resource` ([Routes and steps](#routes-and-steps)). No route means "Start over".
 
 - `routeFor(step)` returns the step's route, from the lists below. Sign-up's also takes the current route, so a verify step reached from `continue` stays under it.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
@@ -83,11 +83,17 @@ Sign-up:
 - `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`
 - `fields` (`fields`) → `continue`
 
-Sign-up's model adds three steps of its own to the ones `getSignUpNextStep` returns, for when there is no sign-up in progress:
+The step is the sign-up resource's and says nothing about the session. The model returns the session beside it as `flow.session`: `none`, `activating` while `setActive` runs and Clerk reports no session, `task` (`key`) for a pending task sign-up shows in its own card, or `active`. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is `active`, not `task`: the flow leaves for its URL.
 
-- `task` (`key`) → `taskChooseOrganization`: the session has a pending task that sign-up shows in its own card. Only the task route is allowed, so a visit to `start` with the task pending moves to it, and the task shows its skeleton until its data loads. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is not a `task` step: the flow leaves for its URL.
-- `signed_in` → `start`: a session is signed in, or pending a task sign-up has no screen for. What it shows depends on whether the session was there when the component mounted. On arrival, single-session mode leaves for the task URL or the after sign-up URL and renders nothing, as `ui`'s `withRedirectToAfterSignUp` does, and multi-session mode shows `start` so the user can add an account. A session that arrived during the flow allows any route, like `leaving`, so the screen whose action created it stays up. The task route is the exception: a signed-in session there means the task it showed is done, so sign-up renders nothing, whether the visit began with a sign-up or with the task already pending.
-- `leaving`: a session is being activated, so Clerk reports no session while `setActive` navigates. It has no route and allows any.
+The controller passes the session to `flowOutcome` (`features/auth-flow/auth-flow.utils.ts`, shared with sign-in) with the two facts only it holds: the session when the component mounted, and where its finish machine is. The outcome is decided before the step is read, so an unfinished sign-up left on the client cannot override it:
+
+- `resource`: the step picks the route, as listed above. This is also the outcome for a visitor who arrived signed in, in multi-session mode, so `start` shows and the user can add an account.
+- `task` → `taskChooseOrganization`: only the task route is shown, so a visit to `start` with the task pending moves to it, and the task shows its skeleton until its data loads.
+- `hold`: keeps the current route and screen, pending. It covers `finalize()` running, the session activating, and a task after a sign-up whose data has not loaded.
+- `leave`: the visitor arrived signed in, in single-session mode. Sign-up leaves for the task URL or the after sign-up URL and renders nothing, as `ui`'s `withRedirectToAfterSignUp` does.
+- `done`: the session this flow created is signed in, or the task the visitor arrived with is finished. Sign-up renders nothing.
+
+A session that another tab signs in mid-flow is `resource`, so the form stays. Each case is a row in `auth-flow/__tests__/auth-flow.utils.test.ts`.
 
 Back from a sign-up verify screen goes to the details route above it: `continue` for the two nested routes, `start` for the others (`detailsRouteFor`).
 
