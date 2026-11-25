@@ -18,8 +18,8 @@ export const DEFAULT_BAR_MESSAGES = {
   projected: 'Projected',
 } as const satisfies Omit<BarChartMessages, keyof ChartMessages>;
 
-/** WCAG 2.5.8's minimum target size, so a short bar can still be picked. */
-const MIN_TARGET = 24;
+/** The shortest a focus ring gets, so one around a short section stays visible. */
+const MIN_FOCUS_HEIGHT = 24;
 
 /** The narrowest a focus ring gets, so it stays findable when bars are a pixel or two wide. */
 const MIN_FOCUS_WIDTH = 12;
@@ -33,7 +33,7 @@ type BarSelectionOptions<TDatum> = Readonly<{
   messages: Pick<BarChartMessages, 'vertical' | 'positiveValues' | 'negativeValues' | 'projected'>;
 }>;
 
-/** How far up each category's positive section and down its negative section a pointer selects. */
+/** How far up each category's positive section and down its negative section a focus ring reaches. */
 function sectionReach(layout: BarSelectionOptions<unknown>['layout']) {
   const top = new Map<number, number>();
   const bottom = new Map<number, number>();
@@ -49,14 +49,15 @@ function sectionReach(layout: BarSelectionOptions<unknown>['layout']) {
     top.set(datumIndex, Math.min(top.get(datumIndex) ?? layout.zeroY, y));
   }
   return {
-    positive: (datumIndex: number) => Math.min(top.get(datumIndex) ?? layout.zeroY, layout.zeroY - MIN_TARGET),
-    negative: (datumIndex: number) => Math.max(bottom.get(datumIndex) ?? layout.zeroY, layout.zeroY + MIN_TARGET),
+    positive: (datumIndex: number) => Math.min(top.get(datumIndex) ?? layout.zeroY, layout.zeroY - MIN_FOCUS_HEIGHT),
+    negative: (datumIndex: number) => Math.max(bottom.get(datumIndex) ?? layout.zeroY, layout.zeroY + MIN_FOCUS_HEIGHT),
   };
 }
 
 /**
- * Selects a section of a stacked bar: above the zero line or below it. A pointer selects only on a
- * bar, or within the minimum target of a short one, so the empty plot around the bars selects nothing.
+ * Selects a section of a stacked bar: above the zero line or below it. A pointer selects the nearest
+ * column anywhere in the plot, the same area the hover band shows, and the section on its side of
+ * the zero line.
  */
 export function barSelectionModel<TDatum>({
   layout,
@@ -78,17 +79,19 @@ export function barSelectionModel<TDatum>({
         return null;
       }
       const { positive, negative } = category.sections;
-      const onPositive = positive && y >= reach.positive(category.datumIndex) && y <= layout.zeroY + nearZero;
-      const onNegative = negative && y <= reach.negative(category.datumIndex) && y >= layout.zeroY - nearZero;
-      const section: BarSection | null =
-        onPositive && onNegative
-          ? (current?.section ?? (y < layout.zeroY ? 'positive' : 'negative'))
-          : onPositive
-            ? 'positive'
-            : onNegative
-              ? 'negative'
-              : null;
-      return section ? { category: category.key, section } : null;
+      if (!positive && !negative) {
+        return null;
+      }
+      const section: BarSection = !negative
+        ? 'positive'
+        : !positive
+          ? 'negative'
+          : Math.abs(y - layout.zeroY) <= nearZero
+            ? (current?.section ?? 'positive')
+            : y < layout.zeroY
+              ? 'positive'
+              : 'negative';
+      return { category: category.key, section };
     },
     land: (category, move, current) => {
       const wanted = move === 'up' ? 'positive' : move === 'down' ? 'negative' : current?.section;
