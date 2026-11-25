@@ -6,7 +6,25 @@ import { FakeClerkServer, type NativeSyncHarness, renderWithNativeSync } from '.
 
 vi.mock('../../../polyfills', () => ({}));
 
+const appState = vi.hoisted(() => {
+  const listeners = new Set<(state: string) => void>();
+  return {
+    currentState: 'active',
+    addEventListener: (_event: string, listener: (state: string) => void) => {
+      listeners.add(listener);
+      return { remove: () => listeners.delete(listener) };
+    },
+    moveTo(state: string) {
+      this.currentState = state;
+      for (const listener of [...listeners]) {
+        listener(state);
+      }
+    },
+  };
+});
+
 vi.mock('react-native', () => ({
+  AppState: appState,
   NativeModules: { BlobModule: {} },
   Platform: { OS: 'ios', constants: { reactNativeVersion: { major: 0, minor: 81, patch: 0 } } },
 }));
@@ -65,7 +83,20 @@ async function start(...args: Parameters<typeof renderWithNativeSync>): Promise<
 afterEach(() => {
   harness?.unmount();
   harness = undefined;
+  appState.currentState = 'active';
+  vi.useRealTimers();
 });
+
+async function skipRetryBackoff(h: NativeSyncHarness): Promise<void> {
+  await h.run(() => vi.advanceTimersByTimeAsync(10_000));
+}
+
+function returnToForeground(h: NativeSyncHarness): Promise<void> {
+  return h.run(() => {
+    appState.moveTo('background');
+    appState.moveTo('active');
+  });
+}
 
 function seedDevice(users: string[] = ['user_1'], activeUser?: string) {
   const server = new FakeClerkServer();
@@ -96,6 +127,120 @@ describe('native client sync behavior', () => {
 
       await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
       await expectConverged(h);
+    });
+
+    it('moves JS to the organization native switches to', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      await h.run(() => h.native.setActiveOrganization('org_1'));
+      await h.settle();
+
+      expect(h.native.activeOrganizationId).toBe('org_1');
+      expect(h.js.session?.lastActiveOrganizationId).toBe('org_1');
+      await expectConverged(h);
+    });
+
+    it('signs JS in with the session a native sign-in created when the first JS refetch fails', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      h.server.failNextRequests('js', 'GET /client');
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+    });
+
+    it('signs JS in when the app returns to the foreground after every JS refetch of a native sign-in failed', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'GET /client', 3);
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(3);
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+      const jsClientFetchesAfterRepair = h.server.requestCount('js', 'GET /client');
+      await returnToForeground(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesAfterRepair);
+    });
+
+    it('stops retrying the JS refetch of a native sign-in once ClerkProvider unmounts', async () => {
+      const h = await start();
+      vi.useFakeTimers();
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'GET /client');
+
+      const signIn = h.native.signIn('user_1');
+      await h.run(() => vi.advanceTimersByTimeAsync(100));
+      await signIn;
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      h.unmount();
+      harness = undefined;
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.server.requestCount('js', 'POST /client/sessions/:id/touch')).toBe(0);
+    });
+
+    it('does not retry a JS refetch of a native sign-in that the server rejected', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.rejectNextRequest('js', 'GET /client', 429);
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+    });
+
+    it('does not refetch the JS client when activating the session of a native sign-in fails', async () => {
+      const h = await start();
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+      h.server.failNextRequests('js', 'POST /client/sessions/:id/touch');
+
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await skipRetryBackoff(h);
+      await h.settle();
+      expect(h.server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.js.session).toBeNull();
+
+      await returnToForeground(h);
+
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await expectConverged(h);
+    });
+
+    it('sends no JS client request when the app returns to the foreground after JS followed a native sign-in', async () => {
+      const h = await start();
+      const sessionId = await h.run(() => h.native.signIn('user_1'));
+      await waitFor(() => expect(h.js.session?.id).toBe(sessionId));
+      await h.settle();
+      const jsClientFetchesBefore = h.server.requestCount('js', 'GET /client');
+
+      await returnToForeground(h);
+      await h.settle();
+
+      expect(h.server.requestCount('js', 'GET /client')).toBe(jsClientFetchesBefore);
+      expect(h.js.session?.id).toBe(sessionId);
     });
 
     it('switches the JS active session when native switches sessions, without a signed-out emission', async () => {
@@ -287,6 +432,21 @@ describe('native client sync behavior', () => {
       await h.settle();
 
       expect(h.native.activeSessionId).toBe(sessionIds.user_2);
+      await expectConverged(h);
+    });
+
+    it('moves native to the organization JS switches to', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      const refreshesBefore = h.native.clientRefreshCount;
+
+      await h.run(() => h.js.setActive({ organization: 'org_1' }));
+      await h.settle();
+
+      expect(h.js.session?.lastActiveOrganizationId).toBe('org_1');
+      expect(h.native.activeOrganizationId).toBe('org_1');
+      expect(h.native.clientRefreshCount - refreshesBefore).toBe(1);
       await expectConverged(h);
     });
 

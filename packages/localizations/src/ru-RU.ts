@@ -1112,6 +1112,11 @@ export const ruRU: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
@@ -2198,6 +2203,10 @@ export const ruRU: LocalizationResource = {
       requireUppercase: 'букву в верхнем регистре',
       sentencePrefix: 'Ваш пароль должен содержать',
     },
+    password_confirmation_attempt_remaining: 'Неверный пароль. У вас осталась 1 попытка.',
+    password_confirmation_attempts_remaining: 'Неверный пароль. Осталось попыток: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Ваш сеанс завершён, так как вы достигли лимита попыток подтверждения пароля. Войдите снова, чтобы продолжить.',
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

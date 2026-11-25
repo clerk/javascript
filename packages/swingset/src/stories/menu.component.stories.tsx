@@ -4,11 +4,11 @@ import { Icon } from '@clerk/mosaic/components/icon';
 import { Menu } from '@clerk/mosaic/components/menu';
 import { Popover } from '@clerk/mosaic/components/popover';
 import { Building } from '@clerk/mosaic/icons/glyphs/building';
-import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
 import { LogOut } from '@clerk/mosaic/icons/glyphs/log-out';
 import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 import { X } from '@clerk/mosaic/icons/glyphs/x';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -55,32 +55,71 @@ export function Default() {
 }
 
 const accounts = [
-  { active: true, identifier: 'colin@clerk.dev', initial: 'C' },
-  { active: false, identifier: 'braden.wiggins@a-very-long-domain.example', initial: 'B' },
+  { identifier: 'colin@clerk.dev', initial: 'C' },
+  { identifier: 'braden.wiggins@a-very-long-domain.example', initial: 'B' },
 ];
 
 export function Accounts() {
+  const [active, setActive] = useState('colin@clerk.dev');
+
   return (
     <Menu.Root>
       <Menu.Trigger>Switch account</Menu.Trigger>
       <Menu.Popup>
-        {accounts.map(account => (
-          <Menu.Item
-            key={account.identifier}
-            label={account.identifier}
-          >
-            <Menu.Media>
-              <Avatar.Root
-                shape='circle'
-                size='fit'
-              >
-                <Avatar.Fallback>{account.initial}</Avatar.Fallback>
-              </Avatar.Root>
-            </Menu.Media>
-            <Menu.Label>{account.identifier}</Menu.Label>
-            <Menu.Indicator>{account.active ? <Icon glyph={Checkmark} /> : null}</Menu.Indicator>
-          </Menu.Item>
-        ))}
+        <Menu.RadioGroup
+          aria-label='Accounts'
+          value={active}
+          onValueChange={setActive}
+        >
+          {accounts.map(account => (
+            <Menu.RadioItem
+              key={account.identifier}
+              label={account.identifier}
+              value={account.identifier}
+              closeOnClick
+            >
+              <Menu.Media>
+                <Avatar.Root
+                  shape='circle'
+                  size='fit'
+                >
+                  <Avatar.Fallback>{account.initial}</Avatar.Fallback>
+                </Avatar.Root>
+              </Menu.Media>
+              <Menu.Label>{account.identifier}</Menu.Label>
+              <Menu.RadioItemIndicator />
+            </Menu.RadioItem>
+          ))}
+        </Menu.RadioGroup>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+export function CheckboxItems() {
+  const [showArchived, setShowArchived] = useState(false);
+  const [showPending, setShowPending] = useState(true);
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger>View</Menu.Trigger>
+      <Menu.Popup>
+        <Menu.CheckboxItem
+          label='Show archived'
+          checked={showArchived}
+          onCheckedChange={setShowArchived}
+        >
+          <Menu.Label>Show archived</Menu.Label>
+          <Menu.CheckboxItemIndicator />
+        </Menu.CheckboxItem>
+        <Menu.CheckboxItem
+          label='Show pending'
+          checked={showPending}
+          onCheckedChange={setShowPending}
+        >
+          <Menu.Label>Show pending</Menu.Label>
+          <Menu.CheckboxItemIndicator />
+        </Menu.CheckboxItem>
       </Menu.Popup>
     </Menu.Root>
   );

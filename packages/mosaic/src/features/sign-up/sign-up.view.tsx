@@ -221,7 +221,6 @@ export function SignUpView({
                   applicationName={applicationName}
                   logo={logo}
                   form={form}
-                  errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}
                   isPending={isPending}
                   isDisabled={isDisabled}

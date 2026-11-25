@@ -45,6 +45,7 @@ export class OAuthApplication implements OAuthApplicationNamespace {
       redirectDomain: data.redirect_domain,
       clientRegistration: data.client_registration,
       clientMetadataHost: data.client_metadata_host,
+      maxOrganizations: data.max_organizations ?? 1,
       scopes:
         data.scopes?.map(s => ({
           scope: s.scope,

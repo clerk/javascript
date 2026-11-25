@@ -90,12 +90,14 @@ describe('Mosaic ActionMenu', () => {
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
 
-  it('reserves an indicator immediately and delays its named spinner', async () => {
+  it('reserves a trailing media column immediately and delays its named spinner', async () => {
     const user = userEvent.setup();
     render(<AsyncMenu />);
     await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
     const item = await screen.findByRole('menuitem', { name: 'Regenerate' });
-    expect(item.querySelector('.cl-menu-item-indicator')).toBeInTheDocument();
+    expect(item.lastElementChild).toHaveClass('cl-menu-item-media');
+    expect(item.lastElementChild).toBeEmptyDOMElement();
+    expect(screen.getByRole('menuitem', { name: 'Remove' }).querySelector('.cl-menu-item-media')).toBeNull();
     vi.useFakeTimers();
     try {
       fireEvent.click(item);

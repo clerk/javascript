@@ -14,6 +14,8 @@ export const oauthConsentMessages = {
   selectedOrganizationsDescription: 'Choose which organizations to grant access to.',
   selectOrganizations: 'Select organizations',
   selectAllOrganizations: 'Select all',
+  organizationLimit: 'You can select up to {limit} organizations.',
+  organizationLimitExceeded: 'Select {limit} or fewer organizations to continue.',
   organizationCount: { one: '{count} organization', other: '{count} organizations' },
   required: 'Required',
   viewFullUrl: 'View full URL',

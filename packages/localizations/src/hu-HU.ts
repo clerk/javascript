@@ -1116,6 +1116,11 @@ export const huHU: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
@@ -2211,6 +2216,10 @@ export const huHU: LocalizationResource = {
       requireUppercase: 'egy nagybetű',
       sentencePrefix: 'A jelszavadnak tartalmaznia kell',
     },
+    password_confirmation_attempt_remaining: 'Helytelen jelszó. 1 próbálkozásod maradt.',
+    password_confirmation_attempts_remaining: 'Helytelen jelszó. {{remainingAttempts}} próbálkozásod maradt.',
+    password_confirmation_session_ended:
+      'A munkameneted véget ért, mert elérted a jelszó-megerősítési kísérletek korlátját. A folytatáshoz jelentkezz be újra.',
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

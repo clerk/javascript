@@ -91,12 +91,16 @@ export type { TagInputProps } from '../components/tag-input';
 export { Otp } from '../components/otp';
 export type { OtpProps, OtpStatus } from '../components/otp';
 export type {
+  MenuCheckboxItemIndicatorProps,
+  MenuCheckboxItemProps,
   MenuItemProps,
   MenuLabelProps,
   MenuMediaProps,
-  MenuMediaSize,
   MenuPopupProps,
   MenuProps,
+  MenuRadioGroupProps,
+  MenuRadioItemIndicatorProps,
+  MenuRadioItemProps,
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';

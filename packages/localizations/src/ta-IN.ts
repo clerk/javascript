@@ -1117,6 +1117,11 @@ export const taIN: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
@@ -2217,6 +2222,11 @@ export const taIN: LocalizationResource = {
       requireUppercase: 'ஒரு பெரிய எழுத்து',
       sentencePrefix: 'உங்கள் கடவுச்சொல்லில் இருக்க வேண்டும்',
     },
+    password_confirmation_attempt_remaining: 'தவறான கடவுச்சொல். உங்களுக்கு 1 முயற்சி மீதமுள்ளது.',
+    password_confirmation_attempts_remaining:
+      'தவறான கடவுச்சொல். உங்களுக்கு {{remainingAttempts}} முயற்சிகள் மீதமுள்ளன.',
+    password_confirmation_session_ended:
+      'கடவுச்சொல் உறுதிப்படுத்தல் முயற்சிகளின் வரம்பை அடைந்ததால் உங்கள் அமர்வு முடிந்தது. தொடர மீண்டும் உள்நுழையவும்.',
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

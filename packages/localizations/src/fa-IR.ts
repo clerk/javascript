@@ -1114,6 +1114,11 @@ export const faIR: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
@@ -2192,6 +2197,10 @@ export const faIR: LocalizationResource = {
       requireUppercase: 'یک حرف بزرگ',
       sentencePrefix: 'رمز عبور شما باید حاوی',
     },
+    password_confirmation_attempt_remaining: 'رمز عبور نادرست است. ۱ تلاش دیگر باقی مانده است.',
+    password_confirmation_attempts_remaining: 'رمز عبور نادرست است. {{remainingAttempts}} تلاش دیگر باقی مانده است.',
+    password_confirmation_session_ended:
+      'جلسه شما به پایان رسید زیرا به حد مجاز تلاش‌های تأیید رمز عبور رسیدید. برای ادامه دوباره وارد شوید.',
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

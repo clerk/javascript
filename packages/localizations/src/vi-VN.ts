@@ -1115,6 +1115,11 @@ export const viVN: LocalizationResource = {
       metadataDocument: undefined,
     },
     offlineAccessNotice: undefined,
+    organizationSelect: {
+      limit: undefined,
+      placeholder: undefined,
+      selectedCount: undefined,
+    },
     redirectNotice: undefined,
     redirectUriModal: {
       subtitle: undefined,
@@ -2202,6 +2207,10 @@ export const viVN: LocalizationResource = {
       requireUppercase: 'một chữ cái viết hoa',
       sentencePrefix: 'Mật khẩu của bạn phải chứa',
     },
+    password_confirmation_attempt_remaining: 'Mật khẩu không đúng. Bạn còn 1 lần thử.',
+    password_confirmation_attempts_remaining: 'Mật khẩu không đúng. Bạn còn {{remainingAttempts}} lần thử.',
+    password_confirmation_session_ended:
+      'Phiên của bạn đã kết thúc vì bạn đã đạt đến giới hạn số lần xác nhận mật khẩu. Hãy đăng nhập lại để tiếp tục.',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

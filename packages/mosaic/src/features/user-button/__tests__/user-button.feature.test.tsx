@@ -65,7 +65,7 @@ describe('UserButton', () => {
     expect(within(popup).queryByRole('button', { name: 'Invite members' })).toBeNull();
 
     const menu = await openMenu(user, within(popup).getByRole('button', { name: 'Switch account' }));
-    expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).toBeInTheDocument();
+    expect(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' })).toBeInTheDocument();
   });
 
   it('stays an account menu when handed a mode it does not take', async () => {

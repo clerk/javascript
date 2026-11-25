@@ -51,9 +51,10 @@ Every run creates users with addresses like `maya.7c1e+clerk_test@example.com` a
 These test files call `host.useSettings` or `host.useMinimumAppVersion` to change the instance, and pass only under the CLI:
 
 - `specs/features/native-modules/biometric-availability.e2e.ts`
+- `specs/features/native-to-web-sso/web-view.e2e.ts`
 - `specs/features/update-required/update-required.e2e.ts`
 
-The CLI holds the Platform API key that changes the settings, and it puts them back when the test ends. In a run by hand, both fail, because e2e alone has no such key. Run them through the CLI, for example `integration/expo-native/bin/control-clerk-expo run native-modules` from the repo root.
+The CLI holds the Platform API key that changes the settings, and it puts them back when the test ends. In a run by hand, they fail, because e2e alone has no such key. Run them through the CLI, for example `integration/expo-native/bin/control-clerk-expo run native-modules` from the repo root.
 
 ## What a run by hand does not do
 

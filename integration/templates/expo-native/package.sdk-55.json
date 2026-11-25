@@ -13,7 +13,8 @@
     "expo": "~55.0.26",
     "expo-application": "~55.0.15",
     "react": "19.2.0",
-    "react-native": "0.83.6"
+    "react-native": "0.83.6",
+    "react-native-webview": "13.16.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

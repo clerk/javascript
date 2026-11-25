@@ -59,6 +59,34 @@ Nest a `<Menu.Root>` inside a parent `<Menu.Root>` — the nested trigger automa
 </Menu.Root>
 ```
 
+### Checkbox and Radio Items
+
+`Menu.CheckboxItem` toggles a setting; `Menu.RadioItem` picks one value from its `Menu.RadioGroup`. Both keep the menu open on click unless you pass `closeOnClick`. Their indicator renders only while the item is checked.
+
+```tsx
+<Menu.CheckboxItem
+  label='Show archived'
+  checked={showArchived}
+  onCheckedChange={setShowArchived}
+>
+  Show archived
+  <Menu.CheckboxItemIndicator>✓</Menu.CheckboxItemIndicator>
+</Menu.CheckboxItem>
+<Menu.RadioGroup
+  aria-label='Sort by'
+  value={sort}
+  onValueChange={setSort}
+>
+  <Menu.RadioItem
+    label='Name'
+    value='name'
+  >
+    Name
+    <Menu.RadioItemIndicator>✓</Menu.RadioItemIndicator>
+  </Menu.RadioItem>
+</Menu.RadioGroup>
+```
+
 ### Controlled
 
 ```tsx
@@ -74,16 +102,21 @@ const [open, setOpen] = useState(false);
 
 ## Parts
 
-| Part              | Default Element | Description                            |
-| ----------------- | --------------- | -------------------------------------- |
-| `Menu.Root`       | —               | Root context provider                  |
-| `Menu.Trigger`    | `<button>`      | Opens/closes the menu                  |
-| `Menu.Portal`     | —               | Portals children (accepts `root` prop) |
-| `Menu.Positioner` | `<div>`         | Floating positioned container          |
-| `Menu.Popup`      | `<div>`         | Visual wrapper for menu items          |
-| `Menu.Item`       | `<button>`      | A menu action item                     |
-| `Menu.Separator`  | `<div>`         | Visual divider between items           |
-| `Menu.Arrow`      | `<svg>`         | Optional floating arrow                |
+| Part                         | Default Element | Description                                 |
+| ---------------------------- | --------------- | ------------------------------------------- |
+| `Menu.Root`                  | —               | Root context provider                       |
+| `Menu.Trigger`               | `<button>`      | Opens/closes the menu                       |
+| `Menu.Portal`                | —               | Portals children (accepts `root` prop)      |
+| `Menu.Positioner`            | `<div>`         | Floating positioned container               |
+| `Menu.Popup`                 | `<div>`         | Visual wrapper for menu items               |
+| `Menu.Item`                  | `<button>`      | A menu action item                          |
+| `Menu.CheckboxItem`          | `<button>`      | An item that toggles on and off             |
+| `Menu.RadioGroup`            | `<div>`         | Holds the value of its radio items          |
+| `Menu.RadioItem`             | `<button>`      | An item that picks its group's value        |
+| `Menu.CheckboxItemIndicator` | `<span>`        | Rendered while its checkbox item is checked |
+| `Menu.RadioItemIndicator`    | `<span>`        | Rendered while its radio item is checked    |
+| `Menu.Separator`             | `<div>`         | Visual divider between items                |
+| `Menu.Arrow`                 | `<svg>`         | Optional floating arrow                     |
 
 ## Props
 
@@ -105,6 +138,35 @@ const [open, setOpen] = useState(false);
 | `label`        | `string`  | **required** | Item text, also used for typeahead matching            |
 | `disabled`     | `boolean` | —            | Prevents click handler, keeps item focusable           |
 | `closeOnClick` | `boolean` | `true`       | Whether clicking this item closes the entire menu tree |
+
+### `Menu.CheckboxItem`
+
+Takes every `Menu.Item` prop, with `closeOnClick` defaulting to `false`.
+
+| Prop              | Type                         | Default | Description                          |
+| ----------------- | ---------------------------- | ------- | ------------------------------------ |
+| `checked`         | `boolean`                    | —       | Controlled checked state             |
+| `defaultChecked`  | `boolean`                    | `false` | Initial checked state (uncontrolled) |
+| `onCheckedChange` | `(checked: boolean) => void` | —       | Called with the new checked state    |
+
+### `Menu.RadioGroup`
+
+| Prop            | Type                      | Default | Description                                                   |
+| --------------- | ------------------------- | ------- | ------------------------------------------------------------- |
+| `value`         | `string`                  | —       | Controlled checked value                                      |
+| `defaultValue`  | `string`                  | —       | Initial checked value (uncontrolled)                          |
+| `onValueChange` | `(value: string) => void` | —       | Called with the picked value, even when it is already checked |
+| `disabled`      | `boolean`                 | `false` | Disables every item in the group                              |
+
+### `Menu.RadioItem`
+
+Takes every `Menu.Item` prop plus a required `value: string`, with `closeOnClick` defaulting to `false`.
+
+### `Menu.CheckboxItemIndicator`, `Menu.RadioItemIndicator`
+
+| Prop          | Type      | Default | Description                                                 |
+| ------------- | --------- | ------- | ----------------------------------------------------------- |
+| `keepMounted` | `boolean` | `false` | Keep it in the DOM while unchecked, marked `data-unchecked` |
 
 ### `Menu.Trigger`, `Menu.Positioner`, `Menu.Popup`, `Menu.Separator`
 
@@ -128,12 +190,13 @@ Accepts all `FloatingArrow` props and forwards `ref`. `context` is injected auto
 
 ## Data Attributes
 
-| Attribute                   | Applies To        | Description             |
-| --------------------------- | ----------------- | ----------------------- |
-| `data-open` / `data-closed` | Trigger           | Menu open state         |
-| `data-active`               | Item              | Keyboard-focused item   |
-| `data-disabled`             | Item              | Disabled item           |
-| `data-side`                 | Positioner, Arrow | Resolved placement side |
+| Attribute                         | Applies To                           | Description             |
+| --------------------------------- | ------------------------------------ | ----------------------- |
+| `data-open` / `data-closed`       | Trigger                              | Menu open state         |
+| `data-active`                     | Item                                 | Keyboard-focused item   |
+| `data-disabled`                   | Item                                 | Disabled item           |
+| `data-checked` / `data-unchecked` | Checkbox item, radio item, indicator | Checked state           |
+| `data-side`                       | Positioner, Arrow                    | Resolved placement side |
 
 ## Open on Hover
 
@@ -158,6 +221,10 @@ Accepts all `FloatingArrow` props and forwards `ref`. `context` is injected auto
 
 - Popup: `role="menu"`
 - Item: `role="menuitem"`, `aria-disabled`
+- Checkbox item: `role="menuitemcheckbox"`, `aria-checked`
+- Radio group: `role="group"`, `aria-disabled`
+- Radio item: `role="menuitemradio"`, `aria-checked`
+- Indicator: `aria-hidden="true"`
 - Separator: `role="separator"`
 - Trigger: `aria-expanded`, `aria-haspopup="menu"`, `aria-controls`
 - Nested trigger: `role="menuitem"` (instead of button)

@@ -90,6 +90,7 @@ settings  app_… (verify-throwaway-…)  no change a test made is pending
 | Username                     | `auth_username.used_for_sign_in`, `auth_username.required_for_sign_up` | `{ 'auth_username.required_for_sign_up': true }`                                                                                        |
 | Organizations                | `organization_settings.enabled`                                        | `{ 'organization_settings.enabled': false }`                                                                                            |
 | Force organization selection | `organization_settings.force_organization_selection`                   | `{ 'organization_settings.force_organization_selection': true }`                                                                        |
+| Native to Web SSO            | `session_transfers.enabled`                                            | `{ 'session_transfers.enabled': true }`                                                                                                 |
 
 An array leaf is set whole: name every value it keeps. The standard values are in `config` of `base.json`, and `settings` prints the live ones.
 

@@ -13,7 +13,7 @@ import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
-import { BaseResource, Session, SignIn, SignUp } from './internal';
+import { BaseResource, Session, SignIn, SignUp, Token } from './internal';
 
 export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
   if (!responseJSON) {
@@ -166,19 +166,28 @@ export class Client extends BaseResource implements ClientResource {
     if (data) {
       Client.revision++;
       this.id = data.id;
-      // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
+      const previousSignedInIds = this.signedInSessions.map(session => session.id);
+      const nextSignedInIds = new Set(
+        (data.sessions || [])
+          .filter(session => session.status === 'active' || session.status === 'pending')
+          .map(session => session.id),
+      );
       const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
+      if (previousSignedInIds.some(id => !nextSignedInIds.has(id))) {
+        SessionTokenCache.clear();
+      }
       this.sessions = (data.sessions || []).map(s => {
-        const session = new Session(s);
-        const previousToken = previousTokens.get(session.id);
-        if (
-          previousToken &&
-          session.lastActiveToken &&
-          shouldKeepExistingLastActiveToken(previousToken, session.lastActiveToken)
-        ) {
+        const previousToken = previousTokens.get(s.id);
+        const incomingToken = s.last_active_token ? new Token(s.last_active_token) : null;
+        if (previousToken && incomingToken && shouldKeepExistingLastActiveToken(previousToken, incomingToken)) {
+          const session = new Session({
+            ...s,
+            last_active_token: previousToken.__internal_toSnapshot(),
+          });
           session.lastActiveToken = previousToken;
+          return session;
         }
-        return session;
+        return new Session(s);
       });
 
       if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {

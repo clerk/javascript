@@ -88,22 +88,70 @@ export function ManyScopes() {
   );
 }
 
+const manyOrganizations = [
+  { value: 'org_1', label: 'My workspace' },
+  { value: 'org_2', label: 'Globex' },
+  { value: 'org_3', label: 'Initech' },
+  { value: 'org_4', label: 'Umbrella' },
+  { value: 'org_5', label: 'Hooli' },
+  { value: 'org_6', label: 'Stark Industries' },
+  { value: 'org_7', label: 'Wayne Enterprises' },
+];
+
+export function SingleOrganization() {
+  const props = useOAuthConsentFixture({
+    scopes: organizationScopes,
+    organizations: manyOrganizations,
+    defaultOrganizationId: 'org_1',
+  });
+  return (
+    <Card.Root align='center'>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
+}
+
 export function MultipleOrganizations() {
   const props = useOAuthConsentFixture({
     scopes: organizationScopes,
-    organizations: [
-      { value: 'org_1', label: 'My workspace' },
-      { value: 'org_2', label: 'Globex' },
-      { value: 'org_3', label: 'Initech' },
-    ],
+    organizations: manyOrganizations,
+    defaultOrganizationId: 'org_1',
   });
-  const [access, setAccess] = useState<OAuthConsentOrganizationAccess>('all');
-  const [selected, setSelected] = useState<string[]>(['org_1']);
+  const [organizationIds, setOrganizationIds] = useState<string[]>(['org_1']);
   return (
     <Card.Root align='center'>
       <OAuthConsentView
         {...props}
-        organizationSelection={{ access, onAccessChange: setAccess, selected, onSelectedChange: setSelected }}
+        organizationSelection={{
+          multiple: true,
+          organizationIds,
+          onOrganizationIdsChange: setOrganizationIds,
+          limit: 5,
+        }}
+      />
+    </Card.Root>
+  );
+}
+
+export function OrganizationAccess() {
+  const props = useOAuthConsentFixture({
+    scopes: organizationScopes,
+    organizations: manyOrganizations.slice(0, 3),
+    defaultOrganizationId: 'org_1',
+  });
+  const [access, setAccess] = useState<OAuthConsentOrganizationAccess>('all');
+  const [organizationIds, setOrganizationIds] = useState<string[]>([]);
+  return (
+    <Card.Root align='center'>
+      <OAuthConsentView
+        {...props}
+        organizationSelection={{
+          multiple: true,
+          access,
+          onAccessChange: setAccess,
+          organizationIds,
+          onOrganizationIdsChange: setOrganizationIds,
+        }}
       />
     </Card.Root>
   );

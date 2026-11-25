@@ -1562,6 +1562,11 @@ export type __internal_LocalizationResource = {
       dynamic: LocalizationValue<'applicationName'>;
       metadataDocument: LocalizationValue<'metadataHost'>;
     };
+    organizationSelect: {
+      placeholder: LocalizationValue;
+      selectedCount: LocalizationValue<'count'>;
+      limit: LocalizationValue<'limit'>;
+    };
   };
   oauthDeviceVerification: {
     start: {
@@ -2582,6 +2587,9 @@ type UnstableErrors = WithParamName<{
   form_password_incorrect: LocalizationValue;
   form_password_or_identifier_incorrect: LocalizationValue;
   form_password_validation_failed: LocalizationValue;
+  password_confirmation_attempt_remaining: LocalizationValue;
+  password_confirmation_attempts_remaining: LocalizationValue<'remainingAttempts'>;
+  password_confirmation_session_ended: LocalizationValue;
   not_allowed_access: LocalizationValue;
   oauth_access_denied: LocalizationValue;
   form_identifier_exists: LocalizationValue;

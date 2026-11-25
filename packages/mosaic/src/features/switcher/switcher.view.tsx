@@ -541,23 +541,17 @@ function PendingRows() {
 }
 
 /**
- * A signed-in account inside the accounts flyout: a menu item you pick to switch to, checked where
+ * A signed-in account inside the accounts flyout: a radio item you pick to switch to, checked where
  * it is already the active one. Its organizations cannot be listed here — they are scoped to the
  * session that fetches them — so switching is all it offers.
  */
-function SessionMenuItem({ session, active }: { session: SwitcherSession; active: boolean }) {
-  const data = useSwitcherContext();
-  const switchSession = data.onSwitchSession;
-
+function SessionMenuItem({ session }: { session: SwitcherSession }) {
   return (
-    <Menu.Item
+    <Menu.RadioItem
       // Named by its identifier, like the active account's row, so the two read as the same kind.
       label={session.identifier}
-      // The check is decorative, so without this the active item reads like the ones you can
-      // switch to.
-      aria-current={active ? 'true' : undefined}
-      // Picking what is already picked does nothing, so the active item only closes the flyout.
-      onClick={active || !switchSession ? undefined : () => switchSession(session.sessionId)}
+      value={session.sessionId}
+      closeOnClick
     >
       <Menu.Media>
         <RowAvatar
@@ -569,12 +563,8 @@ function SessionMenuItem({ session, active }: { session: SwitcherSession; active
         />
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
-      {active ? (
-        <Menu.Indicator>
-          <Icon glyph={Checkmark} />
-        </Menu.Indicator>
-      ) : null}
-    </Menu.Item>
+      <Menu.RadioItemIndicator />
+    </Menu.RadioItem>
   );
 }
 
@@ -631,6 +621,8 @@ function SwitchAccountRow() {
   const data = useSwitcherContext();
   const addAccount = data.onAddAccount;
   const signOutAll = data.onSignOutAll;
+  const switchSession = data.onSwitchSession;
+  const activeSessionId = data.activeSession.sessionId;
   const { pendingKey } = data;
   const busy =
     pendingKey === switcherBusyKeys.signOutAll() ||
@@ -644,17 +636,24 @@ function SwitchAccountRow() {
     >
       {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
             a list of somewhere else to go. */}
-      <SessionMenuItem
-        session={data.activeSession}
-        active
-      />
-      {data.additionalSessions.map(s => (
-        <SessionMenuItem
-          key={s.sessionId}
-          session={s}
-          active={false}
-        />
-      ))}
+      <Menu.RadioGroup
+        aria-label={m.accounts.switch}
+        value={activeSessionId}
+        // Picking what is already picked does nothing, so the active item only closes the flyout.
+        onValueChange={id => {
+          if (id !== activeSessionId) {
+            switchSession?.(id);
+          }
+        }}
+      >
+        <SessionMenuItem session={data.activeSession} />
+        {data.additionalSessions.map(s => (
+          <SessionMenuItem
+            key={s.sessionId}
+            session={s}
+          />
+        ))}
+      </Menu.RadioGroup>
       {addAccount ? (
         <Menu.Item
           label={m.accounts.add}
