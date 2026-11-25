@@ -40,7 +40,12 @@ type FapiRequestInit = RequestInit & {
 };
 
 type FapiResponse = Response & {
-  payload: { errors?: Array<{ code: string }> } | null;
+  payload: {
+    errors?: Array<{ code: string }>;
+    client?: { id?: string } | null;
+    meta?: { client?: { id?: string } };
+    response?: { id?: string } | null;
+  } | null;
 };
 
 type ClerkRuntimeOptions = Pick<BuildClerkOptions, 'publishableKey' | 'proxyUrl' | 'domain'>;
@@ -139,6 +144,23 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         return tokenCache.saveClientToken
           ? tokenCache.saveClientToken(token, requestToken)
           : tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, token);
+      };
+      const dropDiscardedClient = (payload: FapiResponse['payload']) => {
+        const tokenCache = __internal_tokenCache as TokenCache & Partial<ClientTokenCache>;
+        const isDiscarded = (client: { id?: string } | null | undefined) =>
+          !!client?.id && !!tokenCache.isDiscardedClient?.(client.id);
+        if (!payload) {
+          return;
+        }
+        if (isDiscarded(payload.client)) {
+          delete payload.client;
+        }
+        if (isDiscarded(payload.meta?.client)) {
+          delete payload.meta?.client;
+        }
+        if (isDiscarded(payload.response)) {
+          throw new Error('Clerk: Ignored a response for a client that was signed out.');
+        }
       };
       const requestTokens = new WeakMap<FapiRequestInit, string | null>();
       const appVersionRequestHooks = isNative() ? createAppVersionRequestHooks() : null;
@@ -336,6 +358,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (authHeader) {
           await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
         }
+        dropDiscardedClient(response.payload);
 
         appVersionRequestHooks?.afterResponse(requestInit, response);
 

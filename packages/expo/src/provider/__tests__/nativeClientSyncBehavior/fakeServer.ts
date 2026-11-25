@@ -18,7 +18,7 @@ export type FakeServerClientJSON = {
 export type FapiCaller = 'js' | 'native';
 
 export type FapiResponse = {
-  status: 200 | 401;
+  status: 200 | 400 | 401;
   client: FakeServerClientJSON | null;
   /** The device token the response hands back, like the `authorization` response header. */
   token: string | null;
@@ -69,6 +69,7 @@ export class FakeClerkServer {
   #requestFailures: Array<{ caller: FapiCaller; operation: string; status: number | null }> = [];
   #sequence = 0;
   #rotations = 0;
+  singleSessionMode = false;
 
   #nextId(prefix: string): string {
     this.#sequence += 1;
@@ -104,7 +105,11 @@ export class FakeClerkServer {
     return { client: this.#clientFor(token), token };
   }
 
-  #respond(token: string | null, client: FakeServerClientJSON | null, status: 200 | 401 = 200): FapiResponse {
+  #respond(
+    token: string | null,
+    client: FakeServerClientJSON | null,
+    status: FapiResponse['status'] = 200,
+  ): FapiResponse {
     let responseToken = client ? token : null;
     const pendingRotations = client ? (this.#pendingRotations.get(client.id) ?? 0) : 0;
     if (client && pendingRotations > 0) {
@@ -240,6 +245,9 @@ export class FakeClerkServer {
       const { client, token: responseToken } = auth.client
         ? { client: auth.client, token: auth.token }
         : this.#createClient();
+      if (this.singleSessionMode && client.sessions.length > 0) {
+        return { ...this.#respond(responseToken, client, 400), sessionId: '' };
+      }
       const session = {
         id: this.#nextId('sess'),
         userId,

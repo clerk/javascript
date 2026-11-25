@@ -2,7 +2,11 @@ import type { FakeClerkServer, FakeServerClientJSON, FapiResponse } from './fake
 
 type FakeRequestInit = { url: URL; headers: Headers };
 type BeforeRequestHook = (requestInit: FakeRequestInit) => unknown;
-type AfterResponseHook = (requestInit: FakeRequestInit, response: { headers: Headers; payload: null }) => unknown;
+type FakePayload = { client?: FakeServerClientJSON | null; response?: FakeServerClientJSON | null };
+type AfterResponseHook = (
+  requestInit: FakeRequestInit,
+  response: { headers: Headers; payload: FakePayload },
+) => unknown;
 
 export type FakeSessionResource = {
   id: string;
@@ -18,7 +22,10 @@ export type JsEmission = {
   signedInSessionIds: string[];
 };
 
-type ListenerCallback = (resources: { client: FakeClientResource; session: FakeSessionResource | null }) => void;
+type ListenerCallback = (resources: {
+  client: FakeClientResource;
+  session: FakeSessionResource | null | undefined;
+}) => void;
 type StatusListener = (status: string) => void;
 
 function toSessionResource(session: FakeServerClientJSON['sessions'][number]): FakeSessionResource {
@@ -48,7 +55,7 @@ export class FakeClientResource {
   }
 
   fetch = async (_options?: { fetchMaxTries?: number }): Promise<FakeClientResource> => {
-    const response = await this.clerk.fapi(token => this.clerk.server.getClient('js', token));
+    const response = await this.clerk.fapi(token => this.clerk.server.getClient('js', token), 'response');
     return this.fromJSON(response.client);
   };
 
@@ -83,7 +90,8 @@ export class FakeClerk {
   loaded = false;
   status = 'loading';
   client: FakeClientResource | undefined = undefined;
-  session: FakeSessionResource | null = null;
+  session: FakeSessionResource | null | undefined = null;
+  rethrowOfflineNetworkErrors = false;
   __internal_setActiveInProgress = false;
   readonly emissions: JsEmission[] = [];
   #beforeRequestHooks: BeforeRequestHook[] = [];
@@ -103,14 +111,18 @@ export class FakeClerk {
     this.#afterResponseHooks.push(hook);
   }
 
-  async fapi<T extends FapiResponse>(request: (token: string | null) => Promise<T>): Promise<T> {
+  async fapi<T extends FapiResponse>(
+    request: (token: string | null) => Promise<T>,
+    clientField: 'client' | 'response' = 'client',
+  ): Promise<T> {
     const requestInit = await this.#prepareRequest();
     const response = await request(requestInit.headers.get('authorization') || null);
     const headers = new Headers(response.token ? { authorization: response.token } : {});
+    const payload: FakePayload = { [clientField]: response.client };
     for (const hook of this.#afterResponseHooks) {
-      await hook(requestInit, { headers, payload: null });
+      await hook(requestInit, { headers, payload });
     }
-    return response;
+    return { ...response, client: clientField === 'response' ? (payload.response ?? null) : payload.client };
   }
 
   async currentDeviceToken(): Promise<string | null> {
@@ -228,16 +240,40 @@ export class FakeClerk {
 
   async signIn(userId: string): Promise<string> {
     const response = await this.fapi(token => this.server.signIn('js', token, userId));
+    if (response.status === 400) {
+      throw Object.assign(new Error('Session already exists'), { code: 'session_exists' });
+    }
     this.#applyPiggybackedClient(response);
     await this.setActive({ session: response.sessionId });
     return response.sessionId;
   }
 
-  async signOut(): Promise<void> {
-    const response = await this.fapi(token => this.server.removeAllSessions('js', token));
+  signOut = async (options?: { sessionId?: string }): Promise<void> => {
+    const sessionId = options?.sessionId;
+    const signsOutCurrent =
+      !sessionId || (this.client?.signedInSessions.length ?? 0) <= 1 || this.session?.id === sessionId;
+    if (signsOutCurrent) {
+      this.session = undefined;
+      this.#emit();
+    }
+    let response: FapiResponse;
+    try {
+      response = await this.fapi(token =>
+        sessionId && (this.client?.signedInSessions.length ?? 0) > 1
+          ? this.server.removeSession('js', token, sessionId)
+          : this.server.removeAllSessions('js', token),
+      );
+    } catch (error) {
+      if (!this.rethrowOfflineNetworkErrors || !(error instanceof TypeError)) {
+        throw error;
+      }
+      this.session = null;
+      this.#emit();
+      return;
+    }
     this.#applyPiggybackedClient(response);
     await this.setActive({ session: null });
-  }
+  };
 
   async updateProfile(): Promise<void> {
     const sessionId = this.session?.id;
@@ -268,7 +304,7 @@ export class FakeClerk {
   }
 
   #applyPiggybackedClient(response: FapiResponse): void {
-    if (response.status !== 200) {
+    if (response.status !== 200 || response.client === undefined) {
       return;
     }
     const client = this.client ?? new FakeClientResource(this);

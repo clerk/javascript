@@ -3,7 +3,13 @@ import { AuthView, type AuthViewMode, UserButton } from '@clerk/expo/native-comp
 import { type ReactElement, useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
-import { armClientFetchDrop, clientFetchDropsInstalled, useDroppedClientFetches } from '../verify/faults';
+import {
+  armClientFetchDrop,
+  armSignOutDrop,
+  fetchFaultsInstalled,
+  useDroppedClientFetches,
+  useDroppedSignOuts,
+} from '../verify/faults';
 import { AuthLogo } from './AuthLogo';
 import { type Destination, homeLinksFor } from './destinations';
 
@@ -14,6 +20,7 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
   const { user } = useUser();
   const { session } = useSession();
   const dropped = useDroppedClientFetches();
+  const droppedSignOuts = useDroppedSignOuts();
   const [authSheet, setAuthSheet] = useState<'closed' | 'plain' | 'withLogo'>('closed');
   const closeAuth = (): void => setAuthSheet('closed');
 
@@ -60,11 +67,20 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
         </View>
       )}
       {isSignedIn ? (
-        <Button
-          testID='e2e.auth.signOut'
-          title='Sign out'
-          onPress={() => void signOut()}
-        />
+        <>
+          <Button
+            testID='e2e.auth.signOut'
+            title='Sign out'
+            onPress={() => void signOut().catch(() => undefined)}
+          />
+          {fetchFaultsInstalled() && (
+            <Button
+              testID='verify.fault.dropSignOut'
+              title='Drop the next sign-out request'
+              onPress={armSignOutDrop}
+            />
+          )}
+        </>
       ) : (
         <>
           <Text
@@ -78,7 +94,7 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
             title='Sign in'
             onPress={() => setAuthSheet('plain')}
           />
-          {clientFetchDropsInstalled() && (
+          {fetchFaultsInstalled() && (
             <Button
               testID='verify.fault.dropClientFetch'
               title='Drop the next client fetch'
@@ -87,12 +103,20 @@ export function Home({ authMode, onOpen }: HomeProps): ReactElement {
           )}
         </>
       )}
-      {clientFetchDropsInstalled() && (
+      {fetchFaultsInstalled() && (
         <Text
           testID='verify.fault.dropped'
           style={styles.detailText}
         >
           {String(dropped)}
+        </Text>
+      )}
+      {fetchFaultsInstalled() && (
+        <Text
+          testID='verify.fault.droppedSignOuts'
+          style={styles.detailText}
+        >
+          {String(droppedSignOuts)}
         </Text>
       )}
       <View style={styles.links}>

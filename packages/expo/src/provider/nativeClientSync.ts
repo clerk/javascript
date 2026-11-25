@@ -23,6 +23,7 @@ export type SyncableClerk = {
   setActive: (params: { session: SignedInSessionResource | null }) => Promise<void>;
   updateClient: (client: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }) => void;
   handleUnauthenticated: (options?: { broadcast?: boolean }) => Promise<unknown>;
+  signOut?: (...args: unknown[]) => Promise<void>;
   __internal_reloadInitialResources?: () => Promise<void>;
   __internal_setActiveInProgress?: boolean;
 };
@@ -30,6 +31,7 @@ export type SyncableClerk = {
 /** A token cache whose client JWT writes are compare-and-set against the token the request used. */
 export type ClientTokenCache = TokenCache & {
   saveClientToken: (token: string, requestToken: string | null) => Promise<void>;
+  isDiscardedClient: (clientId: string) => boolean;
 };
 
 type SingleFlight = { run: () => Promise<void>; current: () => Promise<void> | null };
@@ -42,7 +44,12 @@ type Engine = {
 
 const noop = () => undefined;
 
-let configuration: { publishableKey: string; proxyUrl: string | null; ready: () => Promise<boolean> } | null = null;
+let configuration: {
+  publishableKey: string;
+  proxyUrl: string | null;
+  ready: () => Promise<boolean>;
+  settled: () => Promise<boolean>;
+} | null = null;
 let activeEngine: Engine | null = null;
 
 function warn(message: string, error?: unknown): void {
@@ -176,6 +183,10 @@ function configureOnce(
         await startup;
         return configured;
       },
+      settled: async () => {
+        await configuring;
+        return configured;
+      },
     };
   }
   return configuration.ready();
@@ -195,11 +206,17 @@ export function createNativeClientSync(
   const fallback = () => getUserTokenCache() ?? MemoryTokenCache;
   const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback(), getNativeUpdateRequiredViewEnabled());
   let mirroredToken: string | null = null;
+  const discardedClientIds = new Set<string>();
   let lastFingerprint: string | undefined;
   let refreshFailure: { error: unknown } | null = null;
 
+  const isDiscarded = (token: string | null) => {
+    const clientId = clientIdOf(token);
+    return !!clientId && discardedClientIds.has(clientId);
+  };
+
   const mirror = (token: string | null) => {
-    if (token && token !== mirroredToken) {
+    if (token && token !== mirroredToken && !isDiscarded(token)) {
       mirroredToken = token;
       void Promise.resolve(fallback().saveToken(CLERK_CLIENT_JWT_KEY, token)).catch(noop);
     }
@@ -213,11 +230,18 @@ export function createNativeClientSync(
 
   const reclaimRotatedToken = async (token: string, requestToken: string | null, current: string | null) => {
     const clientId = clientIdOf(requestToken);
-    if (!clientId || clientIdOf(token) !== clientId) {
+    if (!clientId || clientIdOf(token) !== clientId || isDiscarded(token)) {
       return false;
     }
     const currentClientId = clientIdOf(current);
-    return !!currentClientId && currentClientId !== clientId && setDeviceToken(token, current);
+    if (!currentClientId || currentClientId === clientId || !(await setDeviceToken(token, current))) {
+      return false;
+    }
+    if (isDiscarded(token)) {
+      await setDeviceToken(null, token);
+      return false;
+    }
+    return true;
   };
 
   const tokenCache: ClientTokenCache = {
@@ -237,21 +261,68 @@ export function createNativeClientSync(
       await tokenCache.saveClientToken(token, await native.getDeviceToken().catch(() => null));
     },
     clearToken: key => fallback().clearToken?.(key),
+    isDiscardedClient: clientId => discardedClientIds.has(clientId),
     saveClientToken: async (token, requestToken) => {
-      if (!(await ready())) {
+      if (isDiscarded(token)) {
+        return;
+      }
+      const isReady = await ready();
+      if (isDiscarded(token)) {
+        return;
+      }
+      if (!isReady) {
         return fallback().saveToken(CLERK_CLIENT_JWT_KEY, token);
       }
-      if (token === requestToken || (await setDeviceToken(token, requestToken))) {
+      if (token === requestToken && token === mirroredToken) {
+        return;
+      }
+      if (token !== requestToken && (await setDeviceToken(token, requestToken))) {
         mirror(token);
         return;
       }
       const current = await native.getDeviceToken().catch(() => null);
-      const didReclaim = await reclaimRotatedToken(token, requestToken, current);
+      const didReclaim = token !== requestToken && (await reclaimRotatedToken(token, requestToken, current));
       mirror(didReclaim ? token : current);
       if (didReclaim) {
         void native.refreshClient().catch(error => warn('Failed to refresh the native client.', error));
       }
     },
+  };
+
+  const clearNativeDeviceToken = async (clientId: string | null) => {
+    let current = await native.getDeviceToken().catch(() => null);
+    const nativeClientId = clientIdOf(current);
+    if (clientId && nativeClientId && nativeClientId !== clientId) {
+      return;
+    }
+    while (current && !(await setDeviceToken(null, current))) {
+      const next = await native.getDeviceToken().catch(() => null);
+      if (next === current || clientIdOf(next) !== nativeClientId) {
+        return;
+      }
+      current = next;
+    }
+  };
+
+  const discardDeviceToken = async (clientId: string | null) => {
+    if (clientId) {
+      discardedClientIds.add(clientId);
+    }
+    mirroredToken = null;
+    const cache = fallback();
+    await Promise.resolve()
+      .then(() =>
+        cache.clearToken ? cache.clearToken(CLERK_CLIENT_JWT_KEY) : cache.saveToken(CLERK_CLIENT_JWT_KEY, ''),
+      )
+      .catch(error => warn('Failed to clear the cached device token.', error));
+    if (await ready()) {
+      await clearNativeDeviceToken(clientId);
+      return;
+    }
+    const settled = configuration?.settled;
+    void settled?.()
+      .then(didConfigure => (didConfigure ? clearNativeDeviceToken(clientId) : undefined))
+      .catch(error => warn('Failed to clear the native device token.', error));
   };
 
   const attach = (clerk: SyncableClerk): (() => void) => {
@@ -386,8 +457,36 @@ export function createNativeClientSync(
       return originalHandleUnauthenticated(options);
     };
 
+    const originalSignOut = clerk.signOut;
+    const signOut: SyncableClerk['signOut'] =
+      originalSignOut &&
+      (async (...args) => {
+        const options = args.find(arg => !!arg && typeof arg === 'object') as { sessionId?: string } | undefined;
+        const signsOutEverySession = !options?.sessionId || (clerk.client?.signedInSessions.length ?? 0) <= 1;
+        let failure: { error: unknown } | null = null;
+        try {
+          await originalSignOut(...args);
+        } catch (error) {
+          failure = { error };
+        }
+        if (signsOutEverySession && !clerk.session && clerk.client?.signedInSessions.length) {
+          await discardDeviceToken(clerk.client.id || null);
+        }
+        if (failure && clerk.session === undefined) {
+          await clerk
+            .setActive({ session: null })
+            .catch(error => warn('Failed to finish signing out after the sign-out request failed.', error));
+        }
+        if (failure) {
+          throw failure.error;
+        }
+      });
+
     clerk.updateClient = updateClient;
     clerk.handleUnauthenticated = handleUnauthenticated;
+    if (signOut) {
+      clerk.signOut = signOut;
+    }
     const removeClerkListener = clerk.addListener(
       () => void toNative.run().catch(error => warn('Failed to refresh the native client.', error)),
     );
@@ -419,6 +518,9 @@ export function createNativeClientSync(
       }
       if (clerk.handleUnauthenticated === handleUnauthenticated) {
         clerk.handleUnauthenticated = originalHandleUnauthenticated;
+      }
+      if (signOut && clerk.signOut === signOut) {
+        clerk.signOut = originalSignOut;
       }
       if (activeEngine === engine) {
         activeEngine = null;

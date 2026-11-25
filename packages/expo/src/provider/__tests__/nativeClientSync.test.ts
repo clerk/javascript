@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import type { ClerkExpoNativeModule } from '../../utils/native-module';
+import type { SyncableClerk } from '../nativeClientSync';
 
 const mocks = vi.hoisted(() => {
   const listeners = new Set<(state: string) => void>();
@@ -63,6 +64,33 @@ function nativeWithStoredToken(initial: string): ClerkExpoNativeModule {
     return Promise.resolve(didSet);
   });
   return native;
+}
+
+function clerkWithFailingSignOut(clientId: string): SyncableClerk {
+  return {
+    client: { id: clientId, signedInSessions: [{ id: 'sess_1' }] },
+    session: undefined,
+    addListener: () => () => undefined,
+    setActive: vi.fn().mockResolvedValue(undefined),
+    updateClient: vi.fn(),
+    handleUnauthenticated: vi.fn(),
+    signOut: vi.fn().mockRejectedValue(new TypeError('Network request failed')),
+  } as unknown as SyncableClerk;
+}
+
+function clearableTokenCache(clientToken: string) {
+  const stored = new Map<string, string>([[CLERK_CLIENT_JWT_KEY, clientToken]]);
+  const cache: TokenCache = {
+    getToken: key => Promise.resolve(stored.get(key) ?? null),
+    saveToken: (key, token) => {
+      stored.set(key, token);
+      return Promise.resolve();
+    },
+    clearToken: key => {
+      stored.delete(key);
+    },
+  };
+  return { cache, stored };
 }
 
 async function loadEngine() {
@@ -266,6 +294,195 @@ describe('createNativeClientSync', () => {
     await expect(read).resolves.toBe('native-token');
     expect(getToken).toHaveBeenCalledTimes(2);
     expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', 'seed-token', null);
+  });
+
+  test('clears the device token when native rotates it during a failed sign-out', async () => {
+    const createNativeClientSync = await loadEngine();
+    const beforeRotation = clientToken('client_signed_in', 1);
+    const native = nativeWithStoredToken(clientToken('client_signed_in', 2));
+    vi.mocked(native.getDeviceToken).mockResolvedValueOnce(beforeRotation);
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+
+    createNativeClientSync(native, 'pk_test_123', null, () => storedTokenCache(beforeRotation)).attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    await expect(native.getDeviceToken()).resolves.toBeNull();
+  });
+
+  test('keeps a response that lands while a failed sign-out is clearing the token out of the app token cache', async () => {
+    const createNativeClientSync = await loadEngine();
+    const signedIn = clientToken('client_signed_in', 1);
+    const native = nativeWithStoredToken(signedIn);
+    const { cache, stored } = clearableTokenCache(signedIn);
+    let finishClear!: () => void;
+    cache.clearToken = key => {
+      stored.delete(key);
+      return new Promise<void>(resolve => (finishClear = resolve));
+    };
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    sync.attach(clerk);
+
+    const signOut = clerk.signOut?.();
+    await vi.waitFor(() => expect(finishClear).toBeDefined());
+    await sync.tokenCache.saveClientToken(signedIn, signedIn);
+    finishClear();
+
+    await expect(signOut).rejects.toThrow('Network request failed');
+    expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
+  });
+
+  test('keeps a late response out of the app token cache after a failed sign-out when native never configured', async () => {
+    const createNativeClientSync = await loadEngine();
+    const signedIn = clientToken('client_signed_in', 1);
+    const native = nativeModule();
+    vi.mocked(native.configureNative).mockRejectedValue(new Error('native configure failed'));
+    const { cache, stored } = clearableTokenCache(signedIn);
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    sync.attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    await sync.tokenCache.saveClientToken(clientToken('client_signed_in', 2), signedIn);
+
+    expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
+  });
+
+  test('leaves native alone when it already moved to another client before a failed sign-out', async () => {
+    const createNativeClientSync = await loadEngine();
+    const otherClient = clientToken('client_other', 1);
+    const native = nativeWithStoredToken(otherClient);
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    createNativeClientSync(native, 'pk_test_123', null, () => clearableTokenCache(otherClient).cache).attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+
+    await expect(native.getDeviceToken()).resolves.toBe(otherClient);
+  });
+
+  test.each([
+    ['rejects', () => Promise.reject(new Error('keychain locked'))],
+    [
+      'throws',
+      () => {
+        throw new Error('keychain locked');
+      },
+    ],
+  ])('finishes a failed sign-out when clearing the app token cache %s', async (_, clearToken) => {
+    const createNativeClientSync = await loadEngine();
+    const signedIn = clientToken('client_signed_in', 1);
+    const native = nativeWithStoredToken(signedIn);
+    const { cache } = clearableTokenCache(signedIn);
+    cache.clearToken = clearToken;
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    createNativeClientSync(native, 'pk_test_123', null, () => cache).attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+
+    await expect(native.getDeviceToken()).resolves.toBeNull();
+    expect(clerk.setActive).toHaveBeenCalledWith({ session: null });
+  });
+
+  test('empties an app token cache that cannot clear tokens after a failed sign-out', async () => {
+    const createNativeClientSync = await loadEngine();
+    const signedIn = clientToken('client_signed_in', 1);
+    const native = nativeWithStoredToken(signedIn);
+    const cache = storedTokenCache(signedIn);
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    createNativeClientSync(native, 'pk_test_123', null, () => cache).attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+
+    await expect(cache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('');
+  });
+
+  test('keeps native on another client when a save for the signed-out client finishes after the sign-out', async () => {
+    const createNativeClientSync = await loadEngine();
+    const otherClient = clientToken('client_other', 1);
+    const native = nativeWithStoredToken(otherClient);
+    const compareAndSet = vi.mocked(native.setDeviceToken).getMockImplementation()!;
+    let releaseSave!: () => void;
+    vi.mocked(native.setDeviceToken).mockImplementationOnce(
+      (token, expected) => new Promise(resolve => (releaseSave = () => resolve(compareAndSet(token, expected)))),
+    );
+    const clerk = clerkWithFailingSignOut('client_signed_in');
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => clearableTokenCache(otherClient).cache);
+    sync.attach(clerk);
+
+    const save = sync.tokenCache.saveClientToken(
+      clientToken('client_signed_in', 2),
+      clientToken('client_signed_in', 1),
+    );
+    await vi.waitFor(() => expect(releaseSave).toBeDefined());
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    releaseSave();
+    await save;
+
+    await expect(native.getDeviceToken()).resolves.toBe(otherClient);
+  });
+
+  test('clears the device token once a slow configure finishes after a failed sign-out', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const signedIn = clientToken('client_signed_in', 1);
+      const native = nativeWithStoredToken(signedIn);
+      let finishConfigure!: () => void;
+      vi.mocked(native.configureNative).mockReturnValue(new Promise<void>(resolve => (finishConfigure = resolve)));
+      const clerk = clerkWithFailingSignOut('client_signed_in');
+      createNativeClientSync(native, 'pk_test_123', null, () => clearableTokenCache(signedIn).cache).attach(clerk);
+
+      const signOut = expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+      await vi.advanceTimersByTimeAsync(3_000);
+      await signOut;
+      finishConfigure();
+      await vi.advanceTimersByTimeAsync(0);
+
+      await expect(native.getDeviceToken()).resolves.toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('keeps a save that waited on a failed configure out of the app token cache after a failed sign-out', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const signedIn = clientToken('client_signed_in', 1);
+      const native = nativeModule();
+      vi.mocked(native.configureNative).mockReturnValue(new Promise<void>(() => undefined));
+      const { cache, stored } = clearableTokenCache(signedIn);
+      const clerk = clerkWithFailingSignOut('client_signed_in');
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      sync.attach(clerk);
+
+      const save = sync.tokenCache.saveClientToken(clientToken('client_signed_in', 2), signedIn);
+      const signOut = expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+      await vi.advanceTimersByTimeAsync(3_000);
+      await Promise.all([save, signOut]);
+
+      expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('keeps refusing an earlier signed-out client after a later failed sign-out of another client', async () => {
+    const createNativeClientSync = await loadEngine();
+    const first = clientToken('client_first', 1);
+    const native = nativeModule();
+    vi.mocked(native.configureNative).mockRejectedValue(new Error('native configure failed'));
+    const { cache, stored } = clearableTokenCache(first);
+    const clerk = clerkWithFailingSignOut('client_first');
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    sync.attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    (clerk.client as { id: string }).id = 'client_second';
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    await sync.tokenCache.saveClientToken(clientToken('client_first', 2), first);
+
+    expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
   });
 
   test('keeps the rotated token when a late response mints another client from the old token', async () => {
