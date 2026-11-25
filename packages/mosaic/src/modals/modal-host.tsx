@@ -77,8 +77,7 @@ export function ModalSurfaceHost<Options>({
   const page = useHostPathname();
 
   // Close virtual modals when pathname changes
-  const leftPage =
-    routing === 'virtual' && isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
+  const leftPage = isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
   React.useEffect(() => {
     if (leftPage) {
       location.clear();

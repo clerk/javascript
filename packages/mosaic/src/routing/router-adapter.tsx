@@ -72,7 +72,8 @@ export interface RoutingOptions {
   keyPrefix?: { query?: string; hash?: string };
   /**
    * Where Mosaic's own modals keep their segment: in memory, or in the hash or the query string, so a
-   * modal survives a reload and Back closes it. Changing it needs the provider remounted.
+   * modal survives a reload and Back closes it. In every mode a modal closes when the host moves to
+   * another pathname. Changing it needs the provider remounted.
    *
    * @default 'virtual'
    */

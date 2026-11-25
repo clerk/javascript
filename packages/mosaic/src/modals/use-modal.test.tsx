@@ -900,6 +900,28 @@ describe('a modal surface in query mode', () => {
     warn.mockRestore();
   });
 
+  it('closes when the host moves to another pathname and carries the param along', async () => {
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?q=2&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere?q=2&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.search).toBe('?q=2');
+  });
+
   it('opens with a push to its param and closes by replacing it away', async () => {
     const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
     const length = window.history.length;

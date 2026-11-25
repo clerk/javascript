@@ -8,4 +8,4 @@ Adds 'path', 'query' and 'hash' routing modes.
 
 `MosaicProvider` takes a `routing` prop. `adapter` connects the URL modes to the host router (`usePathname` and `useSearchParams` from `next/navigation` is the Next.js one), `modals: 'query' | 'hash'` puts the profile modals in the URL too, and `keyPrefix` sets what the param names start with.
 
-Virtual modals now close when pathname changes.
+Modals now close when the host navigates to another pathname.
