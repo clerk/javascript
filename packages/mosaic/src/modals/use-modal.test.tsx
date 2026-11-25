@@ -941,6 +941,47 @@ describe('a modal surface in query mode', () => {
     expect(window.location.search).toBe('?q=2');
   });
 
+  it('stays open on Back under an adapter with only usePathname, which lags the restored param', async () => {
+    const listeners = new Set<() => void>();
+    const host = { pathname: '/page' };
+    const usePathname = () =>
+      useSyncExternalStore(
+        listener => {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+        () => host.pathname,
+      );
+    const move = (pathname: string) => {
+      host.pathname = pathname;
+      listeners.forEach(listener => listener());
+    };
+    const { ref } = renderCaller(querySurface(), { routing: { adapter: { usePathname }, modals: 'query' } });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b?q=1');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      move('/b');
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?q=1&.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => move('/page'));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.search).toBe('?q=1&.modal.stub=');
+  });
+
   it('opens with a push to its param and closes by replacing it away', async () => {
     const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
     const length = window.history.length;
@@ -1000,22 +1041,27 @@ describe('a modal surface in hash mode', () => {
     });
   }
 
-  function laggingHost(pathname: string) {
+  function hostStore(initial: { pathname: string; hash?: string }) {
     const listeners = new Set<() => void>();
+    const subscribe = (listener: () => void) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    };
     const host = {
-      pathname,
-      set(next: string) {
-        host.pathname = next;
+      pathname: initial.pathname,
+      hash: initial.hash ?? '',
+      set(next: { pathname?: string; hash?: string }) {
+        host.pathname = next.pathname ?? host.pathname;
+        host.hash = next.hash ?? host.hash;
         listeners.forEach(listener => listener());
       },
-      usePathname: () =>
-        useSyncExternalStore(
-          listener => {
-            listeners.add(listener);
-            return () => listeners.delete(listener);
-          },
-          () => host.pathname,
-        ),
+      navigate(url: string) {
+        const parsed = new URL(url, 'http://memory');
+        host.set({ pathname: parsed.pathname, hash: parsed.hash.slice(1) });
+      },
+      usePathname: () => useSyncExternalStore(subscribe, () => host.pathname),
+      useHash: () => useSyncExternalStore(subscribe, () => host.hash),
+      readUrl: () => ({ pathname: host.pathname, search: '', hash: host.hash }),
     };
     return host;
   }
@@ -1037,7 +1083,7 @@ describe('a modal surface in hash mode', () => {
   });
 
   it('stays open on Back when the adapter pathname lags the restored hash by a commit', async () => {
-    const host = laggingHost('/a');
+    const host = hostStore({ pathname: '/a' });
     const { ref } = renderCaller(hashSurface(), {
       routing: { adapter: { usePathname: host.usePathname }, modals: 'hash' },
     });
@@ -1048,7 +1094,7 @@ describe('a modal surface in hash mode', () => {
     act(() => {
       window.history.pushState(null, '', '/b');
       window.dispatchEvent(new PopStateEvent('popstate'));
-      host.set('/b');
+      host.set({ pathname: '/b' });
     });
     await flush();
     expect(ref.handle?.isOpen).toBe(false);
@@ -1060,10 +1106,32 @@ describe('a modal surface in hash mode', () => {
     await flush();
     expect(ref.handle?.isOpen).toBe(true);
 
-    act(() => host.set('/a'));
+    act(() => host.set({ pathname: '/a' }));
     await flush();
     expect(ref.handle?.isOpen).toBe(true);
     expect(window.location.hash).toBe('#.modal.stub=');
+  });
+
+  it('closes when a memory router that supplies the hash moves to another pathname with it', async () => {
+    const host = hostStore({ pathname: '/a' });
+    const adapter = {
+      usePathname: host.usePathname,
+      useHash: host.useHash,
+      push: host.navigate,
+      replace: host.navigate,
+      readUrl: host.readUrl,
+    };
+    const { ref } = renderCaller(hashSurface(), { routing: { adapter, modals: 'hash' } });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(host.hash).toBe('.modal.stub=');
+    expect(window.location.hash).toBe('');
+
+    act(() => host.set({ pathname: '/b' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(host.hash).toBe('');
   });
 
   it('closes when the host moves to another pathname with the hash carried along', async () => {

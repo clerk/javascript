@@ -24,6 +24,12 @@ const ADAPTER_READS: Record<keyof HostUrl, keyof AdapterReads> = {
   hash: 'useHash',
 };
 
+const MODE_READS: Record<UrlRoutingMode, keyof AdapterReads> = {
+  path: 'usePathname',
+  query: 'useSearchParams',
+  hash: 'useHash',
+};
+
 const LEADING: Record<keyof HostUrl, string> = { pathname: '', search: '?', hash: '#' };
 
 function useAdapterRead(useRead: AdapterRead, leading: string): string | undefined {
@@ -87,14 +93,17 @@ function useVirtualModeLocation(path: string): MosaicLocation {
 /**
  * Low level hook to read the pathname, should not be used directly by components. It reads from the
  * source a segment in `routing` comes from, so that a caller comparing the two sees them change in
- * the same commit: `window` for hash mode, whose segment never comes from the adapter, and the
- * adapter otherwise. The adapter hook is called either way, so the hooks stay unconditional.
+ * the same commit: the adapter when it has the hook for the mode's field, or in virtual mode, where
+ * the segment is synchronous state and the host's pathname is the only page signal; `window` when
+ * the segment itself falls back to `window`. The adapter hook is called either way, so the hooks
+ * stay unconditional.
  */
 export function useHostPathname(routing: RoutingMode): string | undefined {
-  const { reads } = useRoutingConfig();
+  const { reads, has } = useRoutingConfig();
   const fromWindow = useWindowUrl(true);
   const fromAdapter = useAdapterRead(reads.usePathname, '');
-  return routing === 'hash' ? fromWindow?.pathname : (fromAdapter ?? fromWindow?.pathname);
+  const segmentFromAdapter = routing === 'virtual' || has[MODE_READS[routing]];
+  return segmentFromAdapter ? (fromAdapter ?? fromWindow?.pathname) : fromWindow?.pathname;
 }
 
 // Each mode renders from the one field of the URL it owns, read through the adapter when it has

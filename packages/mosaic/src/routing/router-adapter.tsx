@@ -92,6 +92,7 @@ function useNothing(): undefined {
 
 export interface RoutingConfig {
   reads: AdapterReads;
+  has: Record<keyof AdapterReads, boolean>;
   push: RouterAdapter['push'];
   replace: RouterAdapter['replace'];
   readUrl: RouterAdapter['readUrl'];
@@ -102,6 +103,7 @@ export interface RoutingConfig {
 
 const defaultConfig: RoutingConfig = {
   reads: { usePathname: useNothing, useSearchParams: useNothing, useHash: useNothing },
+  has: { usePathname: false, useSearchParams: false, useHash: false },
   push: undefined,
   replace: undefined,
   readUrl: undefined,
@@ -122,8 +124,18 @@ function readsOf(adapter: RouterAdapter | undefined): AdapterReads {
   };
 }
 
+function hasOf(adapter: RouterAdapter | undefined): Record<keyof AdapterReads, boolean> {
+  return {
+    usePathname: adapter?.usePathname !== undefined,
+    useSearchParams: adapter?.useSearchParams !== undefined,
+    useHash: adapter?.useHash !== undefined,
+  };
+}
+
 function shapeOf(adapter: RouterAdapter | undefined): string {
-  return [adapter?.usePathname, adapter?.useSearchParams, adapter?.useHash].map(read => (read ? '1' : '0')).join('');
+  return Object.values(hasOf(adapter))
+    .map(has => (has ? '1' : '0'))
+    .join('');
 }
 
 // The adapter is taken from the first render: its hooks have to be, because the components under the
@@ -135,8 +147,9 @@ export function RoutingConfigProvider({
   modals,
   children,
 }: RoutingOptions & { children: ReactNode }) {
-  const [{ reads, shape, push, replace, readUrl }] = useState(() => ({
+  const [{ reads, has, shape, push, replace, readUrl }] = useState(() => ({
     reads: readsOf(adapter),
+    has: hasOf(adapter),
     shape: shapeOf(adapter),
     push: adapter?.push,
     replace: adapter?.replace,
@@ -155,6 +168,7 @@ export function RoutingConfigProvider({
   const value = useMemo(
     () => ({
       reads,
+      has,
       push,
       replace,
       readUrl,
@@ -162,7 +176,7 @@ export function RoutingConfigProvider({
       hashPrefix,
       modals,
     }),
-    [reads, push, replace, readUrl, queryPrefix, hashPrefix, modals],
+    [reads, has, push, replace, readUrl, queryPrefix, hashPrefix, modals],
   );
   return <RoutingConfigContext.Provider value={value}>{children}</RoutingConfigContext.Provider>;
 }
