@@ -320,16 +320,31 @@ function OrganizationAccess({
           >
             {summarize}
           </Select.Trigger>
-          <OrganizationPopup organizations={organizations} />
+          <OrganizationPopup
+            organizations={organizations}
+            selectAllLabel={m.selectAllOrganizations}
+          />
         </Select.Root>
       </Reveal>
     </div>
   );
 }
 
-function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrganization[] }) {
+function OrganizationPopup({
+  organizations,
+  selectAllLabel,
+}: {
+  organizations: OAuthConsentOrganization[];
+  selectAllLabel?: string;
+}) {
   return (
     <Select.Popup>
+      {selectAllLabel ? (
+        <>
+          <Select.SelectAll label={selectAllLabel} />
+          <Select.Separator />
+        </>
+      ) : null}
       {organizations.map(organization => (
         <Select.Item
           key={organization.value}
