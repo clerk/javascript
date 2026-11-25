@@ -9,7 +9,13 @@ import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
 import { Popover } from './Popover';
 
-export const [ModalContext, _, useUnsafeModalContext] = createContextAndHook<{ toggle?: () => void }>('ModalContext');
+export const [ModalContext, _, useUnsafeModalContext] = createContextAndHook<{
+  toggle?: () => void;
+  /**
+   * Registers a title element id used to label the modal dialog. Returns a function that unregisters it.
+   */
+  registerTitle?: (titleId: string) => () => void;
+}>('ModalContext');
 
 type ModalProps = React.PropsWithChildren<{
   id?: string;
@@ -43,7 +49,15 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       handleOpen?.();
     }
   }, [isOpen]);
-  const modalCtx = React.useMemo(() => ({ value: canCloseModal === false ? {} : { toggle } }), [toggle, canCloseModal]);
+  const [titleIds, setTitleIds] = React.useState<string[]>([]);
+  const registerTitle = React.useCallback((titleId: string) => {
+    setTitleIds(ids => [...ids, titleId]);
+    return () => setTitleIds(ids => ids.filter(existingId => existingId !== titleId));
+  }, []);
+  const modalCtx = React.useMemo(
+    () => ({ value: canCloseModal === false ? { registerTitle } : { toggle, registerTitle } }),
+    [toggle, canCloseModal, registerTitle],
+  );
 
   useSafeLayoutEffect(() => {
     enableScrollLock();
@@ -92,6 +106,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
             elementDescriptor={descriptors.modalContent}
             ref={floating}
             aria-modal='true'
+            aria-labelledby={titleIds[0]}
             role='dialog'
             sx={[
               t => ({
