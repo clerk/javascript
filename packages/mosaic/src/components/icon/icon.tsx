@@ -5,6 +5,7 @@ import React from 'react';
 
 import type { IconComponent } from '../../icons/glyph';
 import { useMosaicIcons } from '../../icons/overrides';
+import { unwrapLazyElement } from '../../primitives/utils';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -25,7 +26,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   { glyph: Glyph, size = 'md', xstyle, ...rest },
   ref,
 ) {
-  const override = useMosaicIcons()[Glyph.iconName];
+  const override = unwrapLazyElement(useMosaicIcons()[Glyph.iconName]);
   const props = mergeStyleProps(
     { 'aria-hidden': true },
     themeProps('icon', { size }),
@@ -33,7 +34,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     rest,
   );
 
-  if (override) {
+  if (React.isValidElement(override)) {
     // `ref` is deliberately not forwarded: it is typed for the built-in `SVGSVGElement`, but an
     // override can be any element. A consumer that needs one puts it on the element they author.
     //

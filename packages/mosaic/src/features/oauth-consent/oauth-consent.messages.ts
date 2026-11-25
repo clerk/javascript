@@ -1,6 +1,10 @@
 export const oauthConsentMessages = {
   title: '{oauthApplicationName} would like to access your {applicationName} account',
   subtitle: 'Only continue if you trust {oauthApplicationName} {#nowrap}({domain}){/nowrap}.',
+  clientIdentity: {
+    dynamic: '{oauthApplicationName} registered itself, so its name and logo are not verified.',
+    metadataDocument: 'Details published by {metadataHost}.',
+  },
   scopeListTitle: 'This will allow {applicationName} access to:',
   privateMetadata: 'Your private metadata set by {applicationName}, which may include sensitive information',
   organizationLabel: 'Grant access for:',
@@ -9,6 +13,8 @@ export const oauthConsentMessages = {
   selectedOrganizations: 'Only selected organizations',
   selectedOrganizationsDescription: 'Choose which organizations to grant access to.',
   selectOrganizations: 'Select organizations',
+  organizationLimit: 'You can select up to {limit} organizations.',
+  organizationLimitExceeded: 'Select {limit} or fewer organizations to continue.',
   organizationCount: { one: '{count} organization', other: '{count} organizations' },
   required: 'Required',
   viewFullUrl: 'View full URL',

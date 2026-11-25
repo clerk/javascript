@@ -5,7 +5,7 @@ import type { ReactNode, Ref } from 'react';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
-import type { FieldFeedback, UseFormResult } from '../../components/form';
+import type { UseFormResult } from '../../components/form';
 import { PhoneInput } from '../../components/phone-input';
 import { fill } from '../../localization';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
@@ -35,7 +35,6 @@ interface AuthAlternativeChannelProps<TValues extends { phoneNumber: string }> {
   applicationName: string;
   logo?: { src: string; alt: string };
   form: UseFormResult<TValues>;
-  errorMessage?: string;
   globalErrorMessage?: string;
   isPending: boolean;
   isDisabled: boolean;
@@ -51,7 +50,6 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
   applicationName,
   logo,
   form,
-  errorMessage,
   globalErrorMessage,
   isPending,
   isDisabled,
@@ -62,7 +60,7 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
 }: AuthAlternativeChannelProps<TValues>) {
   const { ref: phoneFieldRef, ...phone } = form.registerValue('phoneNumber');
   const phoneRef = useMergeRefs<HTMLElement>([phoneFieldRef, focusRef, useFlowAutoFocus<HTMLInputElement>()]);
-  const feedback: FieldFeedback | undefined = errorMessage ? { type: 'error', message: errorMessage } : undefined;
+  const { feedback } = form.fields.phoneNumber;
   const provider = channel.name;
 
   return (
@@ -133,6 +131,8 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
         <SubmitButton
           form={form.id}
           fullWidth
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

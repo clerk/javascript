@@ -1,6 +1,9 @@
 {
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "inputs": ["$TURBO_EXTENDS$", "$TURBO_ROOT$/packages/clerk-js/package.json"]
+    },
     "test": {
       "inputs": [
         "$TURBO_DEFAULT$",

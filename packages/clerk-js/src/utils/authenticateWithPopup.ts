@@ -3,6 +3,16 @@ import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from
 
 import type { Clerk } from '../core/clerk';
 
+const POPUP_ALLOWED_PROTOCOLS = ['http:', 'https:'];
+
+export function navigatePopup(popup: { location: { href: string } }, to: URL | string): void {
+  const url = new URL(to, window.location.href);
+  if (!POPUP_ALLOWED_PROTOCOLS.includes(url.protocol)) {
+    throw new Error(`ClerkJS: "${url.protocol}" is not a valid popup navigation protocol.`);
+  }
+  popup.location.href = url.href;
+}
+
 export async function _authenticateWithPopup(
   client: Clerk,
   reloadResource: 'signIn' | 'signUp',
@@ -147,6 +157,11 @@ export function _futureAuthenticateWithPopup(
     window.addEventListener('message', messageHandler);
 
     // Navigate the popup window to the external verification redirect URL, which kicks off the OAuth flow.
-    params.popup.location.href = params.externalVerificationRedirectURL.toString();
+    try {
+      navigatePopup(params.popup, params.externalVerificationRedirectURL);
+    } catch (e) {
+      window.removeEventListener('message', messageHandler);
+      reject(e);
+    }
   });
 }

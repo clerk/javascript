@@ -8,6 +8,7 @@ export type FakeSessionResource = {
   id: string;
   status: 'active';
   activityVersion: number;
+  lastActiveOrganizationId: string | null;
   updatedAt: Date;
   user: { id: string; profileVersion: number; updatedAt: Date };
 };
@@ -25,6 +26,7 @@ function toSessionResource(session: FakeServerClientJSON['sessions'][number]): F
     id: session.id,
     status: 'active',
     activityVersion: session.activityVersion,
+    lastActiveOrganizationId: session.lastActiveOrganizationId,
     updatedAt: new Date(session.profileVersion + session.activityVersion),
     user: { id: session.userId, profileVersion: session.profileVersion, updatedAt: new Date(session.profileVersion) },
   };
@@ -66,6 +68,7 @@ export class FakeClientResource {
         userId: session.user.id,
         profileVersion: session.user.profileVersion,
         activityVersion: session.activityVersion,
+        lastActiveOrganizationId: session.lastActiveOrganizationId,
       })),
     };
   }
@@ -183,12 +186,18 @@ export class FakeClerk {
     }
   };
 
-  setActive = async ({ session }: { session: FakeSessionResource | string | null }): Promise<void> => {
+  setActive = async ({
+    session = this.session,
+    organization,
+  }: {
+    session?: FakeSessionResource | string | null;
+    organization?: string | null;
+  }): Promise<void> => {
     this.__internal_setActiveInProgress = true;
     try {
       const sessionId = typeof session === 'string' ? session : (session?.id ?? null);
       if (sessionId && this.client) {
-        const response = await this.fapi(token => this.server.touchSession('js', token, sessionId));
+        const response = await this.fapi(token => this.server.touchSession('js', token, sessionId, organization));
         this.#applyPiggybackedClient(response);
       }
       this.session = sessionId ? (this.client?.signedInSessions.find(s => s.id === sessionId) ?? null) : null;

@@ -1,9 +1,12 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+
 export type FakeServerSessionJSON = {
   id: string;
   userId: string;
   profileVersion: number;
   /** Bumped by session activity such as minting a session token. */
   activityVersion: number;
+  lastActiveOrganizationId: string | null;
 };
 
 export type FakeServerClientJSON = {
@@ -63,6 +66,7 @@ export class FakeClerkServer {
   #retiredTokens = new Set<string>();
   #pendingRotations = new Map<string, number>();
   #responseHolds: ResponseHold[] = [];
+  #requestFailures: Array<{ caller: FapiCaller; operation: string; status: number | null }> = [];
   #sequence = 0;
   #rotations = 0;
 
@@ -122,6 +126,16 @@ export class FakeClerkServer {
   ): Promise<T> {
     this.requests.push({ caller, operation, token });
     await networkRoundTrip();
+    const failureIndex = this.#requestFailures.findIndex(
+      failure => failure.caller === caller && failure.operation === operation,
+    );
+    if (failureIndex >= 0) {
+      const [failure] = this.#requestFailures.splice(failureIndex, 1);
+      if (failure.status !== null) {
+        throw new ClerkAPIResponseError('Request rejected', { data: [], status: failure.status });
+      }
+      throw new TypeError('Network request failed');
+    }
     const response = handle();
     const holdIndex = this.#responseHolds.findIndex(hold => hold.caller === caller && hold.operation === operation);
     if (holdIndex >= 0) {
@@ -130,6 +144,16 @@ export class FakeClerkServer {
       await hold.released;
     }
     return response;
+  }
+
+  failNextRequests(caller: FapiCaller, operation: string, count = 1): void {
+    for (let i = 0; i < count; i++) {
+      this.#requestFailures.push({ caller, operation, status: null });
+    }
+  }
+
+  rejectNextRequest(caller: FapiCaller, operation: string, status: number): void {
+    this.#requestFailures.push({ caller, operation, status });
   }
 
   holdNextResponse(caller: FapiCaller, operation: string): HeldResponse {
@@ -160,7 +184,13 @@ export class FakeClerkServer {
     const { client, token } = this.#createClient();
     const sessionIds: Record<string, string> = {};
     for (const userId of users) {
-      const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
+      const session = {
+        id: this.#nextId('sess'),
+        userId,
+        profileVersion: 0,
+        activityVersion: 0,
+        lastActiveOrganizationId: null,
+      };
       client.sessions.push(session);
       sessionIds[userId] = session.id;
     }
@@ -210,20 +240,35 @@ export class FakeClerkServer {
       const { client, token: responseToken } = auth.client
         ? { client: auth.client, token: auth.token }
         : this.#createClient();
-      const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
+      const session = {
+        id: this.#nextId('sess'),
+        userId,
+        profileVersion: 0,
+        activityVersion: 0,
+        lastActiveOrganizationId: null,
+      };
       client.sessions.push(session);
       client.lastActiveSessionId = session.id;
       return { ...this.#respond(responseToken, client), sessionId: session.id };
     });
   }
 
-  touchSession(caller: FapiCaller, token: string | null, sessionId: string): Promise<FapiResponse> {
+  touchSession(
+    caller: FapiCaller,
+    token: string | null,
+    sessionId: string,
+    organizationId?: string | null,
+  ): Promise<FapiResponse> {
     return this.#send(caller, 'POST /client/sessions/:id/touch', token, () => {
       const { client, token: clientToken } = this.#authenticate(token);
-      if (!client?.sessions.some(session => session.id === sessionId)) {
+      const session = client?.sessions.find(candidate => candidate.id === sessionId);
+      if (!client || !session) {
         return this.#respond(clientToken, client, 401);
       }
       client.lastActiveSessionId = sessionId;
+      if (organizationId !== undefined) {
+        session.lastActiveOrganizationId = organizationId;
+      }
       return this.#respond(clientToken, client);
     });
   }

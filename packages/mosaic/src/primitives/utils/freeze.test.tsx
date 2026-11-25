@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -115,5 +115,337 @@ describe('Freeze', () => {
     );
 
     expect(screen.getByText('Globex')).toBeInTheDocument();
+  });
+
+  describe('inside a transition', () => {
+    function Harness() {
+      const [frozen, setFrozen] = React.useState(false);
+      const [label, setLabel] = React.useState('Acme');
+      return (
+        <>
+          <output>{frozen ? 'frozen' : 'live'}</output>
+          <button
+            type='button'
+            onClick={() =>
+              React.startTransition(() => {
+                setFrozen(true);
+                setLabel('Globex');
+              })
+            }
+          >
+            freeze
+          </button>
+          <button
+            type='button'
+            onClick={() => React.startTransition(() => setFrozen(false))}
+          >
+            thaw
+          </button>
+          <button
+            type='button'
+            onClick={() => React.startTransition(() => setLabel('Initech'))}
+          >
+            relabel
+          </button>
+          <Freeze frozen={frozen}>{label}</Freeze>
+        </>
+      );
+    }
+
+    it('holds the frame from before the flip, and lets the transition commit around it', async () => {
+      render(<Harness />);
+
+      await act(() => screen.getByText('freeze').click());
+      expect(screen.getByRole('status').textContent).toBe('frozen');
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(screen.queryByText('Globex')).toBeNull();
+
+      await act(() => screen.getByText('relabel').click());
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(screen.queryByText('Initech')).toBeNull();
+
+      await act(() => screen.getByText('thaw').click());
+      expect(screen.getByText('Initech')).toBeInTheDocument();
+    });
+  });
+
+  describe('under scheduling', () => {
+    function Child({
+      label,
+      onEffect,
+      onRender,
+    }: {
+      label: string;
+      onEffect: (label: string) => void;
+      onRender: (label: string) => void;
+    }) {
+      onRender(label);
+      React.useEffect(() => {
+        onEffect(label);
+      }, [label, onEffect]);
+      return <span>{label}</span>;
+    }
+
+    function Scheduled({
+      onEffect,
+      onRender,
+      strict = false,
+    }: {
+      onEffect?: (label: string) => void;
+      onRender?: (label: string) => void;
+      strict?: boolean;
+    }) {
+      const [frozen, setFrozen] = React.useState(false);
+      const [label, setLabel] = React.useState('Acme');
+      const [tick, setTick] = React.useState(0);
+      const noteEffect = React.useCallback((value: string) => onEffect?.(value), [onEffect]);
+      const noteRender = React.useCallback((value: string) => onRender?.(value), [onRender]);
+      const tree = (
+        <>
+          <output>
+            {frozen ? 'frozen' : 'live'}:{tick}
+          </output>
+          <button
+            type='button'
+            onClick={() =>
+              React.startTransition(() => {
+                setFrozen(true);
+                setLabel('Globex');
+              })
+            }
+          >
+            freeze later
+          </button>
+          <button
+            type='button'
+            onClick={() => React.startTransition(() => setFrozen(false))}
+          >
+            thaw later
+          </button>
+          <button
+            type='button'
+            onClick={() => setFrozen(true)}
+          >
+            freeze now
+          </button>
+          <button
+            type='button'
+            onClick={() => setFrozen(false)}
+          >
+            thaw now
+          </button>
+          <button
+            type='button'
+            onClick={() => setLabel('Initech')}
+          >
+            relabel now
+          </button>
+          <button
+            type='button'
+            onClick={() => setTick(value => value + 1)}
+          >
+            tick
+          </button>
+          <Freeze frozen={frozen}>
+            <Child
+              label={label}
+              onEffect={noteEffect}
+              onRender={noteRender}
+            />
+          </Freeze>
+        </>
+      );
+      return strict ? <React.StrictMode>{tree}</React.StrictMode> : tree;
+    }
+
+    const click = (name: string) => act(() => screen.getByText(name).click());
+    const status = () => screen.getByRole('status').textContent;
+
+    it('does not run the effects of the frame it holds back', async () => {
+      const effects: string[] = [];
+      render(<Scheduled onEffect={label => effects.push(label)} />);
+      effects.length = 0;
+
+      await click('freeze later');
+      expect(status()).toBe('frozen:0');
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(effects).toEqual([]);
+
+      await click('thaw later');
+      expect(screen.getByText('Globex')).toBeInTheDocument();
+      expect(effects).toEqual(['Globex']);
+    });
+
+    // These two run on React's own scheduler rather than inside `act`, which would flush the
+    // transition to completion before the second click. The child renders slowly while it shows
+    // the transition's label, so the transition yields, and the second click usually lands after
+    // the hold's sync commit and before the transition commits, which is the window the tests are
+    // about.
+    // Without mocking the React scheduler, there's no way to enforce that the click lands after
+    // the sync commit, so the test only asserts what it can. That means if this start failing
+    // it might seem flaky, but that's because the re-run that passes is not testing the
+    // correct behavior. Treat flakiness as a real test failure here.
+    async function scheduled(run: (renders: string[]) => Promise<void>) {
+      const flag = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
+      const previous = flag.IS_REACT_ACT_ENVIRONMENT;
+      flag.IS_REACT_ACT_ENVIRONMENT = false;
+      const renders: string[] = [];
+      try {
+        render(
+          <Scheduled
+            onRender={label => {
+              renders.push(label);
+              if (label === 'Globex') {
+                const until = performance.now() + 20;
+                while (performance.now() < until) {
+                  // keep the transition rendering long enough to yield
+                }
+              }
+            }}
+          />,
+        );
+        await run(renders);
+      } finally {
+        flag.IS_REACT_ACT_ENVIRONMENT = previous;
+      }
+    }
+
+    // Resolves once the child has rendered the label, so the transition has at least started and
+    // requested the hold before the second click.
+    const rendered = (renders: string[], label: string) =>
+      new Promise<void>((resolve, reject) => {
+        const deadline = Date.now() + 2000;
+        const check = () => {
+          if (renders.includes(label)) {
+            resolve();
+          } else if (Date.now() > deadline) {
+            reject(new Error(`The child never rendered "${label}"`));
+          } else {
+            setTimeout(check, 1);
+          }
+        };
+        check();
+      });
+
+    it('releases a hold whose transition is thawed before it commits', async () => {
+      await scheduled(async renders => {
+        screen.getByText('freeze later').click();
+        await rendered(renders, 'Globex');
+
+        screen.getByText('thaw now').click();
+
+        await waitFor(() => expect(screen.getByText('Globex')).toBeVisible());
+        expect(status()).toBe('live:0');
+      });
+    });
+
+    it('keeps the transition alive through an unrelated sync update while it is pending', async () => {
+      await scheduled(async renders => {
+        screen.getByText('freeze later').click();
+        await rendered(renders, 'Globex');
+
+        screen.getByText('tick').click();
+
+        await waitFor(() => expect(status()).toBe('frozen:1'));
+        expect(screen.getByText('Acme')).toBeVisible();
+        expect(screen.queryByText('Globex')).toBeNull();
+
+        screen.getByText('thaw later').click();
+        await waitFor(() => expect(screen.getByText('Globex')).toBeVisible());
+      });
+    });
+
+    it('holds the frame committed by a thaw when frozen again right after it', async () => {
+      render(<Scheduled />);
+      await click('freeze now');
+
+      await click('thaw now');
+      await click('relabel now');
+      expect(screen.getByText('Initech')).toBeVisible();
+
+      await click('freeze now');
+      await click('freeze later');
+
+      expect(status()).toBe('frozen:0');
+      expect(screen.getByText('Initech')).toBeVisible();
+      expect(screen.queryByText('Globex')).toBeNull();
+    });
+
+    it('does not commit a thaw that is re-frozen in the same update', async () => {
+      render(<Scheduled />);
+      await click('freeze now');
+
+      await act(() => {
+        screen.getByText('thaw now').click();
+        screen.getByText('relabel now').click();
+        screen.getByText('freeze now').click();
+      });
+
+      expect(status()).toBe('frozen:0');
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(screen.queryByText('Initech')).toBeNull();
+    });
+
+    it('holds the frame from before a transition flip under StrictMode too', async () => {
+      render(<Scheduled strict />);
+
+      await click('freeze later');
+      expect(status()).toBe('frozen:0');
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(screen.queryByText('Globex')).toBeNull();
+
+      await click('thaw now');
+      expect(screen.getByText('Globex')).toBeVisible();
+    });
+
+    it('can unmount while holding', async () => {
+      const { unmount } = render(<Scheduled />);
+      await click('freeze later');
+      expect(() => unmount()).not.toThrow();
+    });
+
+    it('keeps an inner hold while the outer thaws', async () => {
+      function Nested() {
+        const [outer, setOuter] = React.useState(false);
+        const [inner, setInner] = React.useState(false);
+        const [label, setLabel] = React.useState('Acme');
+        return (
+          <>
+            <button
+              type='button'
+              onClick={() => setInner(true)}
+            >
+              freeze inner
+            </button>
+            <button
+              type='button'
+              onClick={() => setOuter(true)}
+            >
+              freeze outer
+            </button>
+            <button
+              type='button'
+              onClick={() => {
+                setOuter(false);
+                setLabel('Globex');
+              }}
+            >
+              thaw outer and relabel
+            </button>
+            <Freeze frozen={outer}>
+              <Freeze frozen={inner}>{label}</Freeze>
+            </Freeze>
+          </>
+        );
+      }
+      render(<Nested />);
+
+      await click('freeze inner');
+      await click('freeze outer');
+      await click('thaw outer and relabel');
+
+      expect(screen.getByText('Acme')).toBeVisible();
+      expect(screen.queryByText('Globex')).toBeNull();
+    });
   });
 });

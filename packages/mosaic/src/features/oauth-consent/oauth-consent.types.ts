@@ -11,8 +11,13 @@ export interface OAuthConsentOrganization extends SelectItem {
   imageUrl?: string;
 }
 
+export type OAuthConsentClientIdentity =
+  | { registration: 'dynamic' }
+  | { registration: 'metadata_document'; metadataHost: string };
+
 export interface OAuthConsentData {
   oauthApplicationName: string;
+  clientIdentity: OAuthConsentClientIdentity | null;
   scopes: OAuthConsentScopeRecord[];
   hasOfflineAccess: boolean;
   applicationName: string;
@@ -49,25 +54,39 @@ export interface OAuthConsentScopeSelection {
 
 export type OAuthConsentOrganizationAccess = 'all' | 'selected';
 
-export interface OAuthConsentOrganizationSelection {
-  access: OAuthConsentOrganizationAccess;
-  onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
-  selected: readonly string[];
-  onSelectedChange: (organizationIds: string[]) => void;
+interface OAuthConsentSingleOrganizationSelection {
+  multiple?: false;
+  organizationId: string | null;
+  onOrganizationIdChange: (organizationId: string) => void;
 }
+
+interface OAuthConsentMultipleOrganizationSelection {
+  multiple: true;
+  organizationIds: readonly string[];
+  onOrganizationIdsChange: (organizationIds: string[]) => void;
+}
+
+export type OAuthConsentOrganizationSelection =
+  | OAuthConsentSingleOrganizationSelection
+  | (OAuthConsentMultipleOrganizationSelection & { limit?: number; access?: never; onAccessChange?: never })
+  | (OAuthConsentMultipleOrganizationSelection & {
+      access: OAuthConsentOrganizationAccess;
+      onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
+      limit?: never;
+    });
 
 export interface OAuthConsentViewProps {
   messages: OAuthConsentMessages;
   oauthApplicationName: string;
+  clientIdentity: OAuthConsentClientIdentity | null;
   identifier: string;
   applicationName: string;
   scopes: OAuthConsentScopeItem[];
-  scopeSelection?: OAuthConsentScopeSelection;
+  scopeSelection: OAuthConsentScopeSelection;
+  scope: string;
   hasOfflineAccess: boolean;
   organizations: OAuthConsentOrganization[];
-  organizationId: string | null;
-  onOrganizationChange: (organizationId: string) => void;
-  organizationSelection?: OAuthConsentOrganizationSelection;
+  organizationSelection: OAuthConsentOrganizationSelection;
   redirectUrl: string;
   redirectDomain: string;
   isRedirectUrlOpen: boolean;

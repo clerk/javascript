@@ -1,5 +1,22 @@
 # @clerk/mosaic
 
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`63864a8`](https://github.com/clerk/javascript/commit/63864a8a9262f24b15bd4626b1a49f1dbab83989)]:
+  - @clerk/shared@4.49.0
+
+## 0.11.0
+
+### Minor Changes
+
+- `OAuthConsent` now lets the user clear the scopes they don't want to grant, and posts only the scopes left checked. `offline_access` is listed as required and can't be cleared. The organization picker only shows while `user:org:read` is checked. The consent card also shows a warning when the application registered itself, and names the host when its details come from a client metadata document. ([#10952](https://github.com/clerk/javascript/pull/10952)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fix elements passed from a React Server Component in development. A `render` element, such as `<Dialog.Trigger render={<Button />}>`, no longer renders as a plain unstyled element with a hydration mismatch, and an `icons` override on `MosaicProvider` no longer throws `Cannot read properties of undefined (reading 'className')`. ([#10940](https://github.com/clerk/javascript/pull/10940)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.10.0
 
 ### Minor Changes

@@ -1,3 +1,4 @@
+import { isPasswordConfirmationError } from '@clerk/shared/internal/clerk-js/passwordConfirmation';
 import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../localization';
@@ -90,6 +91,27 @@ export const createPasswordError = (
   );
 
   return passwordErrorMessage;
+};
+
+// A password confirmation failure carries the remaining attempts; zero means the session has ended.
+// Other errors are returned unchanged so they keep the default translation.
+export const createPasswordConfirmationError = (
+  errors: ClerkAPIError[],
+  localizationConfig: Pick<LocalizationConfigProps, 't'>,
+) => {
+  const remainingAttempts = errors[0]?.meta?.remainingAttempts;
+  if (!isPasswordConfirmationError(errors[0]) || typeof remainingAttempts !== 'number') {
+    return errors[0];
+  }
+
+  const { t } = localizationConfig;
+  if (remainingAttempts === 0) {
+    return t(localizationKeys('unstable__errors.password_confirmation_session_ended'));
+  }
+  if (remainingAttempts === 1) {
+    return t(localizationKeys('unstable__errors.password_confirmation_attempt_remaining'));
+  }
+  return t(localizationKeys('unstable__errors.password_confirmation_attempts_remaining', { remainingAttempts }));
 };
 
 export const addFullStop = (string: string | undefined) => {

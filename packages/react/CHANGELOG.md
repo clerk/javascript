@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.19.6
+
+### Patch Changes
+
+- Updated dependencies [[`63864a8`](https://github.com/clerk/javascript/commit/63864a8a9262f24b15bd4626b1a49f1dbab83989)]:
+  - @clerk/shared@4.49.0
+
+## 6.19.5
+
+### Patch Changes
+
+- Fix `<HandleSSOCallback />` hanging when a sign-up started with `signUp.sso()` returns needing another step, such as a required legal acceptance, a missing username or an unverified email address. The component now calls `navigateToSignUp()` so your sign-up page can resume that attempt. ([#10939](https://github.com/clerk/javascript/pull/10939)) by [@mwickett](https://github.com/mwickett)
+
 ## 6.19.4
 
 ### Patch Changes

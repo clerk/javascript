@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { type ReactNode, useId } from 'react';
 
 import { Badge } from '../../components/badge';
+import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Checkbox } from '../../components/checkbox';
@@ -24,7 +25,9 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { styles } from './oauth-consent.styles';
 import type {
+  OAuthConsentClientIdentity,
   OAuthConsentOrganization,
+  OAuthConsentOrganizationAccess,
   OAuthConsentOrganizationSelection,
   OAuthConsentScopeItem,
   OAuthConsentScopeSelection,
@@ -32,9 +35,16 @@ import type {
 } from './oauth-consent.types';
 
 export function OAuthConsentView(props: OAuthConsentViewProps) {
-  const { messages: m, oauthApplicationName, organizationId } = props;
+  const { messages: m, oauthApplicationName } = props;
   const scopeListTitleId = useId();
-  const postedOrganizationIds = props.organizations.length === 0 ? [] : organizationIdsToPost(props);
+  const postedOrganizationIds =
+    props.organizations.length === 0 ? [] : organizationIdsToPost(props.organizations, props.organizationSelection);
+  const organizationLimit = props.organizationSelection.multiple ? props.organizationSelection.limit : undefined;
+  const exceedsOrganizationLimit = organizationLimit !== undefined && postedOrganizationIds.length > organizationLimit;
+  const missingOrganization =
+    props.organizationSelection.multiple === true &&
+    props.organizations.length > 0 &&
+    postedOrganizationIds.length === 0;
   const openRedirectUrl = () => props.onRedirectUrlOpenChange(true);
   const domain = (
     <RedirectDomainButton
@@ -64,27 +74,20 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           />
         }
       >
-        {props.organizations.length > 0 && props.organizationSelection ? (
-          <OrganizationAccess
+        {props.clientIdentity ? (
+          <ClientIdentityBanner
+            messages={m}
+            identity={props.clientIdentity}
+            name={oauthApplicationName || props.applicationName}
+          />
+        ) : null}
+        {props.organizations.length > 0 ? (
+          <OrganizationField
             messages={m}
             organizations={props.organizations}
             selection={props.organizationSelection}
             disabled={props.pendingAction !== undefined}
           />
-        ) : null}
-        {props.organizations.length > 0 && !props.organizationSelection ? (
-          <Field.Root disabled={props.pendingAction !== undefined}>
-            <Field.Label>{m.organizationLabel}</Field.Label>
-            <Select.Root
-              items={props.organizations}
-              value={organizationId}
-              alignItemWithTrigger={false}
-              onValueChange={props.onOrganizationChange}
-            >
-              <Select.Trigger />
-              <OrganizationPopup organizations={props.organizations} />
-            </Select.Root>
-          </Field.Root>
         ) : null}
         {props.scopes.length > 0 ? (
           <div {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}>
@@ -104,19 +107,12 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
                   key={item.scope}
                   {...stylex.props(styles.scopeRow)}
                 >
-                  {props.scopeSelection ? (
-                    <ScopeOption
-                      item={item}
-                      selection={props.scopeSelection}
-                      disabled={props.pendingAction !== undefined}
-                      requiredLabel={m.required}
-                    />
-                  ) : (
-                    <ScopeText
-                      item={item}
-                      requiredLabel={m.required}
-                    />
-                  )}
+                  <ScopeOption
+                    item={item}
+                    selection={props.scopeSelection}
+                    disabled={props.pendingAction !== undefined}
+                    requiredLabel={m.required}
+                  />
                 </li>
               ))}
             </ul>
@@ -130,14 +126,18 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
             value={value}
           />
         ))}
-        {postedOrganizationIds.map(id => (
+        <input
+          type='hidden'
+          name='scope'
+          value={props.scope}
+        />
+        {postedOrganizationIds.length > 0 ? (
           <input
-            key={id}
             type='hidden'
             name='organization_id'
-            value={id}
+            value={postedOrganizationIds.join(' ')}
           />
-        ))}
+        ) : null}
         <div {...stylex.props(styles.actions)}>
           <SubmitButton
             name='consented'
@@ -154,7 +154,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           <SubmitButton
             name='consented'
             value='true'
-            disabled={props.pendingAction === 'deny'}
+            disabled={props.pendingAction === 'deny' || exceedsOrganizationLimit || missingOrganization}
             isPending={props.pendingAction === 'allow'}
             pendingLabel={m.allowing}
             onClick={props.onAllow}
@@ -233,32 +233,84 @@ function RedirectUrlDialog({
   );
 }
 
-function organizationIdsToPost({ organizations, organizationId, organizationSelection }: OAuthConsentViewProps) {
-  if (!organizationSelection) {
-    return organizationId === null ? [] : [organizationId];
+function organizationIdsToPost(
+  organizations: OAuthConsentOrganization[],
+  selection: OAuthConsentOrganizationSelection,
+): readonly string[] {
+  if (!selection.multiple) {
+    return selection.organizationId === null ? [] : [selection.organizationId];
   }
-  return organizationSelection.access === 'all'
-    ? organizations.map(organization => organization.value)
-    : organizationSelection.selected;
+  if (selection.access === 'all') {
+    return organizations.map(organization => organization.value);
+  }
+  return selection.organizationIds;
+}
+
+interface OrganizationFieldProps {
+  messages: OAuthConsentViewProps['messages'];
+  organizations: OAuthConsentOrganization[];
+  selection: OAuthConsentOrganizationSelection;
+  disabled: boolean;
+}
+
+function OrganizationField({ messages: m, organizations, selection, disabled }: OrganizationFieldProps) {
+  if (!selection.multiple) {
+    return (
+      <Field.Root disabled={disabled}>
+        <Field.Label>{m.organizationLabel}</Field.Label>
+        <Select.Root
+          items={organizations}
+          value={selection.organizationId}
+          alignItemWithTrigger={false}
+          onValueChange={selection.onOrganizationIdChange}
+        >
+          <Select.Trigger />
+          <OrganizationPopup organizations={organizations} />
+        </Select.Root>
+      </Field.Root>
+    );
+  }
+  if (selection.access === undefined) {
+    return (
+      <OrganizationMultiSelect
+        messages={m}
+        organizations={organizations}
+        organizationIds={selection.organizationIds}
+        onChange={selection.onOrganizationIdsChange}
+        limit={selection.limit}
+        disabled={disabled}
+        label={<Field.Label>{m.organizationLabel}</Field.Label>}
+      />
+    );
+  }
+  return (
+    <OrganizationAccess
+      messages={m}
+      organizations={organizations}
+      access={selection.access}
+      onAccessChange={selection.onAccessChange}
+      organizationIds={selection.organizationIds}
+      onOrganizationIdsChange={selection.onOrganizationIdsChange}
+      disabled={disabled}
+    />
+  );
 }
 
 function OrganizationAccess({
   messages: m,
   organizations,
-  selection,
+  access,
+  onAccessChange,
+  organizationIds,
+  onOrganizationIdsChange,
   disabled,
-}: {
-  messages: OAuthConsentViewProps['messages'];
-  organizations: OAuthConsentOrganization[];
-  selection: OAuthConsentOrganizationSelection;
-  disabled: boolean;
+}: Omit<OrganizationFieldProps, 'selection'> & {
+  access: OAuthConsentOrganizationAccess;
+  onAccessChange: (access: OAuthConsentOrganizationAccess) => void;
+  organizationIds: readonly string[];
+  onOrganizationIdsChange: (organizationIds: string[]) => void;
 }) {
   const labelId = useId();
-  const locale = useLocale();
-  const summarize = (value: unknown[]) =>
-    value.length === 1
-      ? organizations.find(organization => organization.value === value[0])?.label
-      : plural(m.organizationCount, value.length, locale);
 
   return (
     <div {...stylex.props(styles.organizationAccess)}>
@@ -271,12 +323,12 @@ function OrganizationAccess({
       </Text>
       <Radio.Group
         aria-labelledby={labelId}
-        value={selection.access}
+        value={access}
         disabled={disabled}
-        onValueChange={access => {
-          selection.onAccessChange(access);
-          if (access === 'all') {
-            selection.onSelectedChange([]);
+        onValueChange={next => {
+          onAccessChange(next);
+          if (next === 'all') {
+            onOrganizationIdsChange([]);
           }
         }}
       >
@@ -296,31 +348,91 @@ function OrganizationAccess({
         </Field.Root>
       </Radio.Group>
       <Reveal
-        open={selection.access === 'selected'}
+        open={access === 'selected'}
         xstyle={styles.organizationPicker}
       >
-        <Select.Root
-          multiple
-          items={organizations}
-          value={[...selection.selected]}
-          onValueChange={selection.onSelectedChange}
-        >
-          <Select.Trigger
-            aria-label={m.selectOrganizations}
-            placeholder={m.selectOrganizations}
-            disabled={disabled}
-            xstyle={styles.organizationPickerTrigger}
-          >
-            {summarize}
-          </Select.Trigger>
-          <OrganizationPopup organizations={organizations} />
-        </Select.Root>
+        <OrganizationMultiSelect
+          messages={m}
+          organizations={organizations}
+          organizationIds={organizationIds}
+          onChange={onOrganizationIdsChange}
+          disabled={disabled}
+          triggerLabel={m.selectOrganizations}
+        />
       </Reveal>
     </div>
   );
 }
 
-function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrganization[] }) {
+function OrganizationMultiSelect({
+  messages: m,
+  organizations,
+  organizationIds,
+  onChange,
+  limit,
+  disabled,
+  label,
+  triggerLabel,
+}: {
+  messages: OAuthConsentViewProps['messages'];
+  organizations: OAuthConsentOrganization[];
+  organizationIds: readonly string[];
+  onChange: (organizationIds: string[]) => void;
+  limit?: number;
+  disabled: boolean;
+  label?: ReactNode;
+  triggerLabel?: string;
+}) {
+  const locale = useLocale();
+  const atLimit = limit !== undefined && organizationIds.length >= limit;
+  const overLimit = limit !== undefined && organizationIds.length > limit;
+  const summarize = (value: unknown[]) =>
+    value.length === 1
+      ? organizations.find(organization => organization.value === value[0])?.label
+      : plural(m.organizationCount, value.length, locale);
+
+  return (
+    <Field.Root
+      disabled={disabled}
+      invalid={overLimit}
+    >
+      {label}
+      <Select.Root
+        multiple
+        items={organizations}
+        value={[...organizationIds]}
+        alignItemWithTrigger={false}
+        onValueChange={onChange}
+      >
+        <Select.Trigger
+          aria-label={triggerLabel}
+          placeholder={m.selectOrganizations}
+          xstyle={triggerLabel ? styles.organizationPickerTrigger : undefined}
+        >
+          {summarize}
+        </Select.Trigger>
+        <OrganizationPopup
+          organizations={organizations}
+          isDisabled={value => atLimit && !organizationIds.includes(value)}
+        />
+      </Select.Root>
+      {limit !== undefined && organizations.length > limit ? (
+        <Field.Description>{fill(m.organizationLimit, { limit })}</Field.Description>
+      ) : null}
+      <Field.Message>
+        <Field.Error>{overLimit ? fill(m.organizationLimitExceeded, { limit }) : null}</Field.Error>
+      </Field.Message>
+    </Field.Root>
+  );
+}
+
+function OrganizationPopup({
+  organizations,
+  isDisabled,
+}: {
+  organizations: OAuthConsentOrganization[];
+  isDisabled?: (value: string) => boolean;
+}) {
   return (
     <Select.Popup>
       {organizations.map(organization => (
@@ -328,6 +440,7 @@ function OrganizationPopup({ organizations }: { organizations: OAuthConsentOrgan
           key={organization.value}
           value={organization.value}
           label={organization.label}
+          disabled={isDisabled?.(organization.value)}
         >
           <Select.Media>
             <RowAvatar
@@ -377,22 +490,25 @@ function ScopeOption({
   );
 }
 
-function ScopeText({ item, requiredLabel }: { item: OAuthConsentScopeItem; requiredLabel: string }) {
-  return (
-    <div {...stylex.props(styles.scopeText)}>
-      <div {...stylex.props(styles.scopeLabel)}>
-        <Text>{item.label}</Text>
-        {item.required ? <Badge color='neutral'>{requiredLabel}</Badge> : null}
-      </div>
-      {item.description ? (
-        <Text
-          size='xs'
-          color='foreground-secondary'
-        >
-          {item.description}
-        </Text>
-      ) : null}
-    </div>
+function ClientIdentityBanner({
+  messages: m,
+  identity,
+  name,
+}: {
+  messages: OAuthConsentViewProps['messages'];
+  identity: OAuthConsentClientIdentity;
+  name: string;
+}) {
+  return identity.registration === 'dynamic' ? (
+    <Banner.Root color='warning'>
+      <Banner.Description>{fill(m.clientIdentity.dynamic, { oauthApplicationName: name })}</Banner.Description>
+    </Banner.Root>
+  ) : (
+    <Banner.Root color='neutral'>
+      <Banner.Description>
+        {fill(m.clientIdentity.metadataDocument, { metadataHost: identity.metadataHost })}
+      </Banner.Description>
+    </Banner.Root>
   );
 }
 

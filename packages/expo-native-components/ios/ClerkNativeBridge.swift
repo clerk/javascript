@@ -63,7 +63,6 @@ final class ClerkUserProfileCustomPageState {
   @ObservationIgnored private var retainedCustomPagePathsByDepth: [Int: String] = [:]
   @ObservationIgnored private var retainedNavigatorPaths: [String] = []
   @ObservationIgnored private var navigatorResetGeneration = 0
-  @ObservationIgnored private var hasObservedUserID = false
   @ObservationIgnored private var observedUserID: String?
   private let postInactiveReset: PostInactiveReset
 
@@ -178,14 +177,9 @@ final class ClerkUserProfileCustomPageState {
   }
 
   func userDidChange(to userID: String?) {
-    guard hasObservedUserID else {
-      observedUserID = userID
-      hasObservedUserID = true
-      return
-    }
-
-    guard observedUserID != userID else { return }
+    let previousUserID = observedUserID
     observedUserID = userID
+    guard let previousUserID, previousUserID != userID else { return }
     invalidateNavigation()
   }
 

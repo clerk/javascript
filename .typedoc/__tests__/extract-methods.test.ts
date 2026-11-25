@@ -31,6 +31,13 @@ async function readGenerated(relPath: string) {
 }
 
 describe('extract-methods snapshots', () => {
+  it('inlines revokeSession options on the method page', async () => {
+    const content = await readGenerated('backend/session-api/methods/revoke-session.mdx');
+    expect(content).toContain('resetDeviceTrust');
+    expect(content).toContain('Clerk also forgets the device');
+    expect(content).not.toContain('revoke-session-params.mdx');
+  });
+
   it('simple callable: clerk.signOut()', async () => {
     const content = await readGenerated('shared/clerk/methods/sign-out.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-methods-sign-out.mdx');

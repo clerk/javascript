@@ -51,6 +51,11 @@ describe('applyRelativeLinkReplacements', () => {
       '[x](/docs/reference/types/billing-proration-credit-detail)',
     ],
     [
+      'user-search-metadata-filter routes to its Backend type page from a nested method page',
+      '[x](../user-search-metadata-filter.mdx)',
+      '[x](/docs/reference/backend/types/backend-user-search-metadata-filter)',
+    ],
+    [
       'OAuth device verification info routes to its future standalone page',
       '[x](o-auth-device-verification-info.mdx)',
       '[x](/docs/reference/types/oauth-device-verification-info)',

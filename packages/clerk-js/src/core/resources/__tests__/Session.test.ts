@@ -1073,6 +1073,269 @@ describe('Session', () => {
         expect(token).toEqual(mockJwt);
         expect(requestSpy).not.toHaveBeenCalled();
       });
+
+      it('cancels default and template proactive refresh timers when client.fromJSON removes a session while keeping remaining sessions active', async () => {
+        Client.clearInstance();
+        try {
+          const client = Client.getOrCreateInstance();
+          BaseResource.clerk = clerkMock({ client: client as any });
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+          const makeSessionJSON = (id: string, status: SessionJSON['status'] = 'active'): SessionJSON =>
+            ({
+              status,
+              id,
+              object: 'session',
+              user: createUser({ id: `user_${id}` }),
+              last_active_organization_id: null,
+              last_active_token: { object: 'token', jwt: mockJwt },
+              actor: null,
+              created_at: Date.now(),
+              updated_at: Date.now(),
+            }) as SessionJSON;
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [makeSessionJSON('sess_1'), makeSessionJSON('sess_10')],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: 'sess_1',
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          await Promise.resolve();
+          await Promise.resolve();
+
+          requestSpy.mockResolvedValueOnce({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+          await client.sessions[0].getToken({ template: 't3-relay' });
+          await Promise.resolve();
+          await Promise.resolve();
+
+          requestSpy.mockClear();
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [makeSessionJSON('sess_10')],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: 'sess_10',
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          await expect(client.sessions[0].getToken()).resolves.toBe(mockJwt);
+          expect(requestSpy).not.toHaveBeenCalled();
+
+          requestSpy.mockResolvedValue({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+          await vi.advanceTimersByTimeAsync(45 * 1000);
+
+          const requestedPaths = requestSpy.mock.calls.map((call: any[]) => call[0]?.path);
+          expect(requestedPaths).not.toContain('/client/sessions/sess_1/tokens');
+          expect(requestedPaths).not.toContain('/client/sessions/sess_1/tokens/t3-relay');
+          expect(requestedPaths).toContain('/client/sessions/sess_10/tokens');
+        } finally {
+          Client.clearInstance();
+        }
+      });
+
+      it('cancels proactive refresh timers when client.fromJSON marks a session as removed', async () => {
+        Client.clearInstance();
+        try {
+          const client = Client.getOrCreateInstance();
+          BaseResource.clerk = clerkMock({ client: client as any });
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+          const makeSessionJSON = (status: SessionJSON['status']): SessionJSON =>
+            ({
+              status,
+              id: 'sess_1',
+              object: 'session',
+              user: createUser({}),
+              last_active_organization_id: null,
+              last_active_token: { object: 'token', jwt: mockJwt },
+              actor: null,
+              created_at: Date.now(),
+              updated_at: Date.now(),
+            }) as SessionJSON;
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [makeSessionJSON('active')],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: 'sess_1',
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          await Promise.resolve();
+          await Promise.resolve();
+          requestSpy.mockClear();
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [makeSessionJSON('removed')],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          await vi.advanceTimersByTimeAsync(45 * 1000);
+          expect(requestSpy).not.toHaveBeenCalled();
+        } finally {
+          Client.clearInstance();
+        }
+      });
+
+      it('does not repopulate cache or schedule another refresh when an in-flight background refresh resolves after session removal', async () => {
+        Client.clearInstance();
+        try {
+          const client = Client.getOrCreateInstance();
+          BaseResource.clerk = clerkMock({ client: client as any });
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+          const refreshedJwt =
+            'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY2NDg0MDAsImlhdCI6MTY2NjY0ODM0MCwiaXNzIjoiaHR0cHM6Ly9jbGVyay5leGFtcGxlLmNvbSIsImp0aSI6Im5ld3Rva2VuIiwibmJmIjoxNjY2NjQ4MzQwLCJzaWQiOiJzZXNzXzEiLCJzdWIiOiJ1c2VyXzEifQ.mock';
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [
+              {
+                status: 'active',
+                id: 'sess_1',
+                object: 'session',
+                user: createUser({}),
+                last_active_organization_id: null,
+                last_active_token: { object: 'token', jwt: mockJwt },
+                actor: null,
+                created_at: Date.now(),
+                updated_at: Date.now(),
+              } as SessionJSON,
+            ],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: 'sess_1',
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          await Promise.resolve();
+          await Promise.resolve();
+          requestSpy.mockClear();
+          dispatchSpy.mockClear();
+
+          let resolveRefresh!: (value: any) => void;
+          requestSpy.mockReturnValueOnce(
+            new Promise(resolve => {
+              resolveRefresh = resolve;
+            }),
+          );
+
+          await vi.advanceTimersByTimeAsync(44 * 1000);
+          expect(requestSpy).toHaveBeenCalledTimes(1);
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          dispatchSpy.mockClear();
+          resolveRefresh({ payload: { object: 'token', jwt: refreshedJwt }, status: 200 });
+          await Promise.resolve();
+          await Promise.resolve();
+
+          expect(dispatchSpy).not.toHaveBeenCalled();
+
+          requestSpy.mockClear();
+          await vi.advanceTimersByTimeAsync(45 * 1000);
+          expect(requestSpy).not.toHaveBeenCalled();
+        } finally {
+          Client.clearInstance();
+        }
+      });
+
+      it('does not emit token:update or schedule refresh when an in-flight getToken fetch resolves after session removal', async () => {
+        Client.clearInstance();
+        try {
+          const client = Client.getOrCreateInstance();
+          BaseResource.clerk = clerkMock({ client: client as any });
+          const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [
+              {
+                status: 'active',
+                id: 'sess_1',
+                object: 'session',
+                user: createUser({}),
+                last_active_organization_id: null,
+                last_active_token: null,
+                actor: null,
+                created_at: Date.now(),
+                updated_at: Date.now(),
+              } as SessionJSON,
+            ],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: 'sess_1',
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          const session = client.sessions[0];
+          requestSpy.mockClear();
+          dispatchSpy.mockClear();
+
+          let resolveFetch!: (value: any) => void;
+          requestSpy.mockReturnValueOnce(
+            new Promise(resolve => {
+              resolveFetch = resolve;
+            }),
+          );
+
+          const tokenPromise = session.getToken();
+
+          client.fromJSON({
+            object: 'client',
+            id: 'client_1',
+            sessions: [],
+            sign_in: null,
+            sign_up: null,
+            last_active_session_id: null,
+            created_at: Date.now(),
+            updated_at: Date.now(),
+          } as any);
+
+          dispatchSpy.mockClear();
+          resolveFetch({ payload: { object: 'token', jwt: mockJwt }, status: 200 });
+          await tokenPromise;
+          await Promise.resolve();
+
+          expect(dispatchSpy).not.toHaveBeenCalled();
+
+          requestSpy.mockClear();
+          await vi.advanceTimersByTimeAsync(45 * 1000);
+          expect(requestSpy).not.toHaveBeenCalled();
+        } finally {
+          Client.clearInstance();
+        }
+      });
     });
   });
 

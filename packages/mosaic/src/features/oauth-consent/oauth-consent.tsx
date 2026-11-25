@@ -23,7 +23,8 @@ export type OAuthConsentProps = OAuthConsentModelOptions & {
 /**
  * Asks the signed-in user whether an OAuth application may access their account. It reads the client,
  * scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props
- * set them, and posts the answer to Clerk with every URL parameter forwarded. It renders `fallback`
+ * set them, and posts the answer to Clerk with the scopes the user kept checked and the other URL
+ * parameters forwarded. It renders `fallback`
  * until Clerk loads, a skeleton of the consent card until the consent details load, and nothing at all
  * when nobody is signed in.
  *
@@ -71,6 +72,7 @@ export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): React
             <Flow.Step ids={['ready']}>
               {current.status === 'ready' ? (
                 <ReadyOAuthConsent
+                  key={`${current.actionUrl} ${current.scopes.map(item => item.scope).join(' ')}`}
                   model={current}
                   messages={messages}
                 />

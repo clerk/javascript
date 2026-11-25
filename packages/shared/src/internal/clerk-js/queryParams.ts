@@ -1,6 +1,7 @@
 import type { EmailLinkErrorCodeStatus } from '../../error';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '../../netlifyCacheHandler';
 import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from './constants';
+import { PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM } from './passwordConfirmation';
 
 const _ClerkQueryParams = [
   '__clerk_status',
@@ -11,6 +12,7 @@ const _ClerkQueryParams = [
   '__clerk_handshake',
   '__clerk_handshake_nonce',
   '__clerk_help',
+  PASSWORD_CONFIRMATION_SESSION_ENDED_PARAM,
   CLERK_NETLIFY_CACHE_BUST_PARAM,
   CLERK_SYNCED,
   CLERK_SATELLITE_URL,

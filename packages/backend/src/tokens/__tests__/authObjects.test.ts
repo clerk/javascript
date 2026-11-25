@@ -145,6 +145,17 @@ describe('signedInAuthObject', () => {
     expect(serialized).not.toContain(rawSessionToken);
   });
 
+  it('trims the machine secret key in debug output', () => {
+    const mockAuthenticateContext = {
+      machineSecretKey: 'ak_test_machine_secret_key_value',
+    } as unknown as AuthenticateContext;
+
+    const authObject = signedInAuthObject(mockAuthenticateContext, 'token', { sub: 'userId' } as unknown as JwtPayload);
+    const debug = authObject.debug();
+
+    expect(debug.machineSecretKey).toBe('ak_test');
+  });
+
   describe('JWT v1', () => {
     it('has() for user scope', () => {
       const mockAuthenticateContext = { sessionToken: 'authContextToken' } as AuthenticateContext;

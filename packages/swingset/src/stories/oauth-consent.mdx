@@ -2,7 +2,7 @@ import * as Stories from './oauth-consent.stories';
 
 # OAuthConsent
 
-Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It renders `fallback` until Clerk loads, a skeleton of the consent card until the consent details load, and nothing when nobody is signed in.
+Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with the other URL parameters forwarded. Every scope starts checked, and the user can clear any of them except `offline_access`; only the checked scopes are posted. When the application asks for `user:org:read` and it stays checked, the user picks which organization to grant. It renders `fallback` until Clerk loads, a skeleton of the consent card until the consent details load, and nothing when nobody is signed in.
 
 ## Example
 
@@ -48,26 +48,44 @@ import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent
 
 ## Examples
 
-### Scope list
-
-Without `scopeSelection`, the scopes render as a list with no checkboxes. This is what `OAuthConsent` renders today.
-
-<Story name='ScopeList' storyModule={Stories} />
-
 ### Many scopes
 
 A long scope list scrolls inside its box, with the edges fading while there is more to see.
 
 <Story name='ManyScopes' storyModule={Stories} />
 
+### Single organization
+
+The default. `organizationSelection` with `organizationId` shows a plain select, and the form posts the one picked `organization_id`.
+
+<Story name='SingleOrganization' storyModule={Stories} />
+
 ### Multiple organizations
 
-With `organizationSelection`, the user grants access to all of their organizations or picks some of them. Picking shows a select of organizations with their avatars, and the select reads as a count once more than one is picked. The form posts one `organization_id` per granted organization.
+The view only, for when the backend accepts more than one organization. `multiple: true` with a `limit` lets the user pick up to that many organizations. Once the limit is picked, the rest are disabled, and the select reads as a count once more than one is picked. Allow stays disabled while none is picked. The form posts the picked organizations as one space-separated `organization_id`.
 
 <Story name='MultipleOrganizations' storyModule={Stories} />
 
+### Organization access
+
+The view only. `multiple: true` with `access` asks whether to grant all organizations or only selected ones. All posts every organization; only selected shows the multi-select, and Allow stays disabled until one is picked.
+
+<Story name='OrganizationAccess' storyModule={Stories} />
+
 ### Offline access
 
-Requesting `offline_access` hides that scope from the list and adds a note that the user stays signed in.
+Requesting `offline_access` lists that scope as required, so it stays checked, and adds a note that the user stays signed in.
 
 <Story name='OfflineAccess' storyModule={Stories} />
+
+### Unverified app
+
+An application that registered itself through dynamic client registration chose its own name and logo, so a warning says they are not verified.
+
+<Story name='UnverifiedApp' storyModule={Stories} />
+
+### Metadata document
+
+An application whose details come from a client metadata document names the host that published them.
+
+<Story name='MetadataDocument' storyModule={Stories} />

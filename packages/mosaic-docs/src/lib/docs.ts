@@ -1,11 +1,19 @@
 import { placeDocs } from '@/core/doc-place';
-import { findRelated } from '@/core/doc-related';
+import { findRelated, hideRelated } from '@/core/doc-related';
 import { docEntries as generatedEntries, type DocEntry } from '@/generated/docs';
 import { site } from '@/lib/site';
 
 export type { DocEntry };
 
-export const docEntries: DocEntry[] = placeDocs(generatedEntries).filter(entry => entry.kind !== 'hooks');
+const siteEntries = placeDocs(generatedEntries).filter(entry => entry.kind !== 'hooks');
+const unpublished = new Set(
+  siteEntries.flatMap(entry => entry.doc.related ?? []).filter(name => !findRelated(siteEntries, name)),
+);
+
+export const docEntries: DocEntry[] = siteEntries.map(entry => ({
+  ...entry,
+  doc: hideRelated(entry.doc, unpublished),
+}));
 
 export const docKinds = [
   { kind: 'components', title: 'Components' },
@@ -25,7 +33,8 @@ export function relatedHref(name: string): string | undefined {
   if (!related) {
     return undefined;
   }
-  return related.anchor ? `${docHref(related.place)}#${related.anchor}` : docHref(related.place);
+  const page = related.tab === 'properties' ? `${docHref(related.place)}/properties` : docHref(related.place);
+  return related.anchor ? `${page}#${related.anchor}` : page;
 }
 
 export function relatedMarkdownHref(name: string): string | undefined {

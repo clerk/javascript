@@ -120,6 +120,7 @@ const LINK_REPLACEMENTS = [
   ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
   ['invitation', '/docs/reference/backend/types/backend-invitation'],
+  ['user-search-metadata-filter', '/docs/reference/backend/types/backend-user-search-metadata-filter'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/types/billing-checkout-resource#confirm-parameters'],

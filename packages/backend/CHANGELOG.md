@@ -1,5 +1,54 @@
 # Change Log
 
+## 3.33.0
+
+### Minor Changes
+
+- Add a `resetDeviceTrust` option to `sessions.revokeSession()` and `users.updateUser()`. When it is `true`, Clerk forgets the affected devices, so the user's next sign-in on them counts as a new device. `updateUser()` accepts it only with a new `password` or `passwordDigest` and `signOutOfOtherSessions: true`. ([#10942](https://github.com/clerk/javascript/pull/10942)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Clean up `auth().debug()` output so it handles all configured keys the same way. ([#10946](https://github.com/clerk/javascript/pull/10946)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Correct the `UserSearchMetadataFilter` JSDoc. A negated `equals` filter matches users that hold the key with a different value, not every user the filter does not match, and `equals` matches any item when the key holds an array. ([#10968](https://github.com/clerk/javascript/pull/10968)) by [@dmoerner](https://github.com/dmoerner)
+
+- Updated dependencies [[`63864a8`](https://github.com/clerk/javascript/commit/63864a8a9262f24b15bd4626b1a49f1dbab83989)]:
+  - @clerk/shared@4.49.0
+
+## 3.32.0
+
+### Minor Changes
+
+- Add `clerkClient.users.getUserListWithoutCount()`, which takes the same parameters as `getUserList()` and returns `{ data }` with the same page of users, without the request to count them. Use it when you don't need `totalCount`: counting can be slow for a search over many users, and `getUserList()` fails when the count does and the page is full. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+- Add `clerkClient.users.searchUsers()`, a faster way to list and filter users on large instances. ([#10880](https://github.com/clerk/javascript/pull/10880)) by [@dmoerner](https://github.com/dmoerner)
+
+  ```ts
+  const { data, cursor } = await clerkClient.users.searchUsers({
+    metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+  });
+
+  // Next page: the same filters, plus the cursor
+  if (cursor.startingAfter) {
+    await clerkClient.users.searchUsers({
+      metadata: [{ scope: 'public', key: 'plan', match: 'equals', value: 'pro' }],
+      startingAfter: cursor.startingAfter,
+    });
+  }
+  ```
+
+  Compared with `getUserList()`:
+  - It pages with a cursor instead of an offset, so later pages are as fast as the first.
+  - It can also filter on public, private and unsafe metadata, on an external account's provider and provider user ID, and on banned or deprovisioned users.
+  - It returns no `totalCount`. Pass `remainingCount` to get a count of the users from the current page onward.
+  - Results can lag a recent change by a short time. To read a user right after you change them, get them by ID with `getUser()`.
+
+  `getUserList()` is unchanged.
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Sign-in security** page under **Protect** (`/~/protect/sign-in-security`) in the Clerk Dashboard, where the lockout settings now live. ([#10745](https://github.com/clerk/javascript/pull/10745)) by [@brunol95](https://github.com/brunol95)
+
 ## 3.31.4
 
 ### Patch Changes

@@ -18,14 +18,12 @@ type UsePopoverReturn = ReturnType<typeof usePopover>;
 type UseSearchInputReturn = ReturnType<typeof useSearchInput>;
 type UseInteractionsReturn = ReturnType<typeof useInteractions>;
 
-type Option = { value: string | null; label?: string };
+type Option = { value: string | null; label?: string; disabled?: boolean };
 
 type RenderOption<O extends Option> = (option: O, index?: number, isSelected?: boolean) => ReactNode;
 
-type SelectProps<O extends Option> = {
+type SelectBaseProps<O extends Option> = {
   options: O[];
-  value: string | null;
-  onChange: (option: O) => void;
   searchPlaceholder?: string;
   placeholder?: string;
   comparator?: (term: string, option: O) => boolean;
@@ -36,15 +34,31 @@ type SelectProps<O extends Option> = {
   referenceElement?: React.RefObject<HTMLElement>;
 };
 
+type SelectSingleProps<O extends Option> = SelectBaseProps<O> & {
+  multiple?: false;
+  value: string | null;
+  onChange: (option: O) => void;
+};
+
+type SelectMultipleProps<O extends Option> = SelectBaseProps<O> & {
+  multiple: true;
+  value: Array<O['value']>;
+  onChange: (value: Array<O['value']>) => void;
+};
+
+type SelectProps<O extends Option> = SelectSingleProps<O> | SelectMultipleProps<O>;
+
 type SelectState<O extends Option> = Pick<
-  SelectProps<O>,
-  'placeholder' | 'searchPlaceholder' | 'elementId' | 'value' | 'comparator' | 'noResultsMessage'
+  SelectBaseProps<O>,
+  'placeholder' | 'searchPlaceholder' | 'elementId' | 'comparator' | 'noResultsMessage'
 > & {
   popoverCtx: UsePopoverReturn;
   searchInputCtx: UseSearchInputReturn;
   renderOption: RenderOption<O>;
   buttonRenderOption: RenderOption<O>;
-  selectedOption: Option | null;
+  multiple: boolean;
+  selectedValues: Array<Option['value']>;
+  selectedOptions: O[];
   select: (option: O) => void;
   getReferenceProps: UseInteractionsReturn['getReferenceProps'];
   getFloatingProps: UseInteractionsReturn['getFloatingProps'];
@@ -94,9 +108,7 @@ const defaultButtonRenderOption = <O extends Option>(option: O) => {
 
 export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildren<SelectProps<O>>) => {
   const {
-    value,
     options,
-    onChange,
     renderOption,
     noResultsMessage,
     comparator,
@@ -106,8 +118,9 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     children,
     portal = false,
     referenceElement = null,
-    ...rest
   } = props;
+  const selectedValues = props.multiple ? props.value : [props.value];
+  const selectedOptions = selectedValues.flatMap(value => options.filter(o => o.value === value).slice(0, 1));
   const popoverCtx = usePopover({
     autoUpdate: true,
     // +2px compensates for the 1px border on each side of the trigger
@@ -120,11 +133,24 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   const elementsRef = React.useRef<Array<HTMLElement | null>>([]);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
+  const searchInputCtx = useSearchInput({
+    items: options,
+    comparator: comparator || (() => true),
+  });
+
   // Delegate keyboard interactions to floating-ui so the trigger opens the
   // listbox on ArrowUp/ArrowDown and navigation stays a single source of truth.
   // `virtual` keeps DOM focus on the listbox (or the search input in combobox
   // mode) and exposes the active option via `aria-activedescendant`.
-  const selectedIndex = options.findIndex(o => o.value === value);
+  const navigableOptions = props.multiple ? searchInputCtx.filteredItems : options;
+  const liveSelectedIndex = navigableOptions.findIndex(o => !o.disabled && selectedValues.includes(o.value));
+  const [openedSelectedIndex, setOpenedSelectedIndex] = React.useState(liveSelectedIndex);
+  const [trackedIsOpen, setTrackedIsOpen] = React.useState(popoverCtx.isOpen);
+  if (trackedIsOpen !== popoverCtx.isOpen) {
+    setTrackedIsOpen(popoverCtx.isOpen);
+    setOpenedSelectedIndex(liveSelectedIndex);
+  }
+  const selectedIndex = props.multiple && popoverCtx.isOpen ? openedSelectedIndex : liveSelectedIndex;
   const listNavigation = useListNavigation(context, {
     listRef: elementsRef,
     activeIndex,
@@ -139,17 +165,21 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   const generatedListboxId = React.useId();
   const [triggerId, setTriggerId] = React.useState(generatedTriggerId);
   const [listboxId, setListboxId] = React.useState(generatedListboxId);
-  const searchInputCtx = useSearchInput({
-    items: options,
-    comparator: comparator || (() => true),
-  });
 
+  const { multiple, value, onChange } = props;
   const select = React.useCallback(
     (option: O) => {
-      onChange?.(option);
+      if (option.disabled) {
+        return;
+      }
+      if (multiple) {
+        onChange(value.includes(option.value) ? value.filter(v => v !== option.value) : [...value, option.value]);
+        return;
+      }
+      onChange(option);
       togglePopover();
     },
-    [togglePopover, onChange],
+    [multiple, value, onChange, togglePopover],
   );
 
   const defaultChildren = (
@@ -165,9 +195,10 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
         value: {
           popoverCtx,
           searchInputCtx,
-          selectedOption: options.find(o => o.value === value) || null,
+          multiple: multiple === true,
+          selectedValues,
+          selectedOptions,
           noResultsMessage,
-          value,
           renderOption: renderOption || defaultRenderOption,
           buttonRenderOption: renderOption || defaultButtonRenderOption,
           placeholder,
@@ -191,7 +222,6 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           portal,
         },
       }}
-      {...rest}
     >
       {React.Children.count(children) ? children : defaultChildren}
     </SelectStateCtx.Provider>
@@ -220,9 +250,10 @@ const SelectRenderOption = React.memo((props: SelectrenderOptionProps<any>) => {
       id={id}
       role='option'
       aria-selected={isSelected}
+      aria-disabled={option.disabled || undefined}
       sx={{
         userSelect: 'none',
-        cursor: 'pointer',
+        cursor: option.disabled ? 'not-allowed' : 'pointer',
       }}
       {...getItemProps({
         onClick: () => handleSelect(option),
@@ -234,6 +265,7 @@ const SelectRenderOption = React.memo((props: SelectrenderOptionProps<any>) => {
         elementId: descriptors.selectOption.setId(elementId),
         'data-selected': isSelected,
         'data-focused': isFocused,
+        'data-disabled': option.disabled,
       })}
     </Flex>
   );
@@ -305,7 +337,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   const {
     popoverCtx,
     searchInputCtx,
-    value,
+    multiple,
+    selectedValues,
     renderOption,
     searchPlaceholder,
     comparator,
@@ -335,13 +368,16 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
   // Reset the highlighted option to the top of the list whenever the filtered
   // results change while searching. Intentionally keyed only on the result
-  // count so it does not fight floating-ui's highlight-on-open behavior.
+  // count (or, in multiple mode, the result values) so it does not fight
+  // floating-ui's highlight-on-open behavior.
+  const resultsKey = multiple ? options.map(o => o.value).join('\u0000') : options.length;
   React.useEffect(() => {
     if (isOpen) {
-      setActiveIndex(0);
+      const firstEnabledIndex = options.findIndex(o => !o.disabled);
+      setActiveIndex(firstEnabledIndex === -1 ? 0 : firstEnabledIndex);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.length]);
+  }, [resultsKey]);
 
   React.useEffect(() => {
     if (isOpen && !comparator) {
@@ -420,6 +456,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           id={effectiveListboxId}
           direction='col'
           role='listbox'
+          aria-multiselectable={multiple || undefined}
           aria-label={ariaLabel}
           aria-labelledby={effectiveAriaLabelledBy}
           aria-activedescendant={comparator ? undefined : activeDescendant}
@@ -439,7 +476,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           <FloatingList elementsRef={elementsRef}>
             {options.map((option, index) => {
               const isFocused = index === activeIndex;
-              const isSelected = value === option.value;
+              const isSelected = selectedValues.includes(option.value);
 
               return (
                 <SelectRenderOption
@@ -476,7 +513,8 @@ export const SelectButton = (
     popoverCtx,
     onTriggerClick,
     buttonRenderOption,
-    selectedOption,
+    multiple,
+    selectedOptions,
     placeholder,
     elementId,
     generatedTriggerId,
@@ -493,7 +531,14 @@ export const SelectButton = (
 
   let show: React.ReactNode = children;
   if (!children) {
-    show = selectedOption ? buttonRenderOption(selectedOption) : <Text as='span'>{placeholder}</Text>;
+    const [firstSelected] = selectedOptions;
+    if (!firstSelected) {
+      show = <Text as='span'>{placeholder}</Text>;
+    } else if (multiple) {
+      show = selectedOptions.map(option => option.label || option.value).join(', ');
+    } else {
+      show = buttonRenderOption(firstSelected);
+    }
   }
 
   return (

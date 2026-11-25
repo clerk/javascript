@@ -29,7 +29,7 @@ export function DocsNav({ groups }: { groups: NavGroup[] }) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  aria-current={item.href === pathname ? 'page' : undefined}
+                  aria-current={item.href === pathname || pathname.startsWith(`${item.href}/`) ? 'page' : undefined}
                   className='nav-link'
                 >
                   <span className='block truncate'>{item.title}</span>
