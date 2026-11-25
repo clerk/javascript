@@ -3,95 +3,36 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
 import { tick } from '../../../__tests__/async';
-import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
-  fapiEnvironment,
-  type FapiEnvironmentOverrides,
   fapiMembership,
   fapiOrganization,
   fapiSession,
   fapiSignUp,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { useVirtualWrite } from '../../../routing/virtual-store';
-import { SignUp, type SignUpProps } from '../sign-up';
-
-const EMAIL = 'alice@example.com';
-const OTHER_EMAIL = 'alice@acme.test';
-const signedInSession = fapiSession({ id: 'sess_existing', user: fapiUser({ id: 'user_existing' }) });
-const PASSWORD = 'correct-horse-battery';
-const SHORT_PASSWORD = 'abc123';
-
-function environment({ attributes, ...overrides }: FapiEnvironmentOverrides = {}) {
-  return fapiEnvironment({
-    attributes: { email_address: { required: true }, password: { required: true }, ...attributes },
-    ...overrides,
-  });
-}
-
-function minimumPasswordLength(min_length: number) {
-  return environment({
-    user_settings: { password_settings: { ...fapiEnvironment().user_settings.password_settings, min_length } },
-  });
-}
-
-async function renderSignUp(
-  seed: FakeFapiSeed = {},
-  props: SignUpProps = {},
-  options?: Parameters<typeof renderWithClerk>[1],
-) {
-  const fapi = serveFapi({ environment: environment(), ...seed });
-  const view = await renderWithClerk(<SignUp {...props} />, options);
-  const user = userEvent.setup();
-  return { ...view, fapi, user };
-}
-
-function RouteProbe() {
-  const write = useVirtualWrite();
-  return (
-    <>
-      <button
-        type='button'
-        onClick={() => write('/sign-up', [])}
-      >
-        Open the start route
-      </button>
-      <button
-        type='button'
-        onClick={() => write('/sign-up', ['verify-email-address'])}
-      >
-        Open the verify route
-      </button>
-      <button
-        type='button'
-        onClick={() => write('/sign-up', ['continue'])}
-      >
-        Open the continue route
-      </button>
-    </>
-  );
-}
-
-async function renderSignUpWithRouteProbe(seed: FakeFapiSeed = {}) {
-  const fapi = serveFapi({ environment: environment(), ...seed });
-  const view = await renderWithClerk(
-    <>
-      <SignUp />
-      <RouteProbe />
-    </>,
-  );
-  const user = userEvent.setup();
-  await screen.findByRole('heading', { name: 'Create your account' });
-  return { ...view, fapi, user };
-}
-
-function visitWithQuery(query: string) {
-  const original = window.location.href;
-  window.history.replaceState(null, '', query);
-  onTestFinished(() => window.history.replaceState(null, '', original));
-}
+import { SignUp } from '../sign-up';
+import {
+  codeSent,
+  continueButton,
+  EMAIL,
+  emailField,
+  enterCode,
+  environment,
+  minimumPasswordLength,
+  OTHER_EMAIL,
+  PASSWORD,
+  passwordField,
+  renderSignUp,
+  renderSignUpWithRouteProbe,
+  SHORT_PASSWORD,
+  signedInSession,
+  submitStart,
+  visitWithQuery,
+  watchFor,
+  watchForHeading,
+} from './sign-up.fixtures';
 
 function captureNavigations() {
   const navigation = (window as unknown as { navigation: EventTarget }).navigation;
@@ -103,38 +44,6 @@ function captureNavigations() {
   navigation.addEventListener('navigate', onNavigate);
   onTestFinished(() => navigation.removeEventListener('navigate', onNavigate));
   return urls;
-}
-
-const emailField = () => screen.getByRole('textbox', { name: 'Email address' });
-const passwordField = () => screen.getByLabelText('Password', { selector: 'input' });
-const continueButton = () => screen.getByRole('button', { name: 'Continue' });
-
-async function submitStart(user: ReturnType<typeof userEvent.setup>, email = EMAIL) {
-  await user.type(await screen.findByRole('textbox', { name: 'Email address' }), email);
-  await user.type(passwordField(), PASSWORD);
-  await user.click(continueButton());
-}
-
-function watchFor(appeared: () => boolean) {
-  let seen = false;
-  const observer = new MutationObserver(() => {
-    seen ||= appeared();
-  });
-  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
-  return () => {
-    observer.disconnect();
-    return seen;
-  };
-}
-
-const watchForHeading = (name: string | RegExp) => watchFor(() => screen.queryByRole('heading', { name }) !== null);
-
-const codeSent = () => screen.findByRole('button', { name: /^Resend \(\d+\)$/ });
-
-async function enterCode(user: ReturnType<typeof userEvent.setup>, code = VERIFICATION_CODE) {
-  await codeSent();
-  await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
-  await user.keyboard(code);
 }
 
 describe('SignUp', () => {
