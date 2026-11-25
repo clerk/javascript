@@ -206,13 +206,13 @@ export function createNativeClientSync(
   const fallback = () => getUserTokenCache() ?? MemoryTokenCache;
   const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback(), getNativeUpdateRequiredViewEnabled());
   let mirroredToken: string | null = null;
-  let discardedClientId: string | null = null;
+  const discardedClientIds = new Set<string>();
   let lastFingerprint: string | undefined;
   let refreshFailure: { error: unknown } | null = null;
 
   const isDiscarded = (token: string | null) => {
     const clientId = clientIdOf(token);
-    return !!clientId && clientId === discardedClientId;
+    return !!clientId && discardedClientIds.has(clientId);
   };
 
   const mirror = (token: string | null) => {
@@ -261,12 +261,16 @@ export function createNativeClientSync(
       await tokenCache.saveClientToken(token, await native.getDeviceToken().catch(() => null));
     },
     clearToken: key => fallback().clearToken?.(key),
-    isDiscardedClient: clientId => clientId === discardedClientId,
+    isDiscardedClient: clientId => discardedClientIds.has(clientId),
     saveClientToken: async (token, requestToken) => {
       if (isDiscarded(token)) {
         return;
       }
-      if (!(await ready())) {
+      const isReady = await ready();
+      if (isDiscarded(token)) {
+        return;
+      }
+      if (!isReady) {
         return fallback().saveToken(CLERK_CLIENT_JWT_KEY, token);
       }
       if (token === requestToken && token === mirroredToken) {
@@ -301,7 +305,9 @@ export function createNativeClientSync(
   };
 
   const discardDeviceToken = async (clientId: string | null) => {
-    discardedClientId = clientId;
+    if (clientId) {
+      discardedClientIds.add(clientId);
+    }
     mirroredToken = null;
     const cache = fallback();
     await Promise.resolve()

@@ -4,7 +4,7 @@ type FakeRequestInit = { url: URL; headers: Headers };
 type BeforeRequestHook = (requestInit: FakeRequestInit) => unknown;
 type AfterResponseHook = (
   requestInit: FakeRequestInit,
-  response: { headers: Headers; payload: { client: FakeServerClientJSON | null } },
+  response: { headers: Headers; payload: { client?: FakeServerClientJSON | null } },
 ) => unknown;
 
 export type FakeSessionResource = {
@@ -21,7 +21,10 @@ export type JsEmission = {
   signedInSessionIds: string[];
 };
 
-type ListenerCallback = (resources: { client: FakeClientResource; session: FakeSessionResource | null }) => void;
+type ListenerCallback = (resources: {
+  client: FakeClientResource;
+  session: FakeSessionResource | null | undefined;
+}) => void;
 type StatusListener = (status: string) => void;
 
 function toSessionResource(session: FakeServerClientJSON['sessions'][number]): FakeSessionResource {
@@ -52,7 +55,7 @@ export class FakeClientResource {
 
   fetch = async (_options?: { fetchMaxTries?: number }): Promise<FakeClientResource> => {
     const response = await this.clerk.fapi(token => this.clerk.server.getClient('js', token));
-    return this.fromJSON(response.client);
+    return response.client === undefined ? this : this.fromJSON(response.client);
   };
 
   fromJSON(data: FakeServerClientJSON | null): this {
@@ -111,7 +114,7 @@ export class FakeClerk {
     const requestInit = await this.#prepareRequest();
     const response = await request(requestInit.headers.get('authorization') || null);
     const headers = new Headers(response.token ? { authorization: response.token } : {});
-    const payload = { client: response.client };
+    const payload: { client?: FakeServerClientJSON | null } = { client: response.client };
     for (const hook of this.#afterResponseHooks) {
       await hook(requestInit, { headers, payload });
     }
@@ -293,7 +296,7 @@ export class FakeClerk {
   }
 
   #applyPiggybackedClient(response: FapiResponse): void {
-    if (response.status !== 200) {
+    if (response.status !== 200 || response.client === undefined) {
       return;
     }
     const client = this.client ?? new FakeClientResource(this);

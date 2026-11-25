@@ -344,11 +344,11 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
       __internal_clerk.__internal_onAfterResponse(async (requestInit: FapiRequestInit, response: FapiResponse) => {
-        dropDiscardedClient(response.payload);
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
         }
+        dropDiscardedClient(response.payload);
 
         appVersionRequestHooks?.afterResponse(requestInit, response);
 

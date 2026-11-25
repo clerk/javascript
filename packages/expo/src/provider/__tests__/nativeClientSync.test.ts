@@ -444,6 +444,47 @@ describe('createNativeClientSync', () => {
     }
   });
 
+  test('keeps a save that waited on a failed configure out of the app token cache after a failed sign-out', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const signedIn = clientToken('client_signed_in', 1);
+      const native = nativeModule();
+      vi.mocked(native.configureNative).mockReturnValue(new Promise<void>(() => undefined));
+      const { cache, stored } = clearableTokenCache(signedIn);
+      const clerk = clerkWithFailingSignOut('client_signed_in');
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      sync.attach(clerk);
+
+      const save = sync.tokenCache.saveClientToken(clientToken('client_signed_in', 2), signedIn);
+      const signOut = expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+      await vi.advanceTimersByTimeAsync(3_000);
+      await Promise.all([save, signOut]);
+
+      expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('keeps refusing an earlier signed-out client after a later failed sign-out of another client', async () => {
+    const createNativeClientSync = await loadEngine();
+    const first = clientToken('client_first', 1);
+    const native = nativeModule();
+    vi.mocked(native.configureNative).mockRejectedValue(new Error('native configure failed'));
+    const { cache, stored } = clearableTokenCache(first);
+    const clerk = clerkWithFailingSignOut('client_first');
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    sync.attach(clerk);
+
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    (clerk.client as { id: string }).id = 'client_second';
+    await expect(clerk.signOut?.()).rejects.toThrow('Network request failed');
+    await sync.tokenCache.saveClientToken(clientToken('client_first', 2), first);
+
+    expect(stored.get(CLERK_CLIENT_JWT_KEY)).toBeUndefined();
+  });
+
   test('keeps the rotated token when a late response mints another client from the old token', async () => {
     const createNativeClientSync = await loadEngine();
     const beforeSignIn = clientToken('client_signed_in', 1);
