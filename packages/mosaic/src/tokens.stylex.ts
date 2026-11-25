@@ -86,6 +86,16 @@ const colorDefaults = {
   '--cl-color-input-placeholder': neutralMix(45, 64.25),
 
   '--cl-color-ring': neutralMix(80, 90),
+
+  // The categorical chart palette, named by slot rather than hue so an override never makes a name
+  // wrong. Each step is chosen per mode to pass the data-viz checks against the surface;
+  // `components/chart/__tests__/chart-palette.test.ts` reruns them on these values.
+  '--cl-color-chart-1': 'light-dark(oklch(0.5413 0.2466 293.01), oklch(0.5995 0.2298 293.13))',
+  '--cl-color-chart-2': 'light-dark(oklch(0.5814 0.1271 237.19), oklch(0.6004 0.1307 237.14))',
+  '--cl-color-chart-3': 'light-dark(oklch(0.6198 0.1695 47.72), oklch(0.6198 0.1695 47.72))',
+  '--cl-color-chart-4': 'light-dark(oklch(0.6498 0.115 215.37), oklch(0.6646 0.1167 214.95))',
+  '--cl-color-chart-5': 'light-dark(oklch(0.6608 0.1347 85.9), oklch(0.665 0.136 85.61))',
+  '--cl-color-chart-6': 'light-dark(oklch(0.4802 0.1034 256.97), oklch(0.5389 0.1039 257.52))',
 } as const;
 
 export const colorVars = stylex.defineVars(colorDefaults);

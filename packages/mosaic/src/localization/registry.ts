@@ -1,3 +1,4 @@
+import { chartMessages } from '../components/chart/chart.messages';
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
@@ -91,6 +92,7 @@ export const mosaicMessages = {
   reverification: reverificationMessages,
   profile: profileMessages,
   form: formMessages,
+  chart: chartMessages,
   errors: errorMessages,
   roles: roleMessages,
   oauthConsent: oauthConsentMessages,

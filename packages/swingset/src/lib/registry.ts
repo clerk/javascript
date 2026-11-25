@@ -38,6 +38,16 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import {
+  DarkMode as ChartComponentDarkMode,
+  Default as ChartComponentDefault,
+  Empty as ChartComponentEmpty,
+  Highlight as ChartComponentHighlight,
+  meta as chartComponentMeta,
+  Palette as ChartComponentPalette,
+  Projection as ChartComponentProjection,
+  RenderError as ChartComponentRenderError,
+} from '../stories/chart.component.stories';
 import { meta as chartMeta } from '../stories/chart.stories';
 import {
   Default as CheckboxDefault,
@@ -804,6 +814,17 @@ const badgeModule: StoryModule = {
   WithIcon: BadgeWithIcon,
 };
 
+const chartComponentModule: StoryModule = {
+  meta: chartComponentMeta,
+  Default: ChartComponentDefault,
+  Palette: ChartComponentPalette,
+  Highlight: ChartComponentHighlight,
+  Projection: ChartComponentProjection,
+  Empty: ChartComponentEmpty,
+  RenderError: ChartComponentRenderError,
+  DarkMode: ChartComponentDarkMode,
+};
+
 const bannerModule: StoryModule = {
   meta: bannerMeta,
   Default: BannerDefault,
@@ -1541,6 +1562,7 @@ export const registry: StoryModule[] = [
   buttonModule,
   linkModule,
   cardComponentModule,
+  chartComponentModule,
   checkboxModule,
   comboboxModule,
   copyButtonModule,

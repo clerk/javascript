@@ -22,6 +22,7 @@ export default defineConfig({
     'components/banner': './src/components/banner/index.ts',
     'components/button': './src/components/button/index.ts',
     'components/card': './src/components/card/index.ts',
+    'components/chart': './src/components/chart/index.ts',
     'components/checkbox': './src/components/checkbox/index.ts',
     'components/combobox': './src/components/combobox/index.ts',
     'components/copy-button': './src/components/copy-button/index.ts',

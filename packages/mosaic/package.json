@@ -66,6 +66,11 @@
       "import": "./dist/components/card.js",
       "default": "./dist/components/card.js"
     },
+    "./components/chart": {
+      "types": "./dist/components/chart.d.ts",
+      "import": "./dist/components/chart.js",
+      "default": "./dist/components/chart.js"
+    },
     "./components/checkbox": {
       "types": "./dist/components/checkbox.d.ts",
       "import": "./dist/components/checkbox.js",
