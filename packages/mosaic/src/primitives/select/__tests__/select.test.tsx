@@ -1077,6 +1077,16 @@ describe('Select', () => {
       expect(onValueChange).not.toHaveBeenCalled();
     });
 
+    it('stays checked while disabled when every option is selected', async () => {
+      const user = userEvent.setup();
+      renderSelectAll({ selectAll: { disabled: true }, defaultValue: ['apple', 'banana', 'cherry'] });
+
+      await user.click(screen.getByRole('combobox'));
+      expect(selectAllOption()).toHaveAttribute('aria-checked', 'true');
+      expect(selectAllOption()).toHaveAttribute('data-checked', '');
+      expect(selectAllOption()).not.toHaveAttribute('data-indeterminate');
+    });
+
     it('keeps the label of a selected value whose option is not rendered', async () => {
       const user = userEvent.setup();
       render(
@@ -1155,6 +1165,56 @@ describe('Select', () => {
 
       await user.keyboard(keys);
       expect(onValueChange).toHaveBeenLastCalledWith([]);
+    });
+
+    it('leaves the value alone on Control+A while the Select all row is disabled', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ selectAll: { disabled: true }, onValueChange });
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('option', { name: 'Apple' })));
+      await user.keyboard('{Control>}a{/Control}');
+
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('leaves the value alone on Control+A without a Select all row', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+          multiple
+          onValueChange={onValueChange}
+        >
+          <Select.Trigger aria-label='Fruits'>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              {fruits.map(({ label, value }) => (
+                <Select.Item
+                  key={value}
+                  value={value}
+                  label={label}
+                >
+                  {label}
+                </Select.Item>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('option', { name: 'Apple' })));
+      await user.keyboard('{Control>}a{/Control}');
+
+      expect(onValueChange).not.toHaveBeenCalled();
     });
 
     it('follows a controlled value', async () => {

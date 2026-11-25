@@ -111,6 +111,7 @@ function SelectInner(props: SelectProps<unknown>) {
   const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<unknown, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [options, setOptions] = useState<ReadonlyMap<unknown, boolean>>(new Map());
+  const [selectAllRows, setSelectAllRows] = useState(0);
   const enabledValues = useMemo(
     () => [...options].flatMap(([value, disabled]) => (disabled ? [] : [value])),
     [options],
@@ -278,18 +279,24 @@ function SelectInner(props: SelectProps<unknown>) {
       });
   }, []);
 
+  const registerSelectAll = useCallback(() => {
+    setSelectAllRows(count => count + 1);
+    return () => setSelectAllRows(count => count - 1);
+  }, []);
+
+  const shortcutEnabled = multiple && selectAllRows > 0;
   const selectAllShortcut = useMemo<ElementProps>(
     () => ({
       floating: {
         onKeyDown(event) {
-          if (multiple && event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey) && !event.altKey) {
+          if (shortcutEnabled && event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey) && !event.altKey) {
             event.preventDefault();
             toggleAll();
           }
         },
       },
     }),
-    [multiple, toggleAll],
+    [shortcutEnabled, toggleAll],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -393,11 +400,12 @@ function SelectInner(props: SelectProps<unknown>) {
       getItemProps,
       handleSelect,
       registerItem,
+      registerSelectAll,
       setSelectedIndex,
       valueToLabelRef,
       selectedItemRef,
     }),
-    [getItemProps, handleSelect, registerItem],
+    [getItemProps, handleSelect, registerItem, registerSelectAll],
   );
 
   const highlightContextValue = useMemo<SelectHighlightContextValue>(

@@ -85,7 +85,7 @@ const [value, setValue] = useState('apple');
 </Select.Root>
 ```
 
-<kbd>Ctrl</kbd>+<kbd>A</kbd> (<kbd>⌘</kbd>+<kbd>A</kbd> on macOS) does the same while the popup is open, with or without a `Select.SelectAll`.
+<kbd>Ctrl</kbd>+<kbd>A</kbd> (<kbd>⌘</kbd>+<kbd>A</kbd> on macOS) does the same while the popup is open and an enabled `Select.SelectAll` is rendered.
 
 ### With `items` for SSR label resolution
 
@@ -186,14 +186,14 @@ Accepts all `FloatingArrow` props and forwards `ref`. `context` is injected auto
 
 ## Keyboard Navigation
 
-| Key               | Action                                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------------ |
-| `ArrowDown`       | Move to next option                                                                              |
-| `ArrowUp`         | Move to previous option                                                                          |
-| `Enter` / `Space` | Select the active option and close the popup; with `multiple`, toggle it and keep the popup open |
-| `Escape`          | Close the popup                                                                                  |
-| Type a character  | Jump to matching option (typeahead)                                                              |
-| `Ctrl/⌘ + A`      | With `multiple`, select every enabled option, or clear them once all are selected                |
+| Key               | Action                                                                                               |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `ArrowDown`       | Move to next option                                                                                  |
+| `ArrowUp`         | Move to previous option                                                                              |
+| `Enter` / `Space` | Select the active option and close the popup; with `multiple`, toggle it and keep the popup open     |
+| `Escape`          | Close the popup                                                                                      |
+| Type a character  | Jump to matching option (typeahead)                                                                  |
+| `Ctrl/⌘ + A`      | With an enabled `Select.SelectAll`, select every enabled option, or clear them once all are selected |
 
 Typeahead is active only while the popup is open. It highlights the matching option; pressing Enter or Space then selects it.
 

@@ -82,6 +82,7 @@ export interface SelectItemsContextValue {
   handleSelect: (value: unknown, index: number) => void;
   /** Records a mounted option and whether it is disabled; returns the cleanup that forgets it. */
   registerItem: (value: unknown, disabled: boolean) => () => void;
+  registerSelectAll: () => () => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   valueToLabelRef: React.MutableRefObject<Map<unknown, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;

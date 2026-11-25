@@ -1,7 +1,7 @@
 'use client';
 
 import { useListItem } from '@floating-ui/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useSelectContext, useSelectHighlightContext, useSelectItemsContext } from './select-context';
@@ -35,14 +35,16 @@ function SelectSelectAllBody(bodyProps: SelectSelectAllBodyProps) {
   const { forwardedRef: ref, render, label, disabled: disabledProp, ...otherProps } = bodyProps;
   const { enabledValues, toggleAll } = useSelectContext();
   const { activeIndex, selectedValues } = useSelectHighlightContext();
-  const { getItemProps } = useSelectItemsContext();
+  const { getItemProps, registerSelectAll } = useSelectItemsContext();
   const { ref: itemRef, index } = useListItem({ label: label ?? null });
 
   const selectedCount = enabledValues.filter(value =>
     selectedValues.some(selected => Object.is(selected, value)),
   ).length;
   const disabled = !!disabledProp || enabledValues.length === 0;
-  const checked = !disabled && selectedCount === enabledValues.length;
+  const checked = enabledValues.length > 0 && selectedCount === enabledValues.length;
+
+  useEffect(() => (disabledProp ? undefined : registerSelectAll()), [disabledProp, registerSelectAll]);
   const isActive = activeIndex === index;
 
   const indeterminate = selectedCount > 0 && !checked;
