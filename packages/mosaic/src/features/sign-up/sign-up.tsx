@@ -3,7 +3,7 @@
 import type { SignUpInitialValues } from '@clerk/shared/types';
 import type { ReactElement, ReactNode } from 'react';
 
-import type { MosaicLocationOptions, RoutingProps } from '../../routing/use-mosaic-location';
+import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import {
   isTaskChooseOrganizationReady,
   TaskChooseOrganizationContent,
@@ -15,7 +15,11 @@ import { useSignUpModel } from './sign-up.model';
 import { SignUpView } from './sign-up.view';
 import { SignUpVerify } from './sign-up-verify/sign-up-verify';
 
-export interface SignUpProps extends RoutingProps {
+export interface SignUpProps {
+  /** Where the component's pages live: `virtual` keeps them in memory. Defaults per component. */
+  routing?: MosaicLocationOptions['routing'];
+  /** The base the component's pages are nested under. Defaults per component. */
+  path?: string;
   fallback?: ReactNode;
   initialValues?: SignUpInitialValues;
   unsafeMetadata?: SignUpUnsafeMetadata;
