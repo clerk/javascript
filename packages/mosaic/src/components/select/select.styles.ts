@@ -34,6 +34,13 @@ export const trigger = stylex.create({
         ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
       },
     },
+    paddingInlineEnd: `calc(${space['3']} - 1px)`,
+    paddingInlineStart: `calc(${space['3']} - 1px)`,
+  },
+});
+
+export const triggerVariant = stylex.create({
+  outline: {
     borderColor: {
       default: colorVars['--cl-color-border'],
       '@media (hover: hover)': {
@@ -46,9 +53,8 @@ export const trigger = stylex.create({
       ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
       ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
     },
-    paddingInlineEnd: `calc(${space['3']} - 1px)`,
-    paddingInlineStart: `calc(${space['3']} - 1px)`,
   },
+  ghost: {},
 });
 
 export const value = stylex.create({
