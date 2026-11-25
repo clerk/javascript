@@ -59,7 +59,7 @@ submitPassword: async (password: string) => {
 - `unknown`: nothing. The screen already shows "Start over".
 - `blocked`: sign-up's `create` resolves with it, not a step, when FAPI answers `action_blocked`. The controller keeps the details for this mount and shows the notice in place of `start`. The notice is not read from Clerk's sign-up error, which outlives the component, so a remount shows the form again, as `ui`'s card error does.
 - Anything else: `go(routeFor(step))`.
-- An error from `finalize()` or the transfer stays on the current screen.
+- An error from `finalize()` or the transfer stays on the current screen until the user leaves it, so Edit clears it. Verifying a sign-up that is already complete skips the request and returns `complete`, so entering the code again runs `finalize()` again.
 
 ## Routes and steps
 

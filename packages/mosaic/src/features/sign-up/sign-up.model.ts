@@ -297,6 +297,13 @@ export function useSignUpModel({
     }
   };
 
+  const verify = async (attempt: () => Promise<{ error: ClerkError | null }>) => {
+    if (signUp.status !== 'complete') {
+      await save(() => run(attempt), ['code']);
+    }
+    return next(signUp);
+  };
+
   const legalConsent = legalConsentRequired
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
@@ -400,19 +407,13 @@ export function useSignUpModel({
         target: signUp.emailAddress ?? '',
         needsCode: step.type === 'verify_email' && !step.sent,
         send: () => run(() => signUp.verifications.sendEmailCode()),
-        verify: async code => {
-          await save(() => run(() => signUp.verifications.verifyEmailCode({ code })), ['code']);
-          return next(signUp);
-        },
+        verify: code => verify(() => signUp.verifications.verifyEmailCode({ code })),
       },
       phone: {
         target: signUp.phoneNumber ?? '',
         needsCode: step.type === 'verify_phone' && !step.sent,
         send: () => run(() => signUp.verifications.sendPhoneCode()),
-        verify: async code => {
-          await save(() => run(() => signUp.verifications.verifyPhoneCode({ code })), ['code']);
-          return next(signUp);
-        },
+        verify: code => verify(() => signUp.verifications.verifyPhoneCode({ code })),
       },
     },
   };

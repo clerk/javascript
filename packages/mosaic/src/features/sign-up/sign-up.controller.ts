@@ -23,14 +23,16 @@ interface FinishContext {
   error: ErrorDescription | undefined;
 }
 
-type FinishEvent = { type: 'FINISH'; frozenModel: SignUpReadyModel };
+type FinishStart = { type: 'FINISH'; frozenModel: SignUpReadyModel };
+
+type FinishEvent = FinishStart | { type: 'DISMISS' };
 
 const finish = setup<FinishContext, FinishEvent>();
 
 const startFinishing = {
   FINISH: {
     target: 'finishing' as const,
-    actions: finish.assign<FinishEvent>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
+    actions: finish.assign<FinishStart>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
   },
 };
 
@@ -50,7 +52,7 @@ const finishMachine = finish.createMachine({
       invoke: finish.fromPromise(context => context.frozenModel?.flow.finalize() ?? Promise.resolve(), {
         onDone: { target: 'handingOff' },
         onError: {
-          target: 'idle',
+          target: 'failed',
           actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
             frozenModel: null,
             error: toLocalizableError(event.error),
@@ -63,6 +65,12 @@ const finishMachine = finish.createMachine({
         guard: context => !context.isNextScreenLoading,
         target: 'finished',
         actions: finish.assign(() => ({ frozenModel: null })),
+      },
+    },
+    failed: {
+      on: {
+        ...startFinishing,
+        DISMISS: { target: 'idle', actions: finish.assign(() => ({ error: undefined })) },
       },
     },
     finished: {
@@ -155,7 +163,10 @@ export function useSignUpController(
     onNext: next,
     isPending: isFinishing,
     globalErrorMessage: finishError,
-    onEditIdentifier: () => go(detailsRouteFor(route)),
+    onEditIdentifier: () => {
+      sendFinish({ type: 'DISMISS' });
+      go(detailsRouteFor(route));
+    },
   };
 
   if (isHidden) {
