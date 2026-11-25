@@ -15,7 +15,7 @@ export default function DnsHelpModalContent({ close, path, routing }: ModalConte
       <Card.Header>
         <Card.Title>{route === 'example' ? 'An example record' : 'DNS help'}</Card.Title>
         <Card.Description>
-          Stacked on the domain modal with its own entry under {path}. A press outside it, or Escape, closes this one
+          Stacked on the domain modal with its own segment under {path}. A press outside it, or Escape, closes this one
           and leaves the one beneath.
         </Card.Description>
       </Card.Header>

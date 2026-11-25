@@ -6,7 +6,7 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { RoutingOptions } from '@clerk/mosaic/routing/router-adapter';
 
 import { DemoPage } from '@/components/routing-demo/demo-page';
-import type { HostEntry } from '@/components/routing-demo/host-links';
+import type { HostSegment } from '@/components/routing-demo/host-links';
 import { HostLinks, hostUrl } from '@/components/routing-demo/host-links';
 import { ModeNav, useModeParam } from '@/components/routing-demo/mode-nav';
 import { TabsArrivingLater, TabsInLocation, TabsInStep } from '@/components/routing-demo/tabs-cases';
@@ -23,7 +23,7 @@ function TabsModalButtons() {
       <div className='flex flex-col gap-1'>
         <h2 className='text-sm font-medium'>Tabs in a modal</h2>
         <p className='text-muted-foreground text-sm'>
-          The modal&apos;s entry is its open tab. Opening on a tab writes that tab as the entry before the content
+          The modal&apos;s segment is its open tab. Opening on a tab writes that tab as the segment before the content
           mounts, the same way a profile modal opens on a page.
         </p>
       </div>
@@ -42,7 +42,7 @@ function TabsModalButtons() {
 
 export default function MultipleTabsPage() {
   const mode = useModeParam(modes);
-  const link = (entries: HostEntry[]) => hostUrl({ mode, pagePath, entries });
+  const link = (segments: HostSegment[]) => hostUrl({ mode, pagePath, segments });
   const routing: RoutingOptions = { adapter: nextRouterAdapter, modals: mode === 'virtual' ? undefined : mode };
 
   return (

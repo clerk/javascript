@@ -28,7 +28,7 @@ export default function SideBySidePage() {
             <p>
               Two components on one page, each routing on its own under its own base. In{' '}
               <code className='font-mono text-xs'>virtual</code>, <code className='font-mono text-xs'>hash</code> and{' '}
-              <code className='font-mono text-xs'>query</code> they are independent: each has its own entry, here the
+              <code className='font-mono text-xs'>query</code> they are independent: each has its own segment, here the
               params <code className='font-mono text-xs'>team</code> and{' '}
               <code className='font-mono text-xs'>sidebar</code>, and navigating one leaves the other where it is.
             </p>
@@ -52,7 +52,7 @@ export default function SideBySidePage() {
               href: hostUrl({
                 mode,
                 pagePath,
-                entries: [
+                segments: [
                   { base: '/team', parts: 'teammates/ada' },
                   { base: '/sidebar', parts: 'teammates/grace' },
                 ],

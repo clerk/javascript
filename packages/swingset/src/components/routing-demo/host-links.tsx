@@ -5,35 +5,35 @@ import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
 
-/** One component's entry, as the host would write it: the base it routes under and the segment. */
-export interface HostEntry {
+/** One component's segment, as the host would write it: the base it routes under and the segment. */
+export interface HostSegment {
   base: string;
   parts: string;
 }
 
 /**
- * The URL a host would link to for these entries in this mode, in the shape the carrier reads:
+ * The URL a host would link to for these segments in this mode, in the shape the codec reads:
  * the pathname under the page in path mode, one param per base in hash and query mode, and the
  * query form in virtual mode, which each owner reads into memory and removes. The pathname holds
- * one entry, so path mode takes the first.
+ * one segment, so path mode takes the first.
  */
 export function hostUrl({
   mode,
   pagePath,
-  entries,
+  segments,
   query = {},
 }: {
   mode: RoutingMode;
   pagePath: string;
-  entries: readonly HostEntry[];
+  segments: readonly HostSegment[];
   query?: Record<string, string>;
 }): string {
   const search = new URLSearchParams({ mode, ...query });
   const key = (base: string) => base.replaceAll('/', '.');
-  const pairs = entries.map(({ base, parts }) => `${key(base)}=${parts}`);
+  const pairs = segments.map(({ base, parts }) => `${key(base)}=${parts}`);
   switch (mode) {
     case 'path': {
-      const first = entries[0];
+      const first = segments[0];
       const pathname = first && first.parts !== '' ? `${pagePath}/${first.parts}` : pagePath;
       return `${pathname}?${search}`;
     }

@@ -33,7 +33,7 @@ export default function RoutingOverviewPage() {
         The URL modes read and write the page through the Next.js adapter in{' '}
         <code className='font-mono text-xs'>src/lib/mosaic-next-router-adapter.ts</code>, two hooks from{' '}
         <code className='font-mono text-xs'>next/navigation</code> and nothing else. Every page keeps its mode in a{' '}
-        <code className='font-mono text-xs'>mode</code> query param of its own, which the carriers leave alone.
+        <code className='font-mono text-xs'>mode</code> query param of its own, which Mosaic leaves alone.
       </p>
     </div>
   );

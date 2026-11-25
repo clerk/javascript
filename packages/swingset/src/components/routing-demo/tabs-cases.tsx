@@ -113,7 +113,7 @@ export function TabsInStep({ routing }: { routing: RoutingMode }) {
 
 const laterTabs = ['usage', 'billing', 'limits'];
 
-/** Tabs whose list arrives after mount, the way a profile's pages do: the entry waits until the table can match it. */
+/** Tabs whose list arrives after mount, the way a profile's pages do: the segment waits until the table can match it. */
 export function TabsArrivingLater({ routing }: { routing: RoutingMode }) {
   const [tabs, setTabs] = useState<readonly string[] | undefined>(undefined);
   useEffect(() => {

@@ -39,12 +39,12 @@ export default function ModalPage() {
             intro={
               <>
                 <p>
-                  A modal is open exactly while its entry exists, and its step is part of the entry. In the hash and
+                  A modal is open exactly while its segment exists, and its step is part of the segment. In the hash and
                   query modes that puts it in the URL: a reload opens it again on the same step, Back closes it, and the
                   handle can open it straight on a step.
                 </p>
                 <p>
-                  It can have another modal on top. The DNS help button opens one with an entry of its own, so the URL
+                  It can have another modal on top. The DNS help button opens one with an segment of its own, so the URL
                   carries both and Back unwinds them one at a time. The two are hosted side by side rather than inside
                   each other, so the modal host keeps the order they opened in and lets only the top one take an outside
                   press or Escape.
@@ -63,14 +63,14 @@ export default function ModalPage() {
               links={[
                 {
                   label: 'The modal at verification',
-                  href: hostUrl({ mode, pagePath, entries: [{ base: '/modal/domain', parts: 'verify' }] }),
+                  href: hostUrl({ mode, pagePath, segments: [{ base: '/modal/domain', parts: 'verify' }] }),
                 },
                 {
                   label: 'The help modal on top of it',
                   href: hostUrl({
                     mode,
                     pagePath,
-                    entries: [
+                    segments: [
                       { base: '/modal/domain', parts: '' },
                       { base: '/modal/dnsHelp', parts: 'example' },
                     ],

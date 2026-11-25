@@ -40,7 +40,7 @@ function Tabs({ mode }: { mode: Mode }) {
 export default function SingleTabsPage() {
   const mode = useModeParam(modes);
   const link = (parts: string) =>
-    hostUrl({ mode, pagePath, entries: [{ base: mode === 'path' ? pagePath : '/tabs', parts }] });
+    hostUrl({ mode, pagePath, segments: [{ base: mode === 'path' ? pagePath : '/tabs', parts }] });
 
   return (
     <MosaicProvider

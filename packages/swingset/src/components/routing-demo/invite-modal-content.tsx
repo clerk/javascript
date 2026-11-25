@@ -13,7 +13,7 @@ export default function InviteModalContent({ close, path, routing }: ModalConten
         <Card.Title>Invite a teammate</Card.Title>
         <Card.Description>
           The same invite flow as on the page, mounted in a modal. It routes under {path} in {routing} mode, so its step
-          is part of the modal&apos;s entry.
+          is part of the modal&apos;s segment.
         </Card.Description>
       </Card.Header>
       <Card.Content>

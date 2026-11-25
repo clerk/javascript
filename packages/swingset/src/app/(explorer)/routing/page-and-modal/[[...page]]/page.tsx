@@ -27,7 +27,7 @@ function MembersTab() {
   const invite = useModal(inviteModal);
   return (
     <div className='flex flex-col gap-3'>
-      <p>Everyone in the organization. Inviting someone opens a modal with its own entry.</p>
+      <p>Everyone in the organization. Inviting someone opens a modal with its own segment.</p>
       <div>
         <Button onClick={() => invite.open()}>Invite a teammate</Button>
       </div>
@@ -99,7 +99,7 @@ export default function PageWithModalsPage() {
                 <>
                   <p>
                     Everything together: a page whose tab is its segment, and modals opened from inside it, each with an
-                    entry of its own beside the page&apos;s. In the URL modes a reload restores the tab and the modal,
+                    segment of its own beside the page&apos;s. In the URL modes a reload restores the tab and the modal,
                     and Back closes the modal before it changes the tab. The invite modal mounts the same component as
                     the page on the first demo, routed under the modal&apos;s base instead.
                   </p>
@@ -127,14 +127,19 @@ export default function PageWithModalsPage() {
                 links={[
                   {
                     label: 'The domains tab',
-                    href: hostUrl({ mode: pageMode, pagePath, entries: [{ base: pageBase, parts: 'domains' }], query }),
+                    href: hostUrl({
+                      mode: pageMode,
+                      pagePath,
+                      segments: [{ base: pageBase, parts: 'domains' }],
+                      query,
+                    }),
                   },
                   {
                     label: 'The invite modal, inviting Grace',
                     href: hostUrl({
                       mode: modalMode,
                       pagePath,
-                      entries: [{ base: '/modal/invite', parts: 'teammates/grace' }],
+                      segments: [{ base: '/modal/invite', parts: 'teammates/grace' }],
                       query: { mode: pageMode, modal: modalMode },
                     }),
                   },
@@ -144,7 +149,7 @@ export default function PageWithModalsPage() {
                       ? hostUrl({
                           mode: pageMode,
                           pagePath,
-                          entries: [
+                          segments: [
                             { base: pageBase, parts: 'domains' },
                             { base: '/modal/domain', parts: 'verify' },
                           ],

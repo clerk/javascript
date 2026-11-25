@@ -21,8 +21,8 @@ export default function DomainModalContent({ close, path, routing }: ModalConten
         <Card.Title>{route === 'verify' ? 'Verify ownership' : 'Add a domain'}</Card.Title>
         <Card.Description>
           {route === 'verify'
-            ? 'Add the TXT record to your DNS, then verify. This step has its own entry, so Back returns to the domain.'
-            : `Open while its entry exists under ${path}, routed in ${routing} mode. Its step is part of the entry.`}
+            ? 'Add the TXT record to your DNS, then verify. This step has its own segment, so Back returns to the domain.'
+            : `Open while its segment exists under ${path}, routed in ${routing} mode. Its step is part of the segment.`}
         </Card.Description>
       </Card.Header>
       <Card.Content>

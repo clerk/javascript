@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { buttonVariants } from '@/components/ui/button';
 
-/** The mode named in the `mode` query param, or the first one. The param is left alone by every carrier. */
+/** The mode named in the `mode` query param, or the first one. The param is left alone by every codec. */
 export function useModeParam<Mode extends string>(modes: readonly [Mode, ...Mode[]], param = 'mode'): Mode {
   const value = useSearchParams().get(param);
   return modes.find(mode => mode === value) ?? modes[0];

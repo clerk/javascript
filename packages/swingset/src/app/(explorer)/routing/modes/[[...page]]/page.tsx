@@ -16,7 +16,7 @@ const routing: RoutingOptions = { adapter: nextRouterAdapter };
 export default function RoutingModesPage() {
   const mode = useModeParam(modes);
   const link = (parts: string) =>
-    hostUrl({ mode, pagePath, entries: [{ base: mode === 'path' ? pagePath : '/invite', parts }] });
+    hostUrl({ mode, pagePath, segments: [{ base: mode === 'path' ? pagePath : '/invite', parts }] });
 
   return (
     <MosaicProvider

@@ -5,7 +5,7 @@ export interface TabsModalOptions {
   tab?: 'invitations' | 'settings';
 }
 
-/** A modal whose content is routed tabs, so the open tab is part of the modal's entry. */
+/** A modal whose content is routed tabs, so the open tab is part of the modal's segment. */
 export const tabsModal = defineModalSurface<TabsModalOptions>({
   id: 'tabs',
   variant: 'card',
