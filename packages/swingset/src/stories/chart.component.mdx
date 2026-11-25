@@ -8,6 +8,9 @@ selection and its announcements.
 
 ## Example
 
+Hover a bar, or focus the chart and use the arrow keys, to see a day's value. Moving or tapping off
+the bars closes the tooltip.
+
 <Story
   name='Default'
   storyModule={ChartStories}
@@ -22,58 +25,39 @@ one line per part. Define `series` and `index` at module level or memoize them.
 ```tsx
 import { Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
 
-const gain = (percent: number) => `color-mix(in oklab, var(--cl-color-chart-1) ${percent}%, white)`;
-const faintText = 'color-mix(in oklab, var(--cl-color-foreground-secondary) 50%, var(--cl-color-surface))';
+const series: ChartSeries<Day>[] = [{ key: 'agents', label: 'Active agents', color: 1, value: day => day.agents }];
+const getDay = (day: Day) => day.date;
 
-const series: ChartSeries<Week>[] = [
-  { key: 'retained', label: 'Retained', color: gain(100), value: week => week.retained },
-  { key: 'reactivated', label: 'Reactivated', color: gain(60), value: week => week.reactivated },
-  { key: 'new', label: 'New', color: gain(30), value: week => week.new },
-  { key: 'retainedChurned', label: 'Retained churned', color: 'var(--cl-color-foreground)', value: week => week.retainedChurned },
-  { key: 'reactivatedChurned', label: 'Reactivated churned', color: 'var(--cl-color-foreground-secondary)', value: week => week.reactivatedChurned },
-  { key: 'newChurned', label: 'New churned', color: faintText, value: week => week.newChurned },
-];
-const getWeek = (week: Week) => week.week;
-
-function ActiveUsers({ weeks, projected }: { weeks: Week[]; projected: number }) {
-  const chart = Chart.useBarChart({
-    data: weeks,
-    index: getWeek,
-    series,
-    projection: { datumIndex: weeks.length - 1, value: projected, label: 'Projected' },
-  });
+function ActiveAgents({ days }: { days: Day[] }) {
+  const chart = Chart.useBarChart({ data: days, series, index: getDay });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly active users'
+      aria-label='Active agents by day'
     >
-      <Chart.Legend />
       <Chart.Grid />
-      <Chart.Bars>
-        <Chart.Bar />
-        <Chart.ProjectionOutline />
-      </Chart.Bars>
+      <Chart.Bars />
       <Chart.YAxis />
       <Chart.XAxis ticks='calendar' />
-      <Chart.Selection>
-        <Chart.Cursor />
-        <Chart.Tooltip />
-      </Chart.Selection>
+      <Chart.Selection />
     </Chart.Root>
   );
 }
 ```
 
+One series needs no legend: the tooltip and the screen reader announcement name it by its `label`,
+as in `Nov 24, 2026, Active agents 53`. Add `Chart.Legend` once a chart has two series or a
+projection.
+
 Each series names its color: a palette slot from `1` to `6`, which reads `--cl-color-chart-<n>`, or
 any CSS color. The legend, the bars and the tooltip read that one field, so filtering the list never
-recolors the series that remain. Give unrelated series separate slots. Give related series, such as
-a measure and its churn, steps of one hue, as above, so the chart reads as gains and losses rather
-than six categories.
+recolors the series that remain.
 
 Besides `data`, `index` and `series`, the hook takes `highlight`, `projection`, `formatValue`,
 `formatCategory`, `categoryGap`, `margin`, `selection`, `onSelectionChange` and `onActivate`. Keys in
-UTC date form, such as `2026-01-05`, format as dates; pass `formatCategory` for anything else. The
-default `margin` leaves room for both axes, so pass a smaller one when you leave an axis out.
+UTC date form, such as `2026-01-05`, format as dates; pass `formatCategory` for anything else, such
+as a month. The default `margin` leaves room for both axes, so pass a smaller one when you leave an
+axis out.
 
 Children customize a part. `Chart.Tooltip` takes a render function that receives
 `{ active, heading, metrics, rows }`, and `Chart.Legend` takes one that renders each item's label.
@@ -81,16 +65,49 @@ Children customize a part. `Chart.Tooltip` takes a render function that receives
 `Chart.Legend items={series}` places the legend elsewhere, such as beside an Export button.
 
 ```tsx
-<Chart.Tooltip<ActiveBar<Week>>>
+<Chart.Tooltip<ActiveBar<Day>>>
   {({ active, heading, metrics, rows }) => (
     <Chart.TooltipContent
       heading={heading}
-      metrics={[...metrics, { label: 'Total', value: active.datum.signups + active.datum.returning }]}
+      metrics={[...metrics, { label: 'Previous day', value: active.datum.previous }]}
       rows={rows}
     />
   )}
 </Chart.Tooltip>
 ```
+
+### Few bars
+
+Bars stop at a maximum width, so three months stay bars rather than blocks. `formatCategory` names
+each month.
+
+<Story
+  name='FewBars'
+  storyModule={ChartStories}
+/>
+
+### Projection
+
+A projected total for one row, drawn as an opaque neutral fill with a dashed outline when it rises
+above the row's bar. A `label` adds it to the legend, the tooltip and the announcement.
+
+<Story
+  name='Projection'
+  storyModule={ChartStories}
+/>
+
+### Stacked
+
+Several series stack in order, and negative values stack below the zero line. Give unrelated series
+separate slots. Give related series, such as a measure and its churn, steps of one hue, so the chart
+reads as gains and losses rather than six categories. Up and Down move the keyboard between the
+positive and negative sections, and the announcement names the section:
+`Feb 16, 2026, negative values, Retained churned -31, Reactivated churned -14, New churned -21`.
+
+<Story
+  name='Stacked'
+  storyModule={ChartStories}
+/>
 
 ### Palette
 
@@ -106,21 +123,11 @@ in one stack.
 ### Highlight
 
 `highlight` keeps the matching bars at full strength and dims the rest with an opaque mix toward
-`--cl-color-surface`, so grid lines never show through. Here the selection drives it. Without
-`highlight`, hovering shows the band and tooltip and dims nothing.
+`--cl-color-surface`, so grid lines never show through. It is separate from the selection, so the
+tooltip still opens and closes as the pointer moves. Without `highlight`, nothing is dimmed.
 
 <Story
   name='Highlight'
-  storyModule={ChartStories}
-/>
-
-### Projection
-
-A projected total for one row, drawn as an opaque neutral fill with a dashed outline when it rises
-above the row's stack. A `label` adds it to the legend and the tooltip.
-
-<Story
-  name='Projection'
   storyModule={ChartStories}
 />
 

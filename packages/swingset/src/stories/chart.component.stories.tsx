@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@clerk/mosaic/components/button';
-import { type BarSelection, Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
-import { useRef, useState } from 'react';
+import { Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
+import { useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -15,6 +15,102 @@ export const meta: StoryMeta = {
   label: 'Chart',
   source: 'packages/mosaic/src/components/chart/index.ts',
 };
+
+/** Active agents per day over 30 days. */
+const dailyAgents = [
+  23, 25, 24, 22, 9, 8, 26, 30, 32, 29, 27, 11, 10, 36, 39, 40, 38, 35, 15, 13, 43, 46, 48, 45, 42, 17, 16, 50, 53, 23,
+].map((agents, i) => ({ day: new Date(Date.UTC(2026, 9, 27 + i)).toISOString().slice(0, 10), agents }));
+
+type DayRow = (typeof dailyAgents)[number];
+
+const agentsByDay: ChartSeries<DayRow>[] = [
+  { key: 'agents', label: 'Active agents', color: 1, value: row => row.agents },
+];
+
+const getDay = (row: DayRow) => row.day;
+
+/** Active agents per month. November is still in progress. */
+const monthlyAgents = [
+  { month: '2026-09-01', agents: 41 },
+  { month: '2026-10-01', agents: 213 },
+  { month: '2026-11-01', agents: 356 },
+];
+
+type MonthRow = (typeof monthlyAgents)[number];
+
+const agentsByMonth: ChartSeries<MonthRow>[] = [
+  { key: 'agents', label: 'Active agents', color: 1, value: row => row.agents },
+];
+
+const getMonth = (row: MonthRow) => row.month;
+
+const monthName = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', year: 'numeric' });
+const formatMonth = (key: string) => monthName.format(new Date(key));
+
+export function Default() {
+  const chart = Chart.useBarChart({ data: dailyAgents, series: agentsByDay, index: getDay });
+  return (
+    <Chart.Root
+      chart={chart}
+      aria-label='Active agents by day'
+    >
+      <Chart.Grid />
+      <Chart.Bars />
+      <Chart.YAxis />
+      <Chart.XAxis ticks='calendar' />
+      <Chart.Selection />
+    </Chart.Root>
+  );
+}
+
+export function FewBars() {
+  const chart = Chart.useBarChart({
+    data: monthlyAgents,
+    series: agentsByMonth,
+    index: getMonth,
+    formatCategory: formatMonth,
+  });
+  return (
+    <Chart.Root
+      chart={chart}
+      aria-label='Active agents by month'
+    >
+      <Chart.Grid />
+      <Chart.Bars />
+      <Chart.YAxis />
+      <Chart.XAxis />
+      <Chart.Selection />
+    </Chart.Root>
+  );
+}
+
+export function Projection() {
+  const chart = Chart.useBarChart({
+    data: monthlyAgents,
+    series: agentsByMonth,
+    index: getMonth,
+    formatCategory: formatMonth,
+    projection: {
+      datumIndex: monthlyAgents.length - 1,
+      value: 410,
+      label: 'Projected',
+      description: 'Projected active agents for the month in progress',
+    },
+  });
+  return (
+    <Chart.Root
+      chart={chart}
+      aria-label='Active agents by month'
+    >
+      <Chart.Legend />
+      <Chart.Grid />
+      <Chart.Bars />
+      <Chart.YAxis />
+      <Chart.XAxis />
+      <Chart.Selection />
+    </Chart.Root>
+  );
+}
 
 /** Weekly active users, as Dashboard's overview reports them. The last week is still in progress. */
 const growth = [
@@ -101,7 +197,7 @@ type GrowthRow = (typeof growth)[number];
 const gain = (percent: number) => `color-mix(in oklab, var(--cl-color-chart-1) ${percent}%, white)`;
 const faintText = 'color-mix(in oklab, var(--cl-color-foreground-secondary) 50%, var(--cl-color-surface))';
 
-const series: ChartSeries<GrowthRow>[] = [
+const growthSeries: ChartSeries<GrowthRow>[] = [
   { key: 'retained', label: 'Retained', color: `var(--users-retained, ${gain(100)})`, value: row => row.retained },
   {
     key: 'reactivated',
@@ -127,18 +223,16 @@ const series: ChartSeries<GrowthRow>[] = [
 
 const getWeek = (row: GrowthRow) => row.week;
 
-const lastWeek = growth.length - 1;
-
 /** The week in progress, projected from its pace so far. */
-const projection = {
-  datumIndex: lastWeek,
+const growthProjection = {
+  datumIndex: growth.length - 1,
   value: 245,
   label: 'Projected',
   description: 'Projected active users for the week in progress',
 };
 
-export function Default() {
-  const chart = Chart.useBarChart({ data: growth, series, index: getWeek, projection });
+export function Stacked() {
+  const chart = Chart.useBarChart({ data: growth, series: growthSeries, index: getWeek, projection: growthProjection });
   return (
     <Chart.Root
       chart={chart}
@@ -146,24 +240,17 @@ export function Default() {
     >
       <Chart.Legend />
       <Chart.Grid />
-      <Chart.Bars>
-        <Chart.Bar />
-        <Chart.ProjectionOutline />
-        <Chart.YLine value={0} />
-      </Chart.Bars>
+      <Chart.Bars />
       <Chart.YAxis />
       <Chart.XAxis ticks='calendar' />
-      <Chart.Selection>
-        <Chart.Cursor />
-        <Chart.Tooltip />
-      </Chart.Selection>
+      <Chart.Selection />
     </Chart.Root>
   );
 }
 
-type Day = { day: string; violet: number; sky: number; orange: number; cyan: number; gold: number; steel: number };
+type Weekday = { day: string; violet: number; sky: number; orange: number; cyan: number; gold: number; steel: number };
 
-const days: Day[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => ({
+const weekdays: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => ({
   day,
   violet: 12 + i,
   sky: 10 + ((i * 3) % 5),
@@ -173,7 +260,7 @@ const days: Day[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => ({
   steel: 10 + (i % 3),
 }));
 
-const palette: ChartSeries<Day>[] = [
+const palette: ChartSeries<Weekday>[] = [
   { key: 'violet', label: 'Slot 1', color: 1, value: day => day.violet },
   { key: 'sky', label: 'Slot 2', color: 2, value: day => day.sky },
   { key: 'orange', label: 'Slot 3', color: 3, value: day => day.orange },
@@ -182,86 +269,62 @@ const palette: ChartSeries<Day>[] = [
   { key: 'steel', label: 'Slot 6', color: 6, value: day => day.steel },
 ];
 
-const getDay = (day: Day) => day.day;
+const getWeekday = (day: Weekday) => day.day;
 
-/** Every part, each with its default children. */
-function DefaultParts() {
+export function Palette() {
+  const chart = Chart.useBarChart({ data: weekdays, series: palette, index: getWeekday });
   return (
-    <>
+    <Chart.Root
+      chart={chart}
+      aria-label='The six palette slots'
+    >
       <Chart.Legend />
       <Chart.Grid />
       <Chart.Bars />
       <Chart.YAxis />
       <Chart.XAxis />
       <Chart.Selection />
-    </>
-  );
-}
-
-export function Palette() {
-  const chart = Chart.useBarChart({ data: days, series: palette, index: getDay });
-  return (
-    <Chart.Root
-      chart={chart}
-      aria-label='The six palette slots'
-    >
-      <DefaultParts />
     </Chart.Root>
   );
 }
+
+const busiestDay = { category: '2026-11-24' };
 
 export function Highlight() {
-  const [selection, setSelection] = useState<BarSelection | null>({ category: '2026-02-16', section: 'positive' });
-  const chart = Chart.useBarChart({
-    data: growth,
-    series,
-    index: getWeek,
-    selection,
-    onSelectionChange: next => setSelection(next ?? selection),
-    highlight: selection,
-  });
+  const chart = Chart.useBarChart({ data: dailyAgents, series: agentsByDay, index: getDay, highlight: busiestDay });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly active users'
+      aria-label='Active agents by day'
     >
-      <DefaultParts />
-    </Chart.Root>
-  );
-}
-
-export function Projection() {
-  const chart = Chart.useBarChart({
-    data: growth,
-    series,
-    index: getWeek,
-    projection,
-  });
-  return (
-    <Chart.Root
-      chart={chart}
-      aria-label='Weekly active users'
-    >
-      <DefaultParts />
+      <Chart.Grid />
+      <Chart.Bars />
+      <Chart.YAxis />
+      <Chart.XAxis ticks='calendar' />
+      <Chart.Selection />
     </Chart.Root>
   );
 }
 
 export function Empty() {
-  const chart = Chart.useBarChart({ data: [], series, index: getWeek });
+  const chart = Chart.useBarChart({ data: [], series: agentsByDay, index: getDay });
   return (
     <Chart.Root
       chart={chart}
-      aria-label='Weekly active users'
+      aria-label='Active agents by day'
     >
-      <DefaultParts />
+      <Chart.Grid />
+      <Chart.Bars />
+      <Chart.YAxis />
+      <Chart.XAxis />
+      <Chart.Selection />
     </Chart.Root>
   );
 }
 
 export function RenderError() {
   const root = useRef<HTMLDivElement>(null);
-  const chart = Chart.useBarChart({ data: growth, series, index: getWeek });
+  const chart = Chart.useBarChart({ data: dailyAgents, series: agentsByDay, index: getDay });
   return (
     <div style={{ display: 'grid', gap: 12, justifyItems: 'start', width: '100%' }}>
       <Button
@@ -274,21 +337,20 @@ export function RenderError() {
       <Chart.Root
         ref={root}
         chart={chart}
-        aria-label='Weekly active users'
+        aria-label='Active agents by day'
       >
-        <DefaultParts />
+        <Chart.Grid />
+        <Chart.Bars />
+        <Chart.YAxis />
+        <Chart.XAxis ticks='calendar' />
+        <Chart.Selection />
       </Chart.Root>
     </div>
   );
 }
 
 export function DarkMode() {
-  const chart = Chart.useBarChart({
-    data: growth,
-    series,
-    index: getWeek,
-    projection,
-  });
+  const chart = Chart.useBarChart({ data: growth, series: growthSeries, index: getWeek, projection: growthProjection });
   return (
     <div
       style={{
@@ -304,7 +366,12 @@ export function DarkMode() {
         chart={chart}
         aria-label='Weekly active users'
       >
-        <DefaultParts />
+        <Chart.Legend />
+        <Chart.Grid />
+        <Chart.Bars />
+        <Chart.YAxis />
+        <Chart.XAxis ticks='calendar' />
+        <Chart.Selection />
       </Chart.Root>
     </div>
   );

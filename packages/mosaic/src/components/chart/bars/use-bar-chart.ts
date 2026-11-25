@@ -23,7 +23,7 @@ import {
 
 export interface UseBarChartOptions<TDatum> extends Omit<
   PrimitiveUseBarChartOptions<TDatum>,
-  'series' | 'projection' | 'isBarActive' | 'formatCategory' | 'messages'
+  'series' | 'projection' | 'isBarActive' | 'formatCategory' | 'formatValue' | 'messages'
 > {
   /** Stack order, bottom first. Define it at module level or memoize it. */
   series: readonly ChartSeries<TDatum>[];
@@ -34,7 +34,7 @@ export interface UseBarChartOptions<TDatum> extends Omit<
    * `--cl-color-surface`. Without it no bar is dimmed.
    */
   highlight?: BarChartHighlight | null;
-  /** Formats a value. `place` is `'axis'` for a tick and `'tooltip'` for a tooltip row. */
+  /** Formats a value. `place` is `'axis'` for a tick and `'tooltip'` for a tooltip row and announcements. */
   formatValue?: (value: number, place: ChartFormatPlace) => string;
   /**
    * Formats a category key. The `'tooltip'` form also names the period in announcements. Default:
@@ -68,6 +68,7 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
     [bridge, index, category, section, highlightSeries],
   );
   const announceCategory = React.useCallback((key: string) => format.category(key, 'tooltip'), [format]);
+  const announceValue = React.useCallback((value: number) => format.value(value, 'tooltip'), [format]);
   const text = useMessages('chart');
   const chart = Primitive.useBarChart({
     ...selection,
@@ -79,6 +80,7 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
     categoryGap: categoryGap ?? categoryGapFor(data.length),
     margin: { ...MARGIN, ...margin },
     formatCategory: announceCategory,
+    formatValue: announceValue,
     messages: {
       navigate: text.keyboardNavigate,
       vertical: text.keyboardSections,
@@ -87,6 +89,7 @@ export function useBarChart<TDatum>(options: UseBarChartOptions<TDatum>): BarCha
       noValues: text.noValues,
       positiveValues: text.positiveValues,
       negativeValues: text.negativeValues,
+      projected: text.projected,
     },
   });
 

@@ -420,9 +420,13 @@ describe('Chart.Selection', () => {
         <GrowthChart />
       </MosaicLocalizationProvider>,
     );
-    expect(surface()).toHaveAccessibleDescription(
-      'Gauche et Droite choisissent une période. Haut et Bas choisissent une section. Échap ferme.',
-    );
+    expect(surface()).toHaveAccessibleDescription('Gauche et Droite choisissent une période. Échap ferme.');
+  });
+
+  it('announces the focused period with each series label and value', async () => {
+    await renderChart(<GrowthChart />);
+    surface().focus();
+    await expect.poll(() => screen.getByRole('status').textContent).toBe('A, Series A 10, Series B 10, Series C 10');
   });
 });
 

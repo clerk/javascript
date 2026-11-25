@@ -9,4 +9,5 @@ export const chartMessages = {
   noValues: 'No values for this period',
   positiveValues: 'positive values',
   negativeValues: 'negative values',
+  projected: 'Projected',
 } as const;

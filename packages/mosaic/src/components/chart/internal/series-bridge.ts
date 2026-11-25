@@ -14,6 +14,7 @@ export type SeriesSlotKey = `${SeriesSlot}`;
 /** A series as a headless chart-type hook takes it, keyed by position. */
 export type PositionedSeries<TDatum> = Readonly<{
   key: SeriesSlotKey;
+  label: string;
   value: (datum: TDatum) => number | null | undefined;
 }>;
 
@@ -43,7 +44,11 @@ export function bridgeSeries<TDatum>(series: readonly ChartSeries<TDatum>[]): Se
     }
     keys.add(key);
   }
-  const positioned = series.map((entry, position) => ({ key: slotKey(position), value: entry.value }));
+  const positioned = series.map((entry, position) => ({
+    key: slotKey(position),
+    label: entry.label,
+    value: entry.value,
+  }));
   return {
     positioned,
     colors: series.map(entry => resolveChartColor(entry.color)),

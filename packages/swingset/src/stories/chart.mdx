@@ -12,11 +12,19 @@ It ships **no styles**. Every part, including the Canvas bars, takes its appeara
 
 ## Example
 
-Move the pointer over the chart, or focus it and use the arrow keys, to select a week. The chart is
-unstyled, so the bars take the inherited text color and the grid and zero lines have no stroke.
+Move the pointer over a bar, or focus the chart and use the arrow keys, to select a day. Moving off
+the bars selects nothing. The chart is unstyled, so the bars take the inherited text color and the
+zero line has no stroke.
 
 <Story
   name='Default'
+  storyModule={ChartStories}
+/>
+
+Several series stack in order, with negative values below the zero line:
+
+<Story
+  name='Stacked'
   storyModule={ChartStories}
 />
 
@@ -74,7 +82,8 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 </Chart.Root>;
 ```
 
-`series` is an ordered list of `{ key, value }`, where `value` reads a number from a row. `index`
+`series` is an ordered list of `{ key, label, value }`, where `value` reads a number from a row and
+`label` names the series in screen reader announcements. `index`
 returns each row's unique category key. Memoize `series`, `index` and `isBarActive`.
 
 ### Dimming bars
