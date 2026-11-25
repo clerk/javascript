@@ -216,7 +216,10 @@ function SelectInner(props: SelectProps<unknown>) {
       setCachedLabels(prev => {
         const next = new Map(prev);
         for (const value of values) {
-          next.set(value, valueToLabelRef.current.get(value) ?? String(value));
+          const label = valueToLabelRef.current.get(value);
+          if (label !== undefined) {
+            next.set(value, label);
+          }
         }
         return next;
       });

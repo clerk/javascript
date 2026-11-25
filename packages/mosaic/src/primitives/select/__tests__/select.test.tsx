@@ -964,9 +964,10 @@ describe('Select', () => {
         defaultValue?: string[];
         onValueChange?: (value: string[]) => void;
         disabledValues?: string[];
+        selectAll?: React.ComponentProps<typeof Select.SelectAll>;
       } = {},
     ) {
-      const { disabledValues = [], ...rootProps } = props;
+      const { disabledValues = [], selectAll, ...rootProps } = props;
       return render(
         <Select.Root
           items={fruits}
@@ -979,7 +980,7 @@ describe('Select', () => {
           </Select.Trigger>
           <Select.Positioner>
             <Select.Popup>
-              <Select.SelectAll>Select all</Select.SelectAll>
+              <Select.SelectAll {...selectAll}>Select all</Select.SelectAll>
               <Select.Separator />
               {fruits.map(({ label, value }) => (
                 <Select.Item
@@ -1061,6 +1062,54 @@ describe('Select', () => {
 
       await user.click(selectAllOption());
       expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('is disabled by its disabled prop, whatever element it renders', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ selectAll: { disabled: true, render: <div /> }, onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      expect(selectAllOption()).toHaveAttribute('aria-disabled', 'true');
+      expect(selectAllOption()).toHaveAttribute('data-disabled', '');
+
+      await user.click(selectAllOption());
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('keeps the label of a selected value whose option is not rendered', async () => {
+      const user = userEvent.setup();
+      render(
+        <Select.Root
+          items={[...fruits, { label: 'Durian', value: 'durian' }]}
+          alignItemWithTrigger={false}
+          defaultValue={['durian']}
+          multiple
+        >
+          <Select.Trigger aria-label='Fruits'>
+            <Select.Value data-testid='select-value' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.SelectAll>Select all</Select.SelectAll>
+              {fruits.map(({ label, value }) => (
+                <Select.Item
+                  key={value}
+                  value={value}
+                  label={label}
+                >
+                  {label}
+                </Select.Item>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(selectAllOption());
+
+      expect(screen.getByTestId('select-value')).toHaveTextContent('Durian, Apple, Banana, Cherry');
     });
 
     it('is reached with the arrow keys and pressed with Enter', async () => {

@@ -32,7 +32,7 @@ interface SelectSelectAllBodyProps extends SelectSelectAllProps {
 }
 
 function SelectSelectAllBody(bodyProps: SelectSelectAllBodyProps) {
-  const { forwardedRef: ref, render, label, ...otherProps } = bodyProps;
+  const { forwardedRef: ref, render, label, disabled: disabledProp, ...otherProps } = bodyProps;
   const { enabledValues, toggleAll } = useSelectContext();
   const { activeIndex, selectedValues } = useSelectHighlightContext();
   const { getItemProps } = useSelectItemsContext();
@@ -41,7 +41,7 @@ function SelectSelectAllBody(bodyProps: SelectSelectAllBodyProps) {
   const selectedCount = enabledValues.filter(value =>
     selectedValues.some(selected => Object.is(selected, value)),
   ).length;
-  const disabled = enabledValues.length === 0;
+  const disabled = !!disabledProp || enabledValues.length === 0;
   const checked = !disabled && selectedCount === enabledValues.length;
   const isActive = activeIndex === index;
 
