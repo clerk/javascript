@@ -33,7 +33,8 @@ import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
-import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
+import { BaseResource, Client, Environment, SignIn, SignUp, Token } from '../resources/internal';
+import { SessionTokenCache } from '../tokenCache';
 
 const mockClientFetch = vi.fn();
 const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
@@ -5094,6 +5095,77 @@ describe('Clerk singleton', () => {
       unsubscribe();
 
       expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('clears cached tokens and refresh timers for sessions dropped by a new client instance', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(1666648260 * 1000));
+      SessionTokenCache.clear();
+
+      try {
+        const mockSession1 = {
+          id: 'sess_1',
+          status: 'active',
+          user: { id: 'user_1' },
+          lastActiveToken: { getRawString: () => mockJwt },
+        };
+        const mockSession2 = {
+          id: 'sess_2',
+          status: 'active',
+          user: { id: 'user_2' },
+          lastActiveToken: { getRawString: () => mockJwt },
+        };
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.updateClient({
+          sessions: [mockSession1, mockSession2],
+          signedInSessions: [mockSession1, mockSession2],
+          lastActiveSessionId: 'sess_1',
+        } as any);
+
+        const onRefreshSess1 = vi.fn();
+        const onRefreshSess1Template = vi.fn();
+        const onRefreshSess2 = vi.fn();
+
+        SessionTokenCache.set({
+          tokenId: 'sess_1',
+          tokenResolver: Promise.resolve(new Token({ id: 'sess_1', jwt: mockJwt, object: 'token' }) as TokenResource),
+          onRefresh: onRefreshSess1,
+        });
+        SessionTokenCache.set({
+          tokenId: 'sess_1-t3-relay',
+          tokenResolver: Promise.resolve(
+            new Token({ id: 'sess_1-t3-relay', jwt: mockJwt, object: 'token' }) as TokenResource,
+          ),
+          onRefresh: onRefreshSess1Template,
+        });
+        SessionTokenCache.set({
+          tokenId: 'sess_2',
+          tokenResolver: Promise.resolve(new Token({ id: 'sess_2', jwt: mockJwt, object: 'token' }) as TokenResource),
+          onRefresh: onRefreshSess2,
+        });
+        await Promise.resolve();
+        await Promise.resolve();
+
+        sut.updateClient({
+          sessions: [mockSession2],
+          signedInSessions: [mockSession2],
+          lastActiveSessionId: 'sess_2',
+        } as any);
+
+        expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
+        expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
+        expect(SessionTokenCache.get({ tokenId: 'sess_2' })).toBeDefined();
+
+        await vi.advanceTimersByTimeAsync(45 * 1000);
+
+        expect(onRefreshSess1).not.toHaveBeenCalled();
+        expect(onRefreshSess1Template).not.toHaveBeenCalled();
+        expect(onRefreshSess2).toHaveBeenCalledTimes(1);
+      } finally {
+        SessionTokenCache.clear();
+        vi.useRealTimers();
+      }
     });
   });
 
