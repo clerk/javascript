@@ -70,8 +70,6 @@ export const partStyles = stylex.create({
       default: easingVars['--cl-ease-enter'],
       ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
-  },
-  tooltipPositioner: {
     zIndex: 10,
   },
 });

@@ -202,14 +202,12 @@ export const ChartCursor = React.forwardRef<HTMLDivElement, ChartCursorProps>(fu
   );
 });
 
-export type ChartTooltipProps<TActive extends ChartActive = ChartActive> = Omit<
-  PrimitiveChartTooltipProps<TActive>,
-  'children'
-> &
-  MosaicStyleProps & {
-    /** Renders the tooltip body inside the popup. Default: `Chart.TooltipContent` with the rows */
-    children?: (tooltip: ChartTooltipData<TActive>) => React.ReactNode;
-  };
+export type ChartTooltipProps<TActive extends ChartActive = ChartActive> = Styled<
+  Omit<PrimitiveChartTooltipProps<TActive>, 'children'>
+> & {
+  /** Renders the tooltip body. Return null to hide it. Default: `Chart.TooltipContent` with the rows */
+  children?: (tooltip: ChartTooltipData<TActive>) => React.ReactNode;
+};
 
 const renderTooltipContent = ({ heading, metrics, rows }: ChartTooltipData) => (
   <ChartTooltipContent
@@ -221,31 +219,16 @@ const renderTooltipContent = ({ heading, metrics, rows }: ChartTooltipData) => (
 
 // eslint-disable-next-line typescript/consistent-type-assertions -- The ref wrapper drops the active type parameter; the caller names the type its chart-type hook selects, as with the primitive.
 export const ChartTooltip = React.forwardRef<HTMLDivElement, ChartTooltipProps>(function ChartTooltip(
-  { children = renderTooltipContent, xstyle, ...positioning },
+  { children = renderTooltipContent, xstyle, ...rest },
   ref,
 ) {
   const { tooltip } = useChartStyle('Tooltip').style;
   return (
-    <Primitive.Tooltip {...positioning}>
-      {() =>
-        tooltip ? (
-          <Primitive.TooltipPortal>
-            <Primitive.TooltipPositioner
-              {...mergeStyleProps(
-                themeProps('chart-tooltip-positioner'),
-                stylex.props(reset.base, partStyles.tooltipPositioner),
-              )}
-            >
-              <Primitive.TooltipPopup
-                ref={ref}
-                {...mergeStyleProps(themeProps('chart-tooltip'), stylex.props(reset.base, partStyles.tooltip, xstyle))}
-              >
-                {children(tooltip)}
-              </Primitive.TooltipPopup>
-            </Primitive.TooltipPositioner>
-          </Primitive.TooltipPortal>
-        ) : null
-      }
+    <Primitive.Tooltip
+      ref={ref}
+      {...mergeStyleProps(themeProps('chart-tooltip'), stylex.props(reset.base, partStyles.tooltip, xstyle), rest)}
+    >
+      {() => (tooltip ? children(tooltip) : null)}
     </Primitive.Tooltip>
   );
 }) as <TActive extends ChartActive = ChartActive>(

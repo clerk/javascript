@@ -198,13 +198,12 @@ export default {
       slot: 'cl-chart-cursor',
     },
     'Chart.Tooltip': {
-      description:
-        'The tooltip for the selected period: the primitive `Chart.Tooltip` with its portal, positioner and a styled popup (`cl-chart-tooltip`) that fades in and out. `xstyle` styles the popup.',
+      description: 'The tooltip surface for the selected period, fading in and out.',
       slot: 'cl-chart-tooltip',
       props: {
         children: {
           type: '(tooltip: ChartTooltipData<TActive>) => React.ReactNode',
-          doc: 'Renders the body inside the popup from `{ active, heading, metrics, rows }`.',
+          doc: 'Renders the body from `{ active, heading, metrics, rows }`. Return null to hide the tooltip.',
           default: '`Chart.TooltipContent` with the heading, metrics and rows',
         },
         side: { type: "'left' | 'right'", doc: 'The side tried first.', default: "'right'" },
