@@ -236,7 +236,7 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (token) {
+    if (token && this.#isSignedInStatus()) {
       const tokenId = this.#getCacheId();
       // Dispatch tokenUpdate for __session tokens with the session's active organization ID
       const shouldDispatchTokenUpdate = true;
@@ -534,7 +534,7 @@ export class Session extends BaseResource implements SessionResource {
       const cachedToken = cacheResult.token ?? (await cacheResult.tokenResolver);
       // Only emit token updates when we have an actual token — emitting with an empty
       // token causes AuthCookieService to remove the __session cookie (looks like sign-out).
-      if (shouldDispatchTokenUpdate && cachedToken.getRawString()) {
+      if (shouldDispatchTokenUpdate && cachedToken.getRawString() && this.#isSignedInOnCurrentClient()) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
@@ -629,13 +629,15 @@ export class Session extends BaseResource implements SessionResource {
     debugLogger.info('Fetching new token from API', { organizationId, template, tokenId }, 'session');
 
     const tokenResolver = this.#createTokenResolver(template, organizationId, skipCache);
-    SessionTokenCache.set({
-      tokenId,
-      tokenResolver,
-      ...focusedRefresh(() =>
-        this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
-      ),
-    });
+    if (this.#isSignedInOnCurrentClient()) {
+      SessionTokenCache.set({
+        tokenId,
+        tokenResolver,
+        ...focusedRefresh(() =>
+          this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate),
+        ),
+      });
+    }
 
     return tokenResolver.then(token => {
       const rawString = token.getRawString();
@@ -644,7 +646,9 @@ export class Session extends BaseResource implements SessionResource {
         // rather than silently returning null (which callers interpret as "signed out").
         throw new ClerkRuntimeError('Token fetch returned empty response', { code: 'network_error' });
       }
-      this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      if (this.#isSignedInOnCurrentClient()) {
+        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
+      }
       return rawString;
     });
   }
@@ -683,15 +687,18 @@ export class Session extends BaseResource implements SessionResource {
       return;
     }
 
+    if (!this.#isSignedInOnCurrentClient()) {
+      Session.#backgroundRefreshInProgress.delete(tokenId);
+      return;
+    }
+
     const tokenResolver = this.#createTokenResolver(template, organizationId, false);
 
     // Don't cache the promise immediately - only update cache on success
     // This allows concurrent calls to continue using the stale token
     tokenResolver
       .then(token => {
-        // Never cache or dispatch empty tokens — preserve the stale-but-valid
-        // token in cache instead of replacing it with an empty one.
-        if (!token.getRawString()) {
+        if (!token.getRawString() || !this.#isSignedInOnCurrentClient()) {
           return;
         }
 
@@ -713,6 +720,23 @@ export class Session extends BaseResource implements SessionResource {
       .finally(() => {
         Session.#backgroundRefreshInProgress.delete(tokenId);
       });
+  }
+
+  #isSignedInStatus(): boolean {
+    return this.status === 'active' || this.status === 'pending';
+  }
+
+  #isSignedInOnCurrentClient(): boolean {
+    if (!this.#isSignedInStatus()) {
+      return false;
+    }
+
+    const client = Session.clerk?.client;
+    if (!client) {
+      return true;
+    }
+
+    return client.signedInSessions.some(session => session.id === this.id);
   }
 
   get currentTask() {

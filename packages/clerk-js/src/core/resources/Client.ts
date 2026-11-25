@@ -166,7 +166,7 @@ export class Client extends BaseResource implements ClientResource {
     if (data) {
       Client.revision++;
       this.id = data.id;
-      // Rebuilt session objects replace the live ones, so a stale piggybacked token must not win.
+      const previousSessionIds = this.sessions.map(session => session.id);
       const previousTokens = new Map(this.sessions.map(session => [session.id, session.lastActiveToken]));
       this.sessions = (data.sessions || []).map(s => {
         const session = new Session(s);
@@ -180,6 +180,22 @@ export class Client extends BaseResource implements ClientResource {
         }
         return session;
       });
+
+      const signedInSessionIds = new Set(this.signedInSessions.map(session => session.id));
+      const inactiveSessionIds = new Set<string>();
+      for (const sessionId of previousSessionIds) {
+        if (!signedInSessionIds.has(sessionId)) {
+          inactiveSessionIds.add(sessionId);
+        }
+      }
+      for (const session of this.sessions) {
+        if (!signedInSessionIds.has(session.id)) {
+          inactiveSessionIds.add(session.id);
+        }
+      }
+      for (const sessionId of inactiveSessionIds) {
+        SessionTokenCache.deleteBySessionId(sessionId);
+      }
 
       if (data.sign_up && this.signUp instanceof SignUp && this.signUp.id === data.sign_up.id) {
         this.signUp.__internal_updateFromJSON(data.sign_up);

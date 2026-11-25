@@ -76,4 +76,12 @@ export const TokenId = {
 
     return remainder || undefined;
   },
+
+  belongsToSession: (tokenId: string, sessionId: string): boolean => {
+    if (!sessionId) {
+      return false;
+    }
+
+    return tokenId === sessionId || tokenId.startsWith(`${sessionId}-`);
+  },
 };

@@ -2207,4 +2207,92 @@ describe('SessionTokenCache', () => {
       expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'aud-split' })).toBeDefined();
     });
   });
+
+  describe('deleteBySessionId', () => {
+    it('removes all entries and cancels proactive refresh timers only for the target session', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const onRefreshSess1Default = vi.fn();
+      const onRefreshSess1Template = vi.fn();
+      const onRefreshSess1Org = vi.fn();
+      const onRefreshSess1Audience = vi.fn();
+      const onRefreshSess10 = vi.fn();
+      const onRefreshSess2 = vi.fn();
+
+      SessionTokenCache.set({
+        tokenId: 'sess_1',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_1')),
+        onRefresh: onRefreshSess1Default,
+      });
+      SessionTokenCache.set({
+        tokenId: 'sess_1-t3-relay',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_1-t3-relay')),
+        onRefresh: onRefreshSess1Template,
+      });
+      SessionTokenCache.set({
+        tokenId: 'sess_1-org_456',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_1-org_456')),
+        onRefresh: onRefreshSess1Org,
+      });
+      SessionTokenCache.set({
+        audience: 'https://api.example.com',
+        tokenId: 'sess_1',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_1')),
+        onRefresh: onRefreshSess1Audience,
+      });
+      SessionTokenCache.set({
+        tokenId: 'sess_10',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_10')),
+        onRefresh: onRefreshSess10,
+      });
+      SessionTokenCache.set({
+        tokenId: 'sess_2',
+        tokenResolver: Promise.resolve(makeToken(jwt, 'sess_2')),
+        onRefresh: onRefreshSess2,
+      });
+      await tick();
+
+      SessionTokenCache.deleteBySessionId('sess_1');
+
+      expect(SessionTokenCache.get({ tokenId: 'sess_1' })).toBeUndefined();
+      expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
+      expect(SessionTokenCache.get({ tokenId: 'sess_1-org_456' })).toBeUndefined();
+      expect(SessionTokenCache.get({ audience: 'https://api.example.com', tokenId: 'sess_1' })).toBeUndefined();
+      expect(SessionTokenCache.get({ tokenId: 'sess_10' })).toBeDefined();
+      expect(SessionTokenCache.get({ tokenId: 'sess_2' })).toBeDefined();
+      expect(SessionTokenCache.size()).toBe(2);
+
+      await vi.advanceTimersByTimeAsync(45 * 1000);
+
+      expect(onRefreshSess1Default).not.toHaveBeenCalled();
+      expect(onRefreshSess1Template).not.toHaveBeenCalled();
+      expect(onRefreshSess1Org).not.toHaveBeenCalled();
+      expect(onRefreshSess1Audience).not.toHaveBeenCalled();
+      expect(onRefreshSess10).toHaveBeenCalledTimes(1);
+      expect(onRefreshSess2).toHaveBeenCalledTimes(1);
+    });
+
+    it('prevents a pending token resolver from resurrecting a deleted session entry', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+      const pending = deferred();
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({
+        tokenId: 'sess_1-t3-relay',
+        tokenResolver: pending.promise,
+        onRefresh,
+      });
+
+      SessionTokenCache.deleteBySessionId('sess_1');
+      pending.resolve(makeToken(jwt, 'sess_1-t3-relay'));
+      await tick();
+
+      expect(SessionTokenCache.get({ tokenId: 'sess_1-t3-relay' })).toBeUndefined();
+      expect(SessionTokenCache.size()).toBe(0);
+
+      await vi.advanceTimersByTimeAsync(45 * 1000);
+      expect(onRefresh).not.toHaveBeenCalled();
+    });
+  });
 });
