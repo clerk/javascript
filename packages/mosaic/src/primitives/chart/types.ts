@@ -21,9 +21,6 @@ export type ChartTick = Readonly<{ value: number; y: number }>;
 /** A point in chart coordinates, relative to the top left of `Chart.Root`. */
 export type ChartPoint = Readonly<{ x: number; y: number }>;
 
-/** A box in chart coordinates. */
-export type ChartRect = Readonly<{ x: number; y: number; width: number; height: number }>;
-
 /**
  * One datum's place on the X axis. A bar chart gives each category a band; a point chart gives it a
  * point, so `width` is 0. Shared parts read only these numbers.
@@ -145,8 +142,6 @@ export type ChartInstance<
   selectionSource: 'pointer' | 'keyboard' | 'external' | null;
   /** Where a tooltip for `selected` points, in chart coordinates. */
   tooltipAnchor: ChartPoint | null;
-  /** The box a focus ring for `selected` outlines, such as a bar section. Null with no selection. */
-  focusRect: ChartRect | null;
   /** The text of the keyboard selection's status announcement. */
   announcement: string;
   /** The keys the chart answers to, for the visually hidden description. */

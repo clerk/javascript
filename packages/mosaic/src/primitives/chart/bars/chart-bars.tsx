@@ -15,7 +15,7 @@ import {
 } from './bar-canvas';
 import { CanvasRenderError } from './bar-canvas-error';
 import { BarsContext, useBarChartContext } from './bar-context';
-import { fitProjectionToBar, projectStackedBarMarks } from './bar-layout';
+import { fitProjectionToBar, paintedSectionBounds, projectStackedBarMarks } from './bar-layout';
 
 export type ChartBarsProps = ComponentProps<'div'>;
 
@@ -131,7 +131,17 @@ export const ChartBars = React.forwardRef<HTMLDivElement, ChartBarsProps>(functi
     () => getProjectionOutlineSnapshot(projectionOutline),
     getServerSnapshot,
   );
-  const barsContext = React.useMemo(() => ({ setBar, setProjectionOutline }), []);
+  const focused = chart.selectionSource === 'keyboard' ? chart.selected : null;
+  const focusDatumIndex = focused?.datumIndex;
+  const focusPositive = focused ? focused.section === 'positive' : undefined;
+  const focusBounds = React.useMemo(
+    () =>
+      focusDatumIndex === undefined || focusPositive === undefined
+        ? null
+        : paintedSectionBounds(marks, projection, focusDatumIndex, focusPositive),
+    [focusDatumIndex, focusPositive, marks, projection],
+  );
+  const barsContext = React.useMemo(() => ({ setBar, setProjectionOutline, focusBounds }), [focusBounds]);
 
   React.useLayoutEffect(() => {
     if (!canvas || !hasArea(size)) {

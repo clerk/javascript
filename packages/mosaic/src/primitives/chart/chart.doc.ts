@@ -3,6 +3,7 @@ import type {
   ChartBarProps,
   ChartBarsProps,
   ChartCursorProps,
+  ChartFocusOutlineProps,
   ChartGridProps,
   ChartProjectionOutlineProps,
   ChartRootProps,
@@ -129,6 +130,18 @@ export default {
       description:
         'A hidden `g` whose computed `stroke`, `stroke-width` and `stroke-dasharray` outline the projected bar on the Canvas, 1px outside its fill, with concentric top corners and square ends on the zero line, when `projection` rises above its stack. Throws outside `Chart.Bars`.',
     },
+    'Chart.FocusOutline': {
+      description:
+        'A `rect` in the `Chart.Bars` SVG around the painted bars of the selected section, rendered only while the keyboard made the selection. Style its `stroke`, `stroke-width` and `rx`; it has `fill: none`. Throws outside `Chart.Bars`.',
+      props: {
+        offset: { type: 'number', doc: 'Space in px between the painted bars and the outline.', default: '2' },
+        minSize: {
+          type: 'number',
+          doc: 'The smallest width and height in px, so the outline stays findable around thin or short bars.',
+          default: '12',
+        },
+      },
+    },
     'Chart.YAxis': {
       description: 'An `aria-hidden` `svg` that holds the Y tick labels in the left margin.',
       props: {
@@ -181,7 +194,7 @@ export default {
     },
     'Chart.Cursor': {
       description:
-        'An `aria-hidden` `div` that covers the selected category, with its width. While the keyboard selected the category it carries `data-focus-visible` and covers just the selected section (`focusRect`, at least 12px wide and 24px tall), so the focus ring can sit on it. Throws outside `Chart.Selection`.',
+        'An `aria-hidden` `div` that covers the selected category, with its width. Carries `data-focus-visible` while the keyboard selected the category. Throws outside `Chart.Selection`.',
     },
     'Chart.Tooltip': {
       description:
@@ -283,6 +296,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   'Chart.Bars': ChartBarsProps;
   'Chart.Bar': ChartBarProps;
   'Chart.ProjectionOutline': ChartProjectionOutlineProps;
+  'Chart.FocusOutline': ChartFocusOutlineProps;
   'Chart.YAxis': ChartYAxisProps;
   'Chart.YTick': ChartYTickProps;
   'Chart.XAxis': ChartXAxisProps;

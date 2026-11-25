@@ -64,6 +64,7 @@ export function TestChart<TDatum>({
       <Chart.Bars>
         {bar ? <Chart.Bar className={barClassName} /> : null}
         <Chart.ProjectionOutline className={outlineClassName} />
+        <Chart.FocusOutline data-testid='focus-outline' />
         <Chart.YLine value={0} />
       </Chart.Bars>
       <Chart.XAxis format={formatXTick}>
