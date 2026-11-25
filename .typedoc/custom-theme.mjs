@@ -621,7 +621,9 @@ function clerkParametersTable(model) {
    */
   const parseParams = (current, acc) => {
     const decl = getParameterObjectShapeDeclaration(current.type);
-    const shouldFlatten = shouldFlattenInlineObjectParameter(decl);
+    const shouldFlatten =
+      shouldFlattenInlineObjectParameter(decl) &&
+      !(this.page?.url?.endsWith('/use-reverification.mdx') && current.name === 'options');
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
@@ -1347,9 +1349,9 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           return superPartials.signatures(model, options);
         }
         const originalSignatures = model.signatures;
-        model.signatures = [originalSignatures[1]];
+        model.signatures = [originalSignatures[0]];
         try {
-          return superPartials.signatures(model, options);
+          return superPartials.signatures(model, options).replace(/\n+#{2,3} Returns(?:\n|$)[\s\S]*$/, '');
         } finally {
           model.signatures = originalSignatures;
         }
