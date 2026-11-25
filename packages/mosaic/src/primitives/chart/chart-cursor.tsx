@@ -33,6 +33,10 @@ export const ChartCursor = React.forwardRef<HTMLDivElement, ChartCursorProps>(fu
     render,
     ref,
     enabled: !!selectedCategory,
+    state: { focusVisible: chart.selectionSource === 'keyboard' },
+    stateAttributesMapping: {
+      focusVisible: (focusVisible: boolean) => (focusVisible ? { 'data-focus-visible': '' } : null),
+    },
     props: mergeProps<'div'>(ownProps, otherProps),
   });
 });
