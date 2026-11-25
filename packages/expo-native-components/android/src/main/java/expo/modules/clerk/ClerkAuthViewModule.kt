@@ -46,6 +46,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
   var logoView: View? = null
     private set
   var hostBackButton: Boolean = false
+  var enableRestoreCredentials: Boolean = false
 
   private var logoWidth = 0
   private var logoHeight = 0
@@ -121,6 +122,7 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
       },
       mode = authMode(mode),
       isDismissible = isDismissible,
+      enableRestoreCredentials = enableRestoreCredentials,
       onDismiss = ::sendDismissEvent,
       onAuthComplete = {
         sendDismissEvent()
@@ -231,6 +233,10 @@ class ClerkAuthViewModule : Module() {
 
       Prop("hostBackButton") { view: ClerkAuthNativeView, hostBackButton: Boolean ->
         view.hostBackButton = hostBackButton
+      }
+
+      Prop("enableRestoreCredentials") { view: ClerkAuthNativeView, enableRestoreCredentials: Boolean? ->
+        view.enableRestoreCredentials = enableRestoreCredentials ?: false
       }
 
       OnViewDidUpdateProps { view: ClerkAuthNativeView ->
