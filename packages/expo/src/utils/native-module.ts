@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 
+import { NATIVE_BRIDGE_VERSION } from '../constants';
 import NativeClerkModule from '../specs/NativeClerkModule';
 import type {
   NativeAuthFlowModule,
@@ -15,18 +16,24 @@ export type ClerkExpoNativeModule = {
   Partial<NativeAuthFlowModule> &
   Partial<NativeUpdateRequiredViewModule>;
 
-function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
-  if (!module || typeof module !== 'object') {
-    return false;
-  }
-  const maybeModule = module as Record<string, unknown>;
+const BRIDGE_METHODS = ['configureNative', 'getDeviceToken', 'setDeviceToken', 'refreshClient'] as const;
 
-  return (
-    typeof maybeModule.configureNative === 'function' &&
-    typeof maybeModule.getDeviceToken === 'function' &&
-    typeof maybeModule.setDeviceToken === 'function' &&
-    typeof maybeModule.refreshClient === 'function'
-  );
+function hasBridgeMethods(module: Record<string, unknown>) {
+  return BRIDGE_METHODS.every(name => typeof module[name] === 'function');
+}
+
+function readBridgeVersion(module: Record<string, unknown>): number | null {
+  if (module.bridgeVersion === undefined) {
+    return hasBridgeMethods(module) ? 1 : null;
+  }
+  return Number.isInteger(module.bridgeVersion) ? (module.bridgeVersion as number) : null;
+}
+
+function isClerkExpoModule(
+  module: Record<string, unknown>,
+  bridgeVersion: number | null,
+): module is ClerkExpoNativeModule {
+  return bridgeVersion === NATIVE_BRIDGE_VERSION && hasBridgeMethods(module);
 }
 
 function loadNativeModule(): ClerkExpoNativeModule | null {
@@ -43,16 +50,25 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     }
   }
 
-  if (isClerkExpoModule(nativeModule)) {
-    return nativeModule;
+  if (!nativeModule || typeof nativeModule !== 'object') {
+    return null;
   }
 
-  if (__DEV__ && nativeModule) {
-    console.error(
-      'Clerk: The native Clerk module in this app binary is incompatible with this version of @clerk/expo, so native components are disabled. ' +
-        'Install the @clerk/expo-native-components version required by @clerk/expo, then rebuild the app.',
-    );
+  const module = nativeModule as Record<string, unknown>;
+  const bridgeVersion = readBridgeVersion(module);
+  if (isClerkExpoModule(module, bridgeVersion)) {
+    return module;
   }
+
+  const reason =
+    bridgeVersion === NATIVE_BRIDGE_VERSION
+      ? `native bridge version ${bridgeVersion} is missing bridge methods`
+      : `native bridge version ${bridgeVersion ?? 'unknown'}, expected ${NATIVE_BRIDGE_VERSION}`;
+  console.error(
+    `Clerk: Native components are disabled because this app's native build doesn't match @clerk/expo ${PACKAGE_VERSION} ` +
+      `(${reason}). ` +
+      'Update @clerk/expo and @clerk/expo-native-components together to their latest versions, then rebuild the app.',
+  );
 
   return null;
 }
