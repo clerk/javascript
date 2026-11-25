@@ -75,10 +75,6 @@ function navigateTo(build: (from: HostUrl) => string | undefined, replace: boole
   notifyWindowUrl();
 }
 
-function urlModeLocationHook(mode: UrlRoutingMode) {
-  return (path: string) => useUrlModeLocation(mode, path);
-}
-
 function useVirtualModeLocation(path: string): MosaicLocation {
   const actions = useVirtualActions();
   return useMemo(() => createVirtualLocation(path, actions), [path, actions]);
@@ -158,6 +154,8 @@ export function useFixedRoutingMode<Mode extends RoutingMode>(routing: Mode): Mo
 
 export function useMosaicLocation({ routing, path = '/' }: MosaicLocationOptions): MosaicLocation {
   const mode = useFixedRoutingMode(routing);
-  const [useLocation] = useState(() => (mode === 'virtual' ? useVirtualModeLocation : urlModeLocationHook(mode)));
+  const [useLocation] = useState(() =>
+    mode === 'virtual' ? useVirtualModeLocation : (path: string) => useUrlModeLocation(mode, path),
+  );
   return useLocation(path);
 }
