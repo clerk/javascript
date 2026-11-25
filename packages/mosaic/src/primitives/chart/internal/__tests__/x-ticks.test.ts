@@ -41,6 +41,35 @@ function expectReadable(ticks: readonly XTick[], area: Plot, measure: (label: st
 }
 
 describe('category labels', () => {
+  it('centers each label under its category when it fits there', () => {
+    const months = categories(['Sep', 'Oct', 'Nov']);
+    const ticks = selectXTicks({
+      categories: months,
+      plot,
+      viewportWidth: 600,
+      formatXTick: label => label,
+      measure: measureByLength,
+    });
+
+    expect(ticks.map(({ x, textAnchor }) => ({ x, textAnchor }))).toEqual(
+      months.map(({ center }) => ({ x: center, textAnchor: 'middle' })),
+    );
+  });
+
+  it('keeps a label that would overflow the plot inside its edge', () => {
+    const days = categories(dailyDates(30, Date.UTC(2026, 9, 27)));
+    const ticks = selectXTicks({
+      categories: days,
+      plot,
+      viewportWidth: 600,
+      formatXTick: label => label,
+      measure: measureByLength,
+    });
+
+    expect(ticks[0]).toMatchObject({ textAnchor: 'start', x: 4 });
+    expect(ticks.at(-1)).toMatchObject({ textAnchor: 'end', x: 596 });
+  });
+
   it.each([
     { name: 'short labels', width: 20, labels: ['Jan', 'Feb', 'Mar'] },
     { name: 'wide labels', width: 260, labels: ['Jan', 'Mar'] },

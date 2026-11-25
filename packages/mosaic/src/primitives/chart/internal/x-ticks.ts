@@ -64,7 +64,6 @@ function selectCategoryTicks({
   formatXTick,
   measure,
 }: SelectXTicksOptions & { measure: (label: string) => number }): XTick[] {
-  const hasDistinctEdges = categories.length > 1;
   const candidates = evenlySpacedIndexes(categories.length, plot.width).flatMap(datumIndex => {
     const category = categories[datumIndex];
     if (!category) {
@@ -74,14 +73,8 @@ function selectCategoryTicks({
     if (label === null) {
       return [];
     }
-    const isFirst = hasDistinctEdges && datumIndex === 0;
-    const isLast = hasDistinctEdges && datumIndex === categories.length - 1;
-    const placement: Pick<XTick, 'x' | 'textAnchor'> = isFirst
-      ? { x: plot.x + EDGE_INSET, textAnchor: 'start' }
-      : isLast
-        ? { x: plot.x + plot.width - EDGE_INSET, textAnchor: 'end' }
-        : { x: category.center, textAnchor: 'middle' };
     const width = measure(label);
+    const placement = clampToPlot(category.center, width, plot);
     const left =
       placement.x - (placement.textAnchor === 'end' ? width : placement.textAnchor === 'middle' ? width / 2 : 0);
     return [{ key: category.key, label, ...placement, left, right: left + width }];
