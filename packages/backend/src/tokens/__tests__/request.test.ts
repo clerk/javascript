@@ -1377,6 +1377,29 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
+  test('cookieToken: returns signed out when the session token payload is not a JSON object', async () => {
+    const [rawHeader, , rawSignature] = mockJwt.split('.');
+
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        {},
+        {
+          __clerk_db_jwt: 'deadbeef',
+          __client_uat: `${mockJwtPayload.iat - 10}`,
+          __session: `${rawHeader}.bnVsbA.${rawSignature}`,
+        },
+      ),
+      mockOptions(),
+    );
+
+    expect(requestState).toBeSignedOut({
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message:
+        'Invalid JWT form. The header and payload must be JSON objects. (reason=token-invalid, token-carrier=cookie)',
+    });
+    expect(requestState.toAuth()).toBeSignedOutToAuth();
+  });
+
   test('cookieToken: returns signed in when cookieToken.iat >= clientUat and valid token [10y.2y]', async () => {
     server.use(
       http.get('https://api.clerk.test/v1/jwks', () => {
