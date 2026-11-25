@@ -48,6 +48,10 @@ export async function hasValidSignature(jwt: Jwt, key: JsonWebKey | string): Pro
   }
 }
 
+function isJsonObject(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationError> {
   const tokenParts = (token || '').toString().split('.');
   if (tokenParts.length !== 3) {
@@ -91,6 +95,17 @@ export function decodeJwt(token: string): JwtReturnType<Jwt, TokenVerificationEr
         new TokenVerificationError({
           reason: TokenVerificationErrorReason.TokenInvalid,
           message: `Invalid JWT form. The header, payload, or signature could not be decoded.`,
+        }),
+      ],
+    };
+  }
+
+  if (!isJsonObject(header) || !isJsonObject(payload)) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalid,
+          message: `Invalid JWT form. The header and payload must be JSON objects.`,
         }),
       ],
     };
