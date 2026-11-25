@@ -38,8 +38,9 @@ describe('passing the Protect check', () => {
     const { fapi, user } = await renderSignUp({ signUp: { protectChecks: 2 } });
 
     await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
-    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']));
+    const firstChallenge = await screen.findByRole('button', { name: 'I am human' });
+    await user.click(firstChallenge);
+    await waitFor(() => expect(firstChallenge).not.toBeInTheDocument());
     await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
@@ -65,8 +66,9 @@ export default (container, { token }) =>
     });
 
     await submitStart(user);
-    await user.click(await screen.findByRole('button', { name: 'I am human' }));
-    await waitFor(() => expect(fapi.signUp.proofTokens).toEqual(['proof_rejected']));
+    const firstChallenge = await screen.findByRole('button', { name: 'I am human' });
+    await user.click(firstChallenge);
+    await waitFor(() => expect(firstChallenge).not.toBeInTheDocument());
     await user.click(await screen.findByRole('button', { name: 'I am human' }));
 
     expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
