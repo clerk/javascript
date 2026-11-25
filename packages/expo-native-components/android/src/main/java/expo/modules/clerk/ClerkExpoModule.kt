@@ -65,6 +65,8 @@ class ClerkExpoModule : Module() {
 
         Events(NATIVE_AUTH_FLOW_CHANGED_EVENT, NATIVE_CLIENT_INVALIDATED_EVENT)
 
+        Constant("bridgeVersion") { 1 }
+
         OnCreate {
             startAuthFlowStateObserver()
         }

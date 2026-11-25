@@ -11,6 +11,7 @@ export interface Spec
   // Exposed by Expo Modules EventEmitter for the internal `clerkNativeClientInvalidated` event.
   // This is not part of the public @clerk/expo API.
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
+  bridgeVersion?: number;
 }
 
 export default requireOptionalNativeModule<Spec>('ClerkExpo');

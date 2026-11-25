@@ -15,18 +15,16 @@ export type ClerkExpoNativeModule = {
   Partial<NativeAuthFlowModule> &
   Partial<NativeUpdateRequiredViewModule>;
 
-function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
-  if (!module || typeof module !== 'object') {
-    return false;
-  }
-  const maybeModule = module as Record<string, unknown>;
+const NATIVE_BRIDGE_VERSION = 1;
 
-  return (
-    typeof maybeModule.configureNative === 'function' &&
-    typeof maybeModule.getDeviceToken === 'function' &&
-    typeof maybeModule.setDeviceToken === 'function' &&
-    typeof maybeModule.refreshClient === 'function'
-  );
+const BRIDGE_V1_METHODS = ['configureNative', 'getDeviceToken', 'setDeviceToken', 'refreshClient'] as const;
+
+function readBridgeVersion(module: object): number | null {
+  const maybeModule = module as Record<string, unknown>;
+  if (typeof maybeModule.bridgeVersion === 'number') {
+    return maybeModule.bridgeVersion;
+  }
+  return BRIDGE_V1_METHODS.every(name => typeof maybeModule[name] === 'function') ? 1 : null;
 }
 
 function loadNativeModule(): ClerkExpoNativeModule | null {
@@ -43,16 +41,20 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     }
   }
 
-  if (isClerkExpoModule(nativeModule)) {
-    return nativeModule;
+  if (!nativeModule || typeof nativeModule !== 'object') {
+    return null;
   }
 
-  if (__DEV__ && nativeModule) {
-    console.error(
-      'Clerk: The native Clerk module in this app binary is incompatible with this version of @clerk/expo, so native components are disabled. ' +
-        'Install the @clerk/expo-native-components version required by @clerk/expo, then rebuild the app.',
-    );
+  const bridgeVersion = readBridgeVersion(nativeModule);
+  if (bridgeVersion === NATIVE_BRIDGE_VERSION) {
+    return nativeModule as ClerkExpoNativeModule;
   }
+
+  console.error(
+    `Clerk: Native components are disabled because this app's native build doesn't match @clerk/expo ${PACKAGE_VERSION} ` +
+      `(native bridge version ${bridgeVersion ?? 'unknown'}, expected ${NATIVE_BRIDGE_VERSION}). ` +
+      'Update @clerk/expo and @clerk/expo-native-components together to their latest versions, then rebuild the app.',
+  );
 
   return null;
 }

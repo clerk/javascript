@@ -18,6 +18,8 @@ public class ClerkExpoModule: Module {
 
     Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientInvalidatedEvent)
 
+    Constant("bridgeVersion") { 1 }
+
     OnCreate {
       Self.sharedInstance = self
       ClerkNativeBridge.setAuthFlowChangedEmitter { body in
