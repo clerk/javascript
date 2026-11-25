@@ -927,6 +927,43 @@ describe('OAuthConsent', () => {
         expect(queryByText('You can select up to 1 organizations.')).toBeNull();
       });
 
+      it('selects the default organization again when the limit drops to 1 after the selection was cleared', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withUser({
+            email_addresses: ['jane@example.com'],
+            organization_memberships: [
+              { id: 'org_1', name: 'Org 1' },
+              { id: 'org_2', name: 'Org 2' },
+            ],
+          });
+          f.withOrganizations();
+        });
+        fixtures.clerk.session.lastActiveOrganizationId = null;
+        props.setProps({ componentName: 'OAuthConsent' } as any);
+        mockOAuthApplication(fixtures.clerk, {
+          getConsentInfo: vi.fn(({ oauthClientId }: { oauthClientId: string }) =>
+            Promise.resolve({
+              ...fakeConsentInfoWithOrgScope,
+              maxOrganizations: oauthClientId === 'another_client' ? 1 : 5,
+            }),
+          ),
+        });
+        const { baseElement, findByRole, getByRole, rerender, userEvent } = render(<OAuthConsent />, { wrapper });
+        const organizationIds = () =>
+          new FormData(baseElement.querySelector('form') as HTMLFormElement).getAll('organization_id');
+
+        await userEvent.click(await findByRole('button', { name: /Org 1$/ }));
+        await userEvent.click(await findByRole('option', { name: /Org 1/ }));
+        await userEvent.keyboard('{Escape}');
+        expect(organizationIds()).toEqual([]);
+
+        props.setProps({ componentName: 'OAuthConsent', oauthClientId: 'another_client' } as any);
+        rerender(<OAuthConsent />);
+
+        await waitFor(() => expect(organizationIds()).toEqual(['org_1']));
+        expect(getByRole('button', { name: 'Allow' })).toBeEnabled();
+      });
+
       it.each([0, -1, 2.5])(
         'keeps the selection of one organization when the reported limit is %s',
         async maxOrganizations => {

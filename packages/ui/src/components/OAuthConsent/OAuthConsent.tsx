@@ -105,7 +105,9 @@ function _OAuthConsent() {
     reportedMaxOrganizations >= 1
       ? reportedMaxOrganizations
       : 1;
-  const effectiveOrgs = (selectedOrgs ?? (defaultOrg ? [defaultOrg] : [])).slice(0, maxOrganizations);
+  const defaultOrgs = defaultOrg ? [defaultOrg] : [];
+  const chosenOrgs = maxOrganizations > 1 || selectedOrgs?.length ? (selectedOrgs ?? defaultOrgs) : defaultOrgs;
+  const effectiveOrgs = chosenOrgs.slice(0, maxOrganizations);
   const isMissingOrgSelection = orgSelectionEnabled && orgOptions.length > 0 && effectiveOrgs.length === 0;
 
   const { t } = useLocalizations();
