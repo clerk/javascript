@@ -121,17 +121,16 @@ function GrowthChart({
         </Chart.XAxis>
         <Chart.Selection>
           <Chart.Cursor className='cursor' />
-          <Chart.Tooltip<ActiveBar<GrowthRow>> collisionBoundary={boundary}>
+          <Chart.Tooltip<ActiveBar<GrowthRow>>
+            className='tooltip'
+            collisionBoundary={boundary}
+          >
             {({ datum }) => (
-              <Chart.TooltipPortal>
-                <Chart.TooltipPositioner>
-                  <Chart.TooltipPopup className='tooltip'>
-                    <div>{datum.week}</div>
-                    <div>Sign-ups: {datum.signups}</div>
-                    <div>Churned: {datum.churned}</div>
-                  </Chart.TooltipPopup>
-                </Chart.TooltipPositioner>
-              </Chart.TooltipPortal>
+              <>
+                <div>{datum.week}</div>
+                <div>Sign-ups: {datum.signups}</div>
+                <div>Churned: {datum.churned}</div>
+              </>
             )}
           </Chart.Tooltip>
         </Chart.Selection>
@@ -168,7 +167,7 @@ describe('Chart stacked bars visual state', () => {
     screen.getByRole('group', { name: 'Weekly growth' }).focus();
     await userEvent.keyboard('{ArrowRight}');
     await expect
-      .poll(() => screen.queryByText('Sign-ups: 52')?.closest<HTMLElement>('[data-side]')?.style.visibility)
+      .poll(() => screen.queryByText('Sign-ups: 52')?.closest<HTMLElement>('.tooltip')?.style.visibility)
       .toBe('');
     await expect(chart).toMatchScreenshot('stacked-bars-tooltip-open');
   });

@@ -532,6 +532,15 @@ function contains(outer: DOMRect, inner: DOMRect) {
 }
 
 describe('the tooltip', () => {
+  it('stays closed for a period whose content is null', async () => {
+    await render(<Chart renderTooltip={active => (active.category === 'Feb' ? null : active.category)} />);
+    await focusPeriod(0);
+    expect(screen.getByTestId('tooltip')).toHaveTextContent('Jan');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(() => screen.queryByTestId('tooltip')).toBeNull();
+  });
+
   it('opens on `side` at `sideOffset` from the period', async () => {
     await render(
       <Chart

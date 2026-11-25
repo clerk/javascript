@@ -66,17 +66,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   </Chart.XAxis>
   <Chart.Selection>
     <Chart.Cursor className='cursor' />
-    <Chart.Tooltip<ActiveBar<Row>>>
-      {active => (
-        <Chart.TooltipPortal>
-          <Chart.TooltipPositioner>
-            <Chart.TooltipPopup className='tooltip'>
-              <PeriodSummary row={active.datum} />
-            </Chart.TooltipPopup>
-          </Chart.TooltipPositioner>
-        </Chart.TooltipPortal>
-      )}
-    </Chart.Tooltip>
+    <Chart.Tooltip<ActiveBar<Row>> className='tooltip'>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
   </Chart.Selection>
 </Chart.Root>;
 ```
@@ -99,11 +89,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.XTick`             | `<text>`        | One category label                                                   |
 | `Chart.Selection`         | `<div>`         | Pointer and keyboard selection over the whole chart                  |
 | `Chart.Cursor`            | `<div>`         | Covers the selected category                                         |
-| `Chart.Tooltip`           | (none)          | Positions a tooltip at the selected category                         |
-| `Chart.TooltipPortal`     | (none)          | Portals the tooltip while it is mounted                              |
-| `Chart.TooltipPositioner` | `<div>`         | The positioned element. Carries `data-side`                          |
-| `Chart.TooltipPopup`      | `<div>`         | The element that animates. Carries `data-open` and `data-closed`     |
-| `Chart.TooltipArrow`      | `<svg>`         | An arrow pointing at the selected category                           |
+| `Chart.Tooltip`           | `<div>`         | The tooltip for the selected category, portaled                      |
 
 Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
 
@@ -140,14 +126,14 @@ Each X label centers under its category, and moves to the plot's edge only where
 
 | Prop                | Type                             | Default   | Description                                                                 |
 | ------------------- | -------------------------------- | --------- | --------------------------------------------------------------------------- |
-| `children`          | `(active: TActive) => ReactNode` | —         | Renders the tooltip parts. While it closes, receives the last selection     |
+| `children`          | `(active: TActive) => ReactNode` | —         | Content for the selected category. Return null to hide the tooltip          |
 | `side`              | `'left' \| 'right'`              | `'right'` | The side tried first                                                        |
 | `sideOffset`        | `number`                         | `16`      | Distance in px from the category center                                     |
 | `collisionPadding`  | `number`                         | `8`       | Space in px kept from the edges of `collisionBoundary`                      |
 | `collisionBoundary` | `RefObject<HTMLElement \| null>` | the chart | Element the tooltip stays inside                                            |
 | `pinned`            | `boolean \| 'auto'`              | `'auto'`  | Pins the tooltip to the top left of the boundary. `auto` below a 416px plot |
 
-`Chart.Tooltip` renders no element. It provides the context of the [Tooltip primitive](../tooltip/README.md), so `Chart.TooltipPortal`, `Chart.TooltipPositioner`, `Chart.TooltipPopup` and `Chart.TooltipArrow` are the Tooltip parts, anchored to the chart instead of a trigger. Style the popup, not the positioner, which keeps `pointer-events: none` so the tooltip never takes the pointer from the chart.
+`Chart.Tooltip` keeps `pointer-events: none`, so it never takes the pointer from the chart. It is not Mosaic's `Tooltip`: that one opens from a trigger on hover and focus and describes it, while the chart opens its tooltip from the selection and announces it through the `status` region.
 
 Name the active type the chart's hook selects, such as `<Chart.Tooltip<ActiveBar<Row>>>`. It defaults to `ChartActive`: the selected `category`, `datumIndex` and `datum`.
 
@@ -290,14 +276,14 @@ Painting the bars is the one thing the chart object does not do, because their c
 
 ## Data attributes
 
-| Attribute                     | Part                      | Description                                                                                                          |
-| ----------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `data-chart-interaction-mode` | `Chart.Root`              | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
-| `data-active`                 | `Chart.XTick`             | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
-| `data-active-section`         | `Chart.Selection`         | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
-| `data-focus-visible`          | `Chart.Cursor`            | Present while the keyboard selected the category. Ring the cursor then, not the whole chart                          |
-| `data-side`                   | `Chart.TooltipPositioner` | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
-| `data-open` / `data-closed`   | `Chart.TooltipPopup`      | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
+| Attribute                     | Part              | Description                                                                                                          |
+| ----------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `data-chart-interaction-mode` | `Chart.Root`      | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
+| `data-active`                 | `Chart.XTick`     | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
+| `data-active-section`         | `Chart.Selection` | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
+| `data-focus-visible`          | `Chart.Cursor`    | Present while the keyboard selected the category. Ring the cursor then, not the whole chart                          |
+| `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
+| `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
 
 The interaction surface also carries the chart type's state, such as `data-active-section` for bars. `Chart.Bar` takes its own attributes before each paint, listed under [Styling](#styling).
 
@@ -399,7 +385,7 @@ A lost or missing 2D context throws `Chart.CanvasRenderError`, with the original
 
 ## Tooltip
 
-`Chart.Tooltip` positions with Floating UI against a virtual element at the chart's `tooltipAnchor`: the selected category's center, at the Y the chart type gives (the top of the plot for bars). It opens on `side`, flips to the other side when that one does not fit inside `collisionBoundary`, and keeps the side it chose last until that side stops fitting, so it does not cross the selection twice near an edge. A keyboard selection starts at the first period, so near the left edge it usually settles on the right. When `pinned`, or by default when the plot is narrower than 416px, it pins to the top-left of the boundary instead. `Chart.TooltipPortal` portals through Mosaic's `Portal`, so a `PortalProvider` decides where. `Chart.TooltipPopup` animates through `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`, and `Chart.Tooltip` passes its children the last selection while the popup closes.
+`Chart.Tooltip` positions with Floating UI against a virtual element at the chart's `tooltipAnchor`: the selected category's center, at the Y the chart type gives (the top of the plot for bars). It opens on `side`, flips to the other side when that one does not fit inside `collisionBoundary`, and keeps the side it chose last until that side stops fitting, so it does not cross the selection twice near an edge. A keyboard selection starts at the first period, so near the left edge it usually settles on the right. When `pinned`, or by default when the plot is narrower than 416px, it pins to the top-left of the boundary instead. It portals through Mosaic's `Portal`, so a `PortalProvider` decides where. It animates through `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`, and holds its last content while it closes.
 
 ## Dependencies and bundle size
 

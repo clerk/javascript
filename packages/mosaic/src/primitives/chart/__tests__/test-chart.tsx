@@ -82,15 +82,10 @@ export function TestChart<TDatum>({
           {renderTooltip ? (
             <Chart.Tooltip<ActiveBar<TDatum>>
               collisionBoundary={boundary}
+              data-testid='tooltip'
               {...tooltip}
             >
-              {active => (
-                <Chart.TooltipPortal>
-                  <Chart.TooltipPositioner data-testid='tooltip'>
-                    <Chart.TooltipPopup>{renderTooltip(active)}</Chart.TooltipPopup>
-                  </Chart.TooltipPositioner>
-                </Chart.TooltipPortal>
-              )}
+              {renderTooltip}
             </Chart.Tooltip>
           ) : null}
         </Chart.Selection>

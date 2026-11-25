@@ -7,10 +7,6 @@ import type {
   ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
-  ChartTooltipArrowProps,
-  ChartTooltipPopupProps,
-  ChartTooltipPortalProps,
-  ChartTooltipPositionerProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
@@ -189,11 +185,11 @@ export default {
     },
     'Chart.Tooltip': {
       description:
-        'Positions a tooltip beside the selected category and renders no element. It provides the Tooltip primitive context, so `Chart.TooltipPortal`, `Chart.TooltipPositioner`, `Chart.TooltipPopup` and `Chart.TooltipArrow` render it. Opens on `side`, flips to the other side when it does not fit, and keeps the side it chose last. Throws outside `Chart.Selection`.',
+        'A `div` portaled through `Portal` beside the selected category. Opens on `side`, flips to the other side when it does not fit, and keeps the side it chose last. Pins to the top left of the boundary on a plot narrower than 416px by default. Carries `data-side`, `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`. Throws outside `Chart.Selection`.',
       props: {
         children: {
           type: '(active: TActive) => React.ReactNode',
-          doc: 'Renders the tooltip parts for the selected category. While the tooltip closes it receives the last selection.',
+          doc: 'Content for the selected category. Return null to hide the tooltip.',
         },
         side: { type: "'left' | 'right'", doc: 'The side tried first.', default: "'right'" },
         sideOffset: { type: 'number', doc: 'Distance in px from the category center.', default: '16' },
@@ -213,21 +209,6 @@ export default {
           default: "'auto'",
         },
       },
-    },
-    'Chart.TooltipPortal': {
-      description:
-        'The Tooltip primitive `Portal`: renders its children through Mosaic `Portal` while the tooltip is mounted.',
-    },
-    'Chart.TooltipPositioner': {
-      description:
-        'The Tooltip primitive `Positioner`: a fixed `div` at the computed position, with `pointer-events: none` so it never takes the pointer from the chart. Carries `data-side`.',
-    },
-    'Chart.TooltipPopup': {
-      description:
-        'The Tooltip primitive `Popup`: the element that animates, with `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`.',
-    },
-    'Chart.TooltipArrow': {
-      description: 'The Tooltip primitive `Arrow`, pointing at the selected category.',
     },
   },
   examples: [
@@ -252,17 +233,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   </Chart.XAxis>
   <Chart.Selection>
     <Chart.Cursor className='cursor' />
-    <Chart.Tooltip<ActiveBar<Row>>>
-      {active => (
-        <Chart.TooltipPortal>
-          <Chart.TooltipPositioner>
-            <Chart.TooltipPopup className='tooltip'>
-              <PeriodSummary row={active.datum} />
-            </Chart.TooltipPopup>
-          </Chart.TooltipPositioner>
-        </Chart.TooltipPortal>
-      )}
-    </Chart.Tooltip>
+    <Chart.Tooltip<ActiveBar<Row>> className='tooltip'>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
   </Chart.Selection>
 </Chart.Root>
 `,
@@ -319,8 +290,4 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   'Chart.Selection': ChartSelectionProps;
   'Chart.Cursor': ChartCursorProps;
   'Chart.Tooltip': ChartTooltipProps;
-  'Chart.TooltipPortal': ChartTooltipPortalProps;
-  'Chart.TooltipPositioner': ChartTooltipPositionerProps;
-  'Chart.TooltipPopup': ChartTooltipPopupProps;
-  'Chart.TooltipArrow': ChartTooltipArrowProps;
 }>;
