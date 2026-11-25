@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { fill } from '../../localization';
 import type { OAuthConsentMessages, OAuthConsentReadyModel, OAuthConsentViewProps } from './oauth-consent.types';
-import { MAX_CONSENTED_ORGANIZATIONS, OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
+import { OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
 
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 
 export function useOAuthConsentController(
-  { status: _status, scopes, organizations, defaultOrganizationId, ...model }: OAuthConsentReadyModel,
+  { status: _status, scopes, organizations, defaultOrganizationId, maxOrganizations, ...model }: OAuthConsentReadyModel,
   messages: OAuthConsentMessages,
 ): OAuthConsentViewProps {
   const [uncheckedScopes, setUncheckedScopes] = useState<readonly string[]>([]);
@@ -48,14 +48,20 @@ export function useOAuthConsentController(
     },
     scope: checked.join(' ') || OFFLINE_ACCESS_SCOPE,
     organizations: sharesOrganizations ? organizations : [],
-    organizationSelection: {
-      multiple: true,
-      organizationIds: sharesOrganizations
-        ? (selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]))
-        : [],
-      onOrganizationIdsChange: setSelectedOrganizationIds,
-      limit: MAX_CONSENTED_ORGANIZATIONS,
-    },
+    organizationSelection:
+      maxOrganizations > 1
+        ? {
+            multiple: true,
+            organizationIds: sharesOrganizations
+              ? (selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]))
+              : [],
+            onOrganizationIdsChange: setSelectedOrganizationIds,
+            limit: maxOrganizations,
+          }
+        : {
+            organizationId: sharesOrganizations ? (selectedOrganizationIds?.[0] ?? defaultOrganizationId) : null,
+            onOrganizationIdChange: organizationId => setSelectedOrganizationIds([organizationId]),
+          },
     isRedirectUrlOpen,
     onRedirectUrlOpenChange: setIsRedirectUrlOpen,
     pendingAction,

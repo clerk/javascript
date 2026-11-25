@@ -29,6 +29,7 @@ export interface OAuthConsentData {
   renderBranding: boolean;
   organizations: OAuthConsentOrganization[];
   defaultOrganizationId: string | null;
+  maxOrganizations: number;
 }
 
 export type OAuthConsentReadyModel = OAuthConsentData & { status: 'ready' };
