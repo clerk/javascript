@@ -232,6 +232,36 @@ function renderValue(value: unknown[]) {
   storyModule={SelectStories}
 />
 
+### Select all
+
+`Select.SelectAll` is a row that selects every enabled option, or clears them once all are
+selected. It shows a check when all are selected and a dash when only some are. Disabled options
+keep their state. <kbd>Ctrl</kbd>+<kbd>A</kbd> (<kbd>⌘</kbd>+<kbd>A</kbd> on macOS) does the same from
+anywhere in the open list. Write the options out yourself to place the row above them.
+
+```tsx
+<Select.Root
+  items={languages}
+  multiple
+>
+  <Select.Trigger placeholder='Select languages' />
+  <Select.Popup>
+    <Select.SelectAll label='Select all' />
+    {languages.map(language => (
+      <Select.Item
+        key={language.value}
+        {...language}
+      />
+    ))}
+  </Select.Popup>
+</Select.Root>
+```
+
+<Story
+  name='SelectAll'
+  storyModule={SelectStories}
+/>
+
 ### Scrolling
 
 A list with more options than fit is cut at the viewport edge and scrolled so the selected row still

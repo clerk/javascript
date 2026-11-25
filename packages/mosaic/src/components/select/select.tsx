@@ -5,11 +5,13 @@ import React from 'react';
 
 import { Checkmark } from '../../icons/glyphs/checkmark';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { Minus } from '../../icons/glyphs/minus';
 import type {
   SelectItemProps as PrimitiveSelectItemProps,
   SelectMultipleProps as PrimitiveSelectMultipleProps,
   SelectPopupProps as PrimitiveSelectPopupProps,
   SelectPortalProps,
+  SelectSelectAllProps as PrimitiveSelectSelectAllProps,
   SelectSingleProps as PrimitiveSelectSingleProps,
 } from '../../primitives/select';
 import { Select as Primitive } from '../../primitives/select';
@@ -23,6 +25,7 @@ import { Button } from '../button';
 import { mergeIds, useOptionalFieldControlProps, useRegisterFieldPartId } from '../field/field.context';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
+import { selectAllScope } from './select.markers.stylex';
 import * as slots from './select.styles';
 
 export interface SelectItem<Value = string> {
@@ -297,6 +300,55 @@ export const SelectItemIndicator = React.forwardRef<HTMLSpanElement, SelectItemI
       >
         {children ?? <Icon glyph={Checkmark} />}
       </Primitive.ItemIndicator>
+    );
+  },
+);
+
+export interface SelectSelectAllProps
+  extends Omit<PrimitiveSelectSelectAllProps, 'label' | 'children' | 'className' | 'style'>,
+    MosaicStyleProps {
+  /** Shown in the row; also drives typeahead. */
+  label: string;
+}
+
+/**
+ * Selects every enabled item, or clears them once all are selected. Shows a check when all are
+ * selected and a dash when some are. Renders nothing unless the Select is `multiple`.
+ *
+ * @example
+ * <Select.Popup>
+ *   <Select.SelectAll label='Select all' />
+ *   {items.map(item => <Select.Item key={item.value} {...item} />)}
+ * </Select.Popup>
+ */
+export const SelectSelectAll = React.forwardRef<HTMLButtonElement, SelectSelectAllProps>(
+  function MosaicSelectSelectAll({ label, xstyle, ...rest }, ref) {
+    return (
+      <Primitive.SelectAll
+        ref={ref}
+        label={label}
+        {...mergeStyleProps(
+          themeProps('select-select-all'),
+          stylex.props(reset.base, focusOutline.visible, selectAllScope, slots.item.base, xstyle),
+          rest,
+        )}
+      >
+        <SelectContent>
+          <SelectLabel>{label}</SelectLabel>
+        </SelectContent>
+        <Icon
+          glyph={Checkmark}
+          size='md'
+          xstyle={[slots.indicator.base, slots.selectAllIndicator.checked]}
+          {...themeProps('select-select-all-indicator', { state: 'checked' })}
+        />
+        <Icon
+          glyph={Minus}
+          size='md'
+          xstyle={[slots.indicator.base, slots.selectAllIndicator.indeterminate]}
+          {...themeProps('select-select-all-indicator', { state: 'indeterminate' })}
+        />
+      </Primitive.SelectAll>
     );
   },
 );

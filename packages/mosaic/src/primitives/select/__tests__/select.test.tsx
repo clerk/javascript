@@ -957,6 +957,210 @@ describe('Select', () => {
     });
   });
 
+  describe('select all', () => {
+    function renderSelectAll(
+      props: {
+        value?: string[];
+        defaultValue?: string[];
+        onValueChange?: (value: string[]) => void;
+        disabledValues?: string[];
+      } = {},
+    ) {
+      const { disabledValues = [], ...rootProps } = props;
+      return render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+          {...rootProps}
+          multiple
+        >
+          <Select.Trigger aria-label='Fruits'>
+            <Select.Value placeholder='Pick fruits...' />
+          </Select.Trigger>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.SelectAll>Select all</Select.SelectAll>
+              {fruits.map(({ label, value }) => (
+                <Select.Item
+                  key={value}
+                  value={value}
+                  label={label}
+                  disabled={disabledValues.includes(value)}
+                >
+                  {label}
+                </Select.Item>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+    }
+
+    function selectAllOption() {
+      return screen.getByRole('option', { name: 'Select all' });
+    }
+
+    it('selects every option, keeping the popup open, then clears them on a second press', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(selectAllOption());
+      expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'banana', 'cherry']);
+      expect(selectAllOption()).toHaveAttribute('aria-selected', 'true');
+      expect(selectAllOption()).toHaveAttribute('aria-checked', 'true');
+      expect(selectAllOption()).toHaveAttribute('data-checked', '');
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-open', '');
+
+      await user.click(selectAllOption());
+      expect(onValueChange).toHaveBeenLastCalledWith([]);
+      expect(selectAllOption()).toHaveAttribute('aria-selected', 'false');
+      expect(selectAllOption()).toHaveAttribute('aria-checked', 'false');
+      expect(selectAllOption()).not.toHaveAttribute('data-checked');
+    });
+
+    it('shows the mixed state while some options are selected, and selects the rest on press', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ defaultValue: ['cherry'], onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      expect(selectAllOption()).toHaveAttribute('data-indeterminate', '');
+      expect(selectAllOption()).toHaveAttribute('aria-selected', 'false');
+      expect(selectAllOption()).toHaveAttribute('aria-checked', 'mixed');
+
+      await user.click(selectAllOption());
+      expect(onValueChange).toHaveBeenLastCalledWith(['cherry', 'apple', 'banana']);
+      expect(selectAllOption()).not.toHaveAttribute('data-indeterminate');
+    });
+
+    it('leaves disabled options as they are', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ defaultValue: ['banana'], disabledValues: ['banana', 'cherry'], onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(selectAllOption());
+      expect(onValueChange).toHaveBeenLastCalledWith(['banana', 'apple']);
+      expect(selectAllOption()).toHaveAttribute('data-checked', '');
+
+      await user.click(selectAllOption());
+      expect(onValueChange).toHaveBeenLastCalledWith(['banana']);
+    });
+
+    it('is disabled when every option is disabled', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ disabledValues: ['apple', 'banana', 'cherry'], onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      expect(selectAllOption()).toHaveAttribute('aria-disabled', 'true');
+      expect(selectAllOption()).toHaveAttribute('data-disabled', '');
+
+      await user.click(selectAllOption());
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('is reached with the arrow keys and pressed with Enter', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ onValueChange });
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(document.activeElement).toBe(selectAllOption()));
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'banana', 'cherry']);
+    });
+
+    it.each([
+      ['Control', '{Control>}a{/Control}'],
+      ['Meta', '{Meta>}a{/Meta}'],
+    ])('toggles every option with %s+A', async (_, keys) => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderSelectAll({ onValueChange });
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(document.activeElement).toBe(selectAllOption()));
+
+      await user.keyboard(keys);
+      expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'banana', 'cherry']);
+
+      await user.keyboard(keys);
+      expect(onValueChange).toHaveBeenLastCalledWith([]);
+    });
+
+    it('follows a controlled value', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = useState<string[]>(['apple']);
+        return (
+          <>
+            <output data-testid='value'>{value.join(',')}</output>
+            <Select.Root
+              items={fruits}
+              alignItemWithTrigger={false}
+              multiple
+              value={value}
+              onValueChange={setValue}
+            >
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Positioner>
+                <Select.Popup>
+                  <Select.SelectAll>Select all</Select.SelectAll>
+                  {fruits.map(({ label, value: optionValue }) => (
+                    <Select.Item
+                      key={optionValue}
+                      value={optionValue}
+                      label={label}
+                    >
+                      {label}
+                    </Select.Item>
+                  ))}
+                </Select.Popup>
+              </Select.Positioner>
+            </Select.Root>
+          </>
+        );
+      }
+      render(<Controlled />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(selectAllOption());
+      expect(screen.getByTestId('value')).toHaveTextContent('apple,banana,cherry');
+      expect(screen.getByRole('combobox')).toHaveTextContent('Apple, Banana, Cherry');
+    });
+
+    it('has no axe violations in the mixed state', async () => {
+      const user = userEvent.setup();
+      const { container } = renderSelectAll({ defaultValue: ['apple'] });
+      await user.click(screen.getByRole('combobox'));
+      expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('renders nothing without multiple', () => {
+      render(
+        <Select.Root
+          items={fruits}
+          defaultOpen
+        >
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.SelectAll>Select all</Select.SelectAll>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+      expect(screen.queryByRole('option', { name: 'Select all' })).not.toBeInTheDocument();
+    });
+  });
+
   it('forwards refs to the value and the options', () => {
     const value = createRef<HTMLSpanElement>();
     const option = createRef<HTMLButtonElement>();

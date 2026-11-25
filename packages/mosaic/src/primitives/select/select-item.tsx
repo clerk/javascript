@@ -41,7 +41,8 @@ interface SelectItemBodyProps extends SelectItemProps {
 const SelectItemBody = React.memo(function SelectItemBody(bodyProps: SelectItemBodyProps) {
   const { forwardedRef: ref, listItemRef: itemRef, index, isActive, isSelected, isAnchor, ...props } = bodyProps;
   const { render, value, label, disabled, ...otherProps } = props;
-  const { setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } = useSelectItemsContext();
+  const { setSelectedIndex, getItemProps, handleSelect, registerItem, valueToLabelRef, selectedItemRef } =
+    useSelectItemsContext();
 
   const displayLabel = label ?? String(value);
 
@@ -52,6 +53,8 @@ const SelectItemBody = React.memo(function SelectItemBody(bodyProps: SelectItemB
       map.delete(value);
     };
   }, [value, displayLabel, valueToLabelRef]);
+
+  useEffect(() => registerItem(value, !!disabled), [value, disabled, registerItem]);
 
   useEffect(() => {
     if (isAnchor) {

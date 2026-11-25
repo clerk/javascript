@@ -3,6 +3,7 @@
 import {
   arrow,
   autoUpdate,
+  type ElementProps,
   flip,
   FloatingNode,
   FloatingTree,
@@ -109,6 +110,11 @@ function SelectInner(props: SelectProps<unknown>) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<unknown, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [options, setOptions] = useState<ReadonlyMap<unknown, boolean>>(new Map());
+  const enabledValues = useMemo(
+    () => [...options].flatMap(([value, disabled]) => (disabled ? [] : [value])),
+    [options],
+  );
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
   const labelsRef = useRef<Array<string | null>>([]);
@@ -198,43 +204,89 @@ function SelectInner(props: SelectProps<unknown>) {
 
   const isControlled = controlledValues !== undefined;
 
+  const cacheLabels = useCallback(
+    (values: unknown[]) => {
+      // In controlled mode the parent decides whether to accept the new value.
+      // If they reject it, the selection rolls back but a cached label would not,
+      // showing a stale label. Only cache labels in uncontrolled mode where
+      // the value always persists after selection.
+      if (isControlled) {
+        return;
+      }
+      setCachedLabels(prev => {
+        const next = new Map(prev);
+        for (const value of values) {
+          next.set(value, valueToLabelRef.current.get(value) ?? String(value));
+        }
+        return next;
+      });
+    },
+    [isControlled],
+  );
+
+  const commitMultiple = useCallback(
+    (next: unknown[]) => {
+      setSelectedValues(next);
+      onMultipleValueChange?.(next);
+      if (next.length === 0) {
+        setSelectedIndex(null);
+      }
+    },
+    [setSelectedValues, onMultipleValueChange],
+  );
+
   const handleSelect = useCallback(
     (value: unknown, index: number) => {
       if (multiple) {
-        const next = selectedValues.some(selected => Object.is(selected, value))
-          ? selectedValues.filter(selected => !Object.is(selected, value))
-          : [...selectedValues, value];
-        setSelectedValues(next);
-        onMultipleValueChange?.(next);
-        if (next.length === 0) {
-          setSelectedIndex(null);
-        }
+        commitMultiple(
+          selectedValues.some(selected => Object.is(selected, value))
+            ? selectedValues.filter(selected => !Object.is(selected, value))
+            : [...selectedValues, value],
+        );
       } else {
         setSelectedValues([value]);
         onSingleValueChange?.(value);
         setSelectedIndex(index);
       }
-      // In controlled mode the parent decides whether to accept the new value.
-      // If they reject it, the selection rolls back but a cached label would not,
-      // showing a stale label. Only cache labels in uncontrolled mode where
-      // the value always persists after selection.
-      if (!isControlled) {
-        const label = valueToLabelRef.current.get(value) ?? String(value);
-        setCachedLabels(prev => new Map(prev).set(value, label));
-      }
+      cacheLabels([value]);
       if (!multiple) {
         handleOpenChange(false);
       }
     },
-    [
-      multiple,
-      selectedValues,
-      isControlled,
-      setSelectedValues,
-      handleOpenChange,
-      onSingleValueChange,
-      onMultipleValueChange,
-    ],
+    [multiple, selectedValues, setSelectedValues, commitMultiple, cacheLabels, handleOpenChange, onSingleValueChange],
+  );
+
+  const toggleAll = useCallback(() => {
+    if (!multiple || enabledValues.length === 0) {
+      return;
+    }
+    const next = toggleAllValues(selectedValues, enabledValues);
+    commitMultiple(next);
+    cacheLabels(next);
+  }, [multiple, selectedValues, enabledValues, commitMultiple, cacheLabels]);
+
+  const registerItem = useCallback((value: unknown, disabled: boolean) => {
+    setOptions(prev => new Map(prev).set(value, disabled));
+    return () =>
+      setOptions(prev => {
+        const next = new Map(prev);
+        next.delete(value);
+        return next;
+      });
+  }, []);
+
+  const selectAllShortcut = useMemo<ElementProps>(
+    () => ({
+      floating: {
+        onKeyDown(event) {
+          if (multiple && event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey) && !event.altKey) {
+            event.preventDefault();
+            toggleAll();
+          }
+        },
+      },
+    }),
+    [multiple, toggleAll],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -271,6 +323,7 @@ function SelectInner(props: SelectProps<unknown>) {
     role,
     listNav,
     typeahead,
+    selectAllShortcut,
   ]);
 
   const contextValue = useMemo<SelectContextValue>(
@@ -300,6 +353,8 @@ function SelectInner(props: SelectProps<unknown>) {
       openMethodRef,
       alignItemWithTrigger: alignActive,
       handleSelect,
+      enabledValues,
+      toggleAll,
       mounted,
       transitionProps,
     }),
@@ -323,6 +378,8 @@ function SelectInner(props: SelectProps<unknown>) {
       returnFocusRef,
       alignActive,
       handleSelect,
+      enabledValues,
+      toggleAll,
       mounted,
       transitionProps,
     ],
@@ -332,11 +389,12 @@ function SelectInner(props: SelectProps<unknown>) {
     () => ({
       getItemProps,
       handleSelect,
+      registerItem,
       setSelectedIndex,
       valueToLabelRef,
       selectedItemRef,
     }),
-    [getItemProps, handleSelect],
+    [getItemProps, handleSelect, registerItem],
   );
 
   const highlightContextValue = useMemo<SelectHighlightContextValue>(
@@ -353,6 +411,14 @@ function SelectInner(props: SelectProps<unknown>) {
       </SelectContext.Provider>
     </FloatingNode>
   );
+}
+
+function toggleAllValues(selected: unknown[], enabled: unknown[]): unknown[] {
+  const isSelected = (value: unknown) => selected.some(item => Object.is(item, value));
+  if (enabled.every(isSelected)) {
+    return selected.filter(item => !enabled.some(value => Object.is(value, item)));
+  }
+  return [...selected, ...enabled.filter(value => !isSelected(value))];
 }
 
 // eslint-disable-next-line typescript/consistent-type-assertions -- The implementation is value-agnostic; the root only hands back values its caller passed in.

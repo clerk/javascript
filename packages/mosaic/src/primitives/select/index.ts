@@ -12,6 +12,7 @@ export type {
   SelectPortalProps,
   SelectPositionerProps,
   SelectProps,
+  SelectSelectAllProps,
   SelectSingleProps,
   SelectTriggerProps,
   SelectValueProps,

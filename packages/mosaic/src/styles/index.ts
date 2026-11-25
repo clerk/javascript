@@ -113,6 +113,7 @@ export type {
   SelectItemProps,
   SelectPopupProps,
   SelectProps,
+  SelectSelectAllProps,
   SelectTriggerProps,
   SelectTriggerVariant,
 } from '../components/select';

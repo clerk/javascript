@@ -11,6 +11,7 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
+import { selectAllScope } from './select.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
 const popupBorder = '1px';
@@ -201,5 +202,25 @@ export const indicator = stylex.create({
     flexShrink: 0,
     visibility: { default: 'hidden', ':is([data-selected])': 'visible' },
     height: space['5'],
+  },
+});
+
+export const selectAllIndicator = stylex.create({
+  checked: {
+    display: {
+      default: 'inline-block',
+      [stylex.when.ancestor('[data-indeterminate]', selectAllScope)]: 'none',
+    },
+    visibility: {
+      default: 'hidden',
+      [stylex.when.ancestor('[data-checked]', selectAllScope)]: 'visible',
+    },
+  },
+  indeterminate: {
+    display: {
+      default: 'none',
+      [stylex.when.ancestor('[data-indeterminate]', selectAllScope)]: 'inline-block',
+    },
+    visibility: 'visible',
   },
 });
