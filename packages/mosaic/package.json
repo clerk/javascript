@@ -510,6 +510,7 @@
     "lint": "oxlint -c oxlint.config.mjs src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
+    "lint:quiet": "oxlint --quiet -c oxlint.config.mjs src",
     "test": "vitest run --project primitives --project lint-rules --project mosaic",
     "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project lint-rules --project mosaic --maxWorkers=70%",

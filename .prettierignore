@@ -4,6 +4,7 @@
 .next
 next-env.d.ts
 .temp_integration
+**/.verify/
 .tsup
 .turbo
 .vscode

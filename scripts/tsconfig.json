@@ -4,6 +4,6 @@
     "allowJs": true,
     "noEmit": true
   },
-  "include": ["./**/*.ts", "./**/*.mjs", "./**/*.js"],
+  "include": ["./**/*.ts", "./**/*.mts", "./**/*.mjs", "./**/*.js"],
   "exclude": ["node_modules", "dist"]
 }

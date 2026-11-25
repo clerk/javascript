@@ -1,0 +1,11 @@
+{
+  "mosaic-quiet-lint": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node ../scripts/agent-lint-hook.mts --format antigravity",
+        "timeout": 180
+      }
+    ]
+  }
+}

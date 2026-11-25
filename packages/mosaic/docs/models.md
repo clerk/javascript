@@ -11,7 +11,7 @@ Worked example: `src/features/switcher/switcher.model.tsx`.
 - A model hook is called by a wrapper, never by a view. A wrapper in another feature may call it too: the profile API keys panels call `useAPIKeysAccess` from `api-keys-table.model.ts` to decide whether to render the table.
 - An async callback returns its promise, because the controller drives pending state off it. Navigation callbacks stay fire-and-forget.
 - No local UI state. What is open and what is in flight belong to the controller.
-- No React state beyond the Clerk hooks, because the model is a derivation of what Clerk currently says. The exceptions are hooks that hold outside state (`useReverificationFlow`, the query hooks in `src/queries/` that cache a Clerk read) and what to fetch: a search query, page or sort the Clerk hook takes as input lives in the model beside the page the hook holds, behind a callback (`search(query)` sets the query and returns to page 1). The controller keeps the input's value and the debounce, and calls that callback.
+- No React state (`useState`, `useReducer`) in a model file; models should be a derivation of what Clerk currently says. The exceptions are hooks that hold outside state (`useReverificationFlow`, the query hooks in `src/queries/` that cache a Clerk read). When a Clerk hook takes query or selection input (a search query, page, sort, or selected id), hold that state in a controller or the feature wrapper and pass it into the model.
 
 ## Shape
 

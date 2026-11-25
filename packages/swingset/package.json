@@ -9,6 +9,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "oxlint -c oxlint.config.mjs src",
+    "lint:quiet": "oxlint --quiet -c oxlint.config.mjs src",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "browserslist": [
