@@ -27,6 +27,7 @@ export interface DisplayConfigJSON {
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
+  logomark_image_url?: string;
   favicon_image_url: string;
   preferred_sign_in_strategy: PreferredSignInStrategy;
   sign_in_url: string;
@@ -72,6 +73,7 @@ export interface DisplayConfigResource extends ClerkResource {
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
+  logomarkImageUrl: string;
   faviconImageUrl: string;
   preferredSignInStrategy: PreferredSignInStrategy;
   signInUrl: string;

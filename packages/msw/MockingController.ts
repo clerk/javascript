@@ -233,6 +233,7 @@ export class MockingController {
               homeUrl: 'https://example.com',
               instanceEnvironmentType: 'production',
               logoImageUrl: '',
+              logomarkImageUrl: '',
               preferredSignInStrategy: 'password',
               signInUrl: '',
               signUpUrl: '',

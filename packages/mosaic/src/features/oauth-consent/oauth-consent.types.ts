@@ -2,6 +2,7 @@ import type { OAuthConsentScope } from '@clerk/shared/types';
 
 import type { SelectItem } from '../../components/select';
 import type { ErrorDescription, MosaicMessages } from '../../localization';
+import type { KnownOAuthClient } from './known-clients';
 
 export type OAuthConsentMessages = MosaicMessages['oauthConsent'];
 
@@ -21,6 +22,10 @@ export interface OAuthConsentData {
   scopes: OAuthConsentScopeRecord[];
   hasOfflineAccess: boolean;
   applicationName: string;
+  applicationLogomarkUrl?: string;
+  applicationLogoUrl?: string;
+  oauthApplicationLogoUrl?: string;
+  knownClient?: KnownOAuthClient;
   identifier: string;
   redirectUrl: string;
   redirectDomain: string;
@@ -79,8 +84,12 @@ export interface OAuthConsentViewProps {
   messages: OAuthConsentMessages;
   oauthApplicationName: string;
   clientIdentity: OAuthConsentClientIdentity | null;
+  oauthApplicationLogoUrl?: string;
+  knownClient?: KnownOAuthClient;
   identifier: string;
   applicationName: string;
+  applicationLogomarkUrl?: string;
+  applicationLogoUrl?: string;
   scopes: OAuthConsentScopeItem[];
   scopeSelection: OAuthConsentScopeSelection;
   scope: string;

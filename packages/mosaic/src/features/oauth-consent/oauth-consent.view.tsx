@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { type ReactNode, useId } from 'react';
 
+import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
@@ -9,6 +10,7 @@ import { Checkbox } from '../../components/checkbox';
 import { Dialog } from '../../components/dialog';
 import { EmptyState } from '../../components/empty-state';
 import { Field } from '../../components/field';
+import { Icon } from '../../components/icon';
 import { Input } from '../../components/input';
 import { Radio } from '../../components/radio';
 import { Reveal } from '../../components/reveal';
@@ -18,11 +20,15 @@ import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
+import { ArrowLeftRight } from '../../icons/glyphs/arrow-left-right';
 import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { fill, plural, rich, useLocale } from '../../localization';
+import { Logomark, useLogomark } from '../../logomark/logomark';
 import { Form } from '../../primitives/form';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { initials } from '../../utils/initials';
+import { knownOAuthClientLogo } from './known-clients';
 import { styles } from './oauth-consent.styles';
 import type {
   OAuthConsentClientIdentity,
@@ -33,6 +39,50 @@ import type {
   OAuthConsentScopeSelection,
   OAuthConsentViewProps,
 } from './oauth-consent.types';
+
+function getClientLogo({ oauthApplicationLogoUrl, knownClient }: OAuthConsentViewProps) {
+  if (oauthApplicationLogoUrl) {
+    return { src: oauthApplicationLogoUrl };
+  }
+  return knownClient ? { render: knownOAuthClientLogo(knownClient) } : undefined;
+}
+
+function ConsentLogos(props: OAuthConsentViewProps) {
+  const logomark = useLogomark({ logomarkUrl: props.applicationLogomarkUrl, logoUrl: props.applicationLogoUrl });
+  const clientLogo = getClientLogo(props);
+  return (
+    <Card.Media xstyle={styles.logos}>
+      <Avatar.Root size='lg'>
+        {clientLogo ? (
+          <Avatar.Image
+            alt={props.oauthApplicationName}
+            {...clientLogo}
+          />
+        ) : null}
+        {/* The title already names the OAuth application, so its initials stay out of the accessibility tree. */}
+        <Avatar.Fallback
+          variant={clientLogo ? 'skeleton' : 'initials'}
+          aria-hidden
+        >
+          {initials(props.oauthApplicationName)}
+        </Avatar.Fallback>
+      </Avatar.Root>
+      {logomark ? (
+        <Icon
+          glyph={ArrowLeftRight}
+          aria-hidden
+        />
+      ) : null}
+      {logomark ? (
+        <Logomark
+          size='lg'
+          logomark={logomark}
+          alt={props.applicationName}
+        />
+      ) : null}
+    </Card.Media>
+  );
+}
 
 export function OAuthConsentView(props: OAuthConsentViewProps) {
   const { messages: m, oauthApplicationName } = props;
@@ -58,6 +108,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
     <>
       <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
       <Card.Header>
+        <ConsentLogos {...props} />
         <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
         <Card.Description>
           {rich(m.subtitle, {

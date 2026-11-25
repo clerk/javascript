@@ -167,6 +167,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       home_url: '',
       instance_environment_type: 'production',
       logo_image_url: '',
+      logomark_image_url: '',
       favicon_image_url: '',
       preferred_sign_in_strategy: 'password',
       sign_in_url: '/sign-in',

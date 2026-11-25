@@ -72,10 +72,10 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
   return <AvatarContext.Provider value={value}>{element}</AvatarContext.Provider>;
 });
 
-export type AvatarImageProps = MosaicElementProps<'img'>;
+export type AvatarImageProps = MosaicComponentProps<'img'>;
 
 const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
-  { src, alt = '', xstyle, ...rest },
+  { src, alt = '', render, xstyle, ...rest },
   ref,
 ) {
   const { bordered, status, onStatusChange } = useAvatarContext('Avatar.Image');
@@ -83,6 +83,11 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
   // Preload `src` and report status to the root, so the fallback shows until the image resolves.
   // A layout effect, because it also has to catch the case below before anything is painted.
   useSafeLayoutEffect(() => {
+    if (render) {
+      onStatusChange('loaded');
+      return;
+    }
+
     if (!src) {
       onStatusChange('error');
       return;
@@ -107,36 +112,44 @@ const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(functio
     return () => {
       active = false;
     };
-  }, [src, onStatusChange]);
+  }, [src, render, onStatusChange]);
 
-  if (status !== 'loaded') {
-    return null;
-  }
-
-  return (
-    <img
-      ref={ref}
-      src={src}
-      alt={alt}
-      // An avatar is an identity mark, not content to pull out of the page — dragging one
-      // only ever produces a stray ghost image mid-interaction.
-      draggable={false}
-      {...mergeStyleProps(
-        themeProps('avatar-image'),
-        stylex.props(reset.base, styles.image, bordered && styles.overlay, xstyle),
-        rest,
-      )}
-    />
+  const styleProps = mergeStyleProps(
+    themeProps('avatar-image'),
+    stylex.props(reset.base, styles.image, bordered && styles.overlay, xstyle),
+    rest,
   );
+
+  return useRender({
+    defaultTagName: 'img',
+    render,
+    ref,
+    enabled: Boolean(render) || status === 'loaded',
+    props: render
+      ? styleProps
+      : {
+          src,
+          alt,
+          // An avatar is an identity mark, not content to pull out of the page — dragging one
+          // only ever produces a stray ghost image mid-interaction.
+          draggable: false,
+          ...styleProps,
+        },
+  });
 });
 
 export interface AvatarFallbackProps extends MosaicElementProps<'span'> {
   /** Wait this many ms before showing the fallback, to avoid a flash on fast connections. */
   delayMs?: number;
+  /**
+   * `skeleton` hides the children behind a blank fill that pulses while an image loads.
+   * `initials` paints the children, such as initials, and holds still.
+   */
+  variant?: 'skeleton' | 'initials';
 }
 
 const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(function MosaicAvatarFallback(
-  { delayMs, xstyle, children, ...rest },
+  { delayMs, variant = 'skeleton', xstyle, children, ...rest },
   ref,
 ) {
   const { bordered, status } = useAvatarContext('Avatar.Fallback');
@@ -150,7 +163,8 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
     return () => clearTimeout(timer);
   }, [delayMs]);
 
-  const pending = canRender && status === 'loading';
+  const skeleton = variant === 'skeleton';
+  const pending = skeleton && canRender && status === 'loading';
 
   if (!canRender || status === 'loaded') {
     return null;
@@ -171,7 +185,9 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
         rest,
       )}
     >
-      <span {...mergeStyleProps(themeProps('avatar-fallback-content'), stylex.props(styles.fallbackContent))}>
+      <span
+        {...mergeStyleProps(themeProps('avatar-fallback-content'), stylex.props(skeleton && styles.fallbackContent))}
+      >
         {children}
       </span>
     </span>

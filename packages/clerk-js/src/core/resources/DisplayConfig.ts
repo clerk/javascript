@@ -39,6 +39,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   id: string = '';
   instanceEnvironmentType: string = '';
   logoImageUrl: string = '';
+  logomarkImageUrl: string = '';
   organizationProfileUrl: string = '';
   preferredSignInStrategy: PreferredSignInStrategy = 'password';
   privacyPolicyUrl: string = '';
@@ -99,6 +100,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.id = this.withDefault(data.id, this.id);
     this.instanceEnvironmentType = this.withDefault(data.instance_environment_type, this.instanceEnvironmentType);
     this.logoImageUrl = this.withDefault(data.logo_image_url, this.logoImageUrl);
+    this.logomarkImageUrl = this.withDefault(data.logomark_image_url, this.logomarkImageUrl);
     this.organizationProfileUrl = this.withDefault(data.organization_profile_url, this.organizationProfileUrl);
     this.preferredSignInStrategy = this.withDefault(data.preferred_sign_in_strategy, this.preferredSignInStrategy);
     this.privacyPolicyUrl = this.withDefault(data.privacy_policy_url, this.privacyPolicyUrl);
@@ -142,6 +144,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
       id: this.id,
       instance_environment_type: this.instanceEnvironmentType,
       logo_image_url: this.logoImageUrl,
+      logomark_image_url: this.logomarkImageUrl,
       organization_profile_url: this.organizationProfileUrl,
       preferred_sign_in_strategy: this.preferredSignInStrategy,
       privacy_policy_url: this.privacyPolicyUrl,

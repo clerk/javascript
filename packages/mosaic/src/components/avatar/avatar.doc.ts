@@ -11,7 +11,7 @@ export default {
     { do: true, text: 'Pass `alt` on `Avatar.Image`.' },
     {
       do: false,
-      text: 'Expect initials passed to `Avatar.Fallback` to show. They stay hidden so a missing picture reads as an absent image.',
+      text: "Expect initials passed to `Avatar.Fallback` to show without `variant='initials'`. They stay hidden so a missing picture reads as an absent image.",
     },
   ],
   parts: {
@@ -35,7 +35,14 @@ export default {
     'Avatar.Fallback': {
       description: 'Holds the space while the image is pending or failed. Carries `data-pending` while resolving.',
       slot: 'cl-avatar-fallback',
-      props: { delayMs: { type: 'number', doc: 'Waits this long before rendering, to avoid a flash on fast loads.' } },
+      props: {
+        delayMs: { type: 'number', doc: 'Waits this long before rendering, to avoid a flash on fast loads.' },
+        variant: {
+          type: "'skeleton' | 'initials'",
+          doc: '`skeleton` is a blank fill that pulses while an image loads. `initials` paints the children and holds still.',
+          default: "'skeleton'",
+        },
+      },
     },
     'Avatar.Icon': {
       description: 'An optional icon over the corner of the avatar.',

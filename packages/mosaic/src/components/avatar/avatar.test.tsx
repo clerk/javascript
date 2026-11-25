@@ -279,6 +279,32 @@ describe('Mosaic Avatar', () => {
     );
     expect(screen.getByTestId('fallback')).toHaveTextContent('CN');
     expect(screen.getByText('CN')).toHaveClass('cl-avatar-fallback-content');
+    expect(screen.getByText('CN')).toHaveClass(stylex.props(styles.fallbackContent).className ?? '');
+  });
+
+  it('paints the fallback content in the initials variant', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Fallback variant='initials'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByText('CN')).not.toHaveClass(stylex.props(styles.fallbackContent).className ?? '');
+  });
+
+  it('holds still in the initials variant while an image is still resolving', () => {
+    unresolved.add('https://example.com/slow.png');
+    render(
+      <Avatar.Root>
+        <Avatar.Image src='https://example.com/slow.png' />
+        <Avatar.Fallback
+          data-testid='fallback'
+          variant='initials'
+        >
+          CN
+        </Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending');
   });
 
   it('pulses only while an image is still resolving', async () => {

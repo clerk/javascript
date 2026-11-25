@@ -4,6 +4,7 @@ import type { OAuthClientRegistration } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { toLocalizableError } from '../../utils/errors';
+import { getKnownOAuthClient } from './known-clients';
 import type { OAuthConsentClientIdentity, OAuthConsentModel } from './oauth-consent.types';
 import { OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils';
 
@@ -67,6 +68,7 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
   }
 
   const { user } = session;
+  const redirectDomain = data.redirectDomain ?? getRedirectDisplay(redirectUrl);
   const requested = data.scopes.map(({ scope: name, description }) => ({ scope: name, description }));
   const organizations =
     environment.organizationSettings.enabled && requested.some(item => item.scope === USER_ORG_READ_SCOPE)
@@ -82,9 +84,13 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
     applicationName: environment.displayConfig.applicationName,
     oauthApplicationName: data.oauthApplicationName,
     clientIdentity: toClientIdentity(data.clientRegistration, data.clientMetadataHost),
+    oauthApplicationLogoUrl: data.oauthApplicationLogoUrl || undefined,
+    knownClient: data.oauthApplicationLogoUrl ? undefined : getKnownOAuthClient(redirectDomain),
+    applicationLogomarkUrl: environment.displayConfig.logomarkImageUrl || undefined,
+    applicationLogoUrl: environment.displayConfig.logoImageUrl || undefined,
     identifier: user.primaryEmailAddress?.emailAddress || user.primaryPhoneNumber?.phoneNumber || '',
     redirectUrl,
-    redirectDomain: data.redirectDomain ?? getRedirectDisplay(redirectUrl),
+    redirectDomain,
     actionUrl: clerk.oauthApplication.buildConsentActionUrl({ clientId: oauthClientId }),
     forwardedParams: [...search.entries()].filter(([name]) => !POSTED_BY_FORM.includes(name)),
     renderBranding: environment.displayConfig.branded,

@@ -5,15 +5,11 @@ import type { ReactElement } from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { initials } from '../../utils/initials';
 import type { AvatarProps } from '../avatar';
 import { Avatar } from '../avatar';
 import { useSlot } from './switcher.context';
 import { sizes, styles } from './switcher-avatar.styles';
-
-function initials(name: string): string {
-  const [first = '', second = ''] = name.trim().split(/\s+/);
-  return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase() || '?';
-}
 
 export interface SwitcherAvatarProps {
   name: string;
