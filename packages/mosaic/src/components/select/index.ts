@@ -9,6 +9,8 @@ export type {
   SelectMediaProps,
   SelectPopupProps,
   SelectProps,
+  SelectSelectAllProps,
+  SelectSeparatorProps,
   SelectTriggerProps,
   SelectTriggerVariant,
 } from './select';

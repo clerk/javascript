@@ -358,6 +358,7 @@ function OrganizationAccess({
           onChange={onOrganizationIdsChange}
           disabled={disabled}
           triggerLabel={m.selectOrganizations}
+          selectAllLabel={m.selectAllOrganizations}
         />
       </Reveal>
     </div>
@@ -373,6 +374,7 @@ function OrganizationMultiSelect({
   disabled,
   label,
   triggerLabel,
+  selectAllLabel,
 }: {
   messages: OAuthConsentViewProps['messages'];
   organizations: OAuthConsentOrganization[];
@@ -382,6 +384,7 @@ function OrganizationMultiSelect({
   disabled: boolean;
   label?: ReactNode;
   triggerLabel?: string;
+  selectAllLabel?: string;
 }) {
   const locale = useLocale();
   const atLimit = limit !== undefined && organizationIds.length >= limit;
@@ -414,6 +417,7 @@ function OrganizationMultiSelect({
         <OrganizationPopup
           organizations={organizations}
           isDisabled={value => atLimit && !organizationIds.includes(value)}
+          selectAllLabel={selectAllLabel}
         />
       </Select.Root>
       {limit !== undefined && organizations.length > limit ? (
@@ -429,12 +433,20 @@ function OrganizationMultiSelect({
 function OrganizationPopup({
   organizations,
   isDisabled,
+  selectAllLabel,
 }: {
   organizations: OAuthConsentOrganization[];
   isDisabled?: (value: string) => boolean;
+  selectAllLabel?: string;
 }) {
   return (
     <Select.Popup>
+      {selectAllLabel ? (
+        <>
+          <Select.SelectAll label={selectAllLabel} />
+          <Select.Separator />
+        </>
+      ) : null}
       {organizations.map(organization => (
         <Select.Item
           key={organization.value}

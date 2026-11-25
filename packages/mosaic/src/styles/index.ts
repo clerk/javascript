@@ -117,6 +117,8 @@ export type {
   SelectItemProps,
   SelectPopupProps,
   SelectProps,
+  SelectSelectAllProps,
+  SelectSeparatorProps,
   SelectTriggerProps,
   SelectTriggerVariant,
 } from '../components/select';

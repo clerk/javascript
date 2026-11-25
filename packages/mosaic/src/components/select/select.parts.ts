@@ -4,6 +4,8 @@ export {
   SelectPopup as Popup,
   SelectItem as Item,
   SelectItemIndicator as ItemIndicator,
+  SelectSelectAll as SelectAll,
+  SelectSeparator as Separator,
   SelectMedia as Media,
   SelectContent as Content,
   SelectLabel as Label,

@@ -236,6 +236,29 @@ export function Multiple() {
   );
 }
 
+/** A select-all row selects every enabled option, shows a dash while only some are selected, and clears them all on a second press. */
+export function SelectAll() {
+  return (
+    <Select.Root
+      items={languages}
+      multiple
+      defaultValue={['javascript']}
+    >
+      <Select.Trigger>{renderLanguages}</Select.Trigger>
+      <Select.Popup>
+        <Select.SelectAll label='Select all' />
+        <Select.Separator />
+        {languages.map(language => (
+          <Select.Item
+            key={language.value}
+            {...language}
+          />
+        ))}
+      </Select.Popup>
+    </Select.Root>
+  );
+}
+
 const timezones = Array.from({ length: 27 }, (_, index) => {
   const offset = index - 12;
   const sign = offset < 0 ? '-' : '+';

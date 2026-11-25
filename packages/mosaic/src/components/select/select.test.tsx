@@ -241,6 +241,43 @@ describe('Mosaic Select', () => {
     expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin, Member');
   });
 
+  it('selects every role from a select-all row that shows a check when all and a dash when some', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin']}
+      >
+        <Select.Trigger placeholder='Choose roles' />
+        <Select.Popup>
+          <Select.SelectAll label='Select all' />
+          <Select.Separator data-testid='separator' />
+          {roles.map(role => (
+            <Select.Item
+              key={role.value}
+              {...role}
+            />
+          ))}
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    await user.click(screen.getByRole('combobox'));
+    const selectAll = screen.getByRole('option', { name: 'Select all' });
+    expect(selectAll).toHaveClass('cl-select-select-all');
+    expect(screen.getByTestId('separator')).toHaveClass('cl-select-separator');
+    expect(selectAll).toHaveAttribute('data-indeterminate', '');
+    expect(selectAll.querySelector('.cl-select-select-all-indicator[data-state="checked"]')).toBeInTheDocument();
+    expect(selectAll.querySelector('.cl-select-select-all-indicator[data-state="indeterminate"]')).toBeInTheDocument();
+
+    await user.click(selectAll);
+    expect(selectAll).toHaveAttribute('data-checked', '');
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent(
+      'Admin, All roles, Member',
+    );
+  });
+
   it('renders the value through a function passed as trigger children', () => {
     render(
       <Select.Root

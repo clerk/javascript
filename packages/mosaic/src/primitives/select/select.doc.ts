@@ -7,6 +7,8 @@ import type { SelectPopupProps } from './select-popup';
 import type { SelectPortalProps } from './select-portal';
 import type { SelectPositionerProps } from './select-positioner';
 import type { SelectProps } from './select-root';
+import type { SelectSelectAllProps } from './select-select-all';
+import type { SelectSeparatorProps } from './select-separator';
 import type { SelectTriggerProps } from './select-trigger';
 import type { SelectValueProps } from './select-value';
 
@@ -128,6 +130,16 @@ export default {
         },
       },
     },
+    'Select.SelectAll': {
+      description:
+        'A `button` with `role="option"` that selects every enabled item, or clears them once all are selected. Disabled items keep their state. `aria-checked` is `mixed` while only some are selected. Renders nothing unless the root is `multiple`. Carries `data-checked`, `data-indeterminate`, `data-active`, and `data-disabled` when there is no enabled item.',
+      props: {
+        label: { type: 'string', doc: 'Matched by typeahead.' },
+      },
+    },
+    'Select.Separator': {
+      description: 'A `div` with `role="presentation"` between items. Arrow keys skip it.',
+    },
     'Select.Group': { description: 'A `div` with `role="group"`, labelled by its `Select.GroupLabel`.' },
     'Select.GroupLabel': { description: 'Names the `Select.Group` it sits in.' },
     'Select.Arrow': {
@@ -166,6 +178,8 @@ export default {
   'Select.Popup': SelectPopupProps;
   'Select.Item': SelectItemProps;
   'Select.ItemIndicator': SelectItemIndicatorProps;
+  'Select.SelectAll': SelectSelectAllProps;
+  'Select.Separator': SelectSeparatorProps;
   'Select.Group': SelectGroupProps;
   'Select.GroupLabel': SelectGroupLabelProps;
   'Select.Arrow': SelectArrowProps;

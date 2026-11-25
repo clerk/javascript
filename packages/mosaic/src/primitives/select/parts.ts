@@ -12,10 +12,12 @@ export { type SelectPositionerProps, SelectPositioner as Positioner } from './se
 export { type SelectPopupProps, SelectPopup as Popup } from './select-popup';
 export { type SelectItemProps, SelectItem as Item } from './select-item';
 export { type SelectItemIndicatorProps, SelectItemIndicator as ItemIndicator } from './select-item-indicator';
+export { type SelectSelectAllProps, SelectSelectAll as SelectAll } from './select-select-all';
 export {
   type SelectGroupLabelProps,
   type SelectGroupProps,
   SelectGroup as Group,
   SelectGroupLabel as GroupLabel,
 } from './select-group';
+export { type SelectSeparatorProps, SelectSeparator as Separator } from './select-separator';
 export { type SelectArrowProps, SelectArrow as Arrow } from './select-arrow';

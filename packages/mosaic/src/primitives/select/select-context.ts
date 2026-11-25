@@ -45,6 +45,10 @@ export interface SelectContextValue {
   /** Whether the popup is currently overlaying the selected item on the trigger. */
   alignItemWithTrigger: boolean;
   handleSelect: (value: unknown, index: number) => void;
+  /** Values of the mounted options that are not disabled, in mount order. */
+  enabledValues: unknown[];
+  /** Selects every enabled option, or clears them once all are selected. Disabled options keep their state. */
+  toggleAll: () => void;
   mounted: boolean;
   transitionProps: TransitionProps;
 }
@@ -76,6 +80,9 @@ export function useSelectHighlightContext() {
 export interface SelectItemsContextValue {
   getItemProps: UseInteractionsReturn['getItemProps'];
   handleSelect: (value: unknown, index: number) => void;
+  /** Records a mounted option and whether it is disabled; returns the cleanup that forgets it. */
+  registerItem: (value: unknown, disabled: boolean) => () => void;
+  registerSelectAll: () => () => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   valueToLabelRef: React.MutableRefObject<Map<unknown, string>>;
   selectedItemRef: React.MutableRefObject<HTMLElement | null>;
