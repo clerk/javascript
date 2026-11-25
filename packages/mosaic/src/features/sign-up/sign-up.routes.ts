@@ -1,14 +1,9 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 
 import type { RouteName } from '../../routing/routes';
+import type { AuthFlowOutcome } from '../auth-flow/auth-flow.types';
 
 export type SignUpTaskKey = 'choose-organization';
-
-export type SignUpFlowStep =
-  | SignUpNextStep
-  | { type: 'task'; key: SignUpTaskKey }
-  | { type: 'signed_in' }
-  | { type: 'leaving' };
 
 export const signUpRoutes = {
   start: '',
@@ -30,11 +25,10 @@ export function detailsRouteFor(route: SignUpRoute): 'start' | 'continue' {
     : 'start';
 }
 
-export function routeFor(step: SignUpFlowStep, from: SignUpRoute): SignUpRoute | undefined {
+export function routeFor(step: SignUpNextStep, from: SignUpRoute): SignUpRoute | undefined {
   const underContinue = detailsRouteFor(from) === 'continue';
   switch (step.type) {
     case 'start':
-    case 'signed_in':
       return 'start';
     case 'fields':
       return 'continue';
@@ -46,21 +40,15 @@ export function routeFor(step: SignUpFlowStep, from: SignUpRoute): SignUpRoute |
       return 'enterpriseConnections';
     case 'protect':
       return 'protectCheck';
-    case 'task':
-      return 'taskChooseOrganization';
     case 'transfer':
     case 'complete':
-    case 'leaving':
     case 'unknown':
       return undefined;
   }
 }
 
-function allowedRoute(route: SignUpRoute, step: SignUpFlowStep): boolean {
-  if (step.type === 'task') {
-    return route === routeFor(step, route);
-  }
-  if (route === 'start' || step.type === 'complete' || step.type === 'transfer' || step.type === 'leaving') {
+function allowedRoute(route: SignUpRoute, step: SignUpNextStep): boolean {
+  if (route === 'start' || step.type === 'complete' || step.type === 'transfer') {
     return true;
   }
   if (route === 'continue' && (step.type === 'verify_email' || step.type === 'verify_phone')) {
@@ -69,9 +57,26 @@ function allowedRoute(route: SignUpRoute, step: SignUpFlowStep): boolean {
   return route === routeFor(step, route);
 }
 
-export function shownRoute(route: SignUpRoute, step: SignUpFlowStep): SignUpRoute | undefined {
+function stepRoute(route: SignUpRoute, step: SignUpNextStep): SignUpRoute | undefined {
   if (step.type === 'unknown') {
     return undefined;
   }
   return allowedRoute(route, step) ? route : routeFor(step, route);
+}
+
+export function shownRoute(
+  route: SignUpRoute,
+  outcome: AuthFlowOutcome<SignUpTaskKey>,
+  step: SignUpNextStep,
+): SignUpRoute | undefined {
+  switch (outcome.type) {
+    case 'resource':
+      return stepRoute(route, step);
+    case 'task':
+      return 'taskChooseOrganization';
+    case 'hold':
+    case 'leave':
+    case 'done':
+      return route;
+  }
 }

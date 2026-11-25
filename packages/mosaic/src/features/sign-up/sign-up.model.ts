@@ -25,9 +25,10 @@ import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
 import { useErrorText, useLocale, useMessages } from '../../localization';
 import { save, SaveError } from '../../utils/errors';
+import type { AuthSessionPhase } from '../auth-flow/auth-flow.types';
 import { passwordError } from '../user-profile/user-profile-password-section/user-profile-password-errors';
 import { passwordFieldFeedback } from '../user-profile/user-profile-password-section/user-profile-password-feedback';
-import type { SignUpFlowStep, SignUpTaskKey } from './sign-up.routes';
+import type { SignUpTaskKey } from './sign-up.routes';
 import type { SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
 import { continueCanSatisfy, continueFields, missesEitherIdentifier, signUpFieldOrder } from './sign-up.utils';
 
@@ -55,10 +56,12 @@ export interface SignUpModelOptions {
 
 export interface SignUpFlowModel {
   signUpId: string | undefined;
-  step: SignUpFlowStep;
+  step: SignUpNextStep;
+  session: AuthSessionPhase<SignUpTaskKey>;
+  singleSession: boolean;
   mode: 'public' | 'restricted' | 'waitlist';
   afterSignUpUrl: string;
-  leave?: () => void;
+  leave: () => void;
   finalize: () => Promise<void>;
   reset: () => Promise<void>;
 }
@@ -217,18 +220,15 @@ export function useSignUpModel({
     return step.type === 'fields' && !continueCanSatisfy(resource) ? { type: 'unknown' } : step;
   };
 
-  const flowStep = (): SignUpFlowStep => {
-    if (signUp.id) {
-      return next(signUp);
-    }
+  const sessionPhase = (): AuthSessionPhase<SignUpTaskKey> => {
     if (session === null) {
-      return next(signUp);
+      return { type: 'none' };
     }
     if (session === undefined) {
-      return { type: 'leaving' };
+      return { type: 'activating' };
     }
     const task = taskInFlow(session.currentTask);
-    return task ? { type: 'task', key: task } : { type: 'signed_in' };
+    return task ? { type: 'task', key: task } : { type: 'active' };
   };
 
   const isShown = (name: SignUpFieldName, required: boolean) =>
@@ -308,21 +308,21 @@ export function useSignUpModel({
     ? { termsUrl: displayConfig.termsUrl || undefined, privacyPolicyUrl: displayConfig.privacyPolicyUrl || undefined }
     : undefined;
 
-  const step = flowStep();
+  const step = next(signUp);
 
   return {
     status: 'ready',
     flow: {
       signUpId: signUp.id,
       step,
+      session: sessionPhase(),
+      singleSession: environment.authConfig.singleSessionMode,
       mode,
       afterSignUpUrl,
-      leave: environment.authConfig.singleSessionMode
-        ? () => {
-            const task = session?.currentTask;
-            void router.navigate(task ? taskUrl(task) : afterSignUpUrl);
-          }
-        : undefined,
+      leave: () => {
+        const task = session?.currentTask;
+        void router.navigate(task ? taskUrl(task) : afterSignUpUrl);
+      },
       finalize: async () => {
         await run(() =>
           signUp.finalize({

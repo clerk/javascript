@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
@@ -11,6 +11,7 @@ import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouteGuard } from '../../routing/use-route-guard';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
+import { flowOutcome } from '../auth-flow/auth-flow.utils';
 import type { SignUpCreateResult, SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
@@ -19,7 +20,6 @@ import { useSignUpDetailsController } from './sign-up-details/sign-up-details.co
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
-  isNextScreenLoading: boolean;
   error: ErrorDescription | undefined;
 }
 
@@ -41,7 +41,6 @@ const finishMachine = finish.createMachine({
   initial: 'idle',
   context: {
     frozenModel: null,
-    isNextScreenLoading: false,
     error: undefined,
   },
   states: {
@@ -50,7 +49,7 @@ const finishMachine = finish.createMachine({
     },
     finishing: {
       invoke: finish.fromPromise(context => context.frozenModel?.flow.finalize() ?? Promise.resolve(), {
-        onDone: { target: 'handingOff' },
+        onDone: { target: 'finalized' },
         onError: {
           target: 'failed',
           actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
@@ -60,20 +59,13 @@ const finishMachine = finish.createMachine({
         },
       }),
     },
-    handingOff: {
-      always: {
-        guard: context => !context.isNextScreenLoading,
-        target: 'finished',
-        actions: finish.assign(() => ({ frozenModel: null })),
-      },
-    },
     failed: {
       on: {
         ...startFinishing,
         DISMISS: { target: 'idle', actions: finish.assign(() => ({ error: undefined })) },
       },
     },
-    finished: {
+    finalized: {
       on: startFinishing,
     },
   },
@@ -111,26 +103,28 @@ export function useSignUpController(
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
   const actions = usePendingAction<'startOver'>();
   const errorText = useErrorText();
-  const liveStep = liveModel.flow.step;
-  const isNextScreenLoading = liveStep.type === 'leaving' || (liveStep.type === 'task' && !isTaskReady);
-  const [finishSnapshot, sendFinish, finishActor] = useMachine(finishMachine, { context: { isNextScreenLoading } });
-  const [signedInVisit] = useState(() => (liveStep.type === 'signed_in' ? { leave: liveModel.flow.leave } : undefined));
+  const [finishSnapshot, sendFinish] = useMachine(finishMachine);
+  const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
   const [blocked, setBlocked] = useState<AuthActionBlockedDetails>();
-  const arrivedSignedIn = signedInVisit !== undefined;
-  const leavesOnArrival = signedInVisit?.leave !== undefined;
+  const outcome = flowOutcome({
+    session: liveModel.flow.session,
+    entry: arrival.session,
+    finish: finishSnapshot.value,
+    singleSession: liveModel.flow.singleSession,
+    isTaskReady,
+  });
+  const isHolding = outcome.type === 'hold';
+  const isLeaving = outcome.type === 'leave';
 
-  useEffect(() => signedInVisit?.leave?.(), [signedInVisit]);
+  useEffect(() => {
+    if (isLeaving) {
+      arrival.leave();
+    }
+  }, [isLeaving, arrival]);
 
-  useLayoutEffect(() => {
-    finishActor.recheck();
-  }, [isNextScreenLoading, finishActor]);
-
-  const model = finishSnapshot.context.frozenModel ?? liveModel;
+  const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
-  const isFinishing = finishSnapshot.value === 'finishing' || finishSnapshot.value === 'handingOff';
-  const shown = shownRoute(route, flow.step.type === 'signed_in' && !arrivedSignedIn ? { type: 'leaving' } : flow.step);
-  const isFlowOver = finishSnapshot.value === 'finished' || shown === 'taskChooseOrganization';
-  const isHidden = liveStep.type === 'signed_in' && (leavesOnArrival || isFlowOver);
+  const shown = shownRoute(route, outcome, flow.step);
   const screen = screenFor(shown, flow.mode, blocked !== undefined);
 
   useRouteGuard({ route, go }, shown);
@@ -154,14 +148,14 @@ export function useSignUpController(
   const flowError = finishError ?? actions.error;
   const details = useSignUpDetailsController(model.details, {
     purpose: screen === 'continue' ? 'continue' : 'start',
-    isBusy: actions.isPending || isFinishing,
+    isBusy: actions.isPending || isHolding,
     globalErrorMessage: flowError,
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
   const verify = {
     onNext: next,
-    isPending: isFinishing,
+    isPending: isHolding,
     globalErrorMessage: finishError,
     onEditIdentifier: () => {
       sendFinish({ type: 'DISMISS' });
@@ -169,7 +163,7 @@ export function useSignUpController(
     },
   };
 
-  if (isHidden) {
+  if (isLeaving || outcome.type === 'done') {
     return { status: 'hidden' };
   }
 

@@ -62,7 +62,7 @@ function SignUpFlow({
 }: Required<MosaicLocationOptions> & { model: SignUpReadyModel }): ReactElement | null {
   const task = useTaskChooseOrganizationFlow({
     redirectUrlComplete: model.flow.afterSignUpUrl,
-    enabled: model.flow.step.type === 'task',
+    enabled: model.flow.session.type === 'task',
   });
   const controller = useSignUpController(model, {
     routing,

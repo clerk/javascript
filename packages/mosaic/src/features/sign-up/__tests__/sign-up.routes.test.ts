@@ -1,16 +1,18 @@
 import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { describe, expect, it } from 'vitest';
 
-import type { SignUpFlowStep, SignUpRoute } from '../sign-up.routes';
+import type { AuthFlowOutcome } from '../../auth-flow/auth-flow.types';
+import type { SignUpRoute, SignUpTaskKey } from '../sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute } from '../sign-up.routes';
 
 const verifyEmail: SignUpNextStep = { type: 'verify_email', target: 'ada@example.com', sent: true };
 const verifyPhone: SignUpNextStep = { type: 'verify_phone', target: '+15555550142', sent: true };
 const fields: SignUpNextStep = { type: 'fields', fields: ['username'] };
-const task: SignUpFlowStep = { type: 'task', key: 'choose-organization' };
+const task = { type: 'task', key: 'choose-organization' } as const;
+const resource = { type: 'resource' } as const;
 
 describe('sign-up shown route', () => {
-  it.each<[string, SignUpRoute, SignUpFlowStep, SignUpRoute | undefined]>([
+  it.each<[string, SignUpRoute, SignUpNextStep, SignUpRoute | undefined]>([
     ['stays on the step route', 'verifyEmail', verifyEmail, 'verifyEmail'],
     ['lets the user edit fields while the email verifies', 'continue', verifyEmail, 'continue'],
     ['lets the user edit fields while the phone verifies', 'continue', verifyPhone, 'continue'],
@@ -42,18 +44,23 @@ describe('sign-up shown route', () => {
     ['keeps start while enterprise SSO is pending', 'start', { type: 'enterprise_sso' }, 'start'],
     ['sends enterprise SSO to its route', 'continue', { type: 'enterprise_sso' }, 'enterpriseConnections'],
     ['has no route for an unknown step', 'verifyEmail', { type: 'unknown' }, undefined],
+    ['moves a task route back to start once signed out', 'taskChooseOrganization', { type: 'start' }, 'start'],
+  ])('%s', (_, route, step, expected) => {
+    expect(shownRoute(route, resource, step)).toBe(expected);
+  });
+
+  it.each<[string, SignUpRoute, AuthFlowOutcome<SignUpTaskKey>, SignUpRoute]>([
     ['sends a session task to its route', 'verifyEmail', task, 'taskChooseOrganization'],
     ['moves the form to the task while one is pending', 'start', task, 'taskChooseOrganization'],
     [
-      'keeps the task screen while the flow leaves',
+      'keeps the task screen while the flow holds',
       'taskChooseOrganization',
-      { type: 'leaving' },
+      { type: 'hold' },
       'taskChooseOrganization',
     ],
-    ['moves a task route back to start once signed out', 'taskChooseOrganization', { type: 'start' }, 'start'],
-    ['shows start to a signed-in user adding an account', 'verifyEmail', { type: 'signed_in' }, 'start'],
-  ])('%s', (_, route, step, expected) => {
-    expect(shownRoute(route, step)).toBe(expected);
+    ['keeps the route once the flow is done', 'verifyEmail', { type: 'done' }, 'verifyEmail'],
+  ])('%s', (_, route, outcome, expected) => {
+    expect(shownRoute(route, outcome, verifyEmail)).toBe(expected);
   });
 });
 
