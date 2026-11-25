@@ -29,6 +29,7 @@ export type {
   ChartOptions,
   ChartPlot,
   ChartPoint,
+  ChartRect,
   ChartSelection,
   ChartSize,
   ChartTick,

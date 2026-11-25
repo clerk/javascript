@@ -21,6 +21,9 @@ export const DEFAULT_BAR_MESSAGES = {
 /** WCAG 2.5.8's minimum target size, so a short bar can still be picked. */
 const MIN_TARGET = 24;
 
+/** The narrowest a focus ring gets, so it stays findable when bars are a pixel or two wide. */
+const MIN_FOCUS_WIDTH = 12;
+
 type BarSelectionOptions<TDatum> = Readonly<{
   layout: Pick<StackedBarLayout<TDatum>, 'plot' | 'zeroY' | 'categories' | 'prepared' | 'scaleY' | 'projection'>;
   data: readonly TDatum[];
@@ -126,6 +129,12 @@ export function barSelectionModel<TDatum>({
     },
     verticalInstructions: twoSided ? messages.vertical : '',
     anchor: (_, category) => ({ x: category.center, y: layout.plot.y }),
+    focusRect: (selection, category) => {
+      const width = Math.max(category.width, MIN_FOCUS_WIDTH);
+      const top = selection.section === 'positive' ? reach.positive(category.datumIndex) : layout.zeroY;
+      const bottom = selection.section === 'positive' ? layout.zeroY : reach.negative(category.datumIndex);
+      return { x: category.center - width / 2, y: top, width, height: bottom - top };
+    },
     surfaceAttributes: selection => ({ 'data-active-section': selection?.section }),
   };
 }

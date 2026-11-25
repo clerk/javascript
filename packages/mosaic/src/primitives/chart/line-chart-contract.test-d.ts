@@ -36,6 +36,7 @@ const lineModel = {
   describe: active => `Users ${active.datum.users}`,
   verticalInstructions: '',
   anchor: (_, category) => ({ x: category.center, y: 0 }),
+  focusRect: (_, category) => ({ x: category.center - 6, y: 0, width: 12, height: 12 }),
   surfaceAttributes: () => ({}),
 } satisfies SelectionModel<ChartSelection, ChartActive<Row>>;
 

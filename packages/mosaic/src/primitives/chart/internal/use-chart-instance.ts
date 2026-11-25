@@ -187,6 +187,8 @@ export function useChartInstance<
   const keyboardInstructions = getKeyboardInstructions(messages, model.verticalInstructions, !!onActivate);
   const tooltipAnchor =
     valid?.selection && currentCategory && selected ? model.anchor(valid.selection, currentCategory) : null;
+  const focusRect =
+    valid?.selection && currentCategory && selected ? model.focusRect(valid.selection, currentCategory) : null;
 
   const lastIndexRef = React.useRef(0);
   const selectedIndex = valid ? currentCategory?.datumIndex : undefined;
@@ -368,6 +370,7 @@ export function useChartInstance<
     selected,
     selectionSource: selected ? (valid?.source ?? null) : null,
     tooltipAnchor,
+    focusRect,
     announcement,
     keyboardInstructions,
     select,
