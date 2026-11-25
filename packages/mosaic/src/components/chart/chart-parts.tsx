@@ -18,7 +18,6 @@ import {
 } from '../../primitives/chart';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { ChartTooltipContent } from './chart';
 import { partStyles } from './chart-parts.styles';
@@ -169,7 +168,12 @@ export const ChartSelection = React.forwardRef<HTMLDivElement, ChartSelectionPro
       ref={ref}
       {...mergeStyleProps(
         themeProps('chart-selection'),
-        stylex.props(partStyles.selection, focusOutline.within, style.activatable && partStyles.activatable, xstyle),
+        stylex.props(
+          partStyles.selection,
+          partStyles.selectionRing,
+          style.activatable && partStyles.activatable,
+          xstyle,
+        ),
         rest,
       )}
     >

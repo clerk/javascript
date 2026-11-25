@@ -1,7 +1,7 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import type {} from '@vitest/browser-playwright';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { cdp, page } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { type ActiveBar, type BarChartHighlight, Chart, type ChartSeries } from '..';
@@ -404,6 +404,21 @@ function CustomTooltipChart() {
 }
 
 describe('Chart.Selection', () => {
+  it('rings the selected bar instead of the whole chart while the keyboard selects', async () => {
+    await renderChart(<GrowthChart />);
+    const selection = () => document.querySelector('.cl-chart-selection');
+    const outline = (element: Element | null) => (element ? getComputedStyle(element).outlineStyle : 'missing');
+
+    surface().focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(() => outline(document.querySelector('.cl-chart-cursor'))).toBe('solid');
+    expect(outline(selection())).toBe('none');
+
+    await userEvent.keyboard('{Escape}');
+    await expect.poll(() => outline(selection())).toBe('solid');
+    expect(document.querySelector('.cl-chart-cursor')).toBeNull();
+  });
+
   it('describes the keys in the language of the localization', async () => {
     await renderChart(
       <MosaicLocalizationProvider
