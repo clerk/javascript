@@ -1,5 +1,62 @@
 # @clerk/mosaic
 
+## 0.12.0
+
+### Minor Changes
+
+- **Breaking:** Rename the `Option` parts of `Select` and `Combobox` to `Item`. This applies to both the styled components and the headless primitives. Behavior is unchanged, and TypeScript flags the old names. ([#10997](https://github.com/clerk/javascript/pull/10997)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                           | After                          |
+  | -------------------------------- | ------------------------------ |
+  | `Select.Option`                  | `Select.Item`                  |
+  | `Combobox.Option`                | `Combobox.Item`                |
+  | `Combobox.OptionIndicator`       | `Combobox.ItemIndicator`       |
+  | `SelectOptionProps`              | `SelectItemProps`              |
+  | `ComboboxOptionProps`            | `ComboboxItemProps`            |
+  | `ComboboxOptionIndicatorProps`   | `ComboboxItemIndicatorProps`   |
+  | `.cl-select-option`              | `.cl-select-item`              |
+  | `.cl-select-option-media`        | `.cl-select-item-media`        |
+  | `.cl-select-option-content`      | `.cl-select-item-content`      |
+  | `.cl-select-option-label`        | `.cl-select-item-label`        |
+  | `.cl-select-option-description`  | `.cl-select-item-description`  |
+  | `.cl-select-option-indicator`    | `.cl-select-item-indicator`    |
+  | `.cl-combobox-option`            | `.cl-combobox-item`            |
+  | `.cl-combobox-option-media`      | `.cl-combobox-item-media`      |
+  | `.cl-combobox-option-label`      | `.cl-combobox-item-label`      |
+  | `.cl-combobox-option-detail`     | `.cl-combobox-item-detail`     |
+  | `.cl-combobox-option-indicator`  | `.cl-combobox-item-indicator`  |
+  | `.cl-phone-input-country-option` | `.cl-phone-input-country-item` |
+
+  Add `Select.ItemIndicator`, which renders only inside the selected item. It is `aria-hidden` and works like `Combobox.ItemIndicator`. Both indicators take `keepMounted`, which renders them in every item and puts `data-selected` only on the selected one. The styled `Select.ItemIndicator` and `Combobox.ItemIndicator` default `keepMounted` to `true` and hide the check on unselected items while keeping its width, so rows no longer change width as the selection moves; pass `keepMounted={false}` to render the check only in the selected item. The primitives default to `false`. The styled `Select.Item` renders a `Select.ItemIndicator`, so the check's `.cl-select-item-indicator` element is now a `span` wrapping the icon.
+
+  A styled `Select.Item` with children no longer adds a check, matching `Combobox.Item`. Add `<Select.ItemIndicator />` to composed rows that should show one.
+
+  Find usages with `git grep -nE "(Select|Combobox)\.Option|OptionIndicator|(Select|Combobox)Option(Indicator)?Props|cl-(select|combobox|phone-input-country)-option"`.
+
+- **Breaking:** Remove `Menu.Indicator` and the `size` prop on `Menu.Media`. Menu now has checkbox and radio items, so a checkmark that marks the current choice goes in their indicator and is announced with `aria-checked`. Anything else at the end of a row, such as a spinner, goes in a trailing `Menu.Media`, which keeps its width while empty. `Menu.Media` is now always 20px wide; `size='xs'` made it 16px without changing the row height, so the label no longer lined up with the other rows. ([#11000](https://github.com/clerk/javascript/pull/11000)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  | Before                                                     | After                                                                                            |
+  | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+  | `<Menu.Item>` with a check in `<Menu.Indicator>`           | `<Menu.RadioItem value>` in a `<Menu.RadioGroup>`, with the check in `<Menu.RadioItemIndicator>` |
+  | A toggled `<Menu.Item>` with a check in `<Menu.Indicator>` | `<Menu.CheckboxItem>`, with the check in `<Menu.CheckboxItemIndicator>`                          |
+  | Any other `<Menu.Indicator>…</Menu.Indicator>`             | `<Menu.Media>…</Menu.Media>`                                                                     |
+  | `MenuIndicatorProps`                                       | `MenuMediaProps`, `MenuRadioItemIndicatorProps` or `MenuCheckboxItemIndicatorProps`              |
+  | `.cl-menu-item-indicator`                                  | `.cl-menu-item-media`, `.cl-menu-radio-item-indicator` or `.cl-menu-checkbox-item-indicator`     |
+  | `<Menu.Media size='xs'>` or `size='sm'`                    | `<Menu.Media>`                                                                                   |
+  | `MenuMediaSize`                                            | Remove it                                                                                        |
+  | `.cl-menu-item-media[data-size]`                           | `.cl-menu-item-media`                                                                            |
+
+  Find usages with `git grep -nE 'Menu\.Indicator|MenuIndicatorProps|cl-menu-item-indicator|MenuMediaSize|Menu\.Media[^>]*size='`.
+
+  Checkbox and radio items keep the menu open on click. Pass `closeOnClick` to close it.
+
+  In the Switcher's accounts flyout, each account is now a `menuitemradio` inside a group named "Switch account", and the active one has `aria-checked="true"` in place of `aria-current="true"`.
+
+### Patch Changes
+
+- Updated dependencies [[`7c8fdc3`](https://github.com/clerk/javascript/commit/7c8fdc3116284ec4888002ba304589be1055952a), [`02a65cd`](https://github.com/clerk/javascript/commit/02a65cde13e22ddef85bce29a10531d90ad6ae34), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e)]:
+  - @clerk/shared@4.50.0
+
 ## 0.11.1
 
 ### Patch Changes

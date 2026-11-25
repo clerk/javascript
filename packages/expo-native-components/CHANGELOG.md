@@ -1,5 +1,15 @@
 # @clerk/expo-native-components
 
+## 0.4.9
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.7.4` to `1.7.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.7.5. ([#11009](https://github.com/clerk/javascript/pull/11009)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix switching organizations in JS or in a native component not reaching the other side. Both now show the same active organization after a switch. ([#10988](https://github.com/clerk/javascript/pull/10988)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix a custom page in the iOS `UserProfileView` closing right after it opens when the profile was shown before the native SDK finished picking up the signed-in session. ([#11003](https://github.com/clerk/javascript/pull/11003)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.4.8
 
 ### Patch Changes
