@@ -1,0 +1,34 @@
+export { type ChartRootProps, ChartRoot as Root } from './chart-root';
+export { type ChartGridProps, ChartGrid as Grid } from './chart-grid';
+export { type ChartYLineProps, ChartYLine as YLine } from './chart-y-line';
+export { type ChartYAxisProps, type ChartYTickItem, ChartYAxis as YAxis } from './chart-y-axis';
+export { type ChartYTickProps, ChartYTick as YTick } from './chart-y-tick';
+export { type ChartXAxisProps, ChartXAxis as XAxis } from './chart-x-axis';
+export { type ChartXTickProps, ChartXTick as XTick } from './chart-x-tick';
+export { type ChartSelectionProps, ChartSelection as Selection } from './chart-selection';
+export { type ChartCursorProps, ChartCursor as Cursor } from './chart-cursor';
+export { type ChartTooltipProps, ChartTooltip as Tooltip } from './chart-tooltip';
+export {
+  type TooltipPortalProps as ChartTooltipPortalProps,
+  TooltipPortal as TooltipPortal,
+} from '../tooltip/tooltip-portal';
+export {
+  type TooltipPositionerProps as ChartTooltipPositionerProps,
+  TooltipPositioner as TooltipPositioner,
+} from '../tooltip/tooltip-positioner';
+export {
+  type TooltipPopupProps as ChartTooltipPopupProps,
+  TooltipPopup as TooltipPopup,
+} from '../tooltip/tooltip-popup';
+export {
+  type TooltipArrowProps as ChartTooltipArrowProps,
+  TooltipArrow as TooltipArrow,
+} from '../tooltip/tooltip-arrow';
+export { useBarChart, type UseBarChartOptions } from './bars/use-bar-chart';
+export { type ChartBarsProps, ChartBars as Bars } from './bars/chart-bars';
+export { type ChartBarProps, ChartBar as Bar } from './bars/chart-bar';
+export {
+  type ChartProjectionOutlineProps,
+  ChartProjectionOutline as ProjectionOutline,
+} from './bars/chart-projection-outline';
+export { CanvasRenderError } from './bars/bar-canvas-error';

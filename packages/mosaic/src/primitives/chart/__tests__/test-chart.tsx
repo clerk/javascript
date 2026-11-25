@@ -1,0 +1,100 @@
+import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
+
+import { type ActiveBar, type BarChartInstance, Chart, type ChartTooltipProps, type UseBarChartOptions } from '..';
+
+export type TestChartProps<TDatum> = Pick<
+  UseBarChartOptions<TDatum>,
+  | 'data'
+  | 'series'
+  | 'index'
+  | 'categoryGap'
+  | 'projection'
+  | 'isBarActive'
+  | 'selection'
+  | 'onSelectionChange'
+  | 'onActivate'
+  | 'messages'
+  | 'formatValue'
+  | 'defaultSelection'
+  | 'disabled'
+> & {
+  ariaLabel: string;
+  formatXTick?: (value: string) => string | null;
+  /** Mounts `Chart.Selection`. Default: true */
+  selectionPart?: boolean;
+  renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
+  tooltip?: Pick<ChartTooltipProps, 'side' | 'sideOffset'>;
+  boundary?: RefObject<HTMLElement | null>;
+  height?: number | string;
+  /** Mounts `Chart.Bar`. Default: true */
+  bar?: boolean;
+  barClassName?: string;
+  outlineClassName?: string;
+  /** Receives the chart object after each render. */
+  chartRef?: { current: BarChartInstance<TDatum> | null };
+};
+
+/** Composes every bar chart part from one flat set of test props. */
+export function TestChart<TDatum>({
+  ariaLabel,
+  formatXTick,
+  selectionPart = true,
+  renderTooltip,
+  tooltip,
+  boundary,
+  height,
+  bar = true,
+  barClassName,
+  outlineClassName,
+  chartRef,
+  ...options
+}: TestChartProps<TDatum>) {
+  const chart = Chart.useBarChart({ ...options, formatCategory: formatXTick });
+  useLayoutEffect(() => {
+    if (chartRef) {
+      chartRef.current = chart;
+    }
+  });
+  return (
+    <Chart.Root
+      chart={chart}
+      height={height}
+      aria-label={ariaLabel}
+    >
+      <Chart.Bars>
+        {bar ? <Chart.Bar className={barClassName} /> : null}
+        <Chart.ProjectionOutline className={outlineClassName} />
+        <Chart.YLine value={0} />
+      </Chart.Bars>
+      <Chart.XAxis format={formatXTick}>
+        {ticks =>
+          ticks.map(tick => (
+            <Chart.XTick
+              key={tick.key}
+              tick={tick}
+            />
+          ))
+        }
+      </Chart.XAxis>
+      {selectionPart ? (
+        <Chart.Selection>
+          <Chart.Cursor data-testid='cursor' />
+          {renderTooltip ? (
+            <Chart.Tooltip<ActiveBar<TDatum>>
+              collisionBoundary={boundary}
+              {...tooltip}
+            >
+              {active => (
+                <Chart.TooltipPortal>
+                  <Chart.TooltipPositioner data-testid='tooltip'>
+                    <Chart.TooltipPopup>{renderTooltip(active)}</Chart.TooltipPopup>
+                  </Chart.TooltipPositioner>
+                </Chart.TooltipPortal>
+              )}
+            </Chart.Tooltip>
+          ) : null}
+        </Chart.Selection>
+      ) : null}
+    </Chart.Root>
+  );
+}
