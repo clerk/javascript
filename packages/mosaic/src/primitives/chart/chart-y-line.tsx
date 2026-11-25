@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { useChartContext } from './chart-context';
+import { useCartesianChart } from './chart-context';
 
 export type ChartYLineProps = ComponentProps<'line'> & {
   /** The value on the Y axis the line marks, such as a tick value or 0. */
@@ -13,7 +13,7 @@ export type ChartYLineProps = ComponentProps<'line'> & {
 /** A line across the plot at a Y value, inside any chart SVG. */
 export const ChartYLine = React.forwardRef<SVGLineElement, ChartYLineProps>(function ChartYLine(props, ref) {
   const { value, render, ...otherProps } = props;
-  const { chart } = useChartContext('YLine');
+  const chart = useCartesianChart('YLine');
   const y = chart.scaleY(value);
 
   const ownProps = {

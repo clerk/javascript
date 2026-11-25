@@ -437,9 +437,9 @@ describe('choosing a period with a pointer', () => {
   it('selects on touch contact, keeps it after the finger lifts, and dismisses on a touch elsewhere', async () => {
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
     await render(<Chart onSelectionChange={onSelectionChange} />);
-    const { x, y } = centerOfCategory(1);
+    const { x } = centerOfCategory(1);
 
-    pointer('pointerdown', surface(), x, y, 'touch');
+    pointer('pointerdown', surface(), x, surface().getBoundingClientRect().bottom - 4, 'touch');
     surface().dispatchEvent(
       new PointerEvent('pointerout', { bubbles: true, pointerType: 'touch', relatedTarget: document.body }),
     );
@@ -447,6 +447,53 @@ describe('choosing a period with a pointer', () => {
 
     pointer('pointerdown', document.body, 0, 0, 'touch');
     await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+  });
+
+  it('closes the tooltip when a mouse moves off a bar into the empty plot above it', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(
+      <Chart
+        onSelectionChange={onSelectionChange}
+        renderTooltip={active => active.category}
+      />,
+    );
+    const plot = surface().getBoundingClientRect();
+    const tallest = centerOfCategory(5);
+    await userEvent.hover(surface(), { position: { x: tallest.x - plot.left, y: plot.height - 4 } });
+    await expect.poll(() => screen.queryByTestId('tooltip')).toHaveTextContent('Jun');
+
+    await userEvent.hover(surface(), { position: { x: centerOfCategory(0).x - plot.left, y: 4 } });
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+    await expect.poll(() => screen.queryByTestId('tooltip')).toBeNull();
+  });
+
+  it('dismisses a touch selection on a tap in the empty plot above a bar', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(<Chart onSelectionChange={onSelectionChange} />);
+    const plot = surface().getBoundingClientRect();
+
+    pointer('pointerdown', surface(), centerOfCategory(5).x, plot.bottom - 4, 'touch');
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jun' });
+
+    pointer('pointerdown', surface(), centerOfCategory(0).x, plot.top + 4, 'touch');
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+  });
+
+  it('selects a short bar from a minimum target above its top', async () => {
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(
+      <Chart
+        data={[
+          { period: 'Jan', value: 1 },
+          { period: 'Feb', value: 100 },
+        ]}
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    const plot = surface().getBoundingClientRect();
+
+    pointer('pointerdown', surface(), plot.left + plot.width / 4, plot.bottom - 20, 'touch');
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jan' });
   });
 });
 

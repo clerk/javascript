@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import { ChartContext } from '../chart-context';
-import type { ChartInstance } from '../types';
+import type { CartesianChartInstance, ChartInstance } from '../types';
 import type { BarStyleElement } from './bar-canvas';
 import type { PreparedStackedBars, StackedBarLayout } from './bar-layout';
 import type { ActiveBar, BarCategory, BarIdentity, BarSelection } from './types';
@@ -17,7 +17,7 @@ export type BarLayout<TDatum> = Readonly<{
 }>;
 
 /** The measured layout and selection of one stacked bar chart, returned by `Chart.useBarChart`. */
-export type BarChartInstance<TDatum = unknown> = ChartInstance<ActiveBar<TDatum>, BarSelection, BarCategory> &
+export type BarChartInstance<TDatum = unknown> = CartesianChartInstance<ActiveBar<TDatum>, BarSelection, BarCategory> &
   Readonly<{ [BAR_LAYOUT]: BarLayout<TDatum> }>;
 
 function isBarChart(chart: ChartInstance): chart is BarChartInstance {

@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { hasArea, useChartContext } from './chart-context';
+import { hasArea, useCartesianChart } from './chart-context';
 
 export interface ChartYTickItem {
   value: number;
@@ -22,7 +22,7 @@ const formatNumber = (value: number) => value.toLocaleString();
 
 export const ChartYAxis = React.forwardRef<SVGSVGElement, ChartYAxisProps>(function ChartYAxis(props, ref) {
   const { format = formatNumber, children, render, ...otherProps } = props;
-  const { chart } = useChartContext('YAxis');
+  const chart = useCartesianChart('YAxis');
   const { size, yTicks } = chart;
   const ticks = React.useMemo(
     () => yTicks.map(tick => ({ value: tick.value, y: tick.y, label: format(tick.value) })),

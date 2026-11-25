@@ -1,6 +1,6 @@
 import { createContext, type RefObject, useContext } from 'react';
 
-import type { ChartInstance, ChartSize } from './types';
+import type { CartesianChartInstance, ChartInstance, ChartSize } from './types';
 
 export interface ChartContextValue {
   chart: ChartInstance;
@@ -17,6 +17,19 @@ export function useChartContext(part: string) {
     throw new Error(`<Chart.${part}> must be used within <Chart.Root>`);
   }
   return context;
+}
+
+function hasValueAxis(chart: ChartInstance): chart is CartesianChartInstance {
+  return 'scaleY' in chart;
+}
+
+/** The chart of a part that draws against the value axis, such as `Chart.YAxis`. */
+export function useCartesianChart(part: string) {
+  const { chart } = useChartContext(part);
+  if (!hasValueAxis(chart)) {
+    throw new Error(`<Chart.${part}> needs a chart with a value axis, such as one from Chart.useBarChart`);
+  }
+  return chart;
 }
 
 export function hasArea(size: ChartSize) {

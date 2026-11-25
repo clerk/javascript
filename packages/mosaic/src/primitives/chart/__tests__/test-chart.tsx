@@ -14,6 +14,7 @@ export type TestChartProps<TDatum> = Pick<
   | 'onSelectionChange'
   | 'onActivate'
   | 'messages'
+  | 'formatValue'
 > & {
   ariaLabel: string;
   formatXTick?: (value: string) => string | null;

@@ -18,6 +18,9 @@ export type ChartPlot = Readonly<{
 
 export type ChartTick = Readonly<{ value: number; y: number }>;
 
+/** A point in chart coordinates, relative to the top left of `Chart.Root`. */
+export type ChartPoint = Readonly<{ x: number; y: number }>;
+
 /**
  * One datum's place on the X axis. A bar chart gives each category a band; a point chart gives it a
  * point, so `width` is 0. Shared parts read only these numbers.
@@ -62,6 +65,8 @@ export interface ChartOptions<TSelection extends ChartSelection, TActive extends
   onActivate?: (active: TActive) => void;
   /** Names a category in announcements. Default: the category key */
   formatCategory?: (category: string) => string | null;
+  /** Formats a value in announcements. Default: `String(value)` */
+  formatValue?: (value: number) => string;
   /** Screen reader text. Default: English */
   messages?: Partial<ChartMessages>;
 }
@@ -121,14 +126,12 @@ export type ChartInstance<
   /** The measured container, zero until the first measurement. */
   size: ChartSize;
   plot: ChartPlot;
-  scaleY: (value: number) => number;
-  yTicks: readonly ChartTick[];
   categories: readonly TCategory[];
   xTicks: (options?: XTicksOptions) => XTick[];
   /** The selection in the current data, or null. */
   selected: TActive | null;
   /** Where a tooltip for `selected` points, in chart coordinates. */
-  tooltipAnchor: Readonly<{ x: number; y: number }> | null;
+  tooltipAnchor: ChartPoint | null;
   /** The text of the keyboard selection's status announcement. */
   announcement: string;
   /** The keys the chart answers to, for the visually hidden description. */
@@ -137,3 +140,17 @@ export type ChartInstance<
   clear: () => void;
   getInteractionProps: () => ChartInteractionProps;
 }>;
+
+/**
+ * A chart with a value axis, such as bars or lines. `Chart.Grid`, `Chart.YAxis` and `Chart.YLine`
+ * need one; a chart without a value axis, such as a donut, is a plain `ChartInstance`.
+ */
+export type CartesianChartInstance<
+  TActive extends ChartActive = ChartActive,
+  TSelection extends ChartSelection = never,
+  TCategory extends ChartCategory = ChartCategory,
+> = ChartInstance<TActive, TSelection, TCategory> &
+  Readonly<{
+    scaleY: (value: number) => number;
+    yTicks: readonly ChartTick[];
+  }>;
