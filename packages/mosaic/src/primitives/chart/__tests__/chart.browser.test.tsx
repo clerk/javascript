@@ -544,7 +544,7 @@ describe('choosing a period with a pointer', () => {
     await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
   });
 
-  it('closes the tooltip when a mouse moves off a bar into the empty plot above it', async () => {
+  it('selects the column under the mouse anywhere in the plot, above a short bar too', async () => {
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
     await render(
       <Chart
@@ -553,16 +553,16 @@ describe('choosing a period with a pointer', () => {
       />,
     );
     const plot = surface().getBoundingClientRect();
-    const tallest = centerOfCategory(5);
-    await userEvent.hover(surface(), { position: { x: tallest.x - plot.left, y: plot.height - 4 } });
+    await userEvent.hover(surface(), { position: { x: centerOfCategory(5).x - plot.left, y: plot.height - 4 } });
     await expect.poll(() => screen.queryByTestId('tooltip')).toHaveTextContent('Jun');
 
     await userEvent.hover(surface(), { position: { x: centerOfCategory(0).x - plot.left, y: 4 } });
-    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
-    await expect.poll(() => screen.queryByTestId('tooltip')).toBeNull();
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jan' });
+    await expect.poll(() => screen.queryByTestId('tooltip')).toHaveTextContent('Jan');
+    await userEvent.unhover(surface());
   });
 
-  it('dismisses a touch selection on a tap in the empty plot above a bar', async () => {
+  it('moves a touch selection to the column tapped, above its bar too', async () => {
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
     await render(<Chart onSelectionChange={onSelectionChange} />);
     const plot = surface().getBoundingClientRect();
@@ -571,24 +571,38 @@ describe('choosing a period with a pointer', () => {
     await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jun' });
 
     pointer('pointerdown', surface(), centerOfCategory(0).x, plot.top + 4, 'touch');
-    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jan' });
   });
 
-  it('selects a short bar from a minimum target above its top', async () => {
+  it('selects the section on the same side of the zero line as the pointer, past the bars too', async () => {
+    type Signed = { period: string; gained: number; lost: number };
     const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
     await render(
-      <Chart
-        data={[
-          { period: 'Jan', value: 1 },
-          { period: 'Feb', value: 100 },
-        ]}
-        onSelectionChange={onSelectionChange}
-      />,
+      <div style={{ width: 600 }}>
+        <TestChart
+          data={[
+            { period: 'Jan', gained: 10, lost: -10 },
+            { period: 'Feb', gained: 100, lost: -100 },
+          ]}
+          series={[
+            { key: 'gained', value: (row: Signed) => row.gained },
+            { key: 'lost', value: (row: Signed) => row.lost },
+          ]}
+          index={(row: Signed) => row.period}
+          ariaLabel='Growth'
+          height={300}
+          barClassName='red'
+          onSelectionChange={onSelectionChange}
+        />
+      </div>,
     );
     const plot = surface().getBoundingClientRect();
+    const jan = plot.left + plot.width / 4;
 
-    pointer('pointerdown', surface(), plot.left + plot.width / 4, plot.bottom - 20, 'touch');
-    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Jan' });
+    pointer('pointermove', surface(), jan, plot.top + 4);
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toEqual({ category: 'Jan', section: 'positive' });
+    pointer('pointermove', surface(), jan, plot.bottom - 4);
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toEqual({ category: 'Jan', section: 'negative' });
   });
 });
 

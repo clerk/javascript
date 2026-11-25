@@ -215,7 +215,7 @@ The interaction surface is focusable while something reads the selection: `selec
 
 Left and Right do not follow `useDirection()`. A time axis reads left to right in every locale, so the earlier period is always on the left.
 
-A pointer selects what the chart type hit-tests under it, and nothing over empty plot. A tap selects on contact and stays selected until the user taps elsewhere, including the empty plot, or the gesture is cancelled.
+A pointer selects what the chart type hit-tests under it. A tap selects on contact and stays selected until the user taps outside the chart or the gesture is cancelled.
 
 ## Selection
 
@@ -234,7 +234,7 @@ A selection set through `selection` or `select` is not announced. Announcements 
 
 Up and Down select the positive or negative section of the period. Left, Right, Home and End keep the section when the new period has it, and otherwise take positive, then negative. When no value in the chart is negative, the keyboard instructions leave Up and Down out.
 
-A pointer selects the period whose center is nearest when it is over a section's bars, or within 24px of the zero line for a shorter section, so a short bar is still a usable target. Over the empty plot above or below the bars it selects nothing. It keeps the current section within a few pixels of the zero line.
+A pointer selects the period whose center is nearest, anywhere in the plot: the same column the hover band shows, so a short or thin bar is as easy to point at as a tall one. It selects the section on its side of the zero line, and keeps the current section within a few pixels of it.
 
 The interaction surface carries `data-active-section`, `positive` or `negative` while a section is selected. The status region announces the period and each nonzero value in the section, such as `Feb, Sign-ups 20`, and the projection when the period has one. When some value in the chart is negative, it names the section first: `Feb, negative values, Churned -4`. A period with nothing to select announces `No values for this period`.
 
