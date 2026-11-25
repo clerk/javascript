@@ -73,9 +73,22 @@ export function selectionReducer<TSelection extends ChartSelection>(
 ): SelectionState<TSelection> {
   switch (action.type) {
     case 'pointer':
-      return action.selection
-        ? { status: 'selected', source: 'pointer', category: action.selection.category, selection: action.selection }
-        : NO_SELECTION;
+      if (!action.selection) {
+        return NO_SELECTION;
+      }
+      if (
+        state.status === 'selected' &&
+        state.source === 'pointer' &&
+        sameSelection(state.selection, action.selection)
+      ) {
+        return state;
+      }
+      return {
+        status: 'selected',
+        source: 'pointer',
+        category: action.selection.category,
+        selection: action.selection,
+      };
     case 'select':
       return {
         status: 'selected',

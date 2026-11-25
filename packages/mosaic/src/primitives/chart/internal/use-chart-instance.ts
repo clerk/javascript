@@ -205,6 +205,9 @@ export function useChartInstance<
     }
     const previous = stateRef.current;
     const next = selectionReducer(previous, action);
+    if (next === previous) {
+      return next;
+    }
     stateRef.current = next;
     setStored(next);
     const nextValue = toPublicSelection(next);

@@ -1,7 +1,7 @@
 import { cleanup, render as renderComponent, screen } from '@testing-library/react';
 import type {} from '@vitest/browser-playwright';
 import type { ReactElement } from 'react';
-import { useRef } from 'react';
+import { Profiler, useRef } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 
@@ -83,6 +83,13 @@ function insideLastBar() {
 
 function pointer(type: string, target: Element, clientX: number, clientY: number, pointerType = 'mouse') {
   target.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX, clientY, pointerType }));
+}
+
+function nextFrames(count: number) {
+  return new Promise<void>(resolve => {
+    const step = (left: number) => (left === 0 ? resolve() : requestAnimationFrame(() => step(left - 1)));
+    step(count);
+  });
 }
 
 function centerOfCategory(categoryIndex: number) {
@@ -432,6 +439,35 @@ describe('choosing a period with a pointer', () => {
     await userEvent.unhover(surface());
     await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toBeNull();
     expect(screen.queryByTestId('cursor')).toBeNull();
+  });
+
+  it('does not rerender while the mouse moves within the selected period', async () => {
+    let commits = 0;
+    const onSelectionChange = vi.fn<(selection: BarSelection | null) => void>();
+    await render(
+      <Profiler
+        id='chart'
+        onRender={() => {
+          commits++;
+        }}
+      >
+        <Chart onSelectionChange={onSelectionChange} />
+      </Profiler>,
+    );
+    const { x, y } = centerOfCategory(3);
+    pointer('pointermove', surface(), x, y);
+    await expect.poll(() => onSelectionChange.mock.lastCall?.[0]).toMatchObject({ category: 'Apr' });
+    await nextFrames(3);
+    const settled = commits;
+
+    for (const dx of [-6, -3, 3, 6]) {
+      pointer('pointermove', surface(), x + dx, y + dx);
+      await nextFrames(1);
+    }
+    await nextFrames(2);
+
+    expect(onSelectionChange).toHaveBeenCalledTimes(1);
+    expect(commits).toBe(settled);
   });
 
   it('selects on touch contact, keeps it after the finger lifts, and dismisses on a touch elsewhere', async () => {
