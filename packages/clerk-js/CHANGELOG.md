@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.48.0
+
+### Minor Changes
+
+- `OAuthConsentInfo` has a new `maxOrganizations` field: the most organizations one OAuth consent can grant. It is `1` unless the instance allows a consent for several organizations. ([#10991](https://github.com/clerk/javascript/pull/10991)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Clear cached session tokens and cancel proactive refresh timers when a session is removed or leaves signed-in status on client updates, preventing background token refresh requests for already-removed sessions. ([#11004](https://github.com/clerk/javascript/pull/11004)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `authenticateWithPopup()` now throws instead of navigating the popup when the identity provider URL uses a protocol other than `http:` or `https:`, matching the protocol check already applied to redirect-based sign-in and sign-up. ([#10975](https://github.com/clerk/javascript/pull/10975)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`7c8fdc3`](https://github.com/clerk/javascript/commit/7c8fdc3116284ec4888002ba304589be1055952a), [`02a65cd`](https://github.com/clerk/javascript/commit/02a65cde13e22ddef85bce29a10531d90ad6ae34), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e)]:
+  - @clerk/shared@4.50.0
+
 ## 6.47.0
 
 ### Minor Changes

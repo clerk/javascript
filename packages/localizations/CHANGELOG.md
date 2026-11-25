@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.28.0
+
+### Minor Changes
+
+- Add the `oauthConsent.organizationSelect.placeholder`, `oauthConsent.organizationSelect.selectedCount` and `oauthConsent.organizationSelect.limit` localization keys for choosing organizations on the OAuth consent screen. ([#10992](https://github.com/clerk/javascript/pull/10992)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`7c8fdc3`](https://github.com/clerk/javascript/commit/7c8fdc3116284ec4888002ba304589be1055952a), [`02a65cd`](https://github.com/clerk/javascript/commit/02a65cde13e22ddef85bce29a10531d90ad6ae34), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e)]:
+  - @clerk/shared@4.50.0
+
 ## 4.27.0
 
 ### Minor Changes

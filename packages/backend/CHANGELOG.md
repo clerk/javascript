@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.33.1
+
+### Patch Changes
+
+- `authenticateRequest()` now returns a signed-out or handshake state instead of throwing when a token's header or payload is valid JSON but not a JSON object. For such tokens, `decodeJwt()`, `verifyJwt()`, and `verifyToken()` now throw a `TokenVerificationError` with reason `token-invalid`. ([#11013](https://github.com/clerk/javascript/pull/11013)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`7c8fdc3`](https://github.com/clerk/javascript/commit/7c8fdc3116284ec4888002ba304589be1055952a), [`02a65cd`](https://github.com/clerk/javascript/commit/02a65cde13e22ddef85bce29a10531d90ad6ae34), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e)]:
+  - @clerk/shared@4.50.0
+
 ## 3.33.0
 
 ### Minor Changes

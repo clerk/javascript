@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 1.46.0
+
+### Minor Changes
+
+- `<OAuthConsent />` lets the user grant access to several organizations at once, up to the limit the instance allows. The user's active organization is the default when it is selected; otherwise the default is the first selected organization in list order. Allow stays disabled until at least one organization is selected. On an instance that allows one organization for each consent, the selection of one organization is unchanged. ([#10991](https://github.com/clerk/javascript/pull/10991)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Updated dependencies [[`7c8fdc3`](https://github.com/clerk/javascript/commit/7c8fdc3116284ec4888002ba304589be1055952a), [`02a65cd`](https://github.com/clerk/javascript/commit/02a65cde13e22ddef85bce29a10531d90ad6ae34), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e), [`125302a`](https://github.com/clerk/javascript/commit/125302ac5534da32909a19680792cdee00fabc4e)]:
+  - @clerk/shared@4.50.0
+  - @clerk/localizations@4.28.0
+
 ## 1.45.0
 
 ### Minor Changes
