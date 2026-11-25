@@ -8,6 +8,8 @@ import type {
   SelectMediaProps,
   SelectPopupProps,
   SelectProps,
+  SelectSelectAllProps,
+  SelectSeparatorProps,
   SelectTriggerProps,
 } from './select';
 
@@ -18,6 +20,7 @@ export default {
   useFor: [
     'picking one option from a list, such as a role',
     'picking several options from a list',
+    'a "select all" row above the options of a multiple select',
     'a compact dropdown in a table row',
     'options with an icon, avatar or description',
   ],
@@ -122,6 +125,18 @@ export default {
         },
       },
     },
+    'Select.SelectAll': {
+      description:
+        "A `role='option'` row that selects every enabled item, or clears them once all are selected. Shows a check when all are selected and a dash when some are. Disabled items keep their state. Renders nothing unless the root is `multiple`. Carries `data-checked`, `data-indeterminate`, `data-active`, and `data-disabled` when there is no enabled item.",
+      slot: 'cl-select-select-all',
+      props: {
+        label: { type: 'string', doc: 'Shown in the row; drives typeahead.' },
+      },
+    },
+    'Select.Separator': {
+      description: 'A full-bleed divider between items, such as below `Select.SelectAll`. Hidden from assistive tech.',
+      slot: 'cl-select-separator',
+    },
     'Select.Media': {
       description: 'A square leading column for an icon, image or avatar.',
       slot: 'cl-select-item-media',
@@ -161,6 +176,21 @@ export default {
 </Select.Root>
 `,
     },
+    {
+      title: 'Select all',
+      code: `
+<Select.Root items={languages} multiple>
+  <Select.Trigger placeholder='Select languages' />
+  <Select.Popup>
+    <Select.SelectAll label='Select all' />
+    <Select.Separator />
+    {languages.map(language => (
+      <Select.Item key={language.value} {...language} />
+    ))}
+  </Select.Popup>
+</Select.Root>
+`,
+    },
   ],
   related: ['Field', 'Combobox'],
 } satisfies ComponentDoc<{
@@ -169,6 +199,8 @@ export default {
   'Select.Popup': SelectPopupProps;
   'Select.Item': SelectItemProps;
   'Select.ItemIndicator': SelectItemIndicatorProps;
+  'Select.SelectAll': SelectSelectAllProps;
+  'Select.Separator': SelectSeparatorProps;
   'Select.Media': SelectMediaProps;
   'Select.Content': SelectContentProps;
   'Select.Label': SelectLabelProps;

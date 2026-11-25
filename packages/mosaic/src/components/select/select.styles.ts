@@ -14,15 +14,14 @@ import {
 import { selectAllScope } from './select.markers.stylex';
 
 const popupRadius = radiusVars['--cl-radius-xl'];
-const popupBorder = '1px';
 const inset = space['1.5'];
 const itemRadius = `max(0px, calc(${popupRadius} - ${inset}))`;
 
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
 // boxes must inset their text and trailing icon identically: the trigger is a `md` Button (32px,
 // 1px border, 11px start and end padding, sm text), and the option gets the same 12px from the
-// popup's 1px border, the viewport's 5px padding, and its own 6px padding, on both the text and
-// the icon's edge, at the same 32px height.
+// viewport's 6px padding and its own 6px padding, on both the text and the icon's edge, at the
+// same 32px height.
 
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 
@@ -68,11 +67,7 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    // Transparent, not removed: it holds the 1px of layout the alignment counts on, and forced colors paints it.
-    borderColor: 'transparent',
     borderRadius: popupRadius,
-    borderStyle: 'solid',
-    borderWidth: popupBorder,
     outline: 'none',
     backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
@@ -111,7 +106,7 @@ export const popup = stylex.create({
 
 export const viewport = stylex.create({
   base: {
-    padding: `calc(${inset} - ${popupBorder})`,
+    padding: inset,
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -189,6 +184,16 @@ export const description = stylex.create({
   base: {
     color: colorVars['--cl-color-foreground-secondary'],
     fontWeight: fontWeightVars['--cl-font-normal'],
+  },
+});
+
+export const separator = stylex.create({
+  base: {
+    marginBlock: space['0.5'],
+    marginInline: `calc(-1 * ${inset})`,
+    backgroundColor: colorVars['--cl-color-border-subtle'],
+    blockSize: '1px',
+    flexShrink: 0,
   },
 });
 

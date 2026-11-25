@@ -12,6 +12,7 @@ import type {
   SelectPopupProps as PrimitiveSelectPopupProps,
   SelectPortalProps,
   SelectSelectAllProps as PrimitiveSelectSelectAllProps,
+  SelectSeparatorProps as PrimitiveSelectSeparatorProps,
   SelectSingleProps as PrimitiveSelectSingleProps,
 } from '../../primitives/select';
 import { Select as Primitive } from '../../primitives/select';
@@ -305,8 +306,7 @@ export const SelectItemIndicator = React.forwardRef<HTMLSpanElement, SelectItemI
 );
 
 export interface SelectSelectAllProps
-  extends Omit<PrimitiveSelectSelectAllProps, 'label' | 'children' | 'className' | 'style'>,
-    MosaicStyleProps {
+  extends Omit<PrimitiveSelectSelectAllProps, 'label' | 'children' | 'className' | 'style'>, MosaicStyleProps {
   /** Shown in the row; also drives typeahead. */
   label: string;
 }
@@ -321,37 +321,53 @@ export interface SelectSelectAllProps
  *   {items.map(item => <Select.Item key={item.value} {...item} />)}
  * </Select.Popup>
  */
-export const SelectSelectAll = React.forwardRef<HTMLButtonElement, SelectSelectAllProps>(
-  function MosaicSelectSelectAll({ label, xstyle, ...rest }, ref) {
-    return (
-      <Primitive.SelectAll
-        ref={ref}
-        label={label}
-        {...mergeStyleProps(
-          themeProps('select-select-all'),
-          stylex.props(reset.base, focusOutline.visible, selectAllScope, slots.item.base, xstyle),
-          rest,
-        )}
-      >
-        <SelectContent>
-          <SelectLabel>{label}</SelectLabel>
-        </SelectContent>
-        <Icon
-          glyph={Checkmark}
-          size='md'
-          xstyle={[slots.indicator.base, slots.selectAllIndicator.checked]}
-          {...themeProps('select-select-all-indicator', { state: 'checked' })}
-        />
-        <Icon
-          glyph={Minus}
-          size='md'
-          xstyle={[slots.indicator.base, slots.selectAllIndicator.indeterminate]}
-          {...themeProps('select-select-all-indicator', { state: 'indeterminate' })}
-        />
-      </Primitive.SelectAll>
-    );
-  },
-);
+export const SelectSelectAll = React.forwardRef<HTMLButtonElement, SelectSelectAllProps>(function MosaicSelectSelectAll(
+  { label, xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.SelectAll
+      ref={ref}
+      label={label}
+      {...mergeStyleProps(
+        themeProps('select-select-all'),
+        stylex.props(reset.base, focusOutline.visible, selectAllScope, slots.item.base, xstyle),
+        rest,
+      )}
+    >
+      <SelectContent>
+        <SelectLabel>{label}</SelectLabel>
+      </SelectContent>
+      <Icon
+        glyph={Checkmark}
+        size='md'
+        xstyle={[slots.indicator.base, slots.selectAllIndicator.checked]}
+        {...themeProps('select-select-all-indicator', { state: 'checked' })}
+      />
+      <Icon
+        glyph={Minus}
+        size='md'
+        xstyle={[slots.indicator.base, slots.selectAllIndicator.indeterminate]}
+        {...themeProps('select-select-all-indicator', { state: 'indeterminate' })}
+      />
+    </Primitive.SelectAll>
+  );
+});
+
+export type SelectSeparatorProps = Omit<PrimitiveSelectSeparatorProps, 'className' | 'style'> & MosaicStyleProps;
+
+/** A full-bleed divider between items, such as below `Select.SelectAll`. */
+export const SelectSeparator = React.forwardRef<HTMLDivElement, SelectSeparatorProps>(function MosaicSelectSeparator(
+  { xstyle, ...rest },
+  ref,
+) {
+  return (
+    <Primitive.Separator
+      ref={ref}
+      {...mergeStyleProps(themeProps('select-separator'), stylex.props(reset.base, slots.separator.base, xstyle), rest)}
+    />
+  );
+});
 
 /** `span`, not `div`: the item this sits in may be a button, so its children are phrasing content. */
 export type SelectMediaProps = MosaicComponentProps<'span'>;

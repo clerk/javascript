@@ -252,6 +252,7 @@ describe('Mosaic Select', () => {
         <Select.Trigger placeholder='Choose roles' />
         <Select.Popup>
           <Select.SelectAll label='Select all' />
+          <Select.Separator data-testid='separator' />
           {roles.map(role => (
             <Select.Item
               key={role.value}
@@ -265,6 +266,7 @@ describe('Mosaic Select', () => {
     await user.click(screen.getByRole('combobox'));
     const selectAll = screen.getByRole('option', { name: 'Select all' });
     expect(selectAll).toHaveClass('cl-select-select-all');
+    expect(screen.getByTestId('separator')).toHaveClass('cl-select-separator');
     expect(selectAll).toHaveAttribute('data-indeterminate', '');
     expect(selectAll.querySelector('.cl-select-select-all-indicator[data-state="checked"]')).toBeInTheDocument();
     expect(selectAll.querySelector('.cl-select-select-all-indicator[data-state="indeterminate"]')).toBeInTheDocument();

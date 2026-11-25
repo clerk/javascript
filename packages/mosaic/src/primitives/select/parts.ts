@@ -19,4 +19,5 @@ export {
   SelectGroup as Group,
   SelectGroupLabel as GroupLabel,
 } from './select-group';
+export { type SelectSeparatorProps, SelectSeparator as Separator } from './select-separator';
 export { type SelectArrowProps, SelectArrow as Arrow } from './select-arrow';

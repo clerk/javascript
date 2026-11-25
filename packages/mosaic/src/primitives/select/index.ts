@@ -13,6 +13,7 @@ export type {
   SelectPositionerProps,
   SelectProps,
   SelectSelectAllProps,
+  SelectSeparatorProps,
   SelectSingleProps,
   SelectTriggerProps,
   SelectValueProps,

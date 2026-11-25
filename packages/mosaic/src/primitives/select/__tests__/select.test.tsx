@@ -980,6 +980,7 @@ describe('Select', () => {
           <Select.Positioner>
             <Select.Popup>
               <Select.SelectAll>Select all</Select.SelectAll>
+              <Select.Separator />
               {fruits.map(({ label, value }) => (
                 <Select.Item
                   key={value}
@@ -1073,6 +1074,19 @@ describe('Select', () => {
       await user.keyboard('{Enter}');
 
       expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'banana', 'cherry']);
+    });
+
+    it('hides the separator from assistive tech and skips it with the arrow keys', async () => {
+      const user = userEvent.setup();
+      renderSelectAll();
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{ArrowDown}');
+      await waitFor(() => expect(document.activeElement).toBe(selectAllOption()));
+      await user.keyboard('{ArrowDown}');
+
+      expect(document.activeElement).toBe(screen.getByRole('option', { name: 'Apple' }));
+      expect(screen.queryByRole('separator')).toBeNull();
     });
 
     it.each([

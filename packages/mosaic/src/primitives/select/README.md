@@ -67,6 +67,26 @@ const [value, setValue] = useState('apple');
 
 `Select.Value` shows the selected labels joined with commas unless given children.
 
+### Select all
+
+`Select.SelectAll` is an option that selects every enabled item, or clears them once all are selected. Disabled items keep their state. It renders nothing unless the root is `multiple`. Style its check and dash off `data-checked` and `data-indeterminate`.
+
+```tsx
+<Select.Root multiple>
+  {/* ... */}
+  <Select.Popup>
+    <Select.SelectAll label='Select all'>Select all</Select.SelectAll>
+    <Select.Separator />
+    <Select.Item
+      value='apple'
+      label='Apple'
+    />
+  </Select.Popup>
+</Select.Root>
+```
+
+<kbd>Ctrl</kbd>+<kbd>A</kbd> (<kbd>⌘</kbd>+<kbd>A</kbd> on macOS) does the same while the popup is open, with or without a `Select.SelectAll`.
+
 ### With `items` for SSR label resolution
 
 The `items` prop allows label resolution before options mount (useful for server rendering or deferred lists):
@@ -105,6 +125,8 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | `Select.Popup`         | `<div>`         | Visual wrapper for the option list                   |
 | `Select.Item`          | `<button>`      | A selectable option                                  |
 | `Select.ItemIndicator` | `<span>`        | Renders inside the selected item only, `aria-hidden` |
+| `Select.SelectAll`     | `<button>`      | Selects every enabled item, or clears them           |
+| `Select.Separator`     | `<div>`         | Divider between items, `role="presentation"`         |
 | `Select.Group`         | `<div>`         | Groups options, named by its label                   |
 | `Select.GroupLabel`    | `<div>`         | Names the enclosing `Select.Group`                   |
 | `Select.Arrow`         | `<svg>`         | Optional floating arrow                              |
@@ -148,7 +170,13 @@ By default, the selected option visually aligns with the trigger. Disable this f
 | ------------- | --------- | ------- | ----------------------------------------------------------------------------- |
 | `keepMounted` | `boolean` | `false` | Render in unselected items too, with `data-selected` only on the selected one |
 
-### `Select.Trigger`, `Select.Positioner`, `Select.Popup`
+### `Select.SelectAll`
+
+| Prop    | Type     | Default | Description          |
+| ------- | -------- | ------- | -------------------- |
+| `label` | `string` | —       | Matched by typeahead |
+
+### `Select.Trigger`, `Select.Positioner`, `Select.Popup`, `Select.Separator`
 
 No additional props beyond standard HTML attributes and the `render` prop.
 
@@ -165,6 +193,7 @@ Accepts all `FloatingArrow` props and forwards `ref`. `context` is injected auto
 | `Enter` / `Space` | Select the active option and close the popup; with `multiple`, toggle it and keep the popup open |
 | `Escape`          | Close the popup                                                                                  |
 | Type a character  | Jump to matching option (typeahead)                                                              |
+| `Ctrl/⌘ + A`      | With `multiple`, select every enabled option, or clear them once all are selected                |
 
 Typeahead is active only while the popup is open. It highlights the matching option; pressing Enter or Space then selects it.
 
@@ -176,6 +205,8 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 | `data-selected`             | Item       | Each selected option                                                              |
 | `data-active`               | Item       | The keyboard-highlighted option                                                   |
 | `data-disabled`             | Item       | Disabled option                                                                   |
+| `data-checked`              | SelectAll  | Every enabled option is selected                                                  |
+| `data-indeterminate`        | SelectAll  | Some, but not all, enabled options are selected                                   |
 | `data-side`                 | Positioner | Resolved placement side, or `none` while the selected option overlays the trigger |
 
 ## Important Notes
@@ -190,4 +221,6 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 - Popup: `role="listbox"`, `aria-multiselectable` when `multiple`
 - Item: `role="option"`, `aria-selected`, `aria-disabled`
+- SelectAll: `role="option"`, `aria-selected`, `aria-checked` (`mixed` while some are selected)
+- Separator: `role="presentation"`
 - Trigger: `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`

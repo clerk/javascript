@@ -247,6 +247,7 @@ export function SelectAll() {
       <Select.Trigger>{renderLanguages}</Select.Trigger>
       <Select.Popup>
         <Select.SelectAll label='Select all' />
+        <Select.Separator />
         {languages.map(language => (
           <Select.Item
             key={language.value}
