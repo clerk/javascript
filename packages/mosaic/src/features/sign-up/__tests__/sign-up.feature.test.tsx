@@ -223,22 +223,65 @@ describe('SignUp', () => {
       await codeSent();
     });
 
-    it('keeps Continue disabled until every required field is filled', async () => {
+    it('names each empty required field when Continue is pressed, and creates nothing until they are filled', async () => {
       const { fapi, user } = await renderSignUp({
-        environment: environment({ attributes: { username: { required: true } } }),
+        environment: environment({
+          attributes: { first_name: { enabled: true, required: true }, username: { required: true } },
+        }),
       });
 
       await submitStart(user);
 
-      expect(continueButton()).toHaveAttribute('aria-disabled', 'true');
+      const firstName = screen.getByRole('textbox', { name: 'First name' });
+      expect(await screen.findByText('First name is required.')).toBeInTheDocument();
+      expect(screen.getByText('Username is required.')).toBeInTheDocument();
+      expect(firstName).toHaveFocus();
       expect(fapi.signUp.creations).toHaveLength(0);
 
+      await user.type(firstName, 'Alice');
       await user.type(screen.getByRole('textbox', { name: 'Username' }), 'alice');
       await user.click(continueButton());
 
       expect(await screen.findByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
       expect(fapi.signUp.creations[0].get('username')).toBe('alice');
       await codeSent();
+    });
+
+    it('flags an empty required field only once Continue is pressed', async () => {
+      const { user } = await renderSignUp();
+
+      await user.click(await screen.findByRole('textbox', { name: 'Email address' }));
+      await user.tab();
+
+      expect(screen.queryByText('Email address is required.')).not.toBeInTheDocument();
+
+      await user.click(continueButton());
+
+      expect(await screen.findByText('Email address is required.')).toBeInTheDocument();
+    });
+
+    it('asks for legal consent when Continue is pressed without it', async () => {
+      const { fapi, user } = await renderSignUp({
+        environment: environment({
+          user_settings: {
+            sign_up: {
+              allowlist_only: false,
+              progressive: true,
+              captcha_enabled: false,
+              mode: 'public',
+              legal_consent_enabled: true,
+            },
+          },
+        }),
+      });
+
+      await user.type(await screen.findByRole('textbox', { name: 'Email address' }), EMAIL);
+      await user.type(passwordField(), PASSWORD);
+      await user.click(continueButton());
+
+      expect(await screen.findByText('Accept the terms to continue.')).toBeInTheDocument();
+      expect(screen.getByRole('checkbox')).toHaveFocus();
+      expect(fapi.signUp.creations).toHaveLength(0);
     });
 
     it('shows a try-again message when sign-ups are rate limited', async () => {

@@ -1,24 +1,25 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import { useState } from 'react';
 
-import type { FieldFeedback } from '../../../components/form';
+import type { FieldFeedback, FieldsConfig } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
+import type { MosaicMessages } from '../../../localization';
 import { useMessages } from '../../../localization';
 import type { SignUpCreateResult, SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
 import type { SignUpDetails, SignUpDetailsScreen, SignUpFieldName, SignUpFields, SignUpValues } from '../sign-up.types';
 import { signUpFieldNames } from '../sign-up.utils';
 
 const emptyValues: SignUpValues = {
+  firstName: '',
+  lastName: '',
+  username: '',
   identifier: '',
   emailAddress: '',
   phoneNumber: '',
   password: '',
   code: '',
   backupCode: '',
-  firstName: '',
-  lastName: '',
-  username: '',
   newPassword: '',
   confirmPassword: '',
   signOutOfOtherSessions: false,
@@ -47,9 +48,25 @@ function detailsStep(
   };
 }
 
-function hasRequired(values: SignUpValues, fields: SignUpFields, consentRequired: boolean): boolean {
-  const filled = signUpFieldNames(fields).every(name => !fields[name]?.required || values[name].trim() !== '');
-  return filled && (!consentRequired || values.legalAccepted);
+function requiredFields(
+  fields: SignUpFields,
+  consentRequired: boolean,
+  m: MosaicMessages['signUp'],
+): FieldsConfig<SignUpValues> {
+  const config: FieldsConfig<SignUpValues> = {};
+  for (const name of signUpFieldNames(fields)) {
+    if (fields[name]?.required) {
+      config[name] = {
+        validate: value => (value.trim() === '' ? { type: 'error', message: m.form.required[name] } : undefined),
+      };
+    }
+  }
+  if (consentRequired) {
+    config.legalAccepted = {
+      validate: accepted => (accepted ? undefined : { type: 'error', message: m.legalConsent.required }),
+    };
+  }
+  return config;
 }
 
 function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
@@ -79,6 +96,7 @@ export function useSignUpDetailsController(
 ) {
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
   const genericError = useMessages('errors').generic;
+  const m = useMessages('signUp');
   const identifier = chosenIdentifier ?? details.initialIdentifier;
   const startFields = details.startFieldsFor(identifier);
   const continueFields = details.continueFieldsFor(identifier);
@@ -88,7 +106,7 @@ export function useSignUpDetailsController(
 
   const form = useForm<SignUpValues, SignUpCreateResult | undefined>({
     initialValues: { ...emptyValues, ...details.prefill },
-    canSubmit: values => hasRequired(values, fields, consentRequired),
+    fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
       const submitted = detailsValues(values, fields);
       return purpose === 'continue'

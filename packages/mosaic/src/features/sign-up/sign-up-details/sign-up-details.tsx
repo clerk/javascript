@@ -123,7 +123,7 @@ export function SignUpDetailsStep({
           <SubmitButton
             form={form.id}
             fullWidth
-            disabled={Boolean(pendingProviderId) || !form.canSubmit}
+            disabled={Boolean(pendingProviderId)}
             focusableWhenDisabled
             isPending={isPending}
             pendingLabel={m.verifying}
@@ -337,7 +337,7 @@ function TextField({
   placeholder: string;
   autoComplete: string;
 }) {
-  const { ref, ...control } = form.register(name);
+  const { ref, onBlur, ...control } = form.register(name);
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
   const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, switchRef, autoFocus ? flowAutoFocusRef : undefined]);
   const { feedback } = form.fields[name];
@@ -372,7 +372,7 @@ function TextField({
 
 function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, switchLabel, onSwitch }: FieldProps) {
   const m = useMessages('signUp');
-  const { ref, ...control } = form.registerValue('phoneNumber');
+  const { ref, onBlur, ...control } = form.registerValue('phoneNumber');
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
   const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, switchRef, autoFocus ? flowAutoFocusRef : undefined]);
   const { feedback } = form.fields.phoneNumber;
