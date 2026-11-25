@@ -9,6 +9,8 @@ import { userProfileModal } from './features/user-profile/user-profile.modal';
 import { UserProfileModalReturn } from './features/user-profile/user-profile.modal-return';
 import type { MosaicExperimental } from './hooks/use-mosaic-experimental';
 import { MosaicExperimentalProvider } from './hooks/use-mosaic-experimental';
+import type { MosaicOptions } from './hooks/use-mosaic-options';
+import { MosaicOptionsProvider } from './hooks/use-mosaic-options';
 import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
@@ -26,6 +28,8 @@ export interface MosaicProviderProps {
   direction?: TextDirection;
   /** Per-name icon glyph overrides, applied to every `<Icon>` below this provider. */
   icons?: MosaicIconOverrides;
+  /** How every component below this provider looks; see `MosaicOptions`. A component's own `options` override these key by key. */
+  options?: MosaicOptions;
   /** Locale and strings for everything Mosaic renders; see `MosaicLocalization`. */
   localization?: MosaicLocalization;
   /** Features still being tried out. Their names and behavior can change in any release. */
@@ -44,6 +48,7 @@ export function MosaicProvider({
   localization,
   experimental,
   profile = defaultProfile,
+  options,
 }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
@@ -58,14 +63,16 @@ export function MosaicProvider({
           <MosaicNowProvider value={now}>
             <MosaicExperimentalProvider value={experimentalValue}>
               <MosaicProfileProvider value={profile}>
-                <ToastProvider>
-                  <VirtualStoreProvider>
-                    <ModalHost surfaces={modalSurfaces}>
-                      <UserProfileModalReturn />
-                      {children}
-                    </ModalHost>
-                  </VirtualStoreProvider>
-                </ToastProvider>
+                <MosaicOptionsProvider options={options}>
+                  <ToastProvider>
+                    <VirtualStoreProvider>
+                      <ModalHost surfaces={modalSurfaces}>
+                        <UserProfileModalReturn />
+                        {children}
+                      </ModalHost>
+                    </VirtualStoreProvider>
+                  </ToastProvider>
+                </MosaicOptionsProvider>
               </MosaicProfileProvider>
             </MosaicExperimentalProvider>
           </MosaicNowProvider>
