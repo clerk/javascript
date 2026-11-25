@@ -16,6 +16,7 @@ import {
   someOtherPublicKey,
 } from '../../fixtures';
 import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
+import { base64url } from '../../util/rfc4648';
 import { signJwt } from '../signJwt';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
@@ -97,6 +98,20 @@ describe('decodeJwt(jwt)', () => {
     const { errors: [error] = [] } = decodeJwt('YWJj.YWJj.YWJj');
     expect(error).toBeInstanceOf(TokenVerificationError);
     expect(error).toMatchObject({ reason: 'token-invalid' });
+  });
+
+  describe.each([
+    [0, 'header'],
+    [1, 'payload'],
+  ])('when segment %i (%s) is not a JSON object', segmentIndex => {
+    it.each([[null], [42], ['str'], [true], [[]]])('returns an error if it decodes to %j', value => {
+      const parts = mockJwt.split('.');
+      parts[segmentIndex] = base64url.stringify(new TextEncoder().encode(JSON.stringify(value)), { pad: false });
+
+      const { errors: [error] = [] } = decodeJwt(parts.join('.'));
+      expect(error).toBeInstanceOf(TokenVerificationError);
+      expect(error).toMatchObject({ reason: 'token-invalid' });
+    });
   });
 });
 
