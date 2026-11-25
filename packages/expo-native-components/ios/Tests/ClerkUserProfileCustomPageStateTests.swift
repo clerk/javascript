@@ -67,6 +67,24 @@ final class ClerkUserProfileCustomPageStateTests: XCTestCase {
   }
 
   @MainActor
+  func testUserArrivingAfterMountKeepsThePresentedPage() {
+    let state = ClerkUserProfileCustomPageState()
+    var events: [String] = []
+    state.setPageEventHandler { type, path in
+      events.append("\(type):\(path)")
+    }
+    state.userDidChange(to: nil)
+    state.navigationPathDidChange(makeNavigationPath("billing"))
+    state.pageDidPresent(path: "billing", navigationDepth: 1)
+    events.removeAll()
+
+    state.userDidChange(to: "user_1")
+
+    XCTAssertEqual(state.navigationPathForRestoration().count, 1)
+    XCTAssertEqual(events, [])
+  }
+
+  @MainActor
   func testUserIdentityChangeInvalidatesNavigationAndDismissesThePageOnce() {
     let state = ClerkUserProfileCustomPageState()
     var events: [String] = []
