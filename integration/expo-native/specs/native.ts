@@ -103,6 +103,7 @@ export function homeLinks(screen: Screen) {
     customSignUp: screen.getByTestId('e2e.home.customSignUp'),
     tokenCache: screen.getByTestId('e2e.home.tokenCache'),
     embeddedProfile: screen.getByTestId('e2e.home.embeddedProfile'),
+    nativeToWeb: screen.getByTestId('e2e.home.nativeToWeb'),
     nativeModules: screen.getByTestId('e2e.home.nativeModules'),
   };
 }
