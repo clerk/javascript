@@ -532,6 +532,23 @@ function contains(outer: DOMRect, inner: DOMRect) {
 }
 
 describe('the tooltip', () => {
+  it('opens on `side` at `sideOffset` from the period', async () => {
+    await render(
+      <Chart
+        width={800}
+        renderTooltip={active => <div style={{ width: 120 }}>{active.category}</div>}
+        tooltip={{ side: 'left', sideOffset: 24 }}
+      />,
+    );
+    const plot = surface().getBoundingClientRect();
+    await userEvent.hover(surface(), { position: { x: centerOfCategory(3).x - plot.left, y: plot.height - 4 } });
+    await expect.poll(() => screen.queryByTestId('tooltip')?.style.visibility).toBe('');
+
+    const tooltip = screen.getByTestId('tooltip');
+    expect(tooltip).toHaveAttribute('data-side', 'left');
+    expect(centerOfCategory(3).x - tooltip.getBoundingClientRect().right).toBeCloseTo(24, 0);
+  });
+
   it('opens beside the selected period and shows its content', async () => {
     await render(
       <BoundedChart

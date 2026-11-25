@@ -1,6 +1,6 @@
 import { type ReactNode, type RefObject, useLayoutEffect } from 'react';
 
-import { type ActiveBar, type BarChartInstance, Chart, type UseBarChartOptions } from '..';
+import { type ActiveBar, type BarChartInstance, Chart, type ChartTooltipProps, type UseBarChartOptions } from '..';
 
 export type TestChartProps<TDatum> = Pick<
   UseBarChartOptions<TDatum>,
@@ -15,12 +15,15 @@ export type TestChartProps<TDatum> = Pick<
   | 'onActivate'
   | 'messages'
   | 'formatValue'
+  | 'defaultSelection'
+  | 'disabled'
 > & {
   ariaLabel: string;
   formatXTick?: (value: string) => string | null;
   /** Mounts `Chart.Selection`. Default: true */
   selectionPart?: boolean;
   renderTooltip?: (active: ActiveBar<TDatum>) => ReactNode;
+  tooltip?: Pick<ChartTooltipProps, 'side' | 'sideOffset'>;
   boundary?: RefObject<HTMLElement | null>;
   height?: number | string;
   /** Mounts `Chart.Bar`. Default: true */
@@ -37,6 +40,7 @@ export function TestChart<TDatum>({
   formatXTick,
   selectionPart = true,
   renderTooltip,
+  tooltip,
   boundary,
   height,
   bar = true,
@@ -77,10 +81,16 @@ export function TestChart<TDatum>({
           <Chart.Cursor data-testid='cursor' />
           {renderTooltip ? (
             <Chart.Tooltip<ActiveBar<TDatum>>
-              boundaryRef={boundary}
-              data-testid='tooltip'
+              collisionBoundary={boundary}
+              {...tooltip}
             >
-              {renderTooltip}
+              {active => (
+                <Chart.TooltipPortal>
+                  <Chart.TooltipPositioner data-testid='tooltip'>
+                    <Chart.TooltipPopup>{renderTooltip(active)}</Chart.TooltipPopup>
+                  </Chart.TooltipPositioner>
+                </Chart.TooltipPortal>
+              )}
             </Chart.Tooltip>
           ) : null}
         </Chart.Selection>

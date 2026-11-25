@@ -7,6 +7,10 @@ import type {
   ChartProjectionOutlineProps,
   ChartRootProps,
   ChartSelectionProps,
+  ChartTooltipArrowProps,
+  ChartTooltipPopupProps,
+  ChartTooltipPortalProps,
+  ChartTooltipPositionerProps,
   ChartTooltipProps,
   ChartXAxisProps,
   ChartXTickProps,
@@ -185,18 +189,45 @@ export default {
     },
     'Chart.Tooltip': {
       description:
-        'A `div` portaled through `Portal` for the selected category. Opens to the right, flips left when it does not fit, and pins to the top of a plot narrower than 416px. Carries `data-side`, `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`. Throws outside `Chart.Selection`.',
+        'Positions a tooltip beside the selected category and renders no element. It provides the Tooltip primitive context, so `Chart.TooltipPortal`, `Chart.TooltipPositioner`, `Chart.TooltipPopup` and `Chart.TooltipArrow` render it. Opens on `side`, flips to the other side when it does not fit, and keeps the side it chose last. Throws outside `Chart.Selection`.',
       props: {
         children: {
           type: '(active: TActive) => React.ReactNode',
-          doc: 'Content for the selected category. Return null to hide the tooltip.',
+          doc: 'Renders the tooltip parts for the selected category. While the tooltip closes it receives the last selection.',
         },
-        boundaryRef: {
+        side: { type: "'left' | 'right'", doc: 'The side tried first.', default: "'right'" },
+        sideOffset: { type: 'number', doc: 'Distance in px from the category center.', default: '16' },
+        collisionPadding: {
+          type: 'number',
+          doc: 'Space in px kept between the tooltip and the boundary edges.',
+          default: '8',
+        },
+        collisionBoundary: {
           type: 'React.RefObject<HTMLElement | null>',
           doc: 'Element the tooltip stays inside.',
           default: 'the chart',
         },
+        pinned: {
+          type: "boolean | 'auto'",
+          doc: 'Pins the tooltip to the top left of the boundary. `auto` pins it below a 416px plot.',
+          default: "'auto'",
+        },
       },
+    },
+    'Chart.TooltipPortal': {
+      description:
+        'The Tooltip primitive `Portal`: renders its children through Mosaic `Portal` while the tooltip is mounted.',
+    },
+    'Chart.TooltipPositioner': {
+      description:
+        'The Tooltip primitive `Positioner`: a fixed `div` at the computed position, with `pointer-events: none` so it never takes the pointer from the chart. Carries `data-side`.',
+    },
+    'Chart.TooltipPopup': {
+      description:
+        'The Tooltip primitive `Popup`: the element that animates, with `data-open`, `data-closed`, `data-starting-style` and `data-ending-style`.',
+    },
+    'Chart.TooltipArrow': {
+      description: 'The Tooltip primitive `Arrow`, pointing at the selected category.',
     },
   },
   examples: [
@@ -221,7 +252,17 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
   </Chart.XAxis>
   <Chart.Selection>
     <Chart.Cursor className='cursor' />
-    <Chart.Tooltip<ActiveBar<Row>> className='tooltip'>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+    <Chart.Tooltip<ActiveBar<Row>>>
+      {active => (
+        <Chart.TooltipPortal>
+          <Chart.TooltipPositioner>
+            <Chart.TooltipPopup className='tooltip'>
+              <PeriodSummary row={active.datum} />
+            </Chart.TooltipPopup>
+          </Chart.TooltipPositioner>
+        </Chart.TooltipPortal>
+      )}
+    </Chart.Tooltip>
   </Chart.Selection>
 </Chart.Root>
 `,
@@ -257,7 +298,7 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   exports: {
     'Chart.useBarChart': {
       description:
-        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `onSelectionChange`, `onActivate`, `formatCategory`, `formatValue` and `messages`. Give each series a `label` so announcements name it. Returns the chart object for `Chart.Root`.',
+        'Lays out stacked bars and owns their selection: `Chart.useBarChart({ data, series, index })`, plus `categoryGap`, `margin`, `projection`, `isBarActive`, `selection`, `defaultSelection`, `onSelectionChange`, `onActivate`, `disabled`, `formatCategory`, `formatValue` and `messages`. Give each series a `label` so announcements name it. Returns the chart object for `Chart.Root`.',
     },
     'Chart.CanvasRenderError': {
       description:
@@ -278,4 +319,8 @@ const chart = Chart.useBarChart({ data, series, index, selection, onSelectionCha
   'Chart.Selection': ChartSelectionProps;
   'Chart.Cursor': ChartCursorProps;
   'Chart.Tooltip': ChartTooltipProps;
+  'Chart.TooltipPortal': ChartTooltipPortalProps;
+  'Chart.TooltipPositioner': ChartTooltipPositionerProps;
+  'Chart.TooltipPopup': ChartTooltipPopupProps;
+  'Chart.TooltipArrow': ChartTooltipArrowProps;
 }>;

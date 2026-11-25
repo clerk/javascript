@@ -81,7 +81,7 @@ function SelectionSurface({ forwardedRef, chart, ariaLabel, children, render, ..
   );
 
   const interaction = chart.getInteractionProps();
-  const focusable = interaction.tabIndex === 0 || tooltipCount > 0;
+  const focusable = !interaction['aria-disabled'] && (interaction.tabIndex === 0 || tooltipCount > 0);
   const surfaceProps = { ...interaction, tabIndex: focusable ? 0 : undefined };
   const { plot } = chart;
 
@@ -100,7 +100,7 @@ function SelectionSurface({ forwardedRef, chart, ariaLabel, children, render, ..
             pointerEvents: 'auto',
           }}
           aria-describedby={keyboardInstructionsId}
-          aria-label={focusable ? ariaLabel : undefined}
+          aria-label={focusable || surfaceProps['aria-disabled'] ? ariaLabel : undefined}
         >
           {children}
         </div>
