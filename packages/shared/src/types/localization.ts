@@ -1562,6 +1562,11 @@ export type __internal_LocalizationResource = {
       dynamic: LocalizationValue<'applicationName'>;
       metadataDocument: LocalizationValue<'metadataHost'>;
     };
+    organizationSelect: {
+      placeholder: LocalizationValue;
+      selectedCount: LocalizationValue<'count'>;
+      limit: LocalizationValue<'limit'>;
+    };
   };
   oauthDeviceVerification: {
     start: {

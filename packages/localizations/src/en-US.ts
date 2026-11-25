@@ -1146,6 +1146,11 @@ export const enUS: LocalizationResource = {
       metadataDocument: 'Details published by {{metadataHost}}.',
     },
     offlineAccessNotice: " You'll stay signed in until you sign out or revoke access.",
+    organizationSelect: {
+      limit: 'You can select up to {{limit}} organizations.',
+      placeholder: 'Select organizations',
+      selectedCount: '{{count}} organizations',
+    },
     redirectNotice: 'If you allow access, this app will redirect you to {{domainAction}}.',
     redirectUriModal: {
       subtitle: 'Make sure you trust {{applicationName}} and that this URL belongs to {{applicationName}}.',
