@@ -295,6 +295,78 @@ describe('Mosaic Menu', () => {
     expect(screen.getByRole('menuitem', { name: 'Sign out' }).querySelector('.cl-menu-item-media')).toBeInTheDocument();
   });
 
+  it('styles checkbox and radio items as rows and marks their indicator with its own slot', async () => {
+    const user = userEvent.setup();
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Popup>
+          <Menu.CheckboxItem label='Show archived'>
+            <Menu.Label>Show archived</Menu.Label>
+            <Menu.CheckboxItemIndicator data-testid='archived-check' />
+          </Menu.CheckboxItem>
+          <Menu.RadioGroup
+            aria-label='Accounts'
+            defaultValue='alice'
+          >
+            <Menu.RadioItem
+              label='Alice'
+              value='alice'
+            >
+              <Menu.Label>Alice</Menu.Label>
+              <Menu.RadioItemIndicator data-testid='alice-check' />
+            </Menu.RadioItem>
+          </Menu.RadioGroup>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+
+    const archived = screen.getByRole('menuitemcheckbox', { name: 'Show archived' });
+    expect(archived).toHaveClass('cl-menu-checkbox-item');
+    expect(screen.getByRole('group', { name: 'Accounts' })).toHaveClass('cl-menu-radio-group');
+    expect(screen.getByRole('menuitemradio', { name: 'Alice' })).toHaveClass('cl-menu-radio-item');
+    expect(screen.getByTestId('alice-check')).toHaveClass('cl-menu-radio-item-indicator');
+    expect(screen.getByTestId('archived-check')).not.toHaveAttribute('data-checked');
+
+    await user.click(archived);
+
+    expect(screen.getByTestId('archived-check')).toHaveClass('cl-menu-checkbox-item-indicator');
+  });
+
+  it('keeps a check mounted in every row by default, marking only the checked one', () => {
+    render(
+      <Menu.Root defaultOpen>
+        <Menu.Trigger />
+        <Menu.Popup>
+          <Menu.RadioGroup
+            aria-label='Accounts'
+            defaultValue='alice'
+          >
+            <Menu.RadioItem
+              label='Alice'
+              value='alice'
+            >
+              <Menu.Label>Alice</Menu.Label>
+              <Menu.RadioItemIndicator data-testid='alice-check' />
+            </Menu.RadioItem>
+            <Menu.RadioItem
+              label='Bob'
+              value='bob'
+            >
+              <Menu.Label>Bob</Menu.Label>
+              <Menu.RadioItemIndicator data-testid='bob-check' />
+            </Menu.RadioItem>
+          </Menu.RadioGroup>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+
+    expect(screen.getByTestId('alice-check').querySelector('svg')).toBeInTheDocument();
+    expect(screen.getByTestId('bob-check').querySelector('svg')).toBeInTheDocument();
+    expect(screen.getByTestId('alice-check')).toHaveAttribute('data-checked', '');
+    expect(screen.getByTestId('bob-check')).not.toHaveAttribute('data-checked');
+  });
+
   it('forwards the media ref and swaps its element via render', () => {
     const ref = React.createRef<HTMLSpanElement>();
     render(
@@ -332,29 +404,6 @@ describe('Mosaic Menu', () => {
     const label = screen.getByRole('menuitem', { name: 'colin@clerk.dev' }).querySelector('.cl-menu-item-label');
     expect(label?.tagName).toBe('SPAN');
     expect(label).toHaveTextContent('colin@clerk.dev');
-  });
-
-  it('sizes the media to sm by default, and reflects the size it is given', () => {
-    render(
-      <Menu.Root defaultOpen>
-        <Menu.Trigger />
-        <Menu.Popup>
-          <Menu.Item label='Sign out'>
-            <Menu.Media />
-            <Menu.Label>Sign out</Menu.Label>
-          </Menu.Item>
-          <Menu.Item label='colin@clerk.dev'>
-            <Menu.Media size='xs' />
-            <Menu.Label>colin@clerk.dev</Menu.Label>
-          </Menu.Item>
-        </Menu.Popup>
-      </Menu.Root>,
-    );
-
-    const mediaOf = (name: string) => screen.getByRole('menuitem', { name }).querySelector('.cl-menu-item-media');
-
-    expect(mediaOf('Sign out')).toHaveAttribute('data-size', 'sm');
-    expect(mediaOf('colin@clerk.dev')).toHaveAttribute('data-size', 'xs');
   });
 
   it('forwards the trigger ref', () => {

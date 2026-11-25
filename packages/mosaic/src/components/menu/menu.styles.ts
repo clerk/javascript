@@ -143,19 +143,7 @@ export const media = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-  },
-  xs: { width: space['4'] },
-  sm: { width: space['5'] },
-});
-
-// The item lays its children out in one flat row, so the label is what has to take the space
-// between the media and whatever trails it, rather than the row spacing the three evenly.
-// `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
-export const label = stylex.create({
-  base: {
-    paddingInline: space['1'],
-    flexGrow: 1,
-    minWidth: 0,
+    width: space['5'],
   },
 });
 
@@ -167,7 +155,27 @@ export const indicator = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'center',
-    width: space['4'],
+    visibility: { default: 'hidden', ':is([data-checked])': 'visible' },
+    width: space['5'],
+  },
+});
+
+export const radioGroup = stylex.create({
+  base: {
+    gap: space['0.5'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
+
+// The item lays its children out in one flat row, so the label is what has to take the space
+// between the media and whatever trails it, rather than the row spacing the three evenly.
+// `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
+export const label = stylex.create({
+  base: {
+    paddingInline: space['1'],
+    flexGrow: 1,
+    minWidth: 0,
   },
 });
 

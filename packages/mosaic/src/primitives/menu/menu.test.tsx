@@ -236,6 +236,232 @@ describe('Menu', () => {
     });
   });
 
+  describe('checkbox and radio items', () => {
+    function Checkable({
+      checked,
+      onCheckedChange,
+      value,
+      onValueChange,
+      groupDisabled,
+      itemDisabled,
+      closeOnClick,
+      keepMounted,
+    }: {
+      checked?: boolean;
+      onCheckedChange?: (checked: boolean) => void;
+      value?: string;
+      onValueChange?: (value: string) => void;
+      groupDisabled?: boolean;
+      itemDisabled?: boolean;
+      closeOnClick?: boolean;
+      keepMounted?: boolean;
+    }) {
+      return (
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Edit'>Edit</Menu.Item>
+              <Menu.CheckboxItem
+                label='Archived'
+                checked={checked}
+                onCheckedChange={onCheckedChange}
+                disabled={itemDisabled}
+                closeOnClick={closeOnClick}
+              >
+                Archived
+                <Menu.CheckboxItemIndicator
+                  data-testid='archived-indicator'
+                  keepMounted={keepMounted}
+                />
+              </Menu.CheckboxItem>
+              <Menu.RadioGroup
+                aria-label='Sort'
+                defaultValue={value === undefined ? 'name' : undefined}
+                value={value}
+                onValueChange={onValueChange}
+                disabled={groupDisabled}
+              >
+                <Menu.RadioItem
+                  label='Name'
+                  value='name'
+                >
+                  Name
+                  <Menu.RadioItemIndicator data-testid='name-indicator' />
+                </Menu.RadioItem>
+                <Menu.RadioItem
+                  label='Date'
+                  value='date'
+                  closeOnClick={closeOnClick}
+                >
+                  Date
+                  <Menu.RadioItemIndicator data-testid='date-indicator' />
+                </Menu.RadioItem>
+              </Menu.RadioGroup>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>
+      );
+    }
+
+    async function open(ui: React.ReactElement) {
+      const user = userEvent.setup();
+      render(ui);
+      await user.click(screen.getByText('Actions'));
+      return user;
+    }
+
+    it('toggles a checkbox item by click, Enter and Space, and keeps the menu open', async () => {
+      const onCheckedChange = vi.fn();
+      const user = await open(<Checkable onCheckedChange={onCheckedChange} />);
+      const item = screen.getByRole('menuitemcheckbox', { name: 'Archived' });
+      expect(item).toHaveAttribute('aria-checked', 'false');
+
+      await user.click(item);
+      expect(item).toHaveAttribute('aria-checked', 'true');
+      expect(item).toHaveAttribute('data-checked', '');
+      expect(onCheckedChange).toHaveBeenLastCalledWith(true);
+
+      item.focus();
+      await user.keyboard('{Enter}');
+      expect(item).toHaveAttribute('aria-checked', 'false');
+      expect(item).toHaveAttribute('data-unchecked', '');
+
+      await user.keyboard(' ');
+      expect(item).toHaveAttribute('aria-checked', 'true');
+      expect(onCheckedChange).toHaveBeenCalledTimes(3);
+      expect(screen.getByRole('menu')).toBeInTheDocument();
+    });
+
+    it('leaves a controlled checkbox item to its owner', async () => {
+      const onCheckedChange = vi.fn();
+      const user = await open(
+        <Checkable
+          checked
+          onCheckedChange={onCheckedChange}
+        />,
+      );
+      const item = screen.getByRole('menuitemcheckbox', { name: 'Archived' });
+
+      await user.click(item);
+
+      expect(onCheckedChange).toHaveBeenCalledWith(false);
+      expect(item).toHaveAttribute('aria-checked', 'true');
+    });
+
+    it('checks one radio item in its group and keeps the menu open', async () => {
+      const onValueChange = vi.fn();
+      const user = await open(<Checkable onValueChange={onValueChange} />);
+      expect(screen.getByRole('group', { name: 'Sort' })).toBeInTheDocument();
+      const name = screen.getByRole('menuitemradio', { name: 'Name' });
+      const date = screen.getByRole('menuitemradio', { name: 'Date' });
+      expect(name).toHaveAttribute('aria-checked', 'true');
+      expect(date).toHaveAttribute('aria-checked', 'false');
+
+      await user.click(date);
+
+      expect(onValueChange).toHaveBeenCalledWith('date');
+      expect(date).toHaveAttribute('aria-checked', 'true');
+      expect(name).toHaveAttribute('aria-checked', 'false');
+      expect(screen.getByRole('menu')).toBeInTheDocument();
+    });
+
+    it('closes the menu when an item asks to', async () => {
+      const user = await open(<Checkable closeOnClick />);
+
+      await user.click(screen.getByRole('menuitemradio', { name: 'Date' }));
+
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
+
+    it('ignores a disabled checkbox item and a disabled radio group', async () => {
+      const onCheckedChange = vi.fn();
+      const onValueChange = vi.fn();
+      const user = await open(
+        <Checkable
+          itemDisabled
+          groupDisabled
+          value='name'
+          onCheckedChange={onCheckedChange}
+          onValueChange={onValueChange}
+        />,
+      );
+      const archived = screen.getByRole('menuitemcheckbox', { name: 'Archived' });
+      const date = screen.getByRole('menuitemradio', { name: 'Date' });
+      expect(archived).toHaveAttribute('aria-disabled', 'true');
+      expect(date).toHaveAttribute('aria-disabled', 'true');
+
+      await user.click(archived);
+      await user.click(date);
+
+      expect(onCheckedChange).not.toHaveBeenCalled();
+      expect(onValueChange).not.toHaveBeenCalled();
+      expect(archived).toHaveAttribute('aria-checked', 'false');
+      expect(date).toHaveAttribute('aria-checked', 'false');
+    });
+
+    it('renders an indicator only while its item is checked, unless kept mounted', async () => {
+      const user = await open(<Checkable />);
+      expect(screen.getByTestId('name-indicator')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.queryByTestId('date-indicator')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('archived-indicator')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('menuitemradio', { name: 'Date' }));
+
+      expect(screen.getByTestId('date-indicator')).toBeInTheDocument();
+      expect(screen.queryByTestId('name-indicator')).not.toBeInTheDocument();
+    });
+
+    it('keeps a kept-mounted indicator in the DOM, marked unchecked', async () => {
+      await open(<Checkable keepMounted />);
+
+      expect(screen.getByTestId('archived-indicator')).toHaveAttribute('data-unchecked', '');
+    });
+
+    it('navigates and typeaheads across plain, checkbox and radio items alike', async () => {
+      const user = await open(<Checkable />);
+
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('menuitemcheckbox', { name: 'Archived' })).toHaveFocus();
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('menuitemradio', { name: 'Name' })).toHaveFocus();
+      await user.keyboard('d');
+      expect(screen.getByRole('menuitemradio', { name: 'Date' })).toHaveFocus();
+    });
+
+    it('throws when an indicator or radio item is used outside its owner', () => {
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      expect(() => render(<Menu.CheckboxItemIndicator />)).toThrow('must be used within <Menu.CheckboxItem>');
+      expect(() => render(<Menu.RadioItemIndicator />)).toThrow('must be used within <Menu.RadioItem>');
+      expect(() =>
+        render(
+          <Menu.Root defaultOpen>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Popup>
+                <Menu.RadioItem
+                  label='Name'
+                  value='name'
+                >
+                  Name
+                </Menu.RadioItem>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Root>,
+        ),
+      ).toThrow('must be used within <Menu.RadioGroup>');
+      vi.mocked(console.error).mockRestore();
+    });
+
+    it('has no axe violations', async () => {
+      await open(<Checkable />);
+
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
+    });
+  });
+
   describe('Arrow', () => {
     it('forwards a ref to the arrow element', async () => {
       const user = userEvent.setup();

@@ -78,14 +78,14 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>
             {action.status !== undefined ? (
-              <Menu.Indicator>
+              <Menu.Media>
                 {action.status === 'pending' && showSpinner ? (
                   <Spinner
                     size='sm'
                     label={action.label}
                   />
                 ) : null}
-              </Menu.Indicator>
+              </Menu.Media>
             ) : null}
           </Menu.Item>
         ))}

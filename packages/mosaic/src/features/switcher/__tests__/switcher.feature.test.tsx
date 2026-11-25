@@ -198,7 +198,7 @@ describe('Switcher', () => {
 
       expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
       const menu = await openAccounts(user);
-      expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).toBeInTheDocument();
+      expect(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' })).toBeInTheDocument();
     });
   });
 
@@ -273,7 +273,7 @@ describe('Switcher', () => {
       const user = await open();
 
       const menu = await openAccounts(user);
-      expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).toBeInTheDocument();
+      expect(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Other' })).toBeNull();
     });
   });
@@ -284,11 +284,23 @@ describe('Switcher', () => {
       const user = await open();
 
       const menu = await openAccounts(user);
-      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+      await user.click(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' }));
 
       await waitFor(() => expect(trigger()).toHaveAccessibleName('Open account menu for Bob Jones'));
       await waitFor(() => expect(waiting()).toBe(false));
       expect(popup()).toBeInTheDocument();
+    });
+
+    it('closes the flyout without switching when the account it is on is picked', async () => {
+      const { navigate } = await renderSwitcher();
+      const user = await open();
+
+      const menu = await openAccounts(user);
+      await user.click(within(menu).getByRole('menuitemradio', { name: 'alice' }));
+
+      await waitFor(() => expect(menu).not.toBeInTheDocument());
+      expect(navigate).not.toHaveBeenCalled();
+      expect(waiting()).toBe(false);
     });
 
     it('lands a switched account where the instance sends it', async () => {
@@ -299,7 +311,7 @@ describe('Switcher', () => {
       const user = await open();
 
       const menu = await openAccounts(user);
-      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+      await user.click(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' }));
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith(expect.stringMatching(/\/switched$/)));
     });
@@ -717,7 +729,7 @@ describe('Switcher', () => {
       const user = await open();
 
       const menu = await openAccounts(user);
-      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+      await user.click(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' }));
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/sign-in#/tasks/choose-organization'));
     });
@@ -810,7 +822,7 @@ describe('Switcher', () => {
       try {
         const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
         const menu = await openAccounts(user);
-        await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+        await user.click(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' }));
         expect(waiting()).toBe(true);
         await waitFor(() => expect(touch.requests).toHaveLength(1));
 
@@ -963,7 +975,9 @@ describe('Switcher', () => {
       await renderSwitcher({ mode: 'user' });
       const user = await open();
 
-      const items = within(await openAccounts(user)).getAllByRole('menuitem');
+      const items = Array.from(
+        (await openAccounts(user)).querySelectorAll('[role="menuitemradio"], [role="menuitem"]'),
+      );
 
       expect(items).toHaveLength(4);
       expect(items[0]).toHaveAccessibleName('alice');
@@ -1042,8 +1056,12 @@ describe('Switcher', () => {
 
       const menu = await openAccounts(user);
 
-      expect(within(menu).getByRole('menuitem', { name: 'alice' })).toHaveAttribute('aria-current', 'true');
-      expect(within(menu).getByRole('menuitem', { name: 'bob@example.com' })).not.toHaveAttribute('aria-current');
+      expect(within(menu).getByRole('group', { name: 'Switch account' })).toBeInTheDocument();
+      expect(within(menu).getByRole('menuitemradio', { name: 'alice' })).toHaveAttribute('aria-checked', 'true');
+      expect(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' })).toHaveAttribute(
+        'aria-checked',
+        'false',
+      );
       expect(within(menu).getByRole('menuitem', { name: 'Add account' })).toBeInTheDocument();
       expect(within(menu).getByRole('menuitem', { name: 'Sign out of all accounts' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Add account' })).toBeNull();
@@ -1290,7 +1308,7 @@ describe('Switcher', () => {
         const touch = holdRequests('post', '/v1/client/sessions/:id/touch');
 
         await openAccounts(user).then(menu =>
-          user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' })),
+          user.click(within(menu).getByRole('menuitemradio', { name: 'bob@example.com' })),
         );
 
         const after = screen.getByRole('button', { name: label });
