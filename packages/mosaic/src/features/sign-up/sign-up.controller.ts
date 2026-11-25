@@ -181,7 +181,7 @@ export function useSignUpController(
       protect: model.protect,
       expiredReloads: expiredProtectReloads,
       onNext: next,
-      isPending: isFinishing,
+      isPending: isHolding,
       globalErrorMessage: finishError,
     },
     restricted: {
