@@ -132,7 +132,7 @@ The namespace also holds `Chart.useBarChart` and `Chart.CanvasRenderError`.
 | `Chart.XAxis` | `format`   | `(key: string) => string \| null`        | the key       | Labels a category, or returns null to omit it                                                  |
 | `Chart.XAxis` | `children` | `(ticks: XTick[]) => ReactNode`          | —             | Renders the labels                                                                             |
 
-`Chart.YLine` takes `value`, the Y value it marks: a grid tick's `value`, `0` for a zero line, or any reference value. `Chart.YTick` and `Chart.XTick` take the `tick` their container passed: `{ value, y, label }` for Y, `{ key, category, label, x, textAnchor }` for X. `XTick.category` is the labelled category key, or null for a calendar boundary label. Calendar labels sit between the centers of the categories dated around them.
+Each X label centers under its category, and moves to the plot's edge only where centered it would overflow, so a few wide bars keep their labels under them and a dense axis still shows its first and last dates. `Chart.YLine` takes `value`, the Y value it marks: a grid tick's `value`, `0` for a zero line, or any reference value. `Chart.YTick` and `Chart.XTick` take the `tick` their container passed: `{ value, y, label }` for Y, `{ key, category, label, x, textAnchor }` for X. `XTick.category` is the labelled category key, or null for a calendar boundary label. Calendar labels sit between the centers of the categories dated around them.
 
 `Chart.Selection` and `Chart.Cursor` take only the props of their element.
 
