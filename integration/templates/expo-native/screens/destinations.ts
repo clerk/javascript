@@ -5,6 +5,7 @@ export type Destination =
   | 'customSignUp'
   | 'nativeModules'
   | 'embeddedProfile'
+  | 'nativeToWeb'
   | 'tokenCache';
 
 type HomeLink = {
@@ -26,6 +27,7 @@ const homeLinks: readonly HomeLink[] = [
   { opens: 'customSignUp', label: 'Custom sign-up', testID: 'e2e.home.customSignUp', shownWhen: 'signedOut' },
   { opens: 'nativeModules', label: 'Native modules', testID: 'e2e.home.nativeModules', shownWhen: 'signedOut' },
   { opens: 'embeddedProfile', label: 'Embedded profile', testID: 'e2e.home.embeddedProfile', shownWhen: 'signedIn' },
+  { opens: 'nativeToWeb', label: 'Native to Web SSO', testID: 'e2e.home.nativeToWeb', shownWhen: 'signedIn' },
   { opens: 'tokenCache', label: 'Token cache', testID: 'e2e.home.tokenCache', shownWhen: 'always' },
 ];
 

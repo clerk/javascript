@@ -20,6 +20,7 @@ import { type Destination, homeLinksFor } from '../screens/destinations';
 import { EmbeddedProfile } from '../screens/EmbeddedProfile';
 import { Home } from '../screens/Home';
 import { NativeModules } from '../screens/NativeModules';
+import { NativeToWeb } from '../screens/NativeToWeb';
 import { readClientTokenKept, TokenCache } from '../screens/TokenCache';
 import { publishableKeyFailure, type VerifyFailure, type VerifyLaunch } from './launch';
 import { type VerifyState, verifyStateJson, type VerifyTicket } from './state';
@@ -237,6 +238,8 @@ function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): React
       return <EmbeddedProfile onHostBack={goHome} />;
     case 'nativeModules':
       return <NativeModules />;
+    case 'nativeToWeb':
+      return <NativeToWeb onDone={goHome} />;
   }
 }
 
