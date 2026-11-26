@@ -19,14 +19,17 @@ import {
 } from './sign-up.fixtures';
 
 const IDP_URL = 'https://idp.example/sso?strategy=enterprise_sso';
-const SEVERAL_CONNECTIONS = 'An enterprise connection ID is required when the domain has several connections.';
+const START_FAILED = 'Enterprise SSO is not available for this domain.';
 const HOLD = { timeout: 4000 };
 
 const oneConnection: FakeFapiSeed = {
   signUp: { enterpriseDomains: ['example.com'], oauth: { enterprise_sso: { emailAddress: EMAIL } } },
 };
-const severalConnections: FakeFapiSeed = {
-  signUp: { enterpriseDomains: ['example.com'], enterpriseConnectionCount: 2 },
+const startFails: FakeFapiSeed = {
+  signUp: {
+    enterpriseDomains: ['example.com'],
+    enterpriseSsoRejected: { code: 'enterprise_sso_unavailable', message: START_FAILED },
+  },
 };
 
 const starts = (fapi: ReturnType<typeof serveFapi>) =>
@@ -116,9 +119,9 @@ describe('submitting the form with an email that belongs to an enterprise connec
   });
 
   it('shows why the redirect could not start on the form', async () => {
-    const { leave } = await submitEnterpriseEmail(severalConnections);
+    const { leave } = await submitEnterpriseEmail(startFails);
 
-    expect(await screen.findByText(SEVERAL_CONNECTIONS)).toBeInTheDocument();
+    expect(await screen.findByText(START_FAILED)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(emailField()).toHaveValue(EMAIL);
     expect(continueButton()).not.toHaveAttribute('aria-busy', 'true');
@@ -214,10 +217,10 @@ describe('arriving on the enterprise route with no form to hold', () => {
   });
 
   it('offers Start over with the reason when the redirect cannot start', async () => {
-    const { leave, user } = await arriveOnEnterpriseRoute(severalConnections);
+    const { leave, user } = await arriveOnEnterpriseRoute(startFails);
 
     expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent(SEVERAL_CONNECTIONS);
+    expect(screen.getByRole('alert')).toHaveTextContent(START_FAILED);
     expect(leave).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Start over' }));

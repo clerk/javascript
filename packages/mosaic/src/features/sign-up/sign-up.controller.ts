@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { AuthActionBlockedDetails } from '../../blocks/auth';
+import type { AuthActionBlockedDetails, AuthProvider } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
@@ -79,8 +79,13 @@ const finishMachine = finish.createMachine({
   },
 });
 
-function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel, isBlocked: boolean): SignUpScreen {
-  if (route === undefined || route === 'enterpriseConnections') {
+function screenFor(
+  route: SignUpRoute | undefined,
+  flow: SignUpFlowModel,
+  isBlocked: boolean,
+  hasConnections: boolean,
+): SignUpScreen {
+  if (route === undefined || (route === 'enterpriseConnections' && !hasConnections)) {
     return 'startOver';
   }
   if (isBlocked && (route === 'start' || route === 'protectCheck' || route === 'continueProtectCheck')) {
@@ -116,6 +121,8 @@ export function useSignUpController(
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
   const [blocked, setBlocked] = useState<AuthActionBlockedDetails>();
+  const [connections, setConnections] = useState<readonly AuthProvider[]>();
+  const connectionActions = usePendingAction<string>();
   const expiredProtectReloads = useRef(0);
   const outcome = flowOutcome({
     session: liveModel.flow.session,
@@ -138,12 +145,15 @@ export function useSignUpController(
   const isReturning = actions.pendingKey === 'return' || (flow.isReturning && actions.lastKey === undefined);
   const shown = shownRoute(route, outcome, flow.step);
   const startsEnterpriseSso =
-    outcome.type === 'resource' && shown === 'enterpriseConnections' && actions.lastKey !== 'enterpriseSso';
+    outcome.type === 'resource' &&
+    shown === 'enterpriseConnections' &&
+    connections === undefined &&
+    actions.lastKey !== 'enterpriseSso';
   const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
   const screen =
     isReturning || startsEnterpriseSso || actions.pendingKey === 'ticket' || actions.pendingKey === 'enterpriseSso'
       ? 'loading'
-      : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
+      : (heldScreen ?? screenFor(shown, flow, blocked !== undefined, connections !== undefined));
 
   useRouteGuard({ route, go }, shown);
 
@@ -158,6 +168,13 @@ export function useSignUpController(
     }
     if (result.type === 'transfer') {
       completeReturn();
+      return;
+    }
+    if (result.type === 'enterprise_connections') {
+      setConnections(result.connections);
+      if (route !== 'enterpriseConnections') {
+        go('enterpriseConnections');
+      }
       return;
     }
     const nextRoute = routeFor(result, route);
@@ -194,7 +211,11 @@ export function useSignUpController(
     if (startsEnterpriseSso) {
       if (!actions.isPending) {
         void actions.run('enterpriseSso', async () => {
-          await flow.startEnterpriseSso();
+          const result = await flow.startEnterpriseSso();
+          if (result) {
+            next(result);
+            return;
+          }
           await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
         });
       }
@@ -256,6 +277,21 @@ export function useSignUpController(
       onSignIn: navigation.goToSignIn,
     },
     actionBlocked: blocked,
+    enterpriseConnections: connections && {
+      options: connections,
+      pendingConnectionId: connectionActions.pendingKey,
+      globalErrorMessage: connectionActions.error,
+      onSelectConnection: (id: string) =>
+        void connectionActions.run(id, async () => {
+          await flow.startEnterpriseSso(id);
+          await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+        }),
+      onCancel: () => {
+        go('start');
+        setConnections(undefined);
+        connectionActions.reset();
+      },
+    },
     startOver: {
       isPending: actions.isPending,
       globalErrorMessage: actions.error,

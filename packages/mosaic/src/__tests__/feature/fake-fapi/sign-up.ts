@@ -4,6 +4,7 @@ import type {
   PhoneCodeChannel,
   SessionJSON,
   SignInJSON,
+  SignUpEnterpriseConnectionJSON,
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
@@ -29,6 +30,8 @@ export interface FakeSignUpSeed {
   takenEmailAddresses?: string[];
   enterpriseDomains?: string[];
   enterpriseConnectionCount?: number;
+  enterpriseConnectionListing?: 'feature_not_enabled' | 'empty';
+  enterpriseSsoRejected?: FakeEnterpriseSsoRejection;
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
@@ -50,6 +53,12 @@ export type FakeOAuthAccount =
   | { signedInSession: string }
   | { error: { code: string; message: string; meta?: ClerkAPIErrorJSON['meta'] } };
 
+export interface FakeEnterpriseSsoRejection {
+  connectionId?: string;
+  code: string;
+  message: string;
+}
+
 type ProtectCheckOn = 'create' | 'update' | 'oauth_callback';
 
 export type FakeTicket = { emailAddress: string } | 'expired';
@@ -58,6 +67,8 @@ export interface FakeSignUpState {
   takenEmailAddresses: string[];
   enterpriseDomains: string[];
   enterpriseConnectionCount: number;
+  enterpriseConnectionListing?: 'feature_not_enabled' | 'empty';
+  enterpriseSsoRejected?: FakeEnterpriseSsoRejection;
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
@@ -107,6 +118,8 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     ...seed,
   };
 }
+
+const ENTERPRISE_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
 export const PROTECT_CHECK_SCRIPT = `
 export default (container, { token, setWidgetVisible }) =>
@@ -337,11 +350,32 @@ export function signUpHandlers(
     };
   };
 
+  const enterpriseConnections = (): SignUpEnterpriseConnectionJSON[] =>
+    Array.from({ length: state.signUp.enterpriseConnectionCount }, (_, index) => ({
+      object: 'enterprise_connection',
+      id: `entc_${index + 1}`,
+      name: `Acme SSO ${index + 1}`,
+      provider: 'saml_okta',
+      logo_public_url: index === 0 ? ENTERPRISE_LOGO : null,
+    }));
+
   const startEnterpriseSso = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
     if (!inEnterpriseDomain(signUp)) {
       return rejected('form_param_value_invalid', 'strategy does not match one of the allowed values.', 'strategy');
     }
-    if (state.signUp.enterpriseConnectionCount > 1 && !body.get('enterprise_connection_id')) {
+    const connectionId = body.get('enterprise_connection_id') ?? undefined;
+    const rejection = state.signUp.enterpriseSsoRejected;
+    if (rejection && rejection.connectionId === connectionId) {
+      return rejected(rejection.code, rejection.message);
+    }
+    if (connectionId && !enterpriseConnections().some(connection => connection.id === connectionId)) {
+      return rejected(
+        'form_param_value_invalid',
+        'enterprise_connection_id does not match one of the allowed values.',
+        'enterprise_connection_id',
+      );
+    }
+    if (state.signUp.enterpriseConnectionCount > 1 && !connectionId) {
       return rejected(
         'enterprise_connection_id_is_required_with_multiple_connections',
         'An enterprise connection ID is required when the domain has several connections.',
@@ -360,7 +394,7 @@ export function signUpHandlers(
           ...fapiVerification('enterprise_sso'),
           next_action: '',
           supported_strategies: ['enterprise_sso'],
-          external_verification_redirect_url: 'https://idp.example/sso?strategy=enterprise_sso',
+          external_verification_redirect_url: `https://idp.example/sso?strategy=enterprise_sso${connectionId ? `&connection=${connectionId}` : ''}`,
         },
       },
     };
@@ -702,6 +736,18 @@ export function signUpHandlers(
         return store(settle({ ...signUp, protect_check: protectCheck(false) }));
       }
       return store(settle(issueProtectCheck({ ...signUp, protect_check: null }, state.signUp.protectCheckOn)));
+    }),
+    http.get(fapiUrl('/v1/client/sign_ups/:id/enterprise_connections'), ({ params }) => {
+      if (!current(params.id)) {
+        return missing();
+      }
+      if (state.signUp.enterpriseConnectionListing === 'feature_not_enabled') {
+        return rejected('feature_not_enabled', 'This feature is not enabled on this instance.', undefined, 403);
+      }
+      return envelope(
+        state.signUp.enterpriseConnectionListing === 'empty' ? [] : enterpriseConnections(),
+        state.client,
+      );
     }),
     http.get(fapiUrl('/v1/client/sign_ups/:id'), ({ params }) => {
       const signUp = current(params.id);

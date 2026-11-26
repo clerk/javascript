@@ -101,7 +101,7 @@ interface SignUpDetailsOptions {
   onSubmit?: () => void;
   onNext: (result: SignUpCreateResult) => void;
   onSignIn: () => void;
-  startEnterpriseSso: () => Promise<void>;
+  startEnterpriseSso: () => Promise<SignUpCreateResult | undefined>;
 }
 
 export function useSignUpDetailsController(
@@ -139,7 +139,10 @@ export function useSignUpDetailsController(
       if (result.type !== 'enterprise_sso') {
         return result;
       }
-      await startEnterpriseSso();
+      const connections = await startEnterpriseSso();
+      if (connections) {
+        return connections;
+      }
       await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
       return undefined;
     },

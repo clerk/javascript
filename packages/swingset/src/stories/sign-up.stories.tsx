@@ -372,16 +372,40 @@ export function EmailLinkSignedUp() {
   );
 }
 
+const enterpriseConnections = {
+  options: [
+    { id: 'acme-okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
+    { id: 'acme-google', name: 'Acme Google Workspace', iconUrl: 'https://img.clerk.com/static/google.svg' },
+  ],
+  onSelectConnection: noop,
+  onCancel: noop,
+};
+
 export function EnterpriseConnections() {
   return (
     <ScreenPanel
       screen='enterpriseConnections'
+      enterpriseConnections={enterpriseConnections}
+    />
+  );
+}
+
+export function EnterpriseConnectionsPending() {
+  return (
+    <ScreenPanel
+      screen='enterpriseConnections'
+      enterpriseConnections={{ ...enterpriseConnections, pendingConnectionId: 'acme-okta' }}
+    />
+  );
+}
+
+export function EnterpriseConnectionsError() {
+  return (
+    <ScreenPanel
+      screen='enterpriseConnections'
       enterpriseConnections={{
-        options: [
-          { id: 'acme-okta', name: 'Acme Okta', iconUrl: 'https://img.clerk.com/static/okta.svg' },
-          { id: 'acme-google', name: 'Acme Google Workspace', iconUrl: 'https://img.clerk.com/static/google.svg' },
-        ],
-        onSelectConnection: noop,
+        ...enterpriseConnections,
+        globalErrorMessage: 'Something went wrong. Please try again.',
       }}
     />
   );

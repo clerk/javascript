@@ -113,6 +113,7 @@ export interface SignUpEnterpriseConnectionsScreen {
   pendingConnectionId?: string;
   globalErrorMessage?: string;
   onSelectConnection: (id: string) => void;
+  onCancel?: () => void;
 }
 
 export interface SignUpWalletsScreen {

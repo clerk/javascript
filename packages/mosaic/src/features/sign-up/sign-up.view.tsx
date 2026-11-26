@@ -178,12 +178,14 @@ export function SignUpView(props: SignUpViewProps) {
                     title: m.enterpriseConnections.title,
                     description: m.enterpriseConnections.description,
                     pendingLabel: m.enterpriseConnections.pending,
+                    secondaryActionLabel: m.back,
                   }}
                   logo={logo}
                   connections={enterpriseConnections.options}
                   globalErrorMessage={enterpriseConnections.globalErrorMessage}
                   pendingConnectionId={enterpriseConnections.pendingConnectionId}
                   onSelectConnection={enterpriseConnections.onSelectConnection}
+                  onCancel={enterpriseConnections.onCancel}
                 />
               ) : null}
             </Flow.Step>
