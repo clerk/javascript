@@ -1,3 +1,5 @@
+'use client';
+
 import type { CountryEntry } from '@clerk/shared/phone';
 import { extractDigits, getCountryFromPhoneString } from '@clerk/shared/phone';
 

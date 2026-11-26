@@ -116,6 +116,14 @@ export default {
     },
   ],
   related: ['Dialog', 'Banner', 'Flow', 'Branding'],
+  exports: {
+    useCardActions: {
+      description: 'Returns how the enclosing card lays out its actions: `stacked`, `end` or `fill`.',
+    },
+    useCardAlign: {
+      description: 'Returns the alignment of the enclosing card, `start` or `center`.',
+    },
+  },
 } satisfies ComponentDoc<{
   'Card.Root': CardProps;
   'Card.Lead': MosaicComponentProps<'div'>;

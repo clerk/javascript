@@ -72,4 +72,9 @@ export default {
     },
   ],
   related: ['Input', 'InputGroup', 'Field'],
+  exports: {
+    isCompletePhoneNumber: {
+      description: 'Whether a phone number has all the digits its country needs.',
+    },
+  },
 } satisfies ComponentDoc<{ PhoneInput: PhoneInputProps }>;

@@ -1,5 +1,12 @@
 import type { ComponentDoc } from '../../docs-schema';
-import type { AvatarFallbackProps, AvatarIconProps, AvatarImageProps, AvatarProps } from './avatar';
+import type {
+  AvatarFallbackProps,
+  AvatarGroupProps,
+  AvatarIconProps,
+  AvatarImageProps,
+  AvatarOverflowProps,
+  AvatarProps,
+} from './avatar';
 
 export default {
   name: 'Avatar',
@@ -41,10 +48,24 @@ export default {
       description: 'An optional icon over the corner of the avatar.',
       slot: 'cl-avatar-icon',
     },
+    'Avatar.Group': {
+      description: 'Lays out overlapping avatars and gives each the same size.',
+      slot: 'cl-avatar-group',
+      props: {
+        size: { type: "'xs' | 'sm' | 'md' | 'lg' | 'fit'", doc: 'The size of every avatar inside.', default: "'xs'" },
+      },
+    },
+    'Avatar.Overflow': {
+      description: 'An avatar that shows how many more there are, such as `+3`.',
+      slot: 'cl-avatar',
+      props: { count: { type: 'number', doc: 'The number of avatars not shown.' } },
+    },
   },
 } satisfies ComponentDoc<{
   'Avatar.Root': AvatarProps;
   'Avatar.Image': AvatarImageProps;
   'Avatar.Fallback': AvatarFallbackProps;
   'Avatar.Icon': AvatarIconProps;
+  'Avatar.Group': AvatarGroupProps;
+  'Avatar.Overflow': AvatarOverflowProps;
 }>;
