@@ -5,7 +5,6 @@ import {
   AuthEmailLinkStatus,
   AuthEnterpriseConnections,
   AuthLoading,
-  AuthProtectCheck,
   AuthStartOver,
   AuthWallets,
 } from '../../blocks/auth';
@@ -20,8 +19,7 @@ import { SignUpRestricted } from './sign-up-restricted/sign-up-restricted';
 
 export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');
-  const { applicationName, applicationLogoUrl } = props;
-  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+  const { applicationName, logo } = props;
 
   return (
     <Card.Root
@@ -204,19 +202,7 @@ export function SignUpView(props: SignUpViewProps) {
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={['protectCheck']}>
-              {protectCheck ? (
-                <AuthProtectCheck
-                  messages={{ ...m.protectCheck, loading: m.loading }}
-                  challenge={protectCheck.challenge}
-                  logo={logo}
-                  globalErrorMessage={protectCheck.globalErrorMessage}
-                  isPending={protectCheck.isPending}
-                  containerRef={protectCheck.containerRef}
-                  onRetry={protectCheck.onRetry}
-                />
-              ) : null}
-            </Flow.Step>
+            <Flow.Step ids={['protectCheck', 'continueProtectCheck']}>{protectCheck}</Flow.Step>
           </>
         )}
       </Flow.Root>

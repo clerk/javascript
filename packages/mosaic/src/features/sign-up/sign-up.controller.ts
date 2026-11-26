@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { AuthActionBlockedDetails } from '../../blocks/auth';
 import { usePendingAction } from '../../hooks/use-pending-action';
@@ -15,7 +15,7 @@ import { flowOutcome } from '../auth-flow/auth-flow.utils';
 import type { SignUpCreateResult, SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
 import { detailsRouteFor, routeFor, shownRoute, signUpRoutes } from './sign-up.routes';
-import type { SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
+import type { SignUpProtectScreen, SignUpScreen, SignUpVerifyScreen, SignUpViewProps } from './sign-up.types';
 import { useSignUpDetailsController } from './sign-up-details/sign-up-details.controller';
 
 interface FinishContext {
@@ -72,14 +72,14 @@ const finishMachine = finish.createMachine({
 });
 
 function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode'], isBlocked: boolean): SignUpScreen {
-  if (route === undefined || route === 'enterpriseConnections' || route === 'protectCheck') {
+  if (route === undefined || route === 'enterpriseConnections') {
     return 'startOver';
+  }
+  if (isBlocked && (route === 'start' || route === 'protectCheck' || route === 'continueProtectCheck')) {
+    return 'actionBlocked';
   }
   if (route !== 'start') {
     return route;
-  }
-  if (isBlocked) {
-    return 'actionBlocked';
   }
   return mode === 'public' ? 'start' : mode;
 }
@@ -88,12 +88,13 @@ type SignUpControllerResult =
   | { status: 'hidden' }
   | (Omit<
       SignUpViewProps,
-      'applicationName' | 'applicationLogoUrl' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone'
+      'applicationName' | 'logo' | 'taskChooseOrganization' | 'verifyEmail' | 'verifyPhone' | 'protectCheck'
     > & {
       status: 'ready';
       attempt?: string;
       verifyEmail: SignUpVerifyScreen;
       verifyPhone: SignUpVerifyScreen;
+      protectCheck: SignUpProtectScreen;
     });
 
 export function useSignUpController(
@@ -106,6 +107,7 @@ export function useSignUpController(
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
   const [blocked, setBlocked] = useState<AuthActionBlockedDetails>();
+  const expiredProtectReloads = useRef(0);
   const outcome = flowOutcome({
     session: liveModel.flow.session,
     entry: arrival.session,
@@ -175,6 +177,13 @@ export function useSignUpController(
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },
     verifyPhone: { ...verify, verification: verification.phone },
+    protectCheck: {
+      protect: model.protect,
+      expiredReloads: expiredProtectReloads,
+      onNext: next,
+      isPending: isHolding,
+      globalErrorMessage: finishError,
+    },
     restricted: {
       globalErrorMessage: details.error ?? flowError,
       onEmailSupport: navigation.emailSupport,

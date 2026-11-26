@@ -13,6 +13,7 @@ import { useSignUpController } from './sign-up.controller';
 import type { SignUpReadyModel } from './sign-up.model';
 import { useSignUpModel } from './sign-up.model';
 import { SignUpView } from './sign-up.view';
+import { SignUpProtect } from './sign-up-protect/sign-up-protect';
 import { SignUpVerify } from './sign-up-verify/sign-up-verify';
 
 export interface SignUpProps {
@@ -74,7 +75,9 @@ function SignUpFlow({
     return null;
   }
 
-  const { status: _status, attempt, verifyEmail, verifyPhone, ...view } = controller;
+  const { status: _status, attempt, verifyEmail, verifyPhone, protectCheck, ...view } = controller;
+  const { applicationName, applicationLogoUrl } = model.app;
+  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
 
   return (
     <SignUpView
@@ -93,8 +96,15 @@ function SignUpFlow({
           {...verifyPhone}
         />
       }
-      applicationName={model.app.applicationName}
-      applicationLogoUrl={model.app.applicationLogoUrl}
+      protectCheck={
+        <SignUpProtect
+          key={protectCheck.protect.challengeId}
+          logo={logo}
+          {...protectCheck}
+        />
+      }
+      applicationName={applicationName}
+      logo={logo}
       renderBranding={model.app.renderBranding}
       taskChooseOrganization={<TaskChooseOrganizationContent controller={task} />}
     />

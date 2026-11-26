@@ -40,7 +40,13 @@ describe('sign-up shown route', () => {
       'verifyEmail',
     ],
     ['keeps the screen while the sign-up transfers', 'continue', { type: 'transfer' }, 'continue'],
-    ['sends protect to its route', 'continue', { type: 'protect' }, 'protectCheck'],
+    [
+      'sends protect from continue to its route under continue',
+      'continue',
+      { type: 'protect' },
+      'continueProtectCheck',
+    ],
+    ['keeps the protect route under continue', 'continueProtectCheck', { type: 'protect' }, 'continueProtectCheck'],
     ['keeps start while enterprise SSO is pending', 'start', { type: 'enterprise_sso' }, 'start'],
     ['sends enterprise SSO to its route', 'continue', { type: 'enterprise_sso' }, 'enterpriseConnections'],
     ['has no route for an unknown step', 'verifyEmail', { type: 'unknown' }, undefined],
@@ -69,6 +75,14 @@ describe('sign-up route after a submit', () => {
     ['verifies at the base after start', 'start', verifyEmail, 'verifyEmail'],
     ['verifies under continue after continue', 'continue', verifyEmail, 'continueVerifyEmail'],
     ['verifies the phone under continue after continue', 'continue', verifyPhone, 'continueVerifyPhone'],
+    ['runs protect under continue after continue', 'continue', { type: 'protect' }, 'continueProtectCheck'],
+    [
+      'verifies under continue after a protect check under continue',
+      'continueProtectCheck',
+      verifyEmail,
+      'continueVerifyEmail',
+    ],
+    ['verifies at the base after a protect check from start', 'protectCheck', verifyEmail, 'verifyEmail'],
   ])('%s', (_, from, step, expected) => {
     expect(routeFor(step, from)).toBe(expected);
   });
@@ -80,6 +94,8 @@ describe('sign-up details route', () => {
     ['verifyPhone', 'start'],
     ['continueVerifyEmail', 'continue'],
     ['continueVerifyPhone', 'continue'],
+    ['protectCheck', 'start'],
+    ['continueProtectCheck', 'continue'],
   ])('goes back from %s to %s', (route, expected) => {
     expect(detailsRouteFor(route)).toBe(expected);
   });

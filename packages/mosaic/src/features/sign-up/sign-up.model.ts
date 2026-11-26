@@ -6,6 +6,7 @@ import { getSignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
+import { runProtectCheck } from '@clerk/shared/internal/clerk-js/protectCheckRunner';
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import type { ActiveIdentifier } from '@clerk/shared/internal/clerk-js/signUpFormFields';
 import {
@@ -102,6 +103,15 @@ export interface SignUpVerificationModel {
   verify: (code: string) => Promise<SignUpNextStep>;
 }
 
+export interface SignUpProtectModel {
+  challengeId: string | undefined;
+  resolve: (options: {
+    container: HTMLDivElement;
+    setWidgetVisible: (visible: boolean) => Promise<void>;
+    expiredReloads: { current: number };
+  }) => Promise<SignUpCreateResult>;
+}
+
 export interface SignUpReadyModel {
   status: 'ready';
   flow: SignUpFlowModel;
@@ -109,6 +119,7 @@ export interface SignUpReadyModel {
   navigation: SignUpNavigationModel;
   details: SignUpDetailsModel;
   verification: { email: SignUpVerificationModel; phone: SignUpVerificationModel };
+  protect: SignUpProtectModel;
 }
 
 export type SignUpModel = { status: 'loading' } | SignUpReadyModel;
@@ -399,6 +410,42 @@ export function useSignUpModel({
       },
       update: async values => {
         await saveDetails(await signUp.update(details(values)));
+        return next(signUp);
+      },
+    },
+    protect: {
+      challengeId: signUp.protectCheck?.token,
+      resolve: async ({ container, setWidgetVisible, expiredReloads }) => {
+        const challenge = signUp.protectCheck;
+        if (challenge) {
+          const outcome = await runProtectCheck<SignUpCreateResult>(
+            {
+              getProtectCheck: () => signUp.protectCheck,
+              getResource: () => next(signUp),
+              reload: () => clerk.client?.signUp.reload() ?? Promise.resolve(),
+              submitProtectCheck: async params => {
+                const result = await signUp.submitProtectCheck(params);
+                const blocked = blockedBy(result.error);
+                if (blocked) {
+                  return { type: 'blocked', details: blocked };
+                }
+                await run(() => Promise.resolve(result));
+                return next(signUp);
+              },
+            },
+            challenge,
+            {
+              container,
+              expiredReloads,
+              setWidgetVisible,
+              loadTimeoutMs:
+                clerk.__internal_protectChallengeLoadTimeoutMs ?? environment.protectConfig?.challenge_load_timeout_ms,
+            },
+          );
+          if (outcome.status === 'resolved') {
+            return outcome.resource;
+          }
+        }
         return next(signUp);
       },
     },

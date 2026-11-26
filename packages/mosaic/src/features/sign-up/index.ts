@@ -1,5 +1,6 @@
 export { SignUp } from './sign-up';
 export type { SignUpProps } from './sign-up';
+export { SignUpProtect } from './sign-up-protect/sign-up-protect';
 export { SignUpVerify } from './sign-up-verify/sign-up-verify';
 export { SignUpView } from './sign-up.view';
 export type {
@@ -8,6 +9,7 @@ export type {
   SignUpFieldName,
   SignUpFields,
   SignUpLegalConsent,
+  SignUpProtectScreen,
   SignUpScreen,
   SignUpSubmitEvent,
   SignUpValues,

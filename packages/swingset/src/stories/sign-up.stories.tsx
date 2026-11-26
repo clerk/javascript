@@ -8,7 +8,7 @@ import type {
   SignUpVerifyScreen,
   SignUpViewProps,
 } from '@clerk/mosaic/features/sign-up';
-import { SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
+import { SignUpProtect, SignUpVerify, SignUpView } from '@clerk/mosaic/features/sign-up';
 import { useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
@@ -25,7 +25,7 @@ export const meta: StoryMeta = {
 };
 
 const APPLICATION_NAME = 'Acme';
-const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
+const LOGO = { src: 'https://avatars.githubusercontent.com/u/49538330?v=4', alt: APPLICATION_NAME };
 const EMAIL = 'new@acme.com';
 const PHONE = '+1 555 555 0123';
 
@@ -87,7 +87,7 @@ function verifyScreen(target: string): SignUpVerifyScreen {
 type DetailsOverrides = Partial<Omit<SignUpDetailsScreen, 'form'>>;
 
 type ScreenOverrides = Partial<
-  Omit<SignUpViewProps, 'screen' | 'start' | 'continue' | 'alternativePhone' | 'applicationName' | 'applicationLogoUrl'>
+  Omit<SignUpViewProps, 'screen' | 'start' | 'continue' | 'alternativePhone' | 'applicationName' | 'logo'>
 >;
 
 function ScreenPanel({
@@ -123,7 +123,7 @@ function ScreenPanel({
     <SignUpView
       screen={screen}
       applicationName={APPLICATION_NAME}
-      applicationLogoUrl={APPLICATION_LOGO_URL}
+      logo={LOGO}
       start={{ ...details, ...start }}
       continue={{ ...details, ...continueDetails }}
       verifyEmail={
@@ -139,6 +139,7 @@ function ScreenPanel({
         />
       }
       restricted={{ onSignIn: noop }}
+      protectCheck={null}
       startOver={{ isPending: false, onStartOver: noop }}
       alternativePhone={
         alternativePhone
@@ -452,7 +453,15 @@ export function ProtectCheck() {
   return (
     <ScreenPanel
       screen='protectCheck'
-      protectCheck={{ challenge: false, isPending: true }}
+      protectCheck={
+        <SignUpProtect
+          protect={{ challengeId: 'ptk_story', resolve: () => new Promise(noop) }}
+          expiredReloads={{ current: 0 }}
+          logo={LOGO}
+          onNext={noop}
+          isPending={false}
+        />
+      }
     />
   );
 }
