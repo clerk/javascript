@@ -60,17 +60,6 @@ describe('composing parts', () => {
     );
   });
 
-  it('throws when Chart.FocusOutline is used outside Chart.Bars', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() =>
-      render(
-        <StackedChart>
-          <Chart.FocusOutline />
-        </StackedChart>,
-      ),
-    ).toThrow('<Chart.FocusOutline> must be used within <Chart.Bars>');
-  });
-
   it('throws when Chart.Bar is used outside Chart.Bars', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>
@@ -182,22 +171,6 @@ describe('choosing a period', () => {
 });
 
 describe('choosing a period with the keyboard', () => {
-  it.each([
-    { name: 'a keyboard selection', setup: { data: quarter }, keyboard: true, focusVisible: true },
-    {
-      name: 'a selection the consumer set',
-      setup: { data: quarter, selection: { category: 'Feb', section: 'positive' as const } },
-      keyboard: false,
-      focusVisible: false,
-    },
-  ])('marks the cursor data-focus-visible only for $name', ({ setup, keyboard, focusVisible }) => {
-    const { interaction, getByTestId } = renderChart(setup);
-    if (keyboard) {
-      press(interaction, 'ArrowRight');
-    }
-    expect(getByTestId('cursor').hasAttribute('data-focus-visible')).toBe(focusVisible);
-  });
-
   it('is a focusable group, not a button or an image', () => {
     const { getByRole } = renderChart({ data: quarter });
     const group = getByRole('group', { name: 'Growth' });

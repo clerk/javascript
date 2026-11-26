@@ -83,7 +83,6 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 | `Chart.Bars`              | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
 | `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
 | `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
-| `Chart.FocusOutline`      | `<rect>`        | Outlines the keyboard-selected section's painted bars                |
 | `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels in the left margin                           |
 | `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
 | `Chart.XAxis`             | `<svg>`         | Holds the category labels below the plot                             |
@@ -94,7 +93,7 @@ const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod })
 
 Every part takes `className`, `ref`, `render` and the native props of its default element. `mergeProps` runs the part's props first: `className` concatenates, `style` merges, handlers chain, and yours override everything else.
 
-Every part throws outside `Chart.Root`. `Chart.Bars` also throws when the chart did not come from `Chart.useBarChart`. `Chart.Bar`, `Chart.ProjectionOutline` and `Chart.FocusOutline` throw outside `Chart.Bars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`. A `Chart.YLine` inside `Chart.Bars`, such as the zero line, paints over the bars.
+Every part throws outside `Chart.Root`. `Chart.Bars` also throws when the chart did not come from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside `Chart.Bars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`. A `Chart.YLine` inside `Chart.Bars`, such as the zero line, paints over the bars.
 
 The namespace also holds `Chart.useBarChart` and `Chart.CanvasRenderError`.
 
@@ -168,22 +167,21 @@ The hook returns a `BarChartInstance<TDatum>`: the [chart object](#the-chart-obj
 
 A chart-type hook returns a `ChartInstance` plus what its own marks need. A chart with a value axis, such as bars, returns a `CartesianChartInstance`, which adds `scaleY` and `yTicks`:
 
-| Field                   | Type                                            | Description                                                                                          |
-| ----------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `rootRef`               | `(element: HTMLElement \| null) => void`        | Measures the element. `Chart.Root` attaches it                                                       |
-| `size`                  | `ChartSize`                                     | The measured container, zero until the first measurement                                             |
-| `plot`                  | `ChartPlot`                                     | The plot rectangle inside the margin                                                                 |
-| `scaleY`                | `(value: number) => number`                     | Cartesian only. Maps a value to a Y coordinate                                                       |
-| `yTicks`                | `readonly ChartTick[]`                          | Cartesian only. The Y ticks                                                                          |
-| `categories`            | `readonly ChartCategory[]`                      | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`                                    |
-| `xTicks`                | `(options?: XTicksOptions) => XTick[]`          | The X labels for a tick mode, as `Chart.XAxis` computes them                                         |
-| `selected`              | `TActive \| null`                               | The selection in the current data                                                                    |
-| `selectionSource`       | `'pointer' \| 'keyboard' \| 'external' \| null` | What made `selected`. `keyboard` is when a focus ring belongs on the selected category               |
-| `tooltipAnchor`         | `{ x, y } \| null`                              | Where a tooltip for `selected` points                                                                |
-| `announcement`          | `string`                                        | The status text for the keyboard selection                                                           |
-| `keyboardInstructions`  | `string`                                        | The keys the chart answers to                                                                        |
-| `select`, `clear`       | `(selection) => void`, `() => void`             | Change the selection and call `onSelectionChange`                                                    |
-| `getInteractionProps()` | `(props?) => ChartInteractionProps`             | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers, merged with `props` |
+| Field                   | Type                                     | Description                                                                                          |
+| ----------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `rootRef`               | `(element: HTMLElement \| null) => void` | Measures the element. `Chart.Root` attaches it                                                       |
+| `size`                  | `ChartSize`                              | The measured container, zero until the first measurement                                             |
+| `plot`                  | `ChartPlot`                              | The plot rectangle inside the margin                                                                 |
+| `scaleY`                | `(value: number) => number`              | Cartesian only. Maps a value to a Y coordinate                                                       |
+| `yTicks`                | `readonly ChartTick[]`                   | Cartesian only. The Y ticks                                                                          |
+| `categories`            | `readonly ChartCategory[]`               | One entry per row: `key`, `datumIndex`, `center`, `x` and `width`                                    |
+| `xTicks`                | `(options?: XTicksOptions) => XTick[]`   | The X labels for a tick mode, as `Chart.XAxis` computes them                                         |
+| `selected`              | `TActive \| null`                        | The selection in the current data                                                                    |
+| `tooltipAnchor`         | `{ x, y } \| null`                       | Where a tooltip for `selected` points                                                                |
+| `announcement`          | `string`                                 | The status text for the keyboard selection                                                           |
+| `keyboardInstructions`  | `string`                                 | The keys the chart answers to                                                                        |
+| `select`, `clear`       | `(selection) => void`, `() => void`      | Change the selection and call `onSelectionChange`                                                    |
+| `getInteractionProps()` | `(props?) => ChartInteractionProps`      | Role, `tabIndex`, `ref`, the chart type's `data-*` state and the event handlers, merged with `props` |
 
 A category's `x` and `width` are the extent its marks occupy: a band for bars. Its `center` is where the pointer snaps, the X tick sits and the tooltip anchors. `Chart.Root` and the shared parts hold the chart as a `ChartInstance`, whose `select` takes no value, so only the code that called the hook can select. `Chart.Grid`, `Chart.YAxis` and `Chart.YLine` throw when the chart has no value axis.
 
@@ -282,7 +280,6 @@ Painting the bars is the one thing the chart object does not do, because their c
 | `data-chart-interaction-mode` | `Chart.Root`      | `pending` before the first measurement, `interactive` with `Chart.Selection` and categories, otherwise `visual-only` |
 | `data-active`                 | `Chart.XTick`     | Present while the tick's period is selected. Calendar boundary labels never carry it                                 |
 | `data-active-section`         | `Chart.Selection` | `positive` or `negative` on the interaction surface while a bar section is selected                                  |
-| `data-focus-visible`          | `Chart.Cursor`    | Present while the keyboard selected the category, while `Chart.FocusOutline` outlines it                             |
 | `data-side`                   | `Chart.Tooltip`   | `left` or `right` of the selected period, or `bottom` when pinned to the top of a narrow chart                       |
 | `data-open` / `data-closed`   | `Chart.Tooltip`   | The tooltip's open state, with `data-starting-style` and `data-ending-style` during transitions                      |
 
@@ -357,10 +354,6 @@ The Canvas repaints in the same frame when:
 - the layout or the props of `Chart.Bars` change
 
 Other changes to the computed color do not repaint: a stylesheet added or removed, or another media query such as `prefers-contrast`. Change the class of `Chart.Bar` to repaint after one. The backing buffer is resized only when its pixel size changes. The part is `display: none`, so a CSS transition on its color does not animate the bars.
-
-### `Chart.FocusOutline`
-
-While the keyboard has a section selected, `Chart.FocusOutline` draws a `rect` around that section's painted bars: the bars less the gaps between them, and the projection above a positive stack. It sits `offset` px outside them and is at least `minSize` px each way, so it stays findable around a bar a pixel or two wide. It is a real SVG element, so style `stroke`, `stroke-width` and `rx` with CSS; the primitive sets only `fill: none` and `pointer-events: none`. A pointer never shows it: the hover band marks a pointer selection.
 
 ## Paint order
 

@@ -15,5 +15,4 @@ export {
   type ChartProjectionOutlineProps,
   ChartProjectionOutline as ProjectionOutline,
 } from './bars/chart-projection-outline';
-export { type ChartFocusOutlineProps, ChartFocusOutline as FocusOutline } from './bars/chart-focus-outline';
 export { CanvasRenderError } from './bars/bar-canvas-error';

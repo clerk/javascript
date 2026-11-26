@@ -4,7 +4,6 @@ export type {
   ChartBarProps,
   ChartBarsProps,
   ChartCursorProps,
-  ChartFocusOutlineProps,
   ChartGridProps,
   ChartProjectionOutlineProps,
   ChartRootProps,

@@ -19,7 +19,7 @@ export const DEFAULT_BAR_MESSAGES = {
 } as const satisfies Omit<BarChartMessages, keyof ChartMessages>;
 
 type BarSelectionOptions<TDatum> = Readonly<{
-  layout: Pick<StackedBarLayout<TDatum>, 'plot' | 'zeroY' | 'categories' | 'prepared' | 'scaleY' | 'projection'>;
+  layout: Pick<StackedBarLayout<TDatum>, 'plot' | 'zeroY' | 'categories' | 'prepared'>;
   data: readonly TDatum[];
   series: readonly BarSeries<TDatum>[];
   projection: BarProjection | undefined;
