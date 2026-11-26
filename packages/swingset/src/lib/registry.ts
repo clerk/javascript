@@ -23,6 +23,14 @@ import {
   Sizes as AvatarSizes,
 } from '../stories/avatar.stories';
 import {
+  InteractiveOverflow as AvatarGroupInteractiveOverflow,
+  meta as avatarGroupMeta,
+  OnColor as AvatarGroupOnColor,
+  Primary as AvatarGroupPrimary,
+  Shapes as AvatarGroupShapes,
+  Sizes as AvatarGroupSizes,
+} from '../stories/avatar-group.stories';
+import {
   Colors as BadgeColors,
   meta as badgeMeta,
   Primary as BadgePrimary,
@@ -779,6 +787,15 @@ const avatarModule: StoryModule = {
   Shapes: AvatarShapes,
 };
 
+const avatarGroupModule: StoryModule = {
+  meta: avatarGroupMeta,
+  Primary: AvatarGroupPrimary,
+  Sizes: AvatarGroupSizes,
+  Shapes: AvatarGroupShapes,
+  OnColor: AvatarGroupOnColor,
+  InteractiveOverflow: AvatarGroupInteractiveOverflow,
+};
+
 const skeletonModule: StoryModule = {
   meta: skeletonMeta,
   Primary: SkeletonPrimary,
@@ -1533,6 +1550,7 @@ export const registry: StoryModule[] = [
   // Components
   actionBarModule,
   avatarModule,
+  avatarGroupModule,
   badgeModule,
   skeletonModule,
   bannerModule,

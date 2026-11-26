@@ -5,6 +5,8 @@
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
+export { AvatarGroup } from '../components/avatar-group';
+export type { AvatarGroupProps, AvatarGroupOverflowProps } from '../components/avatar-group';
 export { Badge } from '../components/badge';
 export type { BadgeProps } from '../components/badge';
 export { Banner } from '../components/banner';

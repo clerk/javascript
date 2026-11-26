@@ -1,0 +1,104 @@
+import * as AvatarGroupStories from './avatar-group.stories';
+
+# AvatarGroup
+
+AvatarGroup stacks avatars in an overlapping row, with an optional count of the ones left out. Each avatar is cut where the next one overlaps it, so the page behind the group shows through the gap rather than a ring painted in a fixed color. `AvatarGroup.Root` sets the default size and shape of every avatar inside it, and the size and shape of `AvatarGroup.Overflow`.
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={AvatarGroupStories}
+/>
+
+## Props
+
+`shape` and `size` live on `AvatarGroup.Root` and are the defaults for each `Avatar.Root` inside; an avatar's own prop wins. `AvatarGroup.Overflow` takes `count`, the number of avatars left out, and renders nothing when it is 0 or less.
+
+<PropTable
+  meta={AvatarGroupStories.meta}
+  extra={[
+    {
+      name: 'count',
+      type: 'number',
+      default: '— (required, on Overflow)',
+      description: 'How many avatars are not shown. Rendered as "+N".',
+    },
+    {
+      name: 'label',
+      type: 'string',
+      default: "'{count} more' (on Overflow)",
+      description: 'The accessible name of the overflow, with `{count}` filled in.',
+    },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { AvatarGroup } from '@clerk/mosaic/components/avatar-group';
+
+<AvatarGroup.Root
+  aria-label='Members'
+  size='sm'
+>
+  {members.slice(0, 3).map(member => (
+    <Avatar.Root key={member.id}>
+      <Avatar.Image
+        src={member.imageUrl}
+        alt={member.name}
+      />
+      <Avatar.Fallback />
+    </Avatar.Root>
+  ))}
+  <AvatarGroup.Overflow count={members.length - 3} />
+</AvatarGroup.Root>;
+```
+
+The group never slices the list. Pass the avatars to show, then `AvatarGroup.Overflow` with the rest. The root has `role="group"`; name it with `aria-label`. The overflow is an image named "N more" by default, or the element passed to `render`.
+
+## Parts
+
+| Part                   | Slot (`.cl-*`)             | Description                                                                                                   |
+| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `AvatarGroup.Root`     | `cl-avatar-group`          | Lays out the row and sets the default `shape` / `size` for every item. Reflects `data-shape` and `data-size`. |
+| `AvatarGroup.Overflow` | `cl-avatar-group-overflow` | The "+N" count, last in the row. Grows into a pill for long counts. Throws outside the root.                  |
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={AvatarGroupStories}
+/>
+
+### Shapes
+
+A long count widens the overflow into a pill. The cutout follows the shape, including a themed square radius.
+
+<Story
+  name='Shapes'
+  storyModule={AvatarGroupStories}
+/>
+
+### On color
+
+The gap between avatars is cut out of them, so it shows whatever sits behind the group.
+
+<Story
+  name='OnColor'
+  storyModule={AvatarGroupStories}
+/>
+
+### Interactive overflow
+
+Use `render` to make the overflow a button, such as a trigger for the full list.
+
+<Story
+  name='InteractiveOverflow'
+  storyModule={AvatarGroupStories}
+/>

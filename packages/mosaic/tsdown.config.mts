@@ -18,6 +18,7 @@ export default defineConfig({
     'components/action-bar': './src/components/action-bar/index.ts',
     'components/action-menu': './src/components/action-menu/index.ts',
     'components/avatar': './src/components/avatar/index.ts',
+    'components/avatar-group': './src/components/avatar-group/index.ts',
     'components/badge': './src/components/badge/index.ts',
     'components/banner': './src/components/banner/index.ts',
     'components/button': './src/components/button/index.ts',
