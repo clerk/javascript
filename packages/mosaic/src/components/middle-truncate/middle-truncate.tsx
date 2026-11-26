@@ -6,6 +6,7 @@ import React from 'react';
 import { autoUpdate } from '../../primitives/utils/dom';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { TooltipPopup, TooltipRoot, TooltipTrigger } from '../tooltip/tooltip';
 import { styles } from './middle-truncate.styles';
@@ -76,7 +77,7 @@ export const MiddleTruncate = React.forwardRef<HTMLSpanElement, MiddleTruncatePr
         aria-describedby={undefined}
         {...mergeStyleProps(
           themeProps('middle-truncate', { overflowing: isOverflowing }),
-          stylex.props(reset.base, styles.root, xstyle),
+          stylex.props(reset.base, styles.root, focusOutline.visible, xstyle),
           rest,
         )}
       >

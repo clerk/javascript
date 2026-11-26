@@ -4,6 +4,7 @@ const OVERFLOWING = '@container cl-middle-truncate (height > 1lh)' as const;
 
 export const styles = stylex.create({
   root: {
+    borderRadius: '2px',
     overflow: 'hidden',
     display: 'inline-flex',
     verticalAlign: 'bottom',
