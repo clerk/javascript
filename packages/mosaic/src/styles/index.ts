@@ -104,6 +104,8 @@ export type {
   MenuSeparatorProps,
   MenuTriggerProps,
 } from '../components/menu';
+export { MiddleTruncate } from '../components/middle-truncate';
+export type { MiddleTruncateProps } from '../components/middle-truncate';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
 export { ProviderButton, ProviderButtonGroup } from '../components/provider-button';

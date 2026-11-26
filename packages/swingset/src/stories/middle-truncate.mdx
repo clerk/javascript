@@ -1,0 +1,44 @@
+import * as MiddleTruncateStories from './middle-truncate.stories';
+
+# MiddleTruncate
+
+Prototype. Single-line text that truncates in the middle and keeps the last `tail` characters visible. Drag the bottom-right corner of each box to resize it. While the text overflows, hovering it (or focusing it, when it is not inside a control) shows the full value in a tooltip.
+
+## Examples
+
+### IDs, emails and names
+
+<Story
+  name='Default'
+  storyModule={MiddleTruncateStories}
+/>
+
+### Inside Entity
+
+<Story
+  name='InsideEntity'
+  storyModule={MiddleTruncateStories}
+/>
+
+### Inside a button
+
+The text adds no tab stop inside a control, so the tooltip opens on hover only.
+
+<Story
+  name='InsideButton'
+  storyModule={MiddleTruncateStories}
+/>
+
+### Right to left
+
+<Story
+  name='RightToLeft'
+  storyModule={MiddleTruncateStories}
+/>
+
+### Inline in a sentence
+
+<Story
+  name='InlineInText'
+  storyModule={MiddleTruncateStories}
+/>

@@ -169,6 +169,14 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as MiddleTruncateDefault,
+  InlineInText as MiddleTruncateInlineInText,
+  InsideButton as MiddleTruncateInsideButton,
+  InsideEntity as MiddleTruncateInsideEntity,
+  meta as middleTruncateMeta,
+  RightToLeft as MiddleTruncateRightToLeft,
+} from '../stories/middle-truncate.stories';
 import { meta as mosaicProviderMeta } from '../stories/mosaic-provider.stories';
 import {
   Default as OAuthConsentDefault,
@@ -1063,6 +1071,15 @@ const captchaModule: StoryModule = {
   Default: CaptchaDefault,
 };
 
+const middleTruncateModule: StoryModule = {
+  meta: middleTruncateMeta,
+  Default: MiddleTruncateDefault,
+  InsideEntity: MiddleTruncateInsideEntity,
+  InsideButton: MiddleTruncateInsideButton,
+  RightToLeft: MiddleTruncateRightToLeft,
+  InlineInText: MiddleTruncateInlineInText,
+};
+
 const visuallyHiddenModule: StoryModule = {
   meta: visuallyHiddenMeta,
   Default: VisuallyHiddenDefault,
@@ -1579,6 +1596,7 @@ export const registry: StoryModule[] = [
   tooltipComponentModule,
   fieldModule,
   captchaModule,
+  middleTruncateModule,
   visuallyHiddenModule,
   // Primitives
   accordionModule,
