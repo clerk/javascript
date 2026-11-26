@@ -80,7 +80,7 @@ function requiredFields(
 }
 
 function detailsValues(values: SignUpValues, fields: SignUpFields): SignUpDetailsValues {
-  const pick = (name: SignUpFieldName) => (fields[name] ? values[name] : undefined);
+  const pick = (name: SignUpFieldName) => (fields[name] && !fields[name].disabled ? values[name] : undefined);
   return {
     emailAddress: pick('emailAddress'),
     phoneNumber: pick('phoneNumber'),
@@ -96,13 +96,14 @@ interface SignUpDetailsOptions {
   purpose: 'start' | 'continue';
   isBusy: boolean;
   globalErrorMessage?: string;
+  onSubmit?: () => void;
   onNext: (result: SignUpCreateResult) => void;
   onSignIn: () => void;
 }
 
 export function useSignUpDetailsController(
   details: SignUpDetailsModel,
-  { purpose, isBusy, globalErrorMessage, onNext, onSignIn }: SignUpDetailsOptions,
+  { purpose, isBusy, globalErrorMessage, onSubmit, onNext, onSignIn }: SignUpDetailsOptions,
 ) {
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
   const [chosenChannel, setChosenChannel] = useState<PhoneCodeChannel | undefined>(undefined);
@@ -121,8 +122,9 @@ export function useSignUpDetailsController(
     initialValues: { ...emptyValues, ...details.prefill },
     fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
+      onSubmit?.();
       const submitted = detailsValues(values, fields);
-      if (purpose === 'continue') {
+      if (purpose === 'continue' || details.inTicketSignUp) {
         return details.update(submitted);
       }
       return details.create(
@@ -197,6 +199,7 @@ export function useSignUpDetailsController(
     },
     error: form.error,
     leaveChannel: () => switchChannel(undefined),
+    adoptInvitation: (emailAddress: string) => form.setValue('emailAddress', emailAddress),
     reset: () => {
       form.reset();
       setChosenChannel(undefined);

@@ -20,10 +20,11 @@ import { useSignUpDetailsController } from './sign-up-details/sign-up-details.co
 
 interface FinishContext {
   frozenModel: SignUpReadyModel | null;
+  frozenScreen: 'loading' | undefined;
   error: ErrorDescription | undefined;
 }
 
-type FinishStart = { type: 'FINISH'; frozenModel: SignUpReadyModel };
+type FinishStart = { type: 'FINISH'; frozenModel: SignUpReadyModel; frozenScreen?: 'loading' };
 
 type FinishEvent = FinishStart | { type: 'DISMISS' };
 
@@ -32,7 +33,11 @@ const finish = setup<FinishContext, FinishEvent>();
 const startFinishing = {
   FINISH: {
     target: 'finishing' as const,
-    actions: finish.assign<FinishStart>((_, event) => ({ frozenModel: event.frozenModel, error: undefined })),
+    actions: finish.assign<FinishStart>((_, event) => ({
+      frozenModel: event.frozenModel,
+      frozenScreen: event.frozenScreen,
+      error: undefined,
+    })),
   },
 };
 
@@ -41,6 +46,7 @@ const finishMachine = finish.createMachine({
   initial: 'idle',
   context: {
     frozenModel: null,
+    frozenScreen: undefined,
     error: undefined,
   },
   states: {
@@ -54,6 +60,7 @@ const finishMachine = finish.createMachine({
           target: 'failed',
           actions: finish.assign<ErrorInvokeEvent>((_, event) => ({
             frozenModel: null,
+            frozenScreen: undefined,
             error: toLocalizableError(event.error),
           })),
         },
@@ -71,7 +78,7 @@ const finishMachine = finish.createMachine({
   },
 });
 
-function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode'], isBlocked: boolean): SignUpScreen {
+function screenFor(route: SignUpRoute | undefined, flow: SignUpFlowModel, isBlocked: boolean): SignUpScreen {
   if (route === undefined || route === 'enterpriseConnections') {
     return 'startOver';
   }
@@ -81,7 +88,7 @@ function screenFor(route: SignUpRoute | undefined, mode: SignUpFlowModel['mode']
   if (route !== 'start') {
     return route;
   }
-  return mode === 'public' ? 'start' : mode;
+  return flow.mode === 'public' || flow.ticket ? 'start' : flow.mode;
 }
 
 type SignUpControllerResult =
@@ -102,7 +109,8 @@ export function useSignUpController(
   { isTaskReady, ...options }: MosaicLocationOptions & { isTaskReady: boolean },
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
-  const actions = usePendingAction<'startOver'>();
+  const actions = usePendingAction<'startOver' | 'ticket'>();
+  const redeemedTicket = useRef<string | undefined>(undefined);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
   const [arrival] = useState(() => ({ session: liveModel.flow.session.type, leave: liveModel.flow.leave }));
@@ -127,17 +135,19 @@ export function useSignUpController(
   const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
   const shown = shownRoute(route, outcome, flow.step);
-  const screen = screenFor(shown, flow.mode, blocked !== undefined);
+  const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
+  const screen =
+    actions.pendingKey === 'ticket' ? 'loading' : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
 
   useRouteGuard({ route, go }, shown);
 
-  const next = (result: SignUpCreateResult) => {
+  const next = (result: SignUpCreateResult, frozenScreen?: 'loading') => {
     if (result.type === 'blocked') {
       setBlocked(result.details);
       return;
     }
     if (result.type === 'complete') {
-      sendFinish({ type: 'FINISH', frozenModel: model });
+      sendFinish({ type: 'FINISH', frozenModel: model, frozenScreen });
       return;
     }
     const nextRoute = routeFor(result, route);
@@ -152,9 +162,24 @@ export function useSignUpController(
     purpose: screen === 'continue' ? 'continue' : 'start',
     isBusy: actions.isPending || isHolding,
     globalErrorMessage: flowError,
+    onSubmit: actions.reset,
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Redeems the invitation once when sign-up opens on start with a ticket in the URL; arriving from the invitation link is not an event a handler could run from. */
+  useEffect(() => {
+    if (!flow.ticket || model.details.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
+      return;
+    }
+    redeemedTicket.current = flow.ticket;
+    void actions.run('ticket', async () => {
+      const { result, emailAddress } = await flow.redeemTicket();
+      details.adoptInvitation(emailAddress);
+      next(result, 'loading');
+    });
+  });
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
+
   const verify = {
     onNext: next,
     isPending: isHolding,
