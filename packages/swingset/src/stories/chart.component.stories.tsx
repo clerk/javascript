@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@clerk/mosaic/components/button';
-import { type BarSelection, Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
+import { type BarChartHighlight, Chart, type ChartSeries } from '@clerk/mosaic/components/chart';
 import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -289,13 +289,17 @@ export function Palette() {
 }
 
 export function Highlight() {
-  const [highlight, setHighlight] = useState<BarSelection | null>(null);
+  const [highlight, setHighlight] = useState<BarChartHighlight | null>(null);
   const chart = Chart.useBarChart({
     data: growth,
     series: growthSeries,
     index: getWeek,
-    onSelectionChange: setHighlight,
     highlight,
+    // Clicking the highlighted section again clears it.
+    onActivate: ({ category, section }) =>
+      setHighlight(current =>
+        current?.category === category && current.section === section ? null : { category, section },
+      ),
   });
   return (
     <Chart.Root
