@@ -1,4 +1,11 @@
-import type { ClientJSON, SessionJSON, SignUpField, SignUpIdentificationField, SignUpJSON } from '@clerk/shared/types';
+import type {
+  ClientJSON,
+  PhoneCodeChannel,
+  SessionJSON,
+  SignUpField,
+  SignUpIdentificationField,
+  SignUpJSON,
+} from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import {
@@ -27,6 +34,8 @@ export interface FakeSignUpSeed {
   protectCheckResolvedElsewhere?: boolean;
   protectCheckBlocked?: Record<string, string>;
   protectCheckScript?: string;
+  whatsAppEnabled?: boolean;
+  whatsAppQuotaExceeded?: boolean;
 }
 
 export interface FakeSignUpState {
@@ -41,6 +50,8 @@ export interface FakeSignUpState {
   protectCheckResolvedElsewhere?: boolean;
   protectCheckBlocked?: Record<string, string>;
   protectCheckScript?: string;
+  whatsAppEnabled: boolean;
+  whatsAppQuotaExceeded: boolean;
   issuedProtectChecks: number;
   reloads: number;
   proofTokens: string[];
@@ -56,6 +67,8 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     sessionTasks: null,
     weakPasswords: {},
     protectChecks: 0,
+    whatsAppEnabled: true,
+    whatsAppQuotaExceeded: false,
     issuedProtectChecks: 0,
     reloads: 0,
     proofTokens: [],
@@ -326,6 +339,47 @@ export function signUpHandlers(
     return next;
   };
 
+  const prepare = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
+    const strategy = body.get('strategy') ?? '';
+    const channel = body.get('channel');
+    const field = STRATEGIES[strategy];
+    const attribute = field ? settings().attributes[field] : undefined;
+    if (!field || !attribute?.verifications.some(supported => supported === strategy)) {
+      return rejected('form_param_value_invalid', `${strategy} does not match one of the allowed values.`, 'strategy');
+    }
+    if (!signUp[field]) {
+      return rejected('form_param_missing', `${field} must be set before it can be verified.`, field);
+    }
+    if (signUp.verifications?.[field].status === 'verified') {
+      return rejected('verification_already_verified', 'This verification has already been verified.', undefined, 400);
+    }
+    const isPhone = field === 'phone_number';
+    if (isPhone && channel && channel !== 'sms' && channel !== 'whatsapp') {
+      return rejected('form_param_value_invalid', `${channel} does not match one of the allowed values.`, 'channel');
+    }
+    if (isPhone && channel === 'whatsapp' && !state.signUp.whatsAppEnabled) {
+      return rejected(
+        'whatsapp_channel_not_enabled',
+        "The 'whatsapp' channel is not available for this instance.",
+        'channel',
+      );
+    }
+    const sentOver = channel === 'whatsapp' && state.signUp.whatsAppQuotaExceeded ? 'sms' : (channel ?? 'sms');
+    state.signUp.preparations.push(isPhone && channel ? `${strategy}:${channel}` : strategy);
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications!,
+        [field]: {
+          ...signUp.verifications![field],
+          ...fapiVerification(strategy),
+          next_action: 'needs_attempt',
+          channel: isPhone ? (sentOver as PhoneCodeChannel) : undefined,
+        },
+      },
+    };
+  };
+
   if (state.client.sign_up) {
     state.client = { ...state.client, sign_up: settle(state.client.sign_up) };
   }
@@ -342,7 +396,16 @@ export function signUpHandlers(
       }
       const blank = fapiSignUp({ id: `sua_${state.signUp.creations.length}` });
       const applied = apply(blank, body);
-      return applied instanceof HttpResponse ? applied : store(settle(issueProtectCheck(applied)));
+      if (applied instanceof HttpResponse) {
+        return applied;
+      }
+      const created = issueProtectCheck(applied);
+      const prepared = body.get('strategy') === 'phone_code' ? prepare(created, body) : created;
+      if (prepared instanceof HttpResponse) {
+        store(settle(created));
+        return clientError(prepared);
+      }
+      return store(settle(prepared));
     }),
     http.get(fapiUrl('/protect-check/challenge.js'), () =>
       HttpResponse.text(state.signUp.protectCheckScript ?? PROTECT_CHECK_SCRIPT, {
@@ -410,35 +473,8 @@ export function signUpHandlers(
       if (!signUp?.verifications) {
         return missing();
       }
-      const strategy = new URLSearchParams(await request.text()).get('strategy') ?? '';
-      const field = STRATEGIES[strategy];
-      const attribute = field ? settings().attributes[field] : undefined;
-      if (!field || !attribute?.verifications.some(supported => supported === strategy)) {
-        return rejected(
-          'form_param_value_invalid',
-          `${strategy} does not match one of the allowed values.`,
-          'strategy',
-        );
-      }
-      if (!signUp[field]) {
-        return rejected('form_param_missing', `${field} must be set before it can be verified.`, field);
-      }
-      if (signUp.verifications[field].status === 'verified') {
-        return rejected(
-          'verification_already_verified',
-          'This verification has already been verified.',
-          undefined,
-          400,
-        );
-      }
-      state.signUp.preparations.push(strategy);
-      return store({
-        ...signUp,
-        verifications: {
-          ...signUp.verifications,
-          [field]: { ...signUp.verifications[field], ...fapiVerification(strategy), next_action: 'needs_attempt' },
-        },
-      });
+      const prepared = prepare(signUp, new URLSearchParams(await request.text()));
+      return prepared instanceof HttpResponse ? prepared : store(prepared);
     }),
     http.post(fapiUrl('/v1/client/sign_ups/:id/attempt_verification'), async ({ params, request }) => {
       const signUp = current(params.id);

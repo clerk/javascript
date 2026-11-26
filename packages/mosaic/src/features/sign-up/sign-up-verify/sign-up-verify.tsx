@@ -9,7 +9,7 @@ interface SignUpVerifyProps extends SignUpVerifyScreen {
   channel: 'email' | 'phone';
 }
 
-export function SignUpVerify({ channel, provider, onEditIdentifier, onCancel, ...options }: SignUpVerifyProps) {
+export function SignUpVerify({ channel, onEditIdentifier, onCancel, ...options }: SignUpVerifyProps) {
   const m = useMessages('signUp');
   const {
     value,
@@ -21,15 +21,16 @@ export function SignUpVerify({ channel, provider, onEditIdentifier, onCancel, ..
     onSubmit,
     onComplete,
     onResend,
+    onSendSms,
     canResend,
     resendRemainingSeconds,
   } = useSignUpVerifyController(options);
   const step: SignUpCode = {
     purpose: channel === 'email' ? 'verify-email' : 'verify-phone',
     identifier: options.verification.target,
-    provider,
+    provider: options.verification.provider,
   };
-  const secondary = signUpCodeSecondaryAction(step, m, onCancel);
+  const secondary = signUpCodeSecondaryAction(step, m, onSendSms ?? onCancel);
   const identity = signUpCodeIdentity(step, m);
 
   return (

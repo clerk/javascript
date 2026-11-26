@@ -1,4 +1,5 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 import { useState } from 'react';
 
 import type { FieldFeedback, FieldsConfig } from '../../../components/form';
@@ -7,8 +8,17 @@ import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import type { MosaicMessages } from '../../../localization';
 import { useMessages } from '../../../localization';
 import type { SignUpCreateResult, SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
-import type { SignUpDetails, SignUpDetailsScreen, SignUpFieldName, SignUpFields, SignUpValues } from '../sign-up.types';
+import type {
+  SignUpAlternativePhoneScreen,
+  SignUpDetails,
+  SignUpDetailsScreen,
+  SignUpFieldName,
+  SignUpFields,
+  SignUpValues,
+} from '../sign-up.types';
 import { signUpFieldNames } from '../sign-up.utils';
+
+const ALTERNATIVE_PHONE_FIELDS: SignUpFields = { phoneNumber: { required: true } };
 
 const emptyValues: SignUpValues = {
   firstName: '',
@@ -95,12 +105,15 @@ export function useSignUpDetailsController(
   { purpose, isBusy, globalErrorMessage, onNext, onSignIn }: SignUpDetailsOptions,
 ) {
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
+  const [chosenChannel, setChosenChannel] = useState<PhoneCodeChannel | undefined>(undefined);
   const genericError = useMessages('errors').generic;
   const m = useMessages('signUp');
   const identifier = chosenIdentifier ?? details.initialIdentifier;
   const startFields = details.startFieldsFor(identifier);
   const continueFields = details.continueFieldsFor(identifier);
-  const fields = purpose === 'continue' ? continueFields : startFields;
+  const channel = purpose === 'start' ? chosenChannel : undefined;
+  const alternativeChannel = details.alternativeChannels.find(provider => provider.id === channel);
+  const fields = alternativeChannel ? ALTERNATIVE_PHONE_FIELDS : purpose === 'continue' ? continueFields : startFields;
 
   const consentRequired = Boolean(purpose === 'continue' ? details.continueLegalConsent : details.legalConsent);
 
@@ -109,9 +122,13 @@ export function useSignUpDetailsController(
     fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
       const submitted = detailsValues(values, fields);
-      return purpose === 'continue'
-        ? details.update(submitted)
-        : details.create({ ...submitted, ...details.startHiddenValuesFor(identifier) });
+      if (purpose === 'continue') {
+        return details.update(submitted);
+      }
+      return details.create(
+        { ...submitted, ...details.startHiddenValuesFor(identifier) },
+        { channel: alternativeChannel?.id },
+      );
     },
     onSuccess: result => {
       if (result) {
@@ -130,9 +147,7 @@ export function useSignUpDetailsController(
     : strength.data;
   const isPending = form.isSubmitting || isBusy;
 
-  const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField'> = {
-    socialProviders: [],
-    onSelectProvider: () => undefined,
+  const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField' | 'socialProviders' | 'onSelectProvider'> = {
     form,
     onSubmit: form.handleSubmit,
     isPending,
@@ -142,21 +157,49 @@ export function useSignUpDetailsController(
     onSignIn,
   };
 
+  const switchChannel = (next: PhoneCodeChannel | undefined) => {
+    setChosenChannel(next);
+    form.reset(form.values);
+  };
+
+  const alternativePhone: SignUpAlternativePhoneScreen | undefined = alternativeChannel
+    ? {
+        channel: alternativeChannel,
+        legalConsent: details.legalConsent,
+        form,
+        onSubmit: form.handleSubmit,
+        isPending,
+        isDisabled: isPending,
+        globalErrorMessage: form.error ?? globalErrorMessage,
+        onCancel: () => switchChannel(undefined),
+      }
+    : undefined;
+
   const switchField = (purpose: 'start' | 'continue') =>
     canSwitch(purpose, details) ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined;
 
   return {
+    alternativePhone,
     start: {
       ...screen,
       step: detailsStep('start', startFields, details, identifier),
       onSwitchField: switchField('start'),
+      socialProviders: details.alternativeChannels,
+      onSelectProvider: (id: string) =>
+        switchChannel(details.alternativeChannels.find(provider => provider.id === id)?.id),
     },
     continue: {
       ...screen,
       step: detailsStep('continue', continueFields, details, identifier),
       onSwitchField: switchField('continue'),
+      socialProviders: [],
+      onSelectProvider: () => undefined,
     },
     error: form.error,
-    reset: form.reset,
+    leaveChannel: () => switchChannel(undefined),
+    reset: () => {
+      form.reset();
+      setChosenChannel(undefined);
+    },
   };
 }

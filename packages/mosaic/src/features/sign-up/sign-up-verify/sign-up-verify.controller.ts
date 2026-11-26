@@ -9,21 +9,35 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
 import { CODE_RESEND_SECONDS, isResendUnlocked, resendUnlockTime } from '../../../utils/verification';
+import type { SignUpVerificationModel } from '../sign-up.model';
 import type { SignUpVerifyScreen } from '../sign-up.types';
 
 interface CodeContext {
-  sendCode: () => Promise<void>;
+  sendCode: SignUpVerificationModel['send'];
   resendAvailableAt: number | undefined;
   error: ErrorDescription | undefined;
 }
 
-type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'ALREADY_SENT' };
+type CodeEvent = { type: 'SEND' } | { type: 'RESEND' } | { type: 'SEND_SMS' } | { type: 'ALREADY_SENT' };
 
 const code = setup<CodeContext, CodeEvent>();
 
 const clearError = code.assign(() => ({ error: undefined }));
 
+const sendBySms = { target: 'sendingSms' as const, actions: clearError };
+
 const startCooldown = code.assign(() => ({ resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS) }));
+
+const settleSend = {
+  onDone: { target: 'sent' as const, actions: startCooldown },
+  onError: {
+    target: 'sent' as const,
+    actions: code.assign<ErrorInvokeEvent>((_, event) => ({
+      error: toLocalizableError(event.error),
+      resendAvailableAt: resendUnlockTime(CODE_RESEND_SECONDS),
+    })),
+  },
+};
 
 const codeMachine = code.createMachine({
   id: 'signUpCode',
@@ -35,20 +49,19 @@ const codeMachine = code.createMachine({
   },
   states: {
     idle: {
-      on: { SEND: 'sending', RESEND: 'sending', ALREADY_SENT: { target: 'sent', actions: startCooldown } },
+      on: {
+        SEND: 'sending',
+        RESEND: 'sending',
+        SEND_SMS: sendBySms,
+        ALREADY_SENT: { target: 'sent', actions: startCooldown },
+      },
     },
-    sending: {
-      invoke: code.fromPromise(context => context.sendCode(), {
-        onDone: { target: 'sent', actions: startCooldown },
-        onError: {
-          target: 'sent',
-          actions: code.assign<ErrorInvokeEvent>((_, event) => ({ error: toLocalizableError(event.error) })),
-        },
-      }),
-    },
+    sending: { invoke: code.fromPromise(context => context.sendCode(), settleSend) },
+    sendingSms: { invoke: code.fromPromise(context => context.sendCode({ channel: 'sms' }), settleSend) },
     sent: {
       on: {
         SEND: { target: 'sending', actions: clearError },
+        SEND_SMS: sendBySms,
         RESEND: {
           target: 'sending',
           guard: context => isResendUnlocked(context.resendAvailableAt),
@@ -78,7 +91,8 @@ export function useSignUpVerifyController({
     send({ type: needsCode ? 'SEND' : 'ALREADY_SENT' });
   }, [needsCode, send]);
 
-  const isPending = actions.isPending || isFlowPending;
+  const isSwitchingToSms = snapshot.value === 'sendingSms';
+  const isPending = actions.isPending || isFlowPending || isSwitchingToSms;
   const submit = (submitted: string) =>
     void actions.run('code', async () => onNext(await verification.verify(submitted)));
 
@@ -91,7 +105,17 @@ export function useSignUpVerifyController({
     canEditIdentifier: !isPending && snapshot.value !== 'sending',
     errorMessage: actions.error,
     globalErrorMessage: snapshot.context.error ? errorText(snapshot.context.error) : globalErrorMessage,
-    onResend: () => send({ type: 'RESEND' }),
+    onResend: () => {
+      setValue('');
+      send({ type: 'RESEND' });
+    },
+    onSendSms: verification.provider
+      ? () => {
+          setValue('');
+          actions.reset();
+          send({ type: 'SEND_SMS' });
+        }
+      : undefined,
     canResend: snapshot.value === 'sent' && resendSeconds === 0 && !isPending,
     resendRemainingSeconds: resendSeconds || undefined,
   };

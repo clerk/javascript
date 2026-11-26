@@ -161,6 +161,7 @@ export function useSignUpController(
     globalErrorMessage: finishError,
     onEditIdentifier: () => {
       sendFinish({ type: 'DISMISS' });
+      details.leaveChannel();
       go(detailsRouteFor(route));
     },
   };
@@ -171,8 +172,9 @@ export function useSignUpController(
 
   return {
     status: 'ready',
-    screen,
+    screen: screen === 'start' && details.alternativePhone ? 'alternativePhone' : screen,
     attempt: flow.signUpId,
+    alternativePhone: details.alternativePhone,
     start: details.start,
     continue: details.continue,
     verifyEmail: { ...verify, verification: verification.email },

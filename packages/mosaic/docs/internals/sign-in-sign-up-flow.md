@@ -38,7 +38,8 @@ Sign-up renders one component per screen, so the route decides what is mounted (
 - A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way. A screen that runs a controller reaches the view as a slot the wrapper builds, as the profile section's `nameAction` does, so `SignUpView` renders plain props only.
 - `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
 - A screen another feature owns arrives as a slot. The wrapper runs the task's model once, passes it to `TaskChooseOrganizationContent` (the task without its card), and tells the controller whether the task has loaded. The view mounts the slot on the task route.
-- A screen that is not a route sits on top of one. `restricted` and `waitlist` replace `start`, `actionBlocked` replaces `start` and the Protect routes, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`) shows `startOver`.
+- A screen that is not a route sits on top of one. `restricted` and `waitlist` replace `start`, `alternativePhone` replaces `start` while the user has picked a phone channel such as WhatsApp there, `actionBlocked` replaces `start` and the Protect routes, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`) shows `startOver`.
+- The channel `alternativePhone` shows is state in `useSignUpDetailsController`, not a route. The user picks it on the start form before any sign-up exists, the screen edits that same form, and no step `getSignUpNextStep` returns leads to it, so there is nothing for a route to restore. Use another method on that screen and Edit on the code screen both clear it.
 
 ## Move on after a submit
 
