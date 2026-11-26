@@ -369,7 +369,6 @@ export function useChartInstance<
     categories,
     xTicks,
     selected,
-    selectionSource: selected ? (valid?.source ?? null) : null,
     tooltipAnchor,
     announcement,
     keyboardInstructions,

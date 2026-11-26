@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import { ChartContext } from '../chart-context';
 import type { CartesianChartInstance, ChartInstance } from '../types';
 import type { BarStyleElement } from './bar-canvas';
-import type { BarBounds, PreparedStackedBars, StackedBarLayout } from './bar-layout';
+import type { PreparedStackedBars, StackedBarLayout } from './bar-layout';
 import type { ActiveBar, BarCategory, BarIdentity, BarSelection } from './types';
 
 /** Only `useBarChart` sets it, so a chart that carries it came from `useBarChart`. */
@@ -41,8 +41,6 @@ export interface BarsContextValue {
   setBar: (element: BarStyleElement | null) => void;
   /** Registers the `Chart.ProjectionOutline` element whose computed stroke outlines the projection. */
   setProjectionOutline: (element: BarStyleElement | null) => void;
-  /** The painted extent of the keyboard-selected section, or null. `Chart.FocusOutline` draws around it. */
-  focusBounds: BarBounds | null;
 }
 
 export const BarsContext = createContext<BarsContextValue | null>(null);
