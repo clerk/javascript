@@ -4,6 +4,7 @@ import type {
   PhoneCodeChannel,
   SessionJSON,
   SignInJSON,
+  SignUpEnterpriseConnectionJSON,
   SignUpField,
   SignUpIdentificationField,
   SignUpJSON,
@@ -28,6 +29,9 @@ type Identifier = 'email_address' | 'phone_number';
 export interface FakeSignUpSeed {
   takenEmailAddresses?: string[];
   enterpriseDomains?: string[];
+  enterpriseConnectionCount?: number;
+  enterpriseConnectionListing?: 'feature_not_enabled' | 'empty';
+  enterpriseSsoRejected?: FakeEnterpriseSsoRejection;
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
@@ -49,6 +53,12 @@ export type FakeOAuthAccount =
   | { signedInSession: string }
   | { error: { code: string; message: string; meta?: ClerkAPIErrorJSON['meta'] } };
 
+export interface FakeEnterpriseSsoRejection {
+  connectionId?: string;
+  code: string;
+  message: string;
+}
+
 type ProtectCheckOn = 'create' | 'update' | 'oauth_callback';
 
 export type FakeTicket = { emailAddress: string } | 'expired';
@@ -56,6 +66,9 @@ export type FakeTicket = { emailAddress: string } | 'expired';
 export interface FakeSignUpState {
   takenEmailAddresses: string[];
   enterpriseDomains: string[];
+  enterpriseConnectionCount: number;
+  enterpriseConnectionListing?: 'feature_not_enabled' | 'empty';
+  enterpriseSsoRejected?: FakeEnterpriseSsoRejection;
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
@@ -84,6 +97,7 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
   return {
     takenEmailAddresses: [],
     enterpriseDomains: [],
+    enterpriseConnectionCount: 1,
     sessionTasks: null,
     weakPasswords: {},
     protectChecks: 0,
@@ -104,6 +118,8 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
     ...seed,
   };
 }
+
+const ENTERPRISE_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
 export const PROTECT_CHECK_SCRIPT = `
 export default (container, { token, setWidgetVisible }) =>
@@ -216,6 +232,9 @@ export function signUpHandlers(
     };
   };
 
+  const inEnterpriseDomain = (signUp: SignUpJSON) =>
+    state.signUp.enterpriseDomains.includes(signUp.email_address?.split('@')[1] ?? '');
+
   const settle = (signUp: SignUpJSON): SignUpJSON => {
     const { attributes } = settings();
     const { required_fields, optional_fields } = requirements();
@@ -250,7 +269,7 @@ export function signUpHandlers(
       settings().sign_up.progressive &&
       identifierNames.every(name => !attributes[name].required) &&
       !identifierNames.some(name => provided(name));
-    const enterprise = state.signUp.enterpriseDomains.includes(signUp.email_address?.split('@')[1] ?? '');
+    const enterprise = inEnterpriseDomain(signUp) && linked !== 'enterprise_sso';
     const missingFields: SignUpField[] = [
       ...required_fields.filter(field => !provided(field)),
       ...(anyIdentifierMissing ? identifierNames : []),
@@ -331,6 +350,64 @@ export function signUpHandlers(
     };
   };
 
+  const enterpriseConnections = (): SignUpEnterpriseConnectionJSON[] =>
+    Array.from({ length: state.signUp.enterpriseConnectionCount }, (_, index) => ({
+      object: 'enterprise_connection',
+      id: `entc_${index + 1}`,
+      name: `Acme SSO ${index + 1}`,
+      provider: 'saml_okta',
+      logo_public_url: index === 0 ? ENTERPRISE_LOGO : null,
+    }));
+
+  const startEnterpriseSso = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
+    if (!inEnterpriseDomain(signUp)) {
+      return rejected('form_param_value_invalid', 'strategy does not match one of the allowed values.', 'strategy');
+    }
+    const connectionId = body.get('enterprise_connection_id') ?? undefined;
+    const rejection = state.signUp.enterpriseSsoRejected;
+    if (rejection && rejection.connectionId === connectionId) {
+      return rejected(rejection.code, rejection.message);
+    }
+    if (connectionId && !enterpriseConnections().some(connection => connection.id === connectionId)) {
+      return rejected(
+        'form_param_value_invalid',
+        'enterprise_connection_id does not match one of the allowed values.',
+        'enterprise_connection_id',
+      );
+    }
+    if (state.signUp.enterpriseConnectionCount > 1 && !connectionId) {
+      return rejected(
+        'enterprise_connection_id_is_required_with_multiple_connections',
+        'An enterprise connection ID is required when the domain has several connections.',
+        'enterprise_connection_id',
+      );
+    }
+    if (!body.get('redirect_url')) {
+      return rejected('form_conditional_param_missing', 'redirect_url must be included.', 'redirect_url');
+    }
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications,
+        external_account: {
+          ...fapiUnpreparedVerification(),
+          ...fapiVerification('enterprise_sso'),
+          next_action: '',
+          supported_strategies: ['enterprise_sso'],
+          external_verification_redirect_url: `https://idp.example/sso?strategy=enterprise_sso${connectionId ? `&connection=${connectionId}` : ''}`,
+        },
+      },
+    };
+  };
+
+  const startExternal = (signUp: SignUpJSON, body: URLSearchParams) => {
+    const strategy = body.get('strategy');
+    if (strategy === 'enterprise_sso') {
+      return startEnterpriseSso(signUp, body);
+    }
+    return strategy?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+  };
+
   state.signUp.returnFromOAuth = () => {
     const signUp = state.client.sign_up;
     const external = signUp?.verifications?.external_account;
@@ -374,29 +451,29 @@ export function signUpHandlers(
     }
     const linked = withExternal({ status: 'verified' });
     state.signUp.linkedStrategy = external.strategy;
-    store(
-      settle(
-        runProtectCheck(
-          {
-            ...linked,
-            email_address: signUp.email_address ?? account.emailAddress,
-            first_name: signUp.first_name ?? account.firstName ?? null,
-            last_name: signUp.last_name ?? account.lastName ?? null,
-            verifications: {
-              ...linked.verifications!,
-              email_address: signUp.email_address
+    const returned = settle(
+      runProtectCheck(
+        {
+          ...linked,
+          email_address: signUp.email_address ?? account.emailAddress,
+          first_name: signUp.first_name ?? account.firstName ?? null,
+          last_name: signUp.last_name ?? account.lastName ?? null,
+          verifications: {
+            ...linked.verifications!,
+            email_address:
+              signUp.email_address && external.strategy !== 'enterprise_sso'
                 ? linked.verifications!.email_address
                 : {
                     ...fapiUnpreparedVerification(),
                     ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
                     next_action: '',
                   },
-            },
           },
-          'oauth_callback',
-        ),
+        },
+        'oauth_callback',
       ),
     );
+    state.client = { ...state.client, sign_up: returned };
   };
 
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
@@ -660,6 +737,18 @@ export function signUpHandlers(
       }
       return store(settle(issueProtectCheck({ ...signUp, protect_check: null }, state.signUp.protectCheckOn)));
     }),
+    http.get(fapiUrl('/v1/client/sign_ups/:id/enterprise_connections'), ({ params }) => {
+      if (!current(params.id)) {
+        return missing();
+      }
+      if (state.signUp.enterpriseConnectionListing === 'feature_not_enabled') {
+        return rejected('feature_not_enabled', 'This feature is not enabled on this instance.', undefined, 403);
+      }
+      return envelope(
+        state.signUp.enterpriseConnectionListing === 'empty' ? [] : enterpriseConnections(),
+        state.client,
+      );
+    }),
     http.get(fapiUrl('/v1/client/sign_ups/:id'), ({ params }) => {
       const signUp = current(params.id);
       if (!signUp) {
@@ -678,7 +767,7 @@ export function signUpHandlers(
       }
       const body = new URLSearchParams(await request.text());
       state.signUp.updates.push(body);
-      const started = body.get('strategy')?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+      const started = startExternal(signUp, body);
       if (started instanceof HttpResponse) {
         return started;
       }

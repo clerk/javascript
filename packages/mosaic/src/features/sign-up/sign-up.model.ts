@@ -31,6 +31,7 @@ import type {
   SetActiveNavigate,
   SignInFutureResource,
   SignInStatus,
+  SignUpEnterpriseConnectionResource,
   SignUpFutureResource,
   SignUpInitialValues,
   UserSettingsResource,
@@ -84,6 +85,7 @@ export interface SignUpFlowModel {
   leave: () => void;
   ticket: string | undefined;
   redeemTicket: () => Promise<{ result: SignUpCreateResult; emailAddress: string }>;
+  startEnterpriseSso: (connectionId?: string) => Promise<SignUpEnterpriseConnectionsResult | undefined>;
   isReturning: boolean;
   completeReturn: () => Promise<SignUpCreateResult | undefined>;
   finalize: () => Promise<void>;
@@ -102,7 +104,15 @@ export interface SignUpNavigationModel {
   emailSupport?: () => void;
 }
 
-export type SignUpCreateResult = SignUpNextStep | { type: 'blocked'; details: AuthActionBlockedDetails };
+export interface SignUpEnterpriseConnectionsResult {
+  type: 'enterprise_connections';
+  connections: readonly AuthProvider[];
+}
+
+export type SignUpCreateResult =
+  | SignUpNextStep
+  | { type: 'blocked'; details: AuthActionBlockedDetails }
+  | SignUpEnterpriseConnectionsResult;
 
 export interface SignUpDetailsModel {
   initialIdentifier: SignUpIdentifier;
@@ -162,6 +172,7 @@ const PREFILL_NAMES = ['emailAddress', 'phoneNumber', 'username', 'firstName', '
 
 const ABSOLUTE_URL = /^https?:\/\//;
 const RETURN_PARAM = '__clerk_mosaic_sign_up';
+const ENTERPRISE_CONNECTION_REQUIRED = 'enterprise_connection_id_is_required_with_multiple_connections';
 const SSO_RETURN = 'sso-callback';
 const OAUTH_PREFIX = /^oauth_(custom_)?/;
 const SHOWN_RETURN_ERRORS: readonly string[] = [
@@ -495,6 +506,35 @@ export function useSignUpModel({
           return { result: { type: 'blocked', details: blocked }, emailAddress: '' };
         }
         return { result: next(signUp), emailAddress: signUp.emailAddress ?? '' };
+      },
+      startEnterpriseSso: async connectionId => {
+        const result = await signUp.sso({
+          strategy: 'enterprise_sso',
+          enterpriseConnectionId: connectionId,
+          redirectCallbackUrl: ssoCallbackUrl(),
+          redirectUrl: afterSignUpUrl,
+        });
+        const needsConnection =
+          result.error !== null &&
+          isClerkAPIResponseError(result.error) &&
+          result.error.errors[0]?.code === ENTERPRISE_CONNECTION_REQUIRED;
+        if (!connectionId && needsConnection) {
+          let listed: SignUpEnterpriseConnectionResource[] = [];
+          await save(async () => {
+            listed = (await clerk.client?.signUp.__experimental_getEnterpriseConnections()) ?? [];
+          });
+          if (listed.length > 0) {
+            return {
+              type: 'enterprise_connections',
+              connections: listed.map(({ id, name, logoPublicUrl }) => ({ id, name, iconUrl: logoPublicUrl || '' })),
+            };
+          }
+        }
+        await save(() => run(() => Promise.resolve(result)));
+        if (!signUp.verifications.externalAccount.externalVerificationRedirectURL) {
+          throw new SaveError({ global: UNEXPECTED_ERROR });
+        }
+        return undefined;
       },
       isReturning: query.get(RETURN_PARAM) === SSO_RETURN,
       completeReturn: async () => {

@@ -55,7 +55,10 @@ function allowedRoute(route: SignUpRoute, step: SignUpNextStep): boolean {
   if (route === 'start' || step.type === 'complete' || step.type === 'transfer') {
     return true;
   }
-  if (route === 'continue' && (step.type === 'verify_email' || step.type === 'verify_phone')) {
+  if (
+    route === 'continue' &&
+    (step.type === 'verify_email' || step.type === 'verify_phone' || step.type === 'enterprise_sso')
+  ) {
     return true;
   }
   return route === routeFor(step, route);

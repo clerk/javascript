@@ -604,22 +604,6 @@ describe('SignUp', () => {
       expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
       expect(emailField()).toHaveValue('');
     });
-
-    it('offers Start over when the email belongs to an enterprise connection', async () => {
-      const { fapi, user } = await renderSignUp({ signUp: { enterpriseDomains: ['example.com'] } });
-
-      await submitStart(user);
-
-      expect(await screen.findByRole('button', { name: 'Start over' })).toBeInTheDocument();
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        'We couldn’t continue signing you up. Start over to try again.',
-      );
-      expect(fapi.signUp.preparations).toEqual([]);
-
-      await user.click(screen.getByRole('button', { name: 'Start over' }));
-
-      expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
-    });
   });
 
   describe('finishing', () => {
