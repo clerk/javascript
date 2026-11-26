@@ -22,7 +22,7 @@ export default defineConfig({
     stylexPlugin({
       fileName: 'styles.css',
       useCSSLayers: true,
-      lightningcssOptions: { targets: mosaicLightningCssTargets },
+      lightningcssOptions: { targets: mosaicLightningCssTargets, minify: true },
     }),
   ],
   onSuccess: async () => {
