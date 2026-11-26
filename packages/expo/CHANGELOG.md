@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.17.8
+
+### Patch Changes
+
+- Log an error that tells you to update `@clerk/expo` and `@clerk/expo-native-components` together and rebuild when the app's native build doesn't match `@clerk/expo`. Native components used to render blank with no explanation in that case, including in release builds that get `@clerk/expo` through an over-the-air update. ([#11011](https://github.com/clerk/javascript/pull/11011)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`c64d559`](https://github.com/clerk/javascript/commit/c64d5597f440a1b5bedd8f4d38982b6920528182)]:
+  - @clerk/clerk-js@6.48.1
+
 ## 4.17.7
 
 ### Patch Changes
