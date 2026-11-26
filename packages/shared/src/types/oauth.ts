@@ -50,6 +50,8 @@ export type InstagramOauthProvider = 'instagram';
 /** @inline */
 export type CoinbaseOauthProvider = 'coinbase';
 /** @inline */
+export type LinkOauthProvider = 'link';
+/** @inline */
 export type SpotifyOauthProvider = 'spotify';
 /** @inline */
 export type XeroOauthProvider = 'xero';
@@ -96,6 +98,7 @@ export type OAuthProvider =
   | LineOauthProvider
   | InstagramOauthProvider
   | CoinbaseOauthProvider
+  | LinkOauthProvider
   | SpotifyOauthProvider
   | XeroOauthProvider
   | BoxOauthProvider
