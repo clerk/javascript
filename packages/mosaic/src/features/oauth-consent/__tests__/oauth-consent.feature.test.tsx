@@ -396,15 +396,97 @@ describe('OAuthConsent', () => {
       expect((await submitAllow(user))?.get('organization_id')).toBe('org_1');
     });
 
-    it('submits the organization the user picks', async () => {
+    it.each([
+      ['is not reported', {}],
+      ['is 1', { max_organizations: 1 }],
+      ['is not a whole number', { max_organizations: 2.5 }],
+      ['is below 1', { max_organizations: 0 }],
+    ])('submits one organization when the limit %s', async (_, limit) => {
       visitOAuthConsent();
-      const { user } = await renderOAuthConsent(signedIn(orgScopes));
+      const { user } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, ...limit }) }),
+      );
 
       await ready();
       await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
       await user.click(await screen.findByRole('option', { name: 'Globex' }));
 
-      expect((await submitAllow(user))?.get('organization_id')).toBe('org_2');
+      expect(screen.getByRole('combobox', { name: /^Grant access for:/ })).toHaveTextContent('Globex');
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_2']);
+    });
+
+    it('caps the selection at the limit the instance allows', async () => {
+      visitOAuthConsent();
+      const initech = fapiOrganization({ id: 'org_3', name: 'Initech' });
+      const carol = fapiUser({
+        id: 'user_3',
+        organization_memberships: [fapiMembership(acme), fapiMembership(globex), fapiMembership(initech)],
+      });
+      const { user } = await renderOAuthConsent({
+        oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 2 }),
+        client: fapiClient([fapiSession({ id: 'sess_3', user: carol, last_active_organization_id: null })]),
+      });
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+
+      expect(screen.getByRole('option', { name: 'Initech' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByText('You can select up to 2 organizations.')).toBeVisible();
+    });
+
+    it('submits every organization the user picks', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 5 }) }),
+      );
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1 org_2']);
+    });
+
+    it('submits the default organization first, then the rest in list order', async () => {
+      visitOAuthConsent();
+      const { user } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 5 }) }),
+      );
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Acme' }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+      await user.click(await screen.findByRole('option', { name: 'Acme' }));
+
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1 org_2']);
+    });
+
+    it('drops a picked organization the user is no longer a member of', async () => {
+      visitOAuthConsent();
+      const { user, fapi, clerk } = await renderOAuthConsent(
+        signedIn({ oauthConsent: consent({ scopes: orgScopes.oauthConsent.scopes, max_organizations: 5 }) }),
+      );
+
+      await ready();
+      await user.click(screen.getByRole('combobox', { name: /^Grant access for:/ }));
+      await user.click(await screen.findByRole('option', { name: 'Globex' }));
+      await user.keyboard('{Escape}');
+
+      fapi.client = fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: { ...alice, organization_memberships: [fapiMembership(acme)] },
+          last_active_organization_id: null,
+        }),
+      ]);
+      await act(async () => {
+        await clerk.client?.reload();
+        await clerk.setActive({ session: 'sess_1' });
+      });
+
+      expect((await submitAllow(user))?.getAll('organization_id')).toEqual(['org_1']);
     });
 
     it('shows each organization logo', async () => {

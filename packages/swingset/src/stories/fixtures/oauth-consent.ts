@@ -23,6 +23,7 @@ const baseModel: OAuthConsentReadyModel = {
   hasOfflineAccess: false,
   organizations: [],
   defaultOrganizationId: null,
+  maxOrganizations: 5,
   redirectUrl,
   redirectDomain: 'example.com',
   actionUrl: '#',

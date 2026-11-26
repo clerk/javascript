@@ -94,7 +94,12 @@ export function useOAuthConsentModel(options: OAuthConsentModelOptions): OAuthCo
     defaultOrganizationId:
       (organizations.find(organization => organization.value === session.lastActiveOrganizationId) ?? organizations[0])
         ?.value ?? null,
+    maxOrganizations: toOrganizationLimit(data.maxOrganizations),
   };
+}
+
+function toOrganizationLimit(reported: number | undefined): number {
+  return reported !== undefined && Number.isInteger(reported) && reported >= 1 ? reported : 1;
 }
 
 function toClientIdentity(

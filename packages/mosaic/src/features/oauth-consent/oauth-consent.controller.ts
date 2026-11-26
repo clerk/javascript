@@ -7,11 +7,11 @@ import { OFFLINE_ACCESS_SCOPE, USER_ORG_READ_SCOPE } from './oauth-consent.utils
 const PRIVATE_METADATA_SCOPE = 'private_metadata';
 
 export function useOAuthConsentController(
-  { status: _status, scopes, organizations, defaultOrganizationId, ...model }: OAuthConsentReadyModel,
+  { status: _status, scopes, organizations, defaultOrganizationId, maxOrganizations, ...model }: OAuthConsentReadyModel,
   messages: OAuthConsentMessages,
 ): OAuthConsentViewProps {
   const [uncheckedScopes, setUncheckedScopes] = useState<readonly string[]>([]);
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
+  const [selectedOrganizationIds, setSelectedOrganizationIds] = useState<string[] | null>(null);
   const [isRedirectUrlOpen, setIsRedirectUrlOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'allow' | 'deny'>();
 
@@ -29,6 +29,14 @@ export function useOAuthConsentController(
     .map(item => item.scope)
     .filter(scope => scope === OFFLINE_ACCESS_SCOPE || !uncheckedScopes.includes(scope));
   const sharesOrganizations = checked.includes(USER_ORG_READ_SCOPE);
+  const pickedOrganizationIds =
+    selectedOrganizationIds ?? (defaultOrganizationId === null ? [] : [defaultOrganizationId]);
+  const organizationIds = sharesOrganizations
+    ? organizations
+        .map(organization => organization.value)
+        .filter(id => pickedOrganizationIds.includes(id))
+        .sort((a, b) => Number(b === defaultOrganizationId) - Number(a === defaultOrganizationId))
+    : [];
 
   return {
     ...model,
@@ -48,10 +56,18 @@ export function useOAuthConsentController(
     },
     scope: checked.join(' ') || OFFLINE_ACCESS_SCOPE,
     organizations: sharesOrganizations ? organizations : [],
-    organizationSelection: {
-      organizationId: sharesOrganizations ? (selectedOrganizationId ?? defaultOrganizationId) : null,
-      onOrganizationIdChange: setSelectedOrganizationId,
-    },
+    organizationSelection:
+      maxOrganizations > 1
+        ? {
+            multiple: true,
+            organizationIds,
+            onOrganizationIdsChange: setSelectedOrganizationIds,
+            limit: maxOrganizations,
+          }
+        : {
+            organizationId: sharesOrganizations ? (organizationIds[0] ?? defaultOrganizationId) : null,
+            onOrganizationIdChange: organizationId => setSelectedOrganizationIds([organizationId]),
+          },
     isRedirectUrlOpen,
     onRedirectUrlOpenChange: setIsRedirectUrlOpen,
     pendingAction,
