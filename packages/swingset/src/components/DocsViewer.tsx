@@ -87,6 +87,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
     link: dynamic(() => import('../stories/link.mdx')),
+    'middle-truncate': dynamic(() => import('../stories/middle-truncate.mdx')),
     skeleton: dynamic(() => import('../stories/skeleton.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
