@@ -918,6 +918,23 @@ export interface EnterpriseConnectionJSON extends ClerkResourceJSON {
   oauth_config?: EnterpriseConnectionOauthConfigJSON | null;
 }
 
+/**
+ * Enterprise connection webhook event payload, used for `enterpriseConnection.created` webhook events.
+ * It carries only the connection's own fields; fetch the full `EnterpriseConnectionJSON`
+ * from the Backend API with `id` when you need its name, provider or SAML/OAuth details.
+ */
+export interface EnterpriseConnectionWebhookEventJSON {
+  object: typeof ObjectType.EnterpriseConnection;
+  id: string;
+  organization_id: string | null;
+  domains: string[];
+  active: boolean;
+  /**
+   * Unix timestamp of creation, in milliseconds.
+   */
+  created_at: number;
+}
+
 export interface SamlConnectionJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SamlConnection;
   name: string;
