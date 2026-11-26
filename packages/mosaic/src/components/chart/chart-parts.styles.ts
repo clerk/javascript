@@ -46,13 +46,13 @@ export const partStyles = stylex.create({
   activatable: {
     cursor: 'pointer',
   },
+  // A keyboard selection shows `Chart.FocusOutline` around the bars instead of the band.
   cursor: {
     borderRadius: radiusVars['--cl-radius-sm'],
-    backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
-    outlineColor: { default: null, ':where([data-focus-visible])': colorVars['--cl-color-ring'] },
-    outlineOffset: { default: null, ':where([data-focus-visible])': focusVars['--cl-focus-outline-offset'] },
-    outlineStyle: { default: null, ':where([data-focus-visible])': focusVars['--cl-focus-outline-style'] },
-    outlineWidth: { default: null, ':where([data-focus-visible])': focusVars['--cl-focus-outline-width'] },
+    backgroundColor: {
+      default: colorVars['--cl-color-neutral-alpha-200'],
+      ':where([data-focus-visible])': 'transparent',
+    },
   },
   tooltip: {
     padding: space['3'],

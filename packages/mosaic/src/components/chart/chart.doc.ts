@@ -1,5 +1,10 @@
 import type { ComponentDoc } from '../../docs-schema';
-import type { ChartBarProps, ChartBarsProps, ChartProjectionOutlineProps } from './bars/chart-bars';
+import type {
+  ChartBarProps,
+  ChartBarsProps,
+  ChartFocusOutlineProps,
+  ChartProjectionOutlineProps,
+} from './bars/chart-bars';
 import type { ChartLegendProps, ChartTooltipContentProps } from './chart';
 import type {
   ChartCursorProps,
@@ -130,7 +135,7 @@ export default {
     },
     'Chart.Bars': {
       description:
-        'Paints the bars on Canvas above the cursor, so the hover band shows only in the gaps. Without children it renders `Chart.Bar`, `Chart.ProjectionOutline` and a zero `Chart.YLine`.',
+        'Paints the bars on Canvas above the cursor, so the hover band shows only in the gaps. Without children it renders `Chart.Bar`, `Chart.ProjectionOutline`, a zero `Chart.YLine` and `Chart.FocusOutline`.',
       slot: 'cl-chart-bars',
     },
     'Chart.Bar': {
@@ -142,6 +147,15 @@ export default {
       description:
         "A dashed outline around the projected total. The Canvas paints it from this hidden element's `stroke`, `stroke-width` and `stroke-dasharray`.",
       slot: 'cl-chart-projection-outline',
+    },
+    'Chart.FocusOutline': {
+      description:
+        "The keyboard focus ring around the selected section's bars, in the ring color and width, 2px clear of them. Shown only while the keyboard made the selection; the hover band marks a pointer selection.",
+      slot: 'cl-chart-focus-outline',
+      props: {
+        offset: { type: 'number', doc: "Space in px between the bars and the ring's center line.", default: '3' },
+        minSize: { type: 'number', doc: 'The smallest width and height in px.', default: '12' },
+      },
     },
     'Chart.YAxis': {
       description: 'Value labels beside the plot, left out while the chart has no rows.',
@@ -321,6 +335,7 @@ const chart = Chart.useBarChart({
   'Chart.Bars': ChartBarsProps;
   'Chart.Bar': ChartBarProps;
   'Chart.ProjectionOutline': ChartProjectionOutlineProps;
+  'Chart.FocusOutline': ChartFocusOutlineProps;
   'Chart.YAxis': ChartYAxisProps;
   'Chart.YTick': ChartYTickProps;
   'Chart.XAxis': ChartXAxisProps;

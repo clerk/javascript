@@ -409,14 +409,18 @@ describe('Chart.Selection', () => {
     const selection = () => document.querySelector('.cl-chart-selection');
     const outline = (element: Element | null) => (element ? getComputedStyle(element).outlineStyle : 'missing');
 
+    const ring = () => document.querySelector('.cl-chart-focus-outline');
+
     surface().focus();
     await userEvent.keyboard('{ArrowRight}');
-    await expect.poll(() => outline(document.querySelector('.cl-chart-cursor'))).toBe('solid');
+    await expect.poll(() => ring() && getComputedStyle(ring()!).strokeWidth).toBe('2px');
+    expect(getComputedStyle(ring()!).stroke).not.toBe('none');
     expect(outline(selection())).toBe('none');
+    expect(getComputedStyle(document.querySelector('.cl-chart-cursor')!).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
     await userEvent.keyboard('{Escape}');
     await expect.poll(() => outline(selection())).toBe('solid');
-    expect(document.querySelector('.cl-chart-cursor')).toBeNull();
+    expect(ring()).toBeNull();
   });
 
   it('describes the keys in the language of the localization', async () => {
