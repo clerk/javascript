@@ -65,6 +65,7 @@ function assertDecodedLiteral(part: string): void {
 
 // 'billing/plans/:planId?' -> [{ param: false, value: 'billing' }, { param: false, value: 'plans' }, { param: true, name: 'planId', optional: true }]
 export function compilePattern(pattern: string): PatternPart[] {
+  const names = new Set<string>();
   const parts = partsOf(pattern).map<PatternPart>(part => {
     if (!part.startsWith(':')) {
       assertDecodedLiteral(part);
@@ -73,14 +74,26 @@ export function compilePattern(pattern: string): PatternPart[] {
     const optional = part.endsWith('?');
     const name = part.slice(1, optional ? -1 : undefined);
     if (name === '') {
-      throw new Error(`[clerk] Route pattern "${pattern}" has a param without a name.`);
+      throw new Error(`[Clerk] Route pattern "${pattern}" has a param without a name.`);
     }
+    if (name.startsWith(':')) {
+      throw new Error(`[Clerk] Route pattern "${pattern}" has a param named "${name}", which starts with a colon.`);
+    }
+    if (name in Object.prototype) {
+      throw new Error(
+        `[Clerk] Route pattern "${pattern}" has a param named "${name}", which is a property of every object.`,
+      );
+    }
+    if (names.has(name)) {
+      throw new Error(`[Clerk] Route pattern "${pattern}" has the param "${name}" more than once.`);
+    }
+    names.add(name);
     return { param: true, name, optional };
   });
   const firstOptional = parts.findIndex(part => part.param && part.optional);
   if (firstOptional !== -1 && parts.slice(firstOptional).some(part => !part.param || !part.optional)) {
     throw new Error(
-      `[clerk] Route pattern "${pattern}" has a required part after an optional one; optional parts come last.`,
+      `[Clerk] Route pattern "${pattern}" has a required part after an optional one; optional parts come last.`,
     );
   }
   return parts;
@@ -171,13 +184,13 @@ export function buildParts(parts: readonly PatternPart[], params: Record<string,
       built.push(part.value);
       continue;
     }
-    const value = params[part.name];
+    const value = Object.hasOwn(params, part.name) ? params[part.name] : undefined;
     if (value === undefined) {
       omitted ??= part.name;
       continue;
     }
     if (omitted !== undefined) {
-      throw new Error(`[clerk] Route param "${part.name}" was given without "${omitted}" before it.`);
+      throw new Error(`[Clerk] Route param "${part.name}" was given without "${omitted}" before it.`);
     }
     built.push(value);
   }

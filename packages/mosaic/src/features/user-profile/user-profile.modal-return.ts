@@ -35,7 +35,7 @@ export function UserProfileModalReturn(): null {
         return;
       }
       url.searchParams.delete(MODAL_PARAM);
-      window.history.replaceState(withoutNextAppRouterMarker(window.history.state), '', url);
+      window.history.replaceState(null, '', url);
       if (page === COMBINED_ACCOUNT_PAGE) {
         openProfile({ ...profileModalOptions(profile), page: 'account' });
       } else {
@@ -45,13 +45,4 @@ export function UserProfileModalReturn(): null {
   }, [openProfile, openUserProfile, profile]);
 
   return null;
-}
-
-function withoutNextAppRouterMarker(state: unknown): unknown {
-  if (typeof state !== 'object' || state === null || !('__NA' in state)) {
-    return state;
-  }
-  const copy: object = Object.assign(Array.isArray(state) ? [] : {}, state);
-  Reflect.deleteProperty(copy, '__NA');
-  return copy;
 }

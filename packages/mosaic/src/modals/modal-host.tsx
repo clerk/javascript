@@ -8,8 +8,21 @@ import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
-import { useMosaicLocation } from '../routing/use-mosaic-location';
-import type { ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
+import { useRoutingConfig } from '../routing/router-adapter';
+import { useFixedRoutingMode, useHostPathname, useMosaicLocation } from '../routing/use-mosaic-location';
+import type { ModalHandle, ModalRoutingMode, ModalSurface, ModalSurfaces } from './modal.types';
+
+// The open modals in the order they opened. Modals are hosted side by side rather than inside
+// one another, so the dialogs cannot tell through the floating tree that one is on top of
+// another. This means that to the one beneath, a press inside the one on top is an outside press,
+// and Escape reaches both so we use this to make sure only the modal on top takes a dismissal.
+// This shouldn't normally happen, but it could so we might as well handle it.
+interface ModalStack {
+  top: string | undefined;
+  register: (id: string) => () => void;
+}
+
+const ModalStackContext = React.createContext<ModalStack | null>(null);
 
 export function ModalHost({
   surfaces,
@@ -18,15 +31,22 @@ export function ModalHost({
   surfaces: ModalSurfaces;
   children: React.ReactNode;
 }): React.ReactElement {
+  const [open, setOpen] = React.useState<readonly string[]>([]);
+  const register = React.useCallback((id: string) => {
+    setOpen(previous => [...previous.filter(other => other !== id), id]);
+    return () => setOpen(previous => previous.filter(other => other !== id));
+  }, []);
+  const stack = React.useMemo<ModalStack>(() => ({ top: open[open.length - 1], register }), [open, register]);
+
   return (
-    <>
+    <ModalStackContext.Provider value={stack}>
       {surfaces.reduceRight<React.ReactNode>(
         (inner, { id, Host }) => (
           <Host key={id}>{inner}</Host>
         ),
         children,
       )}
-    </>
+    </ModalStackContext.Provider>
   );
 }
 
@@ -43,15 +63,40 @@ export function ModalSurfaceHost<Options>({
     openCount: 0,
     openRequested: false,
     wasOpen: false,
+    openedOn: undefined,
   });
 
   // The modal open state is derived from the routing state, so there is no state to sync and
   // opening/closing is just writing to the appropriate routing state. This means that in a mode
   // that writes to the url, the modal opens automatically on page load if the url says so,
   // the Back button just works etc. The public modal open/close are just routing writes.
+  const routing = useFixedRoutingMode(useRoutingConfig().modals ?? 'virtual', {
+    name: '"routing.modals"',
+    remount: 'Remount the provider to change it.',
+  });
   const base = surface.path ?? `/modal/${surface.id}`;
-  const location = useMosaicLocation({ routing: 'virtual', path: base });
+  const location = useMosaicLocation({ routing, path: base });
   const isOpen = location.useSegmentParts() !== undefined;
+  const page = useHostPathname(routing);
+
+  // Close the modal when the host moves to another pathname, in every mode
+  const leftPage = isOpen && state.openedOn !== undefined && page !== undefined && state.openedOn !== page;
+  React.useEffect(() => {
+    if (leftPage) {
+      location.clear();
+    }
+  }, [leftPage, location]);
+  const shown = isOpen && !leftPage;
+
+  // Register/unregister the modal to the stack and determine if it's the top one
+  const stack = React.useContext(ModalStackContext);
+  const register = stack?.register;
+  React.useEffect(() => {
+    // Note that register returns an unregister function, so return is necessary here
+    return shown ? register?.(surface.id) : undefined;
+  }, [shown, register, surface.id]);
+  const isTop = stack === null || stack.top === surface.id;
+
   // wasOpen guarantees this only runs once as we are opening the modal
   if (isOpen && !state.wasOpen) {
     setState(previous =>
@@ -60,13 +105,14 @@ export function ModalSurfaceHost<Options>({
       // modal is rendering because the routing state says so, and we reset whatever
       // options/container state was lying around since last time the modal was open.
       previous.openRequested
-        ? { ...previous, openRequested: false, wasOpen: true }
+        ? { ...previous, openRequested: false, wasOpen: true, openedOn: page }
         : {
             options: undefined,
             container: undefined,
             openCount: previous.openCount + 1,
             openRequested: false,
             wasOpen: true,
+            openedOn: page,
           },
     );
   } else if (!isOpen && state.wasOpen) {
@@ -74,7 +120,7 @@ export function ModalSurfaceHost<Options>({
     // full state here as we need it around for the exit transition
     setState(previous => ({ ...previous, wasOpen: false }));
   }
-  // The entry may appear without `open` being called, written from outside or restored by a URL,
+  // The segment may appear without `open` being called, written from outside or restored by a URL,
   // so the content loads whenever the modal is open, not only when the handle opened it.
   React.useEffect(() => {
     if (isOpen) {
@@ -92,6 +138,7 @@ export function ModalSurfaceHost<Options>({
           container,
           openCount: previous.openCount + 1,
           openRequested: !isOpen,
+          openedOn: page,
         }));
         location.write(surface.initialParts?.(options) ?? []);
       },
@@ -102,7 +149,7 @@ export function ModalSurfaceHost<Options>({
       preload,
       isOpen,
     };
-  }, [surface, location, isOpen]);
+  }, [surface, location, isOpen, page]);
 
   return (
     <surface.context.Provider value={modal}>
@@ -110,9 +157,11 @@ export function ModalSurfaceHost<Options>({
       <ModalSlot
         surface={surface}
         state={state}
-        open={isOpen}
+        open={shown}
         base={base}
+        routing={routing}
         close={modal.close}
+        dismissible={isTop}
       />
     </surface.context.Provider>
   );
@@ -123,13 +172,17 @@ function ModalSlot<Options>({
   state,
   open,
   base,
+  routing,
   close,
+  dismissible,
 }: {
   surface: ModalSurface<Options>;
   state: ModalState<Options>;
   open: boolean;
   base: string;
+  routing: ModalRoutingMode;
   close: () => void;
+  dismissible: boolean;
 }) {
   const [content] = useActor(surface.loader);
   const { Content } = content.context;
@@ -139,7 +192,7 @@ function ModalSlot<Options>({
     <Dialog.Root
       open={open && (Content !== undefined || failed)}
       onOpenChange={open => {
-        if (!open) {
+        if (!open && dismissible) {
           close();
         }
       }}
@@ -151,6 +204,7 @@ function ModalSlot<Options>({
             options={state.options}
             close={close}
             path={base}
+            routing={routing}
           />
         ) : failed ? (
           <LoadFailed />
@@ -180,6 +234,7 @@ interface ModalState<Options> {
   // Set by `open()` until the opening it asked for happens. An opening without it came from outside.
   openRequested: boolean;
   // `isOpen` as of the previous render, kept only to tell the opening and closing edges apart. The
-  // entry alone decides whether the modal renders.
+  // segment alone decides whether the modal renders.
   wasOpen: boolean;
+  openedOn: string | undefined;
 }

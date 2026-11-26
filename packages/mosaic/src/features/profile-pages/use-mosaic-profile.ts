@@ -18,12 +18,14 @@ export interface MosaicProfile {
    */
   combined?: boolean;
   /**
-   * Options for the user profile, whichever component opens or mounts it.
+   * Options for the user profile, whichever component opens or mounts it. `routing` and `path`
+   * apply when the profile is mounted on a page, they are ignored for the modal version.
    */
   userProfileProps?: ProfileUserProps;
   /**
    * Options for the organization profile, or the organization's pages in a combined profile,
-   * whichever component opens or mounts it.
+   * whichever component opens or mounts it. `routing` and `path` apply when the profile is mounted
+   * on a page, they are ignored for the modal version.
    */
   organizationProfileProps?: ProfileOrganizationProps;
   /**
@@ -54,13 +56,15 @@ export interface ProfilePages<PageId extends string> {
 
 /** Options for the underlying `<UserProfile />` component. */
 export interface ProfileUserProps
-  extends ProfilePages<UserProfilePageId>, Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'path'> {}
+  extends
+    ProfilePages<UserProfilePageId>,
+    Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'path' | 'routing'> {}
 
 /** Options for the underlying `<OrganizationProfile />` component. */
 export interface ProfileOrganizationProps
   extends
     ProfilePages<OrganizationProfilePageId>,
-    Pick<OrganizationProfileProps, 'afterLeaveOrganizationUrl' | 'apiKeysProps' | 'path'> {}
+    Pick<OrganizationProfileProps, 'afterLeaveOrganizationUrl' | 'apiKeysProps' | 'path' | 'routing'> {}
 
 const MosaicProfileContext = createContext<MosaicProfile>({});
 

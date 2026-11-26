@@ -1,17 +1,19 @@
 import { logger } from '@clerk/shared/logger';
 import { act, cleanup, configure, render, renderHook, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
-import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
+import React, { useSyncExternalStore } from 'react';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { MosaicProviderProps } from '../mosaic-provider';
 import { MosaicProvider } from '../mosaic-provider';
 import { useRouterScope } from '../routing/use-router';
 import { useVirtualSegment, useVirtualWrite } from '../routing/virtual-store';
+import { markSettled } from '../routing/window-location';
 import { defineModalSurface } from './define-modal-surface';
 import type { ModalContentProps, ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 import { ModalHost } from './modal-host';
 import { useModal } from './use-modal';
 
+beforeEach(() => markSettled());
 afterEach(() => cleanup());
 
 interface StubOptions {
@@ -111,6 +113,54 @@ describe('useModal', () => {
     expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
   });
 
+  it('stays open when the page it moved to opens it again', async () => {
+    const original = window.location.href;
+    onTestFinished(() => window.history.replaceState(null, '', original));
+    window.history.replaceState(null, '', '/page');
+    const { ref } = renderCaller(stubSurface());
+    act(() => ref.handle?.open());
+    await flush();
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(readOptions()).toEqual({ page: 'security' });
+
+    act(() => {
+      window.history.pushState(null, '', '/third');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+  });
+
+  it('closes when the host moves to another pathname, and stays open across a query change', async () => {
+    const original = window.location.href;
+    onTestFinished(() => window.history.replaceState(null, '', original));
+    window.history.replaceState(null, '', '/page');
+    const { ref } = renderCaller(stubSurface());
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?tab=2');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+  });
+
   it('closes through the dialog dismissal and updates isOpen', async () => {
     const { ref } = renderCaller(stubSurface());
     await flush();
@@ -159,6 +209,59 @@ describe('useModal', () => {
     expect(stubHandle?.isOpen).toBe(false);
     expect(screen.getByText('Other modal')).toBeInTheDocument();
     expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
+  });
+
+  it('lets only the modal on top take a dismissal', async () => {
+    function OtherContent() {
+      return <h2>Other modal</h2>;
+    }
+    const stub = stubSurface();
+    const other = defineModalSurface<StubOptions>({
+      id: 'other',
+      variant: 'card',
+      load: () => Promise.resolve({ default: OtherContent }),
+    });
+    let stubHandle: ModalHandle<StubOptions> | undefined;
+    let otherHandle: ModalHandle<StubOptions> | undefined;
+    renderWithModals(
+      [stub, other],
+      <>
+        <Caller
+          surface={stub}
+          onHandle={h => (stubHandle = h)}
+        />
+        <Caller
+          surface={other}
+          onHandle={h => (otherHandle = h)}
+        />
+      </>,
+    );
+    await flush();
+    act(() => stubHandle?.open());
+    await flush();
+    act(() => otherHandle?.open());
+    await flush();
+    expect(screen.getAllByRole('dialog')).toHaveLength(2);
+
+    act(() => {
+      screen.getByText('Other modal').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    });
+    await flush();
+    expect(stubHandle?.isOpen).toBe(true);
+    expect(otherHandle?.isOpen).toBe(true);
+
+    act(() => {
+      screen.getByText('Other modal').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    await flush();
+    expect(otherHandle?.isOpen).toBe(false);
+    expect(stubHandle?.isOpen).toBe(true);
+
+    act(() => {
+      screen.getByText('Stub modal').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    });
+    await flush();
+    expect(stubHandle?.isOpen).toBe(false);
   });
 
   it('loads the content once across preloads and opens', async () => {
@@ -739,5 +842,316 @@ describe('a modal surface that routes', () => {
     await flush();
 
     expect(screen.getByTestId('base').textContent).toBe('/modal/based');
+  });
+});
+
+describe('a modal surface in query mode', () => {
+  const pages = { account: 'account', security: 'security' } as const;
+
+  function QueryContent({ path, routing }: ModalContentProps<StubOptions>) {
+    const { route, go } = useRouterScope(pages, { routing, path, root: 'account' });
+    return (
+      <>
+        <output data-testid='route'>{route}</output>
+        <button
+          type='button'
+          onClick={() => go('security')}
+        >
+          Go to security
+        </button>
+      </>
+    );
+  }
+
+  function querySurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'queried',
+      variant: 'card',
+      load: () => Promise.resolve({ default: QueryContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+  }
+
+  beforeEach(() => window.history.replaceState(null, '', '/page?q=1'));
+
+  it('keeps the mode it mounted with when the provider changes it, and warns', async () => {
+    const warn = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const surface = querySurface();
+    const ref: { handle: ModalHandle<StubOptions> | undefined } = { handle: undefined };
+    const tree = (modals: 'query' | 'hash') => (
+      <MosaicProvider routing={{ modals }}>
+        <ModalHost surfaces={[surface]}>
+          <Caller
+            surface={surface}
+            onHandle={h => (ref.handle = h)}
+          />
+        </ModalHost>
+      </MosaicProvider>
+    );
+    const view = render(tree('query'));
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+
+    view.rerender(tree('hash'));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('"routing.modals" changed'));
+    warn.mockRestore();
+  });
+
+  it('hides as soon as the host leaves the page, before a slow router has removed the param', async () => {
+    const replace = vi.fn<(url: string) => void>();
+    const { ref } = renderCaller(querySurface(), { routing: { adapter: { replace }, modals: 'query' } });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere?q=1&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(replace).toHaveBeenCalledWith('/elsewhere?q=1');
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+    expect(screen.queryByTestId('route')).toBeNull();
+  });
+
+  it('closes when the host moves to another pathname and carries the param along', async () => {
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?q=2&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/elsewhere?q=2&.modal.stub=security');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.search).toBe('?q=2');
+  });
+
+  it('stays open on Back under an adapter with only usePathname, which lags the restored param', async () => {
+    const listeners = new Set<() => void>();
+    const host = { pathname: '/page' };
+    const usePathname = () =>
+      useSyncExternalStore(
+        listener => {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+        () => host.pathname,
+      );
+    const move = (pathname: string) => {
+      host.pathname = pathname;
+      listeners.forEach(listener => listener());
+    };
+    const { ref } = renderCaller(querySurface(), { routing: { adapter: { usePathname }, modals: 'query' } });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b?q=1');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      move('/b');
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => {
+      window.history.pushState(null, '', '/page?q=1&.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => move('/page'));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.search).toBe('?q=1&.modal.stub=');
+  });
+
+  it('opens with a push to its param and closes by replacing it away', async () => {
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
+    const length = window.history.length;
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+    expect(window.history.length).toBe(length + 1);
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.search).toBe('?q=1');
+    expect(window.history.length).toBe(length + 1);
+  });
+
+  it('routes its content in the query string', async () => {
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
+
+    act(() => ref.handle?.open());
+    await flush();
+    expect(window.location.search).toBe('?q=1&.modal.stub=');
+    expect(screen.getByTestId('route').textContent).toBe('account');
+
+    act(() => screen.getByRole('button', { name: 'Go to security' }).click());
+    expect(window.location.search).toBe('?q=1&.modal.stub=security');
+    expect(screen.getByTestId('route').textContent).toBe('security');
+  });
+
+  it('opens from the URL and closes when the browser goes back', async () => {
+    window.history.replaceState(null, '', '/page?q=1&.modal.stub=security');
+    const { ref } = renderCaller(querySurface(), { routing: { modals: 'query' } });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(screen.getByTestId('route').textContent).toBe('security');
+
+    act(() => {
+      window.history.replaceState(null, '', '/page?q=1');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+});
+
+describe('a modal surface in hash mode', () => {
+  function hashSurface() {
+    return defineModalSurface<StubOptions>({
+      id: 'hashed',
+      variant: 'card',
+      load: () => Promise.resolve({ default: StubContent }),
+      path: '/modal/stub',
+      initialParts: options => (options?.page ? [options.page] : []),
+    });
+  }
+
+  function hostStore(initial: { pathname: string; hash?: string }) {
+    const listeners = new Set<() => void>();
+    const subscribe = (listener: () => void) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    };
+    const host = {
+      pathname: initial.pathname,
+      hash: initial.hash ?? '',
+      set(next: { pathname?: string; hash?: string }) {
+        host.pathname = next.pathname ?? host.pathname;
+        host.hash = next.hash ?? host.hash;
+        listeners.forEach(listener => listener());
+      },
+      navigate(url: string) {
+        const parsed = new URL(url, 'http://memory');
+        host.set({ pathname: parsed.pathname, hash: parsed.hash.slice(1) });
+      },
+      usePathname: () => useSyncExternalStore(subscribe, () => host.pathname),
+      useHash: () => useSyncExternalStore(subscribe, () => host.hash),
+      readUrl: () => ({ pathname: host.pathname, search: '', hash: host.hash }),
+    };
+    return host;
+  }
+
+  beforeEach(() => window.history.replaceState(null, '', '/a'));
+
+  it('opens with a push to its hash param and closes by replacing it away', async () => {
+    const { ref } = renderCaller(hashSurface(), { routing: { modals: 'hash' } });
+
+    act(() => ref.handle?.open({ page: 'security' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('#.modal.stub=security');
+
+    act(() => ref.handle?.close());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.hash).toBe('');
+  });
+
+  it('stays open on Back when the adapter pathname lags the restored hash by a commit', async () => {
+    const host = hostStore({ pathname: '/a' });
+    const { ref } = renderCaller(hashSurface(), {
+      routing: { adapter: { usePathname: host.usePathname }, modals: 'hash' },
+    });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      host.set({ pathname: '/b' });
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+
+    act(() => {
+      window.history.pushState(null, '', '/a#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => host.set({ pathname: '/a' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(window.location.hash).toBe('#.modal.stub=');
+  });
+
+  it('closes when a memory router that supplies the hash moves to another pathname with it', async () => {
+    const host = hostStore({ pathname: '/a' });
+    const adapter = {
+      usePathname: host.usePathname,
+      useHash: host.useHash,
+      push: host.navigate,
+      replace: host.navigate,
+      readUrl: host.readUrl,
+    };
+    const { ref } = renderCaller(hashSurface(), { routing: { adapter, modals: 'hash' } });
+    act(() => ref.handle?.open());
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+    expect(host.hash).toBe('.modal.stub=');
+    expect(window.location.hash).toBe('');
+
+    act(() => host.set({ pathname: '/b' }));
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(host.hash).toBe('');
+  });
+
+  it('closes when the host moves to another pathname with the hash carried along', async () => {
+    const { ref } = renderCaller(hashSurface(), { routing: { modals: 'hash' } });
+    act(() => ref.handle?.open());
+    await flush();
+
+    act(() => {
+      window.history.pushState(null, '', '/a?q=2#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(true);
+
+    act(() => {
+      window.history.pushState(null, '', '/b#.modal.stub=');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    await flush();
+    expect(ref.handle?.isOpen).toBe(false);
+    expect(window.location.hash).toBe('');
   });
 });
