@@ -8,7 +8,9 @@ FAPI tracks which requirements are outstanding and whether a code has been sent.
 
 Today FAPI sends `status`, `missing_fields` and `unverified_fields`, not a step. Until it sends `nextStep`, `getSignInNextStep` and `getSignUpNextStep` in `shared` compute it from those fields (see [Bridge](#bridge)).
 
-There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param.
+Sign-up's `continue` screen asks for what FAPI lists in `missing_fields`, not for what the instance's settings would require, so the client never re-derives a rule FAPI already applied (`continueFields` in `mosaic/src/features/sign-up/sign-up.utils.ts`). A missing email, phone or username that FAPI also lists in `optional_fields` is a choice, so the form asks for one of them, with the email/phone switch when both are allowed. An email or phone FAPI lists in `unverified_fields` stays on the form, prefilled, so Edit on a verify screen reached from `continue` has an address to change. FAPI drops the old verification whenever an update sends the address, changed or not, so the verify screen sends a new code. Requirements another step owns, such as `enterprise_sso`, don't appear. When FAPI lists a requirement `continue` can't ask for, such as a required `oauth_*` provider, the step is `unknown` and the user sees Start over instead of a form that can't finish. `start` has no sign-up yet, so it reads the instance's settings.
+
+There is no step machine and no local copy of the step. What the step can't say lives in the route, such as the factor the user picked in `factorOne`'s `:factor` param, or whether a sign-up verify screen was reached from `continue`.
 
 ## Pick the screen
 
@@ -17,13 +19,26 @@ The route and the step can disagree: the user went back, opened an old link, or 
 ```tsx
 const { step } = model;
 const { route } = useRouterScope(signInRoutes, { routing, path, root: 'start' });
-const screen = step.type === 'unknown' ? 'startOver' : allowedRoute(route, step) ? route : routeFor(step);
+const shown = step.type === 'unknown' ? undefined : allowedRoute(route, step) ? route : routeFor(step);
 ```
 
-- `routeFor(step)` returns the step's route, from the lists below.
+The flow's `*.routes.ts` exports this rule as one function, so the controller and the unit test share it (`shownRoute` in `mosaic/src/features/sign-up/sign-up.routes.ts`). Sign-up's also takes the flow outcome and reads the step only when the outcome is `resource` ([Routes and steps](#routes-and-steps)). No route means "Start over".
+
+- `routeFor(step)` returns the step's route, from the lists below. Sign-up's also takes the current route, so a verify step reached from `continue` stays under it.
 - `allowedRoute(route, step)` is `true` for `start`, for the step's own route, and for `continue` while sign-up verifies, so the user can edit a field. `complete` and `transfer` have no route, so they allow any route: the current screen stays up while `next` runs, and shows the error if it fails.
-- The component that owns the route table computes `screen` during render, with no effect.
+- The component that owns the route table computes the screen during render, and passes the route shown to `useRouteGuard`, which replaces a route the step does not allow so the stored route never keeps it. It is a guard, not a route table that changes with the step: the route exists, the flow is just not ready for it.
 - This runs once the model is `ready`, and after Clerk loads there is always a step. Until then the scope gets `ready: false`, so a starting route like `factor-one` isn't reset to `start`.
+
+## Mount the screen
+
+Sign-up renders one component per screen, so the route decides what is mounted (`SignUpView` in `mosaic/src/features/sign-up/sign-up.view.tsx`). Sign-in has no controller yet.
+
+- `useSignUpController` sits above the screens and holds what outlives one: the route and its guard, the next step, finishing and Start over. It also creates the details form through `useSignUpDetailsController` (`sign-up-details/`), so `start` and `continue` render that one form, and a password typed on `start` is still there after Back from a verify screen. The password lives nowhere else.
+- Each screen has a folder that takes its group of the model (`sign-up-details/`, `sign-up-verify/`, `sign-up-restricted/`), as [Features → A flow with several screens](../features.md#a-flow-with-several-screens) describes.
+- A screen with work to do on arrival owns its controller. `SignUpVerify` holds the code machine and sends the code when it mounts on a step with `sent: false`. A submit, a reload and a redirect all arrive that way. A screen that runs a controller reaches the view as a slot the wrapper builds, as the profile section's `nameAction` does, so `SignUpView` renders plain props only.
+- `SignUpVerify` takes the sign-up's id as its `key`, so a new sign-up never reuses the last one's screen.
+- A screen another feature owns arrives as a slot. The wrapper runs the task's model once, passes it to `TaskChooseOrganizationContent` (the task without its card), and tells the controller whether the task has loaded. The view mounts the slot on the task route.
+- A screen that is not a route sits on top of one. `restricted`, `waitlist` and `actionBlocked` replace `start`, and `startOver` replaces any route. A route whose screen is not built yet (`enterpriseConnections`, `protectCheck`) shows `startOver`.
 
 ## Move on after a submit
 
@@ -39,12 +54,12 @@ submitPassword: async (password: string) => {
 },
 ```
 
-- `complete`: the model's `finalize()`, then leave the flow. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
-- `transfer` from sign-in: the model's `transfer()` calls `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step. A sign-in with sign-up built in holds the sign-up routes under `create/`, so it stays in the component. Otherwise it leaves for the sign-up page.
-- `transfer` from sign-up, when the identifier already has an account: the model's `transfer()` calls `signIn.create({ transfer: true })`, then `next` with the sign-in's step.
+- `complete`: the model's `finalize()`, then leave the flow for the after sign-up URL, which honors `redirect_url` and the redirect query params (`clerk.buildAfterSignUpUrl({ params })`). Creating the session clears the sign-up. Sign-up renders the model it left from while `finalize()` runs, and after it until a task that continues in the flow has its data loaded, so the task replaces the screen with no skeleton between them. It keeps the action pending throughout, the way the switcher holds its `frozenModel` ([Controllers → Wrapping actions](../controllers.md#wrapping-actions)). Once the hold ends with the session signed in, the flow is over: if the host keeps the component mounted, it renders nothing. In a modal, don't `close()` when the flow leaves: `finalize()`'s navigation is the last write and takes the modal with it.
+- `transfer`: planned, not built. From sign-in, the model's `transfer()` will call `signUp.create({ transfer: true, unsafeMetadata })`, then `next` with the sign-up's step; a sign-in with sign-up built in holds the sign-up routes under `create/`, otherwise it leaves for the sign-up page. From sign-up, when the identifier already has an account, it will call `signIn.create({ transfer: true })`, then `next` with the sign-in's step. Until then sign-up keeps the current screen on a `transfer` step.
 - `unknown`: nothing. The screen already shows "Start over".
+- `blocked`: sign-up's `create` resolves with it, not a step, when FAPI answers `action_blocked`. The controller keeps the details for this mount and shows the notice in place of `start`. The notice is not read from Clerk's sign-up error, which outlives the component, so a remount shows the form again, as `ui`'s card error does.
 - Anything else: `go(routeFor(step))`.
-- An error from `finalize()` or the transfer stays on the current screen.
+- An error from `finalize()` or the transfer stays on the current screen until the user leaves it, so Edit clears it. Verifying a sign-up that is already complete skips the request and returns `complete`, so entering the code again runs `finalize()` again.
 
 ## Routes and steps
 
@@ -64,9 +79,23 @@ Sign-up:
 - `start` → `start`
 - `protect` → `protectCheck`
 - `enterprise_sso` → `enterpriseConnections`, which goes straight to the IdP unless there are several connections to pick from
-- `verify_email` (`target`, `sent`) → `verifyEmail`
-- `verify_phone` (`target`, `sent`) → `verifyPhone`
+- `verify_email` (`target`, `sent`) → `verifyEmail`, or `continueVerifyEmail` when reached from `continue`
+- `verify_phone` (`target`, `sent`) → `verifyPhone`, or `continueVerifyPhone` when reached from `continue`
 - `fields` (`fields`) → `continue`
+
+The step is the sign-up resource's and says nothing about the session. The model returns the session beside it as `flow.session`: `none`, `activating` while `setActive` runs and Clerk reports no session, `task` (`key`) for a pending task sign-up shows in its own card, or `active`. A task the application gave a URL in `taskUrls`, or one sign-up has no screen for, is `active`, not `task`: the flow leaves for its URL.
+
+The controller passes the session to `flowOutcome` (`features/auth-flow/auth-flow.utils.ts`, shared with sign-in) with the two facts only it holds: the session when the component mounted, and where its finish machine is. The outcome is decided before the step is read, so an unfinished sign-up left on the client cannot override it:
+
+- `resource`: the step picks the route, as listed above. This is also the outcome for a visitor who arrived signed in, in multi-session mode, so `start` shows and the user can add an account.
+- `task` → `taskChooseOrganization`: only the task route is shown, so a visit to `start` with the task pending moves to it, and the task shows its skeleton until its data loads.
+- `hold`: keeps the current route and screen, pending. It covers `finalize()` running, the session activating, and a task after a sign-up whose data has not loaded.
+- `leave`: the visitor arrived signed in, in single-session mode. Sign-up leaves for the task URL or the after sign-up URL and renders nothing, as `ui`'s `withRedirectToAfterSignUp` does.
+- `done`: the session this flow created is signed in, or the task the visitor arrived with is finished. Sign-up renders nothing.
+
+A session that another tab signs in mid-flow is `resource`, so the form stays. Each case is a row in `auth-flow/__tests__/auth-flow.utils.test.ts`.
+
+Back from a sign-up verify screen goes to the details route above it: `continue` for the two nested routes, `start` for the others (`detailsRouteFor`).
 
 `identifier` and `start` are what Mosaic shows before the resource exists; a sign-in with no status and a sign-up not yet created both return them. `sent` means a code or link is out, so a reload on the same `:factor` doesn't send another. Picking a different factor always sends, because `sent` can't tell two targets with the same strategy apart (see [Bridge](#bridge)).
 
@@ -76,17 +105,18 @@ With no `:factor`, `factorOne` starts on the factor `ui`'s `determineStartingSig
 
 - FAPI's state changes only on submit. A route the step doesn't allow is replaced with the step's route.
 - Back to `start` shows the identifier form; submitting it creates a new sign-in. Forward to `factorOne` still works.
-- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`).
+- Reload on `factorOne` keeps the picked factor (`:factor`) and sends no second code (`sent`). Reload on a sign-up verify route sends a code only when `sent` is false, and starts the resend countdown either way, as `ui`'s code card does.
 - Virtual routing has no history: a remount starts at `start`, and FAPI's state is kept.
 
 ## Entry actions
 
-The controller calls these model callbacks on `start`, then `next(step)`.
+Planned, not built. Sign-up does none of these yet. The controller will call these model callbacks on `start`, then `next(step)`.
 
 - Ticket (`__clerk_ticket`): `__clerk_status=sign_up` redeems it with `signUp.ticket({ unsafeMetadata })`; any other status with `signIn.ticket()`, as `ui/src/components/SignIn/SignInStart.tsx` does. A ticket works only once, so redeem it once: keep the "already started" flag in a component that doesn't remount, so a remount or StrictMode can't redeem it twice. A failed redemption shows its error on `start`.
 - Email-link return (`__clerk_status`): `verified` with a `__clerk_created_session` this client has activates that session (`clerk-js/src/core/clerk.ts:2620-2636`); any other `verified` continues by step. `transferable` and the error statuses show their own screen, as `ui/src/common/EmailLinkVerify.tsx` does.
 - Redirect URLs for email links and OAuth/SAML returns come from the router (the planned `useReturnUrl(name, params)`), never hand-built. That part waits for the routing follow-up.
 - A step that is already `complete` or `transfer` on mount, such as a reload before it ran: `next(step)` runs it once, with the same guard as a ticket. The email-link return is handled first.
+- Hash params: Clerk's URL builders (`redirectToSignUp()`, `buildSignUpUrl`) put the redirect params and initial values in the URL hash, and sign-up reads only the query, so they are not read until path routing lands (#10860).
 
 ## Bridge
 

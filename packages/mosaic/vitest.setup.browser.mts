@@ -1,9 +1,11 @@
+import { Clerk } from '@clerk/clerk-js';
 import { __resetClerkQueryClientForTest } from '@clerk/shared/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
+  publishableKey,
   startWorker,
   takeUnhandledRequests,
   takeUnsettledHolds,
@@ -54,6 +56,28 @@ class IsolatedBroadcastChannel extends NativeBroadcastChannel {
   }
 }
 
+type Signal<T> = (value: T) => void;
+
+interface AuthSignals {
+  signInResourceSignal: Signal<{ resource: null }>;
+  signInErrorSignal: Signal<{ error: null }>;
+  signInFetchSignal: Signal<{ status: 'idle' }>;
+  signUpResourceSignal: Signal<{ resource: null }>;
+  signUpErrorSignal: Signal<{ error: null }>;
+  signUpFetchSignal: Signal<{ status: 'idle' }>;
+}
+
+const signals = new Clerk(publishableKey()).__internal_state as unknown as AuthSignals;
+
+function resetAuthSignals() {
+  signals.signInResourceSignal({ resource: null });
+  signals.signInErrorSignal({ error: null });
+  signals.signInFetchSignal({ status: 'idle' });
+  signals.signUpResourceSignal({ resource: null });
+  signals.signUpErrorSignal({ error: null });
+  signals.signUpFetchSignal({ status: 'idle' });
+}
+
 beforeAll(async () => {
   window.BroadcastChannel = IsolatedBroadcastChannel;
   await startWorker();
@@ -61,6 +85,7 @@ beforeAll(async () => {
 
 beforeEach(() => {
   switchFapiHost();
+  resetAuthSignals();
   window.focus();
 });
 

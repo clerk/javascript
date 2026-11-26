@@ -31,6 +31,7 @@ Read every line that matches your task. Paths below are relative to this package
 - Write or change a controller, or how a feature handles pending state, errors, dialogs or removal focus → [Controllers](docs/controllers.md)
 - Write or debug a state machine → [Controllers → Machines](docs/controllers.md#machines), then [Machine runtime](src/machine/README.md)
 - Build a flow with several steps on one surface → [Controllers → Multi-step flows](docs/controllers.md#multi-step-flows), then [Views → Moving between screens](docs/views.md#moving-between-screens-on-one-surface)
+- Build a routed flow with a screen per route, such as sign-up → [Features → A flow with several screens](docs/features.md#a-flow-with-several-screens), then [Sign-in and sign-up flow](docs/internals/sign-in-sign-up-flow.md)
 - Write or change a view, a dialog or step it renders, or a feature's copy → [Views](docs/views.md)
 - Add a styled component, or change a token, a `.cl-<slot>` class or `data-<axis>` attribute, `MosaicProvider`, or the CSS build → [Theming](docs/theming.md)
 - Write or change a `*.styles.ts` or `*.stylex.ts` file → [StyleX](docs/stylex.md)
@@ -99,6 +100,7 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - Arrow-key navigation with one tab stop across a group of items → `useComposite`, with `useCompositeItems` and `useCompositeItem` (`src/primitives/hooks/`)
 - A panel that animates open and closed to its measured size → `usePanelSize` (`src/primitives/hooks/`)
 - One screen replacing another on the same card or dialog → `Flow` (`src/components/flow/`), see [Views](docs/views.md)
+- A route the owner's state does not allow, replaced with the allowed one and no history entry → `useRouteGuard` (`src/routing/`)
 - An interaction with an async lifecycle or two values that move together → A machine in the controller file, via `setup()` (`src/machine/`)
 - Styles several components share → `src/styles/*.styles.ts`
 - Anything else small: a permission, verification codes, backup codes, avatar files, a list patch → List `src/utils/`, `src/hooks/` and `src/primitives/hooks/` first; most of these already have a helper

@@ -66,6 +66,7 @@ const legalConsent = { termsUrl: 'https://acme.com/terms', privacyPolicyUrl: 'ht
 
 const emptyValues: SignInValues = {
   identifier: '',
+  emailAddress: '',
   phoneNumber: '',
   password: '',
   code: '',
@@ -187,6 +188,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       }
       if (identifier.toLowerCase().includes('new')) {
+        form.setValue('emailAddress', identifier);
         navigate({ kind: 'sign-up', fields: signUpDetailFields, legalConsent }, 1);
         return;
       }
@@ -259,11 +261,12 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
 
   const submitSignUp = () =>
     run(() => {
+      const emailAddress = values.emailAddress.trim();
       if (!values.firstName.trim() || !values.lastName.trim()) {
         setGlobalErrorMessage('Enter your first and last name.');
         return;
       }
-      if (!identifier.includes('@')) {
+      if (!emailAddress.includes('@')) {
         setGlobalErrorMessage('Enter a valid email address.');
         return;
       }
@@ -275,7 +278,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setGlobalErrorMessage('Accept the Terms of Service and Privacy Policy to continue.');
         return;
       }
-      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
+      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier: emailAddress }, 1);
     });
 
   const onSubmit = (event?: SignInSubmitEvent) => {
@@ -524,6 +527,7 @@ function StepPanel({
       ...emptyValues,
       identifier:
         identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
+      emailAddress: step.kind === 'sign-up' ? (identifier ?? 'new@acme.com') : '',
       password: password ?? attempted,
       backupCode: attempted,
     },

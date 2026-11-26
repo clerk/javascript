@@ -102,6 +102,7 @@ const form = useForm({
 - Mutations and required revalidation go in `onSubmit`. Success UI, such as closing the dialog or a toast, goes in the synchronous `onSuccess(result, submittedValues)`, whose result type comes from `onSubmit`.
 - `onSuccess` runs during the completion transition, before `isSubmitting` clears, and only while the form is mounted. Use it to close or show UI, not to reset or resubmit. Rejection and a cancelled reverification skip it.
 - A resolved `onSubmit` counts as success even if it returned early. Prevent no-op submissions with `canSubmit`, or return a result that lets `onSuccess` tell them apart.
+- **Exception: sign-up says which required fields are empty.** `canSubmit` disables the submit button, and a disabled button does not say what is missing. The sign-up details form leaves the button enabled and gives each required field a `validate` in `fields` (`requiredFields` in `sign-up-details.controller.ts`). A submit then marks every field touched, shows the errors, focuses the first one and sends nothing. A field shows its error once it is touched, and the form's first field is autofocused. So its text and phone inputs do not receive `onBlur`, and the errors wait for the submit.
 - Unmounting does not cancel the request. If an identity change should discard its completion UI, unmount the form, for example through the composing component's React `key`.
 
 ## Machines
@@ -150,12 +151,13 @@ return {
 
 The view side is in [Views → Moving between screens](views.md#moving-between-screens-on-one-surface).
 
-**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)).
+**Exception: sign-in and sign-up.** FAPI owns their step, so there is no step machine. The model returns the step from `getSignInNextStep` or `getSignUpNextStep`, the controller picks the screen from it, and the route holds what the step can't say, such as the factor the user picked ([Sign-in and sign-up flow](internals/sign-in-sign-up-flow.md#pick-the-screen)). How sign-up splits its controllers across screens is in [Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
 
 ## Wrapping actions
 
 - **One wrapper for every action**, so each is wrapped the same way and only one is in flight (`runAction` in `switcher.controller.tsx`).
 - **Hold the surface still while an action runs.** `setActive` swaps the active organization while its promise is in flight, so the live model would rearrange the popup mid-action. Freeze the model the action started from and render it until the action settles (`context.frozenModel ?? model`). This also covers the model dropping `ready → loading` during Clerk's transitive state.
+- **Hold it past the action when the next screen is still loading.** Keep the frozen model in context after the action settles, and decide during render whether to show it, from the machine's state and the live model (`isHolding` in `sign-up.controller.ts`, which reads `flowOutcome` in `features/auth-flow/auth-flow.utils.ts`). Don't copy the live value into the machine and sync it from an effect: the render already has both, so the hold ends in the same render the next screen is ready.
 - **Derive view props.** A `pendingKey` run through `useSpinDelay`, a `mode` forced by a capability flag: anything the view would otherwise re-derive.
 
 ## Composition and dialog lifetime
@@ -192,7 +194,7 @@ One path, so every error a user sees goes through the `errors.*` catalog.
 - **Owners hold an `ErrorDescription`**: a `LocalizableError` (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`). `toLocalizableError` logs the second as `[Clerk] Could not localize error`. Branch with `isLocalizableError` only when a feature handles the two differently.
 - **Owners resolve copy at render; views get a string.** Owners return `errorMessage` from `useErrorText()`, which tries the catalog entry for `code__paramName`, then `code`, then Clerk's message, then the feature's `errorFallback`, then the generic error. Views never call `useErrorText` on an error they did not create.
 - **`errorFallback` is the copy for faults Clerk cannot describe** (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback, never its cause's `.message`. `network_error` has catalog copy, but network failures can also arrive as raw, unlocalizable errors.
-- Known gaps, not precedent: `useForm` resolves copy when the save fails instead of at render (it takes an `errorFallback` and uses `form.error` when none is given), the profile picture row resolves its error in the view, and the password section maps its own errors (`user-profile-password-errors.ts`).
+- Known gaps, not precedent: `useForm` resolves copy when the save fails instead of at render (it takes an `errorFallback` and uses `form.error` when none is given), the profile picture row resolves its error in the view, the password section maps its own errors (`user-profile-password-errors.ts`), and sign-up's model maps a rejected password through the same file.
 
 ## Testing
 

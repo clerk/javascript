@@ -21,19 +21,20 @@ Read the split as _where the data comes from_ (model) → _what the user is doin
 
 A feature lives in `src/features/<feature>/`, one file per role, each prefixed with the feature name. Use `.ts` unless the file renders JSX.
 
-| File                         | Holds                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------- |
-| `<feature>.model.ts(x)`      | The Clerk adapter                                                           |
-| `<feature>.controller.ts(x)` | Local state, a machine if it has one, and action wrapping                   |
-| `<feature>.view.tsx`         | Rendering only                                                              |
-| `<feature>.tsx`              | The composition wrapper and the public props type                           |
-| `<feature>.types.ts`         | The data contract the model and view share                                  |
-| `<feature>.messages.ts`      | Every string the feature renders ([Views](views.md#where-the-strings-live)) |
-| `<feature>.layout.ts`        | Pure derivation, such as which affordance goes in which slot                |
-| `<feature>.utils.ts`         | Pure helpers                                                                |
-| `<feature>.styles.ts`        | `stylex.create` atoms ([StyleX](stylex.md))                                 |
-| `<feature>.skeleton.tsx`     | The loading placeholder ([Skeletons](skeletons.md))                         |
-| `<name>.dialog.tsx`          | A dialog the view opens, when it would crowd the view file                  |
+| File                         | Holds                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `<feature>.model.ts(x)`      | The Clerk adapter                                                                                |
+| `<feature>.controller.ts(x)` | Local state, a machine if it has one, and action wrapping                                        |
+| `<feature>.view.tsx`         | Rendering only                                                                                   |
+| `<feature>.tsx`              | The composition wrapper and the public props type                                                |
+| `<feature>.types.ts`         | The data contract the model and view share                                                       |
+| `<feature>.messages.ts`      | Every string the feature renders ([Views](views.md#where-the-strings-live))                      |
+| `<feature>.layout.ts`        | Pure derivation, such as which affordance goes in which slot                                     |
+| `<feature>.routes.ts`        | The route table of a flow that owns its routes, and the pure rules over it (`sign-up.routes.ts`) |
+| `<feature>.utils.ts`         | Pure helpers                                                                                     |
+| `<feature>.styles.ts`        | `stylex.create` atoms ([StyleX](stylex.md))                                                      |
+| `<feature>.skeleton.tsx`     | The loading placeholder ([Skeletons](skeletons.md))                                              |
+| `<name>.dialog.tsx`          | A dialog the view opens, when it would crowd the view file                                       |
 
 `*.types.ts` holds the contract so that neither the model nor the view owns it, and the two cannot drift.
 
@@ -47,3 +48,11 @@ Two shapes, chosen by whether the slice fetches its own data.
 - **A view owns its controller** when the slice is a leaf that takes its effect as a prop. There is no model: the Clerk call arrives from whoever renders it (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController` with its `onSubmit`).
 
 Either way, the controller never imports Clerk, and its effects arrive as injected plain functions.
+
+## A flow with several screens
+
+A flow with a screen per route, such as sign-up, keeps one model and gives each screen a folder (`src/features/sign-up/`). How the screens are wired is in [Mount the screen](internals/sign-in-sign-up-flow.md#mount-the-screen).
+
+- **The model returns a group per screen,** plus the groups the flow shares. Each screen takes its group whole.
+- **A screen's folder** is `<feature>-<screen>/` and holds that screen's controller and view (`sign-up-verify/`).
+- **The flow controller keeps what outlives a screen,** such as the route, the next step and finishing.

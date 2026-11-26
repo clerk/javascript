@@ -52,6 +52,7 @@ const livePages = new Set([
   '/misc/sign-out-button',
   '/misc/o-auth-consent',
   '/switcher/switcher',
+  '/authentication/sign-up',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);

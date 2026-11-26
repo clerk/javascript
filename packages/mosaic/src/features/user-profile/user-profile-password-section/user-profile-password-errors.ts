@@ -28,7 +28,7 @@ const passwordComplexityCodes = new Map<string, ComplexityRule>([
   ['form_password_no_special_char', 'require_special_char'],
 ]);
 
-function passwordError(
+export function passwordError(
   errors: ClerkAPIError[],
   settings: Settings,
   messages: Messages,

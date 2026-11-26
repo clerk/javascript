@@ -1,44 +1,14 @@
+import type { SignUpField, SignUpFutureResource } from '@clerk/shared/types';
+
 import type { MosaicMessages } from '../../localization';
 import { fill } from '../../localization';
 import { formatPhoneIdentifier } from '../auth-flow/auth-flow.utils';
-import type { SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent, SignUpStep } from './sign-up.types';
+import type { SignUpIdentifier } from './sign-up.model';
+import type { SignUpCode, SignUpDetails, SignUpFieldName, SignUpFields, SignUpLegalConsent } from './sign-up.types';
 
 type Messages = MosaicMessages['signUp'];
 
-export const signUpStepIds = {
-  details: ['details:start', 'details:continue'],
-  alternativePhone: ['alternative-phone'],
-  code: ['code:verify-email', 'code:verify-phone'],
-  choice: ['choice:enterprise-connections', 'choice:wallets'],
-  notice: [
-    'notice:verify-email-link',
-    'notice:email-link-status',
-    'notice:restricted',
-    'notice:waitlist',
-    'notice:loading',
-    'notice:protect-check',
-    'notice:action-blocked',
-  ],
-} as const;
-
-export type SignUpStepKey = (typeof signUpStepIds)[keyof typeof signUpStepIds][number];
-
-export function signUpStepKey(step: SignUpStep): SignUpStepKey {
-  switch (step.kind) {
-    case 'alternative-phone':
-      return step.kind;
-    case 'details':
-      return `details:${step.purpose}`;
-    case 'code':
-      return `code:${step.purpose}`;
-    case 'choice':
-      return `choice:${step.purpose}`;
-    case 'notice':
-      return `notice:${step.purpose}`;
-  }
-}
-
-const signUpFieldOrder: readonly SignUpFieldName[] = [
+export const signUpFieldOrder: readonly SignUpFieldName[] = [
   'firstName',
   'lastName',
   'username',
@@ -68,10 +38,8 @@ export function legalConsentLabel({ termsUrl, privacyPolicyUrl }: SignUpLegalCon
   return m.legalConsent.termsAndPrivacy;
 }
 
-type SignUpCodeStep = Extract<SignUpStep, { kind: 'code' }>;
-
 export function signUpCodeCopy(
-  step: SignUpCodeStep,
+  step: SignUpCode,
   m: Messages,
 ): { title: string; description: string; fieldLabel: string } {
   if (step.purpose === 'verify-email') {
@@ -91,14 +59,14 @@ export function signUpCodeCopy(
     : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
 }
 
-export function signUpCodeIdentity(step: SignUpCodeStep, m: Messages): { identifier: string; editLabel: string } {
+export function signUpCodeIdentity(step: SignUpCode, m: Messages): { identifier: string; editLabel: string } {
   return step.purpose === 'verify-email'
     ? { identifier: step.identifier, editLabel: m.editIdentifier }
     : { identifier: formatPhoneIdentifier(step.identifier), editLabel: m.editPhoneNumber };
 }
 
 export function signUpCodeSecondaryAction(
-  step: SignUpCodeStep,
+  step: SignUpCode,
   m: Messages,
   onCancel?: () => void,
 ): { label: string; onClick?: () => void } {
@@ -106,4 +74,71 @@ export function signUpCodeSecondaryAction(
     return { label: m.useAnotherMethod, onClick: onCancel };
   }
   return step.provider ? { label: m.verifyPhone.useSms, onClick: onCancel } : { label: m.useAnotherMethod };
+}
+
+const FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
+  first_name: 'firstName',
+  last_name: 'lastName',
+  username: 'username',
+  password: 'password',
+  email_address: 'emailAddress',
+  phone_number: 'phoneNumber',
+};
+
+type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields' | 'unverifiedFields'>;
+
+function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
+  return missingFields.filter(
+    field =>
+      field === 'email_address_or_phone_number' ||
+      (optionalFields.includes(field) &&
+        (field === 'email_address' || field === 'phone_number' || field === 'username')),
+  );
+}
+
+const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
+
+export function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
+  const asksForIdentifier = missingIdentifiers(signUp).length > 0;
+  return signUp.missingFields.every(
+    field =>
+      field in FORM_FIELDS ||
+      CONTINUE_REQUIREMENTS.includes(field) ||
+      (asksForIdentifier && signUp.optionalFields.includes(field)),
+  );
+}
+
+export function missesEitherIdentifier(signUp: SignUpFieldLists): boolean {
+  const identifiers = missingIdentifiers(signUp);
+  return (
+    identifiers.includes('email_address_or_phone_number') ||
+    (identifiers.includes('email_address') && identifiers.includes('phone_number'))
+  );
+}
+
+export function continueFields(signUp: SignUpFieldLists, identifier: SignUpIdentifier): SignUpFields {
+  const identifiers = missingIdentifiers(signUp);
+  const fields: SignUpFields = {};
+  for (const name of signUp.missingFields) {
+    const field = FORM_FIELDS[name];
+    if (field && !identifiers.includes(name)) {
+      fields[field] = { required: true };
+    }
+  }
+  if (missesEitherIdentifier(signUp)) {
+    fields[identifier === 'phoneNumber' ? 'phoneNumber' : 'emailAddress'] = { required: true };
+  } else {
+    const only = identifiers.find(name => name !== 'username') ?? identifiers[0];
+    const field = only ? FORM_FIELDS[only] : undefined;
+    if (field) {
+      fields[field] = { required: true };
+    }
+  }
+  for (const name of signUp.unverifiedFields) {
+    const field = FORM_FIELDS[name];
+    if (field) {
+      fields[field] = { required: true };
+    }
+  }
+  return fields;
 }

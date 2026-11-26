@@ -26,10 +26,13 @@ export type SwitcherModel =
 
 `hidden` is an answer, not an absence: signed out is settled, so the wrapper drops the fallback instead of holding the space open. Keep `hidden` and `loading` apart.
 
+A flow with several screens groups its `ready` model by screen ([Features → A flow with several screens](features.md#a-flow-with-several-screens)).
+
 ## What the model owns
 
 - **Clerk state.** `useUser()`, `useSession()`, `useOrganization()`, `useClerk()`, plus `useMosaicEnvironment()` and `useMosaicRouter()`.
 - **Waiting before `ready`.** Wait for everything that affects layout, because answering early and filling in later is a reshuffle the user sees. A list that fills only part of a surface is the exception: expose it as a `…Loading` flag in the data, so the surface renders and that region shows its skeleton.
+- **Clerk's answer, not a copy of its rules.** When a resource already reports a decision, read it, such as what a sign-up still needs (`missingFields`) or which strategy a verification uses (`supportedStrategies` until a code is sent, because `strategy` is empty before then). Rebuild a decision from environment settings only when no resource exists yet, such as on sign-up's start screen. A copied rule drifts when FAPI changes it, and nothing fails (`continueFields` in `sign-up.utils.ts`).
 - **Plain rows.** Map resources to the shapes in `*.types.ts` (`toMembership(organization)`, `toSession(id, user)`), never pass the resource. Derive those types from `@clerk/shared/types` first: when a field mirrors a resource, `Pick` it so it cannot drift (`Pick<APIKeyResource, 'id' | 'name' | 'createdAt'>`). Write a type by hand only for what Clerk has no type for, such as a formatted label or a UI-only flag.
 - **Permissions and capability.** `session.checkAuthorization(...)`, `user.createOrganizationEnabled`, `authConfig.singleSessionMode`. Express the result by omitting the callback, not by a disabled flag, so the model never describes UI:
 

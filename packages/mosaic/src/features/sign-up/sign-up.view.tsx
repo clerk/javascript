@@ -1,208 +1,111 @@
-import type { Ref } from 'react';
-
 import {
   AuthActionBlocked,
   AuthAlternativeChannel,
   AuthEmailLink,
   AuthEmailLinkStatus,
   AuthEnterpriseConnections,
-  AuthIdentityPreview,
   AuthLoading,
   AuthProtectCheck,
+  AuthStartOver,
   AuthWallets,
 } from '../../blocks/auth';
-import type { VerificationResendMessages } from '../../blocks/verification';
-import { VerificationCode, verificationResend } from '../../blocks/verification';
+import { verificationResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { useMessages } from '../../localization';
-import type { SignUpStep, SignUpViewProps } from './sign-up.types';
-import {
-  signUpCodeCopy,
-  signUpCodeIdentity,
-  signUpCodeSecondaryAction,
-  signUpStepIds,
-  signUpStepKey,
-} from './sign-up.utils';
-import { SignUpDetailsStep } from './steps/sign-up-details';
-import { SignUpLegalConsentField } from './steps/sign-up-legal-consent';
-import { SignUpRestricted } from './steps/sign-up-restricted';
+import type { SignUpViewProps } from './sign-up.types';
+import { SignUpDetailsStep } from './sign-up-details/sign-up-details';
+import { SignUpLegalConsentField } from './sign-up-details/sign-up-legal-consent';
+import { SignUpRestricted } from './sign-up-restricted/sign-up-restricted';
 
-export function SignUpView({
-  step,
-  direction,
-  applicationName,
-  applicationLogoUrl,
-  socialProviders,
-  pendingProviderId,
-  onSelectProvider,
-  form,
-  onSubmit,
-  onCodeComplete,
-  isPending,
-  isDisabled,
-  errorMessage,
-  globalErrorMessage,
-  passwordFeedback,
-  onSwitchField,
-  onSignIn,
-  onEditIdentifier,
-  onCancel,
-  onBack,
-  onEmailSupport,
-  onJoinWaitlist,
-  onResend,
-  canResend,
-  resendRemainingSeconds,
-  onRetry,
-  protectCheckRef,
-  focusRef,
-}: SignUpViewProps & { focusRef?: Ref<HTMLElement> }) {
+export function SignUpView(props: SignUpViewProps) {
   const m = useMessages('signUp');
+  const { applicationName, applicationLogoUrl } = props;
   const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
 
-  const resendFor = (copy: VerificationResendMessages) =>
-    verificationResend(copy, { onResend, canResend, remainingSeconds: resendRemainingSeconds });
-
-  const notice = (current: Extract<SignUpStep, { kind: 'notice' }>) => {
-    switch (current.purpose) {
-      case 'verify-email-link':
-        return (
-          <AuthEmailLink
-            focusRef={focusRef}
-            messages={{
-              title: m.verifyEmailLink.title,
-              description: m.verifyEmailLink.description,
-              editIdentifier: m.editIdentifier,
-              secondaryActionLabel: m.useAnotherMethod,
-            }}
-            identifier={current.identifier}
-            onEditIdentifier={onEditIdentifier}
-            globalErrorMessage={globalErrorMessage}
-            isPending={isPending}
-            resend={resendFor(m.verifyEmailLink)}
-          />
-        );
-      case 'email-link-status':
-        return (
-          <AuthEmailLinkStatus
-            messages={m.emailLinkStatus}
-            status={current.status}
-            globalErrorMessage={globalErrorMessage}
-          />
-        );
-      case 'restricted':
-      case 'waitlist':
-        return (
-          <SignUpRestricted
-            focusRef={focusRef}
-            waitlist={current.purpose === 'waitlist'}
-            logo={logo}
-            globalErrorMessage={globalErrorMessage}
-            onEmailSupport={onEmailSupport}
-            onJoinWaitlist={onJoinWaitlist}
-            onSignIn={onSignIn}
-          />
-        );
-      case 'loading':
-        return (
-          <AuthLoading
-            messages={{ loading: m.loading }}
-            globalErrorMessage={globalErrorMessage}
-          />
-        );
-      case 'protect-check':
-        return (
-          <AuthProtectCheck
-            messages={{ ...m.protectCheck, loading: m.loading }}
-            challenge={current.challenge}
-            logo={logo}
-            globalErrorMessage={globalErrorMessage}
-            isPending={isPending}
-            containerRef={protectCheckRef}
-            onRetry={onRetry}
-          />
-        );
-      case 'action-blocked':
-        return (
-          <AuthActionBlocked
-            messages={m.actionBlocked}
-            details={current.details}
-          />
-        );
-    }
-  };
-
-  const code = (current: Extract<SignUpStep, { kind: 'code' }>) => {
-    const secondary = signUpCodeSecondaryAction(current, m, onCancel);
-    const identity = signUpCodeIdentity(current, m);
-    const field = form.registerValue('code');
-    return (
-      <VerificationCode
-        focusRef={focusRef}
-        messages={{
-          ...signUpCodeCopy(current, m),
-          secondaryActionLabel: secondary.label,
-          primaryActionLabel: m.submit,
-          pendingLabel: m.verifying,
-        }}
-        resend={resendFor(current.purpose === 'verify-email' ? m.verifyEmail : m.verifyPhone)}
-        identity={
-          identity.identifier ? (
-            <AuthIdentityPreview
-              identifier={identity.identifier}
-              editLabel={identity.editLabel}
-              disabled={isPending}
-              onEdit={onEditIdentifier}
-            />
-          ) : undefined
-        }
-        value={field.value}
-        onValueChange={field.onValueChange}
-        errorMessage={errorMessage}
-        globalErrorMessage={globalErrorMessage}
-        isPending={isPending}
-        onSubmit={() => onSubmit()}
-        onComplete={onCodeComplete}
-        onCancel={secondary.onClick}
-      />
-    );
-  };
-
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      align='center'
+      renderBranding={props.renderBranding}
+    >
       <Flow.Root
-        value={signUpStepKey(step)}
-        direction={direction}
-        state={step}
+        value={props.screen}
+        state={props}
       >
-        {current => (
+        {({
+          start,
+          continue: continueDetails,
+          verifyEmail,
+          verifyPhone,
+          restricted,
+          actionBlocked,
+          startOver,
+          alternativePhone,
+          verifyEmailLink,
+          emailLinkStatus,
+          enterpriseConnections,
+          wallets,
+          protectCheck,
+          taskChooseOrganization,
+        }) => (
           <>
-            <Flow.Step ids={signUpStepIds.details}>
-              {current.kind === 'details' ? (
-                <SignUpDetailsStep
-                  focusRef={focusRef}
-                  step={current}
-                  logo={logo}
-                  onSwitchField={onSwitchField}
-                  socialProviders={socialProviders}
-                  pendingProviderId={pendingProviderId}
-                  onSelectProvider={onSelectProvider}
-                  isDisabled={isDisabled}
-                  form={form}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  onSubmit={onSubmit}
-                  passwordFeedback={passwordFeedback}
-                  onSignIn={onSignIn}
-                />
-              ) : null}
+            <Flow.Step ids={['start']}>
+              <SignUpDetailsStep
+                {...start}
+                logo={logo}
+              />
             </Flow.Step>
 
-            <Flow.Step ids={signUpStepIds.alternativePhone}>
-              {current.kind === 'alternative-phone' ? (
+            <Flow.Step ids={['continue']}>
+              <SignUpDetailsStep
+                {...continueDetails}
+                logo={logo}
+              />
+            </Flow.Step>
+
+            <Flow.Step ids={['verifyEmail', 'continueVerifyEmail']}>{verifyEmail}</Flow.Step>
+
+            <Flow.Step ids={['verifyPhone', 'continueVerifyPhone']}>{verifyPhone}</Flow.Step>
+
+            <Flow.Step ids={['restricted']}>
+              <SignUpRestricted
+                {...restricted}
+                waitlist={false}
+                logo={logo}
+              />
+            </Flow.Step>
+
+            <Flow.Step ids={['waitlist']}>
+              <SignUpRestricted
+                {...restricted}
+                waitlist
+                logo={logo}
+              />
+            </Flow.Step>
+
+            <Flow.Step ids={['actionBlocked']}>
+              <AuthActionBlocked
+                messages={m.actionBlocked}
+                details={actionBlocked}
+              />
+            </Flow.Step>
+
+            <Flow.Step ids={['startOver']}>
+              <AuthStartOver
+                messages={m.startOver}
+                {...startOver}
+              />
+            </Flow.Step>
+
+            <Flow.Step ids={['taskChooseOrganization']}>{taskChooseOrganization}</Flow.Step>
+
+            <Flow.Step ids={['loading']}>
+              <AuthLoading messages={{ loading: m.loading }} />
+            </Flow.Step>
+
+            <Flow.Step ids={['alternativePhone']}>
+              {alternativePhone ? (
                 <AuthAlternativeChannel
-                  focusRef={focusRef}
                   messages={{
                     title: m.alternativePhone.title,
                     description: m.alternativePhone.description,
@@ -217,60 +120,103 @@ export function SignUpView({
                     primaryActionLabel: m.submit,
                     pendingLabel: m.verifying,
                   }}
-                  channel={current.channel}
+                  channel={alternativePhone.channel}
                   applicationName={applicationName}
                   logo={logo}
-                  form={form}
-                  globalErrorMessage={globalErrorMessage}
-                  isPending={isPending}
-                  isDisabled={isDisabled}
-                  onSubmit={onSubmit}
-                  onCancel={onCancel}
+                  form={alternativePhone.form}
+                  globalErrorMessage={alternativePhone.globalErrorMessage}
+                  isPending={alternativePhone.isPending}
+                  isDisabled={alternativePhone.isDisabled}
+                  onSubmit={alternativePhone.onSubmit}
+                  onCancel={alternativePhone.onCancel}
                 >
-                  {current.legalConsent ? (
+                  {alternativePhone.legalConsent ? (
                     <SignUpLegalConsentField
-                      form={form}
-                      consent={current.legalConsent}
-                      disabled={isDisabled}
+                      form={alternativePhone.form}
+                      consent={alternativePhone.legalConsent}
+                      disabled={alternativePhone.isDisabled}
                     />
                   ) : null}
                 </AuthAlternativeChannel>
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={signUpStepIds.code}>{current.kind === 'code' ? code(current) : null}</Flow.Step>
+            <Flow.Step ids={['verifyEmailLink']}>
+              {verifyEmailLink ? (
+                <AuthEmailLink
+                  messages={{
+                    title: m.verifyEmailLink.title,
+                    description: m.verifyEmailLink.description,
+                    editIdentifier: m.editIdentifier,
+                    secondaryActionLabel: m.useAnotherMethod,
+                  }}
+                  identifier={verifyEmailLink.identifier}
+                  onEditIdentifier={verifyEmailLink.onEditIdentifier}
+                  globalErrorMessage={verifyEmailLink.globalErrorMessage}
+                  isPending={verifyEmailLink.isPending}
+                  resend={verificationResend(m.verifyEmailLink, {
+                    onResend: verifyEmailLink.onResend,
+                    canResend: verifyEmailLink.canResend,
+                    remainingSeconds: verifyEmailLink.resendRemainingSeconds,
+                  })}
+                />
+              ) : null}
+            </Flow.Step>
 
-            <Flow.Step ids={signUpStepIds.choice}>
-              {current.kind === 'choice' && current.purpose === 'enterprise-connections' ? (
+            <Flow.Step ids={['emailLinkStatus']}>
+              {emailLinkStatus ? (
+                <AuthEmailLinkStatus
+                  messages={m.emailLinkStatus}
+                  status={emailLinkStatus.status}
+                  globalErrorMessage={emailLinkStatus.globalErrorMessage}
+                />
+              ) : null}
+            </Flow.Step>
+
+            <Flow.Step ids={['enterpriseConnections']}>
+              {enterpriseConnections ? (
                 <AuthEnterpriseConnections
-                  focusRef={focusRef}
                   messages={{
                     title: m.enterpriseConnections.title,
                     description: m.enterpriseConnections.description,
                     pendingLabel: m.enterpriseConnections.pending,
                   }}
                   logo={logo}
-                  connections={current.options}
-                  globalErrorMessage={globalErrorMessage}
-                  pendingConnectionId={pendingProviderId}
-                  onSelectConnection={onSelectProvider}
-                />
-              ) : null}
-              {current.kind === 'choice' && current.purpose === 'wallets' ? (
-                <AuthWallets
-                  focusRef={focusRef}
-                  messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
-                  wallets={current.options}
-                  globalErrorMessage={globalErrorMessage}
-                  pendingWalletId={pendingProviderId}
-                  isDisabled={isDisabled}
-                  onSelectWallet={onSelectProvider}
-                  onBack={onBack}
+                  connections={enterpriseConnections.options}
+                  globalErrorMessage={enterpriseConnections.globalErrorMessage}
+                  pendingConnectionId={enterpriseConnections.pendingConnectionId}
+                  onSelectConnection={enterpriseConnections.onSelectConnection}
                 />
               ) : null}
             </Flow.Step>
 
-            <Flow.Step ids={signUpStepIds.notice}>{current.kind === 'notice' ? notice(current) : null}</Flow.Step>
+            <Flow.Step ids={['wallets']}>
+              {wallets ? (
+                <AuthWallets
+                  messages={{ ...m.wallets, backButton: m.back, pendingLabel: m.verifying, loading: m.loading }}
+                  wallets={wallets.options}
+                  globalErrorMessage={wallets.globalErrorMessage}
+                  pendingWalletId={wallets.pendingWalletId}
+                  isDisabled={wallets.isDisabled}
+                  onSelectWallet={wallets.onSelectWallet}
+                  onBack={wallets.onBack}
+                />
+              ) : null}
+            </Flow.Step>
+
+            <Flow.Step ids={['protectCheck']}>
+              {protectCheck ? (
+                <AuthProtectCheck
+                  messages={{ ...m.protectCheck, loading: m.loading }}
+                  challenge={protectCheck.challenge}
+                  logo={logo}
+                  globalErrorMessage={protectCheck.globalErrorMessage}
+                  isPending={protectCheck.isPending}
+                  containerRef={protectCheck.containerRef}
+                  onRetry={protectCheck.onRetry}
+                />
+              ) : null}
+            </Flow.Step>
           </>
         )}
       </Flow.Root>

@@ -19,6 +19,7 @@ export function SignUpLegalConsentField({
 }) {
   const m = useMessages('signUp');
   const { feedback } = form.fields.legalAccepted;
+  const { ref } = form.registerValue('legalAccepted');
   const link = (href: string | undefined) => (children: ReactNode) =>
     href ? (
       <Link
@@ -40,14 +41,18 @@ export function SignUpLegalConsentField({
       disabled={disabled}
     >
       <Checkbox
+        ref={ref}
         checked={form.values.legalAccepted}
         onChange={event => form.setValue('legalAccepted', event.target.checked)}
       />
-      <Field.Label>
-        {rich(legalConsentLabel(consent, m), {
-          components: { terms: link(consent.termsUrl), privacy: link(consent.privacyPolicyUrl) },
-        })}
-      </Field.Label>
+      <Field.Content>
+        <Field.Label>
+          {rich(legalConsentLabel(consent, m), {
+            components: { terms: link(consent.termsUrl), privacy: link(consent.privacyPolicyUrl) },
+          })}
+        </Field.Label>
+        <Field.Feedback feedback={feedback} />
+      </Field.Content>
     </Field.Root>
   );
 }

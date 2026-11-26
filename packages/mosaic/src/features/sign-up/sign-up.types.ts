@@ -1,9 +1,11 @@
-import type { Ref } from 'react';
+import type { SignUpNextStep } from '@clerk/shared/internal/clerk-js/nextStep';
+import type { ReactNode, Ref } from 'react';
 
 import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
-import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
+import type { SignUpVerificationModel } from './sign-up.model';
+import type { SignUpRoute } from './sign-up.routes';
 
 export type SignUpFieldName = 'firstName' | 'lastName' | 'username' | 'emailAddress' | 'phoneNumber' | 'password';
 
@@ -21,47 +23,133 @@ export interface SignUpDetails {
   legalConsent?: SignUpLegalConsent;
 }
 
-export type SignUpStep =
-  | ({ kind: 'details'; purpose: 'start' | 'continue' } & SignUpDetails)
-  | { kind: 'alternative-phone'; channel: AuthProvider; legalConsent?: SignUpLegalConsent }
-  | { kind: 'code'; purpose: 'verify-email' | 'verify-phone'; identifier: string; provider?: string }
-  | { kind: 'choice'; purpose: 'enterprise-connections' | 'wallets'; options: readonly AuthProvider[] }
-  | { kind: 'notice'; purpose: 'verify-email-link'; identifier: string }
-  | { kind: 'notice'; purpose: 'email-link-status'; status: AuthEmailLinkStatusValue }
-  | { kind: 'notice'; purpose: 'restricted' | 'waitlist' | 'loading' }
-  | { kind: 'notice'; purpose: 'protect-check'; challenge: boolean }
-  | { kind: 'notice'; purpose: 'action-blocked'; details?: AuthActionBlockedDetails };
+export interface SignUpCode {
+  purpose: 'verify-email' | 'verify-phone';
+  identifier: string;
+  provider?: string;
+}
 
 export type SignUpValues = AuthFlowValues;
 
 export type SignUpSubmitEvent = AuthFlowSubmitEvent;
 
-export interface SignUpViewProps {
-  step: SignUpStep;
-  direction?: FlowDirection;
-  applicationName: string;
-  applicationLogoUrl?: string;
+export type SignUpScreen =
+  | SignUpRoute
+  | 'startOver'
+  | 'actionBlocked'
+  | 'restricted'
+  | 'waitlist'
+  | 'alternativePhone'
+  | 'verifyEmailLink'
+  | 'emailLinkStatus'
+  | 'wallets'
+  | 'loading';
+
+export interface SignUpDetailsScreen {
+  step: SignUpDetails;
   socialProviders: readonly AuthProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   form: UseFormResult<SignUpValues>;
-  onSubmit: (event?: SignUpSubmitEvent) => void;
-  onCodeComplete: (code: string) => void;
+  onSubmit: (event: SignUpSubmitEvent) => void;
   isPending: boolean;
   isDisabled: boolean;
-  errorMessage?: string;
   globalErrorMessage?: string;
   passwordFeedback?: FieldFeedback;
   onSwitchField?: () => void;
   onSignIn?: () => void;
+}
+
+export interface SignUpVerifyScreen {
+  verification: SignUpVerificationModel;
+  onNext: (step: SignUpNextStep) => void;
+  provider?: string;
+  isPending: boolean;
+  globalErrorMessage?: string;
   onEditIdentifier: () => void;
   onCancel?: () => void;
-  onBack: () => void;
+}
+
+export interface SignUpStartOverScreen {
+  isPending: boolean;
+  globalErrorMessage?: string;
+  onStartOver: () => void;
+}
+
+export interface SignUpRestrictedScreen {
+  globalErrorMessage?: string;
   onEmailSupport?: () => void;
   onJoinWaitlist?: () => void;
+  onSignIn?: () => void;
+}
+
+export interface SignUpAlternativePhoneScreen {
+  channel: AuthProvider;
+  legalConsent?: SignUpLegalConsent;
+  form: UseFormResult<SignUpValues>;
+  onSubmit: (event: SignUpSubmitEvent) => void;
+  isPending: boolean;
+  isDisabled: boolean;
+  globalErrorMessage?: string;
+  onCancel?: () => void;
+}
+
+export interface SignUpEmailLinkScreen {
+  identifier: string;
+  isPending: boolean;
+  globalErrorMessage?: string;
+  onEditIdentifier: () => void;
   onResend?: () => void;
   canResend: boolean;
   resendRemainingSeconds?: number;
+}
+
+export interface SignUpEmailLinkStatusScreen {
+  status: AuthEmailLinkStatusValue;
+  globalErrorMessage?: string;
+}
+
+export interface SignUpEnterpriseConnectionsScreen {
+  options: readonly AuthProvider[];
+  pendingConnectionId?: string;
+  globalErrorMessage?: string;
+  onSelectConnection: (id: string) => void;
+}
+
+export interface SignUpWalletsScreen {
+  options: readonly AuthProvider[];
+  pendingWalletId?: string;
+  isDisabled: boolean;
+  globalErrorMessage?: string;
+  onSelectWallet: (id: string) => void;
+  onBack: () => void;
+}
+
+export interface SignUpProtectCheckScreen {
+  challenge: boolean;
+  isPending: boolean;
+  globalErrorMessage?: string;
+  containerRef?: Ref<HTMLDivElement>;
   onRetry?: () => void;
-  protectCheckRef?: Ref<HTMLDivElement>;
+}
+
+export interface SignUpViewProps {
+  screen: SignUpScreen;
+  applicationName: string;
+  applicationLogoUrl?: string;
+  renderBranding?: boolean;
+  start: SignUpDetailsScreen;
+  continue: SignUpDetailsScreen;
+  verifyEmail: ReactNode;
+  verifyPhone: ReactNode;
+  restricted: SignUpRestrictedScreen;
+  actionBlocked?: AuthActionBlockedDetails;
+  startOver: SignUpStartOverScreen;
+  alternativePhone?: SignUpAlternativePhoneScreen;
+  verifyEmailLink?: SignUpEmailLinkScreen;
+  emailLinkStatus?: SignUpEmailLinkStatusScreen;
+  enterpriseConnections?: SignUpEnterpriseConnectionsScreen;
+  wallets?: SignUpWalletsScreen;
+  protectCheck?: SignUpProtectCheckScreen;
+  taskChooseOrganization?: ReactNode;
 }
