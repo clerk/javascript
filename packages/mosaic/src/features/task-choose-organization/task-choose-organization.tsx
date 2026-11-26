@@ -3,20 +3,24 @@
 import type { ReactElement, ReactNode } from 'react';
 import { useEffect } from 'react';
 
+import { Card } from '../../components/card';
 import { fill, useMessages } from '../../localization';
 import { useCreateOrganizationFlow } from '../create-organization/create-organization';
 import type { CreateOrganizationReadyModel } from '../create-organization/create-organization.controller';
 import { CreateOrganizationSteps } from '../create-organization/create-organization.view';
-import type { TaskChooseOrganizationReadyController } from './task-choose-organization.controller';
+import type {
+  TaskChooseOrganizationController,
+  TaskChooseOrganizationReadyController,
+} from './task-choose-organization.controller';
 import {
   useTaskChooseOrganizationController,
   useTaskChooseOrganizationScreenController,
 } from './task-choose-organization.controller';
 import type { TaskChooseOrganizationModelOptions } from './task-choose-organization.model';
 import { useTaskChooseOrganizationModel } from './task-choose-organization.model';
-import { TaskChooseOrganizationSkeleton } from './task-choose-organization.skeleton';
+import { TaskChooseOrganizationSkeletonSteps } from './task-choose-organization.skeleton';
 import type { TaskChooseOrganizationData } from './task-choose-organization.types';
-import { TaskChooseOrganizationView } from './task-choose-organization.view';
+import { TaskChooseOrganizationSteps } from './task-choose-organization.view';
 
 /** Everything `<TaskChooseOrganization />` takes: where to go once the session has no tasks left. */
 export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
@@ -40,30 +44,62 @@ export type TaskChooseOrganizationProps = TaskChooseOrganizationModelOptions & {
  * ```
  */
 export function TaskChooseOrganization({ fallback, ...options }: TaskChooseOrganizationProps): ReactElement | null {
-  const model = useTaskChooseOrganizationModel(options);
-  const controller = useTaskChooseOrganizationController(model);
+  const task = useTaskChooseOrganizationFlow(options);
 
-  if (controller.status === 'ready') {
-    if (controller.organizationsLoading) {
-      return (
-        <TaskChooseOrganizationSkeleton
-          canCreate={Boolean(controller.createOrganization)}
-          identifier={controller.identifier}
-          renderBranding={controller.renderBranding}
-        />
-      );
-    }
-    return <ConnectedTaskChooseOrganization controller={controller} />;
-  }
-
-  if (model.status === 'complete') {
-    return <ContinueAfterTask onContinue={model.onContinue} />;
-  }
-
-  if (controller.status === 'loading') {
+  if (task.status === 'loading') {
     return <>{fallback}</>;
   }
 
+  if (task.status === 'ready') {
+    return (
+      <Card.Root renderBranding={task.renderBranding}>
+        <TaskChooseOrganizationContent controller={task} />
+      </Card.Root>
+    );
+  }
+
+  return <TaskChooseOrganizationContent controller={task} />;
+}
+
+export type TaskChooseOrganizationFlowController =
+  | TaskChooseOrganizationController
+  | { status: 'complete'; onContinue: () => Promise<unknown> };
+
+export function useTaskChooseOrganizationFlow(
+  options: TaskChooseOrganizationModelOptions & { enabled?: boolean },
+): TaskChooseOrganizationFlowController {
+  const model = useTaskChooseOrganizationModel(options);
+  const controller = useTaskChooseOrganizationController(model);
+
+  if (controller.status !== 'ready' && model.status === 'complete') {
+    return { status: 'complete', onContinue: model.onContinue };
+  }
+  return controller;
+}
+
+export function isTaskChooseOrganizationReady(controller: TaskChooseOrganizationFlowController): boolean {
+  return controller.status !== 'loading' && !(controller.status === 'ready' && controller.organizationsLoading);
+}
+
+export function TaskChooseOrganizationContent({
+  controller,
+}: {
+  controller: TaskChooseOrganizationFlowController;
+}): ReactElement | null {
+  if (controller.status === 'ready') {
+    if (controller.organizationsLoading) {
+      return (
+        <TaskChooseOrganizationSkeletonSteps
+          canCreate={Boolean(controller.createOrganization)}
+          identifier={controller.identifier}
+        />
+      );
+    }
+    return <ConnectedTaskChooseOrganizationSteps controller={controller} />;
+  }
+  if (controller.status === 'complete') {
+    return <ContinueAfterTask onContinue={controller.onContinue} />;
+  }
   return null;
 }
 
@@ -76,12 +112,12 @@ function ContinueAfterTask({ onContinue }: { onContinue: () => Promise<unknown> 
   return null;
 }
 
-function ConnectedTaskChooseOrganization({ controller }: { controller: TaskChooseOrganizationReadyController }) {
+function ConnectedTaskChooseOrganizationSteps({ controller }: { controller: TaskChooseOrganizationReadyController }) {
   const screen = useTaskChooseOrganizationScreenController(controller);
   const { createOrganization } = controller;
 
   return (
-    <TaskChooseOrganizationView
+    <TaskChooseOrganizationSteps
       {...controller}
       step={screen.step}
       createSteps={

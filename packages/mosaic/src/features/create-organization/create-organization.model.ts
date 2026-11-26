@@ -30,13 +30,15 @@ export type CreateOrganizationModel =
       onComplete: (organizationId: string) => Promise<void>;
     };
 
-export function useCreateOrganizationModel(options: CreateOrganizationModelOptions = {}): CreateOrganizationModel {
+export function useCreateOrganizationModel(
+  options: CreateOrganizationModelOptions & { enabled?: boolean } = {},
+): CreateOrganizationModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const {
     isLoaded: isListLoaded,
     createOrganization,
     userMemberships,
-  } = useOrganizationList({ userMemberships: { infinite: true } });
+  } = useOrganizationList(options.enabled === false ? undefined : { userMemberships: { infinite: true } });
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
