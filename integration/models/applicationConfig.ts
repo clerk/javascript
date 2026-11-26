@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import * as path from 'node:path';
 
 import type { AccountlessApplication } from '@clerk/backend';
@@ -12,6 +13,26 @@ import { hash, helpers } from './helpers';
 
 export type ApplicationConfig = ReturnType<typeof applicationConfig>;
 type Scripts = { dev: string; build: string; setup: string; serve: string };
+
+const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
+const INHERITED_PNPM_SETTINGS = [
+  'minimumReleaseAge',
+  'minimumReleaseAgeExclude',
+  'trustPolicy',
+  'trustPolicyExclude',
+  'blockExoticSubdeps',
+] as const;
+
+let rootPnpmSettings: Record<string, unknown> | undefined;
+const getRootPnpmSettings = () => {
+  rootPnpmSettings ??= Object.fromEntries(
+    INHERITED_PNPM_SETTINGS.map(key => {
+      const value = execFileSync('pnpm', ['config', 'get', key, '--json'], { cwd: REPO_ROOT, encoding: 'utf-8' });
+      return [key, JSON.parse(value)];
+    }),
+  );
+  return rootPnpmSettings;
+};
 
 export const applicationConfig = () => {
   let name = '';
@@ -131,16 +152,16 @@ export const applicationConfig = () => {
         logger.info(`Modifying dependencies in "${packageJsonPath}"`);
         contents.dependencies = { ...contents.dependencies, ...Object.fromEntries(npmDeps) };
       }
-      // Pin transitives to versions with pnpm "trustedPublisher" evidence so the
-      // isolated tmp install passes pnpm 10's trust-downgrade check.
-      contents.pnpm = {
-        ...(contents.pnpm ?? {}),
-        overrides: {
-          ...(contents.pnpm?.overrides ?? {}),
-          ...TRUSTED_OVERRIDES,
-        },
-      };
+      const templateOverrides = contents.pnpm?.overrides ?? {};
+      delete contents.pnpm;
+      contents.packageManager ??= (await fs.readJSON(path.join(REPO_ROOT, 'package.json'))).packageManager;
       await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
+
+      await fs.writeJSON(
+        path.join(appDirPath, 'pnpm-workspace.yaml'),
+        { ...getRootPnpmSettings(), overrides: { ...templateOverrides, ...TRUSTED_OVERRIDES } },
+        { spaces: 2 },
+      );
 
       return application(self, appDirPath, appDirName, serverUrl);
     },

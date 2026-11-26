@@ -1,2 +1,19 @@
 packages:
   - '.'
+
+minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - '@clerk/*'
+
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - '@expo/cli@55.0.37'
+  - '@expo/config-plugins@55.0.12'
+  - 'expo@55.0.32'
+  - 'expo-auth-session@55.0.19'
+  - 'expo-dev-client@55.0.41'
+  - 'expo-dev-launcher@55.0.42'
+  - 'expo-modules-autolinking@55.0.28'
+  - 'expo-modules-core@55.0.27'
+
+blockExoticSubdeps: true

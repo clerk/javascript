@@ -94,8 +94,8 @@ export const constants = {
 
 /**
  * Floor versions of transitive deps that carry pnpm "trustedPublisher" evidence.
- * Injected as `pnpm.overrides` into every fixture's tmp `package.json` so that
- * isolated installs satisfy pnpm 10's trust-downgrade check. Sourced from the
+ * Injected as `overrides` into every fixture's tmp `pnpm-workspace.yaml` so that
+ * isolated installs satisfy pnpm's trust-downgrade check. Sourced from the
  * 2026-05-11 npm supply-chain incident response (mini Shai-Hulud worm).
  * Update when upstream packages publish newer versions via OIDC trusted publisher.
  */

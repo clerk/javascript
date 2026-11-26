@@ -7,7 +7,7 @@
     "build": "expo export -p web",
     "dev": "RCT_METRO_PORT=$PORT expo start --web --port $PORT",
     "lint": "expo lint",
-    "start": "pnpm dlx serve dist --single"
+    "start": "serve dist --single"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
@@ -37,6 +37,7 @@
     "@types/react": "18.3.12",
     "@types/react-test-renderer": "^18.0.7",
     "react-test-renderer": "18.2.0",
+    "serve": "14.2.8",
     "typescript": "~5.7.3"
   }
 }
