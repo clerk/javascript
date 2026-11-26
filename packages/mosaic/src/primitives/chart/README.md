@@ -373,7 +373,7 @@ Inside `Chart.Bars`, the position of `Chart.Bar` and `Chart.ProjectionOutline` d
 
 ## Layout
 
-`useBarChart` prepares the stacks when `data`, `series` or `index` change, measures the `rootRef` element, and projects the layout for each size, margin, gap or projection change. `Chart.Bars` projects the bar marks when the layout or the bar geometry changes. The container size is committed before paint, so the chart follows its container while resizing.
+`useBarChart` prepares the stacks when `data`, `series` or `index` change, measures the `rootRef` element, and projects the layout for each size, margin, gap or projection change. `Chart.Bars` projects the bar marks when the layout or the bar geometry changes. The chart measures its container when `rootRef` attaches, so the first paint lands in the commit that mounts or hydrates it rather than a frame later behind the page's own effects, and a `ResizeObserver` commits each later size before paint, so the chart follows its container while resizing.
 
 The Y scale contains zero and the full positive and negative extents, including an accepted projection, before tick rounding. Gaps and the clearance from the zero line are paint insets: they move no values, ticks or stack endpoints. Insets and radii shrink on small marks so at least one pixel stays visible.
 

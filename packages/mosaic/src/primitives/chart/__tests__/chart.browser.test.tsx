@@ -419,6 +419,24 @@ describe('resizing', () => {
     const { x, y } = insideLastBar();
     await expect.poll(() => pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
   });
+
+  it('paints in the commit that mounts it, without waiting for a ResizeObserver callback', async () => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+    try {
+      await render(<Chart />);
+      const { x, y } = insideLastBar();
+      expect(pixelAt(x, y)).toBe('rgba(255, 0, 0, 255)');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 describe('choosing a period with a pointer', () => {
