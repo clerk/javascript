@@ -233,7 +233,7 @@ describe('Web3 connection rows', () => {
         preparation.release();
         if (outcome === 'retry') {
           await waitFor(() =>
-            expect(screen.getByRole('alert')).toHaveTextContent('You have rejected the signature request.'),
+            expect(screen.getByRole('alert')).toHaveTextContent('You declined the signature request.'),
           );
           await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
           expect(screen.getByRole('button', { name: 'Manage Solana' })).toBeEnabled();

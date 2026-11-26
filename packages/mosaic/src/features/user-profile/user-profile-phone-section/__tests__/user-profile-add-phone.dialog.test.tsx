@@ -167,7 +167,7 @@ describe('UserProfileAddPhoneDialog', () => {
   it('allows resending only after the countdown and the current request finish', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ step: 'verify', resendSeconds: 12 });
-    await user.click(screen.getByRole('button', { name: 'Resend (12)' }));
+    await user.click(screen.getByRole('button', { name: 'Resend in 12s' }));
     expect(props.onResend).not.toHaveBeenCalled();
 
     rerender(

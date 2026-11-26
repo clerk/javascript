@@ -87,7 +87,7 @@ describe('CreateOrganization', () => {
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme-inc');
       await user.click(screen.getByRole('button', { name: 'Create organization' }));
 
-      expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
+      expect(await screen.findByRole('heading', { name: 'Invite members' })).toBeVisible();
       const [membership] = fapi.memberships;
       expect(membership?.organization).toMatchObject({ name: 'Acme Inc', slug: 'acme-inc' });
       expect(activeOrganizationId(fapi)).toBe(membership?.organization.id);
@@ -111,7 +111,7 @@ describe('CreateOrganization', () => {
       await create(user, 'Acme Inc');
 
       expect(screen.queryByRole('textbox', { name: 'Slug' })).toBeNull();
-      expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
+      expect(await screen.findByRole('heading', { name: 'Invite members' })).toBeVisible();
       expect(fapi.memberships[0]?.organization.slug).toBe('');
     });
 
@@ -153,7 +153,7 @@ describe('CreateOrganization', () => {
         expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('aria-disabled', 'true'),
       );
       hold.release();
-      expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
+      expect(await screen.findByRole('heading', { name: 'Invite members' })).toBeVisible();
     });
 
     it('shows an error that names no field above the form and keeps the values', async () => {
@@ -184,7 +184,7 @@ describe('CreateOrganization', () => {
       await saveCrop(user, 'Adjust logo');
       await create(user, 'Acme');
 
-      expect(await screen.findByRole('heading', { name: 'Invite new members' })).toBeVisible();
+      expect(await screen.findByRole('heading', { name: 'Invite members' })).toBeVisible();
       expect(fapi.memberships[0]?.organization.has_image).toBe(true);
     });
 
@@ -233,7 +233,7 @@ describe('CreateOrganization', () => {
       await create(user, 'Acme Inc');
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/acme-inc'));
-      expect(screen.queryByRole('heading', { name: 'Invite new members' })).toBeNull();
+      expect(screen.queryByRole('heading', { name: 'Invite members' })).toBeNull();
     });
 
     it('skips the invitations when the organization holds a single member', async () => {
@@ -262,7 +262,7 @@ describe('CreateOrganization', () => {
       const user = userEvent.setup();
 
       await create(user, 'Acme');
-      await user.click(await screen.findByRole('button', { name: 'Skip' }));
+      await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
       expect(fapi.organizationInvitations).toEqual([]);
@@ -277,7 +277,7 @@ describe('CreateOrganization', () => {
       const user = userEvent.setup();
 
       await create(user, 'Acme');
-      await user.click(await screen.findByRole('button', { name: 'Skip' }));
+      await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 
       expect(await screen.findByRole('textbox', { name: 'Name' })).toHaveValue('');
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('');
@@ -301,7 +301,7 @@ describe('CreateOrganization', () => {
       expect(fapi.organizationInvitations.map(item => [item.email_address, item.role])).toEqual([
         ['grace@example.com', 'org:member'],
       ]);
-      await user.click(screen.getByRole('button', { name: 'Finish' }));
+      await user.click(screen.getByRole('button', { name: 'Done' }));
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/dashboard'));
     });
 
@@ -360,7 +360,7 @@ describe('CreateOrganization', () => {
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent('You can invite up to 50 email addresses at a time.'),
       );
-      expect(screen.getByRole('heading', { name: 'Invite new members' })).toBeVisible();
+      expect(screen.getByRole('heading', { name: 'Invite members' })).toBeVisible();
     });
   });
 });

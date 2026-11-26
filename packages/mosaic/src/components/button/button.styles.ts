@@ -62,6 +62,7 @@ export const styles = stylex.create({
         ':not([data-disabled]):hover': durationVars['--cl-duration-instant'],
       },
     },
+    WebkitTapHighlightColor: 'transparent',
     borderColor: 'transparent',
     borderRadius: `var(--_cl-button-radius, ${radiusVars['--cl-radius-md']})`,
     borderStyle: 'solid',
@@ -289,6 +290,7 @@ export const variants = stylex.create({
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',
     height: 'auto',
+    minHeight: 0,
   },
   'link-neutral': {
     backgroundColor: 'transparent',
@@ -303,6 +305,7 @@ export const variants = stylex.create({
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',
     height: 'auto',
+    minHeight: 0,
   },
   'link-negative': {
     backgroundColor: 'transparent',
@@ -317,6 +320,7 @@ export const variants = stylex.create({
     textDecorationSkipInk: 'auto',
     textUnderlinePosition: 'from-font',
     height: 'auto',
+    minHeight: 0,
   },
 });
 
@@ -339,6 +343,7 @@ export const sizes = stylex.create({
       [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['1.5'],
     },
     height: space['6'],
+    minHeight: space['6'],
   },
   sm: {
     // sm runs a step tighter than md on every inline measure, gap included
@@ -354,6 +359,7 @@ export const sizes = stylex.create({
       [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['7'],
+    minHeight: space['7'],
   },
   md: {
     gap: space['2'],
@@ -368,11 +374,12 @@ export const sizes = stylex.create({
       [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['8'],
+    minHeight: space['8'],
   },
   lg: {
     gap: space['2'],
-    fontSize: typeScaleVars['--cl-text-base-size'],
-    lineHeight: typeScaleVars['--cl-text-base-leading'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     paddingInlineEnd: {
       default: space['3'],
       [stylex.when.descendant(':last-child:not(:first-child)', iconScope)]: space['2'],
@@ -382,6 +389,7 @@ export const sizes = stylex.create({
       [stylex.when.descendant(':first-child:not(:last-child)', iconScope)]: space['2'],
     },
     height: space['9'],
+    minHeight: space['9'],
   },
 });
 /* eslint-enable @stylexjs/no-lookahead-selectors */

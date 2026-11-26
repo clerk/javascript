@@ -76,7 +76,8 @@ export function SignUpRestricted({
             {m.signInPrompt}{' '}
             <Button
               type='button'
-              size='sm'
+              size='md'
+              color='neutral'
               variant='link'
               onClick={onSignIn}
             >

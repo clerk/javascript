@@ -77,6 +77,7 @@ function CreateStep({ form, slugEnabled, onNameChange, onCancel, notice }: Creat
     <>
       <Card.Header>
         <Card.Title>{m.create.title}</Card.Title>
+        <Card.Description>{m.create.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -226,6 +227,7 @@ function InviteStep({ invite, onFinish }: CreateOrganizationStepsProps) {
     <>
       <Card.Header>
         <Card.Title>{m.invite.title}</Card.Title>
+        <Card.Description>{m.invite.description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'

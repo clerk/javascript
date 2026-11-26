@@ -48,6 +48,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
         <Card.Root renderBranding={false}>
           <Flow.Root
             value={props.step}
+            direction={props.step === 'phone' ? -1 : 1}
             state={props}
           >
             {current => (

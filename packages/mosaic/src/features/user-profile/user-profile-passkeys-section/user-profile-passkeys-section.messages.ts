@@ -23,7 +23,7 @@ export const userProfilePasskeysMessages = {
   cancel: 'Cancel',
   unavailableError: 'This passkey is no longer available.',
   accountUnavailableError: 'This account is no longer available.',
-  saveError: 'Something went wrong. Please try again.',
+  saveError: 'Something went wrong. Try again.',
   removeAction: 'Remove passkey',
   removeTitle: 'Remove passkey',
   removeDescription: '{name} will be removed from this account.',

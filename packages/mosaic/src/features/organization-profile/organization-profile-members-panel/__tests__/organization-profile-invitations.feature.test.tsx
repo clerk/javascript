@@ -119,7 +119,7 @@ describe('connected organization invitations', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(initial.requests).toHaveLength(1));
     initial.fail('network_error', 'Unavailable');
-    expect(await screen.findByText('Unable to load invitations', {}, { timeout: 12_000 })).toBeVisible();
+    expect(await screen.findByText('Couldn’t load invitations', {}, { timeout: 12_000 })).toBeVisible();
     serve(['org:sys_memberships:manage']);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Try again' }));
@@ -155,7 +155,7 @@ describe('connected organization invitations', () => {
     revoke.fail('network_error', 'Unavailable');
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
-        'Unable to reach the server. Check your connection and try again.',
+        'Couldn’t reach the server. Check your connection and try again.',
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
@@ -196,7 +196,7 @@ describe('connected organization invitations', () => {
 
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
-        'Unable to revoke this invitation. Please try again.',
+        'Couldn’t revoke this invitation. Try again.',
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
@@ -231,16 +231,16 @@ describe('connected organization invitations', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
     refresh.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible(), { timeout: 12_000 });
+    await waitFor(() => expect(screen.getByText('Couldn’t load invitations')).toBeVisible(), { timeout: 12_000 });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
     expect(screen.queryByText('other@example.com')).toBeNull();
     const table = within(screen.getByRole('table', { name: 'Invitations' }));
-    expect(table.getByRole('alert')).toHaveTextContent('Unable to load invitations');
+    expect(table.getByRole('alert')).toHaveTextContent('Couldn’t load invitations');
     const retry = serve(['org:sys_memberships:manage']);
     retry.organizationInvitations = [other];
     await user.click(table.getByRole('button', { name: 'Try again' }));
-    await waitFor(() => expect(screen.queryByText('Unable to load invitations')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Couldn’t load invitations')).toBeNull());
     expect(screen.getByText('other@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   }, 20_000);
@@ -697,7 +697,7 @@ describe('inviting members', () => {
       'bob@example.com',
       'Some of these email addresses already belong to members of this organization.',
     ],
-    ['an address the server cannot parse', 'grace@@example.com', 'Email address must be a valid email address.'],
+    ['an address the server cannot parse', 'grace@@example.com', 'Enter an email like name@example.com.'],
   ])('keeps the dialog open and marks %s as rejected', async (_, rejected, message) => {
     const fapi = serveInvite({ defaultRole: 'org:member' });
     await renderWithClerk(<OrganizationProfileMembersPanel />);

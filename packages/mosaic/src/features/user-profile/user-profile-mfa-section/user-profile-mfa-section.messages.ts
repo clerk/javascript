@@ -1,5 +1,5 @@
 export const userProfileMfaMessages = {
-  label: '2-step verification',
+  label: 'Two-step verification',
   add: 'Add',
   addLabel: 'Add verification method',
   empty: 'No verification methods added',
@@ -10,13 +10,13 @@ export const userProfileMfaMessages = {
   },
   default: 'Default',
   setDefault: 'Set as default',
-  setDefaultError: 'Unable to set this method as default. Please try again.',
+  setDefaultError: 'Couldn’t set this method as default. Try again.',
   remove: 'Remove method',
   regenerate: 'Regenerate',
   manage: 'Manage {label}',
   manageSms: 'Manage {label} {phoneNumber}',
   addDialog: {
-    title: 'Add 2-step verification',
+    title: 'Add two-step verification',
     description: 'Choose a verification method',
     methods: {
       sms: 'Get a code by text message',

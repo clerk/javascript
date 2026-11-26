@@ -81,9 +81,7 @@ describe('signing out of all other devices', () => {
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        'Something went wrong signing these devices out. Please try again.',
-      ),
+      expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t sign these devices out. Try again.'),
     );
     expect(confirmation()).toBeInTheDocument();
 

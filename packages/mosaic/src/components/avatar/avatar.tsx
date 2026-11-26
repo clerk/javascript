@@ -11,7 +11,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { mediaSizes } from '../../styles/media-size.styles';
 import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
-import { shapes, sizes, styles } from './avatar.styles';
+import { groupStyles, shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -22,6 +22,8 @@ interface AvatarContextValue {
 }
 
 const AvatarContext = React.createContext<AvatarContextValue | null>(null);
+
+const AvatarGroupContext = React.createContext<{ size: NonNullable<AvatarProps['size']> } | null>(null);
 
 function useAvatarContext(part: string): AvatarContextValue {
   const context = React.useContext(AvatarContext);
@@ -38,9 +40,11 @@ export interface AvatarProps extends MosaicComponentProps<'span'> {
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
-  { bordered = true, shape = 'circle', size = 'md', render, xstyle, ...rest },
+  { bordered = true, shape = 'circle', size: sizeProp, render, xstyle, ...rest },
   ref,
 ) {
+  const group = React.useContext(AvatarGroupContext);
+  const size = sizeProp ?? group?.size ?? 'md';
   const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
   const value = React.useMemo<AvatarContextValue>(
     () => ({ bordered, status, onStatusChange: setStatus }),
@@ -62,6 +66,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
           sizes[size],
           interactive && styles.interactive,
           interactive && focusOutline.visible,
+          group && groupStyles.member,
           xstyle,
         ),
         rest,
@@ -195,4 +200,45 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
   );
 });
 
-export { AvatarRoot, AvatarImage, AvatarFallback, AvatarIcon };
+export interface AvatarGroupProps extends MosaicComponentProps<'span'> {
+  size?: AvatarProps['size'];
+}
+
+const AvatarGroup = React.forwardRef<HTMLSpanElement, AvatarGroupProps>(function MosaicAvatarGroup(
+  { size = 'xs', render, xstyle, ...rest },
+  ref,
+) {
+  const value = React.useMemo(() => ({ size }), [size]);
+  const element = useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('avatar-group', { size }),
+      stylex.props(reset.base, groupStyles.root, xstyle),
+      rest,
+    ),
+  });
+  return <AvatarGroupContext.Provider value={value}>{element}</AvatarGroupContext.Provider>;
+});
+
+export interface AvatarOverflowProps extends Omit<AvatarProps, 'children'> {
+  count: number;
+}
+
+const AvatarOverflow = React.forwardRef<HTMLSpanElement, AvatarOverflowProps>(function MosaicAvatarOverflow(
+  { count, xstyle, ...rest },
+  ref,
+) {
+  return (
+    <AvatarRoot
+      ref={ref}
+      xstyle={[groupStyles.overflow, xstyle]}
+      {...rest}
+    >
+      +{count}
+    </AvatarRoot>
+  );
+});
+
+export { AvatarRoot, AvatarImage, AvatarFallback, AvatarIcon, AvatarGroup, AvatarOverflow };

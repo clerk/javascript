@@ -205,7 +205,7 @@ describe('Who sees the Security page', () => {
 });
 
 describe('When the connections request fails', () => {
-  const ERROR_TEXT = 'Could not check this organization’s SSO connections';
+  const ERROR_TEXT = 'Couldn’t check this organization’s SSO connections';
   const settle = () => new Promise(resolve => setTimeout(resolve, 50));
 
   beforeEach(() => {
@@ -491,9 +491,7 @@ describe('Adding members to the SSO bypass allow list', () => {
 
     expect(await within(dialog).findByText('Added 1 member')).toBeVisible();
     expect(
-      within(dialog).getByText(
-        '1 member could not be added because their email address is not served by a connection.',
-      ),
+      within(dialog).getByText('1 member couldn’t be added because their email address is not served by a connection.'),
     ).toBeVisible();
     expect(fapi.ssoBypass.users.map(entry => entry.user_id).sort()).toEqual(['user_2', 'user_3']);
   });

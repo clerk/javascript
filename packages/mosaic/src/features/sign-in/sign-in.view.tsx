@@ -1,15 +1,18 @@
 import type { Ref } from 'react';
 
-import { AuthIdentityPreview } from '../../blocks/auth';
+import { AuthMark, emphasizeIdentifier, useAuthMark } from '../../blocks/auth';
+import { Prompt } from '../../blocks/prompt';
 import type { VerificationResendMessages } from '../../blocks/verification';
 import { VerificationCode, verificationResend } from '../../blocks/verification';
+import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
-import { useMessages } from '../../localization';
+import { fill, useMessages } from '../../localization';
 import { SignUpDetailsStep } from '../sign-up/steps/sign-up-details';
 import type { SignInStep, SignInViewProps } from './sign-in.types';
 import {
   codeCopy,
+  codeEditLabel,
   codeIdentity,
   codeNotice,
   codeResendCopy,
@@ -38,6 +41,7 @@ export function SignInView({
   lastUsedProviderId,
   onSelectProvider,
   onPasskey,
+  passkeyInlineFrom,
   form,
   onSubmit,
   onCodeComplete,
@@ -46,6 +50,7 @@ export function SignInView({
   errorMessage,
   globalErrorMessage,
   newPasswordFeedback,
+  newPasswordRules,
   onEditIdentifier,
   onSwitchField,
   onSignUp,
@@ -60,6 +65,7 @@ export function SignInView({
   onEmailSupport,
   pendingFactorId,
   onSelectFactor,
+  onChangeAddress,
   pendingAccountId,
   onSelectAccount,
   onAddAccount,
@@ -79,47 +85,113 @@ export function SignInView({
   const resendFor = (copy: VerificationResendMessages) =>
     verificationResend(copy, { onResend, canResend, remainingSeconds: resendRemainingSeconds });
 
-  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+  const mark = useAuthMark(applicationLogoUrl);
   const code = form.registerValue('code');
 
   const codeStep = (current: Extract<SignInStep, { kind: 'code' }>) => {
     const secondary = codeSecondaryAction(current, m, { onCancel, onBack });
     const identity = codeIdentity(current, m);
+    const copy = codeCopy(current, m, applicationName);
+    const showAddresses =
+      Boolean(current.alternatives?.length) && Boolean(onChangeAddress) && current.channel !== 'totp';
     return (
-      <VerificationCode
+      <>
+        <VerificationCode
+          key={`${current.purpose}:${current.channel}:${current.identifier ?? ''}`}
+          focusRef={focusRef}
+          messages={{
+            ...copy,
+            description: emphasizeIdentifier(copy.description, identity.identifier),
+            ...actions,
+            secondaryActionLabel: secondary.label,
+            ...(current.purpose === 'reset-password' ? { primaryActionLabel: m.resetPasswordCode.verify } : {}),
+          }}
+          resend={resendFor(codeResendCopy(current, m))}
+          prompt={
+            (identity.identifier || current.purpose === 'second-factor') && current.purpose !== 'reset-password' ? (
+              <Prompt
+                text={m.notYou}
+                action={codeEditLabel(current, m)}
+                disabled={isPending}
+                variant={showAddresses || secondary.onClick ? 'ghost' : 'outline'}
+                onAction={onEditIdentifier}
+              />
+            ) : undefined
+          }
+          notice={codeNotice(current, m)}
+          alternatives={
+            showAddresses ? (
+              <Button
+                type='button'
+                variant='outline'
+                color='neutral'
+                fullWidth
+                disabled={isPending}
+                onClick={onChangeAddress}
+              >
+                {current.channel === 'phone' ? m.sendToAnotherPhone : m.sendToAnotherEmail}
+              </Button>
+            ) : undefined
+          }
+          value={code.value}
+          onValueChange={code.onValueChange}
+          errorMessage={errorMessage}
+          globalErrorMessage={globalErrorMessage}
+          isPending={isPending}
+          onSubmit={() => onSubmit()}
+          onComplete={onCodeComplete}
+          onCancel={secondary.onClick}
+        />
+      </>
+    );
+  };
+
+  const signUpStep = (current: Extract<SignInStep, { kind: 'sign-up' }>) => {
+    const identifier = form.values.identifier;
+    return (
+      <SignUpDetailsStep
         focusRef={focusRef}
-        messages={{
-          ...codeCopy(current, m, applicationName),
-          ...actions,
-          secondaryActionLabel: secondary.label,
-          ...(current.purpose === 'reset-password' ? { primaryActionLabel: m.resetPasswordCode.verify } : {}),
-        }}
-        resend={resendFor(codeResendCopy(current, m))}
-        identity={
-          identity.identifier ? (
-            <AuthIdentityPreview
-              identifier={identity.identifier}
-              editLabel={identity.editLabel}
+        step={current}
+        onSwitchField={onSwitchField}
+        socialProviders={identifier ? [] : socialProviders}
+        notice={
+          identifier && current.purpose !== 'continue' ? (
+            <Prompt
+              text={fill(m.noAccount, { applicationName, identifier: identifier })}
+              action={identifier.includes('@') ? m.useDifferentEmail : m.useDifferentPhoneNumber}
               disabled={isPending}
-              onEdit={onEditIdentifier}
+              onAction={onEditIdentifier}
             />
           ) : undefined
         }
-        notice={codeNotice(current, m)}
-        value={code.value}
-        onValueChange={code.onValueChange}
-        errorMessage={errorMessage}
+        pendingProviderId={pendingProviderId}
+        onSelectProvider={onSelectProvider}
+        isDisabled={isDisabled}
+        form={form}
         globalErrorMessage={globalErrorMessage}
         isPending={isPending}
-        onSubmit={() => onSubmit()}
-        onComplete={onCodeComplete}
-        onCancel={secondary.onClick}
+        onSubmit={onSubmit}
+        passwordFeedback={newPasswordFeedback}
+        passwordRules={newPasswordRules}
+        onSignIn={signUpSignIn(current, onEditIdentifier)}
       />
     );
   };
 
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      align='center'
+      variant='prominent'
+    >
+      {mark.logoUrl ? (
+        <AuthMark
+          key={mark.logoUrl}
+          logoUrl={mark.logoUrl}
+          shape={mark.shape}
+          onShape={mark.onShape}
+          onError={mark.onError}
+        />
+      ) : null}
       <Flow.Root
         value={stepKey(step)}
         direction={direction}
@@ -134,7 +206,6 @@ export function SignInView({
                 onSwitchField={onSwitchField}
                 onForgotPassword={onForgotPassword}
                 focusRef={focusRef}
-                logo={logo}
                 applicationName={applicationName}
                 combined={combined}
                 socialProviders={socialProviders}
@@ -142,6 +213,7 @@ export function SignInView({
                 lastUsedProviderId={lastUsedProviderId}
                 onSelectProvider={onSelectProvider}
                 onPasskey={onPasskey}
+                passkeyInlineFrom={passkeyInlineFrom}
                 form={form}
                 errorMessage={errorMessage}
                 globalErrorMessage={globalErrorMessage}
@@ -191,9 +263,7 @@ export function SignInView({
                     onSelectFactor={onSelectFactor}
                     onShowHelp={onShowHelp}
                     onBack={onBack}
-                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
-                    socialProviders={socialProviders}
                     pendingProviderId={pendingProviderId}
                     onSelectProvider={onSelectProvider}
                     onCancel={onCancel}
@@ -212,7 +282,6 @@ export function SignInView({
                     focusRef={focusRef}
                     step={current}
                     applicationName={applicationName}
-                    logo={logo}
                     globalErrorMessage={globalErrorMessage}
                     isPending={isPending}
                     resend={
@@ -243,31 +312,13 @@ export function SignInView({
                     isPending={isPending}
                     onSubmit={onSubmit}
                     passwordFeedback={newPasswordFeedback}
+                    passwordRules={newPasswordRules}
                     onBack={onBack}
                   />
                 ) : null}
               </Flow.Step>
 
-              <Flow.Step ids={stepIds.signUp}>
-                {current.kind === 'sign-up' ? (
-                  <SignUpDetailsStep
-                    focusRef={focusRef}
-                    step={current}
-                    logo={logo}
-                    onSwitchField={onSwitchField}
-                    socialProviders={socialProviders}
-                    pendingProviderId={pendingProviderId}
-                    onSelectProvider={onSelectProvider}
-                    isDisabled={isDisabled}
-                    form={form}
-                    globalErrorMessage={globalErrorMessage}
-                    isPending={isPending}
-                    onSubmit={onSubmit}
-                    passwordFeedback={newPasswordFeedback}
-                    onSignIn={signUpSignIn(current, onEditIdentifier)}
-                  />
-                ) : null}
-              </Flow.Step>
+              <Flow.Step ids={stepIds.signUp}>{current.kind === 'sign-up' ? signUpStep(current) : null}</Flow.Step>
             </>
           );
         }}

@@ -33,6 +33,12 @@ import { Card } from '@clerk/mosaic/components/card';
 
 `Card.Root` takes `align='center'` to center the content of every `Card.Header` in the card.
 
+`variant='prominent'` is for a card that is the whole page, such as sign-in. It widens the insets and enlarges the title. On a card narrower than 24rem, such as on a phone, the inline insets fall back to the default.
+
+A footer that follows content gets a divider only in a large (`lg`) dialog, where it separates the actions from a body that can scroll. Medium dialogs and cards that are the page have none, so the actions read as part of the body.
+
+`Card.Lead` is media that sits above the header as a direct child of `Card.Root`, before a `Flow`. It stays put while the steps below it change, and every `Card.Header` in the card sits 20px under it.
+
 `Card.Banner` sits between the header and the content and is always rendered. While its children hold a message, a `Banner` of the given `color` expands into it; once they are empty it collapses again. Give it `role='alert'` so the message is announced.
 
 Buttons in `Card.Footer` are full width by default. Pass `fullWidth={false}` to opt out. A `Dialog.Popup` or `Popover.Popup` rendered inside the footer doesn't inherit this.
@@ -40,6 +46,13 @@ Buttons in `Card.Footer` are full width by default. Pass `fullWidth={false}` to 
 ---
 
 ## Examples
+
+### Prominent
+
+<Story
+  name='Prominent'
+  storyModule={CardStories}
+/>
 
 ### Media
 

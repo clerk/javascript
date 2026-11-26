@@ -3,6 +3,12 @@ export interface OrganizationListMembership {
   organizationId: string;
   name: string;
   imageUrl?: string;
+  membersCount?: number;
+}
+
+export interface OrganizationListMemberPreview {
+  name: string;
+  imageUrl?: string;
 }
 
 export interface OrganizationListInvitation {
@@ -11,6 +17,9 @@ export interface OrganizationListInvitation {
   organizationId: string;
   name: string;
   imageUrl?: string;
+  inviterName?: string;
+  members?: OrganizationListMemberPreview[];
+  membersCount?: number;
   status: 'pending' | 'accepted';
 }
 
@@ -20,6 +29,9 @@ export interface OrganizationListSuggestion {
   organizationId: string;
   name: string;
   imageUrl?: string;
+  matchedDomain?: string;
+  members?: OrganizationListMemberPreview[];
+  membersCount?: number;
   status: 'pending' | 'accepted';
 }
 

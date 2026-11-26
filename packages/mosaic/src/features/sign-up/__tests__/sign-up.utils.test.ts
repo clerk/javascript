@@ -56,7 +56,7 @@ describe('signUpDetailsHeading', () => {
       'Create your account',
     );
     expect(heading({ purpose: 'continue', fields: { username: { required: true } } }).title).toBe(
-      'Fill in missing fields',
+      'Complete your account',
     );
   });
 
@@ -102,13 +102,22 @@ describe('code step copy', () => {
 
   it('asks for the email code and lets the address be edited or another method be used', () => {
     expect(signUpCodeCopy(email, m).title).toBe('Verify your email');
-    expect(signUpCodeIdentity(email, m)).toEqual({ identifier: 'new@acme.com', editLabel: 'Edit email address' });
-    expect(signUpCodeSecondaryAction(email, m, onCancel)).toEqual({ label: 'Use another method', onClick: onCancel });
+    expect(signUpCodeCopy(email, m).description).toBe('Enter the code we sent to new@acme.com.');
+    expect(signUpCodeIdentity(email, m)).toEqual({
+      identifier: 'new@acme.com',
+      editLabel: 'Edit email address',
+      differentLabel: 'Change email',
+    });
+    expect(signUpCodeSecondaryAction(email, m, onCancel)).toEqual({ label: 'Verify another way', onClick: onCancel });
   });
 
   it('formats a phone being verified and offers no other method', () => {
     expect(signUpCodeCopy(phone, m).title).toBe('Verify your phone');
-    expect(signUpCodeIdentity(phone, m)).toEqual({ identifier: '+1 (555) 555-0123', editLabel: 'Edit phone number' });
+    expect(signUpCodeIdentity(phone, m)).toEqual({
+      identifier: '+1 (555) 555-0123',
+      editLabel: 'Edit phone number',
+      differentLabel: 'Change phone number',
+    });
     expect(signUpCodeSecondaryAction(phone, m, onCancel).onClick).toBeUndefined();
   });
 
@@ -118,7 +127,7 @@ describe('code step copy', () => {
       description: 'Enter the verification code sent to your WhatsApp',
     });
     expect(signUpCodeSecondaryAction(whatsApp, m, onCancel)).toEqual({
-      label: 'Send code via SMS instead',
+      label: 'Send a text message instead',
       onClick: onCancel,
     });
   });

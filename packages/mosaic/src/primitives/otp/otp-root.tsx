@@ -155,10 +155,10 @@ export const OtpRoot = React.forwardRef<HTMLDivElement, OtpProps>(function OtpRo
     }
   }, [value, focus]);
 
-  // Fire `onComplete` on the transition into a full value (typing the last
-  // character or pasting a full code), not on every keystroke while full.
+  // Fire `onComplete` whenever a full value appears or changes: typing the last
+  // character, pasting a full code, or replacing one character of a full code.
   useEffect(() => {
-    if (previousValueRef.current.length < length && value.length === length) {
+    if (value.length === length && value !== previousValueRef.current) {
       onComplete?.(value);
     }
     previousValueRef.current = value;

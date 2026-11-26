@@ -339,7 +339,7 @@ describe('useModal', () => {
     await flush();
 
     expect(screen.getByText('App content')).toBeInTheDocument();
-    const dialog = screen.getByRole('dialog', { name: 'Something went wrong. Please try again.' });
+    const dialog = screen.getByRole('dialog', { name: 'Something went wrong. Try again.' });
     expect(within(dialog).queryByRole('button')).not.toBeInTheDocument();
   });
 
@@ -436,7 +436,7 @@ describe('useModal', () => {
     await flush();
 
     expect(screen.getByText('App caught: profile crashed')).toBeInTheDocument();
-    expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong. Try again.')).not.toBeInTheDocument();
   });
 
   it('throws a clear error outside MosaicProvider', () => {

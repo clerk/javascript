@@ -51,9 +51,9 @@ describe('User profile MFA management', () => {
     },
     {
       cause: new Error('Cannot read properties of undefined'),
-      message: 'Unable to set this method as default. Please try again.',
+      message: 'Couldn’t set this method as default. Try again.',
     },
-    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
+    { cause: 'network failure', message: 'Couldn’t set this method as default. Try again.' },
   ])('shows a safe default-change error for $message', async ({ cause, message }) => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     const second = fapiPhoneNumber({
@@ -153,7 +153,7 @@ describe('User profile MFA management', () => {
 
     replay.fail('action_blocked', 'Unable to update the default method.');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This action couldn’t be completed.'));
     expect(defaultUpdates(fapi)).toEqual([]);
   });
 
@@ -184,7 +184,7 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     expect(screen.queryByText('Internal authenticator failure')).toBeNull();
   });
 
@@ -381,7 +381,7 @@ describe('User profile MFA management', () => {
     held.fail('action_blocked', 'Unable to create backup codes.');
     await waitFor(() =>
       expect(screen.getByRole('alert')).toHaveTextContent(
-        "This action couldn't be completed. Please try again later or contact support if this persists.",
+        'This action couldn’t be completed. Try again later, or contact support if it keeps happening.',
       ),
     );
     expect(screen.queryByRole('dialog')).toBeNull();
@@ -527,7 +527,7 @@ describe('User profile MFA management', () => {
     replay.fail('action_blocked', 'Unable to create backup codes.');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByRole('alert')).toHaveTextContent(
-      "This action couldn't be completed. Please try again later or contact support if this persists.",
+      'This action couldn’t be completed. Try again later, or contact support if it keeps happening.',
     );
     expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
     expect(fapi.mfa.backupCodeCreations).toBe(0);

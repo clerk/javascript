@@ -103,6 +103,7 @@ export function useTaskSetupMfaModel(options: TaskSetupMfaModelOptions = {}): Ta
     isOnTask: Boolean(task) && (task?.key === 'setup-mfa' || clerk.__internal_setActiveInProgress),
     onLeave: () => void router.navigate(redirectUrlComplete),
     renderBranding: environment.displayConfig.branded,
+    applicationLogoUrl: environment.displayConfig.logoImageUrl || undefined,
     applicationName: environment.displayConfig.applicationName,
     identifier: getIdentifier(user),
     methods,

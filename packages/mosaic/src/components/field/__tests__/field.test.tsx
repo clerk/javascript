@@ -582,7 +582,7 @@ describe('Mosaic Field', () => {
       <Field.Root>
         <Input />
         <Field.Message>
-          <Field.Error>Password is incorrect.</Field.Error>
+          <Field.Error>Incorrect password. Try again or use another method.</Field.Error>
           <Field.Success>{null}</Field.Success>
         </Field.Message>
       </Field.Root>,
@@ -606,7 +606,7 @@ describe('Mosaic Field', () => {
     const success = container.querySelector('.cl-field-success');
     expect(container.querySelector('.cl-field-message')).toHaveAttribute('data-open');
     expect(container.querySelector('.cl-field-message')).not.toHaveAttribute('data-ending-style');
-    expect(error).toHaveTextContent('Password is incorrect.');
+    expect(error).toHaveTextContent('Incorrect password. Try again or use another method.');
     expect(error).toHaveAttribute('data-ending-style');
     expect(error).toHaveAttribute('aria-hidden', 'true');
     expect(success).toHaveTextContent('Password verified.');

@@ -280,10 +280,10 @@ describe('APIKeysTable', () => {
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
       const user = userEvent.setup();
 
-      await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Could not load API keys'), {
+      await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Couldn’t load API keys'), {
         timeout: 15_000,
       });
-      expect(within(table()).getByText('Could not load API keys')).toBeVisible();
+      expect(within(table()).getByText('Couldn’t load API keys')).toBeVisible();
       expect(screen.queryByText('No API Keys created')).toBeNull();
 
       failing = false;
@@ -481,7 +481,9 @@ describe('APIKeysTable', () => {
       expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
 
       rejectCopy(new Error('blocked'));
-      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t copy the API key. Try again.'),
+      );
       expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
     });
 
@@ -493,7 +495,9 @@ describe('APIKeysTable', () => {
       await within(dialog).findByRole('textbox', { name: 'API key' });
       vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('blocked'));
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t copy the API key. Try again.'),
+      );
       vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(() => new Promise<void>(() => undefined));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
@@ -515,10 +519,14 @@ describe('APIKeysTable', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
       await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
       first.reject(new Error('blocked'));
-      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t copy the API key. Try again.'),
+      );
       second.resolve();
 
-      await waitFor(() => expect(within(dialog).getByRole('alert')).not.toHaveTextContent('Could not copy'));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).not.toHaveTextContent('Couldn’t copy the API key. Try again.'),
+      );
     });
 
     it('closes the secret on Escape after a failed copy', async () => {
@@ -530,7 +538,9 @@ describe('APIKeysTable', () => {
       vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t copy the API key. Try again.'),
+      );
       await user.keyboard('{Escape}');
 
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -546,7 +556,7 @@ describe('APIKeysTable', () => {
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() =>
-        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.'),
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t copy the API key. Try again.'),
       );
       expect(dialog).toBeVisible();
     });
@@ -644,7 +654,7 @@ describe('APIKeysTable', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
 
       await waitFor(() =>
-        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not create the API key. Try again.'),
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t create the API key. Try again.'),
       );
     });
 
@@ -669,7 +679,7 @@ describe('APIKeysTable', () => {
 
       await waitFor(() =>
         expect(within(dialog).getByRole('alert')).toHaveTextContent(
-          'The API key was created, but its secret could not be shown. Revoke it and create a new one.',
+          'The API key was created, but its secret couldn’t be shown. Revoke it and create a new one.',
         ),
       );
       expect(await within(await loadedTable()).findByText('Deploy')).toBeVisible();

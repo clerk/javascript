@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { AuthMark, useAuthMark } from '../../blocks/auth';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
@@ -18,29 +19,36 @@ export interface TaskChooseOrganizationViewProps extends Omit<
   'hidePersonal' | 'personalImageUrl' | 'children'
 > {
   step: TaskChooseOrganizationStep;
+  applicationName?: string;
   renderBranding?: boolean;
+  applicationLogoUrl?: string;
   identifier?: string;
   error?: string;
   createSteps?: ReactNode;
   onCreateOrganization?: () => void;
+  onSkip?: () => void;
   onSignOut: () => void;
 }
 
 type ChooseStepProps = Omit<
   TaskChooseOrganizationViewProps,
-  'step' | 'renderBranding' | 'identifier' | 'createSteps' | 'onSignOut'
+  'step' | 'renderBranding' | 'applicationLogoUrl' | 'identifier' | 'createSteps' | 'onSignOut'
 >;
 
 export function TaskChooseOrganizationView({
   step,
   renderBranding = true,
+  applicationLogoUrl,
   identifier,
   createSteps,
   onSignOut,
   ...props
 }: TaskChooseOrganizationViewProps) {
   return (
-    <Card.Root renderBranding={renderBranding}>
+    <TaskChooseOrganizationCard
+      renderBranding={renderBranding}
+      applicationLogoUrl={applicationLogoUrl}
+    >
       <Flow.Root
         value={step === 'create' && !createSteps ? 'choose' : step}
         direction={step === 'create' ? 1 : -1}
@@ -63,27 +71,86 @@ export function TaskChooseOrganizationView({
         disabled={Boolean(props.pendingKey)}
         onSignOut={onSignOut}
       />
+    </TaskChooseOrganizationCard>
+  );
+}
+
+export function TaskChooseOrganizationCard({
+  renderBranding,
+  applicationLogoUrl,
+  children,
+}: {
+  renderBranding: boolean;
+  applicationLogoUrl?: string;
+  children: ReactNode;
+}) {
+  const mark = useAuthMark(applicationLogoUrl);
+  return (
+    <Card.Root
+      variant='prominent'
+      align='center'
+      renderBranding={renderBranding}
+    >
+      {mark.logoUrl ? (
+        <AuthMark
+          key={mark.logoUrl}
+          logoUrl={mark.logoUrl}
+          shape={mark.shape}
+          onShape={mark.onShape}
+          onError={mark.onError}
+        />
+      ) : null}
+      {children}
     </Card.Root>
   );
 }
 
-export function TaskChooseOrganizationHeader({ canCreate }: { canCreate: boolean }) {
+export function TaskChooseOrganizationHeader({
+  canCreate,
+  hasMemberships = false,
+  hasOffers = false,
+  applicationName,
+}: {
+  canCreate: boolean;
+  hasMemberships?: boolean;
+  hasOffers?: boolean;
+  applicationName?: string;
+}) {
   const m = useMessages('taskChooseOrganization');
+  const joining = hasOffers && !hasMemberships && Boolean(applicationName);
+  const title = joining ? m.joinTitle : m.title;
+  const subtitle = joining
+    ? fill(canCreate ? m.joinSubtitle : m.joinSubtitleWithoutCreate, { applicationName: applicationName ?? '' })
+    : hasMemberships
+      ? m.subtitleWithMemberships
+      : canCreate
+        ? m.subtitle
+        : m.subtitleWithoutCreate;
   return (
     <Card.Header>
-      <Card.Title>{m.title}</Card.Title>
-      <Card.Description>{canCreate ? m.subtitle : m.subtitleWithoutCreate}</Card.Description>
+      <Card.Title>{title}</Card.Title>
+      <Card.Description>{subtitle}</Card.Description>
     </Card.Header>
   );
 }
 
-function ChooseStep({ error, onCreateOrganization, ...rows }: ChooseStepProps) {
+function ChooseStep({ error, applicationName, onCreateOrganization, onSkip, ...rows }: ChooseStepProps) {
   const m = useMessages('taskChooseOrganization');
   const createButton = useFlowAutoFocus();
+  const busy = Boolean(rows.pendingKey);
+  const waitingOnRequest = rows.suggestions.some(suggestion => suggestion.status === 'accepted');
+  const hasOtherOptions =
+    rows.suggestions.some(suggestion => suggestion.status === 'pending') ||
+    rows.invitations.some(invitation => invitation.status === 'pending');
 
   return (
     <>
-      <TaskChooseOrganizationHeader canCreate={Boolean(onCreateOrganization)} />
+      <TaskChooseOrganizationHeader
+        canCreate={Boolean(onCreateOrganization)}
+        hasMemberships={rows.memberships.length > 0}
+        hasOffers={rows.invitations.length + rows.suggestions.length > 0}
+        applicationName={applicationName}
+      />
       <Card.Banner
         role='alert'
         color='negative'
@@ -94,21 +161,48 @@ function ChooseStep({ error, onCreateOrganization, ...rows }: ChooseStepProps) {
         <OrganizationListRows
           hidePersonal
           {...rows}
-        />
-      </Card.Content>
-      {onCreateOrganization ? (
-        <Card.Footer>
+        >
+          {waitingOnRequest ? (
+            <Text
+              role='status'
+              color='foreground-secondary'
+            >
+              {hasOtherOptions
+                ? m.requestPendingShort
+                : onCreateOrganization
+                  ? m.requestPendingWithCreate
+                  : m.requestPending}
+            </Text>
+          ) : null}
+        </OrganizationListRows>
+        {onCreateOrganization ? (
           <Button
             ref={createButton}
+            type='button'
             variant='outline'
             color='neutral'
             fullWidth
-            disabled={Boolean(rows.pendingKey)}
+            disabled={busy}
             focusableWhenDisabled
             onClick={onCreateOrganization}
           >
             <Icon glyph={Plus} />
             {m.createOrganization}
+          </Button>
+        ) : null}
+      </Card.Content>
+      {onSkip ? (
+        <Card.Footer>
+          <Button
+            type='button'
+            variant='ghost'
+            color='neutral'
+            fullWidth
+            disabled={busy}
+            focusableWhenDisabled
+            onClick={onSkip}
+          >
+            {m.skip}
           </Button>
         </Card.Footer>
       ) : null}
@@ -155,8 +249,10 @@ export function TaskChooseOrganizationSignOut({
         ) : null}
         <Button
           type='button'
+          color='neutral'
           variant='link'
           size='sm'
+          fullWidth={false}
           disabled={disabled || !onSignOut}
           focusableWhenDisabled
           xstyle={styles.signOutAction}

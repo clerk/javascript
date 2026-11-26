@@ -120,7 +120,7 @@ const verificationErrors = {
     apiError(
       422,
       'form_password_incorrect',
-      'Password is incorrect. Try again, or use another method.',
+      'Incorrect password. Try again or use another method. Try again, or use another method.',
       undefined,
       'password',
     ),

@@ -10,13 +10,13 @@ export const userProfileWeb3WalletsMessages = {
   primary: 'Primary',
   unverified: 'Unverified',
   errors: {
-    generic: 'Something went wrong. Please try again.',
+    generic: 'Something went wrong. Try again.',
   },
   solanaDialog: {
     title: 'Select a Solana wallet',
     description: 'Choose an installed wallet to connect to your account.',
     loading: 'Loading wallets…',
-    loadError: 'Wallets could not be loaded. Please refresh the page and try again.',
+    loadError: 'Couldn’t load wallets. Refresh the page and try again.',
     noneAvailable: 'No Solana wallets are available.',
     findWallet: 'Find a Solana wallet',
     cancel: 'Cancel',

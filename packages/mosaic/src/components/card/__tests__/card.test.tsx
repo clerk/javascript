@@ -4,11 +4,11 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Button, SubmitButton } from '../button';
-import { ButtonContext } from '../button/button.context';
-import { Dialog } from '../dialog';
-import { Flow } from '../flow';
-import { Card } from '.';
+import { Button, SubmitButton } from '../../button';
+import { ButtonContext } from '../../button/button.context';
+import { Dialog } from '../../dialog';
+import { Flow } from '../../flow';
+import { Card } from '..';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -212,6 +212,29 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
+  it('groups a large dialog card’s actions at the end and lets a medium one fill the row', () => {
+    render(
+      <>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Card.Root
+              size='lg'
+              data-testid='large'
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Card.Root data-testid='medium' />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </>,
+    );
+
+    expect(screen.getByTestId('large')).toHaveAttribute('data-actions', 'end');
+    expect(screen.getByTestId('medium')).toHaveAttribute('data-actions', 'fill');
+  });
+
   it('defaults to overlay elevation inside a dialog', () => {
     render(
       <Dialog.Root defaultOpen>
@@ -228,6 +251,111 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
+  it('lays out its actions for the surface it is: stacked on a page, filled in a dialog and an alert', () => {
+    render(
+      <>
+        <Card.Root
+          variant='prominent'
+          data-testid='page'
+        />
+        <Card.Root data-testid='inline' />
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup>
+            <Card.Root data-testid='dialog'>
+              <Card.Title>Edit name</Card.Title>
+            </Card.Root>
+          </Dialog.Popup>
+        </Dialog.Root>
+        <Dialog.Root
+          defaultOpen
+          role='alertdialog'
+        >
+          <Dialog.Popup>
+            <Card.Root data-testid='alert'>
+              <Card.Title>Remove email address?</Card.Title>
+              <Card.Description>You won’t be able to sign in with it.</Card.Description>
+            </Card.Root>
+          </Dialog.Popup>
+        </Dialog.Root>
+      </>,
+    );
+
+    expect(screen.getByTestId('page')).toHaveAttribute('data-actions', 'stacked');
+    expect(screen.getByTestId('inline')).toHaveAttribute('data-actions', 'fill');
+    expect(screen.getByTestId('dialog')).toHaveAttribute('data-actions', 'fill');
+    expect(screen.getByTestId('alert')).toHaveAttribute('data-actions', 'fill');
+  });
+
+  it('inherits the elevation of the card it is nested in, so a page card sits flush when embedded', () => {
+    render(
+      <Card.Root elevation='flush'>
+        <Card.Root
+          variant='prominent'
+          data-testid='page'
+        />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('page')).toHaveAttribute('data-elevation', 'flush');
+  });
+
+  it('stacks a prominent card nested in a flush one, so a page card keeps its layout when embedded', () => {
+    render(
+      <Card.Root elevation='flush'>
+        <Card.Root
+          variant='prominent'
+          data-testid='page'
+        />
+      </Card.Root>,
+    );
+
+    expect(screen.getByTestId('page')).toHaveAttribute('data-actions', 'stacked');
+  });
+
+  it('puts the primary first when its actions stack, and keeps buttons at their own width at the end', () => {
+    render(
+      <>
+        <Card.Root actions='stacked'>
+          <Card.Footer data-testid='stacked'>
+            <Button>Use another method</Button>
+            <Button>Continue</Button>
+          </Card.Footer>
+        </Card.Root>
+        <Card.Root actions='end'>
+          <Card.Footer data-testid='end'>
+            <Button>Cancel</Button>
+            <Button>Save</Button>
+          </Card.Footer>
+        </Card.Root>
+      </>,
+    );
+
+    const stacked = screen.getByTestId('stacked').querySelectorAll('button');
+    expect([...stacked].map(button => button.textContent)).toEqual(['Continue', 'Use another method']);
+    expect(screen.getByRole('button', { name: 'Save' })).not.toHaveAttribute('data-full-width');
+    expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('data-full-width');
+  });
+
+  it('sizes its buttons large when it is the page, and leaves an explicit size alone', () => {
+    render(
+      <>
+        <Card.Root variant='prominent'>
+          <Button>Continue</Button>
+          <SubmitButton>Create account</SubmitButton>
+          <Button size='sm'>Forgot password?</Button>
+        </Card.Root>
+        <Card.Root>
+          <Button>Save</Button>
+        </Card.Root>
+      </>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('data-size', 'lg');
+    expect(screen.getByRole('button', { name: 'Create account' })).toHaveAttribute('data-size', 'lg');
+    expect(screen.getByRole('button', { name: 'Forgot password?' })).toHaveAttribute('data-size', 'sm');
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('data-size', 'md');
+  });
+
   it('reflects the size on the root', () => {
     render(
       <>
@@ -241,6 +369,34 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('md')).toHaveAttribute('data-size', 'md');
     expect(screen.getByTestId('lg')).toHaveAttribute('data-size', 'lg');
+  });
+
+  it('reflects the variant on the root, default unless asked', () => {
+    render(
+      <>
+        <Card.Root data-testid='default' />
+        <Card.Root
+          variant='prominent'
+          data-testid='prominent'
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId('default')).toHaveAttribute('data-variant', 'default');
+    expect(screen.getByTestId('prominent')).toHaveAttribute('data-variant', 'prominent');
+  });
+
+  it('renders a lead above the header with its stable class', () => {
+    render(
+      <Card.Root renderBranding={false}>
+        <Card.Lead data-testid='lead'>Logo</Card.Lead>
+        <Card.Header data-testid='header'>Header</Card.Header>
+      </Card.Root>,
+    );
+
+    const lead = screen.getByTestId('lead');
+    expect(lead).toHaveClass('cl-card-lead');
+    expect(lead.compareDocumentPosition(screen.getByTestId('header')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('composes caller xstyle onto every slot', () => {

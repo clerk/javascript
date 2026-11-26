@@ -166,7 +166,7 @@ describe('UserProfileAddEmailDialog', () => {
   it('allows resending only after the countdown and the current request finish', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ step: 'verify', resendSeconds: 12 });
-    await user.click(screen.getByRole('button', { name: 'Resend (12)' }));
+    await user.click(screen.getByRole('button', { name: 'Resend in 12s' }));
     expect(props.onResend).not.toHaveBeenCalled();
 
     rerender(
@@ -199,7 +199,7 @@ describe('UserProfileAddEmailDialog', () => {
     expect(dialog).toHaveTextContent('Open the link we sent to person@example.com');
     expect(dialog).toHaveTextContent('Link expired');
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend (60)' }));
+    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend in 60s' }));
     expect(props.onResend).not.toHaveBeenCalled();
 
     rerender(

@@ -204,7 +204,7 @@ describe('Confirmation', () => {
 
     await user.click(confirmButton());
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
   });
 
   it('starts the next open clean after a failure', async () => {

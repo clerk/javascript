@@ -103,7 +103,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 }).map(heading => heading.textContent)).toEqual([
       'Passkeys',
-      '2-step verification',
+      'Two-step verification',
       'Active devices',
     ]);
     const activeDevices = screen.getByRole('group', { name: 'Active devices' });

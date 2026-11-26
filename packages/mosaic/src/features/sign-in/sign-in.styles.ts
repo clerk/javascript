@@ -3,17 +3,27 @@ import * as stylex from '@stylexjs/stylex';
 import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  actionGroups: {
+    gap: space['2'],
+    display: 'grid',
+  },
+  addressLabel: {
+    gap: space['2'],
+    alignItems: 'center',
+    display: 'inline-flex',
+  },
   buttonStack: {
     gap: space['2'],
     display: 'flex',
     flexDirection: 'column',
   },
+  fastOptions: {
+    gap: space['2'],
+    display: 'grid',
+  },
   fieldStack: {
     gap: space['4'],
     display: 'grid',
-  },
-  footerText: {
-    textAlign: 'center',
   },
   logo: {
     display: 'block',
@@ -23,12 +33,6 @@ export const styles = stylex.create({
   },
   passkeyAction: {
     alignSelf: 'center',
-  },
-  providerIcon: {
-    display: 'block',
-    objectFit: 'contain',
-    height: space['4'],
-    width: space['4'],
   },
   spotlightGroup: {
     display: 'contents',

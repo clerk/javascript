@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { durationVars, easingVars, space, typeScaleVars } from '../../tokens.stylex';
+import { durationVars, easingVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -40,31 +40,19 @@ export const styles = stylex.create({
       default: 'relative',
       ':where([data-closed])': 'absolute',
     },
-    transform: {
-      default: 'scale(1)',
-      ':where([data-starting-style], [data-ending-style])': 'scale(0.96)',
-      '@media (prefers-reduced-motion: reduce)': {
-        default: 'scale(1)',
-        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
-      },
-    },
-    transformOrigin: `50% calc(${space['4']} + ${typeScaleVars['--cl-text-base-size']} * ${typeScaleVars['--cl-text-base-leading']} / 2)`,
     transitionDelay: {
-      default: `calc(${durationVars['--cl-duration-base']} / 2)`,
+      default: durationVars['--cl-duration-fast'],
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
       '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
     },
     transitionDuration: {
-      default: `${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-slow']}`,
-      ':where([data-ending-style])': durationVars['--cl-duration-base'],
+      default: durationVars['--cl-duration-base'],
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: {
-      default: 'opacity, transform',
-      '@media (prefers-reduced-motion: reduce)': 'opacity',
-    },
+    transitionProperty: 'opacity',
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
-      ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
     minWidth: 0,
     width: '100%',

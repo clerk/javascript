@@ -55,7 +55,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
     isPending = false,
     pendingLabel = 'pending',
     spinDelay,
-    size = 'md',
+    size: sizeProp,
     disabled: disabledProp,
     focusableWhenDisabled = false,
     xstyle,
@@ -64,6 +64,7 @@ export const ProviderButton = React.forwardRef<HTMLButtonElement, ProviderButton
   ref,
 ) {
   const defaults = React.useContext(ButtonContext);
+  const size = sizeProp ?? defaults.size ?? 'md';
   const disabled = defaults.disabled || disabledProp || false;
   const showPending = useSpinDelay(isPending || null, spinDelay) !== null;
 

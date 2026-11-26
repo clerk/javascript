@@ -53,9 +53,7 @@ describe('password error feedback', () => {
         { code: 'form_password_pwned', message: 'raw', meta: { param_name: 'new_password' } },
         { code: 'form_password_no_uppercase', message: 'raw', meta: { param_name: 'new_password' } },
       ]).fields?.newPassword,
-    ).toBe(
-      'This password has been found as part of a breach and can not be used, please try another password instead.',
-    );
+    ).toBe('This password appeared in a data breach. Choose a different password.');
   });
   it('combines recognized requirements in a localized list', () => {
     expect(
@@ -148,15 +146,14 @@ describe('password error feedback', () => {
       paramName: 'new_password',
       field: 'newPassword',
       current: false,
-      message:
-        'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
+      message: 'This password is too long. Shorten it or use fewer special characters.',
     },
     {
       code: 'form_password_validation_failed',
       paramName: 'current_password',
       field: 'currentPassword',
       current: true,
-      message: 'Incorrect Password',
+      message: 'Incorrect password. Try again or reset it.',
     },
   ])('uses the English catalog message for $code', ({ code, paramName, field, current, message }) => {
     const defaults = resolveLocalization({ locale: 'en' });
@@ -210,7 +207,7 @@ describe('password error feedback', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       passwordFormError(new Error('Connection interrupted'), true, settings, messages, localization.locale, resolver()),
-    ).toMatchObject({ banner: 'Something went wrong. Please try again.' });
+    ).toMatchObject({ banner: 'Something went wrong. Try again.' });
     expect(passwordFormError(undefined, true, settings, messages, localization.locale, resolver())).toBeInstanceOf(
       FormSubmitError,
     );

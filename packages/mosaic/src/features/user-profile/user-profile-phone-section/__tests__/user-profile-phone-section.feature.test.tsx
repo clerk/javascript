@@ -197,7 +197,7 @@ describe('the user profile phone section', () => {
 
     await addPhone(actor, '8015550100');
 
-    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('Something went wrong. Try again.')).toBeInTheDocument();
   });
 
   it('holds the phone entry step until the first code is sent', async () => {
@@ -242,7 +242,7 @@ describe('the user profile phone section', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
     const retryFapi = serveFapi(fapi);
     await actor.click(screen.getByRole('button', { name: 'Resend' }));
-    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /Resend in \d+s/ })).toBeDisabled();
     await enterCode(actor, VERIFICATION_CODE);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(retryFapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
@@ -264,7 +264,7 @@ describe('the user profile phone section', () => {
 
     await addPhone(actor, '8015550100');
 
-    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /Resend in \d+s/ })).toBeDisabled();
   });
 
   it('disables Cancel while verifying a phone code and allows cancellation after an error', async () => {
@@ -382,7 +382,7 @@ describe('the user profile phone section', () => {
     await waitFor(() => expect(destroy.requests).toHaveLength(1));
     destroy.fail('action_blocked', 'Raw server sentence.');
 
-    expect(await within(dialog).findByText(/Please try again later or contact support/)).toBeInTheDocument();
+    expect(await within(dialog).findByText(/Try again later, or contact support/)).toBeInTheDocument();
     expect(dialog).not.toHaveTextContent('Raw server sentence.');
     expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
   });
@@ -684,7 +684,7 @@ describe('phone reverification', () => {
     replay.fail('action_blocked', 'Unable to set primary number.');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await waitFor(() =>
-      expect(within(row()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
+      expect(within(row()).getByRole('alert')).toHaveTextContent('This action couldn’t be completed.'),
     );
   });
 

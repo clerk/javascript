@@ -79,6 +79,11 @@ Most problems a feature hits already have a shared answer. Find the line for you
 - A direct action that needs step-up verification → `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view
 - A step that verifies a factor (a code, password, backup code or passkey, the method picker, help) → the steps in `src/blocks/verification/`, such as `VerificationCode`
 - A screen sign-in and sign-up both show (an email link and its status, a loading or protect-check notice, a blocked request, the wallet or enterprise connection picker, the alternative phone channel, the identity line, the captcha) → the steps in `src/blocks/auth/`, such as `AuthEmailLink`
+- The user's email or phone number named inside a step's description, in bold → `emphasizeIdentifier` (`src/blocks/auth/`)
+- The application logo above a sign-in or sign-up card → `AuthMark` with `useAuthMark` (`src/blocks/auth/`); a provider's icon, tinted when the mark is monochrome → `AuthProviderIcon`
+- The password requirements under a new password, ticking as each is met → `AuthPasswordChecklist` (`src/blocks/auth/`), fed the instance's enforced rules
+- A step's primary action with a secondary one, in the footer or stacked under the field → `VerificationActions` (`src/blocks/verification/`)
+- A question with a link-style action after it, such as "Didn’t receive a code? Resend" → `Prompt` (`src/blocks/prompt/`)
 - Showing any error to the user → One of the owners above. They call `toLocalizableError` (or `toLocalizableErrors` for all errors) and resolve copy with `useErrorText`
 - Moving focus after a list row is removed → `useListRemovalFocus` (`src/hooks/`)
 - A debounced, abortable async check as the user types → `useDebouncedAsync` (`src/hooks/`)

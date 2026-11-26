@@ -1,12 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars } from '../tokens.stylex';
+import { colorVars, durationVars, shadowVars } from '../tokens.stylex';
 
 // Focus is marked with a border colour change and a soft box-shadow rather than the
 // system focus ring, so a text-entry field reads as a field rather than a control.
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
-const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';
-const invalidFocusShadow = `0 0 0 3px ${colorVars['--cl-color-negative-alpha-300']}`;
+const restingShadow = shadowVars['--cl-shadow-sm'];
+const focusShadow = `0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%)), ${restingShadow}`;
+const invalidFocusShadow = `0 0 0 3px ${colorVars['--cl-color-negative-alpha-300']}, ${restingShadow}`;
 const disabledBackgroundColor = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 5%, transparent)`;
 
 export const inputStyles = stylex.create({
@@ -35,7 +36,7 @@ export const inputStyles = stylex.create({
       ':read-only:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-surface-subtle'],
     },
     boxShadow: {
-      default: null,
+      default: shadowVars['--cl-shadow-sm'],
       ':focus-visible': focusShadow,
       ':focus-visible:where([aria-invalid="true"])': invalidFocusShadow,
     },
@@ -84,7 +85,7 @@ export const inputStyles = stylex.create({
       ':has(input:read-only:not(:disabled, [aria-disabled="true"]))': colorVars['--cl-color-surface-subtle'],
     },
     boxShadow: {
-      default: null,
+      default: shadowVars['--cl-shadow-sm'],
       ':has(input:focus-visible, textarea:focus-visible)': focusShadow,
       ':has(input:focus-visible, textarea:focus-visible):where([data-invalid])': invalidFocusShadow,
     },

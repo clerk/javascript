@@ -122,7 +122,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
     expect(screen.getByRole('searchbox', { name: 'Search members' })).toHaveValue('');
-    expect(screen.queryByText('Unable to load members')).toBeNull();
+    expect(screen.queryByText('Couldn’t load members')).toBeNull();
   });
 
   it('searches after the input settles and keeps rows while a new page loads', async () => {
@@ -176,7 +176,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));
 
     await waitFor(() =>
-      expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove this member. Please try again.'),
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('Couldn’t remove this member. Try again.'),
     );
     expect(fapi.memberships.some(item => item.id === bob.id)).toBe(true);
   });
@@ -282,7 +282,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(members.requests).toHaveLength(1));
     members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), { timeout: 12_000 });
+    await waitFor(() => expect(screen.getByText('Couldn’t load members')).toBeVisible(), { timeout: 12_000 });
     serve();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
@@ -298,15 +298,15 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(members.requests).toHaveLength(1));
     members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), {
+    await waitFor(() => expect(screen.getByText('Couldn’t load members')).toBeVisible(), {
       timeout: 12_000,
     });
     expect(screen.queryByText('Bob Smith')).toBeNull();
     const table = within(screen.getByRole('table', { name: 'Members' }));
-    expect(table.getByRole('alert')).toHaveTextContent('Unable to load members');
+    expect(table.getByRole('alert')).toHaveTextContent('Couldn’t load members');
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await user.click(table.getByRole('button', { name: 'Try again' }));
-    await waitFor(() => expect(screen.queryByText('Unable to load members')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Couldn’t load members')).toBeNull());
     expect(screen.getByText('Bob Smith')).toBeVisible();
   }, 20_000);
 

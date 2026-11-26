@@ -100,6 +100,7 @@ export function AuthAlternativeChannel<TValues extends { phoneNumber: string }>(
             >
               <Field.Label>{fill(messages.fieldLabel, { provider })}</Field.Label>
               <PhoneInput
+                size='lg'
                 ref={phoneRef}
                 autoComplete='tel'
                 placeholder={messages.phonePlaceholder}

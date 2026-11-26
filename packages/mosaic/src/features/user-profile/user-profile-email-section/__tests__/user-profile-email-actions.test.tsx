@@ -122,7 +122,7 @@ describe('email actions', () => {
     renderEmail({ onSetPrimaryEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
   });
 

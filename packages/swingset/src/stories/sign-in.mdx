@@ -2,7 +2,7 @@ import * as Stories from './sign-in.stories';
 
 # SignIn
 
-The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. Enter `error` in the password or backup code field, or `000000` for a code, to render an attempt error under the field. Enter `locked` as the password to return to the start with the lockout in the banner.
+The application logo stays at the top of the card through every step. The example pauses briefly in each pending state. An email containing `new` takes the sign-up path. The only code that works is `123456`; any other code renders an attempt error under the field, as does `error` in the password or backup code field. Enter `locked` as the password to return to the start with the lockout in the banner.
 
 ## Example
 
@@ -11,6 +11,7 @@ The example pauses briefly in each pending state. An email containing `new` take
   storyModule={Stories}
   composition={[
     { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
     { name: 'Flow', href: '/components/flow', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
@@ -25,7 +26,9 @@ The example pauses briefly in each pending state. An email containing `new` take
 
 ## Usage
 
-The view renders its own `Card.Root` and shows one step at a time inside it. `step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps. `form` is one `useForm` holding every step's fields (`SignInValues`), and each step's form submits through `onSubmit`; a completed code goes to `onCodeComplete` with the code. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field and shows under it; `globalErrorMessage` is an error about the whole step and shows in the card's banner. The new-password step is the last save, so its errors come from `form` instead. Everything else reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. `onCancel` is the step's secondary action, "Use another method" or "Back to sign in", and leaving it out hides the button. Leaving out `onResend` hides the resend link, as on the authenticator app step, and `canResend` is false while a resend is waiting or another action runs. `combined` switches the start card to the sign-in-or-up copy; leave out `onSignUp` there to hide the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
+The view renders its own `Card.Root`, the `prominent` variant, and shows one step at a time inside it. `applicationLogoUrl` puts the logo in a `Card.Lead` above the steps, where it stays while they change. Without `applicationLogoUrl`, or when the logo fails to load, there is no lead. Each step puts its primary action under its fields with any secondary action beneath it, and keeps the footer for the sign-up or sign-in prompt.
+
+`step` says which step and carries that step's data, such as the code channel or the factors to choose from; every other prop is shared across steps. `form` is one `useForm` holding every step's fields (`SignInValues`), and each step's form submits through `onSubmit`; a completed code goes to `onCodeComplete` with the code. `isPending` describes the current step's attempt, and `isDisabled` locks every control that would start another action, including while a social provider is pending. `errorMessage` is an error about the step's field and shows under it; `globalErrorMessage` is an error about the whole step and shows in the card's banner. The new-password step is the last save, so its errors come from `form` instead. Everything else reports interactions through plain callbacks. One step component can draw several steps: the code step covers the email code, the authenticator app code and email verification, with different copy. `onCancel` is the step's secondary action, "Use another method" or "Back to sign in", and leaving it out hides the button. Leaving out `onResend` hides the resend link, as on the authenticator app step, and `canResend` is false while a resend is waiting or another action runs. `combined` switches the start card to the sign-in-or-up copy; leave out `onSignUp` there to hide the sign-up link. The code, backup code, method picker, and help steps come from the shared verification blocks (`@clerk/mosaic/blocks/verification`), which reverification uses too.
 
 ```tsx
 import { SignInView } from '@clerk/mosaic/features/sign-in';
@@ -55,6 +58,14 @@ Each section is one component in `features/sign-in/steps/`, or in `blocks/auth/`
 #### Default
 
 <Story name='IdentifierDefault' storyModule={Stories} />
+
+#### Wordmark logo
+
+<Story name='IdentifierWordmarkLogo' storyModule={Stories} />
+
+#### No logo
+
+<Story name='IdentifierNoLogo' storyModule={Stories} />
 
 #### Sign in only
 
@@ -106,6 +117,34 @@ The password field appears on the start screen once it has a value, as when the 
 
 <Story name='IdentifierPassword' storyModule={Stories} />
 
+A passkey is a sign-in method in its own right, so it sits with the providers above the divider. It counts as one of the buttons. Up to three buttons stack, one full-width row each with its long label. At four or more they become one row of icons and the passkey joins it as a key, so a long list of providers never pushes the email field down. The method the user signed in with last always comes first, with its badge. Where the browser supports it, the email field also offers saved passkeys in its autofill list (`webauthn` in `autocomplete`), so a returning user can pick one without pressing anything.
+
+#### Email first, options stacked
+
+The default puts the one-click options first. An app that wants the email field first, with every provider and the passkey stacked below it, can get there with CSS alone, through the public class names: order the providers and the divider after the form, and stack the provider row with its long labels. In an app that imports Mosaic's stylesheet into a cascade layer, the documented setup, these plain rules win as written. This explorer loads Mosaic without a layer, so the example below adds `!important` to the three display rules.
+
+```css
+.email-first .cl-sign-in-divider { order: 1; }
+.email-first .cl-sign-in-providers { order: 2; }
+.email-first .cl-provider-button-group-row { display: grid; grid-template-columns: minmax(0, 1fr); }
+.email-first .cl-provider-button-long-label { display: block; }
+.email-first .cl-provider-button-short-label { display: none; }
+```
+
+<Story name='IdentifierEmailFirst' storyModule={Stories} />
+
+#### Passkey without social providers
+
+<Story name='IdentifierPasskeyOnly' storyModule={Stories} />
+
+#### Passkey last used
+
+<Story name='IdentifierPasskeyLastUsed' storyModule={Stories} />
+
+#### Waiting for a passkey
+
+<Story name='IdentifierPasskeyPending' storyModule={Stories} />
+
 #### Web3 wallets
 
 <Story name='IdentifierWeb3' storyModule={Stories} />
@@ -133,6 +172,8 @@ The password field appears on the start screen once it has a value, as when the 
 ### Credential step
 
 `credential-step.tsx` draws `{ kind: 'credential' }`: the password (with identity preview and forgot password), a passkey prompt (with identity preview) or a backup code (`VerificationBackupCode`).
+
+The identity preview shows where the user can still go back and change who they are signing in as, with a pencil to do it. Where they can't, such as a second factor, a password reset or a new device check, the description names the address instead, and the authenticator app and backup code steps name none.
 
 #### Password
 
@@ -175,6 +216,12 @@ The view draws every `{ kind: 'code' }` with the `VerificationCode` block. The p
 #### Email code
 
 <Story name='CodeEmail' storyModule={Stories} />
+
+#### Email code, try it
+
+Type `123456` to pass. Any other code shows the error, nudges the row, and drops the digits out right to left while focus returns to the first box. Typing again cancels it straight away. One focus ring glides between the boxes, and the code reads as two groups of three.
+
+<Story name='CodeEmailTryIt' storyModule={Stories} />
 
 #### Authenticator app
 

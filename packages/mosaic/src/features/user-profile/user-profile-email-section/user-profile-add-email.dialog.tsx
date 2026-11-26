@@ -4,7 +4,7 @@ import type { FormEvent, Ref } from 'react';
 import { useId, useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
-import { Card } from '../../../components/card';
+import { Card, useCardAlign } from '../../../components/card';
 import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
@@ -18,6 +18,7 @@ import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
+import { resendLine } from '../../../styles/resend-line.styles';
 import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
@@ -64,6 +65,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
         <Card.Root renderBranding={false}>
           <Flow.Root
             value={props.step}
+            direction={props.step === 'email' ? -1 : 1}
             state={props}
           >
             {current => (
@@ -210,6 +212,7 @@ interface VerifyEmailStepProps {
 function VerifyEmailStep(props: VerifyEmailStepProps) {
   const m = useMessages('userProfile').email.addDialog;
   const verifyFormId = useId();
+  const centered = useCardAlign() === 'center';
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -248,7 +251,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <Field.Description>
+          <Field.Description xstyle={centered ? resendLine.center : resendLine.start}>
             {m.verify.resendText}{' '}
             <ResendButton
               labels={m.verify}
@@ -414,7 +417,7 @@ function ResendButton(props: ResendButtonProps) {
   return (
     <Button
       type='button'
-      size='sm'
+      size='md'
       variant='link'
       color='neutral'
       disabled={props.disabled || props.isResending || resendSeconds > 0}

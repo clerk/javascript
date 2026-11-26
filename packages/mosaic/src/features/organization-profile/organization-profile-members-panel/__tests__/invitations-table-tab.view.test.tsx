@@ -57,7 +57,7 @@ function renderTab(overrides: Partial<InvitationsTableTabViewProps> = {}) {
 describe('InvitationsTableTabView', () => {
   it('does not report invitations as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });
-    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load invitations');
+    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load invitations');
     expect(screen.queryByText('Invitations loaded')).toBeNull();
   });
 
@@ -93,7 +93,7 @@ describe('InvitationsTableTabView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByText('ada@example.com')).toBeNull();
-    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Unable to load invitations');
+    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Couldn’t load invitations');
     expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
   });
 

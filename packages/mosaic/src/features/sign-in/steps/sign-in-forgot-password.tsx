@@ -1,7 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
+import { VerificationActions } from '../../../blocks/verification';
+import { SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
@@ -38,26 +39,25 @@ export function SignInForgotPassword({
       >
         {globalErrorMessage}
       </Card.Banner>
-      <Card.Footer>
-        <Button
-          type='button'
-          variant='outline'
-          color='neutral'
+      <Card.Content>
+        <VerificationActions
+          primary={
+            <SubmitButton
+              ref={ref}
+              type='button'
+              fullWidth
+              isPending={isPending}
+              pendingLabel={m.forgotPassword.pending}
+              onClick={onSubmit}
+            >
+              {m.forgotPassword.submit}
+            </SubmitButton>
+          }
+          secondaryLabel={m.forgotPassword.back}
+          onSecondary={onBack}
           disabled={isPending}
-          onClick={onBack}
-        >
-          {m.forgotPassword.back}
-        </Button>
-        <SubmitButton
-          ref={ref}
-          type='button'
-          isPending={isPending}
-          pendingLabel={m.forgotPassword.pending}
-          onClick={onSubmit}
-        >
-          {m.continue}
-        </SubmitButton>
-      </Card.Footer>
+        />
+      </Card.Content>
     </>
   );
 }

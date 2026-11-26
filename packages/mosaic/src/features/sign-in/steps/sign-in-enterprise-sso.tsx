@@ -2,9 +2,9 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
+import { VerificationActions } from '../../../blocks/verification';
+import { SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { styles } from '../sign-in.styles';
@@ -53,33 +53,23 @@ export function SignInEnterpriseSso({
         {globalErrorMessage}
       </Card.Banner>
       <Card.Content>
-        <SubmitButton
-          ref={ref}
-          type='button'
-          fullWidth
-          isPending={isPending}
-          pendingLabel={m.enterpriseSso.pending}
-          onClick={onSubmit}
-        >
-          {m.enterpriseSso.continue}
-        </SubmitButton>
-        {onCancel ? (
-          <Text
-            size='sm'
-            xstyle={styles.footerText}
-          >
-            <Button
+        <VerificationActions
+          primary={
+            <SubmitButton
+              ref={ref}
               type='button'
-              size='sm'
-              variant='link'
-              color='neutral'
-              disabled={isPending}
-              onClick={onCancel}
+              fullWidth
+              isPending={isPending}
+              pendingLabel={m.enterpriseSso.pending}
+              onClick={onSubmit}
             >
-              {m.enterpriseSso.bypass}
-            </Button>
-          </Text>
-        ) : null}
+              {m.enterpriseSso.continue}
+            </SubmitButton>
+          }
+          secondaryLabel={m.useAnotherMethod}
+          onSecondary={onCancel}
+          disabled={isPending}
+        />
       </Card.Content>
     </>
   );

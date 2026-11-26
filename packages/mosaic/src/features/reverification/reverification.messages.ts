@@ -21,7 +21,7 @@ export const reverificationMessages = {
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
-    resendCountdown: 'Resend ({seconds})',
+    resendCountdown: 'Resend in {seconds}s',
   },
   phoneCode: {
     title: 'Verification required',
@@ -29,7 +29,7 @@ export const reverificationMessages = {
     label: 'Verification code',
     resendText: 'Didn’t receive a code?',
     resend: 'Resend',
-    resendCountdown: 'Resend ({seconds})',
+    resendCountdown: 'Resend in {seconds}s',
   },
   totp: {
     title: 'Verification required',
@@ -38,7 +38,7 @@ export const reverificationMessages = {
   },
   backupCode: {
     title: 'Enter a backup code',
-    description: 'Enter the backup code you received when setting up two-step authentication',
+    description: 'Enter the backup code you received when setting up two-step verification.',
     label: 'Backup code',
   },
   methods: {
@@ -58,12 +58,13 @@ export const reverificationMessages = {
     description:
       'If you have trouble verifying your account, email us and we will work with you to restore access as soon as possible.',
     emailSupport: 'Email support',
+    back: 'Back to verification methods',
   },
   error: {
     close: 'Close',
     generic: {
       title: 'Something went wrong',
-      description: 'Please try again.',
+      description: 'Try again.',
     },
     noFactors: {
       title: 'Cannot verify your account',
@@ -72,8 +73,8 @@ export const reverificationMessages = {
   },
   continue: 'Continue',
   useAnotherMethod: 'Use another method',
-  back: 'Back',
-  attemptFailed: 'Something went wrong. Please try again.',
+  back: 'Back to verification',
+  attemptFailed: 'Something went wrong. Try again.',
   /** Announced while an attempt is in flight; the button's own label stays visible. */
   verifying: 'Verifying',
 } as const;

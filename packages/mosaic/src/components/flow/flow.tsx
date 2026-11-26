@@ -7,6 +7,7 @@ import { Flow as HeadlessFlow, type FlowDirection } from '../../primitives/flow'
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { styles } from './flow.styles';
 
 export interface FlowRootProps<State> extends Omit<MosaicComponentProps<'div'>, 'children'> {
@@ -56,7 +57,7 @@ const Step = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(
     <HeadlessFlow.Step
       {...mergeStyleProps(
         themeProps('flow-step', { step: ids[0] }),
-        stylex.props(reset.base, styles.step, xstyle),
+        stylex.props(reset.base, rtl.inlineSign, styles.step, xstyle),
         rest,
       )}
       ref={ref}

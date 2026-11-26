@@ -1,6 +1,11 @@
 import type { Ref } from 'react';
 
-import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
+import type {
+  AuthActionBlockedDetails,
+  AuthEmailLinkStatusValue,
+  AuthPasswordRule,
+  AuthProvider,
+} from '../../blocks/auth';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
@@ -52,6 +57,7 @@ export interface SignUpViewProps {
   errorMessage?: string;
   globalErrorMessage?: string;
   passwordFeedback?: FieldFeedback;
+  passwordRules?: readonly AuthPasswordRule[];
   onSwitchField?: () => void;
   onSignIn?: () => void;
   onEditIdentifier: () => void;

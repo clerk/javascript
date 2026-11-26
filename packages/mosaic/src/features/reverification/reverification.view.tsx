@@ -275,7 +275,7 @@ export function ReverificationView({
               messages={{
                 title: m.help.title,
                 description: m.help.description,
-                backButton: m.back,
+                backButton: m.help.back,
                 supportButton: m.help.emailSupport,
               }}
               onEmailSupport={onEmailSupport}

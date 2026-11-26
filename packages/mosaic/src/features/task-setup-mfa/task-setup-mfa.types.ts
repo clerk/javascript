@@ -24,6 +24,7 @@ export type TaskSetupMfaModel =
       isOnTask: boolean;
       onLeave: () => void;
       renderBranding: boolean;
+      applicationLogoUrl?: string;
       applicationName: string;
       identifier: string;
       methods: readonly TaskSetupMfaMethod[];

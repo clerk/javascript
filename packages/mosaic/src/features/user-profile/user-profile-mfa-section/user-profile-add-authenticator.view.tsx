@@ -1,6 +1,7 @@
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
+import { useVerificationLayout, VerificationActions } from '../../../blocks/verification';
+import { SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { Otp } from '../../../components/otp';
@@ -31,6 +32,7 @@ export function UserProfileAddAuthenticatorView({
 }: UserProfileAddAuthenticatorViewProps) {
   const m = useMessages('userProfile').mfa.addAuthenticator;
   const formId = useId();
+  const layout = useVerificationLayout();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const inputRef = useFlowAutoFocus<HTMLInputElement>();
   const submitCode = (value: string) => {
@@ -38,6 +40,29 @@ export function UserProfileAddAuthenticatorView({
       onSubmit(value);
     }
   };
+
+  const actions = (
+    <VerificationActions
+      layout={layout}
+      primary={
+        <SubmitButton
+          ref={actionRef}
+          type='submit'
+          form={formId}
+          fullWidth={layout === 'stacked' || undefined}
+          isPending={isPending}
+          disabled={code.length !== 6}
+          focusableWhenDisabled
+          pendingLabel={m.pending}
+        >
+          {m.verify}
+        </SubmitButton>
+      }
+      secondaryLabel={m.back}
+      onSecondary={onBack}
+      disabled={isPending}
+    />
+  );
 
   return (
     <>
@@ -59,9 +84,8 @@ export function UserProfileAddAuthenticatorView({
           disabled={isPending}
           focusableWhenDisabled
           invalid={Boolean(errorMessage)}
-          xstyle={styles.field}
         >
-          <Field.Label xstyle={styles.label}>{m.codeLabel}</Field.Label>
+          <Field.Label visuallyHidden>{m.codeLabel}</Field.Label>
           <Otp
             ref={inputRef}
             name='code'
@@ -73,29 +97,9 @@ export function UserProfileAddAuthenticatorView({
             <Field.Error>{errorMessage}</Field.Error>
           </Field.Message>
         </Field.Root>
+        {layout === 'stacked' ? actions : null}
       </Card.Content>
-      <Card.Footer>
-        <Button
-          type='button'
-          variant='outline'
-          color='neutral'
-          disabled={isPending}
-          onClick={onBack}
-        >
-          {m.back}
-        </Button>
-        <SubmitButton
-          ref={actionRef}
-          type='submit'
-          form={formId}
-          isPending={isPending}
-          disabled={code.length !== 6}
-          focusableWhenDisabled
-          pendingLabel={m.pending}
-        >
-          {m.verify}
-        </SubmitButton>
-      </Card.Footer>
+      {layout === 'inline' ? actions : null}
     </>
   );
 }

@@ -1,12 +1,16 @@
+export { useVerificationLayout, VerificationActions } from './verification-actions';
 export { VerificationBackupCode } from './verification-backup-code';
 export { VerificationCode } from './verification-code';
 export { VerificationHelp } from './verification-help';
+export { VerificationLinks } from './verification-links';
 export { VerificationMethodPicker } from './verification-method-picker';
 export { VerificationPasskey } from './verification-passkey';
 export { VerificationPassword } from './verification-password';
 export { verificationResend } from './verification-resend';
+export type { VerificationLayout } from './verification-actions';
 export type { VerificationBackupCodeMessages } from './verification-backup-code';
 export type { VerificationCodeMessages, VerificationCodeResend } from './verification-code';
 export type { VerificationHelpMessages } from './verification-help';
+export type { VerificationLink } from './verification-links';
 export type { VerificationMethodPickerMessages } from './verification-method-picker';
 export type { VerificationResendMessages } from './verification-resend';

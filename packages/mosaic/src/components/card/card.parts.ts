@@ -1,5 +1,6 @@
 export {
   CardRoot as Root,
+  CardLead as Lead,
   CardHeader as Header,
   CardMedia as Media,
   CardTitle as Title,

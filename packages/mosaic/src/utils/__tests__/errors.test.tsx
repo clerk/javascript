@@ -71,7 +71,7 @@ describe('toLocalizableError', () => {
   it('localizes a network failure instead of falling back', () => {
     const error = toLocalizableError(new ClerkRuntimeError('Failed to fetch', { code: 'network_error' }));
     expect(errorText()(error, 'Unable to save.')).toBe(
-      'Unable to reach the server. Check your connection and try again.',
+      'Couldn’t reach the server. Check your connection and try again.',
     );
   });
 

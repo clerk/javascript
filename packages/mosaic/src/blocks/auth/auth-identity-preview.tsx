@@ -1,36 +1,40 @@
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 
-import { Button } from '../../components/button';
+import { Badge } from '../../components/badge';
 import { Card } from '../../components/card';
-import { Icon } from '../../components/icon';
-import { Pen } from '../../icons/glyphs/pen';
-import { truncationStyles } from '../../styles/typography.styles';
+import { themeProps } from '../../props';
 import { styles } from './auth.styles';
 
 interface AuthIdentityPreviewProps {
   identifier: string;
-  editLabel: string;
-  disabled?: boolean;
-  onEdit?: () => void;
 }
 
-export function AuthIdentityPreview({ identifier, editLabel, disabled = false, onEdit }: AuthIdentityPreviewProps) {
+export function AuthIdentityPreview({ identifier }: AuthIdentityPreviewProps) {
   return (
     <Card.Description xstyle={styles.identity}>
-      <span {...stylex.props(styles.identityText, truncationStyles.singleLine)}>{identifier}</span>
-      {onEdit ? (
-        <Button
-          type='button'
-          variant='ghost'
-          shape='circle'
-          size='xs'
-          aria-label={editLabel}
-          disabled={disabled}
-          onClick={onEdit}
-        >
-          <Icon glyph={Pen} />
-        </Button>
-      ) : null}
+      <Badge
+        color='neutral'
+        dir='ltr'
+        title={identifier}
+        {...themeProps('auth-identity')}
+      >
+        {identifier}
+      </Badge>
     </Card.Description>
+  );
+}
+
+export function emphasizeIdentifier(text: string, identifier: string | undefined, node?: ReactNode): ReactNode {
+  const at = identifier ? text.indexOf(identifier) : -1;
+  if (!identifier || at < 0) {
+    return text;
+  }
+  return (
+    <>
+      {text.slice(0, at)}
+      {node ?? <strong {...stylex.props(styles.identifierText)}>{identifier}</strong>}
+      {text.slice(at + identifier.length)}
+    </>
   );
 }

@@ -77,8 +77,11 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   authentication: {
     'sign-in': dynamic(() => import('../stories/sign-in.mdx')),
     'sign-up': dynamic(() => import('../stories/sign-up.mdx')),
+    'sign-in-layouts': dynamic(() => import('../stories/sign-in-layouts.mdx')),
+    'password-checklist-lab': dynamic(() => import('../stories/password-checklist-lab.mdx')),
   },
   blocks: {
+    'card-gallery': dynamic(() => import('../stories/card-gallery.mdx')),
     confirmation: dynamic(() => import('../stories/confirmation.mdx')),
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },

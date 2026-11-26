@@ -12,6 +12,8 @@ Worked example: `src/features/switcher/switcher.view.tsx`.
 - Take derived booleans from the controller. The view never re-implements a machine guard or works out whether an action is allowed.
 - Every string comes from the feature's `*.messages.ts`, read with `useMessages`. Never import a `*.messages.ts` directly: that skips the customer's locale and overrides.
 - Text that reports a failure is an error, never a description: `Card.Banner color='negative'` with `role='alert'` for the form, `Field.Feedback` for one field. This holds for a fixed message too, such as a breached password.
+- A stack of full-width buttons has at most one `ghost` button, and it is the last. Any button above it is `outline` ("More options", "Use another method"), so two quiet buttons never sit one under the other (`sign-in-alternatives.tsx`).
+- A `link` button is `color='neutral'` unless it is the call to action of the text around it. Utility links (sign out, switch account or field, "Forgot password?", "Already have an account? Sign in") read as quiet text, so the brand color stays for the one thing the card wants the user to do. `Prompt` (`src/blocks/prompt/`) already does this.
 - Pure derivation (which affordance lands in which slot, how a consumer's `order` array rearranges a list) has no React in it. It lives in `*.layout.ts` or `*.utils.ts` with its own tests, and the view calls the result.
 
 ## Moving between screens on one surface

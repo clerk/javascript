@@ -2,6 +2,7 @@ import { Field } from '@clerk/mosaic/components/field';
 import type { OtpProps } from '@clerk/mosaic/components/otp';
 import { Otp } from '@clerk/mosaic/components/otp';
 import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -82,6 +83,47 @@ export function Error() {
         aria-label='Verification code'
       />
       <Field.Error>Incorrect code</Field.Error>
+    </Field.Root>
+  );
+}
+
+const CORRECT_CODE = '123456';
+
+export function Interactive() {
+  const [value, setValue] = useState('');
+  const [status, setStatus] = useState<'neutral' | 'success' | 'error'>('neutral');
+
+  return (
+    <Field.Root
+      invalid={status === 'error'}
+      xstyle={styles.stack}
+    >
+      <Field.Label>Verification code</Field.Label>
+      <Otp
+        name='code'
+        value={value}
+        status={status}
+        onValueChange={next => {
+          setValue(next);
+          if (next.length > 0 && status === 'error') {
+            setStatus('neutral');
+          }
+        }}
+        onComplete={code => {
+          if (code === CORRECT_CODE) {
+            setStatus('success');
+            return;
+          }
+          setStatus('error');
+        }}
+      />
+      {status === 'error' ? (
+        <Field.Error>Incorrect code. Try again.</Field.Error>
+      ) : (
+        <Field.Description>
+          {status === 'success' ? 'Code verified' : `Try ${CORRECT_CODE}, or anything else for the error.`}
+        </Field.Description>
+      )}
     </Field.Root>
   );
 }

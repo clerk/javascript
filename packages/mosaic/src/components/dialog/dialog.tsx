@@ -21,6 +21,7 @@ import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
 import { Icon } from '../icon';
+import { InputSizeContext } from '../input/input.context';
 import { ToastProvider } from '../toast/toast';
 import {
   backdropMotion,
@@ -485,9 +486,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 
   return (
     <Primitive.Portal>
-      <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
-        {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
-      </ButtonContext.Provider>
+      <InputSizeContext.Provider value={undefined}>
+        <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+          {holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+        </ButtonContext.Provider>
+      </InputSizeContext.Provider>
     </Primitive.Portal>
   );
 });

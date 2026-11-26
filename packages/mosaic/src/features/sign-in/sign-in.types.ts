@@ -1,6 +1,11 @@
 import type { Ref } from 'react';
 
-import type { AuthActionBlockedDetails, AuthEmailLinkStatusValue, AuthProvider } from '../../blocks/auth';
+import type {
+  AuthActionBlockedDetails,
+  AuthEmailLinkStatusValue,
+  AuthPasswordRule,
+  AuthProvider,
+} from '../../blocks/auth';
 import type { FlowDirection } from '../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../components/form';
 import type { AuthFlowSubmitEvent, AuthFlowValues } from '../auth-flow/auth-flow.types';
@@ -9,9 +14,30 @@ import type { SignUpFields, SignUpLegalConsent } from '../sign-up/sign-up.types'
 export type SignInFactor =
   | { id: string; stage: 'first'; strategy: 'password' }
   | { id: string; stage: 'first' | 'second'; strategy: 'passkey' }
-  | { id: string; stage: 'first' | 'second'; strategy: 'email_code'; emailAddressId: string; identifier: string }
-  | { id: string; stage: 'first' | 'second'; strategy: 'email_link'; emailAddressId: string; identifier: string }
-  | { id: string; stage: 'first' | 'second'; strategy: 'phone_code'; phoneNumberId: string; identifier: string }
+  | {
+      id: string;
+      stage: 'first' | 'second';
+      strategy: 'email_code';
+      emailAddressId: string;
+      identifier: string;
+      primary?: boolean;
+    }
+  | {
+      id: string;
+      stage: 'first' | 'second';
+      strategy: 'email_link';
+      emailAddressId: string;
+      identifier: string;
+      primary?: boolean;
+    }
+  | {
+      id: string;
+      stage: 'first' | 'second';
+      strategy: 'phone_code';
+      phoneNumberId: string;
+      identifier: string;
+      primary?: boolean;
+    }
   | { id: string; stage: 'second'; strategy: 'totp' | 'backup_code' }
   | {
       id: string;
@@ -39,6 +65,8 @@ export type SignInStep =
       nextField?: SignInIdentifierField;
       lastUsed?: boolean;
       password?: boolean;
+      passwordVisible?: boolean;
+      emailFirst?: boolean;
     }
   | {
       kind: 'identifier';
@@ -47,7 +75,7 @@ export type SignInStep =
       flow?: 'sign-in' | 'sign-up';
       legalConsent?: SignUpLegalConsent;
     }
-  | { kind: 'credential'; credential: 'password'; identifier: string }
+  | { kind: 'credential'; credential: 'password'; identifier: string; alternatives?: readonly SignInFactor[] }
   | { kind: 'credential'; credential: 'backup-code'; identifier: string; resetting?: boolean }
   | { kind: 'credential'; credential: 'passkey'; identifier?: string }
   | {
@@ -62,6 +90,8 @@ export type SignInStep =
         | 'verify-phone';
       channel: 'email' | 'phone' | 'totp';
       identifier?: string;
+      alternatives?: readonly { id: string; identifier: string }[];
+      methods?: readonly SignInFactor[];
       provider?: string;
       resetting?: boolean;
     }
@@ -71,6 +101,7 @@ export type SignInStep =
       options: readonly SignInFactor[];
       canGoBack?: boolean;
     }
+  | { kind: 'choice'; purpose: 'addresses'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'reset-methods'; options: readonly SignInFactor[] }
   | { kind: 'choice'; purpose: 'enterprise-connections'; options: readonly SignInProvider[] }
   | { kind: 'choice'; purpose: 'accounts'; options: readonly SignInAccount[] }
@@ -111,6 +142,7 @@ export interface SignInViewProps {
   lastUsedProviderId?: string;
   onSelectProvider: (id: string) => void;
   onPasskey?: () => void;
+  passkeyInlineFrom?: number;
   form: UseFormResult<SignInValues>;
   onSubmit: (event?: SignInSubmitEvent) => void;
   onCodeComplete: (code: string) => void;
@@ -119,6 +151,7 @@ export interface SignInViewProps {
   errorMessage?: string;
   globalErrorMessage?: string;
   newPasswordFeedback?: FieldFeedback;
+  newPasswordRules?: readonly AuthPasswordRule[];
   onEditIdentifier: () => void;
   onSwitchField?: () => void;
   onSignUp?: () => void;
@@ -133,6 +166,7 @@ export interface SignInViewProps {
   onEmailSupport: () => void;
   pendingFactorId?: string;
   onSelectFactor: (id: string) => void;
+  onChangeAddress?: () => void;
   pendingAccountId?: string;
   onSelectAccount: (id: string) => void;
   onAddAccount?: () => void;

@@ -1,16 +1,20 @@
 import { useMergeRefs } from '@floating-ui/react';
+import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import { AuthIdentityPreview } from '../../../blocks/auth';
+import { emphasizeIdentifier } from '../../../blocks/auth';
+import { Prompt } from '../../../blocks/prompt';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { PasswordInput } from '../../../components/password-input';
-import { useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
+import { styles } from '../sign-in.styles';
 import type { SignInSubmitEvent, SignInValues } from '../sign-in.types';
+import { differentIdentifierLabel } from '../sign-in.utils';
 
 interface SignInPasswordProps {
   identifier: string;
@@ -48,13 +52,9 @@ export function SignInPassword({
     <>
       <Card.Header>
         <Card.Title>{m.password.title}</Card.Title>
-        <Card.Description>{m.password.description}</Card.Description>
-        <AuthIdentityPreview
-          identifier={identifier}
-          editLabel={m.editIdentifier}
-          disabled={isPending}
-          onEdit={onEditIdentifier}
-        />
+        <Card.Description>
+          {emphasizeIdentifier(fill(m.password.description, { identifier }), identifier)}
+        </Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -67,6 +67,13 @@ export function SignInPassword({
           id={form.id}
           onSubmit={onSubmit}
         >
+          <input
+            readOnly
+            hidden
+            name='identifier'
+            autoComplete='username'
+            value={identifier}
+          />
           <Field.Root
             required
             invalid={feedback?.type === 'error'}
@@ -79,6 +86,7 @@ export function SignInPassword({
                 <Button
                   type='button'
                   size='sm'
+                  color='neutral'
                   variant='link'
                   disabled={isPending}
                   onClick={onForgotPassword}
@@ -88,9 +96,10 @@ export function SignInPassword({
               ) : null}
             </Field.Header>
             <PasswordInput
+              size='lg'
               ref={passwordRef}
               autoComplete='current-password'
-              placeholder={m.password.placeholder}
+              enterKeyHint='go'
               {...password}
               showPasswordLabel={m.showPassword}
               hidePasswordLabel={m.hidePassword}
@@ -98,29 +107,37 @@ export function SignInPassword({
             <Field.Feedback feedback={feedback} />
           </Field.Root>
         </Form>
-      </Card.Content>
-      <Card.Footer>
-        {onCancel || onShowHelp ? (
-          <Button
-            type='button'
-            variant='outline'
-            color='neutral'
+        <div {...stylex.props(styles.actionGroups)}>
+          <SubmitButton
+            form={form.id}
             fullWidth
-            disabled={isPending}
-            onClick={onCancel ?? onShowHelp}
+            isPending={isPending}
+            pendingLabel={m.verifying}
           >
-            {onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink}
-          </Button>
-        ) : null}
-        <SubmitButton
-          form={form.id}
-          fullWidth
-          isPending={isPending}
-          pendingLabel={m.verifying}
-        >
-          {m.continue}
-        </SubmitButton>
-      </Card.Footer>
+            {m.continue}
+          </SubmitButton>
+          {onCancel || onShowHelp ? (
+            <Button
+              type='button'
+              variant='outline'
+              color='neutral'
+              fullWidth
+              disabled={isPending}
+              onClick={onCancel ?? onShowHelp}
+            >
+              {onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink}
+            </Button>
+          ) : null}
+          {onEditIdentifier ? (
+            <Prompt
+              text={m.notYou}
+              action={differentIdentifierLabel(identifier, m)}
+              disabled={isPending}
+              onAction={onEditIdentifier}
+            />
+          ) : null}
+        </div>
+      </Card.Content>
     </>
   );
 }

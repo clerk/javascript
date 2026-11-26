@@ -1,11 +1,12 @@
 import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { useCallback, useRef, useState } from 'react';
 
-import type { AuthProvider } from '../../../blocks/auth';
-import { AuthCaptcha } from '../../../blocks/auth';
+import type { AuthPasswordRule, AuthProvider } from '../../../blocks/auth';
+import { AuthCaptcha, AuthPasswordChecklist, AuthProviderIcon } from '../../../blocks/auth';
+import { Prompt } from '../../../blocks/prompt';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
@@ -19,6 +20,7 @@ import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
+import { separatorGap } from '../../../styles/separator-gap.styles';
 import { styles } from '../sign-up.styles';
 import type { SignUpDetails, SignUpFieldName, SignUpSubmitEvent, SignUpValues } from '../sign-up.types';
 import { signUpDetailsHeading, signUpFieldNames } from '../sign-up.utils';
@@ -36,9 +38,11 @@ interface SignUpDetailsProps {
   isPending: boolean;
   onSubmit: (event: SignUpSubmitEvent) => void;
   passwordFeedback?: FieldFeedback;
+  passwordRules?: readonly AuthPasswordRule[];
   onSignIn?: () => void;
   focusRef?: Ref<HTMLElement>;
   logo?: { src: string; alt: string };
+  notice?: ReactNode;
 }
 
 export function SignUpDetailsStep({
@@ -53,9 +57,11 @@ export function SignUpDetailsStep({
   isPending,
   onSubmit,
   passwordFeedback,
+  passwordRules,
   onSignIn,
   focusRef,
   logo,
+  notice,
 }: SignUpDetailsProps) {
   const m = useMessages('signUp');
   const { fields, legalConsent } = step;
@@ -78,7 +84,7 @@ export function SignUpDetailsStep({
           </Card.Media>
         ) : null}
         <Card.Title>{heading.title}</Card.Title>
-        <Card.Description>{heading.description}</Card.Description>
+        {notice ?? <Card.Description>{heading.description}</Card.Description>}
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -92,7 +98,7 @@ export function SignUpDetailsStep({
           {...inertProps(isChallengeShown)}
         >
           <SignUpProviders
-            providers={onlyLegalConsent ? [] : socialProviders}
+            providers={onlyLegalConsent || step.purpose === 'continue' ? [] : socialProviders}
             showDivider={hasFields}
             pendingProviderId={pendingProviderId}
             isDisabled={isDisabled}
@@ -106,41 +112,32 @@ export function SignUpDetailsStep({
               onSubmit={onSubmit}
               onSwitchField={onSwitchField}
               passwordFeedback={passwordFeedback}
+              passwordRules={passwordRules}
               focusRef={focusRef}
             />
           ) : null}
+          {hasForm ? (
+            <SubmitButton
+              form={form.id}
+              fullWidth
+              disabled={Boolean(pendingProviderId)}
+              isPending={isPending}
+              pendingLabel={m.verifying}
+            >
+              {m.submit}
+            </SubmitButton>
+          ) : null}
         </div>
         {step.purpose === 'continue' ? null : <AuthCaptcha onInteractiveChange={setIsChallengeShown} />}
-        {onSignIn ? (
-          <Text
-            size='sm'
-            color='foreground-secondary'
-            xstyle={styles.footerText}
-          >
-            {m.signInPrompt}{' '}
-            <Button
-              type='button'
-              size='sm'
-              variant='link'
-              disabled={isDisabled}
-              onClick={onSignIn}
-            >
-              {m.signInLink}
-            </Button>
-          </Text>
-        ) : null}
       </Card.Content>
-      {hasForm ? (
-        <Card.Footer xstyle={isChallengeShown && styles.spotlightHidden}>
-          <SubmitButton
-            form={form.id}
-            fullWidth
-            disabled={Boolean(pendingProviderId)}
-            isPending={isPending}
-            pendingLabel={m.verifying}
-          >
-            {m.submit}
-          </SubmitButton>
+      {onSignIn && step.purpose !== 'continue' ? (
+        <Card.Footer>
+          <Prompt
+            text={m.signInPrompt}
+            action={m.signInLink}
+            disabled={isDisabled}
+            onAction={onSignIn}
+          />
         </Card.Footer>
       ) : null}
     </>
@@ -154,10 +151,11 @@ function SignUpFields({
   onSubmit,
   onSwitchField,
   passwordFeedback,
+  passwordRules,
   focusRef,
 }: Pick<
   SignUpDetailsProps,
-  'step' | 'form' | 'isDisabled' | 'onSubmit' | 'onSwitchField' | 'passwordFeedback' | 'focusRef'
+  'step' | 'form' | 'isDisabled' | 'onSubmit' | 'onSwitchField' | 'passwordFeedback' | 'passwordRules' | 'focusRef'
 >) {
   const m = useMessages('signUp');
   const { fields, nextField, legalConsent } = step;
@@ -228,6 +226,7 @@ function SignUpFields({
           <PasswordField
             {...field('password')}
             advisoryFeedback={passwordFeedback}
+            rules={passwordRules}
           />
         ) : null}
         {legalConsent ? (
@@ -267,10 +266,9 @@ function SignUpProviders({
           <ProviderButton
             key={provider.id}
             icon={
-              <img
-                src={provider.iconUrl}
-                alt=''
-                {...stylex.props(styles.providerIcon)}
+              <AuthProviderIcon
+                id={provider.id}
+                iconUrl={provider.iconUrl}
               />
             }
             longLabel={fill(m.form.socialButton, { provider: provider.name })}
@@ -281,7 +279,7 @@ function SignUpProviders({
           />
         ))}
       </ProviderButtonGroup>
-      {showDivider ? <Separator>{m.form.divider}</Separator> : null}
+      {showDivider ? <Separator xstyle={separatorGap.tight}>{m.form.divider}</Separator> : null}
     </>
   );
 }
@@ -370,6 +368,7 @@ function TextField({
         />
       </Field.Header>
       <Input
+        size='lg'
         ref={mergedRef}
         type={type}
         autoComplete={autoComplete}
@@ -405,6 +404,7 @@ function PhoneField({ form, required, disabled, autoFocus, inputRef, switchRef, 
         />
       </Field.Header>
       <PhoneInput
+        size='lg'
         ref={mergedRef}
         autoComplete='tel'
         placeholder={m.form.phonePlaceholder}
@@ -427,11 +427,16 @@ function PasswordField({
   autoFocus,
   inputRef,
   advisoryFeedback,
-}: FieldProps & { advisoryFeedback?: FieldFeedback }) {
+  rules,
+}: FieldProps & {
+  advisoryFeedback?: FieldFeedback;
+  rules?: readonly AuthPasswordRule[];
+}) {
   const m = useMessages('signUp');
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields.password;
-  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const checklist = rules && rules.length > 1 ? rules : undefined;
+  const message = feedback?.type === 'error' ? feedback : checklist ? undefined : advisoryFeedback;
   const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
   const { ref, ...control } = form.register('password');
   const flowAutoFocusRef = useFlowAutoFocus<HTMLInputElement>();
@@ -449,6 +454,7 @@ function PasswordField({
         {required ? null : <OptionalHint />}
       </Field.Header>
       <PasswordInput
+        size='lg'
         ref={mergedRef}
         autoComplete='new-password'
         placeholder={m.form.passwordPlaceholder}
@@ -462,6 +468,13 @@ function PasswordField({
         hidePasswordLabel={m.form.hidePassword}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+      {checklist ? (
+        <AuthPasswordChecklist
+          rules={checklist}
+          showMissed={feedback?.type === 'error'}
+          metLabel={m.form.passwordRuleMet}
+        />
+      ) : null}
     </Field.Root>
   );
 }
@@ -477,6 +490,7 @@ function FieldHeaderEnd({
       <Button
         type='button'
         size='sm'
+        color='neutral'
         variant='link'
         disabled={disabled}
         onClick={onSwitch}

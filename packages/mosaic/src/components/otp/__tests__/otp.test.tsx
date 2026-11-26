@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Field } from '../field';
-import { Otp } from './otp';
+import { Field } from '../../field';
+import { Otp } from '../otp';
 
 const slots = () => screen.getAllByRole('textbox');
 
@@ -37,6 +37,7 @@ describe('Mosaic Otp', () => {
       <Otp
         aria-invalid
         length={3}
+        defaultValue='123'
         aria-label='Code'
       />,
     );
@@ -58,12 +59,32 @@ describe('Mosaic Otp', () => {
       <Otp
         length={3}
         status='error'
+        defaultValue='123'
         aria-label='Code'
       />,
     );
     expect(screen.getByRole('group', { name: 'Code' })).toHaveAttribute('data-status', 'error');
     for (const slot of slots()) {
       expect(slot).toHaveAttribute('data-status', 'error');
+      expect(slot).toHaveAttribute('aria-invalid', 'true');
+    }
+  });
+
+  it('stops colouring the slots as an error once the code is no longer complete', async () => {
+    const user = userEvent.setup();
+    render(
+      <Otp
+        length={3}
+        status='error'
+        defaultValue='123'
+        aria-label='Code'
+      />,
+    );
+    await user.click(slots()[2]);
+    await user.keyboard('{Backspace}');
+
+    for (const slot of slots()) {
+      expect(slot).toHaveAttribute('data-status', 'neutral');
       expect(slot).toHaveAttribute('aria-invalid', 'true');
     }
   });

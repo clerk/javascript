@@ -1,3 +1,3 @@
 export const formMessages = {
-  error: 'Something went wrong. Please try again.',
+  error: 'Something went wrong. Try again.',
 };

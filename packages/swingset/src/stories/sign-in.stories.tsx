@@ -1,6 +1,7 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { FieldFeedback, FieldsConfig } from '@clerk/mosaic/components/form';
-import { useForm } from '@clerk/mosaic/components/form';
+import type { FieldFeedback } from '@clerk/mosaic/components/form';
+import { FormSubmitError, useForm } from '@clerk/mosaic/components/form';
+import { isCompletePhoneNumber } from '@clerk/mosaic/components/phone-input';
 import type {
   SignInAccount,
   SignInFactor,
@@ -12,13 +13,28 @@ import type {
 } from '@clerk/mosaic/features/sign-in';
 import { SignInView } from '@clerk/mosaic/features/sign-in';
 import type { SignUpFields } from '@clerk/mosaic/features/sign-up';
-import { useRef, useState } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosCompany, chaosEmail } from '@/lib/chaos';
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './sign-in.stories?raw';
 
+import type { AuthConfig } from './fixtures/auth-config';
+import {
+  APPLICATION_LOGO_URL,
+  AuthConfigContext,
+  hasFinishStep,
+  logoUrlFor,
+  passwordRulesFor,
+  providersFor,
+  signInIdentifierFields,
+  signUpFinishErrors,
+  signUpFinishFields,
+  WORDMARK_LOGO_URL,
+} from './fixtures/auth-config';
 export const meta: StoryMeta = {
   group: 'Authentication',
   status: 'wip',
@@ -29,7 +45,6 @@ export const meta: StoryMeta = {
 };
 
 const APPLICATION_NAME = 'Acme';
-const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const IDENTIFIER = 'jane@acme.com';
 const PHONE = '+1******0123';
 
@@ -42,13 +57,68 @@ const socialProviders: SignInProvider[] = [
 
 const firstFactors: SignInFactor[] = [
   { id: 'password', stage: 'first', strategy: 'password' },
-  { id: 'email_code', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: 'j***@acme.com' },
+  {
+    id: 'email_code',
+    stage: 'first',
+    strategy: 'email_code',
+    emailAddressId: 'idn_1',
+    identifier: 'j***@acme.com',
+    primary: true,
+  },
+  { id: 'email_code_2', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_2', identifier: 'j***@gmail.com' },
+  { id: 'phone_code', stage: 'first', strategy: 'phone_code', phoneNumberId: 'idn_5', identifier: '+1******0123' },
 ];
 
 const secondFactors: SignInFactor[] = [
   { id: 'totp', stage: 'second', strategy: 'totp' },
   { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
 ];
+
+const manyFirstFactors: SignInFactor[] = [
+  { id: 'password', stage: 'first', strategy: 'password' },
+  { id: 'passkey', stage: 'first', strategy: 'passkey' },
+  {
+    id: 'email_code',
+    stage: 'first',
+    strategy: 'email_code',
+    emailAddressId: 'idn_1',
+    identifier: 'j***@acme.com',
+    primary: true,
+  },
+  { id: 'email_code_2', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_2', identifier: 'j***@gmail.com' },
+  {
+    id: 'email_code_3',
+    stage: 'first',
+    strategy: 'email_code',
+    emailAddressId: 'idn_3',
+    identifier: 'j***@analytical-engines.co.uk',
+  },
+  { id: 'email_code_4', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_4', identifier: 'j***@proton.me' },
+  {
+    id: 'phone_code',
+    stage: 'first',
+    strategy: 'phone_code',
+    phoneNumberId: 'idn_5',
+    identifier: '+1******0123',
+    primary: true,
+  },
+  { id: 'phone_code_2', stage: 'first', strategy: 'phone_code', phoneNumberId: 'idn_6', identifier: '+1******4477' },
+  { id: 'phone_code_3', stage: 'first', strategy: 'phone_code', phoneNumberId: 'idn_7', identifier: '+44*******900' },
+  { id: 'phone_code_4', stage: 'first', strategy: 'phone_code', phoneNumberId: 'idn_8', identifier: '+49********812' },
+];
+
+const manySecondFactors: SignInFactor[] = [
+  { id: 'totp', stage: 'second', strategy: 'totp' },
+  { id: 'passkey_2fa', stage: 'second', strategy: 'passkey' },
+  { id: 'phone_2fa', stage: 'second', strategy: 'phone_code', phoneNumberId: 'idn_5', identifier: '+1******0123' },
+  { id: 'phone_2fa_2', stage: 'second', strategy: 'phone_code', phoneNumberId: 'idn_6', identifier: '+1******4477' },
+  { id: 'phone_2fa_3', stage: 'second', strategy: 'phone_code', phoneNumberId: 'idn_7', identifier: '+44*******900' },
+  { id: 'email_2fa', stage: 'second', strategy: 'email_code', emailAddressId: 'idn_1', identifier: 'j***@acme.com' },
+  { id: 'email_2fa_2', stage: 'second', strategy: 'email_code', emailAddressId: 'idn_2', identifier: 'j***@gmail.com' },
+  { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
+];
+
+export const ManyMethodsContext = createContext(false);
 
 const resetFactors: SignInFactor[] = [
   { id: 'reset_email', stage: 'first', strategy: 'reset_password_email_code', identifier: 'j***@acme.com' },
@@ -79,18 +149,15 @@ const emptyValues: SignInValues = {
   legalAccepted: false,
 };
 
-const newPasswordFields: FieldsConfig<SignInValues> = {
-  newPassword: {
-    validate: newPassword =>
-      newPassword.length < 8
-        ? { type: 'error', message: 'Your password must contain 8 or more characters.' }
-        : undefined,
-  },
-  confirmPassword: {
-    validate: (confirmPassword, values) =>
-      confirmPassword !== values.newPassword ? { type: 'error', message: 'Passwords don’t match.' } : undefined,
-  },
-};
+function newPasswordErrors(values: SignInValues): Partial<Record<keyof SignInValues, string>> | undefined {
+  if (values.newPassword.length < 8) {
+    return { newPassword: 'Your password must contain 8 or more characters.' };
+  }
+  if (values.confirmPassword !== values.newPassword) {
+    return { confirmPassword: 'Passwords don’t match.' };
+  }
+  return undefined;
+}
 
 function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   switch (factor.strategy) {
@@ -120,6 +187,18 @@ function stepFor(factor: SignInFactor, identifier: string): SignInStep {
   }
 }
 
+function withAlternatives(step: SignInStep, factor: SignInFactor, factors: readonly SignInFactor[]): SignInStep {
+  if (step.kind !== 'code' || (factor.strategy !== 'email_code' && factor.strategy !== 'phone_code')) {
+    return step;
+  }
+  const alternatives = factors.flatMap(other =>
+    other.id !== factor.id && other.strategy === factor.strategy && other.stage === factor.stage
+      ? [{ id: other.id, identifier: other.identifier }]
+      : [],
+  );
+  return alternatives.length > 0 ? { ...step, alternatives } : step;
+}
+
 function offersResend(step: SignInStep): boolean {
   return (
     (step.kind === 'code' && step.channel !== 'totp') ||
@@ -127,12 +206,26 @@ function offersResend(step: SignInStep): boolean {
   );
 }
 
+const PASSKEY_FACTOR: SignInFactor = { id: 'passkey', stage: 'first', strategy: 'passkey' };
+
+function withPasskeySetting(factors: SignInFactor[], config: AuthConfig): SignInFactor[] {
+  const others = factors.filter(factor => factor.strategy !== 'passkey');
+  return config.passkey ? [PASSKEY_FACTOR, ...others] : others;
+}
+
 type Outcome = { kind: 'signed-in' } | { kind: 'signed-up' } | { kind: 'redirect'; provider: string };
 
-function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void }) {
-  const [step, setStep] = useState<SignInStep>({ kind: 'identifier', field: 'email' });
+export function WorkingExample({
+  onComplete,
+  newAccount = false,
+}: {
+  onComplete: (outcome: Outcome) => void;
+  newAccount?: boolean;
+}) {
+  const [step, setStep] = useState<SignInStep>({ kind: 'identifier' });
+  const [fieldIndex, setFieldIndex] = useState(0);
   const [direction, setDirection] = useState<-1 | 1>(1);
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [fieldError, setFieldError] = useState<{ message: string; values: string }>();
   const [globalErrorMessage, setGlobalErrorMessage] = useState<string>();
   const [isPending, setIsPending] = useState(false);
   const [pendingProviderId, setPendingProviderId] = useState<string>();
@@ -142,16 +235,57 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   const [supportRequested, setSupportRequested] = useState(false);
   const [stage, setStage] = useState<'first' | 'second'>('first');
   const pickerReturnRef = useRef<SignInStep>({ kind: 'credential', credential: 'password', identifier: '' });
-  const form = useForm<SignInValues>({
+  const addressesReturnRef = useRef<SignInStep>({ kind: 'identifier' });
+  const authConfig = useContext(AuthConfigContext);
+  const stepKindRef = useRef<SignInStep['kind']>('identifier');
+  const form = useForm<SignInValues, Outcome>({
     initialValues: emptyValues,
-    fields: newPasswordFields,
-    onSubmit: () => settleAfter(1_500),
-    onSuccess: () => onComplete({ kind: 'signed-in' }),
+    onSubmit: async submitted => {
+      const isSignUp = stepKindRef.current === 'sign-up';
+      const fields = isSignUp ? signUpFinishErrors(submitted, authConfig) : newPasswordErrors(submitted);
+      if (fields) {
+        throw new FormSubmitError<SignInValues>({ fields });
+      }
+      if (isSignUp) {
+        await settleAfter(700);
+        return { kind: 'signed-up' };
+      }
+      await settleAfter(1_500);
+      return { kind: 'signed-in' };
+    },
+    onSuccess: outcome => onComplete(outcome),
   });
   const { values } = form;
-  const identifier = values.identifier.trim();
+  const manyMethods = useContext(ManyMethodsContext);
+  const firstStageFactors = withPasskeySetting(manyMethods ? manyFirstFactors : firstFactors, authConfig).filter(
+    factor => authConfig.password || factor.strategy !== 'password',
+  );
+  const identifierFields = signInIdentifierFields(authConfig);
+  const identifierField = identifierFields[fieldIndex % identifierFields.length];
+  const startStep: SignInStep = {
+    kind: 'identifier',
+    field: identifierField,
+    lastUsed: authConfig.lastUsed === 'identifier',
+    password: authConfig.password && !authConfig.combined && identifierField !== 'phone',
+    passwordVisible: true,
+    emailFirst: authConfig.emailFirst,
+    nextField: identifierFields.length > 1 ? identifierFields[(fieldIndex + 1) % identifierFields.length] : undefined,
+  };
+  const identifier = (identifierField === 'phone' ? values.phoneNumber : values.identifier).trim();
+  const passwordStepFor = (forIdentifier: string): SignInStep => ({
+    kind: 'credential',
+    credential: 'password',
+    identifier: forIdentifier,
+    alternatives:
+      authConfig.methodsLayout === 'button' ? [] : firstStageFactors.filter(factor => factor.strategy !== 'password'),
+  });
+  const typedValues = JSON.stringify(values);
+  const errorMessage = fieldError && fieldError.values === typedValues ? fieldError.message : undefined;
+  const setErrorMessage = (message: string | undefined) =>
+    setFieldError(message ? { message, values: typedValues } : undefined);
 
   const navigate = (next: SignInStep, nextDirection: -1 | 1) => {
+    stepKindRef.current = next.kind;
     setDirection(nextDirection);
     setStep(next);
     form.setValue('code', '');
@@ -171,28 +305,95 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   };
 
   const startSecondFactor = () => {
+    if (!authConfig.twoStep) {
+      onComplete({ kind: 'signed-in' });
+      return;
+    }
     setStage('second');
     setFactorId('totp');
-    navigate({ kind: 'code', purpose: 'second-factor', channel: 'totp' }, 1);
+    navigate(
+      {
+        kind: 'code',
+        purpose: 'second-factor',
+        channel: 'totp',
+        methods: (manyMethods ? manySecondFactors : secondFactors).filter(factor => factor.id !== 'totp'),
+      },
+      1,
+    );
   };
 
   const submitStart = () =>
     run(() => {
+      const isPhone = identifierField === 'phone';
       if (!identifier) {
-        setErrorMessage('Enter your email address.');
+        setErrorMessage(
+          isPhone
+            ? 'Enter your phone number.'
+            : identifierField === 'email-or-username'
+              ? 'Enter your email address or username.'
+              : 'Enter your email address.',
+        );
         return;
       }
-      if (!identifier.includes('@')) {
+      if (identifierField === 'email' && !identifier.includes('@')) {
         setErrorMessage('Enter a valid email address.');
         return;
       }
-      if (identifier.toLowerCase().includes('new')) {
-        navigate({ kind: 'sign-up', fields: signUpDetailFields, legalConsent }, 1);
+      if (isPhone && !isCompletePhoneNumber(identifier)) {
+        setErrorMessage('This number looks incomplete. Enter the full number, including the area code.');
+        return;
+      }
+      if (authConfig.outcome === 'blocked') {
+        navigate(
+          {
+            kind: 'notice',
+            purpose: 'action-blocked',
+            details: { linkUrl: 'https://acme.com/support', linkText: 'Contact support', traceId: 'trc_2x7Hq9LmP4' },
+          },
+          1,
+        );
+        return;
+      }
+      if (authConfig.outcome === 'no-methods') {
+        navigate({ kind: 'notice', purpose: 'no-methods' }, 1);
+        return;
+      }
+      const isNew = newAccount || (isPhone ? identifier.endsWith('0000') : identifier.toLowerCase().includes('new'));
+      if (isNew && identifierField !== 'email-or-username') {
+        navigate(
+          isPhone
+            ? { kind: 'code', purpose: 'verify-phone', channel: 'phone', identifier }
+            : { kind: 'code', purpose: 'verify-email', channel: 'email', identifier },
+          1,
+        );
         return;
       }
       setStage('first');
-      setFactorId('password');
-      navigate({ kind: 'credential', credential: 'password', identifier }, 1);
+      if (authConfig.password && !authConfig.combined && identifierField !== 'phone') {
+        if (!values.password) {
+          setErrorMessage('Enter your password.');
+          return;
+        }
+        startSecondFactor();
+        return;
+      }
+      if (authConfig.password) {
+        setFactorId('password');
+        navigate(passwordStepFor(identifier), 1);
+        return;
+      }
+      setFactorId(isPhone ? 'phone_code' : 'email_code');
+      navigate(
+        isPhone
+          ? { kind: 'code', purpose: 'first-factor', channel: 'phone', identifier }
+          : {
+              kind: 'code',
+              purpose: 'first-factor',
+              channel: 'email',
+              identifier: identifier.includes('@') ? identifier : 'j***@acme.com',
+            },
+        1,
+      );
     });
 
   const submitPassword = () =>
@@ -205,9 +406,13 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setErrorMessage('Password is incorrect. Try again, or use another method.');
         return;
       }
+      if (authConfig.outcome === 'compromised') {
+        navigate({ kind: 'notice', purpose: 'password-compromised' }, 1);
+        return;
+      }
       if (values.password.toLowerCase() === 'locked') {
-        navigate({ kind: 'identifier', field: 'email' }, -1);
-        setGlobalErrorMessage('Your account is locked. You will be able to try again in 30 minutes.');
+        navigate({ kind: 'identifier' }, -1);
+        setGlobalErrorMessage('Your account is locked. Try again later or contact support.');
         return;
       }
       startSecondFactor();
@@ -219,8 +424,8 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         setErrorMessage('Enter the complete verification code.');
         return;
       }
-      if (code === '000000') {
-        setErrorMessage('Incorrect code. Try again.');
+      if (code !== '123456') {
+        setFieldError({ message: 'Incorrect code. Try again.', values: JSON.stringify({ ...values, code }) });
         return;
       }
       if (step.kind !== 'code') {
@@ -239,7 +444,20 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
           onComplete({ kind: 'signed-in' });
           return;
         case 'verify-email':
-          onComplete({ kind: 'signed-up' });
+        case 'verify-phone':
+          if (!hasFinishStep(authConfig)) {
+            onComplete({ kind: 'signed-up' });
+            return;
+          }
+          navigate(
+            {
+              kind: 'sign-up',
+              purpose: 'continue',
+              fields: signUpFinishFields(authConfig),
+              legalConsent: authConfig.legalConsent ? legalConsent : undefined,
+            },
+            1,
+          );
           return;
       }
     });
@@ -257,29 +475,8 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
       onComplete({ kind: 'signed-in' });
     });
 
-  const submitSignUp = () =>
-    run(() => {
-      if (!values.firstName.trim() || !values.lastName.trim()) {
-        setGlobalErrorMessage('Enter your first and last name.');
-        return;
-      }
-      if (!identifier.includes('@')) {
-        setGlobalErrorMessage('Enter a valid email address.');
-        return;
-      }
-      if (values.password.length < 8) {
-        setGlobalErrorMessage('Your password must contain 8 or more characters.');
-        return;
-      }
-      if (!values.legalAccepted) {
-        setGlobalErrorMessage('Accept the Terms of Service and Privacy Policy to continue.');
-        return;
-      }
-      navigate({ kind: 'code', purpose: 'verify-email', channel: 'email', identifier }, 1);
-    });
-
   const onSubmit = (event?: SignInSubmitEvent) => {
-    if (step.kind === 'new-password') {
+    if (step.kind === 'new-password' || step.kind === 'sign-up') {
       form.handleSubmit(event ?? { preventDefault: () => undefined });
       return;
     }
@@ -293,16 +490,13 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         return;
       case 'credential':
         if (step.credential === 'passkey') {
-          void run(() => startSecondFactor());
+          void run(() => onComplete({ kind: 'signed-in' }));
           return;
         }
         void (step.credential === 'password' ? submitPassword() : submitBackupCode());
         return;
       case 'code':
         void submitCode(values.code);
-        return;
-      case 'sign-up':
-        void submitSignUp();
         return;
       case 'notice':
         if (step.purpose === 'forgot-password') {
@@ -326,39 +520,88 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     })();
   };
 
-  const stageFactors = stage === 'first' ? firstFactors : secondFactors;
+  const stageFactors = stage === 'first' ? firstStageFactors : manyMethods ? manySecondFactors : secondFactors;
   const otherFactors = stageFactors.filter(factor => factor.id !== factorId);
+
+  const methodOptions = otherFactors.flatMap(factor => {
+    if (
+      authConfig.addressChoice !== 'primary' ||
+      (factor.strategy !== 'email_code' && factor.strategy !== 'phone_code')
+    ) {
+      return [factor];
+    }
+    const same = otherFactors.filter(other => other.strategy === factor.strategy && other.stage === factor.stage);
+    const lead = same.find(other => 'primary' in other && other.primary) ?? same[0];
+    if (lead.id !== factor.id) {
+      return [];
+    }
+    return [same.length > 1 ? { ...factor, identifier: '' } : factor];
+  });
 
   const onSelectFactor = (id: string) => {
     const factor = stageFactors.find(candidate => candidate.id === id);
     if (!factor) {
       return;
     }
+    const addresses = stageFactors.filter(candidate => candidate.strategy === factor.strategy);
+    const choosingAddress = step.kind === 'choice' && step.purpose === 'addresses';
+    if (!choosingAddress && addresses.length > 1 && authConfig.addressChoice === 'ask') {
+      addressesReturnRef.current = step;
+      navigate({ kind: 'choice', purpose: 'addresses', options: addresses }, 1);
+      return;
+    }
+    const chosen =
+      !choosingAddress && addresses.length > 1
+        ? (addresses.find(candidate => 'primary' in candidate && candidate.primary) ?? factor)
+        : factor;
     void (async () => {
-      setPendingFactorId(id);
+      setPendingFactorId(chosen.id);
       await settleAfter(700);
       setPendingFactorId(undefined);
-      setFactorId(id);
-      navigate(stepFor(factor, identifier), 1);
+      if (chosen.strategy === 'passkey') {
+        onComplete({ kind: 'signed-in' });
+        return;
+      }
+      setFactorId(chosen.id);
+      navigate(
+        chosen.strategy === 'password'
+          ? passwordStepFor(identifier)
+          : withAlternatives(stepFor(chosen, identifier), chosen, stageFactors),
+        1,
+      );
     })();
+  };
+
+  const onChangeAddress = () => {
+    const current = stageFactors.find(candidate => candidate.id === factorId);
+    const addresses = current ? stageFactors.filter(candidate => candidate.strategy === current.strategy) : [];
+    if (addresses.length < 2) {
+      return;
+    }
+    addressesReturnRef.current = step;
+    navigate({ kind: 'choice', purpose: 'addresses', options: addresses }, 1);
   };
 
   const onShowMethods = () => {
     pickerReturnRef.current = step;
-    navigate({ kind: 'choice', purpose: 'methods', options: otherFactors }, 1);
+    navigate({ kind: 'choice', purpose: 'methods', options: methodOptions }, 1);
   };
 
   const onBack = () => {
     if (step.kind === 'notice' && step.purpose === 'forgot-password') {
-      navigate({ kind: 'credential', credential: 'password', identifier: step.identifier }, -1);
+      navigate(passwordStepFor(step.identifier), -1);
       return;
     }
     if (step.kind === 'new-password' || (step.kind === 'code' && step.purpose === 'reset-password')) {
-      navigate({ kind: 'credential', credential: 'password', identifier }, -1);
+      navigate(passwordStepFor(identifier), -1);
       return;
     }
     if (step.kind === 'notice') {
-      navigate({ kind: 'choice', purpose: 'methods', options: otherFactors }, -1);
+      navigate({ kind: 'choice', purpose: 'methods', options: methodOptions }, -1);
+      return;
+    }
+    if (step.kind === 'choice' && step.purpose === 'addresses') {
+      navigate(addressesReturnRef.current, -1);
       return;
     }
     if (step.kind === 'choice') {
@@ -370,7 +613,7 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
     if (current.kind === 'code' && current.purpose === 'reset-password') {
       return onBack;
     }
-    if (current.kind === 'code' && current.purpose === 'verify-email') {
+    if (current.kind === 'code' && (current.purpose === 'verify-email' || current.purpose === 'verify-phone')) {
       return undefined;
     }
     return otherFactors.length > 0 ? onShowMethods : undefined;
@@ -393,12 +636,33 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
   return (
     <>
       <SignInView
-        step={step}
+        step={step.kind === 'identifier' && !('channel' in step) ? startStep : step}
+        onSwitchField={identifierFields.length > 1 ? () => setFieldIndex(current => current + 1) : undefined}
         direction={direction}
         applicationName={APPLICATION_NAME}
-        applicationLogoUrl={APPLICATION_LOGO_URL}
-        combined
-        socialProviders={socialProviders}
+        applicationLogoUrl={logoUrlFor(authConfig)}
+        combined={authConfig.combined}
+        socialProviders={providersFor(authConfig)}
+        lastUsedProviderId={
+          authConfig.lastUsed === 'google' && authConfig.socialProviders > 0
+            ? 'oauth_google'
+            : authConfig.lastUsed === 'passkey' && authConfig.passkey
+              ? 'passkey'
+              : undefined
+        }
+        onPasskey={
+          authConfig.passkey
+            ? () =>
+                void (async () => {
+                  setPendingProviderId('passkey');
+                  await settleAfter(900);
+                  setPendingProviderId(undefined);
+                  onComplete({ kind: 'signed-in' });
+                })()
+            : undefined
+        }
+        onSignUp={authConfig.combined || authConfig.mode !== 'public' ? undefined : () => undefined}
+        onJoinWaitlist={!authConfig.combined && authConfig.mode === 'waitlist' ? () => undefined : undefined}
         pendingProviderId={pendingProviderId}
         onSelectProvider={onSelectProvider}
         form={form}
@@ -411,6 +675,13 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         isDisabled={isPending || form.isSubmitting || Boolean(pendingProviderId) || Boolean(pendingFactorId)}
         errorMessage={errorMessage}
         globalErrorMessage={globalErrorMessage}
+        newPasswordRules={
+          step.kind === 'sign-up'
+            ? passwordRulesFor(values.password, authConfig.passwordPolicy)
+            : step.kind === 'new-password'
+              ? passwordRulesFor(values.newPassword)
+              : undefined
+        }
         newPasswordFeedback={
           values.newPassword === ''
             ? undefined
@@ -420,16 +691,17 @@ function WorkingExample({ onComplete }: { onComplete: (outcome: Outcome) => void
         }
         onEditIdentifier={() => {
           setStage('first');
-          navigate({ kind: 'identifier', field: 'email' }, -1);
+          navigate({ kind: 'identifier' }, -1);
         }}
-        onForgotPassword={() => navigate({ kind: 'notice', purpose: 'forgot-password', identifier }, 1)}
+        onForgotPassword={() => navigate({ kind: 'code', purpose: 'reset-password', channel: 'email', identifier }, 1)}
         onCancel={cancelFor(step)}
         onShowHelp={() => navigate({ kind: 'notice', purpose: 'help' }, 1)}
         onBack={onBack}
-        onStartOver={() => navigate({ kind: 'identifier', field: 'email' }, -1)}
+        onStartOver={() => navigate({ kind: 'identifier' }, -1)}
         onEmailSupport={() => setSupportRequested(true)}
         pendingFactorId={pendingFactorId}
         onSelectFactor={onSelectFactor}
+        onChangeAddress={authConfig.addressChoice === 'primary' ? onChangeAddress : undefined}
         onSelectAccount={() => undefined}
         onResend={offersResend(step) ? onResend : undefined}
         canResend={canResend && !isPending}
@@ -455,7 +727,7 @@ export function Default() {
   const [outcome, setOutcome] = useState<Outcome>();
 
   return (
-    <div className='min-h-136 grid w-full place-items-center'>
+    <div className='min-h-136 grid w-full grid-cols-[minmax(0,1fr)] place-items-center'>
       {outcome ? (
         <div className='grid gap-4 text-center'>
           <p>{outcomeLabel(outcome)}</p>
@@ -483,6 +755,7 @@ function StepPanel({
   step,
   combined = true,
   errorMessage,
+  tryCode = false,
   globalErrorMessage,
   isPending = false,
   pendingProviderId,
@@ -498,10 +771,12 @@ function StepPanel({
   passwordFeedback,
   onRetry,
   password,
+  logoUrl = APPLICATION_LOGO_URL,
 }: {
   step: SignInStep;
   combined?: boolean;
   errorMessage?: string;
+  tryCode?: boolean;
   globalErrorMessage?: string;
   isPending?: boolean;
   pendingProviderId?: string;
@@ -517,24 +792,40 @@ function StepPanel({
   passwordFeedback?: FieldFeedback;
   onRetry?: () => void;
   password?: string;
+  logoUrl?: string | null;
 }) {
+  const fixture = useChaosFixture({ applicationName: APPLICATION_NAME, email: IDENTIFIER, step }, data => ({
+    applicationName: chaosCompany(0),
+    email: chaosEmail(0),
+    step:
+      'identifier' in data.step && typeof data.step.identifier === 'string' && data.step.identifier.includes('@')
+        ? { ...data.step, identifier: chaosEmail(0) }
+        : data.step,
+  }));
   const attempted = errorMessage && step.kind !== 'identifier' ? 'incorrect' : '';
   const form = useForm<SignInValues>({
     initialValues: {
       ...emptyValues,
       identifier:
-        identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : IDENTIFIER),
+        identifier ?? (step.kind === 'sign-up' ? 'new@acme.com' : step.kind === 'identifier' ? '' : fixture.email),
       password: password ?? attempted,
       backupCode: attempted,
     },
     onSubmit: () => Promise.resolve(),
   });
 
+  const [failedCode, setFailedCode] = useState<string>();
+  const enteredCode = form.values.code;
+  const codeError =
+    failedCode !== undefined && (enteredCode === failedCode || enteredCode === '')
+      ? 'That code didn’t work. Try again.'
+      : undefined;
+
   return (
     <SignInView
-      step={step}
-      applicationName={APPLICATION_NAME}
-      applicationLogoUrl={APPLICATION_LOGO_URL}
+      step={fixture.step}
+      applicationName={fixture.applicationName}
+      applicationLogoUrl={logoUrl ?? undefined}
       combined={combined}
       socialProviders={providers}
       pendingProviderId={pendingProviderId}
@@ -544,10 +835,15 @@ function StepPanel({
       onPasskey={onPasskey}
       form={form}
       onSubmit={event => event?.preventDefault()}
-      onCodeComplete={code => form.setValue('code', code)}
+      onCodeComplete={code => {
+        form.setValue('code', code);
+        if (tryCode) {
+          setFailedCode(code === TRY_CODE ? undefined : code);
+        }
+      }}
       isPending={isPending}
       isDisabled={isPending || Boolean(pendingProviderId)}
-      errorMessage={errorMessage}
+      errorMessage={codeError ?? errorMessage}
       globalErrorMessage={globalErrorMessage}
       newPasswordFeedback={passwordFeedback}
       onEditIdentifier={() => undefined}
@@ -573,7 +869,31 @@ function StepPanel({
   );
 }
 
-const passwordStep: SignInStep = { kind: 'credential', credential: 'password', identifier: IDENTIFIER };
+const passwordStep: SignInStep = {
+  kind: 'credential',
+  credential: 'password',
+  identifier: IDENTIFIER,
+  alternatives: [{ id: 'passkey', stage: 'first', strategy: 'passkey' }, ...firstFactors.slice(1)],
+};
+const identifierStep: SignInStep = { kind: 'identifier', field: 'email' };
+
+export function IdentifierWordmarkLogo() {
+  return (
+    <StepPanel
+      step={identifierStep}
+      logoUrl={WORDMARK_LOGO_URL}
+    />
+  );
+}
+
+export function IdentifierNoLogo() {
+  return (
+    <StepPanel
+      step={identifierStep}
+      logoUrl={null}
+    />
+  );
+}
 
 export function IdentifierDefault() {
   return <StepPanel step={{ kind: 'identifier', field: 'email' }} />;
@@ -625,7 +945,7 @@ export function IdentifierLocked() {
       step={{ kind: 'identifier', field: 'email' }}
       combined={false}
       identifier={IDENTIFIER}
-      globalErrorMessage='Your account is locked. You will be able to try again in 30 minutes. For more information, please contact support.'
+      globalErrorMessage='Your account is locked. Try again later or contact support.'
     />
   );
 }
@@ -694,6 +1014,75 @@ export function IdentifierPasskey() {
     <StepPanel
       combined={false}
       step={{ kind: 'identifier', field: 'email' }}
+      onPasskey={() => undefined}
+    />
+  );
+}
+
+const emailFirstCss = `
+.email-first .cl-sign-in-divider { order: 1; }
+.email-first .cl-sign-in-providers { order: 2; }
+.email-first .cl-provider-button-group-row { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; }
+.email-first .cl-provider-button-long-label { display: block !important; }
+.email-first .cl-provider-button-short-label { display: none !important; }
+`;
+
+export function IdentifierEmailFirst() {
+  return (
+    <div className='email-first'>
+      <style>{emailFirstCss}</style>
+      <StepPanel
+        combined={false}
+        step={{ kind: 'identifier', field: 'email' }}
+        providers={[
+          ...socialProviders,
+          { id: 'oauth_apple', name: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+        ]}
+        onPasskey={() => undefined}
+      />
+    </div>
+  );
+}
+
+const TRY_CODE = '123456';
+
+export function CodeEmailTryIt() {
+  return (
+    <StepPanel
+      step={{ kind: 'code', purpose: 'first-factor', channel: 'email', identifier: IDENTIFIER }}
+      tryCode
+    />
+  );
+}
+
+export function IdentifierPasskeyOnly() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      providers={[]}
+      onPasskey={() => undefined}
+    />
+  );
+}
+
+export function IdentifierPasskeyLastUsed() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      lastUsedProviderId='passkey'
+      onPasskey={() => undefined}
+    />
+  );
+}
+
+export function IdentifierPasskeyPending() {
+  return (
+    <StepPanel
+      combined={false}
+      step={{ kind: 'identifier', field: 'email' }}
+      pendingProviderId='passkey'
       onPasskey={() => undefined}
     />
   );
@@ -1278,4 +1667,17 @@ export function SignUpVerifyEmailLink() {
 
 export function SignUpEmailLinkSignedUp() {
   return <StepPanel step={{ kind: 'notice', purpose: 'email-link-status', status: 'signed-in', flow: 'sign-up' }} />;
+}
+
+export function ChoiceMethodsMany() {
+  return <StepPanel step={{ kind: 'choice', purpose: 'methods', options: manyFirstFactors.slice(1) }} />;
+}
+
+export function ChoiceMethodsSecondFactorMany() {
+  return (
+    <StepPanel
+      providers={[]}
+      step={{ kind: 'choice', purpose: 'methods', options: manySecondFactors }}
+    />
+  );
 }

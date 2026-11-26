@@ -73,7 +73,7 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toBe('File size exceeds the maximum limit of 10MB. Please choose a smaller file.');
+    expect(result.current.error).toBe('This file is over 10 MB. Choose a smaller file.');
     expect(result.current.isPending).toBe(false);
 
     await act(async () => result.current.onChange?.(file));
@@ -87,7 +87,7 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toBe('Something went wrong. Please try again.');
+    expect(result.current.error).toBe('Something went wrong. Try again.');
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
   });
 

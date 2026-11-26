@@ -211,7 +211,7 @@ describe('connected accounts', () => {
     await renderWithClerk(<UserProfileConnectedAccountsSection />);
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    expect(await screen.findByText('The connection could not start. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('The connection couldn’t start. Try again.')).toBeInTheDocument();
   });
 
   it('returns to the profile modal after connecting', async () => {
@@ -544,7 +544,7 @@ describe('connected accounts', () => {
     vi.spyOn(clerk, 'navigate').mockRejectedValueOnce(new Error('Navigation failed'));
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('Something went wrong. Try again.')).toBeInTheDocument();
   });
 
   it('keeps pending and error state local to each mounted section', async () => {

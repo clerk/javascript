@@ -1,14 +1,27 @@
-import { useForm } from '@clerk/mosaic/components/form';
+import { FormSubmitError, useForm } from '@clerk/mosaic/components/form';
+import { isCompletePhoneNumber } from '@clerk/mosaic/components/phone-input';
 import type { SignInProvider } from '@clerk/mosaic/features/sign-in';
 import type { SignUpStep, SignUpValues } from '@clerk/mosaic/features/sign-up';
 import { SignUpView } from '@clerk/mosaic/features/sign-up';
-import { useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { useTestTurnstile } from '@/lib/test-turnstile';
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './sign-up.stories?raw';
 
+import type { AuthConfig } from './fixtures/auth-config';
+import {
+  APPLICATION_LOGO_URL,
+  AuthConfigContext,
+  hasFinishStep,
+  LEGAL_CONSENT,
+  logoUrlFor,
+  passwordRulesFor,
+  providersFor,
+  signUpFinishErrors,
+  signUpFinishFields,
+} from './fixtures/auth-config';
 export const meta: StoryMeta = {
   group: 'Authentication',
   status: 'wip',
@@ -19,7 +32,6 @@ export const meta: StoryMeta = {
 };
 
 const APPLICATION_NAME = 'Acme';
-const APPLICATION_LOGO_URL = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const EMAIL = 'new@acme.com';
 
 const socialProviders: SignInProvider[] = [
@@ -117,11 +129,196 @@ function StepPanel({
       onResend={resend ? () => undefined : undefined}
       canResend
       onRetry={onRetry}
+      passwordRules={passwordRulesFor(form.values.password)}
     />
   );
 }
 
+type Stage = { kind: 'start' } | { kind: 'verify'; identifier: string } | { kind: 'finish' };
+type Channel = 'emailAddress' | 'phoneNumber';
+
+const START: Stage = { kind: 'start' };
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
 export function Default() {
+  return <WorkingExample />;
+}
+
+export function WorkingExample({ onComplete }: { onComplete?: () => void }) {
+  const config = useContext(AuthConfigContext);
+  const finishing = hasFinishStep(config);
+  const consentOnStart = config.legalConsent && !finishing;
+  const [stage, setStage] = useState<Stage>(START);
+  const [channel, setChannel] = useState<Channel>(config.identifier === 'phone' ? 'phoneNumber' : 'emailAddress');
+  const [direction, setDirection] = useState<-1 | 1>(1);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [failedCode, setFailedCode] = useState<string>();
+  const stageRef = useRef<Stage>(START);
+
+  const navigate = (next: Stage, nextDirection: -1 | 1) => {
+    stageRef.current = next;
+    setFailedCode(undefined);
+    setDirection(nextDirection);
+    setStage(next);
+  };
+
+  const form = useForm<SignUpValues, Stage>({
+    initialValues: emptyValues,
+    onSubmit: async submitted => {
+      if (stageRef.current.kind === 'start') {
+        const identifier = (channel === 'phoneNumber' ? submitted.phoneNumber : submitted.identifier).trim();
+        const fields: Partial<Record<keyof SignUpValues, string>> = {};
+        if (channel === 'emailAddress' && !EMAIL_PATTERN.test(identifier)) {
+          fields.identifier = 'Enter a valid email address.';
+        }
+        if (config.identifier === 'username' && submitted.username.trim().length < 4) {
+          fields.username = 'Use at least 4 characters for your username.';
+        }
+        if (channel === 'phoneNumber' && !isCompletePhoneNumber(identifier)) {
+          fields.phoneNumber = 'This number looks incomplete. Enter the full number, including the area code.';
+        }
+        if (consentOnStart && !submitted.legalAccepted) {
+          fields.legalAccepted = 'Accept the Terms and Privacy Policy to continue.';
+        }
+        if (Object.keys(fields).length > 0) {
+          throw new FormSubmitError<SignUpValues>({ fields });
+        }
+        await settleAfter(700);
+        return { kind: 'verify', identifier };
+      }
+      const fields = signUpFinishErrors(submitted, config);
+      if (fields) {
+        throw new FormSubmitError<SignUpValues>({ fields });
+      }
+      await settleAfter(700);
+      return START;
+    },
+    onSuccess: next => {
+      if (next.kind === 'start' && onComplete) {
+        onComplete();
+        return;
+      }
+      if (next.kind === 'start') {
+        form.reset();
+      }
+      navigate(next, next.kind === 'start' ? -1 : 1);
+    },
+  });
+
+  const afterVerified = () => {
+    form.setValue('code', '');
+    if (finishing) {
+      navigate({ kind: 'finish' }, 1);
+      return;
+    }
+    if (onComplete) {
+      onComplete();
+      return;
+    }
+    form.reset();
+    navigate(START, -1);
+  };
+
+  const onCodeComplete = (code: string) => {
+    form.setValue('code', code);
+    void (async () => {
+      setIsVerifying(true);
+      setFailedCode(undefined);
+      await settleAfter(700);
+      setIsVerifying(false);
+      if (code !== '123456') {
+        setFailedCode(code);
+        return;
+      }
+      afterVerified();
+    })();
+  };
+
+  const linkPending = stage.kind === 'verify' && channel === 'emailAddress' && config.verification === 'link';
+  useEffect(() => {
+    if (!linkPending) {
+      return;
+    }
+    const timer = setTimeout(afterVerified, 3_000);
+    return () => clearTimeout(timer);
+  });
+
+  const codeError =
+    failedCode !== undefined && form.values.code === failedCode ? 'Incorrect code. Try again.' : undefined;
+  const step = signUpStepFor(stage, channel, config, consentOnStart);
+  const toStart = () => navigate(START, -1);
+
+  return (
+    <SignUpView
+      step={step}
+      direction={direction}
+      applicationName={APPLICATION_NAME}
+      applicationLogoUrl={logoUrlFor(config)}
+      socialProviders={providersFor(config)}
+      onSelectProvider={() => undefined}
+      form={form}
+      onSubmit={event => form.handleSubmit(event ?? { preventDefault: () => undefined })}
+      onCodeComplete={onCodeComplete}
+      isPending={isVerifying || form.isSubmitting}
+      isDisabled={isVerifying || form.isSubmitting}
+      errorMessage={codeError}
+      onSwitchField={
+        config.identifier === 'email-or-phone'
+          ? () => setChannel(current => (current === 'emailAddress' ? 'phoneNumber' : 'emailAddress'))
+          : undefined
+      }
+      onSignIn={() => undefined}
+      onEditIdentifier={toStart}
+      onBack={toStart}
+      onResend={() => undefined}
+      canResend
+      onEmailSupport={() => undefined}
+      onJoinWaitlist={() => undefined}
+      passwordRules={passwordRulesFor(form.values.password, config.passwordPolicy)}
+    />
+  );
+}
+
+function signUpStepFor(stage: Stage, channel: Channel, config: AuthConfig, consentOnStart: boolean): SignUpStep {
+  if (config.mode !== 'public') {
+    return { kind: 'notice', purpose: config.mode };
+  }
+  if (stage.kind === 'finish') {
+    return {
+      kind: 'details',
+      purpose: 'continue',
+      fields: signUpFinishFields(config),
+      legalConsent: config.legalConsent ? LEGAL_CONSENT : undefined,
+    };
+  }
+  if (stage.kind === 'verify') {
+    if (channel === 'phoneNumber') {
+      return { kind: 'code', purpose: 'verify-phone', identifier: stage.identifier };
+    }
+    return config.verification === 'link'
+      ? { kind: 'notice', purpose: 'verify-email-link', identifier: stage.identifier }
+      : { kind: 'code', purpose: 'verify-email', identifier: stage.identifier };
+  }
+  return {
+    kind: 'details',
+    purpose: 'start',
+    fields:
+      config.identifier === 'username'
+        ? { username: { required: true }, [channel]: { required: true } }
+        : { [channel]: { required: true } },
+    nextField:
+      config.identifier === 'email-or-phone'
+        ? channel === 'emailAddress'
+          ? 'phoneNumber'
+          : 'emailAddress'
+        : undefined,
+    legalConsent: consentOnStart ? LEGAL_CONSENT : undefined,
+  };
+}
+
+export function AllFieldsAtOnce() {
   return <StepPanel step={startStep} />;
 }
 

@@ -23,5 +23,5 @@ export const oauthConsentMessages = {
   signedInAs: 'Signed in as {identifier}',
   loading: 'Loading consent information',
   loaded: 'Consent information loaded',
-  loadError: 'Could not load consent information.',
+  loadError: 'Couldn’t load consent information.',
 } as const;

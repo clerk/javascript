@@ -2,7 +2,7 @@ export const userProfileProfileSectionMessages = {
   title: 'Profile',
   picture: {
     label: 'Profile picture',
-    description: 'Recommend size 1:1, up to 10MB.',
+    description: 'Square image, up to 10 MB.',
     upload: 'Upload',
     manage: 'Manage profile picture',
     change: 'Change avatar',

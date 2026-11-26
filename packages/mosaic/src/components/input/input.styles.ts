@@ -64,10 +64,10 @@ export const sizes = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     paddingInline: `calc(${space['3']} - 1px)`,
     fontSize: {
-      default: typeScaleVars['--cl-text-base-size'],
-      '@media (pointer: coarse)': `max(1rem, ${typeScaleVars['--cl-text-base-size']})`,
+      default: typeScaleVars['--cl-text-sm-size'],
+      '@media (pointer: coarse)': `max(1rem, ${typeScaleVars['--cl-text-sm-size']})`,
     },
-    lineHeight: 1.375,
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
     height: space['9'],
   },
 });

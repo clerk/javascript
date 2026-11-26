@@ -249,7 +249,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(update.requests).toHaveLength(1));
       update.fail('', '');
       await waitFor(() =>
-        expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'),
       );
       expect(field).toBeValid();
     });

@@ -2,12 +2,14 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { FormEvent, Ref } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
+import type { VerificationLayout } from './verification-actions';
+import { useVerificationLayout, VerificationActions } from './verification-actions';
 
 export interface VerificationBackupCodeMessages {
   title: string;
@@ -28,6 +30,8 @@ interface VerificationBackupCodeProps {
   onSubmit: () => void;
   onCancel?: () => void;
   focusRef?: Ref<HTMLElement>;
+  /** `stacked` puts the actions under the field, primary first, for a full-page card. Defaults to `stacked` on a card whose `actions` stack, otherwise `inline`. */
+  layout?: VerificationLayout;
 }
 
 export function VerificationBackupCode({
@@ -40,17 +44,36 @@ export function VerificationBackupCode({
   onSubmit,
   onCancel,
   focusRef,
+  layout: layoutProp,
 }: VerificationBackupCodeProps) {
+  const layout = useVerificationLayout(layoutProp);
   const formId = useId();
-
-  const canSubmit = value !== '';
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isPending) {
+    if (!isPending) {
       onSubmit();
     }
   };
+
+  const actions = (
+    <VerificationActions
+      layout={layout}
+      primary={
+        <SubmitButton
+          form={formId}
+          fullWidth={layout === 'stacked' || undefined}
+          isPending={isPending}
+          pendingLabel={messages.pendingLabel}
+        >
+          {messages.primaryActionLabel}
+        </SubmitButton>
+      }
+      secondaryLabel={messages.secondaryActionLabel}
+      onSecondary={onCancel}
+      disabled={isPending}
+    />
+  );
 
   return (
     <>
@@ -77,10 +100,13 @@ export function VerificationBackupCode({
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input
+              size={layout === 'stacked' ? 'lg' : undefined}
               ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
               name='backupCode'
               type='text'
               autoComplete='off'
+              autoCapitalize='none'
+              autoCorrect='off'
               spellCheck={false}
               data-1p-ignore
               value={value}
@@ -91,28 +117,9 @@ export function VerificationBackupCode({
             </Field.Message>
           </Field.Root>
         </Form>
+        {layout === 'stacked' ? actions : null}
       </Card.Content>
-      <Card.Footer>
-        {onCancel ? (
-          <Button
-            type='button'
-            variant='outline'
-            color='neutral'
-            disabled={isPending}
-            onClick={onCancel}
-          >
-            {messages.secondaryActionLabel}
-          </Button>
-        ) : null}
-        <SubmitButton
-          form={formId}
-          disabled={!canSubmit}
-          isPending={isPending}
-          pendingLabel={messages.pendingLabel}
-        >
-          {messages.primaryActionLabel}
-        </SubmitButton>
-      </Card.Footer>
+      {layout === 'inline' ? actions : null}
     </>
   );
 }

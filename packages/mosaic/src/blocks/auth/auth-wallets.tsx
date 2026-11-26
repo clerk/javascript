@@ -108,7 +108,7 @@ export function AuthWallets({
         >
           <Button
             type='button'
-            size='sm'
+            size='md'
             variant='link'
             color='neutral'
             disabled={isDisabled}

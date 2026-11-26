@@ -882,7 +882,7 @@ describe('Deferred active-device actions', () => {
 
 describe('Sign out an unavailable device', () => {
   it.each([
-    ['en-US', 'This device is no longer available. Please try again.'],
+    ['en-US', 'This device is no longer available. Try again.'],
     ['fr-FR', 'Cet appareil est indisponible.'],
   ])('shows the catalog message in %s', async (locale, expectedMessage) => {
     serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'Phone' })]);

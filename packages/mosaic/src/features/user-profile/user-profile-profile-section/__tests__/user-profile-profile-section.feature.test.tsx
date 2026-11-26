@@ -200,9 +200,7 @@ describe('the user profile profile section', () => {
     await actor.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     await waitFor(() =>
-      expect(within(dialog).getByRole('alert')).toHaveTextContent(
-        'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
-      ),
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('This file is over 10 MB. Choose a smaller file.'),
     );
     expect(toBlob).toHaveBeenCalledTimes(3);
     expect(upload.requests).toHaveLength(0);
@@ -331,9 +329,7 @@ describe('the user profile profile section', () => {
     await saveCrop(actor, 'Adjust profile picture');
 
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
-      ),
+      expect(screen.getByRole('alert')).toHaveTextContent('This file is over 10 MB. Choose a smaller file.'),
     );
   });
 
@@ -343,7 +339,7 @@ describe('the user profile profile section', () => {
 
     await actor.upload(fileInput(container), oversized());
 
-    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    expect(screen.getByRole('alert')).toHaveTextContent('This file is over 10 MB.');
     expect(upload.requests).toHaveLength(0);
     upload.release();
   });
@@ -367,13 +363,13 @@ describe('the user profile profile section', () => {
     await waitFor(() => expect(fileInput(container)).toBeEnabled());
 
     await actor.upload(fileInput(container), oversized());
-    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    expect(screen.getByRole('alert')).toHaveTextContent('This file is over 10 MB.');
 
     failsWith('/v1/me/profile_image', { code: 'action_blocked', message: 'Blocked' }, 403);
     await openMenu(actor, screen.getByRole('button', { name: 'Manage profile picture' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This action couldn’t be completed.'));
   });
 
   it('hands the name to an active enterprise connection instead of offering to edit it', async () => {

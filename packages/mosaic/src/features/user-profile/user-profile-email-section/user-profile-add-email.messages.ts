@@ -16,14 +16,14 @@ export const userProfileAddEmailMessages = {
     resend: 'Resend',
     resendText: 'Didn’t receive a code?',
     resending: 'Sending code…',
-    resendCountdown: 'Resend ({seconds})',
+    resendCountdown: 'Resend in {seconds}s',
   },
   link: {
     title: 'Verify your email',
     description: 'Open the link we sent to {emailAddress}',
     cancel: 'Cancel',
     resend: 'Didn’t receive a link? Resend',
-    resendCountdown: 'Didn’t receive a link? Resend ({seconds})',
+    resendCountdown: 'Didn’t receive a link? Resend in {seconds}s',
   },
   sso: {
     title: 'Verify your email',

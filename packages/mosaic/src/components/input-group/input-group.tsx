@@ -11,6 +11,7 @@ import { reset } from '../../styles/reset.styles';
 import { ButtonContext } from '../button/button.context';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Input } from '../input';
+import { InputSizeContext } from '../input/input.context';
 import type { InputGroupSize } from './input-group.context';
 import { InputGroupContext, useInputGroupContext } from './input-group.context';
 import { inputGroupScope } from './input-group.markers.stylex';
@@ -23,10 +24,12 @@ export interface InputGroupRootProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, InputGroupRootProps>(function MosaicInputGroupRoot(
-  { render, xstyle, onClick, disabled: disabledProp, invalid: invalidProp, size = 'md', ...otherProps },
+  { render, xstyle, onClick, disabled: disabledProp, invalid: invalidProp, size: sizeProp, ...otherProps },
   ref,
 ) {
   const field = useOptionalFieldContext();
+  const contextSize = React.useContext(InputSizeContext);
+  const size = sizeProp ?? contextSize ?? 'md';
   const disabled = disabledProp ?? field?.disabled ?? false;
   const invalid = invalidProp ?? field?.invalid ?? false;
   const inputElementRef = React.useRef<HTMLInputElement | null>(null);

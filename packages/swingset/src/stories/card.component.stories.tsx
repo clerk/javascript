@@ -5,6 +5,7 @@ import { Card } from '@clerk/mosaic/components/card';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Input } from '@clerk/mosaic/components/input';
+import { Text } from '@clerk/mosaic/components/text';
 import { Application2 } from '@clerk/mosaic/icons/glyphs/application-2';
 import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
 import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
@@ -40,6 +41,10 @@ const styles = stylex.create({
     gap: space['2'],
     width: space['32'],
   },
+  prompt: {
+    textAlign: 'center',
+    width: '100%',
+  },
   line: {
     borderBlockStartColor: colorVars['--cl-color-foreground-secondary'],
     borderBlockStartStyle: 'dashed',
@@ -58,11 +63,13 @@ export const meta: StoryMeta = {
       elevation: { card: {}, flush: {}, overlay: {} },
       renderBranding: { true: {}, false: {} },
       size: { md: {}, lg: {} },
+      variant: { default: {}, prominent: {} },
     },
     _defaultVariants: {
       elevation: 'card',
       renderBranding: true,
       size: 'md',
+      variant: 'default',
     },
   },
 };
@@ -181,6 +188,57 @@ export function WithBanner() {
           Clear
         </Button>
         <Button onClick={() => setError('Incorrect password. Try again.')}>Fail</Button>
+      </Card.Footer>
+    </Card.Root>
+  );
+}
+
+export function Prominent() {
+  return (
+    <Card.Root
+      variant='prominent'
+      align='center'
+    >
+      <Card.Lead>
+        <Avatar.Root
+          shape='square'
+          size='md'
+        >
+          <Avatar.Image
+            src={CLERK_LOGO_SRC}
+            alt='Clerk'
+          />
+        </Avatar.Root>
+      </Card.Lead>
+      <Card.Header>
+        <Card.Title>Sign in to Acme</Card.Title>
+        <Card.Description>Welcome back! Sign in to continue.</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Email address</Field.Label>
+          <Input
+            type='email'
+            placeholder='you@example.com'
+          />
+        </Field.Root>
+        <Button fullWidth>Continue</Button>
+      </Card.Content>
+      <Card.Footer>
+        <Text
+          size='sm'
+          color='foreground-secondary'
+          xstyle={styles.prompt}
+        >
+          Don’t have an account?{' '}
+          <Button
+            variant='link'
+            size='sm'
+            fullWidth={false}
+          >
+            Sign up
+          </Button>
+        </Text>
       </Card.Footer>
     </Card.Root>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import type { MosaicLocalization } from '@clerk/mosaic/localization';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import * as React from 'react';
 
@@ -27,13 +28,20 @@ export function useChaosFixture<T>(data: T, toChaos: (data: T) => T): T {
   return chaos ? toChaos(data) : data;
 }
 
-export function StoryMosaicProvider({ children }: { children: React.ReactNode }) {
+export function StoryMosaicProvider({
+  children,
+  localization,
+}: {
+  children: React.ReactNode;
+  localization?: MosaicLocalization;
+}) {
   const { chaos } = useChaos();
   const { direction } = useDirection();
   return (
     <MosaicProvider
       key={String(chaos)}
       direction={direction}
+      localization={localization}
     >
       {children}
     </MosaicProvider>

@@ -167,11 +167,9 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
             queueFocus(0, '');
             return;
           }
-          const targetIndex = Math.max(0, index - 1);
-          // Delete this slot's character if it has one, otherwise the previous
-          // slot's — either way focus lands on the previous slot.
-          const deleteIndex = char === '' ? targetIndex : index;
-          const next = removeAt(value, deleteIndex);
+          // A filled slot clears in place; an empty one clears the previous slot and moves there.
+          const targetIndex = char === '' ? Math.max(0, index - 1) : index;
+          const next = removeAt(value, targetIndex);
           setValue(next);
           queueFocus(targetIndex, next);
           return;

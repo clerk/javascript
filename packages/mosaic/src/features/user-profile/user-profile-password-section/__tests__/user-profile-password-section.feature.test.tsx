@@ -139,7 +139,7 @@ describe('Changing a password', () => {
     const dialog = screen.getByRole('dialog');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     expect(dialog).not.toHaveTextContent('Connection interrupted');
     expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
@@ -173,9 +173,7 @@ describe('Changing a password', () => {
     await user.type(screen.getByLabelText('New password'), '-password-123');
 
     await waitFor(() =>
-      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-        'Something went wrong. Please try again.',
-      ),
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription('Something went wrong. Try again.'),
     );
   });
 
@@ -269,7 +267,7 @@ describe('Changing a password', () => {
 
     const field = await screen.findByLabelText('New password');
     expect(field).toHaveValue('new-password-123');
-    await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/appeared in a data breach/));
     await waitFor(() => expect(field).toHaveFocus());
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
@@ -316,7 +314,7 @@ describe('Changing a password', () => {
 
     await waitFor(() =>
       expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-        'This password has been found as part of a breach and can not be used, please try another password instead.',
+        'This password appeared in a data breach. Choose a different password.',
       ),
     );
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');

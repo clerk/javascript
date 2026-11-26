@@ -9,5 +9,5 @@ export const organizationProfileInviteMembersMessages = {
   cancel: 'Cancel',
   submit: 'Send invites',
   sent: { one: 'Invitation sent', other: 'Invitations sent' },
-  error: 'Unable to send invitations. Please try again.',
+  error: 'Couldn’t send invitations. Try again.',
 };

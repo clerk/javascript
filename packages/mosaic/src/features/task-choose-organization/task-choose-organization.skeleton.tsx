@@ -4,7 +4,11 @@ import { Skeleton } from '../../components/skeleton';
 import { RowAvatar } from '../../components/switcher/switcher-avatar';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useMessages } from '../../localization';
-import { TaskChooseOrganizationHeader, TaskChooseOrganizationSignOut } from './task-choose-organization.view';
+import {
+  TaskChooseOrganizationCard,
+  TaskChooseOrganizationHeader,
+  TaskChooseOrganizationSignOut,
+} from './task-choose-organization.view';
 
 const PLACEHOLDER_ORGANIZATIONS = ['Acme Corporation', 'Globex'];
 
@@ -12,14 +16,19 @@ export function TaskChooseOrganizationSkeleton({
   canCreate,
   identifier,
   renderBranding,
+  applicationLogoUrl,
 }: {
   canCreate: boolean;
   identifier?: string;
   renderBranding: boolean;
+  applicationLogoUrl?: string;
 }) {
   const m = useMessages('organizationList');
   return (
-    <Card.Root renderBranding={renderBranding}>
+    <TaskChooseOrganizationCard
+      renderBranding={renderBranding}
+      applicationLogoUrl={applicationLogoUrl}
+    >
       <TaskChooseOrganizationHeader canCreate={canCreate} />
       <Card.Content>
         <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
@@ -45,6 +54,6 @@ export function TaskChooseOrganizationSkeleton({
         </Item.Group>
       </Card.Content>
       <TaskChooseOrganizationSignOut identifier={identifier} />
-    </Card.Root>
+    </TaskChooseOrganizationCard>
   );
 }

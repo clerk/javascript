@@ -77,7 +77,7 @@ export function signUpCodeCopy(
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
-      description: fill<string>(m.verifyEmail.description, { identifier: step.identifier }),
+      description: fill(m.verifyEmail.description, { identifier: step.identifier }),
       fieldLabel: m.verifyEmail.label,
     };
   }
@@ -88,13 +88,24 @@ export function signUpCodeCopy(
         description: fill(m.verifyPhone.descriptionProvider, { provider }),
         fieldLabel: m.verifyPhone.label,
       }
-    : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
+    : {
+        title: m.verifyPhone.title,
+        description: fill(m.verifyPhone.description, { identifier: formatPhoneIdentifier(step.identifier) }),
+        fieldLabel: m.verifyPhone.label,
+      };
 }
 
-export function signUpCodeIdentity(step: SignUpCodeStep, m: Messages): { identifier: string; editLabel: string } {
+export function signUpCodeIdentity(
+  step: SignUpCodeStep,
+  m: Messages,
+): { identifier: string; editLabel: string; differentLabel: string } {
   return step.purpose === 'verify-email'
-    ? { identifier: step.identifier, editLabel: m.editIdentifier }
-    : { identifier: formatPhoneIdentifier(step.identifier), editLabel: m.editPhoneNumber };
+    ? { identifier: step.identifier, editLabel: m.editIdentifier, differentLabel: m.useDifferentEmail }
+    : {
+        identifier: formatPhoneIdentifier(step.identifier),
+        editLabel: m.editPhoneNumber,
+        differentLabel: m.useDifferentPhoneNumber,
+      };
 }
 
 export function signUpCodeSecondaryAction(

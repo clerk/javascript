@@ -11,6 +11,7 @@ import {
   fapiMembership,
   fapiOrganization,
   fapiSession,
+  fapiSuggestion,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
@@ -84,7 +85,7 @@ describe('TaskChooseOrganization', () => {
       const user = userEvent.setup();
 
       expect(screen.getByRole('heading', { name: 'Choose an organization' })).toBeVisible();
-      expect(screen.getByText('Join an existing organization or create a new one')).toBeVisible();
+      expect(screen.getByText('Select an organization to continue.')).toBeVisible();
 
       await user.click(screen.getByRole('button', { name: 'Other' }));
 
@@ -127,7 +128,7 @@ describe('TaskChooseOrganization', () => {
 
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
-          'You are no longer a member of this organization. Please choose another one.',
+          'You’re no longer a member of this organization. Choose another one.',
         ),
       );
     });
@@ -137,6 +138,38 @@ describe('TaskChooseOrganization', () => {
 
       expect(screen.getByText('Gamma')).toBeVisible();
       expect(screen.getByRole('button', { name: 'Join' })).toBeVisible();
+    });
+
+    it('says an email will follow once a request to join is sent', async () => {
+      await renderTask(
+        pending({
+          organizations: [],
+          invitations: [fapiInvitation('inv_1', other)],
+          suggestions: [fapiSuggestion('sug_1', gamma)],
+        }),
+      );
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Request to join' }));
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'We’ll email you once an admin approves your request.',
+      );
+      expect(screen.getByRole('button', { name: 'Join' })).toBeVisible();
+    });
+
+    it('explains the wait once a request to join is the only option left', async () => {
+      await renderTask(pending({ organizations: [], suggestions: [fapiSuggestion('sug_1', gamma)] }));
+      const user = userEvent.setup();
+
+      expect(screen.queryByRole('status')).toBeNull();
+
+      await user.click(screen.getByRole('button', { name: 'Request to join' }));
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'We’ll email you once an admin approves your request. In the meantime, you can create your own organization or sign out.',
+      );
+      expect(screen.getByRole('button', { name: 'Pending approval' })).toBeVisible();
     });
   });
 
@@ -158,7 +191,7 @@ describe('TaskChooseOrganization', () => {
 
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
-          'You are no longer a member of this organization. Please choose or create another one.',
+          'You’re no longer a member of this organization. Choose or create another one.',
         ),
       );
       expect(screen.getByRole('button', { name: 'Acme' })).toBeVisible();
@@ -171,7 +204,7 @@ describe('TaskChooseOrganization', () => {
       await renderTask();
       const user = userEvent.setup();
 
-      await user.click(screen.getByRole('button', { name: 'Create new organization' }));
+      await user.click(screen.getByRole('button', { name: 'Create an organization' }));
       expect(await screen.findByRole('heading', { name: 'Create organization' })).toBeVisible();
 
       await user.click(screen.getByRole('button', { name: 'Cancel' }));
@@ -223,23 +256,24 @@ describe('TaskChooseOrganization', () => {
       expect(await screen.findByRole('textbox', { name: 'Name' })).toHaveValue('Initech');
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('initech');
       expect(
-        screen.getByText(
-          'An organization already exists for the detected company name (Initech) and initech.com. Join by invitation.',
-        ),
+        screen.getByText('Initech (initech.com) already has an organization. Ask an admin to invite you.'),
       ).toBeVisible();
     });
 
     it('offers no create button when the user cannot create organizations', async () => {
-      await renderTask(pending({ createOrganizationEnabled: false }));
+      await renderTask(
+        pending({ createOrganizationEnabled: false, organizations: [], invitations: [fapiInvitation('inv_1', gamma)] }),
+      );
 
-      expect(screen.getByText('Join an existing organization')).toBeVisible();
-      expect(screen.queryByRole('button', { name: 'Create new organization' })).toBeNull();
+      expect(screen.getByRole('heading', { name: 'Join your team' })).toBeVisible();
+      expect(screen.getByText(/^Your team is already using .+\. Join them to continue\.$/)).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Create an organization' })).toBeNull();
     });
 
     it('explains that an invitation is needed when there is nothing to list and nothing to create', async () => {
       await renderTask(pending({ createOrganizationEnabled: false, organizations: [] }));
 
-      expect(await screen.findByRole('heading', { name: 'You must belong to an organization' })).toBeVisible();
+      expect(await screen.findByRole('heading', { name: 'You need an organization to continue' })).toBeVisible();
       expect(screen.getByText('Contact your organization admin for an invitation.')).toBeVisible();
     });
   });

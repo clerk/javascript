@@ -90,14 +90,23 @@ export const buttonStyles = stylex.create({
   longLabel: {
     display: {
       default: 'block',
-      [stylex.when.ancestor(':has(> :nth-child(2))', inlineGroupScope)]: 'none',
+      // eslint-disable-next-line @stylexjs/valid-styles -- The rule rejects a computed key on a nested condition; the compiler accepts it and the browser test covers the output.
+      [stylex.when.ancestor(':has(> :last-child:nth-child(2))', inlineGroupScope)]: {
+        default: 'none',
+        [narrow]: 'block',
+      },
+      [stylex.when.ancestor(':has(> :nth-child(3))', inlineGroupScope)]: 'none',
     },
     minWidth: 0,
   },
   shortLabel: {
     display: {
       default: 'none',
-      [stylex.when.ancestor(':has(> :last-child:nth-child(2))', inlineGroupScope)]: 'block',
+      // eslint-disable-next-line @stylexjs/valid-styles -- The rule rejects a computed key on a nested condition; the compiler accepts it and the browser test covers the output.
+      [stylex.when.ancestor(':has(> :last-child:nth-child(2))', inlineGroupScope)]: {
+        default: 'block',
+        [narrow]: 'none',
+      },
     },
     minWidth: 0,
   },

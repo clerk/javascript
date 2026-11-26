@@ -8,6 +8,8 @@ import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
 import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
+import { optical } from '../../../styles/optical.styles';
+import { rtl } from '../../../styles/rtl.styles';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {
@@ -32,13 +34,13 @@ export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorM
         <Card.Title>{m.addDialog.title}</Card.Title>
         <Card.Description>{m.addDialog.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
       <Card.Content>
-        <Card.Banner
-          role='alert'
-          color='negative'
-        >
-          {errorMessage}
-        </Card.Banner>
         <Item.Group>
           {methods.map((type, index) => (
             <Item.Root
@@ -65,7 +67,16 @@ export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorM
                 <Item.Label>{m.methods[type]}</Item.Label>
                 <Item.Description>{m.addDialog.methods[type]}</Item.Description>
               </Item.Content>
-              <Item.Actions>{pendingMethod === type ? <Spinner /> : <Icon glyph={ChevronRight} />}</Item.Actions>
+              <Item.Actions>
+                {pendingMethod === type ? (
+                  <Spinner />
+                ) : (
+                  <Icon
+                    glyph={ChevronRight}
+                    xstyle={[rtl.mirror, optical.trailingChevron]}
+                  />
+                )}
+              </Item.Actions>
             </Item.Root>
           ))}
         </Item.Group>

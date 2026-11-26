@@ -161,7 +161,7 @@ describe('Web3 wallets', () => {
     await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.release();
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     const pendingId = fapi.client.sessions[0]?.user.web3_wallets[0]?.id;
     expect(pendingId).toBeDefined();
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
@@ -271,9 +271,7 @@ describe('Web3 wallets', () => {
     expect(request).toHaveBeenCalledOnce();
 
     rerender(<MosaicProvider>{section}</MosaicProvider>);
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'A Web3 Wallet extension cannot be found. Please install one to continue.',
-    );
+    expect(screen.getByRole('alert')).toHaveTextContent('No wallet extension found. Install one to continue.');
     expect(request).toHaveBeenCalledOnce();
   });
 
@@ -1023,7 +1021,7 @@ describe('Web3 wallets', () => {
         await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
         await waitFor(() =>
           expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
-            'Something went wrong. Please try again.',
+            'Something went wrong. Try again.',
           ),
         );
 
@@ -1033,15 +1031,15 @@ describe('Web3 wallets', () => {
           await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: dismissal }));
         }
         await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.');
         await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
 
-        expect(within(screen.getByRole('dialog')).queryByText('Something went wrong. Please try again.')).toBeNull();
+        expect(within(screen.getByRole('dialog')).queryByText('Something went wrong. Try again.')).toBeNull();
         expect(screen.getByRole('button', { name: 'Test Solana' })).toBeEnabled();
         await user.click(screen.getByRole('button', { name: 'Test Solana' }));
         await waitFor(() =>
           expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
-            'Something went wrong. Please try again.',
+            'Something went wrong. Try again.',
           ),
         );
         expect(connect).toHaveBeenCalledTimes(2);

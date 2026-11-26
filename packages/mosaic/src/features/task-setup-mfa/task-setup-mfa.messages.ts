@@ -23,7 +23,7 @@ export const taskSetupMfaMessages = {
         'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
     },
     backupCodesDescription:
-      'Save these backup codes somewhere safe. If you lose access to your authentication device, you can use them to sign in.',
+      'Save these backup codes somewhere safe. Each one signs you in once if you lose access to your device.',
     codesLabel: 'Backup codes',
     copy: 'Copy',
     copied: 'Copied',

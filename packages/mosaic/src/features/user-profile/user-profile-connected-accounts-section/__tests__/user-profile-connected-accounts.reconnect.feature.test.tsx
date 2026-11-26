@@ -326,7 +326,7 @@ describe('reconnect reverification', () => {
 
     replay.fail('action_blocked', 'Unable to reconnect.');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This action couldn’t be completed.'));
     expect(navigate).not.toHaveBeenCalled();
   });
 

@@ -1,7 +1,8 @@
 import type { CountryEntry } from '@clerk/shared/phone';
-import { extractDigits } from '@clerk/shared/phone';
+import { extractDigits, getCountryFromPhoneString } from '@clerk/shared/phone';
 
 const E164_MAX_DIGITS = 15;
+const MIN_NATIONAL_DIGITS = 4;
 
 export function getNationalNumber(value: string, country: CountryEntry): string {
   const digits = extractDigits(value);
@@ -36,4 +37,10 @@ export function formatNationalNumber(digits: string, pattern: string | undefined
 
 function capNationalNumber(digits: string, country: CountryEntry): string {
   return digits.slice(0, E164_MAX_DIGITS - country.code.length);
+}
+
+export function isCompletePhoneNumber(value: string): boolean {
+  const { number, country } = getCountryFromPhoneString(value);
+  const expected = country.pattern ? country.pattern.split('.').length - 1 : MIN_NATIONAL_DIGITS;
+  return number.length >= expected;
 }

@@ -31,7 +31,9 @@ describe('useErrorText', () => {
   });
 
   it('ships English for known codes', () => {
-    expect(errorText()({ code: 'form_password_incorrect', message: 'api text' })).toBe('Password is incorrect.');
+    expect(errorText()({ code: 'form_password_incorrect', message: 'api text' })).toBe(
+      'Incorrect password. Try again or use another method.',
+    );
   });
 
   it('falls back to the message Clerk sent for a code it has no text for', () => {
@@ -56,7 +58,7 @@ describe('useErrorText', () => {
 
   it('falls back to the generic message when there is nothing else', () => {
     expect(errorText({ 'errors.generic': 'Algo salió mal.' })({ cause: new Error('boom') })).toBe('Algo salió mal.');
-    expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Please try again.');
+    expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Try again.');
   });
 
   it('uses the fallback it is given ahead of the generic message', () => {
@@ -71,7 +73,7 @@ describe('useErrorText', () => {
 
   it('never shows an empty message', () => {
     expect(errorText()({ code: 'unknown', message: '' }, 'Unable to save.')).toBe('Unable to save.');
-    expect(errorText()({ code: 'unknown', message: '' })).toBe('Something went wrong. Please try again.');
+    expect(errorText()({ code: 'unknown', message: '' })).toBe('Something went wrong. Try again.');
   });
 });
 

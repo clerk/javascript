@@ -7,6 +7,7 @@ import { useMessages } from '../../../localization';
 import type { SignInStep, SignInSubmitEvent, SignInValues } from '../sign-in.types';
 import { backupCodeDescription } from '../sign-in.utils';
 import { SignInPassword } from './sign-in-password';
+import { SignInWrongAccount } from './sign-in-wrong-account';
 
 interface CredentialStepProps {
   step: Extract<SignInStep, { kind: 'credential' }>;
@@ -62,50 +63,55 @@ export function CredentialStep({
 
   if (step.credential === 'passkey') {
     return (
-      <VerificationPasskey
-        focusRef={focusRef}
-        messages={{
-          title: m.passkey.title,
-          description: m.passkey.description,
-          ...actions,
-          secondaryActionLabel: onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink,
-        }}
-        identity={
-          step.identifier ? (
-            <AuthIdentityPreview
-              identifier={step.identifier}
-              editLabel={m.editIdentifier}
-              disabled={isPending}
-              onEdit={onEditIdentifier}
-            />
-          ) : undefined
-        }
-        errorMessage={globalErrorMessage}
-        isPending={isPending}
-        onSubmit={() => onSubmit()}
-        onCancel={onCancel ?? onShowHelp}
-      />
+      <>
+        <VerificationPasskey
+          focusRef={focusRef}
+          messages={{
+            title: m.passkey.title,
+            description: m.passkey.description,
+            ...actions,
+            secondaryActionLabel: onCancel ? m.useAnotherMethod : m.alternativeMethods.helpLink,
+          }}
+          identity={step.identifier ? <AuthIdentityPreview identifier={step.identifier} /> : undefined}
+          errorMessage={globalErrorMessage}
+          isPending={isPending}
+          onSubmit={() => onSubmit()}
+          onCancel={onCancel ?? onShowHelp}
+        />
+        {step.identifier ? (
+          <SignInWrongAccount
+            disabled={isPending}
+            onStartOver={onEditIdentifier}
+          />
+        ) : null}
+      </>
     );
   }
 
   const { value, onValueChange } = form.registerValue('backupCode');
 
   return (
-    <VerificationBackupCode
-      focusRef={focusRef}
-      messages={{
-        title: m.backupCodeMfa.title,
-        description: backupCodeDescription(step, m),
-        fieldLabel: m.backupCodeMfa.label,
-        ...actions,
-      }}
-      value={value}
-      errorMessage={errorMessage}
-      globalErrorMessage={globalErrorMessage}
-      isPending={isPending}
-      onValueChange={onValueChange}
-      onSubmit={() => onSubmit()}
-      onCancel={onCancel}
-    />
+    <>
+      <VerificationBackupCode
+        focusRef={focusRef}
+        messages={{
+          title: m.backupCodeMfa.title,
+          description: backupCodeDescription(step, m),
+          fieldLabel: m.backupCodeMfa.label,
+          ...actions,
+        }}
+        value={value}
+        errorMessage={errorMessage}
+        globalErrorMessage={globalErrorMessage}
+        isPending={isPending}
+        onValueChange={onValueChange}
+        onSubmit={() => onSubmit()}
+        onCancel={onCancel}
+      />
+      <SignInWrongAccount
+        disabled={isPending}
+        onStartOver={onEditIdentifier}
+      />
+    </>
   );
 }

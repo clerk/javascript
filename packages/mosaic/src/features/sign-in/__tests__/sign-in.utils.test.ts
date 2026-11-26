@@ -10,9 +10,11 @@ import {
   codeIdentity,
   codeNotice,
   codeSecondaryAction,
+  differentIdentifierLabel,
   emailLinkStatusMessages,
   factorLabel,
   identifierFieldCopy,
+  isSecondFactorChoice,
   splitLastUsedProvider,
   startPrompt,
   stepIds,
@@ -35,6 +37,7 @@ const stepsByKey: Record<SignInStepKey, SignInStep> = {
   'code:verify-email': { kind: 'code', purpose: 'verify-email', channel: 'email', identifier: 'new@acme.com' },
   'code:verify-phone': { kind: 'code', purpose: 'verify-phone', channel: 'phone' },
   'choice:methods': { kind: 'choice', purpose: 'methods', options: [] },
+  'choice:addresses': { kind: 'choice', purpose: 'addresses', options: [] },
   'choice:reset-methods': { kind: 'choice', purpose: 'reset-methods', options: [] },
   'choice:enterprise-connections': { kind: 'choice', purpose: 'enterprise-connections', options: [] },
   'choice:accounts': { kind: 'choice', purpose: 'accounts', options: [] },
@@ -82,7 +85,7 @@ describe('backupCodeDescription', () => {
         { kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com', resetting: true },
         m,
       ),
-    ).toBe('We need to verify your identity before resetting your password.');
+    ).toBe('Confirm it’s you before resetting your password.');
     expect(
       backupCodeDescription({ kind: 'credential', credential: 'backup-code', identifier: 'jane@acme.com' }, m),
     ).toBe(m.backupCodeMfa.description);
@@ -94,22 +97,22 @@ describe('identifierFieldCopy', () => {
     const m = signInMessages;
     expect(identifierFieldCopy('email', m)).toEqual({
       label: 'Email address',
-      placeholder: 'Enter your email address',
+      placeholder: 'you@example.com',
       switchLabel: 'Use email',
     });
     expect(identifierFieldCopy('email-or-username', m)).toEqual({
       label: 'Email address or username',
-      placeholder: 'Enter email or username',
+      placeholder: '',
       switchLabel: 'Use email or username',
     });
     expect(identifierFieldCopy('username', m)).toEqual({
       label: 'Username',
-      placeholder: 'Enter your username',
+      placeholder: '',
       switchLabel: 'Use username',
     });
     expect(identifierFieldCopy('phone', m)).toEqual({
       label: 'Phone number',
-      placeholder: 'Enter your phone number',
+      placeholder: '',
       switchLabel: 'Use phone',
     });
   });
@@ -126,7 +129,7 @@ describe('startPrompt', () => {
     });
     expect(startPrompt(signInMessages, { onSignUp, onJoinWaitlist })).toEqual({
       text: 'Want early access?',
-      link: 'Join waitlist',
+      link: 'Join the waitlist',
       onClick: onJoinWaitlist,
     });
     expect(startPrompt(signInMessages, {})).toBeUndefined();
@@ -162,11 +165,11 @@ describe('emailLinkStatusMessages', () => {
 
   it('uses the sign-in wording for a sign-in link', () => {
     expect(emailLinkStatusMessages('sign-in', m).signedIn).toEqual({
-      title: 'Successfully signed in',
+      title: 'You’re signed in',
       description: 'Return to original tab to continue',
     });
     expect(emailLinkStatusMessages('sign-in', m).signedInOtherTab).toEqual({
-      title: 'Signed in on other tab',
+      title: 'Signed in on another tab',
       description: 'Return to the newly opened tab to continue',
     });
   });
@@ -174,15 +177,15 @@ describe('emailLinkStatusMessages', () => {
   it('uses the sign-up wording where it differs, and the sign-in wording elsewhere', () => {
     const signUp = emailLinkStatusMessages('sign-up', m);
 
-    expect(signUp.loading.title).toBe('Signing up...');
-    expect(signUp.signedIn.title).toBe('Successfully signed up');
+    expect(signUp.loading.title).toBe('Signing up…');
+    expect(signUp.signedIn.title).toBe('Your account is ready');
     expect(signUp.signedInOtherTab).toEqual({
-      title: 'Successfully verified email',
+      title: 'Email verified',
       description: 'Return to previous tab to continue',
     });
     expect(signUp.clientMismatch.description).toContain('sign-up');
     expect(signUp.expired).toEqual(emailLinkStatusMessages('sign-in', m).expired);
-    expect(signUp.closeTab).toBe('You may close this tab');
+    expect(signUp.closeTab).toBe('You can close this tab.');
   });
 });
 
@@ -194,35 +197,40 @@ describe('code step copy', () => {
 
     expect(codeCopy(step, m, 'Acme').title).toBe('Check your WhatsApp');
     expect(codeSecondaryAction(step, m, { onCancel: () => undefined, onBack: () => undefined }).label).toBe(
-      'Send code via SMS instead',
+      'Send a text message instead',
     );
   });
 
-  it('shows an editable identifier on its own line before the second factor', () => {
+  it('names an editable identifier in the description before the second factor', () => {
     const step = { kind: 'code', purpose: 'first-factor', channel: 'phone', identifier: '+1******0123' } as const;
 
-    expect(codeIdentity(step, m)).toEqual({ identifier: '+1******0123', editLabel: 'Edit phone number' });
-    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code to continue to Acme');
+    expect(codeIdentity(step, m)).toEqual({
+      identifier: '+1******0123',
+      editLabel: 'Edit phone number',
+    });
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the code we sent to +1******0123.');
   });
 
   it('names the identifier in the description when it cannot be edited', () => {
     const step = { kind: 'code', purpose: 'second-factor', channel: 'email', identifier: 'jane@acme.com' } as const;
 
     expect(codeIdentity(step, m).identifier).toBeUndefined();
-    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code sent to jane@acme.com');
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the code we sent to jane@acme.com.');
   });
 
-  it('shows the identifier on its own line, with an edit button, when resetting a password', () => {
+  it('names the identifier in the description when resetting a password', () => {
     const step = { kind: 'code', purpose: 'reset-password', channel: 'email', identifier: 'jane@acme.com' } as const;
 
     expect(codeIdentity(step, m).identifier).toBe('jane@acme.com');
-    expect(codeCopy(step, m, 'Acme').description).toBe('First, enter the code sent to your email address');
+    expect(codeCopy(step, m, 'Acme').description).toBe(
+      'Enter the code we sent to jane@acme.com to reset your password.',
+    );
   });
 
   it('formats a phone number named in the description', () => {
     const step = { kind: 'code', purpose: 'second-factor', channel: 'phone', identifier: '+15555550123' } as const;
 
-    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the verification code sent to +1 (555) 555-0123');
+    expect(codeCopy(step, m, 'Acme').description).toBe('Enter the code we sent to +1 (555) 555-0123.');
   });
 
   it('leaves a masked phone number as FAPI sent it', () => {
@@ -234,11 +242,9 @@ describe('code step copy', () => {
   it('says why a second factor is asked for while resetting a password', () => {
     const step = { kind: 'code', purpose: 'second-factor', channel: 'phone', resetting: true } as const;
 
-    expect(codeCopy(step, m, 'Acme').description).toBe(
-      'We need to verify your identity before resetting your password.',
-    );
+    expect(codeCopy(step, m, 'Acme').description).toBe('Confirm it’s you before resetting your password.');
     expect(codeCopy({ ...step, channel: 'totp' }, m, 'Acme').description).toBe(
-      'We need to verify your identity before resetting your password.',
+      'Confirm it’s you before resetting your password.',
     );
   });
 
@@ -252,7 +258,7 @@ describe('code step copy', () => {
     } as const;
 
     expect(codeCopy(step, m, 'Acme').description).toBe(
-      'Enter the verification code sent to +1******0123. We need to verify your identity before resetting your password.',
+      'Enter the code sent to +1******0123 to confirm it’s you before resetting your password.',
     );
     expect(codeNotice(step, m)).toBeUndefined();
   });
@@ -278,9 +284,9 @@ describe('code step copy', () => {
     const onCancel = () => undefined;
     const step = { kind: 'code', purpose: 'second-factor', channel: 'phone' } as const;
 
-    expect(codeSecondaryAction(step, m, { onBack })).toEqual({ label: 'Back', onClick: onBack });
+    expect(codeSecondaryAction(step, m, { onBack })).toEqual({ label: 'Back to sign-in', onClick: onBack });
     expect(codeSecondaryAction(step, m, { onCancel, onBack })).toEqual({
-      label: 'Use another method',
+      label: 'Verify another way',
       onClick: onCancel,
     });
   });
@@ -295,7 +301,7 @@ describe('choice step copy', () => {
         { id: '1', stage: 'first', strategy: 'email_code', emailAddressId: 'idn_1', identifier: 'jane@acme.com' },
         m,
       ),
-    ).toBe('Email code to jane@acme.com');
+    ).toBe('Email a code to jane@acme.com');
     expect(
       factorLabel({ id: '2', stage: 'first', strategy: 'reset_password_phone_code', identifier: '+1******0123' }, m),
     ).toBe('Text a code to +1******0123');
@@ -304,6 +310,30 @@ describe('choice step copy', () => {
 
   it('titles the reset methods apart from the other ways to sign in', () => {
     expect(choiceCopy({ kind: 'choice', purpose: 'reset-methods', options: [] }, m).title).toBe('Forgot password?');
-    expect(choiceCopy({ kind: 'choice', purpose: 'methods', options: [] }, m).title).toBe('Use another method');
+    expect(choiceCopy({ kind: 'choice', purpose: 'methods', options: [] }, m).title).toBe('Sign in another way');
+  });
+
+  it('titles a second-factor choice as verification, not another way to sign in', () => {
+    const step = {
+      kind: 'choice',
+      purpose: 'methods',
+      options: [
+        { id: 'totp', stage: 'second', strategy: 'totp' },
+        { id: 'backup', stage: 'second', strategy: 'backup_code' },
+      ],
+    } as const;
+
+    expect(isSecondFactorChoice(step)).toBe(true);
+    expect(choiceCopy(step, m).title).toBe('Verify another way');
+  });
+});
+
+describe('differentIdentifierLabel', () => {
+  const m = signInMessages;
+
+  it('names the kind of identifier being switched', () => {
+    expect(differentIdentifierLabel('ada@acme.com', m)).toBe('Change email');
+    expect(differentIdentifierLabel('+1 (415) 555-0100', m)).toBe('Change phone number');
+    expect(differentIdentifierLabel('ada_l', m)).toBe('Use a different account');
   });
 });

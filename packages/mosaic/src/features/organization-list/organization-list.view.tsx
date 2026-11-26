@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useId } from 'react';
 
+import { Avatar } from '../../components/avatar';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
@@ -8,13 +9,15 @@ import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
 import { RowAvatar } from '../../components/switcher/switcher-avatar';
+import { VisuallyHidden } from '../../components/visually-hidden';
 import { Plus } from '../../icons/glyphs/plus';
-import { fill, useMessages } from '../../localization';
+import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import type {
   OrganizationListData,
   OrganizationListInvitation,
+  OrganizationListMemberPreview,
   OrganizationListMembership,
   OrganizationListSuggestion,
 } from './organization-list.types';
@@ -128,6 +131,7 @@ export type OrganizationListRowsProps = Pick<
   | 'onAcceptInvitation'
   | 'onAcceptSuggestion'
 > & {
+  keepJoinedInvitations?: boolean;
   children?: ReactNode;
 };
 
@@ -142,6 +146,7 @@ export function OrganizationListRows({
   onSelectOrganization,
   onAcceptInvitation,
   onAcceptSuggestion,
+  keepJoinedInvitations = false,
   children,
 }: OrganizationListRowsProps) {
   const m = useMessages('organizationList');
@@ -172,6 +177,7 @@ export function OrganizationListRows({
           key={invitation.id}
           invitation={invitation}
           pendingKey={pendingKey}
+          keepJoined={keepJoinedInvitations}
           onSelectOrganization={onSelectOrganization}
           onAcceptInvitation={onAcceptInvitation}
         />
@@ -221,9 +227,14 @@ function MembershipRow({
   pendingKey?: string | null;
   onSelectOrganization?: (organizationId: string) => void;
 }) {
+  const m = useMessages('organizationList');
+  const locale = useLocale();
+  const description =
+    membership.membersCount === undefined ? undefined : plural(m.membersCount, membership.membersCount, locale);
   return (
     <SelectRow
       name={membership.name}
+      description={description || undefined}
       imageUrl={membership.imageUrl}
       shape='square'
       {...busyState(pendingKey, organizationListBusyKeys.selectOrganization(membership.organizationId))}
@@ -235,17 +246,19 @@ function MembershipRow({
 function InvitationRow({
   invitation,
   pendingKey,
+  keepJoined,
   onSelectOrganization,
   onAcceptInvitation,
 }: {
   invitation: OrganizationListInvitation;
   pendingKey?: string | null;
+  keepJoined: boolean;
   onSelectOrganization?: (organizationId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
 }) {
   const m = useMessages('organizationList');
 
-  if (invitation.status === 'accepted') {
+  if (invitation.status === 'accepted' && !keepJoined) {
     return (
       <MembershipRow
         membership={{
@@ -264,7 +277,11 @@ function InvitationRow({
     <OfferRow
       name={invitation.name}
       imageUrl={invitation.imageUrl}
+      description={invitation.inviterName ? fill(m.invitedBy, { name: invitation.inviterName }) : undefined}
+      members={invitation.members}
+      membersCount={invitation.membersCount}
       actionLabel={m.acceptInvitation}
+      note={invitation.status === 'accepted' ? m.invitationAccepted : undefined}
       {...busyState(pendingKey, organizationListBusyKeys.acceptInvitation(invitation.id))}
       onAccept={onAcceptInvitation ? () => onAcceptInvitation(invitation.id) : undefined}
     />
@@ -285,6 +302,9 @@ function SuggestionRow({
     <OfferRow
       name={suggestion.name}
       imageUrl={suggestion.imageUrl}
+      description={suggestion.matchedDomain ? m.matchesDomain : undefined}
+      members={suggestion.members}
+      membersCount={suggestion.membersCount}
       actionLabel={m.acceptSuggestion}
       note={suggestion.status === 'accepted' ? m.suggestionAccepted : undefined}
       {...busyState(pendingKey, organizationListBusyKeys.acceptSuggestion(suggestion.id))}
@@ -295,6 +315,7 @@ function SuggestionRow({
 
 interface SelectRowProps {
   name: string;
+  description?: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
   busy: boolean;
@@ -302,7 +323,7 @@ interface SelectRowProps {
   onSelect?: () => void;
 }
 
-function SelectRow({ name, imageUrl, shape, busy, disabled, onSelect }: SelectRowProps) {
+function SelectRow({ name, description, imageUrl, shape, busy, disabled, onSelect }: SelectRowProps) {
   const m = useMessages('organizationList');
   return (
     <Item.Root
@@ -327,6 +348,7 @@ function SelectRow({ name, imageUrl, shape, busy, disabled, onSelect }: SelectRo
       </Item.Media>
       <Item.Content>
         <Item.Label>{name}</Item.Label>
+        {description ? <Item.Description>{description}</Item.Description> : null}
       </Item.Content>
       {busy ? (
         <Item.Media>
@@ -342,7 +364,10 @@ function SelectRow({ name, imageUrl, shape, busy, disabled, onSelect }: SelectRo
 
 interface OfferRowProps {
   name: string;
+  description?: string;
   imageUrl?: string;
+  members?: OrganizationListMemberPreview[];
+  membersCount?: number;
   actionLabel: string;
   note?: string;
   busy: boolean;
@@ -350,7 +375,44 @@ interface OfferRowProps {
   onAccept?: () => void;
 }
 
-function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept }: OfferRowProps) {
+const MAX_MEMBER_PREVIEWS = 3;
+
+function MemberPreviews({ members, count }: { members: OrganizationListMemberPreview[]; count: number }) {
+  const m = useMessages('organizationList');
+  const locale = useLocale();
+  const shown = members.slice(0, MAX_MEMBER_PREVIEWS);
+  const rest = count - shown.length;
+  return (
+    <>
+      <Avatar.Group aria-hidden>
+        {shown.map(member => (
+          <RowAvatar
+            key={member.name}
+            name={member.name}
+            imageUrl={member.imageUrl}
+            shape='circle'
+            size='xs'
+          />
+        ))}
+        {rest > 0 ? <Avatar.Overflow count={rest} /> : null}
+      </Avatar.Group>
+      <VisuallyHidden>{plural(m.membersCount, count, locale)}</VisuallyHidden>
+    </>
+  );
+}
+
+function OfferRow({
+  name,
+  description,
+  imageUrl,
+  members,
+  membersCount,
+  actionLabel,
+  note,
+  busy,
+  disabled,
+  onAccept,
+}: OfferRowProps) {
   const m = useMessages('organizationList');
   const labelId = useId();
 
@@ -366,9 +428,16 @@ function OfferRow({ name, imageUrl, actionLabel, note, busy, disabled, onAccept 
       </Item.Media>
       <Item.Content>
         <Item.Label id={labelId}>{name}</Item.Label>
+        {description ? <Item.Description>{description}</Item.Description> : null}
       </Item.Content>
       {note || onAccept ? (
         <Item.Actions>
+          {members?.length ? (
+            <MemberPreviews
+              members={members}
+              count={Math.max(membersCount ?? members.length, members.length)}
+            />
+          ) : null}
           <SubmitButton
             type='button'
             variant='outline'

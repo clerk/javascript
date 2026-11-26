@@ -1,5 +1,5 @@
 export const organizationProfileSecurityPanelMessages = {
-  errorFallback: 'Something went wrong. Please try again.',
+  errorFallback: 'Something went wrong. Try again.',
   empty: {
     label: 'No connections to secure',
     description: 'Single sign-on and directory sync settings for this organization will appear here.',
@@ -14,8 +14,8 @@ export const organizationProfileSecurityPanelMessages = {
     manageLabel: 'Manage {name}',
     remove: 'Remove',
     empty: 'There are no members on the allow list yet',
-    loadError: 'Could not load the SSO allow list',
-    connectionsError: 'Could not check this organization’s SSO connections',
+    loadError: 'Couldn’t load the SSO allow list',
+    connectionsError: 'Couldn’t check this organization’s SSO connections',
     connectionsRetry: 'Retry',
     retry: 'Try again',
     loading: 'Loading the SSO allow list',
@@ -42,7 +42,7 @@ export const organizationProfileSecurityPanelMessages = {
       roleLabel: 'Role',
       rolePlaceholder: 'Select a role',
       roleOption: '{role} ({count})',
-      rolesError: 'Could not load the organization’s roles.',
+      rolesError: 'Couldn’t load the organization’s roles.',
       roleWarning: 'This list does not sync, members are managed manually.',
       submit: 'Add members',
       submitting: 'Adding members',
@@ -52,14 +52,14 @@ export const organizationProfileSecurityPanelMessages = {
       added: { one: 'Added {count} member', other: 'Added {count} members' },
       skipped: {
         domainNotServed: {
-          one: '{count} member could not be added because their email address is not served by a connection.',
-          other: '{count} members could not be added because their email address is not served by a connection.',
+          one: '{count} member couldn’t be added because their email address is not served by a connection.',
+          other: '{count} members couldn’t be added because their email address is not served by a connection.',
         },
         notMember: {
-          one: '{count} member could not be added because they are no longer in the organization.',
-          other: '{count} members could not be added because they are no longer in the organization.',
+          one: '{count} member couldn’t be added because they are no longer in the organization.',
+          other: '{count} members couldn’t be added because they are no longer in the organization.',
         },
-        unknown: { one: '{count} member could not be added.', other: '{count} members could not be added.' },
+        unknown: { one: '{count} member couldn’t be added.', other: '{count} members couldn’t be added.' },
       },
     },
   },

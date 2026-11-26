@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Field } from '../field';
-import { PhoneInput } from './phone-input';
+import { Field } from '../../field';
+import { PhoneInput } from '../phone-input';
 
 const labels = {
   countryTriggerLabel: 'Country, {country}',

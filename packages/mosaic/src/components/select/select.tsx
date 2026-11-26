@@ -22,6 +22,7 @@ import { truncationStyles } from '../../styles/typography.styles';
 import { Button } from '../button';
 import { mergeIds, useOptionalFieldControlProps, useRegisterFieldPartId } from '../field/field.context';
 import { Icon } from '../icon';
+import { InputSizeContext } from '../input/input.context';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { selectOptionScope } from './select.markers.stylex';
 import * as slots from './select.styles';
@@ -133,13 +134,14 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
   // A combobox takes no name from its content, so the value is named explicitly, after any label.
   // An `aria-label` is kept by naming the trigger itself.
   const labelledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
+  const inputSize = React.useContext(InputSizeContext);
   const trigger: SelectTriggerProps['render'] =
     render ??
     (props => (
       <Button
         variant={variant}
         color='neutral'
-        size='md'
+        size={inputSize ?? 'md'}
         xstyle={slots.trigger.base}
         {...props}
       />

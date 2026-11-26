@@ -6,11 +6,14 @@ import {
   AuthEmailLink,
   AuthEmailLinkStatus,
   AuthEnterpriseConnections,
-  AuthIdentityPreview,
   AuthLoading,
+  AuthMark,
   AuthProtectCheck,
   AuthWallets,
+  emphasizeIdentifier,
+  useAuthMark,
 } from '../../blocks/auth';
+import { Prompt } from '../../blocks/prompt';
 import type { VerificationResendMessages } from '../../blocks/verification';
 import { VerificationCode, verificationResend } from '../../blocks/verification';
 import { Card } from '../../components/card';
@@ -44,6 +47,7 @@ export function SignUpView({
   errorMessage,
   globalErrorMessage,
   passwordFeedback,
+  passwordRules,
   onSwitchField,
   onSignIn,
   onEditIdentifier,
@@ -59,7 +63,7 @@ export function SignUpView({
   focusRef,
 }: SignUpViewProps & { focusRef?: Ref<HTMLElement> }) {
   const m = useMessages('signUp');
-  const logo = applicationLogoUrl ? { src: applicationLogoUrl, alt: applicationName } : undefined;
+  const mark = useAuthMark(applicationLogoUrl);
 
   const resendFor = (copy: VerificationResendMessages) =>
     verificationResend(copy, { onResend, canResend, remainingSeconds: resendRemainingSeconds });
@@ -74,13 +78,21 @@ export function SignUpView({
               title: m.verifyEmailLink.title,
               description: m.verifyEmailLink.description,
               editIdentifier: m.editIdentifier,
+              waiting: m.waitingForLink,
               secondaryActionLabel: m.useAnotherMethod,
             }}
             identifier={current.identifier}
-            onEditIdentifier={onEditIdentifier}
             globalErrorMessage={globalErrorMessage}
             isPending={isPending}
             resend={resendFor(m.verifyEmailLink)}
+            prompt={
+              <Prompt
+                text={m.wrongEmail}
+                action={m.useDifferentEmail}
+                disabled={isPending}
+                onAction={onEditIdentifier}
+              />
+            }
           />
         );
       case 'email-link-status':
@@ -97,7 +109,6 @@ export function SignUpView({
           <SignUpRestricted
             focusRef={focusRef}
             waitlist={current.purpose === 'waitlist'}
-            logo={logo}
             globalErrorMessage={globalErrorMessage}
             onEmailSupport={onEmailSupport}
             onJoinWaitlist={onJoinWaitlist}
@@ -116,7 +127,6 @@ export function SignUpView({
           <AuthProtectCheck
             messages={{ ...m.protectCheck, loading: m.loading }}
             challenge={current.challenge}
-            logo={logo}
             globalErrorMessage={globalErrorMessage}
             isPending={isPending}
             containerRef={protectCheckRef}
@@ -126,8 +136,10 @@ export function SignUpView({
       case 'action-blocked':
         return (
           <AuthActionBlocked
+            focusRef={focusRef}
             messages={m.actionBlocked}
             details={current.details}
+            onEmailSupport={onEmailSupport}
           />
         );
     }
@@ -136,27 +148,19 @@ export function SignUpView({
   const code = (current: Extract<SignUpStep, { kind: 'code' }>) => {
     const secondary = signUpCodeSecondaryAction(current, m, onCancel);
     const identity = signUpCodeIdentity(current, m);
+    const copy = signUpCodeCopy(current, m);
     const field = form.registerValue('code');
     return (
       <VerificationCode
         focusRef={focusRef}
         messages={{
-          ...signUpCodeCopy(current, m),
+          ...copy,
+          description: emphasizeIdentifier(copy.description, identity.identifier),
           secondaryActionLabel: secondary.label,
           primaryActionLabel: m.submit,
           pendingLabel: m.verifying,
         }}
         resend={resendFor(current.purpose === 'verify-email' ? m.verifyEmail : m.verifyPhone)}
-        identity={
-          identity.identifier ? (
-            <AuthIdentityPreview
-              identifier={identity.identifier}
-              editLabel={identity.editLabel}
-              disabled={isPending}
-              onEdit={onEditIdentifier}
-            />
-          ) : undefined
-        }
         value={field.value}
         onValueChange={field.onValueChange}
         errorMessage={errorMessage}
@@ -165,12 +169,33 @@ export function SignUpView({
         onSubmit={() => onSubmit()}
         onComplete={onCodeComplete}
         onCancel={secondary.onClick}
+        prompt={
+          <Prompt
+            text={current.purpose === 'verify-email' ? m.wrongEmail : m.wrongPhoneNumber}
+            action={identity.differentLabel}
+            disabled={isPending}
+            variant={secondary.onClick ? 'ghost' : 'outline'}
+            onAction={onEditIdentifier}
+          />
+        }
       />
     );
   };
 
   return (
-    <Card.Root align='center'>
+    <Card.Root
+      align='center'
+      variant='prominent'
+    >
+      {mark.logoUrl ? (
+        <AuthMark
+          key={mark.logoUrl}
+          logoUrl={mark.logoUrl}
+          shape={mark.shape}
+          onShape={mark.onShape}
+          onError={mark.onError}
+        />
+      ) : null}
       <Flow.Root
         value={signUpStepKey(step)}
         direction={direction}
@@ -183,7 +208,6 @@ export function SignUpView({
                 <SignUpDetailsStep
                   focusRef={focusRef}
                   step={current}
-                  logo={logo}
                   onSwitchField={onSwitchField}
                   socialProviders={socialProviders}
                   pendingProviderId={pendingProviderId}
@@ -194,6 +218,7 @@ export function SignUpView({
                   isPending={isPending}
                   onSubmit={onSubmit}
                   passwordFeedback={passwordFeedback}
+                  passwordRules={passwordRules}
                   onSignIn={onSignIn}
                 />
               ) : null}
@@ -219,7 +244,6 @@ export function SignUpView({
                   }}
                   channel={current.channel}
                   applicationName={applicationName}
-                  logo={logo}
                   form={form}
                   errorMessage={errorMessage}
                   globalErrorMessage={globalErrorMessage}
@@ -250,7 +274,6 @@ export function SignUpView({
                     description: m.enterpriseConnections.description,
                     pendingLabel: m.enterpriseConnections.pending,
                   }}
-                  logo={logo}
                   connections={current.options}
                   globalErrorMessage={globalErrorMessage}
                   pendingConnectionId={pendingProviderId}

@@ -15,6 +15,9 @@ const listInset = space['1.5'];
 const optionRadius = `max(0px, calc(${popupRadius} - ${listInset}))`;
 
 export const styles = stylex.create({
+  root: {
+    direction: 'ltr',
+  },
   triggerStart: {
     paddingInlineStart: 0,
   },
@@ -64,11 +67,11 @@ export const styles = stylex.create({
     width: '1px',
   },
   prefix: {
-    gap: space['2'],
+    gap: space['1.5'],
     color: colorVars['--cl-color-foreground'],
     fontVariantNumeric: 'tabular-nums',
     paddingInlineEnd: 0,
-    paddingInlineStart: space['2'],
+    paddingInlineStart: space['1'],
   },
   control: {
     fontVariantNumeric: 'tabular-nums',
@@ -179,6 +182,7 @@ export const styles = stylex.create({
   },
   optionCode: {
     fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontVariantNumeric: 'tabular-nums',
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
   },

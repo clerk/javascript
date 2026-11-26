@@ -2,7 +2,7 @@ export const organizationProfileProfileSectionMessages = {
   sectionTitle: 'Organization details',
   logo: {
     label: 'Logo',
-    description: 'Recommended size 1:1, up to 10MB.',
+    description: 'Square image, up to 10 MB.',
     upload: 'Upload',
     manage: 'Manage logo',
     change: 'Change logo',

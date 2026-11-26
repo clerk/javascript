@@ -1,0 +1,9 @@
+import * as Stories from './card-gallery.stories';
+
+# Card gallery
+
+Every flow that renders a `Card`, one row per flow, each step in order: sign-in and sign-up pages, inline cards, dialogs and alert dialogs. **Play flow** runs the flow for real: a dialog flow opens in one dialog and moves between its steps with the `Flow` slide, and a page flow opens the live story. **View details** shows the parts each flow is built from, the props the card resolves for its surface, the copy it changes and the decisions behind it.
+
+The card decides how its actions lay out through `actions`: a prominent card stacks them under large controls, and every other card fills the row, stacking with the primary on top in a dialog on a phone. Nothing on this page passes `actions`; each card takes it from its surface.
+
+<Stories.Gallery />

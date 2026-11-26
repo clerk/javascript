@@ -151,7 +151,7 @@ describe('OrganizationList', () => {
 
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
-          'You are no longer a member of this organization. Please choose or create another one.',
+          'You’re no longer a member of this organization. Choose or create another one.',
         ),
       );
     });
@@ -167,7 +167,7 @@ describe('OrganizationList', () => {
 
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
-          'You are no longer a member of this organization. Please choose another one.',
+          'You’re no longer a member of this organization. Choose another one.',
         ),
       );
     });

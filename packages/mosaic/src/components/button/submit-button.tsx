@@ -58,7 +58,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
   {
     isPending = false,
     pendingLabel = 'pending',
-    size = 'md',
+    size: sizeProp,
     spinDelay,
     disabled: disabledProp,
     focusableWhenDisabled = false,
@@ -69,6 +69,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
   ref,
 ) {
   const defaults = React.useContext(ButtonContext);
+  const size = sizeProp ?? defaults.size ?? 'md';
   const disabled = defaults.disabled || disabledProp || false;
   // `isPending` drives the semantics, this drives the pixels. The split is deliberate: the button
   // has to go inert and start announcing the moment the action does, or a fast action gets

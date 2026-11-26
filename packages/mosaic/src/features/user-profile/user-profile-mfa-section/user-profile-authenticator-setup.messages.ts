@@ -1,6 +1,6 @@
 export const userProfileAuthenticatorSetupMessages = {
   title: 'Add an authenticator app',
-  scanDescription: 'Set up a new sign-in method in your authenticator app and scan the QR code.',
+  scanDescription: 'Scan the QR code with your authenticator app, then enter the 6-digit code it shows.',
   manualDescription: 'Enter the setup key in your authenticator app, or use the setup URI if your app supports it.',
   qrCodeLabel: 'Authenticator setup QR code',
   setupKey: 'Setup key',
@@ -8,6 +8,8 @@ export const userProfileAuthenticatorSetupMessages = {
   copyKey: 'Copy setup key',
   copyUri: 'Copy setup URI',
   copied: 'Copied',
-  viewSetupKey: 'Can’t scan? View setup key',
-  scanQrCode: 'Scan QR code instead',
+  scanPrompt: 'Can’t scan?',
+  viewSetupKey: 'View setup key',
+  keyPrompt: 'Prefer to scan?',
+  scanQrCode: 'Scan QR code',
 } as const;

@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { AuthMark, useAuthMark } from '../../blocks/auth';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow, type FlowDirection } from '../../components/flow';
@@ -16,7 +17,9 @@ import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import { fill, useMessages } from '../../localization';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { mergeStyleProps, themeProps } from '../../props';
+import { optical } from '../../styles/optical.styles';
 import { reset } from '../../styles/reset.styles';
+import { rtl } from '../../styles/rtl.styles';
 import type { ReverificationController } from '../reverification';
 import { Reverification } from '../reverification';
 import type { UserProfileAddAuthenticatorViewProps } from '../user-profile/user-profile-mfa-section/user-profile-add-authenticator.view';
@@ -57,6 +60,7 @@ export interface TaskSetupMfaViewProps {
   step: TaskSetupMfaStep;
   direction: FlowDirection;
   renderBranding: boolean;
+  applicationLogoUrl?: string;
   reverification: ReverificationController;
   select: TaskSetupMfaSelectProps;
   sms: UserProfileAddSmsViewProps;
@@ -71,8 +75,22 @@ const icons = {
 } as const;
 
 export function TaskSetupMfaView(props: TaskSetupMfaViewProps) {
+  const mark = useAuthMark(props.applicationLogoUrl);
   return (
-    <Card.Root renderBranding={props.renderBranding}>
+    <Card.Root
+      variant='prominent'
+      align='center'
+      renderBranding={props.renderBranding}
+    >
+      {mark.logoUrl ? (
+        <AuthMark
+          key={mark.logoUrl}
+          logoUrl={mark.logoUrl}
+          shape={mark.shape}
+          onShape={mark.onShape}
+          onError={mark.onError}
+        />
+      ) : null}
       <Flow.Root
         value={props.step}
         direction={props.direction}
@@ -146,7 +164,16 @@ function SelectStep({ methods, pendingMethod, errorMessage, onSelect }: TaskSetu
                 <Item.Label>{m.methods[method]}</Item.Label>
                 <Item.Description>{m.methodDescriptions[method]}</Item.Description>
               </Item.Content>
-              <Item.Actions>{pendingMethod === method ? <Spinner /> : <Icon glyph={ChevronRight} />}</Item.Actions>
+              <Item.Actions>
+                {pendingMethod === method ? (
+                  <Spinner />
+                ) : (
+                  <Icon
+                    glyph={ChevronRight}
+                    xstyle={[rtl.mirror, optical.trailingChevron]}
+                  />
+                )}
+              </Item.Actions>
             </Item.Root>
           ))}
         </Item.Group>
@@ -161,7 +188,6 @@ function SuccessStep({
   copied,
   onCopy,
   onDownload,
-  onPrint,
   onContinue,
   pendingAction,
   errorMessage,
@@ -173,7 +199,7 @@ function SuccessStep({
     <>
       <Card.Header>
         <Card.Title>{m[method].title}</Card.Title>
-        <Card.Description>{m[method].description}</Card.Description>
+        <Card.Description>{codes.length > 0 ? m.backupCodesDescription : m[method].description}</Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
@@ -183,7 +209,6 @@ function SuccessStep({
       </Card.Banner>
       {codes.length > 0 ? (
         <Card.Content>
-          <Text color='foreground-secondary'>{m.backupCodesDescription}</Text>
           <ul
             aria-label={m.codesLabel}
             {...mergeStyleProps(themeProps('backup-codes'), stylex.props(reset.base, backupCodeStyles.codes))}
@@ -195,7 +220,6 @@ function SuccessStep({
               >
                 <Text
                   render={<code />}
-                  color='foreground-secondary'
                   xstyle={backupCodeStyles.code}
                 >
                   {code}
@@ -204,11 +228,22 @@ function SuccessStep({
             ))}
           </ul>
           <div {...stylex.props(styles.codeActions)}>
+            <Button
+              type='button'
+              variant='outline'
+              color='neutral'
+              fullWidth
+              disabled={pendingAction !== undefined}
+              onClick={onDownload}
+            >
+              <Icon glyph={Download} />
+              {m.download}
+            </Button>
             <SubmitButton
               type='button'
               variant='outline'
               color='neutral'
-              size='sm'
+              fullWidth
               isPending={pendingAction === 'copy'}
               disabled={pendingAction === 'complete'}
               pendingLabel={m.copy}
@@ -217,27 +252,6 @@ function SuccessStep({
               <Icon glyph={copied ? Checkmark : Clipboard} />
               {copied ? m.copied : m.copy}
             </SubmitButton>
-            <Button
-              type='button'
-              variant='outline'
-              color='neutral'
-              size='sm'
-              disabled={pendingAction !== undefined}
-              onClick={onDownload}
-            >
-              <Icon glyph={Download} />
-              {m.download}
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              color='neutral'
-              size='sm'
-              disabled={pendingAction !== undefined}
-              onClick={onPrint}
-            >
-              {m.print}
-            </Button>
           </div>
         </Card.Content>
       ) : null}
@@ -283,6 +297,7 @@ function SignOutFooter({ identifier, onSignOut, isPending, errorMessage }: TaskS
         {errorMessage ?? fill(m.text, { identifier })}{' '}
         <Button
           type='button'
+          color='neutral'
           variant='link'
           size='sm'
           fullWidth={false}

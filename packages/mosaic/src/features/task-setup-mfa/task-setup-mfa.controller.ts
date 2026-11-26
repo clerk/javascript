@@ -204,7 +204,11 @@ const taskSetupMfaMachine = createMachine({
         EDIT_CODE: {
           actions: assign((context, event) => {
             const flow = resolve(context);
-            return flow.kind === 'sms' || flow.kind === 'authenticator' ? { flow: { ...flow, code: event.value } } : {};
+            if (flow.kind !== 'sms' && flow.kind !== 'authenticator') {
+              return {};
+            }
+            const error = event.value === flow.code ? flow.error : undefined;
+            return { flow: { ...flow, code: event.value, error } };
           }),
         },
         PRINT_FAILED: {
@@ -414,6 +418,7 @@ export function useTaskSetupMfaController(model: TaskSetupMfaReadyModel): TaskSe
     step: stepFor(flow, reverifying),
     direction: context.direction,
     renderBranding: model.renderBranding,
+    applicationLogoUrl: model.applicationLogoUrl,
     reverification,
     select: {
       methods: model.methods,

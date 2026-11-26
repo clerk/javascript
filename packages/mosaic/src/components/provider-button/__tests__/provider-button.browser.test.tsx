@@ -100,6 +100,12 @@ describe('label forms', () => {
     expect(isShown('Provider 0')).toBe(true);
   });
 
+  it('shows the long label when two buttons collapse to one column', () => {
+    renderGroup(2, { width: 280 });
+    expect(isShown('Continue with Provider 0')).toBe(true);
+    expect(isShown('Provider 0')).toBe(false);
+  });
+
   it('shows neither label for three inline buttons, keeping the name', () => {
     const buttons = renderGroup(3);
     expect(isShown('Continue with Provider 0')).toBe(false);

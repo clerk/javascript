@@ -5,6 +5,6 @@ export const userProfileEnterpriseAccountsMessages = {
   connecting: 'Connecting',
   requiresAction: 'Requires action',
   errors: {
-    generic: 'Something went wrong. Please try again.',
+    generic: 'Something went wrong. Try again.',
   },
 } as const;

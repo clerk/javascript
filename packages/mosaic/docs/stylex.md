@@ -31,6 +31,8 @@ When several components render the same visual surface, hoist the atoms into `st
 
 Pick `rtl.mirror` (`styles/rtl.styles.ts`) by meaning, not shape: a forward or back chevron mirrors; a dropdown chevron or an external-link arrow does not.
 
+For a distance that should run the other way in a right-to-left layout, such as a slide or an offset, apply `rtl.inlineSign` to the element and multiply by `var(--_cl-inline-sign, 1)`, which is `-1` under a `dir="rtl"` ancestor (`blocks/auth/auth-mark.styles.ts`).
+
 ## Tokens in use
 
 The token groups and the color model are in [Theming → Tokens](theming.md#tokens). Check `tokens.stylex.ts` before writing a literal: elevation, for example, comes from `shadowVars`.

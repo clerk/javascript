@@ -7,6 +7,7 @@ import {
   AuthLoading,
   AuthProtectCheck,
 } from '../../../blocks/auth';
+import { Prompt } from '../../../blocks/prompt';
 import type { VerificationCodeResend } from '../../../blocks/verification';
 import { VerificationHelp } from '../../../blocks/verification';
 import { useMessages } from '../../../localization';
@@ -64,6 +65,7 @@ export function NoticeStep({
   };
   const emailLink = {
     editIdentifier: m.editIdentifier,
+    waiting: m.waitingForLink,
     secondaryActionLabel: m.useAnotherMethod,
   };
 
@@ -75,6 +77,7 @@ export function NoticeStep({
             title: m.alternativeMethods.getHelp.title,
             description: m.alternativeMethods.getHelp.description,
             ...help,
+            backButton: m.alternativeMethods.getHelp.back,
           }}
           onEmailSupport={onEmailSupport}
           onBack={onBack}
@@ -102,8 +105,10 @@ export function NoticeStep({
     case 'action-blocked':
       return (
         <AuthActionBlocked
-          messages={m.actionBlocked}
+          focusRef={focusRef}
+          messages={{ ...m.actionBlocked, emailSupport: m.alternativeMethods.getHelp.emailSupport }}
           details={step.details}
+          onEmailSupport={onEmailSupport}
         />
       );
     case 'password-compromised':
@@ -135,11 +140,18 @@ export function NoticeStep({
           messages={{ title: m.emailLink.title, description: m.emailLink.description, ...emailLink }}
           notice={step.newDevice ? m.clientTrust.notice : undefined}
           identifier={step.identifier}
-          onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           resend={resend}
           onCancel={onCancel}
+          prompt={
+            <Prompt
+              text={m.notYou}
+              action={m.back}
+              disabled={isPending}
+              onAction={onEditIdentifier}
+            />
+          }
         />
       );
     case 'verify-email-link':
@@ -148,10 +160,17 @@ export function NoticeStep({
           focusRef={focusRef}
           messages={{ ...m.verifyEmailLink, ...emailLink }}
           identifier={step.identifier}
-          onEditIdentifier={onEditIdentifier}
           globalErrorMessage={globalErrorMessage}
           isPending={isPending}
           resend={resend}
+          prompt={
+            <Prompt
+              text={m.notYou}
+              action={m.back}
+              disabled={isPending}
+              onAction={onEditIdentifier}
+            />
+          }
         />
       );
     case 'restricted':

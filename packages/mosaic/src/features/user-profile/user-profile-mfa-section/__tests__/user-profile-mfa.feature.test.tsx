@@ -18,7 +18,7 @@ import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 describe('User profile MFA', () => {
   it('hides when no second factor strategy is enabled', async () => {
     await renderMfa(fapiUser({ id: 'user_1' }), fapiEnvironment());
-    expect(screen.queryByText('2-step verification')).toBeNull();
+    expect(screen.queryByText('Two-step verification')).toBeNull();
   });
 
   it('offers configured methods and creates one authenticator secret', async () => {
@@ -92,9 +92,9 @@ describe('User profile MFA', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
-    await user.click(await screen.findByRole('button', { name: 'Can’t scan? View setup key' }));
+    await user.click(await screen.findByRole('button', { name: 'View setup key' }));
     expect(screen.getByDisplayValue('SECRET1')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Scan QR code instead' }));
+    await user.click(screen.getByRole('button', { name: 'Scan QR code' }));
     expect(screen.getByRole('img', { name: /QR code/i })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Back' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));

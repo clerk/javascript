@@ -68,7 +68,6 @@ export function UserProfileBackupCodesView({
               >
                 <Text
                   render={<code />}
-                  color='foreground-secondary'
                   xstyle={styles.code}
                 >
                   {code}

@@ -1,8 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  centered: {
+    textAlign: 'center',
+  },
   captcha: {
     justifySelf: 'center',
   },
@@ -14,14 +17,18 @@ export const styles = stylex.create({
     textAlign: 'center',
   },
   identity: {
-    gap: space['1'],
-    alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
+    marginBlockStart: space['2'],
+    paddingInlineEnd: space['4'],
+    paddingInlineStart: space['4'],
     minWidth: 0,
   },
-  identityText: {
-    minWidth: 0,
+  identifierText: {
+    color: colorVars['--cl-color-foreground'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    overflowWrap: 'anywhere',
+    unicodeBidi: 'isolate',
   },
   loading: {
     justifyItems: 'center',
@@ -48,6 +55,39 @@ export const styles = stylex.create({
     objectFit: 'contain',
     height: space['4'],
     width: space['4'],
+  },
+  providerMark: {
+    backgroundColor: 'currentColor',
+    maskPosition: 'center',
+    maskRepeat: 'no-repeat',
+    maskSize: 'contain',
+  },
+  providerMarkImage: (image: string) => ({
+    maskImage: image,
+  }),
+  reference: {
+    gap: space['0.5'],
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+  },
+  referenceCopy: {
+    flexShrink: 0,
+  },
+  referenceLabel: {
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
+  referenceText: {
+    fontVariantNumeric: 'tabular-nums',
+    minWidth: 0,
+  },
+  referenceValue: {
+    gap: space['1'],
+    alignItems: 'center',
+    display: 'flex',
+    maxWidth: '100%',
+    minWidth: 0,
   },
   status: {
     alignItems: 'center',

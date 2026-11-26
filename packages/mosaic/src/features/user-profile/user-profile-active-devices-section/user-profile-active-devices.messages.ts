@@ -11,7 +11,7 @@ export const userProfileActiveDevicesMessages = {
   otherDevice: '{count} other device',
   otherDevices: '{count} other devices',
   signOutAll: 'Sign out of all devices',
-  signOutAllError: 'Something went wrong signing these devices out. Please try again.',
+  signOutAllError: 'Couldn’t sign these devices out. Try again.',
   signOutAllDialog: {
     title: 'Sign out of all devices',
     description: {
@@ -35,7 +35,7 @@ export const userProfileActiveDevicesMessages = {
     location: 'Last location',
     signedInAt: 'Original sign in',
     signOut: 'Sign out',
-    signOutError: 'Something went wrong signing this device out. Please try again.',
+    signOutError: 'Couldn’t sign this device out. Try again.',
     close: 'Close',
   },
   signOutDialog: {

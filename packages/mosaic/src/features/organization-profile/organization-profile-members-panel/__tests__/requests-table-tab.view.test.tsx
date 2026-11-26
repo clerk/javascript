@@ -70,8 +70,8 @@ describe('RequestsTableTabView', () => {
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
           action === 'Accept'
-            ? 'Unable to accept this request. Please try again.'
-            : 'Unable to decline this request. Please try again.',
+            ? 'Couldn’t accept this request. Try again.'
+            : 'Couldn’t decline this request. Try again.',
         ),
       );
       await user.click(screen.getByRole('button', { name: `${action} Ada Lovelace` }));
@@ -88,7 +88,7 @@ describe('RequestsTableTabView', () => {
 
   it('does not report requests as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });
-    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load requests');
     expect(screen.queryByText('Requests loaded')).toBeNull();
   });
 
@@ -134,7 +134,7 @@ describe('RequestsTableTabView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByText('ada@example.com')).toBeNull();
-    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Couldn’t load requests');
     expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
   });
   it('forwards paging without search, sorting, or page-size controls', async () => {

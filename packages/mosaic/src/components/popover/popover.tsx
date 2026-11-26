@@ -10,6 +10,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { ButtonContext, NO_BUTTON_DEFAULTS } from '../button/button.context';
+import { InputSizeContext } from '../input/input.context';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg' | 'anchor';
@@ -101,16 +102,18 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
         {...(ariaLabelledby == null ? {} : { 'aria-labelledby': ariaLabelledby })}
       >
-        <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
-          <Primitive.Popup
-            ref={ref}
-            {...mergeStyleProps(
-              themeProps('popover-popup', { size }),
-              stylex.props(reset.base, styles.popup, sizes[size], xstyle),
-              rest,
-            )}
-          />
-        </ButtonContext.Provider>
+        <InputSizeContext.Provider value={undefined}>
+          <ButtonContext.Provider value={NO_BUTTON_DEFAULTS}>
+            <Primitive.Popup
+              ref={ref}
+              {...mergeStyleProps(
+                themeProps('popover-popup', { size }),
+                stylex.props(reset.base, styles.popup, sizes[size], xstyle),
+                rest,
+              )}
+            />
+          </ButtonContext.Provider>
+        </InputSizeContext.Provider>
       </Positioner>
     </Primitive.Portal>
   );

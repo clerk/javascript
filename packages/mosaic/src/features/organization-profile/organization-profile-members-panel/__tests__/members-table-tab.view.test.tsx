@@ -82,7 +82,7 @@ function renderTab(overrides: Partial<MembersTableTabViewProps> = {}) {
 describe('MembersTableTabView', () => {
   it('does not report members as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });
-    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load members');
+    expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load members');
     expect(screen.queryByText('Members loaded')).toBeNull();
   });
 

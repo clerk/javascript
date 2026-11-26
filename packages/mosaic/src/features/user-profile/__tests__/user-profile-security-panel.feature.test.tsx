@@ -33,7 +33,7 @@ describe('UserProfileSecurityPanel', () => {
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     await screen.findByRole('heading', { level: 3, name: 'Active devices' });
-    expect(sectionHeadings()).toEqual(['Password', 'Passkeys', '2-step verification', 'Active devices']);
+    expect(sectionHeadings()).toEqual(['Password', 'Passkeys', 'Two-step verification', 'Active devices']);
   });
 
   it('renders only the sections passed as children, in their order', async () => {

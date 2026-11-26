@@ -7,7 +7,10 @@ import { fill, useMessages } from '../../localization';
 import { useCreateOrganizationFlow } from '../create-organization/create-organization';
 import type { CreateOrganizationReadyModel } from '../create-organization/create-organization.controller';
 import { CreateOrganizationSteps } from '../create-organization/create-organization.view';
-import type { TaskChooseOrganizationReadyController } from './task-choose-organization.controller';
+import type {
+  TaskChooseOrganizationReadyController,
+  TaskChooseOrganizationScreenController,
+} from './task-choose-organization.controller';
 import {
   useTaskChooseOrganizationController,
   useTaskChooseOrganizationScreenController,
@@ -15,7 +18,6 @@ import {
 import type { TaskChooseOrganizationModelOptions } from './task-choose-organization.model';
 import { useTaskChooseOrganizationModel } from './task-choose-organization.model';
 import { TaskChooseOrganizationSkeleton } from './task-choose-organization.skeleton';
-import type { TaskChooseOrganizationData } from './task-choose-organization.types';
 import { TaskChooseOrganizationView } from './task-choose-organization.view';
 
 /** Everything `<TaskChooseOrganization />` takes: where to go once the session has no tasks left. */
@@ -50,6 +52,7 @@ export function TaskChooseOrganization({ fallback, ...options }: TaskChooseOrgan
           canCreate={Boolean(controller.createOrganization)}
           identifier={controller.identifier}
           renderBranding={controller.renderBranding}
+          applicationLogoUrl={controller.applicationLogoUrl}
         />
       );
     }
@@ -80,42 +83,49 @@ function ConnectedTaskChooseOrganization({ controller }: { controller: TaskChoos
   const screen = useTaskChooseOrganizationScreenController(controller);
   const { createOrganization } = controller;
 
+  if (!createOrganization) {
+    return (
+      <TaskChooseOrganizationView
+        {...controller}
+        step={screen.step}
+        onCreateOrganization={screen.onCreateOrganization}
+      />
+    );
+  }
+
+  return (
+    <ConnectedTaskChooseOrganizationWithCreate
+      controller={controller}
+      screen={screen}
+      model={createOrganization}
+    />
+  );
+}
+
+function ConnectedTaskChooseOrganizationWithCreate({
+  controller,
+  screen,
+  model,
+}: {
+  controller: TaskChooseOrganizationReadyController;
+  screen: TaskChooseOrganizationScreenController;
+  model: CreateOrganizationReadyModel;
+}) {
+  const m = useMessages('taskChooseOrganization');
+  const steps = useCreateOrganizationFlow(model, { initialValues: controller.creationDefaults });
+
   return (
     <TaskChooseOrganizationView
       {...controller}
       step={screen.step}
       createSteps={
-        createOrganization ? (
-          <TaskChooseOrganizationCreateSteps
-            model={createOrganization}
-            creationDefaults={controller.creationDefaults}
-            advisory={controller.advisory}
-            onCancel={screen.onCancelCreate}
-          />
-        ) : undefined
+        <CreateOrganizationSteps
+          {...steps}
+          notice={controller.advisory ? fill(m.organizationAlreadyExists, { ...controller.advisory }) : undefined}
+          onCancel={screen.onCancelCreate}
+        />
       }
       onCreateOrganization={screen.onCreateOrganization}
-    />
-  );
-}
-
-function TaskChooseOrganizationCreateSteps({
-  model,
-  creationDefaults,
-  advisory,
-  onCancel,
-}: Pick<TaskChooseOrganizationData, 'creationDefaults' | 'advisory'> & {
-  model: CreateOrganizationReadyModel;
-  onCancel?: () => void;
-}) {
-  const m = useMessages('taskChooseOrganization');
-  const steps = useCreateOrganizationFlow(model, { initialValues: creationDefaults });
-
-  return (
-    <CreateOrganizationSteps
-      {...steps}
-      notice={advisory ? fill(m.organizationAlreadyExists, { ...advisory }) : undefined}
-      onCancel={onCancel}
     />
   );
 }

@@ -85,6 +85,24 @@ export const styles = stylex.create({
   },
 });
 
+export const groupStyles = stylex.create({
+  root: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+  },
+  member: {
+    boxShadow: `0 0 0 2px ${colorVars['--cl-color-surface']}`,
+    marginInlineStart: { default: 0, ':not(:first-child)': `calc(${space['1.5']} * -1)` },
+  },
+  overflow: {
+    backgroundColor: colorVars['--cl-color-surface-subtle'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: '0.5625rem',
+    fontVariantNumeric: 'tabular-nums',
+  },
+});
+
 // shape — square takes the radius its size sets (see `mediaSizes`); circle rounds fully
 export const shapes = stylex.create({
   circle: { borderRadius: radiusVars['--cl-radius-full'] },

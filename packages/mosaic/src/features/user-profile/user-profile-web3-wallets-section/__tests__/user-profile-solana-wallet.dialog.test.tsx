@@ -26,9 +26,7 @@ describe('Solana wallet discovery failures', () => {
       </MosaicProvider>,
     );
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        'Wallets could not be loaded. Please refresh the page and try again.',
-      ),
+      expect(screen.getByRole('alert')).toHaveTextContent('Couldn’t load wallets. Refresh the page and try again.'),
     );
     expect(screen.queryByText('No Solana wallets are available.')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Retry|Try again/ })).not.toBeInTheDocument();

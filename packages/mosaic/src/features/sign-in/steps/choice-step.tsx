@@ -2,29 +2,13 @@ import type { Ref } from 'react';
 
 import { AuthEnterpriseConnections, AuthWallets } from '../../../blocks/auth';
 import { VerificationMethodPicker } from '../../../blocks/verification';
-import type { IconComponent } from '../../../icons/glyph';
-import { Envelope } from '../../../icons/glyphs/envelope';
-import { Key } from '../../../icons/glyphs/key';
-import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
-import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
-import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
-import type { SignInFactor, SignInProvider, SignInStep } from '../sign-in.types';
-import { choiceCopy, factorLabel } from '../sign-in.utils';
+import type { SignInStep } from '../sign-in.types';
+import { choiceCopy, factorButtonLabel, factorRow, groupedFactors, passkeyFirst } from '../sign-in.utils';
+import { factorIcon } from './factor-icon';
 import { SignInAccounts } from './sign-in-accounts';
+import { SignInAddressPicker } from './sign-in-address-picker';
 import { SignInAlternativeMethods } from './sign-in-alternative-methods';
-
-const factorIcon = {
-  password: SecurityLockSquare,
-  passkey: SecurityPasskey,
-  email_code: Envelope,
-  email_link: Envelope,
-  phone_code: SecurityPhone,
-  totp: SecurityLockSquare,
-  backup_code: Key,
-  reset_password_email_code: Envelope,
-  reset_password_phone_code: SecurityPhone,
-} as const satisfies Record<SignInFactor['strategy'], IconComponent>;
 
 interface ChoiceStepProps {
   step: Extract<SignInStep, { kind: 'choice' }>;
@@ -34,7 +18,6 @@ interface ChoiceStepProps {
   onBack: () => void;
   logo?: { src: string; alt: string };
   globalErrorMessage?: string;
-  socialProviders: readonly SignInProvider[];
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   onCancel?: () => void;
@@ -54,7 +37,6 @@ export function ChoiceStep({
   onBack,
   logo,
   globalErrorMessage,
-  socialProviders,
   pendingProviderId,
   onSelectProvider,
   onCancel,
@@ -119,11 +101,23 @@ export function ChoiceStep({
   }
 
   const copy = choiceCopy(step, m);
-  const methods = step.options.map(factor => ({
-    id: factor.id,
-    label: factorLabel(factor, m),
-    icon: factorIcon[factor.strategy],
-  }));
+  if (step.purpose === 'addresses') {
+    return (
+      <SignInAddressPicker
+        focusRef={focusRef}
+        title={copy.title}
+        description={copy.description}
+        options={step.options}
+        pendingFactorId={pendingFactorId}
+        onSelectFactor={onSelectFactor}
+        isDisabled={isDisabled}
+        globalErrorMessage={globalErrorMessage}
+        onBack={onBack}
+      />
+    );
+  }
+
+  const groups = groupedFactors(step.options);
 
   if (step.purpose === 'methods') {
     return (
@@ -131,12 +125,14 @@ export function ChoiceStep({
         focusRef={focusRef}
         title={copy.title}
         description={copy.description}
-        methods={methods}
+        methods={passkeyFirst(groups).map(({ factor, count }) => ({
+          id: factor.id,
+          label: factorButtonLabel(factor, m),
+          description: factorRow(factor, m, count).description,
+          icon: factorIcon[factor.strategy],
+        }))}
         pendingMethodId={pendingFactorId}
         onSelectMethod={onSelectFactor}
-        socialProviders={socialProviders}
-        pendingProviderId={pendingProviderId}
-        onSelectProvider={onSelectProvider}
         isDisabled={isDisabled}
         globalErrorMessage={globalErrorMessage}
         onBack={step.canGoBack === false ? undefined : onBack}
@@ -150,11 +146,15 @@ export function ChoiceStep({
       focusRef={focusRef}
       messages={{
         ...copy,
-        backButton: m.back,
+        backButton: m.alternativeMethods.back,
         helpText: m.alternativeMethods.helpPrompt,
         helpButton: m.alternativeMethods.helpLink,
       }}
-      methods={methods}
+      methods={groups.map(({ factor, count }) => ({
+        id: factor.id,
+        ...factorRow(factor, m, count),
+        icon: factorIcon[factor.strategy],
+      }))}
       pendingMethodId={pendingFactorId}
       onSelect={onSelectFactor}
       onHelp={onShowHelp}

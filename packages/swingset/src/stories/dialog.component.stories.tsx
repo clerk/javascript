@@ -284,7 +284,6 @@ export function Stacked() {
             <Button
               type='submit'
               form='update-profile'
-              fullWidth
             >
               Save
             </Button>

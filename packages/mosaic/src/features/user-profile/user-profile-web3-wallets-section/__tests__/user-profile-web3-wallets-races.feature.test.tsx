@@ -189,9 +189,7 @@ describe('Web3 wallet selection races', () => {
         );
       } else {
         signature.reject(new Error('User rejected the request.'));
-        await waitFor(() =>
-          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
-        );
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
         expect(
           fapi.client.sessions[0]?.user.web3_wallets.find(wallet => wallet.id === pendingWallet?.id)?.verification
             ?.status,
@@ -224,7 +222,7 @@ describe('Web3 wallet selection races', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
     signature.reject(new Error('User rejected the request.'));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     request.mockImplementation(({ method }) =>
       Promise.resolve(method === 'eth_requestAccounts' ? ['0xabcd'] : 'signature'),
     );

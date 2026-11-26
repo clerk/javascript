@@ -10,6 +10,7 @@ import { inputStyles } from '../../styles/input.styles';
 import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
+import { InputSizeContext } from './input.context';
 import { sizes, styles } from './input.styles';
 
 /** `default` provides field chrome; `ghost` keeps input sizing while its container provides chrome and focus styling. */
@@ -47,7 +48,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     ariaLabelledBy,
     ariaDescribedBy,
   });
-  const size = inputGroup?.size ?? sizeProp ?? 'md';
+  const contextSize = React.useContext(InputSizeContext);
+  const size = inputGroup?.size ?? sizeProp ?? contextSize ?? 'md';
   const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
   const keepsFocus = disabled && (fieldProps?.focusableWhenDisabled ?? false);
   const required = fieldProps?.required ?? requiredProp;

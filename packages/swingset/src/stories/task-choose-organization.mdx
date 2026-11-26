@@ -37,13 +37,27 @@ It renders `fallback` while Clerk loads and nothing when nobody is signed in. Wh
 ## Choosing an organization
 
 The list holds the organizations the user belongs to, then invitations, then suggestions, the same
-rows as [OrganizationList](/misc/organization-list) without the personal account. Selecting an
-organization makes it active and finishes the task. The user goes on to their next task, at its
+rows as [OrganizationList](/misc/organization-list) without the personal account. The example shows a
+user who belongs to none yet, so every row is an invitation (**Join**) or an organization that matches
+their email (**Request to join**). **Join** accepts the invitation, makes that organization active and
+finishes the task in one step; other invitations can be accepted later from the organization switcher.
+**Request to join** only sends a request, so the row shows it is pending approval and the user stays on
+the list. Selecting an organization makes it active and finishes the task. The user goes on to their next task, at its
 `taskUrls` entry or the sign-in task route, or to `redirectUrlComplete` when none is left.
 
 A user whose only membership is exclusive is not asked. Their organization is activated as soon as the
 card has their memberships, and the list stays on screen with that row pending. If activating fails,
 the error appears above the list and the user can choose again.
+
+## Waiting for approval
+
+When a request to join is all that is left, a line under the list says an email will follow once an
+admin approves, and what the user can do until then.
+
+<Story
+  name='RequestPending'
+  storyModule={TaskChooseOrganizationStories}
+/>
 
 ## Loading
 

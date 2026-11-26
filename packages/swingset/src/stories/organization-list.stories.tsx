@@ -49,16 +49,30 @@ const unavailable = () =>
   });
 
 const initialMemberships: OrganizationListMembership[] = [
-  { kind: 'membership', organizationId: 'org_1', name: 'Acme Corporation' },
-  { kind: 'membership', organizationId: 'org_2', name: 'Globex' },
+  { kind: 'membership', organizationId: 'org_1', name: 'Acme Corporation', membersCount: 12 },
+  { kind: 'membership', organizationId: 'org_2', name: 'Globex', membersCount: 48 },
 ];
 
 const initialInvitations: OrganizationListInvitation[] = [
-  { kind: 'invitation', id: 'inv_1', organizationId: 'org_3', name: 'Initech', status: 'pending' },
+  {
+    kind: 'invitation',
+    id: 'inv_1',
+    organizationId: 'org_3',
+    name: 'Initech',
+    status: 'pending',
+    inviterName: 'Sam Lee',
+  },
 ];
 
 const initialSuggestions: OrganizationListSuggestion[] = [
-  { kind: 'suggestion', id: 'sug_1', organizationId: 'org_4', name: 'Umbrella', status: 'pending' },
+  {
+    kind: 'suggestion',
+    id: 'sug_1',
+    organizationId: 'org_4',
+    name: 'Umbrella',
+    status: 'pending',
+    matchedDomain: 'umbrella.com',
+  },
 ];
 
 const createOrganization: CreateOrganizationReadyModel = {

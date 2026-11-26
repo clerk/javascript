@@ -15,7 +15,7 @@ describe('User profile MFA interaction boundaries', () => {
     const user = userEvent.setup();
     const add = screen.getByRole('button', { name: 'Add verification method' });
     await user.click(add);
-    expect(screen.getByRole('dialog', { name: 'Add 2-step verification' })).toHaveAccessibleDescription(
+    expect(screen.getByRole('dialog', { name: 'Add two-step verification' })).toHaveAccessibleDescription(
       'Choose a verification method',
     );
     await user.keyboard('{Escape}');
@@ -58,15 +58,15 @@ describe('User profile MFA interaction boundaries', () => {
     }
     form.requestSubmit();
     expect(fapi.mfa.totpAttempts).toHaveLength(0);
-    await user.click(screen.getByRole('button', { name: 'Can’t scan? View setup key' }));
+    await user.click(screen.getByRole('button', { name: 'View setup key' }));
     const secret = screen.getByRole('textbox', { name: 'Setup key' });
     const uri = screen.getByRole('textbox', { name: 'Setup URI' });
     expect(secret).toHaveAttribute('readonly');
     expect(uri).toHaveAttribute('readonly');
     const originalSecret = secret.getAttribute('value');
-    await user.click(screen.getByRole('button', { name: 'Scan QR code instead' }));
+    await user.click(screen.getByRole('button', { name: 'Scan QR code' }));
     expect(screen.getByRole('img', { name: /QR code/i })).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Can’t scan? View setup key' }));
+    await user.click(screen.getByRole('button', { name: 'View setup key' }));
     expect(screen.getByRole('textbox', { name: 'Setup key' })).toHaveAttribute('value', originalSecret);
     expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveValue('1');
     expect(screen.getByRole('textbox', { name: 'Character 2 of 6' })).toHaveValue('2');
@@ -272,7 +272,7 @@ describe('User profile MFA interaction boundaries', () => {
     const codes = await screen.findByRole('list', { name: 'Backup codes' });
     expect(within(codes).getByText('CODE0001')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Try again.'));
     expect(screen.queryByText('Clipboard unavailable')).toBeNull();
     expect(within(codes).getByText('CODE0001')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Copy and close' }));

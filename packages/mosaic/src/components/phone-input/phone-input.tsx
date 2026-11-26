@@ -21,6 +21,7 @@ import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
+import { InputSizeContext } from '../input/input.context';
 import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
@@ -80,7 +81,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     country: countryProp,
     defaultCountry,
     onCountryChange,
-    size = 'md',
+    size: sizeProp,
     countryTriggerLabel,
     countryPopupLabel,
     countrySearchLabel,
@@ -104,6 +105,8 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   forwardedRef,
 ) {
   const field = useOptionalFieldContext();
+  const contextSize = React.useContext(InputSizeContext);
+  const size = sizeProp ?? contextSize ?? 'md';
   const disabled = disabledProp ?? field?.disabled ?? false;
   const ariaInvalid = ariaInvalidProp ?? (field?.invalid ? true : undefined);
   const invalid = ariaInvalid === true || ariaInvalid === 'true';
@@ -199,7 +202,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
         disabled={disabled}
         invalid={invalid}
         {...themeProps('phone-input', { size, disabled, invalid })}
-        xstyle={xstyle}
+        xstyle={[styles.root, xstyle]}
       >
         <Popover.Root
           open={open}

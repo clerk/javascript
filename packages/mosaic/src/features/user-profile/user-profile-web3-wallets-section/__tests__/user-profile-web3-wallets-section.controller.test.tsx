@@ -55,7 +55,7 @@ describe('Web3 connection controller', () => {
       await pending.promise.catch(() => undefined);
     });
     expect(result.current.wallets[0]?.primaryError).toBeUndefined();
-    expect(result.current.availableProviders[0]?.connectError).toBe('Something went wrong. Please try again.');
+    expect(result.current.availableProviders[0]?.connectError).toBe('Something went wrong. Try again.');
   });
 
   it('does not move a later primary update to the previous connection target', async () => {
@@ -83,7 +83,7 @@ describe('Web3 connection controller', () => {
     await act(async () => {
       await result.current.onConnect('web3_metamask_signature');
     });
-    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Try again.');
     act(() => {
       void result.current.onSetPrimary('other');
     });
@@ -92,7 +92,7 @@ describe('Web3 connection controller', () => {
       primary.reject(new Error('Primary rejected'));
       await primary.promise.catch(() => undefined);
     });
-    expect(result.current.wallets[1]?.primaryError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[1]?.primaryError).toBe('Something went wrong. Try again.');
     expect(result.current.wallets[0]?.verifyError).toBeUndefined();
   });
 
@@ -117,7 +117,7 @@ describe('Web3 connection controller', () => {
       pending.reject(new Error('Rejected'));
       await pending.promise.catch(() => undefined);
     });
-    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Try again.');
     expect(result.current.wallets[0]?.primaryError).toBeUndefined();
   });
 
@@ -186,7 +186,7 @@ describe('Web3 connection controller', () => {
       pending.reject(new Error('Retry rejected'));
       await pending.promise.catch(() => undefined);
     });
-    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Try again.');
     expect(result.current.wallets[1]?.primaryError).toBeUndefined();
   });
 
@@ -246,7 +246,7 @@ describe('Web3 connection controller', () => {
       await signature.promise.catch(() => undefined);
     });
     expect(pendingRowId(result.current)).toBeUndefined();
-    expect(result.current.wallets[1]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[1]?.verifyError).toBe('Something went wrong. Try again.');
     expect(result.current.wallets[0]?.verifyError).toBeUndefined();
   });
 });

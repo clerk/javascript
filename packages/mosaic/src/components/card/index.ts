@@ -1,5 +1,5 @@
 /**
- * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Media`, `Card.Title`,
+ * A styled surface composed through `Card.Root`, `Card.Lead`, `Card.Header`, `Card.Media`, `Card.Title`,
  * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic
  * `render` prop and forwards its ref.
  *
@@ -11,4 +11,5 @@
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
 export * as Card from './card.parts';
-export type { CardAlign, CardBannerProps, CardProps, CardSize } from './card';
+export { useCardActions, useCardAlign } from './card';
+export type { CardActions, CardAlign, CardBannerProps, CardProps, CardSize, CardVariant } from './card';

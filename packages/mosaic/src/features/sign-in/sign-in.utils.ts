@@ -21,6 +21,7 @@ export const stepIds = {
   ],
   choice: [
     'choice:methods',
+    'choice:addresses',
     'choice:reset-methods',
     'choice:enterprise-connections',
     'choice:accounts',
@@ -94,13 +95,123 @@ export function factorLabel(factor: SignInFactor, m: Messages): string {
   }
 }
 
+const GROUPED_STRATEGIES: ReadonlySet<SignInFactor['strategy']> = new Set(['email_code', 'phone_code']);
+
+export interface FactorGroup {
+  factor: SignInFactor;
+  count: number;
+  members: SignInFactor[];
+}
+
+export function groupedFactors(factors: readonly SignInFactor[]): FactorGroup[] {
+  const groups = new Map<string, FactorGroup>();
+  for (const factor of factors) {
+    const key = GROUPED_STRATEGIES.has(factor.strategy) ? `${factor.stage}:${factor.strategy}` : factor.id;
+    const group = groups.get(key);
+    if (group) {
+      group.count += 1;
+      group.members.push(factor);
+    } else {
+      groups.set(key, { factor, count: 1, members: [factor] });
+    }
+  }
+  return [...groups.values()];
+}
+
+export function factorButtonLabel(factor: SignInFactor, m: Messages): string {
+  const labels = m.alternativeMethods.buttons;
+  switch (factor.strategy) {
+    case 'password':
+      return m.alternativeMethods.rows.password.label;
+    case 'passkey':
+      return labels.passkey;
+    case 'email_code':
+      return labels.emailCode;
+    case 'email_link':
+      return labels.emailLink;
+    case 'phone_code':
+      return labels.phoneCode;
+    case 'totp':
+      return labels.totp;
+    case 'backup_code':
+      return labels.backupCode;
+    case 'reset_password_email_code':
+    case 'reset_password_phone_code':
+      return factorLabel(factor, m);
+  }
+}
+
+export function passkeyFirst(groups: FactorGroup[]): FactorGroup[] {
+  return groups.sort((a, b) => Number(b.factor.strategy === 'passkey') - Number(a.factor.strategy === 'passkey'));
+}
+
+export function factorIdentifier(factor: SignInFactor): string {
+  return 'identifier' in factor ? factor.identifier : '';
+}
+
+export function factorRow(factor: SignInFactor, m: Messages, count = 1): { label: string; description?: string } {
+  const rows = m.alternativeMethods.rows;
+  if (count > 1 && factor.strategy === 'email_code') {
+    return rows.emailCodeMany;
+  }
+  if (count > 1 && factor.strategy === 'email_link') {
+    return rows.emailLinkMany;
+  }
+  if (count > 1 && factor.strategy === 'phone_code') {
+    return rows.phoneCodeMany;
+  }
+  switch (factor.strategy) {
+    case 'password':
+      return rows.password;
+    case 'passkey':
+      return rows.passkey;
+    case 'email_code':
+      return { ...rows.emailCode, description: fill(rows.emailCode.description, { identifier: factor.identifier }) };
+    case 'email_link':
+      return { ...rows.emailLink, description: fill(rows.emailLink.description, { identifier: factor.identifier }) };
+    case 'phone_code':
+      return { ...rows.phoneCode, description: fill(rows.phoneCode.description, { identifier: factor.identifier }) };
+    case 'totp':
+      return rows.totp;
+    case 'backup_code':
+      return rows.backupCode;
+    case 'reset_password_email_code':
+    case 'reset_password_phone_code':
+      return { label: factorLabel(factor, m) };
+  }
+}
+
 export function choiceCopy(
   step: Extract<SignInStep, { kind: 'choice' }>,
   m: Messages,
 ): { title: string; description: string } {
-  return step.purpose === 'reset-methods'
-    ? { title: m.resetMethods.title, description: m.resetMethods.description }
-    : { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+  if (step.purpose === 'reset-methods') {
+    return { title: m.resetMethods.title, description: m.resetMethods.description };
+  }
+  if (step.purpose === 'addresses') {
+    const phone = step.options[0]?.strategy === 'phone_code';
+    return {
+      title: phone ? m.addresses.phoneTitle : m.addresses.emailTitle,
+      description: addressesDescription(step.options[0], m),
+    };
+  }
+  if (isSecondFactorChoice(step)) {
+    return { title: m.alternativeMethods.secondFactorTitle, description: m.alternativeMethods.secondFactorDescription };
+  }
+  return { title: m.alternativeMethods.title, description: m.alternativeMethods.description };
+}
+
+function addressesDescription(factor: SignInFactor | undefined, m: Messages): string {
+  if (factor?.strategy === 'phone_code') {
+    return m.addresses.phoneCode;
+  }
+  return factor?.strategy === 'email_link' ? m.addresses.emailLink : m.addresses.emailCode;
+}
+
+export function isSecondFactorChoice(step: Extract<SignInStep, { kind: 'choice' }>): boolean {
+  return (
+    step.purpose === 'methods' && step.options.length > 0 && step.options.every(option => option.stage === 'second')
+  );
 }
 
 interface IdentifierFieldCopy {
@@ -165,17 +276,12 @@ export function codeCopy(
 ): { title: string; description: string; fieldLabel: string } {
   const identifier = displayIdentifier(step) ?? '';
   if (step.purpose === 'reset-password') {
-    return {
-      title: m.resetPasswordCode.title,
-      description:
-        step.channel === 'phone' ? m.resetPasswordCode.descriptionPhone : m.resetPasswordCode.descriptionEmail,
-      fieldLabel: m.resetPasswordCode.label,
-    };
+    return resetPasswordCodeCopy(step, m, identifier);
   }
   if (step.purpose === 'verify-email') {
     return {
       title: m.verifyEmail.title,
-      description: fill<string>(m.verifyEmail.description, { identifier }),
+      description: fill<string>(m.verifyEmail.description, { identifier, applicationName }),
       fieldLabel: m.verifyEmail.label,
     };
   }
@@ -187,7 +293,11 @@ export function codeCopy(
           description: fill(m.verifyPhone.descriptionProvider, { provider }),
           fieldLabel: m.verifyPhone.label,
         }
-      : { title: m.verifyPhone.title, description: m.verifyPhone.description, fieldLabel: m.verifyPhone.label };
+      : {
+          title: m.verifyPhone.title,
+          description: identifier ? fill(m.verifyPhone.descriptionSentTo, { identifier }) : m.verifyPhone.description,
+          fieldLabel: m.verifyPhone.label,
+        };
   }
   if (step.channel === 'totp') {
     return {
@@ -203,6 +313,22 @@ export function codeCopy(
       ? fill(m.alternativePhoneCode.title, { provider: step.provider })
       : copy.title;
   return { title, description, fieldLabel: copy.label };
+}
+
+function resetPasswordCodeCopy(
+  step: CodeStepData,
+  m: Messages,
+  identifier: string,
+): { title: string; description: string; fieldLabel: string } {
+  return {
+    title: m.resetPasswordCode.title,
+    description: identifier
+      ? fill(m.resetPasswordCode.descriptionSentTo, { identifier })
+      : step.channel === 'phone'
+        ? m.resetPasswordCode.descriptionPhone
+        : m.resetPasswordCode.descriptionEmail,
+    fieldLabel: m.resetPasswordCode.label,
+  };
 }
 
 export function codeResendCopy(step: CodeStepData, m: Messages): CodeResendCopy {
@@ -235,13 +361,9 @@ function codeDescription(
   { identifier, applicationName }: { identifier: string; applicationName: string },
 ): string {
   if (step.resetting) {
-    return sentToIdentifier(step)
-      ? fill(m.resetPasswordMfa.descriptionSentTo, { identifier })
-      : m.resetPasswordMfa.description;
+    return identifier ? fill(m.resetPasswordMfa.descriptionSentTo, { identifier }) : m.resetPasswordMfa.description;
   }
-  return sentToIdentifier(step)
-    ? fill(copy.descriptionSentTo, { identifier })
-    : fill(copy.description, { applicationName });
+  return identifier ? fill(copy.descriptionSentTo, { identifier }) : fill(copy.description, { applicationName });
 }
 
 function identifierEditable(step: CodeStepData): boolean {
@@ -252,10 +374,6 @@ function identifierEditable(step: CodeStepData): boolean {
     step.purpose === 'verify-phone' ||
     step.purpose === 'reset-password'
   );
-}
-
-function sentToIdentifier(step: CodeStepData): boolean {
-  return Boolean(step.identifier) && !identifierEditable(step);
 }
 
 function displayIdentifier(step: CodeStepData): string | undefined {
@@ -288,6 +406,26 @@ export function codeNotice(step: CodeStepData, m: Messages): string | undefined 
   }
 }
 
+export function differentIdentifierLabel(identifier: string, m: Messages): string {
+  if (identifier.includes('@')) {
+    return m.useDifferentEmail;
+  }
+  return /^\+?[\d\s().-]+$/.test(identifier) ? m.useDifferentPhoneNumber : m.useDifferentAccount;
+}
+
+export function codeEditLabel(step: CodeStepData, m: Messages): string {
+  if (step.purpose === 'verify-email') {
+    return m.useDifferentEmail;
+  }
+  if (step.purpose === 'verify-phone') {
+    return m.useDifferentPhoneNumber;
+  }
+  if (step.purpose === 'second-factor' || step.purpose === 'client-trust') {
+    return m.useDifferentAccount;
+  }
+  return step.identifier ? differentIdentifierLabel(step.identifier, m) : m.back;
+}
+
 export function codeSecondaryAction(
   step: CodeStepData,
   m: Messages,
@@ -300,10 +438,14 @@ export function codeSecondaryAction(
     return { label: m.alternativePhoneCode.useSms, onClick: onCancel };
   }
   if (step.purpose === 'verify-phone') {
-    return { label: m.useAnotherMethod, onClick: undefined };
+    return { label: m.verifyAnotherWay, onClick: undefined };
   }
   if ((step.purpose === 'second-factor' || step.purpose === 'client-trust') && !onCancel) {
     return { label: m.back, onClick: onBack };
   }
-  return { label: m.useAnotherMethod, onClick: onCancel };
+  return {
+    label:
+      step.purpose === 'second-factor' || step.purpose === 'client-trust' ? m.verifyAnotherWay : m.useAnotherMethod,
+    onClick: onCancel,
+  };
 }

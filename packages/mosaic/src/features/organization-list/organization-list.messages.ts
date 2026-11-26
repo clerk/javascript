@@ -8,6 +8,10 @@ export const organizationListMessages = {
   acceptInvitation: 'Join',
   acceptSuggestion: 'Request to join',
   suggestionAccepted: 'Pending approval',
+  invitationAccepted: 'Joined',
   createOrganization: 'Create organization',
-  error: 'Something went wrong. Please try again.',
+  error: 'Something went wrong. Try again.',
+  membersCount: { one: '{count} member', other: '{count} members' },
+  invitedBy: 'Invited by {name}',
+  matchesDomain: 'Matches your email',
 } as const;

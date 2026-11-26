@@ -38,6 +38,7 @@ import {
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CaptchaDefault, meta as captchaMeta } from '../stories/captcha.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import { Gallery as CardGalleryGallery, meta as cardGalleryMeta } from '../stories/card-gallery.stories';
 import {
   Default as CheckboxDefault,
   meta as checkboxMeta,
@@ -253,6 +254,10 @@ import {
 } from '../stories/pagination.stories';
 import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
+  Lab as PasswordChecklistLab,
+  meta as passwordChecklistLabMeta,
+} from '../stories/password-checklist-lab.stories';
+import {
   Default as PasswordInputDefault,
   Disabled as PasswordInputDisabled,
   Invalid as PasswordInputInvalid,
@@ -422,6 +427,7 @@ import {
   meta as signInButtonMeta,
   Pending as SignInButtonPending,
 } from '../stories/sign-in-button.stories';
+import { Layouts as SignInLayoutsLayouts, meta as signInLayoutsMeta } from '../stories/sign-in-layouts.stories';
 import {
   CustomElement as SignInWithMetamaskButtonCustomElement,
   Default as SignInWithMetamaskButtonDefault,
@@ -1304,6 +1310,11 @@ const userProfileDangerSectionModule: StoryModule = {
   WithError: UserProfileDangerSectionWithError,
 };
 
+const cardGalleryModule: StoryModule = {
+  meta: cardGalleryMeta,
+  Gallery: CardGalleryGallery,
+};
+
 const confirmationModule: StoryModule = {
   meta: confirmationMeta,
   Default: ConfirmationDefault,
@@ -1353,6 +1364,16 @@ const reverificationModule: StoryModule = {
   MethodPicker: ReverificationMethodPicker,
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
+};
+
+const signInLayoutsModule: StoryModule = {
+  meta: signInLayoutsMeta,
+  Layouts: SignInLayoutsLayouts,
+};
+
+const passwordChecklistLabModule: StoryModule = {
+  meta: passwordChecklistLabMeta,
+  Lab: PasswordChecklistLab,
 };
 
 const signUpModule: StoryModule = {
@@ -1525,7 +1546,10 @@ export const registry: StoryModule[] = [
   // Authentication
   signInModule,
   signUpModule,
+  signInLayoutsModule,
+  passwordChecklistLabModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
+  cardGalleryModule,
   confirmationModule,
   destructiveModule,
   // Components

@@ -237,7 +237,7 @@ describe('useForm', () => {
     expect(result.current.error).toBe('Could not save');
     expect(result.current.fields.username.feedback).toEqual({
       type: 'error',
-      message: 'Something went wrong. Please try again.',
+      message: 'Something went wrong. Try again.',
     });
   });
 
@@ -273,7 +273,7 @@ describe('useForm', () => {
         result.current.submit();
         await tick();
       });
-      expect(result.current.error).toBe('Something went wrong. Please try again.');
+      expect(result.current.error).toBe('Something went wrong. Try again.');
       expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
     }
   });
@@ -335,7 +335,7 @@ describe('useForm', () => {
       empty.result.current.submit();
       await tick();
     });
-    expect(empty.result.current.error).toBe('Something went wrong. Please try again.');
+    expect(empty.result.current.error).toBe('Something went wrong. Try again.');
 
     const blank = renderHook(() =>
       useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new FormSubmitError({})) }),
@@ -344,7 +344,7 @@ describe('useForm', () => {
       blank.result.current.submit();
       await tick();
     });
-    expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
+    expect(blank.result.current.error).toBe('Something went wrong. Try again.');
 
     const undisplayable = renderHook(() =>
       useForm({
@@ -356,7 +356,7 @@ describe('useForm', () => {
       undisplayable.result.current.submit();
       await tick();
     });
-    expect(undisplayable.result.current.error).toBe('Something went wrong. Please try again.');
+    expect(undisplayable.result.current.error).toBe('Something went wrong. Try again.');
     expect(undisplayable.result.current.fields.username.feedback).toBeUndefined();
   });
 

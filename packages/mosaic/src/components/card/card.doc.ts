@@ -48,12 +48,27 @@ export default {
           default: "'md'",
         },
         align: { type: 'CardAlign', doc: 'Aligns every `Card.Header`: `start` or `center`.', default: "'start'" },
+        variant: {
+          type: 'CardVariant',
+          doc: '`default`, or `prominent` for a card that is the whole page, such as sign-in: wider insets, a larger title and a borderless footer.',
+          default: "'default'",
+        },
+        actions: {
+          type: 'CardActions',
+          doc: 'How the actions lay out: `stacked` puts the primary first at full width with the alternative under it, `end` groups the buttons at the inline end at their natural widths, and `fill` shares the row, stacking with the primary on top in a dialog on a phone. A nested card inherits it.',
+          default: "'stacked' for a prominent card, otherwise 'fill'",
+        },
         renderBranding: {
           type: 'boolean',
           doc: 'Signs the foot of the card with "Secured by Clerk".',
           default: 'true',
         },
       },
+    },
+    'Card.Lead': {
+      description:
+        'A mark above the first header, such as a logo. Each `Card.Header` drops its top padding to sit under it.',
+      slot: 'cl-card-lead',
     },
     'Card.Header': {
       description:
@@ -77,7 +92,8 @@ export default {
     },
     'Card.Content': { description: 'The body.', slot: 'cl-card-content' },
     'Card.Footer': {
-      description: 'The actions row. Buttons inside default to `fullWidth`. Carries `data-elevation`.',
+      description:
+        "The actions row, laid out by the card's `actions`. Buttons inside are `fullWidth` when the layout is `stacked` or `fill`; `stacked` puts the last child, the primary, first. Carries `data-elevation` and `data-actions`.",
       slot: 'cl-card-footer',
     },
   },
@@ -102,6 +118,7 @@ export default {
   related: ['Dialog', 'Banner', 'Flow', 'Branding'],
 } satisfies ComponentDoc<{
   'Card.Root': CardProps;
+  'Card.Lead': MosaicComponentProps<'div'>;
   'Card.Header': MosaicComponentProps<'div'>;
   'Card.Media': MosaicComponentProps<'div'>;
   'Card.Title': MosaicComponentProps<'h2'>;

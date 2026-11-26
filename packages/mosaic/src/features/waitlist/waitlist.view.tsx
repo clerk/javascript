@@ -50,6 +50,7 @@ export function WaitlistView({ step, form, renderBranding, isRedirecting, onSign
           {m.signIn.text}{' '}
           <Button
             type='button'
+            color='neutral'
             variant='link'
             size='sm'
             fullWidth={false}

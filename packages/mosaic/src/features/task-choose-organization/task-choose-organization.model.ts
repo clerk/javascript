@@ -70,12 +70,24 @@ export function useTaskChooseOrganizationModel({
     return { status: 'loading' };
   }
 
+  const selectOrganization = async (organizationId: string | null) => {
+    try {
+      await clerk.setActive({
+        organization: organizationId,
+        navigate: ({ session: next, decorateUrl }) => continueAfterTask(next, decorateUrl),
+      });
+    } catch (error) {
+      throw unavailableOrganization(error, user.createOrganizationEnabled);
+    }
+  };
+
   const advisory = creationDefaults.data?.advisory;
   const otherSessions = (clerk.client?.signedInSessions ?? []).filter(s => s.id !== session.id);
 
   return {
     status: 'ready',
     applicationName: environment.displayConfig.applicationName,
+    applicationLogoUrl: environment.displayConfig.logoImageUrl || undefined,
     renderBranding: environment.displayConfig.branded,
     hidePersonal: true,
     ...entries,
@@ -97,14 +109,12 @@ export function useTaskChooseOrganizationModel({
       createOrganization.status === 'ready' && user.createOrganizationEnabled
         ? { ...createOrganization, onComplete: () => continueAfterTask(clerk.session ?? session) }
         : undefined,
-    onSelectOrganization: async organizationId => {
-      try {
-        await clerk.setActive({
-          organization: organizationId,
-          navigate: ({ session: next, decorateUrl }) => continueAfterTask(next, decorateUrl),
-        });
-      } catch (error) {
-        throw unavailableOrganization(error, user.createOrganizationEnabled);
+    onSelectOrganization: selectOrganization,
+    onAcceptInvitation: async invitationId => {
+      await entries.onAcceptInvitation(invitationId);
+      const organizationId = entries.invitations.find(invitation => invitation.id === invitationId)?.organizationId;
+      if (organizationId) {
+        await selectOrganization(organizationId);
       }
     },
     onSignOut: () =>

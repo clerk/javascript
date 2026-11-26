@@ -82,9 +82,7 @@ describe('Waitlist', () => {
 
       await join('not-an-email');
 
-      await waitFor(() =>
-        expect(emailField()).toHaveAccessibleDescription('Email address must be a valid email address.'),
-      );
+      await waitFor(() => expect(emailField()).toHaveAccessibleDescription('Enter an email like name@example.com.'));
       expect(emailField()).toHaveAttribute('aria-invalid', 'true');
       expect(fapi.waitlistEntries).toEqual([]);
       expect(screen.queryByRole('heading', { name: 'Thanks for joining the waitlist!' })).toBeNull();

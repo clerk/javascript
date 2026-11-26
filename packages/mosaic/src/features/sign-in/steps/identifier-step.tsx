@@ -3,21 +3,25 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React, { type Ref } from 'react';
 
-import { AuthAlternativeChannel, AuthCaptcha } from '../../../blocks/auth';
+import { AuthAlternativeChannel, AuthCaptcha, AuthProviderIcon } from '../../../blocks/auth';
+import { Prompt } from '../../../blocks/prompt';
 import { Badge } from '../../../components/badge';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
+import { Icon } from '../../../components/icon';
 import { Input } from '../../../components/input';
 import { PasswordInput } from '../../../components/password-input';
 import { PhoneInput } from '../../../components/phone-input';
 import { ProviderButton, ProviderButtonGroup } from '../../../components/provider-button';
 import { Separator } from '../../../components/separator';
-import { Text } from '../../../components/text';
+import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { fill, useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
 import { Form } from '../../../primitives/form';
+import { mergeStyleProps, themeProps } from '../../../props';
+import { separatorGap } from '../../../styles/separator-gap.styles';
 import { SignUpLegalConsentField } from '../../sign-up/steps/sign-up-legal-consent';
 import { styles } from '../sign-in.styles';
 import type {
@@ -31,7 +35,10 @@ import { identifierFieldCopy, splitLastUsedProvider, startPrompt } from '../sign
 
 type IdentifierStepData = Extract<SignInStep, { kind: 'identifier' }>;
 
-interface IdentifierStepProps extends Omit<IdentifierStartProps, 'field' | 'nextField' | 'lastUsed' | 'password'> {
+interface IdentifierStepProps extends Omit<
+  IdentifierStartProps,
+  'field' | 'nextField' | 'lastUsed' | 'password' | 'passwordVisible'
+> {
   step: IdentifierStepData;
   onCancel?: () => void;
 }
@@ -85,6 +92,8 @@ export function IdentifierStep({ step, onCancel, ...props }: IdentifierStepProps
       nextField={step.nextField}
       lastUsed={step.lastUsed}
       password={step.password}
+      passwordVisible={step.passwordVisible}
+      emailFirst={step.emailFirst}
       {...props}
     />
   );
@@ -95,6 +104,8 @@ interface IdentifierStartProps {
   nextField?: SignInIdentifierField;
   lastUsed?: boolean;
   password?: boolean;
+  passwordVisible?: boolean;
+  emailFirst?: boolean;
   onForgotPassword?: () => void;
   lastUsedProviderId?: string;
   onSwitchField?: () => void;
@@ -105,6 +116,7 @@ interface IdentifierStartProps {
   pendingProviderId?: string;
   onSelectProvider: (id: string) => void;
   onPasskey?: () => void;
+  passkeyInlineFrom?: number;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   globalErrorMessage?: string;
@@ -121,6 +133,8 @@ function IdentifierStart({
   nextField,
   lastUsed = false,
   password = false,
+  passwordVisible = false,
+  emailFirst = false,
   onForgotPassword,
   lastUsedProviderId,
   onSwitchField,
@@ -131,6 +145,7 @@ function IdentifierStart({
   pendingProviderId,
   onSelectProvider,
   onPasskey,
+  passkeyInlineFrom,
   form,
   errorMessage,
   globalErrorMessage,
@@ -170,20 +185,25 @@ function IdentifierStart({
           {...stylex.props(isChallengeShown ? styles.spotlightHidden : styles.spotlightGroup)}
           {...inertProps(isChallengeShown)}
         >
-          <SignInProviders
-            providers={socialProviders}
-            showDivider={Boolean(field)}
-            pendingProviderId={pendingProviderId}
-            lastUsedProviderId={lastUsedProviderId}
-            isDisabled={isDisabled}
-            onSelectProvider={onSelectProvider}
-          />
+          {emailFirst && field ? null : (
+            <SignInProviders
+              providers={socialProviders}
+              showDivider={Boolean(field)}
+              pendingProviderId={pendingProviderId}
+              lastUsedProviderId={lastUsedProviderId}
+              isDisabled={isDisabled}
+              onSelectProvider={onSelectProvider}
+              onPasskey={onPasskey}
+              passkeyInlineFrom={passkeyInlineFrom}
+            />
+          )}
           {field ? (
             <StartForm
               field={field}
               nextField={nextField}
               lastUsed={lastUsed}
               password={password}
+              passwordVisible={passwordVisible}
               form={form}
               errorMessage={errorMessage}
               isDisabled={isDisabled}
@@ -193,42 +213,35 @@ function IdentifierStart({
               focusRef={focusRef}
             />
           ) : null}
+          {field ? (
+            <SubmitButton
+              form={form.id}
+              fullWidth
+              disabled={Boolean(pendingProviderId)}
+              isPending={isPending}
+              pendingLabel={m.verifying}
+            >
+              {emailFirst && field === 'email' ? m.start.continueWithEmail : m.continue}
+            </SubmitButton>
+          ) : null}
+          {emailFirst && field ? (
+            <StackedProviders
+              providers={socialProviders}
+              pendingProviderId={pendingProviderId}
+              lastUsedProviderId={lastUsedProviderId}
+              isDisabled={isDisabled}
+              onSelectProvider={onSelectProvider}
+              onPasskey={onPasskey}
+            />
+          ) : null}
         </div>
         <AuthCaptcha onInteractiveChange={setIsChallengeShown} />
-        {onPasskey ? (
-          <Button
-            type='button'
-            size='sm'
-            variant='link'
-            disabled={isDisabled}
-            onClick={onPasskey}
-            xstyle={styles.passkeyAction}
-          >
-            {m.start.usePasskey}
-          </Button>
-        ) : null}
-        <StartPrompt
-          onSignUp={onSignUp}
-          onJoinWaitlist={onJoinWaitlist}
-          isDisabled={isDisabled}
-        />
       </Card.Content>
-      {field ? (
-        <Card.Footer
-          xstyle={isChallengeShown && styles.spotlightHidden}
-          {...inertProps(isChallengeShown)}
-        >
-          <SubmitButton
-            form={form.id}
-            fullWidth
-            disabled={Boolean(pendingProviderId)}
-            isPending={isPending}
-            pendingLabel={m.verifying}
-          >
-            {m.continue}
-          </SubmitButton>
-        </Card.Footer>
-      ) : null}
+      <StartPrompt
+        onSignUp={onSignUp}
+        onJoinWaitlist={onJoinWaitlist}
+        isDisabled={isDisabled}
+      />
     </>
   );
 }
@@ -238,6 +251,7 @@ interface StartFormProps {
   nextField?: SignInIdentifierField;
   lastUsed: boolean;
   password: boolean;
+  passwordVisible: boolean;
   form: UseFormResult<SignInValues>;
   errorMessage?: string;
   isDisabled: boolean;
@@ -252,6 +266,7 @@ function StartForm({
   nextField,
   lastUsed,
   password,
+  passwordVisible,
   form,
   errorMessage,
   isDisabled,
@@ -298,6 +313,7 @@ function StartForm({
               <Button
                 type='button'
                 size='sm'
+                color='neutral'
                 variant='link'
                 disabled={isDisabled}
                 onClick={switchField}
@@ -305,13 +321,15 @@ function StartForm({
                 {identifierFieldCopy(nextField, m).switchLabel}
               </Button>
             ) : lastUsed ? (
-              <Badge color='neutral'>{m.start.lastUsed}</Badge>
+              <Badge color='primary'>{m.start.lastUsed}</Badge>
             ) : null}
           </Field.Header>
           {field === 'phone' ? (
             <PhoneInput
+              size='lg'
               ref={phoneRef}
               autoComplete='tel webauthn'
+              enterKeyHint='go'
               placeholder={copy.placeholder}
               countryTriggerLabel={m.start.selectedCountry}
               countryPopupLabel={m.start.chooseCountry}
@@ -322,8 +340,14 @@ function StartForm({
             />
           ) : (
             <Input
+              size='lg'
               ref={identifierRef}
               type={field === 'email' ? 'email' : 'text'}
+              dir={field === 'email' ? 'ltr' : undefined}
+              autoCapitalize='none'
+              autoCorrect='off'
+              spellCheck={false}
+              enterKeyHint='go'
               autoComplete={field === 'email' ? 'email webauthn' : 'username webauthn'}
               placeholder={copy.placeholder}
               {...identifier}
@@ -333,6 +357,7 @@ function StartForm({
         </Field.Root>
         {password ? (
           <StartPassword
+            visible={passwordVisible}
             form={form}
             isDisabled={isDisabled}
             onForgotPassword={onForgotPassword}
@@ -352,10 +377,12 @@ function isAutofilled(element: HTMLInputElement): boolean {
 }
 
 function StartPassword({
+  visible,
   form,
   isDisabled,
   onForgotPassword,
 }: {
+  visible: boolean;
   form: UseFormResult<SignInValues>;
   isDisabled: boolean;
   onForgotPassword?: () => void;
@@ -365,7 +392,7 @@ function StartPassword({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const ref = useMergeRefs<HTMLElement>([fieldRef, inputRef]);
   const [autofilled, setAutofilled] = React.useState(false);
-  const shown = autofilled || form.values.password !== '';
+  const shown = visible || autofilled || form.values.password !== '';
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -389,6 +416,7 @@ function StartPassword({
           <Button
             type='button'
             size='sm'
+            color='neutral'
             variant='link'
             disabled={isDisabled}
             onClick={onForgotPassword}
@@ -398,6 +426,7 @@ function StartPassword({
         ) : null}
       </Field.Header>
       <PasswordInput
+        size='lg'
         ref={ref}
         autoComplete='current-password'
         placeholder={m.password.placeholder}
@@ -416,30 +445,59 @@ interface SignInProvidersProps {
   lastUsedProviderId?: string;
   isDisabled: boolean;
   onSelectProvider: (id: string) => void;
+  onPasskey?: () => void;
+  passkeyInlineFrom?: number;
   showDivider: boolean;
 }
 
-function SignInProviders({
+const PASSKEY_INLINE_FROM = 3;
+
+const PASSKEY_ID = 'passkey';
+
+const STACKED_COUNT = 3;
+
+function SignInProviders({ showDivider, ...options }: SignInProvidersProps) {
+  const m = useMessages('signIn');
+  if (options.providers.length === 0 && !options.onPasskey) {
+    return null;
+  }
+  const stacked = options.providers.length + (options.onPasskey ? 1 : 0) === STACKED_COUNT;
+
+  return (
+    <>
+      <div {...mergeStyleProps(themeProps('sign-in-providers'), stylex.props(styles.fastOptions))}>
+        {stacked ? <StackedOptions {...options} /> : <InlineOptions {...options} />}
+      </div>
+      {showDivider ? (
+        <Separator
+          {...themeProps('sign-in-divider')}
+          xstyle={separatorGap.tight}
+        >
+          {m.start.divider}
+        </Separator>
+      ) : null}
+    </>
+  );
+}
+
+function InlineOptions({
   providers,
   pendingProviderId,
   lastUsedProviderId,
   isDisabled,
   onSelectProvider,
-  showDivider,
-}: SignInProvidersProps) {
+  onPasskey,
+  passkeyInlineFrom = PASSKEY_INLINE_FROM,
+}: Omit<SignInProvidersProps, 'showDivider'>) {
   const m = useMessages('signIn');
-  if (providers.length === 0) {
-    return null;
-  }
   const { lastUsed: lastUsedProvider, others: otherProviders } = splitLastUsedProvider(providers, lastUsedProviderId);
   const providerButton = (provider: SignInProvider, badge?: string) => (
     <ProviderButton
       key={provider.id}
       icon={
-        <img
-          src={provider.iconUrl}
-          alt=''
-          {...stylex.props(styles.providerIcon)}
+        <AuthProviderIcon
+          id={provider.id}
+          iconUrl={provider.iconUrl}
         />
       }
       longLabel={fill(m.start.socialButton, { provider: provider.name })}
@@ -451,15 +509,159 @@ function SignInProviders({
     />
   );
 
+  const passkeyLastUsed = Boolean(onPasskey) && lastUsedProviderId === PASSKEY_ID;
+  const passkeyInline = Boolean(onPasskey) && providers.length >= passkeyInlineFrom;
+  const passkeyButton = onPasskey ? (
+    <ProviderButton
+      key={PASSKEY_ID}
+      icon={<Icon glyph={SecurityPasskey} />}
+      longLabel={m.start.passkeyButton}
+      shortLabel={m.start.passkeyShort}
+      badge={passkeyLastUsed ? m.start.lastUsed : undefined}
+      isPending={pendingProviderId === PASSKEY_ID}
+      pendingLabel={m.verifying}
+      onClick={onPasskey}
+    />
+  ) : null;
+  const placement = placePasskey({
+    passkeyButton,
+    passkeyInline,
+    passkeyLastUsed,
+    lastUsedProviderButton: lastUsedProvider ? providerButton(lastUsedProvider, m.start.lastUsed) : undefined,
+  });
+  const passkeyRow = placement.row ? (
+    <ProviderButtonGroup
+      layout='stacked'
+      disabled={isDisabled}
+    >
+      {placement.row}
+    </ProviderButtonGroup>
+  ) : null;
+
+  return (
+    <>
+      {passkeyLastUsed ? passkeyRow : null}
+      {providers.length > 0 ? (
+        <ProviderButtonGroup
+          disabled={isDisabled}
+          lastUsed={placement.groupLastUsed}
+        >
+          {otherProviders.map(provider => providerButton(provider))}
+          {placement.groupTrailing}
+        </ProviderButtonGroup>
+      ) : null}
+      {passkeyLastUsed ? null : passkeyRow}
+    </>
+  );
+}
+
+function placePasskey({
+  passkeyButton,
+  passkeyInline,
+  passkeyLastUsed,
+  lastUsedProviderButton,
+}: {
+  passkeyButton: React.ReactElement | null;
+  passkeyInline: boolean;
+  passkeyLastUsed: boolean;
+  lastUsedProviderButton?: React.ReactElement;
+}) {
+  if (!passkeyButton) {
+    return { row: null, groupLastUsed: lastUsedProviderButton, groupTrailing: null };
+  }
+  if (!passkeyInline) {
+    return { row: passkeyButton, groupLastUsed: lastUsedProviderButton, groupTrailing: null };
+  }
+  if (passkeyLastUsed) {
+    return { row: null, groupLastUsed: passkeyButton, groupTrailing: null };
+  }
+  return { row: null, groupLastUsed: lastUsedProviderButton, groupTrailing: passkeyButton };
+}
+
+const STACKED_LIMIT = 3;
+
+function StackedProviders(props: Omit<SignInProvidersProps, 'showDivider'>) {
+  const m = useMessages('signIn');
+  if (props.providers.length === 0 && !props.onPasskey) {
+    return null;
+  }
+
+  return (
+    <>
+      <Separator
+        {...themeProps('sign-in-divider')}
+        xstyle={separatorGap.tight}
+      >
+        {m.start.divider}
+      </Separator>
+      <StackedOptions {...props} />
+    </>
+  );
+}
+
+function StackedOptions({
+  providers,
+  pendingProviderId,
+  lastUsedProviderId,
+  isDisabled,
+  onSelectProvider,
+  onPasskey,
+}: Omit<SignInProvidersProps, 'showDivider'>) {
+  const m = useMessages('signIn');
+  const [showAll, setShowAll] = React.useState(false);
+  const options = [
+    ...providers.map(provider => ({
+      id: provider.id,
+      icon: (
+        <AuthProviderIcon
+          id={provider.id}
+          iconUrl={provider.iconUrl}
+        />
+      ),
+      label: fill(m.start.socialButton, { provider: provider.name }),
+      onClick: () => onSelectProvider(provider.id),
+    })),
+    ...(onPasskey
+      ? [{ id: PASSKEY_ID, icon: <Icon glyph={SecurityPasskey} />, label: m.start.passkeyButton, onClick: onPasskey }]
+      : []),
+  ].sort((a, b) => Number(b.id === lastUsedProviderId) - Number(a.id === lastUsedProviderId));
+  if (options.length === 0) {
+    return null;
+  }
+  const hidden = options.length - STACKED_LIMIT;
+  const visible = showAll || hidden <= 1 ? options : options.slice(0, STACKED_LIMIT);
+
   return (
     <>
       <ProviderButtonGroup
+        layout='stacked'
         disabled={isDisabled}
-        lastUsed={lastUsedProvider ? providerButton(lastUsedProvider, m.start.lastUsed) : undefined}
       >
-        {otherProviders.map(provider => providerButton(provider))}
+        {visible.map(option => (
+          <ProviderButton
+            key={option.id}
+            icon={option.icon}
+            longLabel={option.label}
+            shortLabel={option.label}
+            badge={option.id === lastUsedProviderId ? m.start.lastUsed : undefined}
+            isPending={pendingProviderId === option.id}
+            pendingLabel={m.verifying}
+            onClick={option.onClick}
+          />
+        ))}
       </ProviderButtonGroup>
-      {showDivider ? <Separator>{m.start.divider}</Separator> : null}
+      {visible.length < options.length ? (
+        <Button
+          type='button'
+          variant='ghost'
+          color='neutral'
+          fullWidth
+          disabled={isDisabled}
+          onClick={() => setShowAll(true)}
+        >
+          {m.start.showOtherOptions}
+        </Button>
+      ) : null}
     </>
   );
 }
@@ -478,21 +680,13 @@ function StartPrompt({ onSignUp, onJoinWaitlist, isDisabled }: StartPromptProps)
   }
 
   return (
-    <Text
-      size='sm'
-      color='foreground-secondary'
-      xstyle={styles.footerText}
-    >
-      {prompt.text}{' '}
-      <Button
-        type='button'
-        size='sm'
-        variant='link'
+    <Card.Footer>
+      <Prompt
+        text={prompt.text}
+        action={prompt.link}
         disabled={isDisabled}
-        onClick={prompt.onClick}
-      >
-        {prompt.link}
-      </Button>
-    </Text>
+        onAction={prompt.onClick}
+      />
+    </Card.Footer>
   );
 }

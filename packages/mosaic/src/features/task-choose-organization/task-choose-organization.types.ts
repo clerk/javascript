@@ -9,6 +9,7 @@ export interface TaskChooseOrganizationData extends Pick<
   OrganizationListData,
   'renderBranding' | 'organizationsLoading' | 'memberships' | 'invitations' | 'suggestions' | 'paging'
 > {
+  applicationLogoUrl?: string;
   identifier?: string;
   exclusiveOrganizationId: string | null;
   creationDefaults?: { name: string; slug: string };

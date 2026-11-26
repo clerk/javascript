@@ -3,7 +3,10 @@ import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useState } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
+import type { AuthPasswordRule } from '../../../blocks/auth';
+import { AuthPasswordChecklist } from '../../../blocks/auth';
+import { VerificationActions } from '../../../blocks/verification';
+import { SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Checkbox } from '../../../components/checkbox';
 import { Field } from '../../../components/field';
@@ -21,6 +24,7 @@ interface NewPasswordStepProps {
   isPending: boolean;
   onSubmit: (event: SignInSubmitEvent) => void;
   passwordFeedback?: FieldFeedback;
+  passwordRules?: readonly AuthPasswordRule[];
   onBack: () => void;
   focusRef?: Ref<HTMLElement>;
 }
@@ -31,6 +35,7 @@ export function NewPasswordStep({
   isPending,
   onSubmit,
   passwordFeedback,
+  passwordRules,
   onBack,
   focusRef,
 }: NewPasswordStepProps) {
@@ -70,6 +75,7 @@ export function NewPasswordStep({
             disabled={isPending}
             inputRef={focusRef}
             advisoryFeedback={passwordFeedback}
+            rules={passwordRules}
           />
           <PasswordField
             form={form}
@@ -90,27 +96,22 @@ export function NewPasswordStep({
             </Field.Root>
           )}
         </div>
-      </Card.Content>
-      <Card.Footer>
-        <Button
-          type='button'
-          variant='outline'
-          color='neutral'
+        <VerificationActions
+          primary={
+            <SubmitButton
+              fullWidth
+              isPending={isPending}
+              pendingLabel={m.newPassword.pending}
+              focusableWhenDisabled
+            >
+              {m.newPassword.submit}
+            </SubmitButton>
+          }
+          secondaryLabel={m.forgotPassword.back}
+          onSecondary={onBack}
           disabled={isPending}
-          onClick={onBack}
-        >
-          {m.forgotPassword.back}
-        </Button>
-        <SubmitButton
-          form={form.id}
-          isPending={isPending}
-          pendingLabel={m.newPassword.pending}
-          disabled={!form.canSubmit}
-          focusableWhenDisabled
-        >
-          {m.newPassword.submit}
-        </SubmitButton>
-      </Card.Footer>
+        />
+      </Card.Content>
     </>
   );
 }
@@ -122,6 +123,7 @@ function PasswordField({
   disabled,
   inputRef,
   advisoryFeedback,
+  rules,
 }: {
   form: UseFormResult<SignInValues>;
   name: 'newPassword' | 'confirmPassword';
@@ -129,11 +131,13 @@ function PasswordField({
   disabled: boolean;
   inputRef?: Ref<HTMLElement>;
   advisoryFeedback?: FieldFeedback;
+  rules?: readonly AuthPasswordRule[];
 }) {
   const m = useMessages('signIn');
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];
-  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const checklist = rules && rules.length > 1 ? rules : undefined;
+  const message = feedback?.type === 'error' ? feedback : checklist ? undefined : advisoryFeedback;
   const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
   const { ref, ...control } = form.register(name);
   const mergedRef = useMergeRefs<HTMLElement>([ref, inputRef, useFlowAutoFocus<HTMLInputElement>()]);
@@ -147,6 +151,7 @@ function PasswordField({
     >
       <Field.Label>{label}</Field.Label>
       <PasswordInput
+        size='lg'
         ref={mergedRef}
         autoComplete='new-password'
         {...control}
@@ -159,6 +164,13 @@ function PasswordField({
         hidePasswordLabel={m.hidePassword}
       />
       <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+      {checklist ? (
+        <AuthPasswordChecklist
+          rules={checklist}
+          showMissed={feedback?.type === 'error'}
+          metLabel={m.newPassword.ruleMet}
+        />
+      ) : null}
     </Field.Root>
   );
 }

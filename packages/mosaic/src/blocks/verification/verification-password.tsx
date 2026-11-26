@@ -46,11 +46,9 @@ export function VerificationPassword({
 }: VerificationPasswordProps) {
   const formId = useId();
 
-  const canSubmit = value !== '';
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (canSubmit && !isPending) {
+    if (!isPending) {
       onSubmit();
     }
   };
@@ -109,7 +107,6 @@ export function VerificationPassword({
         ) : null}
         <SubmitButton
           form={formId}
-          disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

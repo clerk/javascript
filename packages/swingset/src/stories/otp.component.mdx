@@ -75,6 +75,15 @@ Inside a `Field.Root`, the field's `disabled`, `required`, and `invalid` flow in
 
 ## Examples
 
+### Interactive
+
+`123456` is accepted and every box takes the ink outline. Any other complete code turns the boxes red, shakes the row once and keeps the digits, so you can see what you typed. The shake is skipped under reduced motion. Backspace deletes one digit at a time, and clicking a box selects its digit so typing replaces it. The error belongs to that code: once it changes, the boxes return to normal. One focus ring glides between boxes, snapping when you type fast or paste.
+
+<Story
+  name='Interactive'
+  storyModule={OtpStories}
+/>
+
 ### In a Field
 
 <Story

@@ -142,7 +142,7 @@ describe('the user profile email section', () => {
     await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
     await actor.click(screen.getByRole('button', { name: 'Continue' }));
 
-    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('Something went wrong. Try again.')).toBeInTheDocument();
   });
 
   it('holds the code field until the code has been sent', async () => {
@@ -460,7 +460,7 @@ describe('email reverification', () => {
     replay.fail('action_blocked', 'Unable to set primary address.');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await waitFor(() =>
-      expect(within(emailRow()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
+      expect(within(emailRow()).getByRole('alert')).toHaveTextContent('This action couldn’t be completed.'),
     );
   });
 

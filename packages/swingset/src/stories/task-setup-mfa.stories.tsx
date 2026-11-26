@@ -1,7 +1,9 @@
+import { isCompletePhoneNumber } from '@clerk/mosaic/components/phone-input';
 import type { TaskSetupMfaReadyModel } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.controller';
 import { useTaskSetupMfaController } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.controller';
 import type { TaskSetupMfaMethod } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.types';
 import { TaskSetupMfaView } from '@clerk/mosaic/features/task-setup-mfa/task-setup-mfa.view';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -19,6 +21,19 @@ export const meta: StoryMeta = {
 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+const incompletePhoneNumber = () =>
+  new ClerkAPIResponseError('is invalid', {
+    status: 422,
+    data: [
+      {
+        code: 'form_param_format_invalid',
+        message: 'is invalid',
+        long_message: 'Phone number must be in a valid international format.',
+        meta: { param_name: 'phone_number' },
+      },
+    ],
+  });
 
 const backupCodes = [
   'k7f2m9qd',
@@ -41,10 +56,14 @@ const phones = [
 interface HarnessProps {
   methods?: readonly TaskSetupMfaMethod[];
   withPhones?: boolean;
+  knownPhones?: typeof phones;
 }
 
-function fakeModel({ methods = ['sms', 'authenticator'], withPhones = true }: HarnessProps, onComplete: () => void) {
-  const knownPhones = withPhones ? phones : [];
+function fakeModel(
+  { methods = ['sms', 'authenticator'], withPhones = true, knownPhones: givenPhones }: HarnessProps,
+  onComplete: () => void,
+) {
+  const knownPhones = givenPhones ?? (withPhones ? phones : []);
   const model: TaskSetupMfaReadyModel = {
     status: 'ready',
     userId: 'user_1',
@@ -52,12 +71,16 @@ function fakeModel({ methods = ['sms', 'authenticator'], withPhones = true }: Ha
     isOnTask: true,
     onLeave: () => {},
     renderBranding: true,
+    applicationLogoUrl: 'https://avatars.githubusercontent.com/u/49538330?v=4',
     applicationName: 'Acme',
     identifier: 'alice@example.com',
     methods,
     phones: knownPhones,
     enrollPhoneNumber: async phoneNumber => {
       await settleAfter(800);
+      if (!isCompletePhoneNumber(phoneNumber)) {
+        throw incompletePhoneNumber();
+      }
       return { status: 'needsVerification', phone: { id: 'phone_new', phoneNumber, verified: false } };
     },
     enrollSms: async (phoneId, code) => {
@@ -92,8 +115,8 @@ function fakeModel({ methods = ['sms', 'authenticator'], withPhones = true }: Ha
   return model;
 }
 
-function TaskSetupMfaHarness(props: HarnessProps & { onRestart: () => void }) {
-  const [model] = useState(() => fakeModel(props, props.onRestart));
+export function TaskSetupMfaHarness(props: HarnessProps & { onComplete: () => void }) {
+  const [model] = useState(() => fakeModel(props, props.onComplete));
   const controller = useTaskSetupMfaController(model);
   return <TaskSetupMfaView {...controller} />;
 }
@@ -105,7 +128,7 @@ function RestartableHarness(props: HarnessProps) {
     <TaskSetupMfaHarness
       key={round}
       {...props}
-      onRestart={() => setRound(current => current + 1)}
+      onComplete={() => setRound(current => current + 1)}
     />
   );
 }

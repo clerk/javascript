@@ -240,7 +240,7 @@ describe('enterprise accounts', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
+      expect(screen.getByRole('alert')).toHaveTextContent('The connection couldn’t start. Try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
     await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
@@ -314,7 +314,7 @@ describe('enterprise accounts', () => {
 
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
+      expect(screen.getByRole('alert')).toHaveTextContent('The connection couldn’t start. Try again.'),
     );
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();

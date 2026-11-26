@@ -1,7 +1,9 @@
 import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
+import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../../components/button';
+import { VerificationActions } from '../../../blocks/verification';
+import { SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useMessages } from '../../../localization';
 import { useFlowAutoFocus } from '../../../primitives/flow/flow-step-context';
@@ -23,43 +25,47 @@ export function SignInPasswordCompromised({
 }: SignInPasswordCompromisedProps) {
   const m = useMessages('signIn');
   const ref = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLButtonElement>()]);
+  const messageId = useId();
 
   return (
     <>
       <Card.Header>
         <Card.Title>{m.passwordCompromised.title}</Card.Title>
+        <Card.Description>
+          <span id={messageId}>{m.passwordCompromised.message}</span>
+        </Card.Description>
       </Card.Header>
       <Card.Banner
         role='alert'
         color='negative'
       >
-        {globalErrorMessage ?? m.passwordCompromised.message}
+        {globalErrorMessage}
       </Card.Banner>
-      <Card.Footer>
-        {onCancel ? (
-          <Button
-            ref={onForgotPassword ? undefined : ref}
-            type='button'
-            variant='outline'
-            color='neutral'
+      {onForgotPassword || onCancel ? (
+        <Card.Content>
+          <VerificationActions
+            primary={
+              onForgotPassword ? (
+                <SubmitButton
+                  ref={ref}
+                  type='button'
+                  aria-describedby={messageId}
+                  fullWidth
+                  isPending={isPending}
+                  pendingLabel={m.passwordCompromised.pending}
+                  onClick={onForgotPassword}
+                >
+                  {m.passwordCompromised.resetPassword}
+                </SubmitButton>
+              ) : undefined
+            }
+            secondaryLabel={m.useAnotherMethod}
+            onSecondary={onCancel}
             disabled={isPending}
-            onClick={onCancel}
-          >
-            {m.useAnotherMethod}
-          </Button>
-        ) : null}
-        {onForgotPassword ? (
-          <SubmitButton
-            ref={ref}
-            type='button'
-            isPending={isPending}
-            pendingLabel={m.passwordCompromised.pending}
-            onClick={onForgotPassword}
-          >
-            {m.passwordCompromised.resetPassword}
-          </SubmitButton>
-        ) : null}
-      </Card.Footer>
+            secondaryRef={onForgotPassword ? undefined : ref}
+          />
+        </Card.Content>
+      ) : null}
     </>
   );
 }

@@ -7,11 +7,11 @@ import type { IconProps } from '../../components/icon';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Spinner } from '../../components/spinner';
-import { Text } from '../../components/text';
 import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
+import { optical } from '../../styles/optical.styles';
 import { rtl } from '../../styles/rtl.styles';
-import { styles } from './verification.styles';
+import { Prompt } from '../prompt';
 
 interface VerificationMethod {
   id: string;
@@ -89,7 +89,7 @@ export function VerificationMethodPicker({
                   ) : (
                     <Icon
                       glyph={ChevronRight}
-                      xstyle={rtl.mirror}
+                      xstyle={[rtl.mirror, optical.trailingChevron]}
                     />
                   )}
                 </Item.Actions>
@@ -108,26 +108,16 @@ export function VerificationMethodPicker({
             </Button>
           ) : null}
         </Item.Group>
-        <Text
-          size='xs'
-          xstyle={styles.helpText}
-        >
-          {messages.helpText}{' '}
-          <Button
-            type='button'
-            size='sm'
-            color='neutral'
-            variant='link'
-            disabled={Boolean(pendingMethodId)}
-            onClick={() => {
-              if (!pendingMethodId) {
-                onHelp();
-              }
-            }}
-          >
-            {messages.helpButton}
-          </Button>
-        </Text>
+        <Prompt
+          text={messages.helpText}
+          action={messages.helpButton}
+          disabled={Boolean(pendingMethodId)}
+          onAction={() => {
+            if (!pendingMethodId) {
+              onHelp();
+            }
+          }}
+        />
       </Card.Content>
     </>
   );

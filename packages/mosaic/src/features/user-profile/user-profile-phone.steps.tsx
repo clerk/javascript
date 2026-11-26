@@ -5,7 +5,7 @@ import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
+import { Card, useCardAlign } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Otp } from '../../components/otp';
@@ -14,6 +14,7 @@ import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
 import { useFlowAutoFocus } from '../../primitives/flow/flow-step-context';
 import { Form } from '../../primitives/form';
+import { resendLine } from '../../styles/resend-line.styles';
 import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { CODE_LENGTH } from '../../utils/verification';
 
@@ -110,6 +111,7 @@ interface VerifyPhoneStepProps {
 export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
   const m = useMessages('userProfile').phone.addDialog;
   const verifyFormId = useId();
+  const centered = useCardAlign() === 'center';
   const canSubmit = props.code.length === CODE_LENGTH;
 
   const submitCode = (code?: string) => {
@@ -158,11 +160,11 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <Field.Description>
+          <Field.Description xstyle={centered ? resendLine.center : resendLine.start}>
             {m.verify.resendText}{' '}
             <Button
               type='button'
-              size='sm'
+              size='md'
               variant='link'
               color='neutral'
               disabled={props.isPending || props.isResending || (props.resendSeconds ?? 0) > 0}
