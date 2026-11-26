@@ -225,3 +225,41 @@ describe('arriving on the enterprise route with no form to hold', () => {
     expect(await screen.findByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
   });
 });
+
+describe('a Protect check on a sign-up that needs enterprise SSO', () => {
+  it('runs the Protect check, then sends the user to the identity provider', async () => {
+    const { fapi, leave, user } = await submitEnterpriseEmail({
+      signUp: { ...oneConnection.signUp, protectChecks: 1 },
+    });
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: 'I am human' }));
+
+    await waitFor(() => expect(leave).toHaveBeenCalled());
+    expect(String(leave.mock.calls[0][0])).toBe(IDP_URL);
+    expect(starts(fapi)).toHaveLength(1);
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+  });
+
+  it('runs the Protect check raised on the return from the identity provider, then finishes the sign-up', async () => {
+    const { fapi, leave, unmount } = await submitEnterpriseEmail(
+      { signUp: { ...oneConnection.signUp, protectChecks: 1, protectCheckOn: 'oauth_callback' } },
+      { signUpFallbackRedirectUrl: '/welcome' },
+    );
+    await waitFor(() => expect(leave).toHaveBeenCalled());
+    const callback = new URL(starts(fapi)[0].get('redirect_url') ?? '');
+
+    unmount();
+    fapi.signUp.returnFromOAuth();
+    window.history.replaceState(null, '', `${callback.pathname}${callback.search}`);
+    const { navigate } = await renderWithClerk(<SignUp />, { signUpFallbackRedirectUrl: '/welcome' });
+
+    expect(await screen.findByRole('heading', { name: 'Verifying your request' })).toBeInTheDocument();
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'I am human' }));
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/welcome'));
+    expect(fapi.signUp.proofTokens).toEqual(['proof_ptk_1']);
+    expect(fapi.client.sessions).toHaveLength(1);
+    expect(starts(fapi)).toHaveLength(1);
+  });
+});
