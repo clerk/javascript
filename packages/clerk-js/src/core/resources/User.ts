@@ -42,7 +42,6 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { computeMergePatch } from '../../utils/mergePatch';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
@@ -271,34 +270,15 @@ export class User extends BaseResource implements UserResource {
       );
     }
 
-    // The FAPI endpoint deprecates `unsafe_metadata` on PATCH /me. Route
-    // metadata through PATCH /me/metadata (deep-merge) while preserving the
-    // *replace* semantics of `user.update({ unsafeMetadata })` by
-    // diffing the locally-cached value against the desired one and sending
-    // an RFC 7396 merge patch (null-deletes for removed keys).
-    //
-    //
-    // When `hasRest` is true the PATCH /me below refreshes `this` in place
-    // via `fromJSON` before we read `this.unsafeMetadata` for the diff.
-    // When it's false (only-metadata update), no upstream call refreshes the cache,
-    // so we `reload()` explicitly.
     if (hasRest) {
       await this._basePatch({
         body: normalizeUnsafeMetadata(rest as UpdateUserParams),
       });
-    } else {
-      await this.reload();
     }
 
-    const patch = computeMergePatch(this.unsafeMetadata, unsafeMetadata);
-
-    // An empty patch means current already equals desired — short-circuit.
-    if (patch !== null && typeof patch === 'object' && Object.keys(patch).length === 0) {
-      return this;
-    }
-
-    return this.updateMetadata({
-      unsafeMetadata: patch as UserUnsafeMetadata,
+    return this._basePut({
+      path: `${this.path()}/metadata`,
+      body: normalizeUnsafeMetadata({ unsafeMetadata }),
     });
   };
 
