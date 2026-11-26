@@ -48,7 +48,8 @@ describe('sign-up shown route', () => {
     ],
     ['keeps the protect route under continue', 'continueProtectCheck', { type: 'protect' }, 'continueProtectCheck'],
     ['keeps start while enterprise SSO is pending', 'start', { type: 'enterprise_sso' }, 'start'],
-    ['sends enterprise SSO to its route', 'continue', { type: 'enterprise_sso' }, 'enterpriseConnections'],
+    ['keeps continue while enterprise SSO is pending', 'continue', { type: 'enterprise_sso' }, 'continue'],
+    ['sends enterprise SSO to its route', 'verifyEmail', { type: 'enterprise_sso' }, 'enterpriseConnections'],
     ['has no route for an unknown step', 'verifyEmail', { type: 'unknown' }, undefined],
     ['moves a task route back to start once signed out', 'taskChooseOrganization', { type: 'start' }, 'start'],
   ])('%s', (_, route, step, expected) => {

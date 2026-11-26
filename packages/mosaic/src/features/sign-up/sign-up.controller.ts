@@ -11,6 +11,7 @@ import type { MosaicLocationOptions } from '../../routing/use-mosaic-location';
 import { useRouteGuard } from '../../routing/use-route-guard';
 import { useRouterScope } from '../../routing/use-router';
 import { toLocalizableError } from '../../utils/errors';
+import { REDIRECT_HOLD_MS } from '../../utils/redirect';
 import { flowOutcome } from '../auth-flow/auth-flow.utils';
 import type { SignUpCreateResult, SignUpFlowModel, SignUpReadyModel } from './sign-up.model';
 import type { SignUpRoute } from './sign-up.routes';
@@ -109,7 +110,7 @@ export function useSignUpController(
   { isTaskReady, ...options }: MosaicLocationOptions & { isTaskReady: boolean },
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
-  const actions = usePendingAction<'startOver' | 'ticket' | 'return'>();
+  const actions = usePendingAction<'startOver' | 'ticket' | 'return' | 'enterpriseSso'>();
   const redeemedTicket = useRef<string | undefined>(undefined);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
@@ -136,9 +137,11 @@ export function useSignUpController(
   const { flow, navigation, verification } = model;
   const isReturning = actions.pendingKey === 'return' || (flow.isReturning && actions.lastKey === undefined);
   const shown = shownRoute(route, outcome, flow.step);
+  const startsEnterpriseSso =
+    outcome.type === 'resource' && shown === 'enterpriseConnections' && actions.lastKey !== 'enterpriseSso';
   const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
   const screen =
-    isReturning || actions.pendingKey === 'ticket'
+    isReturning || startsEnterpriseSso || actions.pendingKey === 'ticket' || actions.pendingKey === 'enterpriseSso'
       ? 'loading'
       : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
 
@@ -180,11 +183,21 @@ export function useSignUpController(
     onSubmit: actions.reset,
     onNext: next,
     onSignIn: navigation.goToSignIn,
+    startEnterpriseSso: flow.startEnterpriseSso,
   });
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return once when sign-up opens with its marker in the URL, on any route, or redeems an invitation once when it opens on start with its ticket; arriving from a redirect or a link is not an event a handler could run from. */
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return once when sign-up opens with its marker in the URL, on any route, redeems an invitation once when it opens on start with its ticket, or starts the enterprise SSO redirect once when the enterprise route opens; arriving from a redirect or a link is not an event a handler could run from, and a submit, a ticket and a return all arrive on the enterprise route. */
   useEffect(() => {
     if (flow.isReturning && actions.lastKey === undefined) {
       completeReturn();
+      return;
+    }
+    if (startsEnterpriseSso) {
+      if (!actions.isPending) {
+        void actions.run('enterpriseSso', async () => {
+          await flow.startEnterpriseSso();
+          await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+        });
+      }
       return;
     }
     if (

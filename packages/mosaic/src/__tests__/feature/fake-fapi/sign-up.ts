@@ -28,6 +28,7 @@ type Identifier = 'email_address' | 'phone_number';
 export interface FakeSignUpSeed {
   takenEmailAddresses?: string[];
   enterpriseDomains?: string[];
+  enterpriseConnectionCount?: number;
   sessionTasks?: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords?: Record<string, string[]>;
@@ -56,6 +57,7 @@ export type FakeTicket = { emailAddress: string } | 'expired';
 export interface FakeSignUpState {
   takenEmailAddresses: string[];
   enterpriseDomains: string[];
+  enterpriseConnectionCount: number;
   sessionTasks: SessionJSON['tasks'];
   blocked?: Record<string, string>;
   weakPasswords: Record<string, string[]>;
@@ -84,6 +86,7 @@ export function createSignUpState(seed: FakeSignUpSeed = {}): FakeSignUpState {
   return {
     takenEmailAddresses: [],
     enterpriseDomains: [],
+    enterpriseConnectionCount: 1,
     sessionTasks: null,
     weakPasswords: {},
     protectChecks: 0,
@@ -216,6 +219,9 @@ export function signUpHandlers(
     };
   };
 
+  const inEnterpriseDomain = (signUp: SignUpJSON) =>
+    state.signUp.enterpriseDomains.includes(signUp.email_address?.split('@')[1] ?? '');
+
   const settle = (signUp: SignUpJSON): SignUpJSON => {
     const { attributes } = settings();
     const { required_fields, optional_fields } = requirements();
@@ -250,7 +256,7 @@ export function signUpHandlers(
       settings().sign_up.progressive &&
       identifierNames.every(name => !attributes[name].required) &&
       !identifierNames.some(name => provided(name));
-    const enterprise = state.signUp.enterpriseDomains.includes(signUp.email_address?.split('@')[1] ?? '');
+    const enterprise = inEnterpriseDomain(signUp) && linked !== 'enterprise_sso';
     const missingFields: SignUpField[] = [
       ...required_fields.filter(field => !provided(field)),
       ...(anyIdentifierMissing ? identifierNames : []),
@@ -331,6 +337,43 @@ export function signUpHandlers(
     };
   };
 
+  const startEnterpriseSso = (signUp: SignUpJSON, body: URLSearchParams): SignUpJSON | ReturnType<typeof rejected> => {
+    if (!inEnterpriseDomain(signUp)) {
+      return rejected('form_param_value_invalid', 'strategy does not match one of the allowed values.', 'strategy');
+    }
+    if (state.signUp.enterpriseConnectionCount > 1 && !body.get('enterprise_connection_id')) {
+      return rejected(
+        'enterprise_connection_id_is_required_with_multiple_connections',
+        'An enterprise connection ID is required when the domain has several connections.',
+        'enterprise_connection_id',
+      );
+    }
+    if (!body.get('redirect_url')) {
+      return rejected('form_conditional_param_missing', 'redirect_url must be included.', 'redirect_url');
+    }
+    return {
+      ...signUp,
+      verifications: {
+        ...signUp.verifications,
+        external_account: {
+          ...fapiUnpreparedVerification(),
+          ...fapiVerification('enterprise_sso'),
+          next_action: '',
+          supported_strategies: ['enterprise_sso'],
+          external_verification_redirect_url: 'https://idp.example/sso?strategy=enterprise_sso',
+        },
+      },
+    };
+  };
+
+  const startExternal = (signUp: SignUpJSON, body: URLSearchParams) => {
+    const strategy = body.get('strategy');
+    if (strategy === 'enterprise_sso') {
+      return startEnterpriseSso(signUp, body);
+    }
+    return strategy?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+  };
+
   state.signUp.returnFromOAuth = () => {
     const signUp = state.client.sign_up;
     const external = signUp?.verifications?.external_account;
@@ -374,29 +417,29 @@ export function signUpHandlers(
     }
     const linked = withExternal({ status: 'verified' });
     state.signUp.linkedStrategy = external.strategy;
-    store(
-      settle(
-        runProtectCheck(
-          {
-            ...linked,
-            email_address: signUp.email_address ?? account.emailAddress,
-            first_name: signUp.first_name ?? account.firstName ?? null,
-            last_name: signUp.last_name ?? account.lastName ?? null,
-            verifications: {
-              ...linked.verifications!,
-              email_address: signUp.email_address
+    const returned = settle(
+      runProtectCheck(
+        {
+          ...linked,
+          email_address: signUp.email_address ?? account.emailAddress,
+          first_name: signUp.first_name ?? account.firstName ?? null,
+          last_name: signUp.last_name ?? account.lastName ?? null,
+          verifications: {
+            ...linked.verifications!,
+            email_address:
+              signUp.email_address && external.strategy !== 'enterprise_sso'
                 ? linked.verifications!.email_address
                 : {
                     ...fapiUnpreparedVerification(),
                     ...fapiVerification(`from_${external.strategy}`, { status: 'verified' }),
                     next_action: '',
                   },
-            },
           },
-          'oauth_callback',
-        ),
+        },
+        'oauth_callback',
       ),
     );
+    state.client = { ...state.client, sign_up: returned };
   };
 
   const apply = (signUp: SignUpJSON, body: URLSearchParams) => {
@@ -678,7 +721,7 @@ export function signUpHandlers(
       }
       const body = new URLSearchParams(await request.text());
       state.signUp.updates.push(body);
-      const started = body.get('strategy')?.startsWith('oauth_') ? startOAuth(signUp, body) : signUp;
+      const started = startExternal(signUp, body);
       if (started instanceof HttpResponse) {
         return started;
       }

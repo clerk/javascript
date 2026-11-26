@@ -84,6 +84,7 @@ export interface SignUpFlowModel {
   leave: () => void;
   ticket: string | undefined;
   redeemTicket: () => Promise<{ result: SignUpCreateResult; emailAddress: string }>;
+  startEnterpriseSso: () => Promise<void>;
   isReturning: boolean;
   completeReturn: () => Promise<SignUpCreateResult | undefined>;
   finalize: () => Promise<void>;
@@ -495,6 +496,20 @@ export function useSignUpModel({
           return { result: { type: 'blocked', details: blocked }, emailAddress: '' };
         }
         return { result: next(signUp), emailAddress: signUp.emailAddress ?? '' };
+      },
+      startEnterpriseSso: async () => {
+        await save(() =>
+          run(() =>
+            signUp.sso({
+              strategy: 'enterprise_sso',
+              redirectCallbackUrl: ssoCallbackUrl(),
+              redirectUrl: afterSignUpUrl,
+            }),
+          ),
+        );
+        if (!signUp.verifications.externalAccount.externalVerificationRedirectURL) {
+          throw new SaveError({ global: UNEXPECTED_ERROR });
+        }
       },
       isReturning: query.get(RETURN_PARAM) === SSO_RETURN,
       completeReturn: async () => {

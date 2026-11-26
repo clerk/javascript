@@ -101,11 +101,12 @@ interface SignUpDetailsOptions {
   onSubmit?: () => void;
   onNext: (result: SignUpCreateResult) => void;
   onSignIn: () => void;
+  startEnterpriseSso: () => Promise<void>;
 }
 
 export function useSignUpDetailsController(
   details: SignUpDetailsModel,
-  { purpose, isBusy, globalErrorMessage, onSubmit, onNext, onSignIn }: SignUpDetailsOptions,
+  { purpose, isBusy, globalErrorMessage, onSubmit, onNext, onSignIn, startEnterpriseSso }: SignUpDetailsOptions,
 ) {
   const [chosenIdentifier, setChosenIdentifier] = useState<SignUpIdentifier | undefined>(undefined);
   const [chosenChannel, setChosenChannel] = useState<PhoneCodeChannel | undefined>(undefined);
@@ -124,17 +125,23 @@ export function useSignUpDetailsController(
   const form = useForm<SignUpValues, SignUpCreateResult | undefined>({
     initialValues: { ...emptyValues, ...details.prefill },
     fields: requiredFields(fields, consentRequired, m),
-    onSubmit: values => {
+    onSubmit: async values => {
       onSubmit?.();
       providerActions.reset();
       const submitted = detailsValues(values, fields);
-      if (purpose === 'continue' || details.inTicketSignUp) {
-        return details.update(submitted);
+      const result =
+        purpose === 'continue' || details.inTicketSignUp
+          ? await details.update(submitted)
+          : await details.create(
+              { ...submitted, ...details.startHiddenValuesFor(identifier) },
+              { channel: alternativeChannel?.id },
+            );
+      if (result.type !== 'enterprise_sso') {
+        return result;
       }
-      return details.create(
-        { ...submitted, ...details.startHiddenValuesFor(identifier) },
-        { channel: alternativeChannel?.id },
-      );
+      await startEnterpriseSso();
+      await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+      return undefined;
     },
     onSuccess: result => {
       if (result) {
