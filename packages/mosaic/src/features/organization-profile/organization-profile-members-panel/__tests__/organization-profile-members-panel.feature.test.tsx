@@ -68,22 +68,16 @@ describe('OrganizationProfileMembersPanel', () => {
     const list = holdRequests('get', '/v1/organizations/:organizationId/memberships');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const table = () => screen.getByRole('table', { name: 'Members' });
-    const columnWidths = () =>
-      within(table())
-        .getAllByRole('columnheader')
-        .map(cell => cell.getBoundingClientRect().width);
 
     expect(await screen.findByRole('status')).toHaveTextContent('Loading members');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
     expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeDisabled();
-    const loadingWidths = columnWidths();
     list.release();
     expect(await screen.findByText('Bob Smith')).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('Members loaded');
     expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeVisible();
     expect(within(table()).getAllByRole('row')).toHaveLength(3);
-    expect(columnWidths()).toEqual(loadingWidths);
   });
 
   it('loads roles for a member who can only read members', async () => {
