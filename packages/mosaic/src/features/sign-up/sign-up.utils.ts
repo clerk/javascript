@@ -85,7 +85,10 @@ const FORM_FIELDS: Partial<Record<SignUpField, SignUpFieldName>> = {
   phone_number: 'phoneNumber',
 };
 
-type SignUpFieldLists = Pick<SignUpFutureResource, 'missingFields' | 'optionalFields' | 'unverifiedFields'>;
+type SignUpFieldLists = Pick<
+  SignUpFutureResource,
+  'missingFields' | 'optionalFields' | 'requiredFields' | 'unverifiedFields'
+>;
 
 function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists): SignUpField[] {
   return missingFields.filter(
@@ -98,11 +101,15 @@ function missingIdentifiers({ missingFields, optionalFields }: SignUpFieldLists)
 
 const CONTINUE_REQUIREMENTS: readonly SignUpField[] = ['legal_accepted', 'email_address_or_phone_number'];
 
-export function continueCanSatisfy(signUp: SignUpFieldLists): boolean {
+export function continueCanSatisfy(signUp: SignUpFieldLists, providers: readonly string[]): boolean {
+  if (signUp.requiredFields.filter(field => field.startsWith('oauth_')).length > 1) {
+    return false;
+  }
   const asksForIdentifier = missingIdentifiers(signUp).length > 0;
   return signUp.missingFields.every(
     field =>
       field in FORM_FIELDS ||
+      providers.includes(field) ||
       CONTINUE_REQUIREMENTS.includes(field) ||
       (asksForIdentifier && signUp.optionalFields.includes(field)),
   );

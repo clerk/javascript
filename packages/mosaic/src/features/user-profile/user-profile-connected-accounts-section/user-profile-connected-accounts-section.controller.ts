@@ -8,8 +8,8 @@ import { usePanelTitle } from '../../../components/panel/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import { REDIRECT_HOLD_MS } from '../../../utils/redirect';
 import type { ReverificationController } from '../../reverification';
-import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,

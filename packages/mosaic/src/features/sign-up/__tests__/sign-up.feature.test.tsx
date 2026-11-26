@@ -561,7 +561,7 @@ describe('SignUp', () => {
   });
 
   describe('starting over', () => {
-    it('offers Start over when the sign-up needs a requirement the continue screen cannot ask for', async () => {
+    it('offers Start over when the sign-up needs a provider that cannot sign the user in', async () => {
       const { user } = await renderSignUp({
         environment: environment({
           user_settings: {
@@ -569,7 +569,7 @@ describe('SignUp', () => {
               oauth_google: {
                 enabled: true,
                 required: true,
-                authenticatable: true,
+                authenticatable: false,
                 strategy: 'oauth_google',
                 name: 'Google',
                 logo_url: null,

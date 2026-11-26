@@ -1,6 +1,6 @@
 import { usePendingAction } from '../../../hooks/use-pending-action';
+import { REDIRECT_HOLD_MS } from '../../../utils/redirect';
 import type { ReverificationController } from '../../reverification';
-import { REDIRECT_HOLD_MS } from '../user-profile.utils';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,

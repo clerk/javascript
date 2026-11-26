@@ -109,7 +109,7 @@ export function useSignUpController(
   { isTaskReady, ...options }: MosaicLocationOptions & { isTaskReady: boolean },
 ): SignUpControllerResult {
   const { route, go } = useRouterScope(signUpRoutes, { ...options, root: 'start' });
-  const actions = usePendingAction<'startOver' | 'ticket'>();
+  const actions = usePendingAction<'startOver' | 'ticket' | 'return'>();
   const redeemedTicket = useRef<string | undefined>(undefined);
   const errorText = useErrorText();
   const [finishSnapshot, sendFinish] = useMachine(finishMachine);
@@ -134,10 +134,13 @@ export function useSignUpController(
 
   const model = isHolding ? (finishSnapshot.context.frozenModel ?? liveModel) : liveModel;
   const { flow, navigation, verification } = model;
+  const isReturning = actions.pendingKey === 'return' || (flow.isReturning && actions.lastKey === undefined);
   const shown = shownRoute(route, outcome, flow.step);
   const heldScreen = isHolding ? finishSnapshot.context.frozenScreen : undefined;
   const screen =
-    actions.pendingKey === 'ticket' ? 'loading' : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
+    isReturning || actions.pendingKey === 'ticket'
+      ? 'loading'
+      : (heldScreen ?? screenFor(shown, flow, blocked !== undefined));
 
   useRouteGuard({ route, go }, shown);
 
@@ -150,11 +153,23 @@ export function useSignUpController(
       sendFinish({ type: 'FINISH', frozenModel: model, frozenScreen });
       return;
     }
+    if (result.type === 'transfer') {
+      completeReturn();
+      return;
+    }
     const nextRoute = routeFor(result, route);
     if (nextRoute) {
       go(nextRoute);
     }
   };
+
+  const completeReturn = () =>
+    void actions.run('return', async () => {
+      const result = await flow.completeReturn();
+      if (result) {
+        next(result);
+      }
+    });
 
   const finishError = finishSnapshot.context.error ? errorText(finishSnapshot.context.error) : undefined;
   const flowError = finishError ?? actions.error;
@@ -166,9 +181,19 @@ export function useSignUpController(
     onNext: next,
     onSignIn: navigation.goToSignIn,
   });
-  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Redeems the invitation once when sign-up opens on start with a ticket in the URL; arriving from the invitation link is not an event a handler could run from. */
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Completes an OAuth return once when sign-up opens with its marker in the URL, on any route, or redeems an invitation once when it opens on start with its ticket; arriving from a redirect or a link is not an event a handler could run from. */
   useEffect(() => {
-    if (!flow.ticket || model.details.inTicketSignUp || route !== 'start' || redeemedTicket.current === flow.ticket) {
+    if (flow.isReturning && actions.lastKey === undefined) {
+      completeReturn();
+      return;
+    }
+    if (
+      actions.isPending ||
+      !flow.ticket ||
+      model.details.inTicketSignUp ||
+      route !== 'start' ||
+      redeemedTicket.current === flow.ticket
+    ) {
       return;
     }
     redeemedTicket.current = flow.ticket;

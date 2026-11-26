@@ -5,8 +5,10 @@ import { useState } from 'react';
 import type { FieldFeedback, FieldsConfig } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { MosaicMessages } from '../../../localization';
 import { useMessages } from '../../../localization';
+import { REDIRECT_HOLD_MS } from '../../../utils/redirect';
 import type { SignUpCreateResult, SignUpDetailsModel, SignUpDetailsValues, SignUpIdentifier } from '../sign-up.model';
 import type {
   SignUpAlternativePhoneScreen,
@@ -109,6 +111,7 @@ export function useSignUpDetailsController(
   const [chosenChannel, setChosenChannel] = useState<PhoneCodeChannel | undefined>(undefined);
   const genericError = useMessages('errors').generic;
   const m = useMessages('signUp');
+  const providerActions = usePendingAction<string>();
   const identifier = chosenIdentifier ?? details.initialIdentifier;
   const startFields = details.startFieldsFor(identifier);
   const continueFields = details.continueFieldsFor(identifier);
@@ -123,6 +126,7 @@ export function useSignUpDetailsController(
     fields: requiredFields(fields, consentRequired, m),
     onSubmit: values => {
       onSubmit?.();
+      providerActions.reset();
       const submitted = detailsValues(values, fields);
       if (purpose === 'continue' || details.inTicketSignUp) {
         return details.update(submitted);
@@ -147,14 +151,15 @@ export function useSignUpDetailsController(
   const passwordFeedback: FieldFeedback | undefined = strength.isError
     ? { type: 'error', message: genericError }
     : strength.data;
-  const isPending = form.isSubmitting || isBusy;
+  const isPending = form.isSubmitting || isBusy || providerActions.isPending;
 
   const screen: Omit<SignUpDetailsScreen, 'step' | 'onSwitchField' | 'socialProviders' | 'onSelectProvider'> = {
     form,
     onSubmit: form.handleSubmit,
     isPending,
     isDisabled: isPending,
-    globalErrorMessage: form.error ?? globalErrorMessage,
+    globalErrorMessage: form.error ?? providerActions.error ?? globalErrorMessage,
+    pendingProviderId: providerActions.pendingKey,
     passwordFeedback,
     onSignIn,
   };
@@ -177,6 +182,24 @@ export function useSignUpDetailsController(
       }
     : undefined;
 
+  const selectOAuth = (id: string) => {
+    const provider = details.oauthProviders.find(oauth => oauth.id === id);
+    if (!provider) {
+      return;
+    }
+    void providerActions.run(id, async () => {
+      const result = await details.sso(provider.id, {
+        legalAccepted: form.values.legalAccepted,
+        continueSignUp: purpose === 'continue',
+      });
+      if (result) {
+        onNext(result);
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, REDIRECT_HOLD_MS));
+    });
+  };
+
   const switchField = (purpose: 'start' | 'continue') =>
     canSwitch(purpose, details) ? () => setChosenIdentifier(otherIdentifier(identifier)) : undefined;
 
@@ -186,16 +209,22 @@ export function useSignUpDetailsController(
       ...screen,
       step: detailsStep('start', startFields, details, identifier),
       onSwitchField: switchField('start'),
-      socialProviders: details.alternativeChannels,
-      onSelectProvider: (id: string) =>
-        switchChannel(details.alternativeChannels.find(provider => provider.id === id)?.id),
+      socialProviders: [...details.oauthProviders, ...details.alternativeChannels],
+      onSelectProvider: (id: string) => {
+        const channel = details.alternativeChannels.find(provider => provider.id === id)?.id;
+        if (channel) {
+          switchChannel(channel);
+          return;
+        }
+        selectOAuth(id);
+      },
     },
     continue: {
       ...screen,
       step: detailsStep('continue', continueFields, details, identifier),
       onSwitchField: switchField('continue'),
-      socialProviders: [],
-      onSelectProvider: () => undefined,
+      socialProviders: details.continueOAuthProviders,
+      onSelectProvider: selectOAuth,
     },
     error: form.error,
     leaveChannel: () => switchChannel(undefined),
