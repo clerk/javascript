@@ -102,6 +102,7 @@ const form = useForm({
 - Mutations and required revalidation go in `onSubmit`. Success UI, such as closing the dialog or a toast, goes in the synchronous `onSuccess(result, submittedValues)`, whose result type comes from `onSubmit`.
 - `onSuccess` runs during the completion transition, before `isSubmitting` clears, and only while the form is mounted. Use it to close or show UI, not to reset or resubmit. Rejection and a cancelled reverification skip it.
 - A resolved `onSubmit` counts as success even if it returned early. Prevent no-op submissions with `canSubmit`, or return a result that lets `onSuccess` tell them apart.
+- **Exception: sign-up says which required fields are empty.** `canSubmit` disables the submit button, and a disabled button does not say what is missing. The sign-up details form leaves the button enabled and gives each required field a `validate` in `fields` (`requiredFields` in `sign-up-details.controller.ts`). A submit then marks every field touched, shows the errors, focuses the first one and sends nothing. A field shows its error once it is touched, and the form's first field is autofocused. So its text and phone inputs do not receive `onBlur`, and the errors wait for the submit.
 - Unmounting does not cancel the request. If an identity change should discard its completion UI, unmount the form, for example through the composing component's React `key`.
 
 ## Machines
