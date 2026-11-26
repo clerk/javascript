@@ -1,0 +1,232 @@
+import * as ChartStories from './chart.stories';
+
+# Chart
+
+A stacked bar chart over a category or time axis, with values above and below zero. It is a
+**headless** primitive: `Chart.useBarChart` owns the layout and selection, `Chart.Bars` and
+`Chart.Bar` paint the bars, and the shared parts draw the root, grid, axes, lines, selection,
+cursor and tooltip from the chart object the hook returns. D3 computes the stacks and scales,
+Canvas paints the bars, SVG draws the grid, axes and marks, and the primitive handles pointer and
+keyboard selection.
+It ships **no styles**. Every part, including the Canvas bars, takes its appearance from your CSS.
+
+## Example
+
+Move the pointer over the chart, or focus it and use the arrow keys, to select a week. The chart is
+unstyled, so the bars take the inherited text color and the grid and zero lines have no stroke.
+
+<Story
+  name='Default'
+  storyModule={ChartStories}
+/>
+
+## Usage
+
+```tsx
+import { type ActiveBar, Chart } from '@clerk/mosaic/primitives/chart';
+
+const chart = Chart.useBarChart({ data, series, index, onActivate: openPeriod });
+
+<Chart.Root
+  chart={chart}
+  height={320}
+  aria-label='Weekly sign-ups'
+>
+  <Chart.Grid>
+    {ticks =>
+      ticks.map(tick => (
+        <Chart.YLine
+          key={tick.value}
+          value={tick.value}
+        />
+      ))
+    }
+  </Chart.Grid>
+  <Chart.Bars>
+    <Chart.Bar className='bar' />
+    <Chart.ProjectionOutline />
+    <Chart.YLine value={0} />
+  </Chart.Bars>
+  <Chart.YAxis>
+    {ticks =>
+      ticks.map(tick => (
+        <Chart.YTick
+          key={tick.value}
+          tick={tick}
+        />
+      ))
+    }
+  </Chart.YAxis>
+  <Chart.XAxis>
+    {ticks =>
+      ticks.map(tick => (
+        <Chart.XTick
+          key={tick.key}
+          tick={tick}
+        />
+      ))
+    }
+  </Chart.XAxis>
+  <Chart.Selection>
+    <Chart.Cursor />
+    <Chart.Tooltip<ActiveBar<Row>>>{active => <PeriodSummary row={active.datum} />}</Chart.Tooltip>
+  </Chart.Selection>
+</Chart.Root>;
+```
+
+`series` is an ordered list of `{ key, value }`, where `value` reads a number from a row. `index`
+returns each row's unique category key. Memoize `series`, `index` and `isBarActive`.
+
+### Dimming bars
+
+`isBarActive` marks every other bar `data-inactive`, so CSS can dim it. Control the selection to
+dim every bar outside the selected section:
+
+```tsx
+const [selection, setSelection] = useState<BarSelection | null>(null);
+const isBarActive = useCallback(
+  (bar: BarIdentity<Row>) =>
+    !selection || (bar.datum.week === selection.category && bar.positive === (selection.section === 'positive')),
+  [selection],
+);
+const chart = Chart.useBarChart({ data, series, index, selection, onSelectionChange: setSelection, isBarActive });
+```
+
+### Projection
+
+`projection` draws a projected total above one category's positive stack. The fill is painted
+with `Chart.Bar`'s `data-projection` color, and the outline with `Chart.ProjectionOutline`'s
+`stroke`, `stroke-width` and `stroke-dasharray`. The Canvas paints both, so they stay aligned at any
+pixel ratio.
+It is drawn only when `value` is above that category's stack.
+
+```tsx
+const chart = Chart.useBarChart({
+  data,
+  series,
+  index,
+  projection: { datumIndex: data.length - 1, value: 130 },
+});
+```
+
+## Parts
+
+| Part                      | Default Element | Description                                                          |
+| ------------------------- | --------------- | -------------------------------------------------------------------- |
+| `Chart.Root`              | `<div>`         | Attaches the chart's measurement and provides the chart to the parts |
+| `Chart.Grid`              | `<svg>`         | Holds the grid lines                                                 |
+| `Chart.YLine`             | `<line>`        | One line across the plot at a Y value, such as a tick or zero        |
+| `Chart.Bars`              | `<div>`         | Paints the bars on Canvas and holds an SVG for the marks above them  |
+| `Chart.Bar`               | `<g>`           | Hidden. Its computed style paints the bars                           |
+| `Chart.ProjectionOutline` | `<g>`           | Hidden. Its computed stroke outlines the projected bar               |
+| `Chart.YAxis`             | `<svg>`         | Holds the Y tick labels                                              |
+| `Chart.YTick`             | `<text>`        | One Y tick label                                                     |
+| `Chart.XAxis`             | `<svg>`         | Holds the category labels                                            |
+| `Chart.XTick`             | `<text>`        | One category label                                                   |
+| `Chart.Selection`         | `<div>`         | Pointer and keyboard selection                                       |
+| `Chart.Cursor`            | `<div>`         | Covers the selected category's band                                  |
+| `Chart.Tooltip`           | `<div>`         | The tooltip for the selected bar, portaled                           |
+
+Every part comes from `@clerk/mosaic/primitives/chart`.
+Every part accepts a `render` prop and the standard attributes of its default element. Every part
+throws outside `Chart.Root`, and `Chart.Bars` also throws for a chart that did not come
+from `Chart.useBarChart`. `Chart.Bar` and `Chart.ProjectionOutline` throw outside
+`Chart.Bars`, and `Chart.Cursor` and `Chart.Tooltip` throw outside `Chart.Selection`.
+
+## Props
+
+### `Chart.useBarChart`
+
+| Prop                           | Type                                                         | Default                    | Description                                            |
+| ------------------------------ | ------------------------------------------------------------ | -------------------------- | ------------------------------------------------------ |
+| <code>data</code>              | <code>readonly TDatum[]</code>                               | — (required)               | The rows                                               |
+| <code>series</code>            | <code>readonly BarSeries&lt;TDatum&gt;[]</code>              | — (required)               | Stack order and each series' value                     |
+| <code>index</code>             | <code>(datum: TDatum, index: number) => string</code>        | — (required)               | A unique, stable category key                          |
+| <code>categoryGap</code>       | <code>number</code>                                          | <code>0.28</code>          | Fraction of each band left empty                       |
+| <code>margin</code>            | <code>Partial&lt;ChartMargin&gt;</code>                      | <code>8, 16, 36, 52</code> | Space for the axes: top, right, bottom, left           |
+| <code>projection</code>        | <code>&#123; datumIndex: number; value: number &#125;</code> | —                          | A projected total, drawn when it rises above its stack |
+| <code>isBarActive</code>       | <code>(bar: BarIdentity&lt;TDatum&gt;) => boolean</code>     | every bar active           | Returns false for a bar styled through `data-inactive` |
+| <code>selection</code>         | <code>BarSelection \| null</code>                            | uncontrolled               | The selected category and section                      |
+| <code>onSelectionChange</code> | <code>(selection: BarSelection \| null) => void</code>       | —                          | Called when the selection changes                      |
+| <code>onActivate</code>        | <code>(active: ActiveBar&lt;TDatum&gt;) => void</code>       | —                          | Called on click, Enter or Space                        |
+| <code>formatCategory</code>    | <code>(key: string) => string \| null</code>                 | the key                    | Names a period in keyboard announcements               |
+
+The hook returns the chart object: `rootRef`, `size`, `plot`, `scaleY`, `categories`, `yTicks`,
+`xTicks(options)`, `selected`, `tooltipAnchor`, `announcement`, `keyboardInstructions`, `select`,
+`clear` and `getInteractionProps()`. Each category carries `key`, `datumIndex`, `center`, and its
+band as `x` and `width`. Render from it directly to skip the parts.
+
+### `Chart.Root`
+
+| Prop                    | Type                          | Default          | Description                                        |
+| ----------------------- | ----------------------------- | ---------------- | -------------------------------------------------- |
+| <code>chart</code>      | <code>ChartInstance</code>    | — (required)     | The result of a chart-type hook                    |
+| <code>aria-label</code> | <code>string</code>           | — (required)     | Labels the chart image and the interaction surface |
+| <code>height</code>     | <code>number \| string</code> | <code>500</code> | The container height                               |
+
+### `Chart.YLine`
+
+| Prop               | Type                | Default      | Description                                     |
+| ------------------ | ------------------- | ------------ | ----------------------------------------------- |
+| <code>value</code> | <code>number</code> | — (required) | The Y value the line marks, such as a tick or 0 |
+
+### `Chart.XAxis`
+
+| Prop                | Type                                         | Default                 | Description                                                    |
+| ------------------- | -------------------------------------------- | ----------------------- | -------------------------------------------------------------- |
+| <code>ticks</code>  | <code>'category' \| 'calendar'</code>        | <code>'category'</code> | `calendar` labels calendar boundaries for long UTC date ranges |
+| <code>format</code> | <code>(key: string) => string \| null</code> | the key                 | Labels a category, or returns null to omit it                  |
+
+`Chart.YAxis` takes `format` (`(value: number) => ReactNode`, locale number by default).
+`Chart.Grid`, `Chart.YAxis` and `Chart.XAxis` take a `children` function that receives their
+items. `Chart.YTick` and `Chart.XTick` take `tick`.
+
+### `Chart.Tooltip`
+
+| Prop                     | Type                                              | Default      | Description                                 |
+| ------------------------ | ------------------------------------------------- | ------------ | ------------------------------------------- |
+| <code>children</code>    | <code>(active: TActive) => ReactNode</code>       | — (required) | Content for the selected bar; null hides it |
+| <code>boundaryRef</code> | <code>RefObject&lt;HTMLElement \| null&gt;</code> | the chart    | Element the tooltip stays inside            |
+
+Name the active type the hook selects: `<Chart.Tooltip<ActiveBar<Row>>>`.
+
+## Styling
+
+`Chart.Bar` styles the Canvas. Before each paint the chart sets these attributes on it, reads
+its computed `color`, and paints with it:
+
+| Attribute         | Description                      |
+| ----------------- | -------------------------------- |
+| `data-series`     | The series key of the bar        |
+| `data-inactive`   | The bar is outside `isBarActive` |
+| `data-projection` | The projection fill              |
+
+Its `max-width` caps the bar width, `row-gap` sets the gap between segments, its top corner radius
+rounds a stack's outer end and its bottom corner radius rounds every other corner. Without
+`Chart.Bar`, nothing is painted.
+
+| Attribute                     | Applies To | Description                                                    |
+| ----------------------------- | ---------- | -------------------------------------------------------------- |
+| `data-chart-interaction-mode` | Root       | `pending`, `interactive` or `visual-only`                      |
+| `data-active`                 | XTick      | Present while the tick's period is selected                    |
+| `data-active-section`         | Selection  | `positive` or `negative` on the interaction surface            |
+| `data-side`                   | Tooltip    | `left` or `right` of the period, or `bottom` when pinned       |
+| `data-open` / `data-closed`   | Tooltip    | Open state, with `data-starting-style` and `data-ending-style` |
+
+```css
+.bar[data-series='signups'] {
+  --bar: #7c3aed;
+}
+.bar {
+  max-width: 32px;
+  row-gap: 2px;
+  border-radius: 4px 4px 2px 2px;
+  color: var(--bar);
+}
+.bar[data-inactive] {
+  color: color-mix(in srgb, var(--bar) 40%, transparent);
+}
+.bar[data-projection] {
+  color: #d4d4d4;
+}
+```

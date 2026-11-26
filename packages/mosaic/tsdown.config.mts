@@ -85,6 +85,7 @@ export default defineConfig({
     'primitives/accordion': './src/primitives/accordion/index.ts',
     'primitives/autocomplete': './src/primitives/autocomplete/index.ts',
     'primitives/button': './src/primitives/button/index.ts',
+    'primitives/chart': './src/primitives/chart/index.ts',
     'primitives/collapsible': './src/primitives/collapsible/index.ts',
     'primitives/combobox': './src/primitives/combobox/index.ts',
     'primitives/dialog': './src/primitives/dialog/index.ts',
