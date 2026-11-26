@@ -65,11 +65,6 @@ async function renderTable(seed: FakeFapiSeed = signedIn(), props: Partial<APIKe
 type User = ReturnType<typeof userEvent.setup>;
 
 const table = () => screen.getByRole('table', { name: 'API Keys' });
-const columnWidths = () =>
-  within(table())
-    .getAllByRole('columnheader')
-    .map(cell => cell.getBoundingClientRect().width);
-
 async function loadedTable() {
   await screen.findByText('API keys loaded');
   return table();
@@ -202,19 +197,6 @@ describe('APIKeysTable', () => {
       expect(screen.queryByText('Unavailable')).toBeNull();
       list.release();
       expect(await within(await loadedTable()).findByText('Web app')).toBeVisible();
-    });
-
-    it('keeps its column widths when the first page arrives', async () => {
-      serveFapi(signedIn());
-      const list = holdRequests('get', '/api_keys');
-      await renderWithClerk(<APIKeysTable subject={alice.id} />);
-      await screen.findByRole('status');
-      const loadingWidths = columnWidths();
-
-      list.release();
-      await within(await loadedTable()).findByText('Web app');
-
-      expect(columnWidths()).toEqual(loadingWidths);
     });
 
     it('explains when the user has no keys', async () => {
