@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, focusVars, radiusVars, space } from '../../../tokens.stylex';
+import { colorVars, radiusVars, space } from '../../../tokens.stylex';
 
 const mark = 'var(--_cl-chart-mark)';
 
@@ -30,10 +30,5 @@ export const barStyles = stylex.create({
     stroke: colorVars['--cl-color-foreground-secondary'],
     strokeDasharray: '3 3',
     strokeWidth: 1,
-  },
-  // The keyboard focus ring, in Mosaic's ring color and width, around the selected section's bars.
-  focusOutline: {
-    stroke: colorVars['--cl-color-ring'],
-    strokeWidth: focusVars['--cl-focus-outline-width'],
   },
 });

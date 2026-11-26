@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, focusVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 export const partStyles = stylex.create({
   gridLine: {
@@ -23,36 +23,12 @@ export const partStyles = stylex.create({
   selection: {
     borderRadius: radiusVars['--cl-radius-md'],
   },
-  // The chart is one tab stop with arrow keys inside, so the ring sits on the selected band and
-  // rings the whole chart only while keyboard focus has no band, as after Escape.
-  selectionRing: {
-    outlineColor: {
-      default: null,
-      ':has(:focus-visible):not(:has([data-focus-visible]))': colorVars['--cl-color-ring'],
-    },
-    outlineOffset: {
-      default: null,
-      ':has(:focus-visible):not(:has([data-focus-visible]))': focusVars['--cl-focus-outline-offset'],
-    },
-    outlineStyle: {
-      default: null,
-      ':has(:focus-visible):not(:has([data-focus-visible]))': focusVars['--cl-focus-outline-style'],
-    },
-    outlineWidth: {
-      default: null,
-      ':has(:focus-visible):not(:has([data-focus-visible]))': focusVars['--cl-focus-outline-width'],
-    },
-  },
   activatable: {
     cursor: 'pointer',
   },
-  // A keyboard selection shows `Chart.FocusOutline` around the bars instead of the band.
   cursor: {
     borderRadius: radiusVars['--cl-radius-sm'],
-    backgroundColor: {
-      default: colorVars['--cl-color-neutral-alpha-200'],
-      ':where([data-focus-visible])': 'transparent',
-    },
+    backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
   },
   tooltip: {
     padding: space['3'],

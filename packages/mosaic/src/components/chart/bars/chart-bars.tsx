@@ -7,7 +7,6 @@ import {
   Chart as Primitive,
   type ChartBarProps as PrimitiveChartBarProps,
   type ChartBarsProps as PrimitiveChartBarsProps,
-  type ChartFocusOutlineProps as PrimitiveChartFocusOutlineProps,
   type ChartProjectionOutlineProps as PrimitiveChartProjectionOutlineProps,
 } from '../../../primitives/chart';
 import type { MosaicStyleProps } from '../../../props';
@@ -20,7 +19,7 @@ export type ChartBarsProps = Omit<PrimitiveChartBarsProps, 'className' | 'style'
 
 /**
  * Paints the bars on Canvas above the cursor, so the hover band shows only in the gaps. Without
- * children it renders `Chart.Bar`, `Chart.ProjectionOutline`, a zero line and `Chart.FocusOutline`.
+ * children it renders `Chart.Bar`, `Chart.ProjectionOutline` and a zero line.
  */
 export const ChartBars = React.forwardRef<HTMLDivElement, ChartBarsProps>(function ChartBars(
   { children, xstyle, ...rest },
@@ -36,7 +35,6 @@ export const ChartBars = React.forwardRef<HTMLDivElement, ChartBarsProps>(functi
           <ChartBar />
           <ChartProjectionOutline />
           <ChartYLine value={0} />
-          <ChartFocusOutline />
         </>
       )}
     </Primitive.Bars>
@@ -76,24 +74,3 @@ export const ChartProjectionOutline = React.forwardRef<SVGGElement, ChartProject
     );
   },
 );
-
-export type ChartFocusOutlineProps = Omit<PrimitiveChartFocusOutlineProps, 'className' | 'style'> & MosaicStyleProps;
-
-/**
- * The keyboard focus ring around the selected section's bars, 2px clear of them. StyleX cannot set
- * an SVG `rx`, so the corner radius is an attribute: the bars' top radius plus the gap, so the ring
- * stays concentric with them.
- */
-export const ChartFocusOutline = React.forwardRef<SVGRectElement, ChartFocusOutlineProps>(function ChartFocusOutline(
-  { xstyle, offset = 3, rx = 6, ...rest },
-  ref,
-) {
-  return (
-    <Primitive.FocusOutline
-      ref={ref}
-      offset={offset}
-      rx={rx}
-      {...mergeStyleProps(themeProps('chart-focus-outline'), stylex.props(barStyles.focusOutline, xstyle), rest)}
-    />
-  );
-});
