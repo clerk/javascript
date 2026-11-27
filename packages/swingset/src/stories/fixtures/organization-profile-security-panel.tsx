@@ -17,6 +17,9 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosName, chaosRows } from '@/lib/chaos';
 
+import type { useSSOConnectionsFixture } from './organization-profile-security-sso';
+import { SSOSectionExample } from './organization-profile-security-sso';
+
 interface FixtureMember extends SSOBypassEntry {
   role: 'org:admin' | 'org:member';
   outsideConnection?: boolean;
@@ -237,11 +240,13 @@ function SSOBypassSectionExample({ model }: { model: SSOBypassModel }) {
 
 export function SecurityPanelExample({
   isLoading = false,
+  sso,
   ...fixture
-}: Parameters<typeof useSSOBypassFixture>[0] = {}) {
+}: Parameters<typeof useSSOBypassFixture>[0] & { sso?: Parameters<typeof useSSOConnectionsFixture>[0] } = {}) {
   const bypass = useSSOBypassFixture({ isLoading, ...fixture });
   return (
     <OrganizationProfileSecurityPanelView>
+      <SSOSectionExample {...sso} />
       <SSOBypassSectionExample model={bypass} />
     </OrganizationProfileSecurityPanelView>
   );

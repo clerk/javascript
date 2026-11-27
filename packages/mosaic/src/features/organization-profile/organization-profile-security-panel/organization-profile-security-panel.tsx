@@ -11,6 +11,7 @@ import { useSecurityPanelAccessModel } from './organization-profile-security-pan
 import { SSOBypassSectionSkeleton } from './sso-bypass.skeleton';
 import { SSOBypassConnectionsErrorView } from './sso-bypass.view';
 import { SSOBypassSection } from './sso-bypass-section';
+import { SSOSection } from './sso-section';
 
 export interface OrganizationProfileSecurityPanelProps {
   fallback?: ReactNode;
@@ -37,16 +38,19 @@ function SecurityPanel({ capabilities }: { capabilities: SecurityCapabilities })
   const model = useSecurityPanelModel(capabilities);
   return (
     <OrganizationProfileSecurityPanelView>
+      {capabilities.canConfigureSso ? <SSOSection /> : null}
       {model.isLoading ? (
         <SSOBypassSectionSkeleton />
       ) : model.isConnectionsError ? (
-        <SSOBypassConnectionsErrorView
-          isRetrying={model.isRetryingConnections}
-          onRetry={model.retryConnections}
-        />
+        capabilities.canConfigureSso ? null : (
+          <SSOBypassConnectionsErrorView
+            isRetrying={model.isRetryingConnections}
+            onRetry={model.retryConnections}
+          />
+        )
       ) : model.showSSOBypass ? (
         <SSOBypassSection />
-      ) : (
+      ) : capabilities.canConfigureSso ? null : (
         <OrganizationProfileSecurityPanelEmptyState />
       )}
     </OrganizationProfileSecurityPanelView>
