@@ -453,6 +453,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       emailAddress,
       legalAccepted,
       oidcPrompt,
+      oidcLoginHint,
       slackTeamIdHint,
       enterpriseConnectionId,
     } = params;
@@ -468,6 +469,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
         oidcPrompt,
+        oidcLoginHint,
         slackTeamIdHint,
         enterpriseConnectionId,
       };

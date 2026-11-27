@@ -467,23 +467,35 @@ void (async () => {
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);
       const scopes = [
-        ...(searchParams.get('scope')?.split(',') ?? []).map(scope => ({
+        ...(
+          searchParams
+            .get('scope')
+            ?.split(/[\s,]+/)
+            .filter(Boolean) ?? []
+        ).map(scope => ({
           scope,
           description: scope === 'offline_access' ? null : `Grants access to your ${scope}`,
           requires_consent: true,
         })),
-        {
-          scope: 'sandbox:long_description',
-          description:
-            'Grants access to read and update your profile, connected accounts, and organization memberships across every workspace you belong to',
-          requires_consent: true,
-        },
+        // Preview-only scope for the long-description layout. A real
+        // authorization request (one with a client_id) would submit it and
+        // fail with invalid_scope, so only show it in the bare sandbox page.
+        ...(searchParams.has('client_id')
+          ? []
+          : [
+              {
+                scope: 'sandbox:long_description',
+                description:
+                  'Grants access to read and update your profile, connected accounts, and organization memberships across every workspace you belong to',
+                requires_consent: true,
+              },
+            ]),
       ];
       Clerk.mountOAuthConsent(
         app,
         componentControls.oauthConsent.getProps() ?? {
           scopes,
-          oauthClientId: 'Wg9fP2d0pSFXCZ1u',
+          oauthClientId: searchParams.get('client_id') ?? 'Wg9fP2d0pSFXCZ1u',
           redirectUrl: searchParams.get('redirect_uri') ?? 'http://localhost:4000/oauth/callback',
         },
       );

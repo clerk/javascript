@@ -5002,4 +5002,60 @@ describe('SignIn Slack workspace hint requests', () => {
       Array(2).fill('/v1/client/sign_ins/signin_existing/prepare_first_factor'),
     );
   });
+  describe('OIDC login hint on prepare', () => {
+    const existingAttempt = () =>
+      new SignIn({ ...new SignIn().__internal_toSnapshot(), id: 'signin_slack', status: 'needs_first_factor' });
+
+    it('forwards the hint when a legacy continuation prepares an existing attempt', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T123ABC') }));
+      await existingAttempt().authenticateWithRedirect({
+        strategy: 'oauth_chatgpt',
+        continueSignIn: true,
+        redirectUrl: 'https://example.com/callback',
+        redirectUrlComplete: 'https://example.com/dashboard',
+        oidcLoginHint: 'user@example.com',
+      });
+
+      expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+        '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      ]);
+      expect(fields().get('oidc_login_hint')).toBe('user@example.com');
+    });
+
+    it('prepares an existing unified attempt when only the hint is set', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T123ABC') }));
+      const { error } = await existingAttempt().__internal_future.sso({
+        strategy: 'oauth_chatgpt',
+        redirectUrl: 'https://example.com/dashboard',
+        redirectCallbackUrl: 'https://example.com/callback',
+        oidcLoginHint: 'user@example.com',
+      });
+
+      expect(error).toBeNull();
+      expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+        '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      ]);
+      expect(fields().get('oidc_login_hint')).toBe('user@example.com');
+      expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledOnce();
+    });
+
+    it('sends the hint on the enterprise SSO prepare after create', async () => {
+      fetchMock
+        .mockResolvedValueOnce(jsonResponse({ response: { ...response, status: 'needs_first_factor' } }))
+        .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T123ABC') }));
+      await new SignIn().authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        identifier: 'user@example.com',
+        redirectUrl: 'https://example.com/callback',
+        redirectUrlComplete: 'https://example.com/dashboard',
+        oidcLoginHint: 'user@example.com',
+      });
+
+      expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+        '/v1/client/sign_ins',
+        '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      ]);
+      expect(fields(1).get('oidc_login_hint')).toBe('user@example.com');
+    });
+  });
 });

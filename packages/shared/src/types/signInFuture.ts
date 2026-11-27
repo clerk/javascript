@@ -249,6 +249,10 @@ export interface SignInFutureSSOParams {
    */
   oidcPrompt?: string;
   /**
+   * The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\(if%20necessary\).) in the generated OAuth redirect URL, so the provider can preselect or prefill the account to sign in with.
+   */
+  oidcLoginHint?: string;
+  /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */
   slackTeamIdHint?: string;
