@@ -1,0 +1,58 @@
+---
+id: 9
+title: 'Reach the host router through a plain adapter object'
+summary: 'A host hands MosaicProvider a RouterAdapter of optional hooks, readUrl and navigation functions; each missing member falls back to window. The adapter is taken from the first render. Next supplies its own two hooks as they are.'
+status: accepted
+implementation: shipped
+implementation_note: 'src/routing/router-adapter.tsx; the Next.js App Router adapter is packages/swingset/src/lib/mosaic-next-router-adapter.ts.'
+date: 2026-11-11
+authors:
+  - 'Fredrik Höglund <fredrik@clerk.dev>'
+tags: [architecture, adapters, ssr]
+supersedes: null
+superseded_by: null
+---
+
+## TL;DR
+
+`<MosaicProvider routing={{ adapter, keyPrefix }}>` connects the URL modes to the host router. The adapter is a plain object with `usePathname`, `useSearchParams`, `useHash`, `push`, `replace` and `readUrl`, every one of them optional; a read the adapter does not have comes from `window`, a write without `push` or `replace` goes to `window.history`, and a write composes from the address bar unless `readUrl` says where the router is. `usePathname` returns the pathname as the address bar has it; `useSearchParams` returns a string or a `URLSearchParams`. Mosaic has no framework entry points: the Next.js adapter is `{ usePathname, useSearchParams }` from `next/navigation`, in a file a host copies.
+
+## Context
+
+Reading the host's own hooks is what makes a component's segment and the page change in the same commit, inside the host's transitions. Frameworks expose different things: Next has `usePathname` and a `ReadonlyURLSearchParams`, no hash hook, and a `router.push` that fetches from the server; React Router has `useLocation`; TanStack applies navigations asynchronously. One adapter per mode was considered and rejected, since the pathname never needs one and the hash rarely does. Making the reads mandatory whenever `push` is given was considered and rejected in favour of stating what a partial adapter can and cannot see.
+
+The first adapter read the query string raw, from `window.location.search` under a subscription to Next's hook, because `useSearchParams().toString()` re-encodes the `/` between a value's parts. That workaround was a sign the model was wrong, and the swingset proved it: under Next the query came back re-serialised on load, adapter or not, from something in that app's stack rather than from Next's own hydration. [MEDR-0008](./0008-url-carriers.md) now reads a param's value decoded, so Next's hook serves as it is and the adapter is two imports. Next needs no `push` or `replace`: a `window` write with no history state moves its hooks without the server round trip `router.push` makes, since Next copies its marker onto a foreign entry by itself.
+
+## Decision
+
+The adapter is a plain object on `MosaicProvider`, with per-method fallback to `window`.
+
+- The whole adapter is taken from the first render under the provider: the hooks because the components below call them in their own hook order, `push`, `replace` and `readUrl` so that nothing under the provider has to track a changing adapter. An adapter that later has other hooks warns and is ignored; anything else that changes is silently kept. Taking the functions fresh, through a ref written in an insertion effect, was built first and removed as machinery for a case nobody has.
+- A component calls only the adapter hook for the field its mode owns: `usePathname` in path mode, `useSearchParams` in query mode, nothing in hash mode. A missing hook is filled with a no-op hook by the provider, so the call is unconditional and `window` fills in for what comes back empty.
+- `usePathname` and `useHash` return the URL percent-encoded, with or without the leading `#`. `useSearchParams` returns the query string with or without its `?`, or a `URLSearchParams`, or `undefined` where it cannot read, and that read falls back to `window`. The hash from `useHash` is ignored until the page has hydrated: a server has no hash, and a client that read one through the adapter hydrated onto a different page than the server rendered.
+- A write composes from the address bar, whoever performs it, so the adapter's reads never reach a write and a `URLSearchParams` read cannot respell the host's params. `readUrl`, a plain synchronous function returning `{ pathname, search, hash }`, is for a router whose location is not the address bar, a memory router: with it, a write through `push` or `replace` composes from the router's own location. It is paired with `push` and `replace`, since a write that lands in `history` composes from `history`; that pairing is documented, not enforced. A write through `push` or `replace` is seen through the adapter's hooks, and through `window.location` for a field the adapter does not read, read right after the call returns.
+- `keyPrefix` sets what goes in front of the hash and query param names, which start with a dot on their own, so the query prefix names the links of [MEDR-0010](./0010-links.md) too; empty by default.
+
+## Consequences
+
+- Build the adapter once, outside render. The provider keeps the first one, hooks and functions alike.
+- A host router moves its hooks inside a React transition, so a page change that comes from the host arrives in a transition render. Anything that suspends on purpose to hold the DOM, `Freeze` under a leaving tab panel or dialog, would make that transition wait forever; `Freeze` therefore asks for its hold from the render that first sees it, commits the hold in a sync update before the transition can commit, and lets the transition retry against the already held boundary, which React does not wait for. The profile's pages did not switch in path mode under Next until it did.
+- Under Next, only an owner in query mode calls the adapter's `useSearchParams`, so only a statically rendered route that hosts one needs a `Suspense` boundary above it or `next build` fails. That is Next's rule for its own hook; the guide says so. The link consumer of [MEDR-0010](./0010-links.md) reads it for every owner today, and moving that read to the `window` store is open there.
+- A memory router works in the URL modes with `readUrl`, `push`, `replace` and the hooks. Without any `window`, as in a native app, virtual mode works with no adapter and the URL modes need that full adapter.
+- A router that applies a navigation asynchronously must read the fields it moves, or a write through its `push` is never observed. Under a base path, hash and query work with reads alone, since the write then starts from `window`; path mode needs the base path in the adapter's pathname and in the component's `path`, so that the pathname is read and written in the same world. The earlier advice to supply `push` and `replace` that prepend it was dropped: it made every step a server navigation and still left `useReturnUrl` without the prefix.
+- The server renders the pathname and the query string through the adapter, so `path` and `query` render their page on the server, and so does a link. `hash` renders the root, since a server has no hash.
+- When `ClerkProvider` starts rendering `MosaicProvider`, the framework SDKs supply the same adapter and hosts stop copying it.
+
+## References
+
+- `src/routing/router-adapter.tsx`, `src/routing/use-mosaic-location.ts`
+- `packages/swingset/src/lib/mosaic-next-router-adapter.ts`, `packages/swingset/src/app/(clerk)/live/user-profile/user-profile/[[...page]]/page.tsx`
+- `src/routing/__tests__/url-location.test.tsx`
+- [MEDR-0008](./0008-url-carriers.md)
+
+## Changelog
+
+- **2026-11-11**: Accepted.
+- **2026-11-17**: Amended: the query prefix names links too.
+- **2026-11-24**: Amended: the adapter's hash waits for hydration; the base path recipe prefixes the pathname instead of supplying `push` and `replace`; `query` renders on the server too.
+- **2026-11-25**: Amended: the whole adapter is taken from the first render; one hook per mode; writes compose from the address bar or `readUrl`; `readUrl` added.
