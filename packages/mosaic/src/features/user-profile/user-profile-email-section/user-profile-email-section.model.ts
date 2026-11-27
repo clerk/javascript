@@ -3,12 +3,11 @@ import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useReturnUrl } from '../../../routing/use-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
-import { withUserProfileModalReturn } from '../user-profile.modal-return';
-import type { UserProfileOptions } from '../user-profile.provider';
-import { useUserProfileOptions } from '../user-profile.provider';
+import { USER_PROFILE_ROUTES } from '../user-profile.layout';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import { byId, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
@@ -36,7 +35,7 @@ function startEmailVerification(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
-  profile: Pick<UserProfileOptions, 'mode' | 'combined'>,
+  returnUrl: () => string,
 ): UserProfileEmailVerification {
   if (email.matchesSsoConnection) {
     return {
@@ -50,7 +49,7 @@ function startEmailVerification(
         save(async () => {
           const prepared = await email.prepareVerification({
             strategy: 'enterprise_sso',
-            redirectUrl: withUserProfileModalReturn(window.location.href, profile),
+            redirectUrl: returnUrl(),
           });
           const url = prepared.verification.externalVerificationRedirectURL;
           if (!url) {
@@ -75,10 +74,10 @@ function toEmailVerifier(
   email: EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
-  profile: Pick<UserProfileOptions, 'mode' | 'combined'>,
+  returnUrl: () => string,
 ): UserProfileEmailVerifier {
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router, profile),
+    start: () => startEmailVerification(email, linkRedirectUrl, router, returnUrl),
     verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
@@ -86,7 +85,7 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
-  const { mode, combined } = useUserProfileOptions();
+  const returnUrl = useReturnUrl(USER_PROFILE_ROUTES);
   const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
   );
@@ -116,7 +115,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
   const verifierFor = (email: EmailAddressResource) =>
-    toEmailVerifier(email, linkRedirectUrl, router, { mode, combined });
+    toEmailVerifier(email, linkRedirectUrl, router, () => returnUrl('account'));
 
   return {
     status: 'ready',

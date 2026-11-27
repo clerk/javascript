@@ -50,7 +50,6 @@ export function ModalProfile({
     <UserProfileSurface
       {...props}
       combined={combined}
-      presentation='modal'
       path={path}
       routing={routing}
     />

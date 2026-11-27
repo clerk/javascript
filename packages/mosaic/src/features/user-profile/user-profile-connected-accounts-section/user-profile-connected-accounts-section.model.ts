@@ -16,10 +16,11 @@ import type {
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useReturnUrl } from '../../../routing/use-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
-import { withUserProfileModalReturn } from '../user-profile.modal-return';
+import { USER_PROFILE_ROUTES } from '../user-profile.layout';
 import { useUserProfileOptions } from '../user-profile.provider';
 import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
@@ -227,7 +228,8 @@ function unavailable() {
 }
 
 export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
-  const { additionalOAuthScopes, mode, combined } = useUserProfileOptions();
+  const { additionalOAuthScopes } = useUserProfileOptions();
+  const returnUrl = useReturnUrl(USER_PROFILE_ROUTES);
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
@@ -282,8 +284,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
     return current;
   };
 
-  const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
-  const withModalState = (url: string) => withUserProfileModalReturn(url, { mode, combined });
+  const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : returnUrl('account'));
 
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
@@ -318,7 +319,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       const current = requireCurrentUser();
       const response = await createAccount(current, {
         strategy: provider.strategy,
-        redirectUrl: withModalState(redirectUrl),
+        redirectUrl,
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
       });
       return completeVerification(response);
@@ -339,11 +340,11 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
         recovery.kind === 'reauthorize'
           ? await account.reauthorize({
               additionalScopes: recovery.additionalScopes,
-              redirectUrl: withModalState(redirectUrl),
+              redirectUrl,
             })
           : await recreateAccount(current, {
               strategy: recovery.strategy,
-              redirectUrl: withModalState(redirectUrl),
+              redirectUrl,
               additionalScopes: recovery.additionalScopes,
             });
       return completeVerification(response);

@@ -1,15 +1,21 @@
 import { logger } from '@clerk/shared/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useConsumeLink } from './consume-link';
 import type { MosaicLocation, SegmentParts } from './location';
-import type { Route, Router } from './router';
+import type { Route, RouteParamsArgs, Router } from './router';
 import { createRouter } from './router';
+import type { RoutingConfig } from './router-adapter';
+import { useRoutingConfig } from './router-adapter';
 import type { RouteName, RouteTable } from './routes';
 import { isRouteName, routeParts } from './routes';
 import type { RoutingScope } from './routing-scope';
 import { createRoutingScope, useInheritedScope } from './routing-scope';
+import type { SegmentCodec } from './url-location';
+import { createSegmentCodec, urlOf, urlWith } from './url-location';
 import type { MosaicLocationOptions } from './use-mosaic-location';
 import { useFixedRoutingMode, useMosaicLocation } from './use-mosaic-location';
+import { readWindowUrl } from './window-location';
 
 const EMPTY_PARAMS: Record<string, string> = Object.freeze({});
 const EMPTY_PARTS: SegmentParts = Object.freeze([]);
@@ -153,7 +159,8 @@ export function useRouterScope<const Routes extends RouteTable>(
   const scope = useMemo(() => createRoutingScope({ routing, path }), [routing, path]);
   const rooted: Routes = { ...routes, [root]: '' };
   const { location, table, router, segment } = useRouting(rooted, { routing, path });
-  const held = useOwnedSegment(location, segment, routing === 'virtual');
+  const linked = useConsumeLink(location, segment, { routing, path });
+  const held = useOwnedSegment(location, linked, routing === 'virtual');
   const { parts, matched } = useMatch(router, held);
   const fallback = useMemo<RouteName<Routes> | undefined>(() => {
     if (!ready || matched !== undefined) {
@@ -203,5 +210,37 @@ export function useRouter<const Routes extends RouteTable>(routes: Routes): Nest
   return useMemo(
     () => ({ route: matched?.name, params: matched?.params ?? EMPTY_PARAMS, go: router.go }),
     [router, matched],
+  );
+}
+
+export type ReturnUrl<Routes extends RouteTable> = <Name extends RouteName<Routes>>(
+  name: Name,
+  ...args: RouteParamsArgs<Routes[Name]>
+) => string;
+
+function returnCodec(
+  { routing, path = '/' }: MosaicLocationOptions,
+  { queryPrefix, hashPrefix }: RoutingConfig,
+): SegmentCodec {
+  return createSegmentCodec(routing === 'virtual' ? 'query' : routing, path, { query: queryPrefix, hash: hashPrefix });
+}
+
+export function useReturnUrl<const Routes extends RouteTable>(routes: Routes): ReturnUrl<Routes> {
+  const scope = useInheritedScope();
+  const config = useRoutingConfig();
+  const table = useStableTable(routes);
+  const codec = useMemo(() => (scope === undefined ? undefined : returnCodec(scope, config)), [scope, config]);
+
+  return useMemo<ReturnUrl<Routes>>(
+    () =>
+      (name, ...[params]) => {
+        const page = readWindowUrl();
+        if (page === undefined) {
+          return '';
+        }
+        const url = codec === undefined ? undefined : urlWith(codec, page, routeParts(table, name, params));
+        return `${window.location.origin}${url ?? urlOf(page)}`;
+      },
+    [codec, table],
   );
 }

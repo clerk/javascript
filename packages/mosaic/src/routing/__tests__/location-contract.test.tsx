@@ -37,13 +37,23 @@ interface LocationMode {
     dropsOnMove?: boolean;
     // Parking keeps a hidden owner's segment in the owner. A URL mode keeps it in the URL instead.
     parks?: boolean;
+    // A link in the query string is the query mode's own entry, so it stays in the URL.
+    linkIsEntry?: boolean;
   };
+}
+
+function VirtualProvider({ initial, children }: { initial?: Record<string, SegmentParts>; children: ReactNode }) {
+  return (
+    <RoutingConfigProvider>
+      <VirtualStoreProvider initial={initial}>{children}</VirtualStoreProvider>
+    </RoutingConfigProvider>
+  );
 }
 
 const virtual: LocationMode = {
   name: 'virtual',
   routing: 'virtual',
-  Provider: VirtualStoreProvider,
+  Provider: VirtualProvider,
   useEntry: base => useVirtualEntries().get(normalizeBase(base)) ?? null,
   useOutsideWrite: useVirtualWrite,
   leave: { away: unmount => unmount(), back: remount => remount() },
@@ -148,7 +158,12 @@ const path = urlMode(
   { severalBases: true },
 );
 
-function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: string) {
+function paramMode(
+  routing: 'hash' | 'query',
+  field: 'hash' | 'search',
+  prefix: string,
+  excludes: LocationMode['excludes'] = {},
+) {
   return urlMode(
     routing,
     {
@@ -162,11 +177,24 @@ function paramMode(routing: 'hash' | 'query', field: 'hash' | 'search', prefix: 
           [field]: withPair(url[field], paramName(prefix, base), parts === undefined ? undefined : encode(parts)),
         }),
     },
-    {},
+    excludes,
   );
 }
 
-const modes: LocationMode[] = [virtual, path, paramMode('hash', 'hash', ''), paramMode('query', 'search', '')];
+const modes: LocationMode[] = [
+  virtual,
+  path,
+  paramMode('hash', 'hash', ''),
+  paramMode('query', 'search', '', { linkIsEntry: true }),
+];
+
+const flush = () =>
+  act(async () => {
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+
+const withLink = (url: HostUrl, base: string, value: string) =>
+  urlOf({ ...url, search: withPair(url.search, paramName('', base), value) });
 
 beforeEach(() => {
   markSettled();
@@ -517,6 +545,89 @@ describe.each(modes)('$name location', mode => {
       expect(entry()).toEqual([]);
       expect(warn).not.toHaveBeenCalled();
       warn.mockRestore();
+    });
+
+    it('opens on the page a link in the query string names, at the base in path mode too', async () => {
+      window.history.replaceState(null, '', '/user?a=1&.user=security#h');
+      render(
+        <Page>
+          <Owner />
+          <Entry />
+        </Page>,
+      );
+      await flush();
+      expect(route()).toBe('security');
+      expect(entry()).toEqual(['security']);
+    });
+
+    it('shows the page a link names in its first render', async () => {
+      window.history.replaceState(null, '', '/user?.user=billing/statement/s1');
+      const seen: string[] = [];
+      render(
+        <Page>
+          <Owner seen={seen} />
+        </Page>,
+      );
+      expect(seen[0]).toBe('statement');
+      await flush();
+      expect(seen).not.toContain('index');
+    });
+
+    it.skipIf(mode.excludes.linkIsEntry)('removes the link and keeps every other param and the hash', async () => {
+      window.history.replaceState(null, '', '/user?a=1&.user=security&b=2#h');
+      render(
+        <Page>
+          <Owner />
+        </Page>,
+      );
+      await flush();
+      expect(window.location.search).toBe('?a=1&b=2');
+      expect(new URLSearchParams(window.location.hash.slice(1)).has('h')).toBe(true);
+    });
+
+    it.skipIf(mode.excludes.linkIsEntry)('keeps the entry it has over a link it mounts with', async () => {
+      window.history.replaceState(null, '', '/user?.user=billing/statement/s1');
+      render(
+        <Page initial={{ '/user': ['security'] }}>
+          <Owner />
+          <Entry />
+        </Page>,
+      );
+      await flush();
+      expect(route()).toBe('security');
+      expect(entry()).toEqual(['security']);
+      expect(window.location.search).toBe('');
+    });
+
+    it('follows a link that arrives after mount, over the entry it has', async () => {
+      render(
+        <Page>
+          <Owner />
+          <Entry />
+        </Page>,
+      );
+      await flush();
+      click('Go to security /user');
+      act(() => navigate(withLink(currentUrl(), '/user', 'billing/statement/s1')));
+      await flush();
+      expect(entry()).toEqual(['billing', 'statement', 's1']);
+      expect(new URLSearchParams(window.location.search).has('.user')).toBe(Boolean(mode.excludes.linkIsEntry));
+    });
+
+    it.skipIf(mode.excludes.severalBases)('lets each owner take its own link and leaves the rest', async () => {
+      window.history.replaceState(null, '', '/user?.user=security&a=1&.organization=members&b=2');
+      render(
+        <Page>
+          <Owner />
+          <OtherOwner path='/organization' />
+        </Page>,
+      );
+      await flush();
+      expect(route()).toBe('security');
+      expect(other('/organization')).toBe('members');
+      expect(window.location.search).toBe(
+        mode.excludes.linkIsEntry ? '?.user=security&a=1&.organization=members&b=2' : '?a=1&b=2',
+      );
     });
 
     it.skipIf(mode.excludes.severalBases)('keeps owners of different bases independent', () => {
