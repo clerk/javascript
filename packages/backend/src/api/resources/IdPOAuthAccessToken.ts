@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@clerk/shared/types';
 
-import type { IdPOAuthAccessTokenActorJSON, IdPOAuthAccessTokenJSON } from './JSON';
+import type { IdPOAuthAccessTokenActorJSON, IdPOAuthAccessTokenGrantedOrgJSON, IdPOAuthAccessTokenJSON } from './JSON';
 
 type OAuthJwtPayload = JwtPayload & {
   aud?: string | string[];
@@ -9,6 +9,8 @@ type OAuthJwtPayload = JwtPayload & {
   scope?: string;
   scp?: string[];
   act?: unknown;
+  org_id?: unknown;
+  granted_orgs?: unknown;
 };
 
 function toActor(value: unknown, nestedLevels: number): IdPOAuthAccessTokenActorJSON | undefined {
@@ -25,6 +27,28 @@ function toActor(value: unknown, nestedLevels: number): IdPOAuthAccessTokenActor
     sub,
     ...(nested ? { act: nested } : {}),
   };
+}
+
+function toOrgId(value: unknown): string | undefined {
+  return typeof value === 'string' && value !== '' ? value : undefined;
+}
+
+function toGrantedOrgs(value: unknown): IdPOAuthAccessTokenGrantedOrgJSON[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const grantedOrgs: IdPOAuthAccessTokenGrantedOrgJSON[] = [];
+  for (const entry of value) {
+    if (typeof entry !== 'object' || entry === null) {
+      return undefined;
+    }
+    const { id, name } = entry as Record<string, unknown>;
+    if (typeof id !== 'string' || id === '' || typeof name !== 'string') {
+      return undefined;
+    }
+    grantedOrgs.push({ id, name });
+  }
+  return grantedOrgs.length > 0 ? grantedOrgs : undefined;
 }
 
 export class IdPOAuthAccessToken {
@@ -47,6 +71,10 @@ export class IdPOAuthAccessToken {
     readonly aud?: string[],
     /** The actor chain of a token issued by an OAuth 2.0 Token Exchange (RFC 8693 section 4.1). */
     readonly act?: IdPOAuthAccessTokenActorJSON,
+    /** The default organization of the grant. */
+    readonly orgId?: string,
+    /** The organizations the user granted in one consent, default first. Present only when two or more were granted. */
+    readonly grantedOrgs?: IdPOAuthAccessTokenGrantedOrgJSON[],
   ) {}
 
   static fromJSON(data: IdPOAuthAccessTokenJSON) {
@@ -64,6 +92,8 @@ export class IdPOAuthAccessToken {
       data.updated_at,
       data.aud,
       toActor(data.act, 1),
+      toOrgId(data.org_id),
+      toGrantedOrgs(data.granted_orgs),
     );
   }
 
@@ -90,6 +120,8 @@ export class IdPOAuthAccessToken {
       payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
       oauthPayload.aud === undefined ? undefined : [oauthPayload.aud].flat(),
       toActor(oauthPayload.act, 1),
+      toOrgId(oauthPayload.org_id),
+      toGrantedOrgs(oauthPayload.granted_orgs),
     );
   }
 }

@@ -1,6 +1,7 @@
 import type { AgentActClaim, JwtPayload } from '@clerk/shared/types';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import type { IdPOAuthAccessToken } from '../../api';
 import { createBackendApiClient } from '../../api/factory';
 import { createJwt, mockJwtPayload } from '../../fixtures';
 import { mockTokens, mockVerificationResults } from '../../fixtures/machine';
@@ -450,6 +451,25 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
+      expect(authObject.orgId).toBeNull();
+      expect(authObject.grantedOrgs).toBeNull();
+    });
+
+    it('exposes orgId and grantedOrgs from the verified token', () => {
+      const grantedOrgs = [
+        { id: 'org_1', name: 'Acme' },
+        { id: 'org_2', name: 'Globex' },
+      ];
+      const tokenWithOrgs = { ...verificationResult, orgId: 'org_1', grantedOrgs } as IdPOAuthAccessToken;
+      const authObject = authenticatedMachineObject('oauth_token', token, tokenWithOrgs, debugData);
+      expect(authObject.orgId).toBe('org_1');
+      expect(authObject.grantedOrgs).toEqual(grantedOrgs);
+    });
+
+    it('returns null orgId and grantedOrgs for an unauthenticated oauth_token object', () => {
+      const authObject = unauthenticatedMachineObject('oauth_token', debugData);
+      expect(authObject.orgId).toBeNull();
+      expect(authObject.grantedOrgs).toBeNull();
     });
   });
 

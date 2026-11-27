@@ -395,6 +395,89 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     );
   });
 
+  describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token organization claims', format => {
+    beforeEach(() => {
+      vi.setSystemTime(new Date(mockOAuthAccessTokenJwtPayload.iat * 1000));
+    });
+
+    async function verifyWithOrgClaims(claims: Record<string, unknown>) {
+      let token: string;
+      if (format === 'opaque') {
+        token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
+        server.use(
+          http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () =>
+            HttpResponse.json({
+              object: 'clerk_idp_oauth_access_token',
+              ...mockVerificationResults.oauth_token,
+              ...claims,
+            }),
+          ),
+        );
+      } else {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, ...claims }, format);
+      }
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeUndefined();
+      return result.data as IdPOAuthAccessToken;
+    }
+
+    it('returns orgId and grantedOrgs, dropping extra keys from each granted org', async () => {
+      const token = await verifyWithOrgClaims({
+        org_id: 'org_1',
+        granted_orgs: [
+          { id: 'org_1', name: 'Acme' },
+          { id: 'org_2', name: 'Globex', slug: 'x' },
+        ],
+      });
+
+      expect(token.orgId).toBe('org_1');
+      expect(token.grantedOrgs).toStrictEqual([
+        { id: 'org_1', name: 'Acme' },
+        { id: 'org_2', name: 'Globex' },
+      ]);
+    });
+
+    it('returns orgId without grantedOrgs when only org_id is present', async () => {
+      const token = await verifyWithOrgClaims({ org_id: 'org_1' });
+
+      expect(token.orgId).toBe('org_1');
+      expect(token.grantedOrgs).toBeUndefined();
+    });
+
+    it('returns neither orgId nor grantedOrgs when both are absent', async () => {
+      const token = await verifyWithOrgClaims({});
+
+      expect(token.orgId).toBeUndefined();
+      expect(token.grantedOrgs).toBeUndefined();
+    });
+
+    it.each([
+      { name: 'non-string org_id', claims: { org_id: 123, granted_orgs: 'x' } },
+      { name: 'malformed granted org entries', claims: { granted_orgs: [{ id: 1 }, null] } },
+      {
+        name: 'one malformed entry next to a valid one',
+        claims: {
+          granted_orgs: [
+            { id: 'org_1', name: 'Acme' },
+            { id: 7, name: 'Globex' },
+          ],
+        },
+      },
+      { name: 'an entry with an empty id', claims: { granted_orgs: [{ id: '', name: 'Acme' }] } },
+    ])('drops malformed org claims ($name)', async ({ claims }) => {
+      const token = await verifyWithOrgClaims(claims);
+
+      expect(token.orgId).toBeUndefined();
+      expect(token.grantedOrgs).toBeUndefined();
+    });
+  });
+
   describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token audience verification', format => {
     const audience = 'https://resource.example.com';
     const otherAudience = 'https://other.example.com';
