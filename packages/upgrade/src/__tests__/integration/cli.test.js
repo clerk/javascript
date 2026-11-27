@@ -175,6 +175,38 @@ describe('CLI Integration', () => {
     });
   });
 
+  describe('Unsupported framework version', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v6');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('stops before upgrading when Next.js is below the minimum version', async () => {
+      const fs = await import('node:fs');
+      const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+
+      const result = await runCli(['--dir', fixture.path, '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('Minimum Next.js version increased to 15.2.8');
+      expect(result.stderr).toContain('Upgrade stopped before changing any packages');
+      expect(result.stdout).not.toContain('Upgrading @clerk/nextjs');
+      expect(result.exitCode).toBe(1);
+      expect(fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8')).toBe(pkgBefore);
+    });
+
+    it('reports the blocker in dry-run mode', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('Minimum Next.js version increased to 15.2.8');
+      expect(result.stdout).toContain('[dry run] The upgrade would stop here until the issues above are fixed');
+    });
+  });
+
   describe('Version Display', () => {
     it('shows current version in output', async () => {
       const dir = getFixturePath('nextjs-v6');
