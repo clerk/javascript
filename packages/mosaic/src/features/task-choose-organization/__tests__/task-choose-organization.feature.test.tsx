@@ -13,6 +13,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { imageFile, saveCrop } from '../../../__tests__/feature/image';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { TaskChooseOrganization } from '../task-choose-organization';
 
@@ -195,6 +196,29 @@ describe('TaskChooseOrganization', () => {
       await waitFor(() => expect(navigate).toHaveBeenCalledWith('/done'));
       expect(session(fapi)?.last_active_organization_id).toBe(fapi.memberships.at(-1)?.organization.id);
       expect(fapi.memberships.at(-1)?.organization.name).toBe('Initech');
+    });
+
+    it('still makes the new organization active and finishes the task when the logo upload fails', async () => {
+      const { fapi, navigate } = await renderTask(pending({ organizations: [] }));
+      const user = userEvent.setup();
+      const input = await waitFor(() => {
+        const element = document.querySelector<HTMLInputElement>('input[type="file"]');
+        expect(element).not.toBeNull();
+        return element as HTMLInputElement;
+      });
+
+      await user.upload(input, await imageFile('logo.png'));
+      await saveCrop(user, 'Adjust logo');
+      const logo = holdRequests('post', '/v1/organizations/:organizationId/logo');
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Initech');
+      await user.click(screen.getByRole('button', { name: 'Create organization' }));
+
+      await waitFor(() => expect(logo.requests).toHaveLength(1));
+      logo.fail();
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/done'));
+      expect(session(fapi)?.last_active_organization_id).toBe(fapi.memberships.at(-1)?.organization.id);
+      expect(fapi.memberships.at(-1)?.organization.has_image).toBe(false);
     });
 
     it('fills the form from the organization creation defaults and shows their advisory', async () => {
