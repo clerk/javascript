@@ -619,4 +619,16 @@ describe('Environment', () => {
       maintenance_mode: false,
     });
   });
+
+  it('turns Connect off when the API does not send connect_settings', () => {
+    const environment = new Environment({ object: 'environment' } as any);
+    expect(environment.connectSettings).toEqual({ enabled: false });
+    expect(environment.__internal_toSnapshot().connect_settings).toEqual({ enabled: false });
+  });
+
+  it('reads Connect settings and keeps them in the snapshot', () => {
+    const environment = new Environment({ object: 'environment', connect_settings: { enabled: true } } as any);
+    expect(environment.connectSettings).toEqual({ enabled: true });
+    expect(new Environment(environment.__internal_toSnapshot()).connectSettings).toEqual({ enabled: true });
+  });
 });

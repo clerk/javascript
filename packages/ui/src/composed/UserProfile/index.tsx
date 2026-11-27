@@ -8,6 +8,7 @@ export { UserProfileUsernameSection } from './AccountUsername';
 export { UserProfileEmailSection } from './AccountEmails';
 export { UserProfilePhoneSection } from './AccountPhone';
 export { UserProfileConnectedAccountsSection } from './AccountConnectedAccounts';
+export { UserProfileConnectionsSection } from './AccountConnections';
 export { UserProfileEnterpriseAccountsSection } from './AccountEnterpriseAccounts';
 export { UserProfileWeb3Section } from './AccountWeb3';
 export { UserProfilePasswordSection } from './SecurityPassword';

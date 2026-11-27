@@ -12,6 +12,7 @@ import type {
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
+import type { ConnectNamespace } from './connect';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { ClerkAPIResponseError } from './errors';
@@ -1333,6 +1334,14 @@ export interface Clerk {
    * The `APIKeys` object used for managing API keys.
    */
   apiKeys: APIKeysNamespace;
+
+  /**
+   * The `Connect` object used for managing the current user's connections to external services.
+   *
+   * @experimental Clerk Connect is in development and the API is subject to change.
+   * @hidden
+   */
+  connect: ConnectNamespace;
 
   /**
    * OAuth application helpers (e.g., consent metadata for custom consent UIs).

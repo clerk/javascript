@@ -94,6 +94,7 @@ import type {
   ClientJSONSnapshot,
   ClientResource,
   ConfigureSSOProps,
+  ConnectNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -205,6 +206,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { Connect } from './modules/connect';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
@@ -261,6 +263,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
+  private static _connect: ConnectNamespace;
   private static _oauthApplication: OAuthApplicationNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
@@ -494,6 +497,13 @@ export class Clerk implements ClerkInterface {
       Clerk._apiKeys = new APIKeys();
     }
     return Clerk._apiKeys;
+  }
+
+  get connect(): ConnectNamespace {
+    if (!Clerk._connect) {
+      Clerk._connect = new Connect(url => this.__internal_windowNavigate(url));
+    }
+    return Clerk._connect;
   }
 
   get oauthApplication(): OAuthApplicationNamespace {

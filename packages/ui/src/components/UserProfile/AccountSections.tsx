@@ -1,8 +1,9 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import type { ReactNode } from 'react';
 
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
+import { ConnectionsSection } from './ConnectionsSection';
 import { EmailsSection } from './EmailsSection';
 import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
 import { PhoneSection } from './PhoneSection';
@@ -65,6 +66,17 @@ export function AccountConnectedAccounts(): ReactNode {
   }
 
   return <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />;
+}
+
+export function AccountConnections(): ReactNode {
+  const { connectSettings } = useEnvironment();
+  const clerk = useClerk();
+
+  if (!connectSettings?.enabled || clerk.__internal_oauthTransport) {
+    return null;
+  }
+
+  return <ConnectionsSection />;
 }
 
 export function AccountEnterpriseAccounts(): ReactNode {

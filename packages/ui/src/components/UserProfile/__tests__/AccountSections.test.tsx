@@ -7,6 +7,7 @@ import { CardStateProvider } from '@/ui/elements/contexts';
 import { clearFetchCache } from '../../../hooks';
 import {
   AccountConnectedAccounts,
+  AccountConnections,
   AccountEmails,
   AccountEnterpriseAccounts,
   AccountPhone,
@@ -204,6 +205,51 @@ describe('AccountSections — self-gating visibility', () => {
 
       const { container } = render(<AccountWeb3 />, { wrapper });
       expect(container.innerHTML).toBe('');
+    });
+  });
+
+  describe('AccountConnections', () => {
+    const mockConnect = (fixtures: any) => {
+      Object.defineProperty(fixtures.clerk, 'connect', {
+        configurable: true,
+        value: {
+          connectors: {
+            list: () =>
+              Promise.resolve({ data: [{ id: 'cnr_1', key: 'acme', displayName: 'Acme Tasks' }], total_count: 1 }),
+          },
+          connections: { list: () => Promise.resolve({ data: [], total_count: 0 }) },
+        },
+      });
+    };
+
+    it('renders when the instance enables Connect', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withConnect();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      mockConnect(fixtures);
+      render(<AccountConnections />, { wrapper });
+      expect(await screen.findByText('Connected services')).toBeInTheDocument();
+    });
+
+    it('renders nothing when Connect is off', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      mockConnect(fixtures);
+      const { container } = render(<AccountConnections />, { wrapper });
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it('renders nothing for an app that uses an OAuth transport', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withConnect();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      mockConnect(fixtures);
+      Object.defineProperty(fixtures.clerk, '__internal_oauthTransport', { configurable: true, value: {} });
+      const { container } = render(<AccountConnections />, { wrapper });
+      expect(container).toBeEmptyDOMElement();
     });
   });
 });
