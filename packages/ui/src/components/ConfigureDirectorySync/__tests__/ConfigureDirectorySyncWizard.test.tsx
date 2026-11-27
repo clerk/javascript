@@ -140,6 +140,29 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     expect(screen.getByText('Not configured')).toBeInTheDocument();
   });
 
+  it.each([
+    { credentialsConfigured: false, ticked: 0, outcome: 'leaves the configure step unticked' },
+    { credentialsConfigured: true, ticked: 1, outcome: 'ticks the configure step' },
+  ])(
+    'for a Google Workspace directory with credentialsConfigured=$credentialsConfigured, $outcome',
+    async ({ credentialsConfigured, ticked }) => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory({ credentialsConfigured }));
+
+      const { container } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+      await screen.findByRole('button', { name: 'Upload JSON key' });
+
+      // The stepper used to tick step 1 as soon as the directory row existed,
+      // which for Google is before the credentials it collects are stored. A
+      // completed bullet renders a checkmark instead of its digit.
+      const bullets = Array.from(container.querySelectorAll('.cl-configureSSOStepperItemBullet'));
+      expect(bullets).toHaveLength(4);
+      expect(bullets.filter(el => !/\d/.test(el.textContent ?? ''))).toHaveLength(ticked);
+    },
+  );
+
   it('sends the uploaded key and admin email, and does not keep the key afterwards', async () => {
     const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);

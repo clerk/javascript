@@ -631,6 +631,69 @@ describe('OrganizationSecurityPage', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('shows a Google Workspace directory without credentials as In Progress with Continue configuration', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({ active: true, provider: 'saml_google' }),
+      ]);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(
+        directory({ provider: 'google', enabled: false, credentialsConfigured: false }),
+      );
+
+      const { userEvent } = renderPage(wrapper);
+
+      // The row used to read "Inactive" and offer Activate, which the server
+      // refuses until the service account key is stored, so the admin saw a
+      // dead switch instead of the step still to do.
+      expect(await screen.findByText('In Progress')).toBeInTheDocument();
+      expect(section('directorySync').queryByText('Inactive')).not.toBeInTheDocument();
+      expect(section('directorySync').getByRole('button', { name: 'Continue configuration' })).toBeEnabled();
+
+      await openDirectorySyncMenu(userEvent);
+
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Deactivate' })).not.toBeInTheDocument();
+    });
+
+    it('opens the Directory Sync wizard from Continue configuration', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
+        configuredConnection({ active: true, provider: 'saml_google' }),
+      ]);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(
+        directory({ provider: 'google', enabled: false, credentialsConfigured: false }),
+      );
+
+      const { userEvent } = renderPage(wrapper);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Continue configuration' }));
+
+      // The wizard replaces the overview, so the row menu goes away.
+      await waitFor(() => expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument());
+    });
+
+    it('keeps Activate for a disabled push directory, whose credentials do not apply', async () => {
+      const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+      withActiveConnection(fixtures);
+      fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(
+        directory({ enabled: false, credentialsConfigured: null }),
+      );
+
+      const { userEvent } = renderPage(wrapper);
+
+      // The SSO connection above is active, so "Inactive" can only be the directory badge.
+      expect(await screen.findByText('Inactive')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
+
+      await openDirectorySyncMenu(userEvent);
+
+      expect(screen.getByRole('menuitem', { name: 'Activate' })).toBeInTheDocument();
+    });
+
     it('lists Edit and Deactivate for an active directory', async () => {
       const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
       withActiveConnection(fixtures);
