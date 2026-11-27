@@ -2,6 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
+import { useLogsAccess } from '../logs/logs-table.model';
 import type { OrganizationProfilePageId } from './organization-profile.types';
 import { useMembersPanelAccessModel } from './organization-profile-members-panel/organization-profile-members-panel.model';
 import { useSecurityPanelAccessModel } from './organization-profile-security-panel/organization-profile-security-panel-access.model';
@@ -16,9 +17,16 @@ export function useOrganizationProfileModel(): OrganizationProfileModel {
   const environment = useMosaicEnvironment();
   const membersAccess = useMembersPanelAccessModel();
   const apiKeysAccess = useAPIKeysAccess(organization?.id);
+  const logsAccess = useLogsAccess();
   const securityAccess = useSecurityPanelAccessModel();
 
-  if (!isLoaded || !environment || membersAccess.status === 'loading' || !apiKeysAccess.isLoaded) {
+  if (
+    !isLoaded ||
+    !environment ||
+    membersAccess.status === 'loading' ||
+    !apiKeysAccess.isLoaded ||
+    !logsAccess.isLoaded
+  ) {
     return { status: 'loading' };
   }
   if (!organization) {
@@ -34,6 +42,9 @@ export function useOrganizationProfileModel(): OrganizationProfileModel {
   }
   if (apiKeysAccess.isAvailable) {
     pages.push('apiKeys');
+  }
+  if (logsAccess.isAvailable) {
+    pages.push('logs');
   }
   return { status: 'ready', pages };
 }

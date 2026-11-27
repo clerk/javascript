@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type OrganizationProfilePageId = 'general' | 'members' | 'security' | 'billing' | 'apiKeys';
+export type OrganizationProfilePageId = 'general' | 'members' | 'security' | 'billing' | 'apiKeys' | 'logs';
 
 export interface OrganizationProfilePages {
   general: ReactNode;
@@ -8,6 +8,7 @@ export interface OrganizationProfilePages {
   security?: ReactNode;
   billing?: ReactNode;
   apiKeys?: ReactNode;
+  logs?: ReactNode;
 }
 
 export interface CustomOrganizationProfilePage {

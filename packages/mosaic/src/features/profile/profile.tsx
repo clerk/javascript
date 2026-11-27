@@ -15,6 +15,7 @@ import type {
 import { OrganizationProfileView } from '../organization-profile/organization-profile.view';
 import { OrganizationProfileApiKeysPanel } from '../organization-profile/organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from '../organization-profile/organization-profile-general-panel';
+import { OrganizationProfileLogsPanel } from '../organization-profile/organization-profile-logs-panel';
 import { OrganizationProfileMembersPanel } from '../organization-profile/organization-profile-members-panel/organization-profile-members-panel';
 import { OrganizationProfileSecurityPanel } from '../organization-profile/organization-profile-security-panel/organization-profile-security-panel';
 import { useProfilePagesController } from '../profile-pages/profile-pages.controller';
@@ -320,6 +321,7 @@ function organizationProfilePanels(
 ): OrganizationProfilePages {
   return {
     general: <OrganizationProfileGeneralPanel />,
+    logs: available.includes('logs') ? <OrganizationProfileLogsPanel /> : undefined,
     members: available.includes('members') ? <OrganizationProfileMembersPanel /> : undefined,
     security: available.includes('security') ? <OrganizationProfileSecurityPanel /> : undefined,
     apiKeys:

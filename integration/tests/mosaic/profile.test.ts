@@ -75,6 +75,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic Prof
       'Custom page',
       'General',
       'Members',
+      'Logs',
       'Team page',
     ]);
 
