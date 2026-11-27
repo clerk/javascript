@@ -2397,6 +2397,10 @@ export const esCR: LocalizationResource = {
         successMessage: 'El correo electrónico {{identifier}} se ha agregado a tu cuenta.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Para verificar esta dirección de correo electrónico, abre el enlace en el dispositivo y navegador donde lo solicitaste',
+        },
         formHint:
           'Se enviará un correo electrónico con un enlace de verificación a esta dirección de correo electrónico.',
         formSubtitle: 'Haz clic en el enlace de verificación en el correo electrónico enviado a {{identifier}}',

@@ -2389,6 +2389,9 @@ export const trTR: LocalizationResource = {
         successMessage: '{{identifier}} adresi hesabınıza eklendi.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: 'Bu e-posta adresini doğrulamak için bağlantıyı talep ettiğiniz cihaz ve tarayıcıda açın',
+        },
         formHint: 'Doğrulama bağlantısını içeren bir e-posta belirttiğiniz adrese gönderilecektir.',
         formSubtitle: '{{identifier}} adresine gönderilen doğrulama bağlantısını tıklayınız',
         formTitle: 'Doğrulama bağlantısı',

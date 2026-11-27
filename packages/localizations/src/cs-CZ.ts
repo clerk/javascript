@@ -2396,6 +2396,10 @@ export const csCZ: LocalizationResource = {
         successMessage: 'E-mail {{identifier}} byl přidán k vašemu účtu.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Pro ověření této e-mailové adresy otevřete odkaz na zařízení a v prohlížeči, ze kterých jste o něj požádali',
+        },
         formHint: 'Na tuto e-mailovou adresu bude odeslán ověřovací odkaz.',
         formSubtitle: 'Klikněte na ověřovací odkaz v e-mailu odeslaném na {{identifier}}',
         formTitle: 'Ověřovací odkaz',

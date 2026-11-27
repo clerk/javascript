@@ -2413,6 +2413,10 @@ export const isIS: LocalizationResource = {
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Til að staðfesta þetta netfang skaltu opna tengilinn á tækinu og í vafranum þar sem þú baðst um hann',
+        },
         formHint: 'Tölvupóstur sem inniheldur staðfestingartengil verður sendur á þetta netfang.',
         formSubtitle: 'Smelltu á staðfestingartengilinn í tölvupóstinum sem sendur var á {{identifier}}',
         formTitle: 'Staðfestingartengill',

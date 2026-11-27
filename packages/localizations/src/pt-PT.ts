@@ -1757,7 +1757,7 @@ export const ptPT: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'O cliente não corresponde ao esperado. Tente novamente.',
-        title: 'Erro de cliente',
+        title: 'Esta ligação de verificação é inválida neste dispositivo',
       },
       expired: {
         subtitle: 'Retorne para a aba original para continuar',
@@ -2408,6 +2408,10 @@ export const ptPT: LocalizationResource = {
         successMessage: 'O e-mail {{identifier}} foi adicionado à sua conta.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Para verificar este endereço de e-mail, abra a ligação no mesmo dispositivo e navegador em que a solicitou',
+        },
         formHint: 'Será enviado um e-mail com uma ligação de verificação para este endereço de e-mail.',
         formSubtitle: 'Clique na ligação de verificação enviada para {{identifier}}',
         formTitle: 'Ligação de verificação',

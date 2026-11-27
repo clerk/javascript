@@ -1761,7 +1761,7 @@ export const deDE: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',
-        title: 'Client-Kompatibilitätsfehler',
+        title: 'Dieser Bestätigungslink ist auf diesem Gerät ungültig',
       },
       expired: {
         subtitle: 'Kehren Sie zum ursprünglichen Tab zurück, um fortzufahren.',
@@ -2418,6 +2418,10 @@ export const deDE: LocalizationResource = {
         successMessage: 'Die E-Mail-Adresse {{identifier}} wurde Ihrem Konto hinzugefügt.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'Um diese E-Mail-Adresse zu bestätigen, öffnen Sie den Link auf demselben Gerät und im selben Browser, mit dem Sie ihn angefordert haben',
+        },
         formHint: 'An diese E-Mail-Adresse wird eine E-Mail mit einem Bestätigungslink gesendet.',
         formSubtitle: 'Klicken Sie auf den Bestätigungslink in der an {{identifier}} gesendeten E-Mail',
         formTitle: 'Bestätigungslink',

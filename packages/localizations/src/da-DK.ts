@@ -1744,7 +1744,7 @@ export const daDK: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Klient uoverensstemmelse. Prøv igen.',
-        title: 'Klient fejl',
+        title: 'Dette bekræftelseslink er ugyldigt på denne enhed',
       },
       expired: {
         subtitle: 'Vend tilbage til den oprindelige fane for at fortsætte.',
@@ -2381,6 +2381,10 @@ export const daDK: LocalizationResource = {
         successMessage: 'E-mailen {{identifier}} er blevet tilføjet til din konto.',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'For at bekræfte denne e-mailadresse skal du åbne linket på den enhed og i den browser, hvor du anmodede om det',
+        },
         formHint: 'En e-mail indeholdende et bekræftelseslink vil blive sendt til denne e-mailadresse.',
         formSubtitle: 'Klik på bekræftelseslinket i e-mailen sendt til {{identifier}}',
         formTitle: 'Bekræftelseslink',

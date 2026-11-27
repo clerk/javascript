@@ -1753,8 +1753,9 @@ export const caES: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          "Per continuar, obre l'enllaç de verificació al dispositiu i al navegador des d'on has iniciat la sessió",
+        title: "L'enllaç de verificació no és vàlid per a aquest dispositiu",
       },
       expired: {
         subtitle: 'Torna a la pestanya original per continuar.',
@@ -2400,6 +2401,10 @@ export const caES: LocalizationResource = {
         successMessage: "El correu electrònic {{identifier}} s'ha afegit al teu compte.",
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            "Per verificar aquesta adreça de correu electrònic, obre l'enllaç al dispositiu i al navegador des d'on l'has sol·licitat",
+        },
         formHint:
           "S'enviarà un correu electrònic que conté un enllaç de verificació a aquesta adreça de correu electrònic.",
         formSubtitle: "Fes clic a l'enllaç de verificació al correu enviat a {{identifier}}",

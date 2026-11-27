@@ -1733,8 +1733,8 @@ export const zhCN: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: '要继续，请在您发起登录的设备和浏览器上打开验证链接',
+        title: '验证链接在此设备上无效',
       },
       expired: {
         subtitle: '返回原始标签页继续。',
@@ -2359,6 +2359,9 @@ export const zhCN: LocalizationResource = {
         successMessage: '电子邮件 {{identifier}} 已被添加到您的账户。',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle: '要验证此电子邮件地址，请在您请求链接的设备和浏览器上打开该链接',
+        },
         formHint: '一封含有验证链接的邮件将会被发送到这个电子邮件地址。',
         formSubtitle: '点击发送到 {{identifier}} 的邮件中的验证链接',
         formTitle: '验证链接',

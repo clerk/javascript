@@ -1754,7 +1754,7 @@ export const itIT: LocalizationResource = {
     emailLink: {
       clientMismatch: {
         subtitle: 'Il client utilizzato non corrisponde al tipo di account associato.',
-        title: 'Errore di mismatch del client',
+        title: 'Questo link di verifica non è valido su questo dispositivo',
       },
       expired: {
         subtitle: 'Ritorna alla scheda originaria per continuare',
@@ -2394,6 +2394,10 @@ export const itIT: LocalizationResource = {
         successMessage: "L'indirizzo email {{identifier}} è stato aggiunto al tuo account.",
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            "Per verificare questo indirizzo email, apri il link sul dispositivo e nel browser da cui l'hai richiesto",
+        },
         formHint: 'Una email contenente un link di verifica sarà inviata a questo indirizzo email.',
         formSubtitle: 'Clicca sul link di verifica nella email inviata a {{identifier}}',
         formTitle: 'Link di verifica',

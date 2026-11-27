@@ -2411,6 +2411,10 @@ export const bnIN: LocalizationResource = {
         successMessage: 'ইমেইল {{identifier}} আপনার অ্যাকাউন্টে যোগ করা হয়েছে।',
       },
       emailLink: {
+        clientMismatch: {
+          subtitle:
+            'এই ইমেইল ঠিকানা যাচাই করতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি লিংকটির অনুরোধ করেছেন সেখানে এটি খুলুন',
+        },
         formHint: 'এই ইমেইল ঠিকানায় একটি যাচাইকরণ লিংক সহ একটি ইমেইল পাঠানো হবে।',
         formSubtitle: '{{identifier}}-এ পাঠানো ইমেইলের যাচাইকরণ লিংকে ক্লিক করুন',
         formTitle: 'যাচাইকরণ লিংক',
