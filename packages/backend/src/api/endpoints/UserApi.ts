@@ -185,8 +185,12 @@ export type PasswordHasher =
   | 'argon2id'
   | 'awscognito'
   | 'bcrypt'
+  | 'bcrypt_pbkdf2_sha1'
+  | 'bcrypt_pbkdf2_sha256'
   | 'bcrypt_peppered'
   | 'bcrypt_sha256_django'
+  | 'bcrypt_ssha'
+  | 'bcrypt_ssha256'
   | 'md5'
   | 'md5_salted'
   | 'pbkdf2_sha256'
@@ -195,6 +199,7 @@ export type PasswordHasher =
   | 'pbkdf2_sha512'
   | 'pbkdf2_sha512_hex'
   | 'phpass'
+  | 'scrypt'
   | 'scrypt_firebase'
   | 'scrypt_werkzeug'
   | 'sha256'
@@ -228,6 +233,19 @@ export type UserPasswordHashingParams = {
    *  <li> [`bcrypt_peppered`](https://github.com/heartcombo/devise) </li>
    *   <ul>
    *    <li> Used in implementations such as Devise for Ruby on Rails applications. Identical to `bcrypt` except that a `pepper` string is appended to the input before hashing. When set, `password_digest` must be in the format of `$<algorithm version>$<cost>$<salt & hash>$<pepper>`. </li>
+   *   </ul>
+   *  <li> `bcrypt_pbkdf2_sha1` and `bcrypt_pbkdf2_sha256` </li>
+   *   <ul>
+   *    <li> A PBKDF2 hash that [WorkOS](https://workos.com/docs/migrate/export-from-workos) wrapped in bcrypt on import. Pass the hash from the WorkOS export unchanged. When set, `password_digest` must be in the format of `$bcrypt-pbkdf2-sha1$v=1$i=<iterations>,kl=<key length>$<salt>$<bcrypt>` (or `$bcrypt-pbkdf2-sha256$...`). </li>
+   *    <li> _salt:_ The base64-encoded salt, without padding. </li>
+   *    <li> _bcrypt:_ The base64-encoded bcrypt hash of the lowercase hex PBKDF2 key. </li>
+   *   </ul>
+   *  <li> `bcrypt_ssha` and `bcrypt_ssha256` </li>
+   *   <ul>
+   *    <li> A salted SHA-1 or SHA-256 hash that [WorkOS](https://workos.com/docs/migrate/export-from-workos) wrapped in bcrypt on import. Pass the hash from the WorkOS export unchanged. When set, `password_digest` must be in the format of `$bcrypt-ssha$v=1$<salt>$<bcrypt>` or `$bcrypt-ssha256$v=1$<salt>$<bcrypt>`. </li>
+   *    <li> For `bcrypt_ssha256`, `$bcrypt-ssha256$v=1$sp=prefix$<salt>$<bcrypt>` means the salt was prepended to the password instead of appended. </li>
+   *    <li> _salt:_ The base64-encoded salt, without padding. </li>
+   *    <li> _bcrypt:_ The base64-encoded bcrypt hash of the lowercase hex SHA digest. </li>
    *   </ul>
    *  <li> [`md5` (insecure)](https://en.wikipedia.org/wiki/MD5) </li>
    *   <ul>
@@ -271,6 +289,11 @@ export type UserPasswordHashingParams = {
    *    <li> _rounds:_ A single character encoding a 6-bit integer representing the number of rounds used. </li>
    *    <li> _salt:_ Eight characters drawn from `[./0-9A-Za-z]`, providing a 48-bit salt. </li>
    *    <li> _encoded-checksum:_ 22 characters drawn from the same set, encoding the 128-bit checksum with MD5. </li>
+   *   </ul>
+   *  <li> [`scrypt`](https://en.wikipedia.org/wiki/Scrypt) </li>
+   *   <ul>
+   *    <li> The scrypt hash format from a [WorkOS](https://workos.com/docs/migrate/export-from-workos) export. Pass it unchanged. When set, `password_digest` must be in the format of `$scrypt$v=1$n=<N>,r=<r>,p=<p>,kl=<key length>$<salt>$<hash>`. </li>
+   *    <li> _salt_ and _hash:_ Base64-encoded, without padding. </li>
    *   </ul>
    *  <li> [`scrypt_firebase`](https://firebaseopensource.com/projects/firebase/scrypt/) </li>
    *   <ul>
