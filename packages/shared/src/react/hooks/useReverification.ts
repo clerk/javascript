@@ -4,7 +4,7 @@ import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
 import { eventMethodCalled } from '../../telemetry';
-import type { Clerk, ReverificationResult, SessionVerificationLevel } from '../../types';
+import type { Clerk, ReverificationPrefill, ReverificationResult, SessionVerificationLevel } from '../../types';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
@@ -51,6 +51,10 @@ export type NeedsReverificationParameters = {
    * The verification level required for the reverification process.
    */
   level: SessionVerificationLevel | undefined;
+  /**
+   * What the `prefill` option returned for this request, if set.
+   */
+  prefill?: ReverificationPrefill;
 };
 
 /**
@@ -58,7 +62,7 @@ export type NeedsReverificationParameters = {
  *
  * @interface
  */
-export type UseReverificationOptions = {
+export type UseReverificationOptions<Args extends any[] = any[]> = {
   /**
    * Handler for the reverification process. Opts out of using the default UI. Use this to build a custom UI.
    *
@@ -69,10 +73,27 @@ export type UseReverificationOptions = {
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
   /**
-   * When `true`, the fetcher's first argument is a `ReverificationResult` (`undefined` on the first call), and the
-   * returned function takes the remaining arguments.
+   * Returns values the reverification modal reuses instead of asking for them. It's called with the request's
+   * arguments when reverification is needed. Today it's used when the user resets a breached or compromised
+   * password to reverify: the modal saves `passwordReset.newPassword` with the reset code, so a password change
+   * form doesn't ask for its new password twice.
+   *
+   * If it throws, the request rejects with that error and no modal opens.
    */
-  passReverificationResult?: true;
+  prefill?: (...args: Args) => ReverificationPrefill | undefined;
+};
+
+/**
+ * Options for the `passReverificationResult: true` overload.
+ *
+ * @interface
+ */
+export type UseReverificationWithResultOptions<Args extends any[] = any[]> = UseReverificationOptions<Args> & {
+  /**
+   * Must be `true` to pass the reverification result as the fetcher's first argument (`undefined` on the first call).
+   * The returned function takes the remaining arguments.
+   */
+  passReverificationResult: true;
 };
 
 /**
@@ -84,25 +105,37 @@ type UseReverificationResult<
 > = (...args: Args) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>>;
 
 /**
+ * Keep the general overload last: `typeof useReverification<Fetcher>` and `Parameters<typeof useReverification>`
+ * resolve to it.
+ *
  * @interface
  */
-type UseReverification = <
-  Fetcher extends (...args: any[]) => Promise<any> | undefined,
-  Options extends UseReverificationOptions = UseReverificationOptions,
->(
-  /**
-   * A function that returns a promise.
-   */
-  fetcher: Fetcher,
-  /**
-   * Optional configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#usereverificationoptions).
-   */
-  options?: Options,
-) => Options extends { passReverificationResult: true }
-  ? UseReverificationResult<Fetcher, Parameters<Fetcher> extends [any?, ...infer Rest] ? Rest : Parameters<Fetcher>>
-  : UseReverificationResult<Fetcher>;
+type UseReverification = {
+  <Args extends any[], Return extends Promise<any> | undefined>(
+    /**
+     * A function that returns a promise. Its first argument is the reverification result.
+     */
+    fetcher: (reverification: ReverificationResult | undefined, ...args: Args) => Return,
+    /**
+     * Configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#usereverificationoptions).
+     */
+    options: UseReverificationWithResultOptions<Args>,
+  ): (...args: Args) => Promise<ExcludeClerkError<Awaited<Return>>>;
+  <Fetcher extends (...args: any[]) => Promise<any> | undefined>(
+    /**
+     * A function that returns a promise.
+     */
+    fetcher: Fetcher,
+    /**
+     * Optional configuration. See [`UseReverificationWithResultOptions`](#usereverificationwithresultoptions) below for the `passReverificationResult: true`
+     * overload.
+     */
+    options?: UseReverificationOptions<Parameters<Fetcher>> & { passReverificationResult?: undefined },
+  ): UseReverificationResult<Fetcher>;
+};
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
+  passReverificationResult?: boolean;
   openUIComponent: Clerk['__internal_openReverification'];
   telemetry: Clerk['telemetry'];
 };
@@ -145,6 +178,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
           resolvers.resolve(reverificationResult);
         };
 
+        const prefill = params.prefill?.(...args);
+
         if (params.onNeedsReverification === undefined) {
           /**
            * On success resolve the pending promise
@@ -152,6 +187,10 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
            */
           params.openUIComponent?.({
             level: level,
+            resetPassword: prefill?.passwordReset && {
+              password: prefill.passwordReset.newPassword,
+              signOutOfOtherSessions: prefill.passwordReset.signOutOfOtherSessions,
+            },
             afterVerification: complete,
             afterVerificationCancelled: cancel,
           });
@@ -160,6 +199,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
             cancel,
             complete,
             level,
+            prefill,
           });
         }
 
@@ -232,20 +272,31 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * ### Handle a password reset during reverification
  *
  * If reverification reset the password, Clerk already saved the new password. Reload the user instead of sending the
- * original password update again.
+ * original password update again. `prefill` passes the new password to the modal, so the user isn't asked for it twice.
  *
  * ```tsx
  * const updatePassword = useReverification(
- *   (reverification: ReverificationResult | undefined, currentUser: UserResource, params: UpdateUserPasswordParams) =>
+ *   (reverification, currentUser: UserResource, params: UpdateUserPasswordParams) =>
  *     reverification?.passwordReset ? currentUser.reload() : currentUser.updatePassword(params),
- *   { passReverificationResult: true },
+ *   {
+ *     passReverificationResult: true,
+ *     prefill: (_currentUser, params) => ({
+ *       passwordReset: {
+ *         newPassword: params.newPassword,
+ *         signOutOfOtherSessions: !!params.signOutOfOtherSessions,
+ *       },
+ *     }),
+ *   },
  * );
  *
  * // In the submit handler, once `user` is loaded:
  * await updatePassword(user, { newPassword, signOutOfOtherSessions: true });
  * ```
  */
-export const useReverification: UseReverification = (fetcher, options) => {
+export const useReverification = ((
+  fetcher: (...args: any[]) => Promise<any> | undefined,
+  options?: UseReverificationOptions & { passReverificationResult?: true },
+) => {
   const { __internal_openReverification, telemetry } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);
@@ -254,6 +305,7 @@ export const useReverification: UseReverification = (fetcher, options) => {
     eventMethodCalled('useReverification', {
       onNeedsReverification: Boolean(options?.onNeedsReverification),
       passReverificationResult: Boolean(options?.passReverificationResult),
+      prefill: Boolean(options?.prefill),
     }),
   );
 
@@ -264,7 +316,7 @@ export const useReverification: UseReverification = (fetcher, options) => {
   });
 
   // The returned function's parameters depend on `passReverificationResult`, which the
-  // conditional return type of `UseReverification` describes.
+  // overloads of `UseReverification` describe.
   return useCallback(
     (...args: unknown[]) => {
       const handler = createReverificationHandler({
@@ -272,8 +324,8 @@ export const useReverification: UseReverification = (fetcher, options) => {
         telemetry,
         ...optionsRef.current,
       })(fetcherRef.current);
-      return handler(...(args as Parameters<typeof fetcher>));
+      return handler(...args);
     },
     [__internal_openReverification, telemetry],
-  ) as ReturnType<UseReverification>;
-};
+  );
+}) as UseReverification;

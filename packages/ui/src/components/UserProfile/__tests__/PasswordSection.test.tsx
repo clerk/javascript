@@ -357,7 +357,7 @@ describe('PasswordSection', () => {
         });
 
       // Submits the form, which needs reverification, and returns the props the modal was opened with.
-      const submitAndOpenReverification = async () => {
+      const submitAndOpenReverification = async ({ uncheckSignOut = false } = {}) => {
         const config = createFixtures.config(f => {
           f.withReverification();
           f.withPassword();
@@ -374,11 +374,19 @@ describe('PasswordSection', () => {
         await waitFor(() => getByRole('heading', { name: /update password/i }));
         await userEvent.type(getByLabelText(/new password/i), 'testtest');
         await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
+        if (uncheckSignOut) {
+          await userEvent.click(getByLabelText(/sign out of all other devices/i));
+        }
         await userEvent.click(getByRole('button', { name: /save$/i }));
 
         await waitFor(() => expect(openReverification).toHaveBeenCalledTimes(1));
         return { fixtures, modalProps: openReverification.mock.calls[0][0]! };
       };
+
+      it("passes the form's sign-out choice to the modal when it's unchecked", async () => {
+        const { modalProps } = await submitAndOpenReverification({ uncheckSignOut: true });
+        expect(modalProps.resetPassword).toEqual({ password: 'testtest', signOutOfOtherSessions: false });
+      });
 
       it('passes the new password to the modal and skips the change after the modal resets it', async () => {
         const { fixtures, modalProps } = await submitAndOpenReverification();

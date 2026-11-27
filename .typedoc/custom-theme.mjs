@@ -621,7 +621,9 @@ function clerkParametersTable(model) {
    */
   const parseParams = (current, acc) => {
     const decl = getParameterObjectShapeDeclaration(current.type);
-    const shouldFlatten = shouldFlattenInlineObjectParameter(decl);
+    const shouldFlatten =
+      shouldFlattenInlineObjectParameter(decl) &&
+      !(this.page?.url?.endsWith('/use-reverification.mdx') && current.name === 'options');
     return shouldFlatten ? [...acc, current, ...flattenParams(current)] : [...acc, current];
   };
   /**
@@ -1337,6 +1339,22 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        */
       parametersTable: model => {
         return clerkParametersTable.call(this, model);
+      },
+      signatures: (model, options) => {
+        if (
+          !this.page?.url?.endsWith('/use-reverification.mdx') ||
+          model.name !== 'useReverification' ||
+          model.signatures?.length !== 2
+        ) {
+          return superPartials.signatures(model, options);
+        }
+        const originalSignatures = model.signatures;
+        model.signatures = [originalSignatures[0]];
+        try {
+          return superPartials.signatures(model, options).replace(/\n+#{2,3} Returns(?:\n|$)[\s\S]*$/, '');
+        } finally {
+          model.signatures = originalSignatures;
+        }
       },
       /**
        * In `compact` mode the default plugin skips `getFlattenedDeclarations`, so union object members never get rows.
