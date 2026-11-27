@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.48.1
+
+### Patch Changes
+
+- `user.update({ unsafeMetadata })` now replaces unsafe metadata with a single request instead of reloading the user first. Keys set to `null` are now stored as `null` instead of being removed, matching the behavior before 6.16.1. To remove a key, leave it out of `unsafeMetadata`. ([#10979](https://github.com/clerk/javascript/pull/10979)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 6.48.0
 
 ### Minor Changes

@@ -1,5 +1,27 @@
 # @clerk/mosaic
 
+## 0.13.0
+
+### Minor Changes
+
+- Add `Select.SelectAll` for multiple selects. It selects every enabled item, or clears them once all are selected, and shows a check when all are selected and a dash when some are. It renders nothing in a single select. While the row is rendered and enabled, Ctrl+A (⌘+A on macOS) does the same from the open list. ([#11007](https://github.com/clerk/javascript/pull/11007)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Add `Select.Separator`, a divider between items, such as below `Select.SelectAll`. Screen readers skip it.
+
+  The organization select in `OAuthConsent` now has a "Select all" row when the user picks which organizations to grant access to.
+
+- Adds 'path', 'query' and 'hash' routing modes. ([#10977](https://github.com/clerk/javascript/pull/10977)) by [@Ephem](https://github.com/Ephem)
+
+  `UserProfile`, `OrganizationProfile` and `Profile` take a `routing` prop that keeps the open page in the pathname under `path`, in a query param, or in the hash, so the page survives a reload and Back returns to the previous one. `virtual`, in memory, stays the default.
+
+  `MosaicProvider` takes a `routing` prop. `adapter` connects the URL modes to the host router (`usePathname` and `useSearchParams` from `next/navigation` is the Next.js one), `modals: 'query' | 'hash'` puts the profile modals in the URL too, and `keyPrefix` sets what the param names start with.
+
+  Modals now close when the host navigates to another pathname.
+
+### Patch Changes
+
+- Fix `Select.Trigger` with `variant='ghost'` showing a border and no hover background. Ghost triggers are borderless again and tint on hover like a ghost `Button`; outline triggers are unchanged. ([#11017](https://github.com/clerk/javascript/pull/11017)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.12.0
 
 ### Minor Changes

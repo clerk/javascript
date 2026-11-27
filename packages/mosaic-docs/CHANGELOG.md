@@ -1,5 +1,12 @@
 # @clerk/mosaic-docs
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`093c7a7`](https://github.com/clerk/javascript/commit/093c7a7f46a0f871e929122521423c772cbebf44), [`ada1d27`](https://github.com/clerk/javascript/commit/ada1d278c7583da8f7a311100be4767bef2539eb), [`55fab73`](https://github.com/clerk/javascript/commit/55fab73859133c9a6a6ac080dfd09735086b27cd)]:
+  - @clerk/mosaic@0.13.0
+
 ## 0.0.7
 
 ### Patch Changes
