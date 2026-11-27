@@ -177,6 +177,8 @@ export const signedJwt =
 export const pkTest = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 export const pkLive = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 
+export const maxDateSeconds = 8.64e12;
+
 type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
 export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
   const encoder = new TextEncoder();
