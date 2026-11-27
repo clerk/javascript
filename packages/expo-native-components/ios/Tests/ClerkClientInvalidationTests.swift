@@ -144,6 +144,30 @@ final class ClerkClientInvalidationTests: XCTestCase {
     )
   }
 
+  func testDpopProofErrorCodes() {
+    XCTAssertEqual(clerkDpopProofErrorDescriptor(ClerkClientSyncError.notConfigured).code, "E_NOT_CONFIGURED")
+    XCTAssertEqual(clerkDpopProofErrorDescriptor(CancellationError()).code, "E_CANCELLED")
+    XCTAssertEqual(clerkDpopProofErrorDescriptor(Clerk.DeviceTokenError.updateRejected).code, "E_DPOP_PROOF_FAILED")
+  }
+
+  func testHostSigningOptInReachesTheClerkOptionsOnlyWhenJSAsks() {
+    defer { ClerkNativeBridge.setHostSignsRequests(false) }
+
+    XCTAssertFalse(ClerkNativeBridge.makeClerkOptions(proxyUrl: nil).hostSignsRequests)
+    ClerkNativeBridge.setHostSignsRequests(true)
+    XCTAssertTrue(ClerkNativeBridge.makeClerkOptions(proxyUrl: nil).hostSignsRequests)
+  }
+
+  func testCreateDpopProofRejectsBeforeConfiguration() async {
+    do {
+      _ = try await ClerkNativeBridge.shared.createDpopProof(
+        method: "GET", url: "https://clerk.example.com/v1/client", authorization: nil)
+      XCTFail("Expected createDpopProof to throw")
+    } catch {
+      XCTAssertEqual(clerkDpopProofErrorDescriptor(error).code, "E_NOT_CONFIGURED")
+    }
+  }
+
   func testSyncFunctionsRejectOrReturnNilBeforeConfiguration() async {
     XCTAssertNil(ClerkNativeBridge.shared.getDeviceToken())
     do {
