@@ -4,6 +4,7 @@ import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { ScenarioPicker } from './AccessOnboarding/ScenarioPicker';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 import { useSecurityRouteAccess } from './useSecurityRouteAccess';
@@ -50,6 +51,12 @@ const OrganizationSecurityPage = lazy(() =>
   })),
 );
 
+const AccessOnboardingPage = lazy(() =>
+  import(/* webpackChunkName: "op-access-page"*/ './AccessOnboarding/AccessOnboardingPage').then(module => ({
+    default: module.AccessOnboardingPage,
+  })),
+);
+
 type OrganizationProfileRoutesProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
@@ -64,6 +71,7 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSecurityPage,
+    shouldShowAccessOnboarding,
     apiKeysProps,
   } = useOrganizationProfileContext();
 
@@ -92,6 +100,7 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     <Switch>
       {customPageRoutesWithContents}
       <Route>
+        {shouldShowAccessOnboarding ? <ScenarioPicker /> : null}
         <Route path={isGeneralPageRoot ? undefined : 'organization-general'}>
           <Switch>
             <Route index>
@@ -179,6 +188,19 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
               </Route>
             </Switch>
           </Route>
+        ) : null}
+        {shouldShowAccessOnboarding ? (
+          <Protect condition={has => has({ permission: 'org:sys_domains:manage' })}>
+            <Route path='organization-access'>
+              <Switch>
+                <Route index>
+                  <Suspense fallback={''}>
+                    <AccessOnboardingPage contentRef={contentRef} />
+                  </Suspense>
+                </Route>
+              </Switch>
+            </Route>
+          </Protect>
         ) : null}
       </Route>
     </Switch>

@@ -13,6 +13,7 @@ export const ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID = {
   BILLING: 'billing',
   API_KEYS: 'apiKeys',
   SECURITY: 'security',
+  ACCESS: 'access',
 };
 
 export const USER_BUTTON_ITEM_ID = {

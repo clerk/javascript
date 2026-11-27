@@ -6,3 +6,4 @@ export { PricingTableSBB } from './pricing-table-sbb';
 export { AnnualOnlyPlans } from './annual-only-plans';
 export { XProviderEnabled } from './x-provider-enabled';
 export { ImpersonationSignedIn } from './impersonation-signed-in';
+export { OrgAccessOnboarding } from './org-access-onboarding';

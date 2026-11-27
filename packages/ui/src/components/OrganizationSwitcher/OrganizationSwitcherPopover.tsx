@@ -14,6 +14,7 @@ import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { RootBox } from '../../elements/RootBox';
 import { Cog } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
+import { ParentSwitcherAction } from '../OrganizationProfile/AccessOnboarding/ParentSwitcherAction';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
 type OrganizationSwitcherPopoverProps = { close?: (open: boolean) => void } & PropsOfComponent<typeof PopoverCard.Root>;
@@ -155,6 +156,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
                       title={localizationKeys('organizationSwitcher.personalWorkspace')}
                     />
                   )}
+              <ParentSwitcherAction onOpen={close} />
               <OrganizationActionList
                 onCreateOrganizationClick={handleCreateOrganizationClicked}
                 onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}

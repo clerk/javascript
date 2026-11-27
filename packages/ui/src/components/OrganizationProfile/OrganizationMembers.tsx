@@ -12,10 +12,15 @@ import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
+import { useRouter } from '../../router';
 import { mqu } from '../../styledSystem';
+import { UNMANAGED_USERS_TAB } from './AccessOnboarding/navigation';
+import { protoKey, useAccessPrototype } from './AccessOnboarding/prototypeState';
+import { ParentMembersSetting } from './AccessOnboarding/SubOrganizations';
+import { unmanagedUsersOf, UnmanagedUsersPanel } from './AccessOnboarding/UnmanagedUsers';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
 import { MembersSearch } from './MembersSearch';
@@ -31,6 +36,15 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
   const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
+  // Prototype: a parent account's users outside it get their own tab, and its members a setting.
+  const { shouldShowAccessOnboarding } = useOrganizationProfileContext();
+  const accessPrototype = useAccessPrototype();
+  const { queryParams } = useRouter();
+  const showsUnmanagedUsers = shouldShowAccessOnboarding && accessPrototype.hierarchy?.role === 'parent';
+  const unmanagedCount = showsUnmanagedUsers ? unmanagedUsersOf(accessPrototype).users.length : 0;
+  const tabsBeforeUnmanaged =
+    (canReadMemberships ? 1 : 0) + (canManageMemberships ? 1 : 0) + (canManageMemberships && isDomainsEnabled ? 1 : 0);
+  const defaultTabIndex = showsUnmanagedUsers && queryParams.tab === UNMANAGED_USERS_TAB ? tabsBeforeUnmanaged : 0;
 
   const [query, setQuery] = useState('');
   const [search, setSearch] = useState('');
@@ -81,7 +95,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
               </Header.Root>
             </Animated>
             <Card.Alert>{card.error}</Card.Alert>
-            <Tabs>
+            <Tabs defaultIndex={defaultTabIndex}>
               <TabsList sx={t => ({ gap: t.space.$2 })}>
                 {canReadMemberships && (
                   <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
@@ -118,6 +132,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     )}
                   </Tab>
                 )}
+                {showsUnmanagedUsers && (
+                  <Tab localizationKey={protoKey('Unmanaged users')}>
+                    {unmanagedCount > 0 && (
+                      <NotificationCountBadge
+                        notificationCount={unmanagedCount}
+                        colorScheme='outline'
+                      />
+                    )}
+                  </Tab>
+                )}
               </TabsList>
               <TabPanels>
                 {canReadMemberships && (
@@ -129,6 +153,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                         width: '100%',
                       }}
                     >
+                      {showsUnmanagedUsers ? <ParentMembersSetting /> : null}
                       <Flex
                         gap={2}
                         direction='col'
@@ -174,6 +199,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 {canManageMemberships && isDomainsEnabled && (
                   <TabPanel sx={{ width: '100%' }}>
                     <OrganizationMembersTabRequests />
+                  </TabPanel>
+                )}
+                {showsUnmanagedUsers && (
+                  <TabPanel sx={{ width: '100%' }}>
+                    <UnmanagedUsersPanel />
                   </TabPanel>
                 )}
               </TabPanels>

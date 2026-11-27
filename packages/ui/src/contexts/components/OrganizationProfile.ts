@@ -30,6 +30,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   shouldShowSelfServeSSO: boolean;
   shouldShowSelfServeDirectorySync: boolean;
   shouldShowSecurityPage: boolean;
+  shouldShowAccessOnboarding: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -65,6 +66,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const shouldShowSelfServeSSO =
     environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
+  const shouldShowAccessOnboarding = Boolean(ctx.__internal_accessOnboarding);
+
   const shouldShowSelfServeDirectorySync =
     environment.userSettings.enterpriseSSO.self_serve_sso &&
     environment.userSettings.enterpriseSSO.self_serve_directory_sync &&
@@ -81,8 +84,9 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
         shouldShowBilling,
         environment,
         shouldShowSecurityPage,
+        shouldShowAccessOnboarding,
       ),
-    [customPages, shouldShowBilling, shouldShowSecurityPage],
+    [customPages, shouldShowBilling, shouldShowSecurityPage, shouldShowAccessOnboarding],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -111,5 +115,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     shouldShowSelfServeSSO,
     shouldShowSelfServeDirectorySync,
     shouldShowSecurityPage,
+    shouldShowAccessOnboarding,
   };
 };
