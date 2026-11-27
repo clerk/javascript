@@ -1,6 +1,7 @@
 import { app, protocol } from 'electron';
 
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
+import { writeAgentRulesOnce } from './agent-rules';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
 import { setupMissingRendererOAuthTransportIpcHandlers, setupOAuthTransportIpcHandlers } from './oauth-transport';
 import { setupPasskeysMain } from './passkey-handlers';
@@ -47,6 +48,8 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
       'Clerk: createClerkBridge requires a storage adapter. Pass createClerkBridge({ storage: storage() }) from @clerk/electron/storage, or provide a custom storage adapter.',
     );
   }
+
+  writeAgentRulesOnce();
 
   let ownsSingleInstanceLock = false;
 

@@ -29,6 +29,7 @@ export default defineConfig(({ watch, env }) => {
       './src/phone/index.ts',
       './src/workerTimers/index.ts',
       './src/types/index.ts',
+      './src/agentRules/index.ts',
       './src/dom/*.ts',
       './src/ui/index.ts',
       './src/keyless/index.ts',

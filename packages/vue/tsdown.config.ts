@@ -9,7 +9,14 @@ export default defineConfig(overrideOptions => {
 
   return {
     clean: true,
-    entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts', './src/types/index.ts'],
+    entry: [
+      './src/index.ts',
+      './src/experimental.ts',
+      './src/internal.ts',
+      './src/errors.ts',
+      './src/types/index.ts',
+      './src/vite.ts',
+    ],
     format: ['esm'],
     fixedExtension: false,
     sourcemap: true,

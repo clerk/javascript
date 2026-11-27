@@ -96,6 +96,7 @@
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
+    "AGENTS.md",
     "dist",
     "native-components",
     "native",
