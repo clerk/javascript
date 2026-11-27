@@ -1,5 +1,6 @@
 import type {
   ActClaim,
+  AgentActClaim,
   Clerk,
   ClerkOptions,
   ClientResource,
@@ -23,6 +24,7 @@ export interface VueClerkInjectionKeyType {
     userId: string | null | undefined;
     sessionId: string | null | undefined;
     actor: ActClaim | null | undefined;
+    agent: AgentActClaim | null | undefined;
     sessionStatus: SessionStatusClaim | null | undefined;
     sessionClaims: JwtPayload | null | undefined;
     orgId: string | null | undefined;

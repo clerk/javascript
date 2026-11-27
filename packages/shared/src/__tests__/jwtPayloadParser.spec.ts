@@ -42,6 +42,163 @@ const authFromFeaturePermissionMask = (fpm: string) => {
 };
 
 describe('JWTPayloadToAuthObjectProperties', () => {
+  test('exposes the agent task session from the agt claim and leaves actor unset', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    });
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
+    expect(actor).toBeUndefined();
+  });
+
+  test('exposes the agent from the agt claim on a v1 payload', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as any);
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
+    expect(actor).toBeUndefined();
+  });
+
+  test('keeps both actor and agent when the payload has act and agt', () => {
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      act: { sub: 'impersonator' },
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com' },
+    } as any);
+
+    expect(actor).toEqual({ sub: 'impersonator' });
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: false });
+  });
+
+  test('exposes a Poppy session from the agt claim, with no task_id', () => {
+    const clientId = 'https://agent.example.com/client.json';
+    const { agent, actor } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: {
+        id: clientId,
+        reg: clientId,
+        poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123', agent_id: 'agent-7' },
+        rst: true,
+      },
+    } as any);
+    expect(agent).toStrictEqual({
+      sub: clientId,
+      type: 'agent',
+      task_id: undefined,
+      restricted: true,
+      poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123', agent_id: 'agent-7' },
+    });
+    expect(actor).toBeUndefined();
+  });
+
+  test('leaves agent_id undefined for a Poppy session without one', () => {
+    const clientId = 'https://agent.example.com/client.json';
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: {
+        id: clientId,
+        reg: clientId,
+        poppy: { session_id: 'ps_123', client_id: clientId, user_id: 'pu_123' },
+        rst: true,
+      },
+    } as any);
+    expect(agent?.poppy).toStrictEqual({
+      session_id: 'ps_123',
+      client_id: clientId,
+      user_id: 'pu_123',
+      agent_id: undefined,
+    });
+    expect(agent?.task_id).toBeUndefined();
+  });
+
+  test('leaves poppy undefined for an agent task session', () => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', poppy: null },
+    } as any);
+    expect(agent?.poppy).toBeUndefined();
+    expect(agent?.task_id).toBe('agttsk_456');
+  });
+
+  test.each([
+    ['a string', 'ps_123'],
+    ['an empty object', {}],
+    ['non-string fields', { session_id: 1, client_id: [], user_id: {}, agent_id: 2 }],
+  ])('poppy is still set for a malformed poppy value: %s', (_name, poppy) => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', reg: 'https://clerk.com', poppy },
+    } as any);
+    expect(agent?.poppy).toStrictEqual({ session_id: '', client_id: '', user_id: '', agent_id: undefined });
+  });
+
+  test('sets restricted to true when the agt claim has rst true', () => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', rst: true },
+    });
+
+    expect(agent).toEqual({ sub: 'agent_123', type: 'agent', task_id: 'agttsk_456', restricted: true });
+  });
+
+  test.each([
+    ['absent', undefined],
+    ['false', false],
+    ['the string "true"', 'true'],
+    ['1', 1],
+  ])('sets restricted to false when the agt claim rst is %s', (_name, rst) => {
+    const { agent } = JWTPayloadToAuthObjectProperties({
+      ...baseClaims,
+      v: 2,
+      agt: { id: 'agent_123', tsk: 'agttsk_456', reg: 'https://clerk.com', rst },
+    } as any);
+
+    expect(agent?.restricted).toBe(false);
+  });
+
+  test.each([
+    ['an empty object', {}, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a missing tsk', { id: 'agent_123' }, { sub: 'agent_123', type: 'agent', task_id: undefined, restricted: false }],
+    ['a missing id', { tsk: 'agttsk_456' }, { sub: '', type: 'agent', task_id: 'agttsk_456', restricted: false }],
+    ['empty strings', { id: '', tsk: '' }, { sub: '', type: 'agent', task_id: '', restricted: false }],
+    ['non-string fields', { id: 1, tsk: 2 }, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a string', 'x', { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['a number', 1, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['an array', [], { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['true', true, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['false', false, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['zero', 0, { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+    ['an empty string', '', { sub: '', type: 'agent', task_id: undefined, restricted: false }],
+  ])('agent is still non-null for a malformed agt claim: %s', (_name, agt, expected) => {
+    expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toEqual(expected);
+  });
+
+  test.each([
+    ['null', null],
+    ['undefined', undefined],
+  ])('agent is null when the agt claim is %s', (_name, agt) => {
+    expect(JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2, agt } as any).agent).toBeNull();
+  });
+
+  test('agent is null when the agt claim is absent', () => {
+    const v2 = JWTPayloadToAuthObjectProperties({ ...baseClaims, v: 2 });
+    const v1 = JWTPayloadToAuthObjectProperties({ ...baseClaims, act: { sub: 'impersonator' } } as any);
+
+    expect(v2.agent).toBeNull();
+    expect(v1.agent).toBeNull();
+    expect(v1.actor).toEqual({ sub: 'impersonator' });
+  });
+
   test('auth object with JWT v2 does not produces anything org related if there is no org active', () => {
     const { sessionClaims: v2Claims, ...signedInAuthObjectV2 } = JWTPayloadToAuthObjectProperties({
       ...baseClaims,
