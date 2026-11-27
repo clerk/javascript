@@ -46,6 +46,11 @@
       "import": "./dist/components/avatar.js",
       "default": "./dist/components/avatar.js"
     },
+    "./components/avatar-group": {
+      "types": "./dist/components/avatar-group.d.ts",
+      "import": "./dist/components/avatar-group.js",
+      "default": "./dist/components/avatar-group.js"
+    },
     "./components/badge": {
       "types": "./dist/components/badge.d.ts",
       "import": "./dist/components/badge.js",

@@ -11,6 +11,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { mediaSizes } from '../../styles/media-size.styles';
 import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
+import { AvatarContext as AvatarDefaultsContext } from './avatar.context';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -38,9 +39,12 @@ export interface AvatarProps extends MosaicComponentProps<'span'> {
 }
 
 const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function MosaicAvatarRoot(
-  { bordered = true, shape = 'circle', size = 'md', render, xstyle, ...rest },
+  { bordered = true, shape: shapeProp, size: sizeProp, render, xstyle, ...rest },
   ref,
 ) {
+  const defaults = React.useContext(AvatarDefaultsContext);
+  const shape = shapeProp ?? defaults.shape ?? 'circle';
+  const size = sizeProp ?? defaults.size ?? 'md';
   const [status, setStatus] = React.useState<ImageLoadingStatus>('idle');
   const value = React.useMemo<AvatarContextValue>(
     () => ({ bordered, status, onStatusChange: setStatus }),
@@ -62,6 +66,7 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
           sizes[size],
           interactive && styles.interactive,
           interactive && focusOutline.visible,
+          defaults.styles,
           xstyle,
         ),
         rest,
