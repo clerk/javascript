@@ -68,12 +68,12 @@ export type GetOrganizationParams = (
 export type UpdateParams = {
   /**
    * Lets Organization admins set up enterprise SSO in `<OrganizationProfile />`. Requires Clerk
-   * Organizations to be enabled for the instance and a Pro or Business plan in production.
+   * Organizations to be enabled for the instance and a [Pro or Business plan](https://clerk.com/pricing) in production.
    */
   selfServeSsoEnabled?: boolean;
   /**
    * Lets Organization admins set up Directory Sync in `<OrganizationProfile />`. Requires self-serve
-   * SSO for the Organization, an SSO connection, and a Pro or Business plan in production.
+   * SSO for the Organization, an SSO connection, and a [Pro or Business plan](https://clerk.com/pricing) in production.
    */
   selfServeDirectorySyncEnabled?: boolean;
   /** The name to update the Organization with. */
