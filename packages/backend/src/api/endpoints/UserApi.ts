@@ -506,7 +506,7 @@ export type SetPasswordCompromisedParams = {
   revokeAllSessions?: boolean;
 };
 
-/** @generateWithEmptyComment */
+/** @inline */
 export type MergeUserParams = {
   /** The ID of the user to merge into the other user. This user is deleted. */
   fromUserId: string;

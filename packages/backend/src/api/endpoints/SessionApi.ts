@@ -43,7 +43,7 @@ export type CreateSessionParams = {
   userId: string;
 };
 
-/** @generateWithEmptyComment */
+/** @inline */
 export type UpdateSessionParams = {
   /** When the session should expire. Must be at least 5 minutes and at most 10 years from now. */
   expireAt: Date;
