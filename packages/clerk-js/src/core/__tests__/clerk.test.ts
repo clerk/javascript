@@ -1138,6 +1138,29 @@ describe('Clerk singleton', () => {
           expect(sut.status).toBe('degraded');
         });
 
+        it('applies the cached environment before notifying listeners of the cached client', async () => {
+          const clientInstance = { fetch: mockClientFetch, signedInSessions: [] };
+          vi.mocked(Client.getOrCreateInstance)
+            .mockReturnValueOnce(clientInstance as any)
+            .mockReturnValueOnce(clientInstance as any);
+          mockClientFetch.mockRejectedValue(
+            new ClerkRuntimeError('Network request failed.', { code: 'network_error' }),
+          );
+
+          const sut = new Clerk(productionPublishableKey);
+          const unloadedEnvironment = sut.__internal_environment;
+          sut.__internal_getCachedResources = vi.fn(() =>
+            Promise.resolve({ client: null, environment: { display_config: { id: 'display_config_cached' } } as any }),
+          );
+          const environmentsSeenByListeners: unknown[] = [];
+          sut.addListener(() => environmentsSeenByListeners.push(sut.__internal_environment));
+          await sut.load({ standardBrowser: false });
+
+          expect(sut.status).toBe('degraded');
+          expect(environmentsSeenByListeners.length).toBeGreaterThan(0);
+          expect(environmentsSeenByListeners).not.toContain(unloadedEnvironment);
+        });
+
         describe('when the initial requests stall', () => {
           beforeEach(() => {
             vi.useFakeTimers();
