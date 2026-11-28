@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { render, screen } from '@/test/utils';
 
 import { CardStateProvider } from '../../../elements/contexts';
 import { clearFetchCache, useFetch } from '../../../hooks';
@@ -316,6 +316,44 @@ describe('SignInFactorOneCodeForm', () => {
       const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });
 
       expect(getByLabelText('Enter verification code')).toBeInTheDocument();
+    });
+
+    it('does not render a back button that has no accessible name', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+
+      const { container } = renderWithProviders(
+        <SignInFactorOneCodeForm
+          {...defaultProps}
+          onBackLinkClicked={vi.fn()}
+        />,
+        { wrapper },
+      );
+
+      expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+      expect(container.querySelector('[class*="cl-formButtonReset"]')).toBeNull();
+    });
+
+    it('renders a named back button when a label is provided', async () => {
+      const onBackLinkClicked = vi.fn();
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+      });
+
+      const { userEvent } = renderWithProviders(
+        <SignInFactorOneCodeForm
+          {...defaultProps}
+          onBackLinkClicked={onBackLinkClicked}
+          backLinkLabel={localizationKeys('backButton')}
+        />,
+        { wrapper },
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Back' }));
+      expect(onBackLinkClicked).toHaveBeenCalledOnce();
     });
   });
 });
