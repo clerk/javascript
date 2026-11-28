@@ -84,7 +84,15 @@ interface ClerkMiddleware {
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, options] = parseHandlerAndOptions(args);
   return eventHandler(async event => {
-    const clerkRequest = toWebRequest(event);
+    let clerkRequest: Request;
+    try {
+      clerkRequest = toWebRequest(event);
+    } catch (e) {
+      if (e instanceof TypeError) {
+        throw createError({ statusCode: 400, statusMessage: 'Bad Request' });
+      }
+      throw e;
+    }
 
     // Resolve keyless in development if keys are missing
     let keylessClaimUrl: string | undefined;

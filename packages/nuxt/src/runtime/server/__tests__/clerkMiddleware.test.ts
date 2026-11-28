@@ -84,6 +84,18 @@ describe('clerkMiddleware(params)', () => {
     expect(response.status).toBe(400);
   });
 
+  test('returns 400 when the request path starts with // followed by an invalid host character', async () => {
+    const app = createApp();
+    const handler = toWebHandler(app);
+    app.use(clerkMiddleware());
+    app.use(
+      '/',
+      eventHandler(() => ({ status: 'ok' })),
+    );
+    const response = await handler(new Request('http://localhost//%5coast.me'));
+    expect(response.status).toBe(400);
+  });
+
   test('renders route as normally when used without params', async () => {
     const app = createApp();
     const handler = toWebHandler(app);
